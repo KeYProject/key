@@ -8,6 +8,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
@@ -16,7 +17,8 @@ public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeat
 
     private final Function mul;
 
-    protected AbstractMonomialSmallerThanFeature(IIntLdt numbers) {
+    protected AbstractMonomialSmallerThanFeature(TermOrdering termOrdering, IIntLdt numbers) {
+        super(termOrdering);
         this.mul = numbers.getMul();
     }
 

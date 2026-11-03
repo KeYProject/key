@@ -137,12 +137,14 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     @Override
     protected Feature createMonomialsSmallerThanFeature(ProjectionToTerm<Goal> left,
             ProjectionToTerm<Goal> right, IIntLdt numbers) {
-        return MonomialsSmallerThanFeature.create(left, right, numbers);
+        return MonomialsSmallerThanFeature.create(left, right,
+            StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
     @Override
     protected Feature createAtomSmallerThanFeature(String left, String right, IIntLdt numbers) {
-        return AtomsSmallerThanFeature.create(instOf(left), instOf(right), numbers);
+        return AtomsSmallerThanFeature.create(instOf(left), instOf(right),
+            StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
     @Override
@@ -254,12 +256,14 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     @Override
     protected Feature createTermSmallerThanFeature(ProjectionToTerm<Goal> left,
             ProjectionToTerm<Goal> right) {
-        return TermSmallerThanFeature.create(left, right);
+        return TermSmallerThanFeature.create(left, right,
+            StaticFeatureCollection.createTermOrdering());
     }
 
     @Override
     protected Feature createMonomialSmallerThan(String left, String right, IIntLdt numbers) {
-        return MonomialsSmallerThanFeature.create(instOf(left), instOf(right), numbers);
+        return MonomialsSmallerThanFeature.create(instOf(left), instOf(right),
+            StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
     @Override

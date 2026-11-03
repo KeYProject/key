@@ -201,8 +201,18 @@ public class ProveTest {
     /**
      * Override this method in order to change reload behaviour.
      */
+    /**
+     * Skips the save-and-reload step of provable cases when set to {@code false}
+     * ({@code -Dkey.rap.reload=false}, forwarded by the gradle tasks via
+     * {@code -PrapReload=false}). Reloading roughly doubles the wall time of a full run and
+     * also writes the reproduced proofs over the {@code .proof} files in the examples tree,
+     * which is unwanted noise when the run only gates prover behavior or timing.
+     */
+    private static final boolean RELOAD_ALLOWED =
+        Boolean.parseBoolean(System.getProperty("key.rap.reload", "true"));
+
     private void reload(Path proofFile, Proof loadedProof) throws Exception {
-        if (reloadEnabled) {
+        if (reloadEnabled && RELOAD_ALLOWED) {
             System.err.println("Test reloadability.");
             // Save the available proof to a temporary file.
             ProofSaver.saveToFile(proofFile, loadedProof);

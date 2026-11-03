@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.logic.LexPathOrdering;
-import de.uka.ilkd.key.logic.TermOrdering;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.util.collection.ImmutableList;
@@ -20,7 +19,11 @@ import org.key_project.util.collection.ImmutableList;
  */
 public abstract class SmallerThanFeature extends BinaryTacletAppFeature<Goal> {
 
-    private final TermOrdering termOrdering = new LexPathOrdering();
+    private final TermOrdering termOrdering;
+
+    protected SmallerThanFeature(TermOrdering termOrdering) {
+        this.termOrdering = termOrdering;
+    }
 
     protected boolean lessThan(Term t1, Term t2,
             PosInOccurrence focus, Goal currentGoal) {

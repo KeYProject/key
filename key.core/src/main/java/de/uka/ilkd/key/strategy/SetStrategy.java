@@ -78,7 +78,8 @@ public class SetStrategy extends AbstractFeatureStrategy<Goal> implements Compon
         bindRuleSet(d, "setComm",
             add(applyTF("commLeft", not(or(stf.unionF, stf.intersectF))),
                 applyTF("commRight", not(or(stf.unionF, stf.intersectF))),
-                SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), stf),
+                SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), stf,
+                    StaticFeatureCollection.createTermOrdering()),
                 longConst(COMMUTE)));
         return d;
     }

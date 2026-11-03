@@ -9,6 +9,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.SetTermFeatures;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -24,7 +25,8 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
 
     private SetsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            SetTermFeatures setFeatures) {
+            SetTermFeatures setFeatures, TermOrdering termOrdering) {
+        super(termOrdering);
         this.left = left;
         this.right = right;
         this.setFeatures = setFeatures;
@@ -32,8 +34,8 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
 
     public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            SetTermFeatures setFeatures) {
-        return new SetsSmallerThanFeature(left, right, setFeatures);
+            SetTermFeatures setFeatures, TermOrdering termOrdering) {
+        return new SetsSmallerThanFeature(left, right, setFeatures, termOrdering);
     }
 
 

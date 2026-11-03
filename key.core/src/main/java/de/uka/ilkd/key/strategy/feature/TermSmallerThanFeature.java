@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.TermOrdering;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -21,11 +22,14 @@ public class TermSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm<Goal> left, right;
 
-    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
-        return new TermSmallerThanFeature(left, right);
+    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            TermOrdering termOrdering) {
+        return new TermSmallerThanFeature(left, right, termOrdering);
     }
 
-    private TermSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    private TermSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+            TermOrdering termOrdering) {
+        super(termOrdering);
         this.left = left;
         this.right = right;
     }

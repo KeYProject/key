@@ -4,11 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.ldt.IIntLdt;
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -48,8 +49,8 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
 
 
     private MonomialsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IIntLdt numbers) {
-        super(numbers);
+            TermOrdering termOrdering, IIntLdt numbers) {
+        super(termOrdering, numbers);
         this.left = left;
         this.right = right;
         this.add = numbers.getAdd();
@@ -67,8 +68,8 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IIntLdt numbers) {
-        return new MonomialsSmallerThanFeature(left, right, numbers);
+            TermOrdering termOrdering, IIntLdt numbers) {
+        return new MonomialsSmallerThanFeature(left, right, termOrdering, numbers);
     }
 
     @Override
@@ -173,7 +174,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     private class MonomialCollector extends Collector {
-        protected void collect(Term te, MutableState mState, Services services) {
+        protected void collect(Term te, MutableState mState, LogicServices services) {
             if (te.op() == add) {
                 collect(te.sub(0), mState, services);
                 collect(te.sub(1), mState, services);
@@ -182,7 +183,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
             }
         }
 
-        private Term stripOffLiteral(Term te, MutableState mState, Services services) {
+        private Term stripOffLiteral(Term te, MutableState mState, LogicServices services) {
             if (!(hasCoeff.compute(te, mState, services) instanceof TopRuleAppCost))
             // we leave out literals/coefficients on the right, because we
             // do not want to compare these literals

@@ -8,6 +8,7 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -37,8 +38,8 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
     private final Function Z;
 
     private AtomsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IIntLdt numbers) {
-        super(numbers);
+            TermOrdering termOrdering, IIntLdt numbers) {
+        super(termOrdering, numbers);
         this.left = left;
         this.right = right;
         this.Z = numbers.getNumberSymbol();
@@ -46,8 +47,8 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
 
 
     public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IIntLdt numbers) {
-        return new AtomsSmallerThanFeature(left, right, numbers);
+            TermOrdering termOrdering, IIntLdt numbers) {
+        return new AtomsSmallerThanFeature(left, right, termOrdering, numbers);
     }
 
     @Override
