@@ -7,7 +7,6 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 import de.uka.ilkd.key.strategy.StaticFeatureCollection;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
@@ -83,18 +82,6 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public Feature createReducibleMonomialFeature(ProjectionToTerm<Goal> dividend,
-            ProjectionToTerm<Goal> divisor) {
-        return ReducibleMonomialsFeature.createReducible(dividend, divisor, JMonomial::create);
-    }
-
-    @Override
-    public Feature createTrivialMonomialLCRFeature(ProjectionToTerm<Goal> a,
-            ProjectionToTerm<Goal> b) {
-        return TrivialMonomialLCRFeature.create(a, b, JMonomial::create);
-    }
-
-    @Override
     public ProjectionToTerm<Goal> createReduceMonomialsProjection(
             ProjectionToTerm<Goal> dividend, ProjectionToTerm<Goal> divisor) {
         return ReduceMonomialsProjection.create(dividend, divisor);
@@ -122,22 +109,6 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     public ProjectionToTerm<Goal> createCoeffGcdProjection(ProjectionToTerm<Goal> monomialLeft,
             ProjectionToTerm<Goal> monomialRight) {
         return CoeffGcdProjection.create(monomialLeft, monomialRight);
-    }
-
-    @Override
-    public Feature createExactlyBoundedInEquationMultFeature(
-            ProjectionToTerm<Goal> mult1Candidate, ProjectionToTerm<Goal> mult2Candidate,
-            TermFeature targetCandidate) {
-        return new IsBoundedByInequationFeature<>(mult1Candidate, mult2Candidate,
-            targetCandidate, JMonomial::create);
-    }
-
-    @Override
-    public Feature createTotalyBoundedInEquationMultFeature(
-            ProjectionToTerm<Goal> mult1Candidate, ProjectionToTerm<Goal> mult2Candidate,
-            ProjectionToTerm<Goal> targetCandidate) {
-        return InEquationMultFeature.totallyBounded(mult1Candidate, mult2Candidate,
-            targetCandidate, JMonomial::create);
     }
 
     @Override

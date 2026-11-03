@@ -8,6 +8,7 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
@@ -55,7 +56,8 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE),
             new JavaFeatureConstants(),
-            proof.getServices().getTypeConverter().getIntegerLDT());
+            proof.getServices().getTypeConverter().getIntegerLDT(),
+            JMonomial::create);
         this.proof = proof;
         init();
     }

@@ -34,11 +34,6 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     TermFeature createEliminableQuantifier();
 
-    Feature createReducibleMonomialFeature(ProjectionToTerm<G> dividend,
-            ProjectionToTerm<G> divisor);
-
-    Feature createTrivialMonomialLCRFeature(ProjectionToTerm<G> a, ProjectionToTerm<G> b);
-
     ProjectionToTerm<G> createReduceMonomialsProjection(ProjectionToTerm<G> dividend,
             ProjectionToTerm<G> divisor);
 
@@ -53,14 +48,6 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     ProjectionToTerm<G> createCoeffGcdProjection(
             ProjectionToTerm<G> monomialLeft, ProjectionToTerm<G> monomialRight);
-
-    Feature createExactlyBoundedInEquationMultFeature(
-            ProjectionToTerm<G> mult1Candidate, ProjectionToTerm<G> mult2Candidate,
-            TermFeature targetCandidate);
-
-    Feature createTotalyBoundedInEquationMultFeature(
-            ProjectionToTerm<G> mult1Candidate, ProjectionToTerm<G> mult2Candidate,
-            ProjectionToTerm<G> targetCandidate);
 
     Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
             ProjectionToTerm<G> right);

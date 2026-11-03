@@ -6,6 +6,7 @@ package org.key_project.prover.strategy;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.*;
@@ -16,6 +17,7 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.*;
 import org.key_project.prover.strategy.costbased.feature.*;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.AssumptionProjection;
 import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
@@ -77,10 +79,12 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     final FeatureConstants<G> fc;
 
+    private final BiFunction<Term, LogicServices, Monomial> monomialBuilder;
+
     public IntegerStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
             boolean nonLinearArithmeticEnabled, boolean divAndModuloReasoningEnabled,
             boolean stopAtFirstNonCloseableGoal, FeatureConstants<G> featureConstants,
-            IIntLdt numbers) {
+            IIntLdt numbers, BiFunction<Term, LogicServices, Monomial> monomialBuilder) {
         this.tf = tf;
         this.ff = ff;
         // determine configuration
@@ -96,6 +100,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         this.fc = featureConstants;
 
         this.numbers = numbers;
+        this.monomialBuilder = monomialBuilder;
     }
 
     protected void init() {
@@ -437,7 +442,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                         atLeastTwoLCEquation),
                     add(FocusInAntecFeature.getInstance(),
                         applyTF(FocusFormulaProjection.<G>create(), atLeastTwoLCEquation))),
-                fc.createReducibleMonomialFeature(focus, eqLeft));
+                ReducibleMonomialsFeature.createReducible(focus, eqLeft, monomialBuilder));
 
         final Feature eqMonomialFeature = add(
             not(fc.directlyBelowSymbolAtIndex(tf.mul, -1)),
@@ -462,8 +467,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             ifZero(MatchedAssumesFeature.create(),
                 add(MonomialsSmallerThanFeature.<G>create(instOf("cpLeft1"), instOf("cpLeft2"),
                     createTermOrdering(), numbers),
-                    not(fc.createTrivialMonomialLCRFeature(instOf("cpLeft1"),
-                        instOf("cpLeft2"))))));
+                    not(TrivialMonomialLCRFeature.<G>create(instOf("cpLeft1"),
+                        instOf("cpLeft2"), monomialBuilder)))));
     }
 
     private void setupDivModDivision(RuleSetDispatchFeature d) {
@@ -475,7 +480,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         final Feature checkNumTerm = ifZero(
             add(not(applyTF(numTerm, tf.addF)),
-                fc.createReducibleMonomialFeature(numTerm, denomLC)),
+                ReducibleMonomialsFeature.createReducible(numTerm, denomLC, monomialBuilder)),
             add(instantiate("polyDivCoeff",
                 fc.createReduceMonomialsProjection(numTerm, denomLC)),
                 inftyConst()));
@@ -557,8 +562,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                             instOf("aePseudoLeft"), createTermOrdering(), numbers),
                         let(divisor, StaticFeatureCollection.instOf("aePseudoLeft"),
                             let(dividend, StaticFeatureCollection.instOf("aePseudoTargetLeft"),
-                                add(fc.createReducibleMonomialFeature(dividend,
-                                    divisor),
+                                add(ReducibleMonomialsFeature.createReducible(dividend,
+                                    divisor, monomialBuilder),
                                     instantiate("aePseudoTargetFactor",
                                         fc.createReduceMonomialsProjection(dividend,
                                             divisor)))))))));
@@ -858,12 +863,12 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         final Feature totallyBounded = not(sum(intRel, relevantSequentFormulas,
             not(add(
-                fc.createTotalyBoundedInEquationMultFeature(instOf("multLeft"),
+                InEquationMultFeature.<G>totallyBounded(instOf("multLeft"),
                     instOf("multFacLeft"),
-                    sub(intRel, 0)),
+                    sub(intRel, 0), monomialBuilder),
                 intRelation))));
-        final Feature exactlyBounded = fc.createExactlyBoundedInEquationMultFeature(
-            instOf("multLeft"), instOf("multFacLeft"), tf.intRelation);
+        final Feature exactlyBounded = new IsBoundedByInequationFeature<G>(
+            instOf("multLeft"), instOf("multFacLeft"), tf.intRelation, monomialBuilder);
 
         // this is a bit hackish
         //
@@ -962,7 +967,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                     SumFeature.createSum(applyTF(divisor, tf.nonCoeffMonomial),
                         not(eq(dividend, divisor)), applyTFNonStrict("divXBoundPos", tf.posLiteral),
                         applyTFNonStrict("divXBoundNeg", tf.negLiteral),
-                        fc.createReducibleMonomialFeature(dividend, divisor),
+                        ReducibleMonomialsFeature.createReducible(dividend, divisor,
+                            monomialBuilder),
                         instantiate(
                             "divY", fc.createReduceMonomialsProjection(dividend,
                                 divisor))))))));
@@ -989,8 +995,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                                         fc.createEqTermFeature(divisor))),
                                     applyTFNonStrict("divXBoundNonPos", tf.nonPosLiteral),
                                     applyTFNonStrict("divXBoundNonNeg", tf.nonNegLiteral),
-                                    fc.createReducibleMonomialFeature(dividend,
-                                        divisor),
+                                    ReducibleMonomialsFeature.createReducible(dividend,
+                                        divisor, monomialBuilder),
                                     let(quotient,
                                         fc.createReduceMonomialsProjection(dividend,
                                             divisor),
