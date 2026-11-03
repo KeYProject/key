@@ -14,6 +14,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;

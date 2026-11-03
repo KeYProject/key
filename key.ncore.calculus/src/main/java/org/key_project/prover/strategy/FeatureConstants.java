@@ -9,6 +9,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -123,4 +124,11 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
     Feature countOccurrences(ProjectionToTerm<G> target);
 
     TermFeature containsExecutableCodeTF();
+
+    TermGenerator<G> heuristicGenerator(TriggerTreatment option);
+
+    Feature computeInstantiationCostOf(ProjectionToTerm<G> instOfT,
+            TriggerTreatment triggerTreatment);
+
+    Feature getInstantiationTieBreakFeature(TermBuffer<G> varInst, String s);
 }

@@ -115,8 +115,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
 
     @Override
     protected Feature isBelow(TermFeature t) {
-        final de.uka.ilkd.key.strategy.termProjection.TermBuffer superTerm =
-            new de.uka.ilkd.key.strategy.termProjection.TermBuffer();
+        final TermBuffer superTerm = new TermBuffer();
         return not(sum(superTerm, SuperTermGenerator.upwards(any(), proof.getServices()),
             not(applyTF(superTerm, t))));
     }

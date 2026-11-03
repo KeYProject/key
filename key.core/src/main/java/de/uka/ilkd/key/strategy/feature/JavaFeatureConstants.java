@@ -10,7 +10,9 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 import de.uka.ilkd.key.strategy.StaticFeatureCollection;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationTieBreakFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
@@ -22,6 +24,8 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.FeatureConstants;
 import org.key_project.prover.strategy.costbased.feature.*;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.InstantiationCostScalerFeature;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -276,5 +280,21 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     @Override
     public TermFeature containsExecutableCodeTF() {
         return ContainsExecutableCodeTermFeature.PROGRAMS;
+    }
+
+    @Override
+    public TermGenerator<Goal> heuristicGenerator(TriggerTreatment option) {
+        return HeuristicInstantiation.forOption(option);
+    }
+
+    @Override
+    public Feature computeInstantiationCostOf(ProjectionToTerm<Goal> instOf_t,
+            TriggerTreatment option) {
+        return InstantiationCost.create(instOf_t, option);
+    }
+
+    @Override
+    public Feature getInstantiationTieBreakFeature(TermBuffer<Goal> varInst, String s) {
+        return InstantiationTieBreakFeature.create(varInst, s);
     }
 }

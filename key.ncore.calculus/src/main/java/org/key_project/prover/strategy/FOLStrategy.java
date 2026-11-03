@@ -18,6 +18,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.*;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.InstantiationCostScalerFeature;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.*;
 import org.key_project.prover.strategy.costbased.termfeature.IsNonRigidTermFeature;
 
@@ -32,12 +34,12 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
         implements ComponentStrategy<G> {
     public static final Name NAME = new Name("FOL Strategy");
 
-    private final RuleSetDispatchFeature costComputationDispatcher;
-    private final RuleSetDispatchFeature approvalDispatcher;
-    private final RuleSetDispatchFeature instantiationDispatcher;
-    private final Feature costComputationF;
-    private final Feature approvalF;
-    private final Feature instantiationF;
+    protected RuleSetDispatchFeature costComputationDispatcher;
+    protected RuleSetDispatchFeature approvalDispatcher;
+    protected RuleSetDispatchFeature instantiationDispatcher;
+    protected Feature costComputationF;
+    protected Feature approvalF;
+    protected Feature instantiationF;
 
     protected final ArithTermFeatures tf;
     protected final IFormulaTermFeatures ff;
@@ -56,8 +58,10 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
         this.termOrdering = termOrdering;
         this.numbers = numbers;
+    }
 
-        costComputationDispatcher = setupCostComputationF();
+    protected void initDispatchersAndFeatures() {
+        costComputationDispatcher = setupCostComputationF(new RuleSetDispatchFeature());
         approvalDispatcher = setupApprovalDispatcher();
         instantiationDispatcher = setupInstantiationF();
 
@@ -70,9 +74,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
         return d;
     }
 
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-
+    protected RuleSetDispatchFeature setupCostComputationF(RuleSetDispatchFeature d) {
         bindRuleSet(d, "closure", CostBand.CLOSE.cost());
         bindRuleSet(d, "alpha", CostBand.DECOMPOSE.cost());
         bindRuleSet(d, "delta", CostBand.TYPE.cost());
@@ -357,7 +359,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
         if (quantifierInstantiatedEnabled()) {
             final TermBuffer<G> varInst = new TermBuffer<>();
             final Feature branchPrediction = fc.instantiationCostScaler(
-                InstantiationCost.create(varInst, triggerTreatment()),
+                fc.computeInstantiationCostOf(varInst, triggerTreatment()),
                 allowQuantifierSplitting());
 
             bindRuleSet(d, "gamma",
@@ -366,14 +368,13 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                         add(ff.quantifiedClauseSet(),
                             instQuantifiersWithQueries() ? longTermConst(0)
                                     : ff.notContainsExecutable())),
-                    forEach(varInst, HeuristicInstantiation.forOption(triggerTreatment()),
+                    forEach(varInst, fc.heuristicGenerator(triggerTreatment()),
                         add(instantiate("t", varInst),
                             add(branchPrediction,
                                 CostBand.DEFAULT.at(10),
                                 // orders candidates of one predicted-cost band by their
                                 // connection to the sequent instead of formula position
-                                InstantiationTieBreakFeature.create(varInst,
-                                    triggersOption()))))));
+                                fc.getInstantiationTieBreakFeature(varInst, triggersOption()))))));
             final TermBuffer<G> splitInst = new TermBuffer<>();
 
             bindRuleSet(d, "triggered",
@@ -387,22 +388,26 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
         }
     }
 
+    protected abstract TriggerTreatment triggerTreatment();
+
     private void setupQuantifierInstantiationApproval(RuleSetDispatchFeature d) {
         if (quantifierInstantiatedEnabled()) {
             final TermBuffer<G> varInst = new TermBuffer<>();
 
+            ProjectionToTerm<G> instOf_t = instOf("t");
             bindRuleSet(d, "gamma", add(isInstantiated("t"),
-                not(sum(varInst, HeuristicInstantiation.forOption(triggerTreatment()),
-                    not(StaticFeatureCollection.eq(instOf("t"), varInst)))),
+                not(sum(varInst, fc.heuristicGenerator(triggerTreatment()),
+                    not(StaticFeatureCollection.eq(instOf_t, varInst, fc::createEqTermFeature)))),
                 InstantiationCostScalerFeature.create(
-                    InstantiationCost.create(instOf("t"), triggerTreatment()),
+                    fc.computeInstantiationCostOf(instOf_t, triggerTreatment()),
                     longConst(0))));
 
             final TermBuffer<G> splitInst = new TermBuffer<>();
             bindRuleSet(d, "triggered",
-                add(isTriggerVariableInstantiated(),
+                add(TriggerVarInstantiatedFeature.create(),
                     not(sum(splitInst, fc.createTriggeredInstantiations(false),
-                        not(StaticFeatureCollection.eq(instOfTriggerVariable(), splitInst))))));
+                        not(StaticFeatureCollection.eq(new TriggerVariableInstantiationProjection(),
+                            splitInst, fc::createEqTermFeature))))));
         } else {
             bindRuleSet(d, "gamma", inftyConst());
             bindRuleSet(d, "triggered", inftyConst());

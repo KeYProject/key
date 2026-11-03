@@ -2,7 +2,7 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package org.key_project.prover.strategy.costbased.quantifierHeuristics;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;

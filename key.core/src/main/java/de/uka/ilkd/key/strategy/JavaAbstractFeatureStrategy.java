@@ -150,14 +150,6 @@ public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrateg
         }
     }
 
-    protected Feature instantiateTriggeredVariable(ProjectionToTerm<Goal> value) {
-        if (instantiateActive != 0) {
-            return SVInstantiationCP.createTriggeredVarCP(value);
-        } else {
-            return longConst(0);
-        }
-    }
-
     protected Feature instantiate(String sv, ProjectionToTerm<Goal> value) {
         return instantiate(new Name(sv), value);
     }

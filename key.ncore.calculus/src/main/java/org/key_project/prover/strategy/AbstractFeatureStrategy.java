@@ -60,6 +60,14 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
 
     protected abstract RuleSet getHeuristic(String p_name);
 
+    protected Feature instantiateTriggeredVariable(ProjectionToTerm<G> value) {
+        if (instantiateActive != 0) {
+            return SVInstantiationCP.createTriggeredVarCP(value);
+        } else {
+            return longConst(0);
+        }
+    }
+
     protected Feature instantiate(String sv, ProjectionToTerm<G> value) {
         return instantiate(new Name(sv), value);
     }

@@ -52,7 +52,9 @@ public class JFOLStrategyFactory implements StrategyFactory {
     @Override
     public org.key_project.prover.strategy.Strategy<Goal> create(Proof proof,
             StrategyProperties strategyProperties) {
-        return new JFOLStrategy(proof, strategyProperties);
+        var tf = new JavaArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
+        var ff = new FormulaTermFeatures(tf);
+        return new JFOLStrategy(tf, ff, proof, strategyProperties);
     }
 
     private static OneOfStrategyPropertyDefinition getQuantifierTreatment() {
