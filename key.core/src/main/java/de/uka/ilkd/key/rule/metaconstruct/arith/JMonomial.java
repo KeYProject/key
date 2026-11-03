@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
@@ -26,7 +27,8 @@ public class JMonomial {
     private JMonomial() {
     }
 
-    public static Monomial create(Term monoTerm, Services services) {
+    public static Monomial create(Term monoTerm, LogicServices p_services) {
+        final Services services = (Services) p_services;
         final Map<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
         monoTerm = TermLabelManager.removeIrrelevantLabels((JTerm) monoTerm,
             services);

@@ -8,6 +8,7 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
@@ -29,12 +30,7 @@ import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.IntegerStrategy;
 import org.key_project.prover.strategy.costbased.DivModCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.AtomsSmallerThanFeature;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.MonomialsSmallerThanFeature;
-import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
-import org.key_project.prover.strategy.costbased.feature.SumFeature;
-import org.key_project.prover.strategy.costbased.feature.TermSmallerThanFeature;
+import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -116,7 +112,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     @Override
     protected Feature createReducibleMonomialFeature(ProjectionToTerm<Goal> dividend,
             ProjectionToTerm<Goal> divisor) {
-        return ReducibleMonomialsFeature.createReducible(dividend, divisor);
+        return ReducibleMonomialsFeature.createReducible(dividend, divisor, JMonomial::create);
     }
 
     @Override
