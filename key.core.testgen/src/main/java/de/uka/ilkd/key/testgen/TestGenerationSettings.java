@@ -114,7 +114,6 @@ public class TestGenerationSettings extends AbstractSettings {
 
     // Legacy Properties-based overload; the Settings interface still requires it. The
     // Configuration-based readSettings is the non-deprecated path.
-    @SuppressWarnings("deprecation")
     @Override
     public void readSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
@@ -187,7 +186,6 @@ public class TestGenerationSettings extends AbstractSettings {
 
     // Legacy Properties-based overload; the Settings interface still requires it. The
     // Configuration-based writeSettings is the non-deprecated path.
-    @SuppressWarnings("deprecation")
     @Override
     public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";

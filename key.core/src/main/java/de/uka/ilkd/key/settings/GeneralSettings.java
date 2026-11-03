@@ -224,7 +224,6 @@ public class GeneralSettings extends AbstractSettings {
      * object in a way that it represents the stored settings
      */
     // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
-    @SuppressWarnings("deprecation")
     public void readSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         String val = props.getProperty(prefix + TACLET_FILTER);
@@ -301,7 +300,6 @@ public class GeneralSettings extends AbstractSettings {
      * @param props the Properties object where to write the settings as (key, value) pair
      */
     // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
-    @SuppressWarnings("deprecation")
     @Override
     public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";

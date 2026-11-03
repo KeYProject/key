@@ -99,7 +99,6 @@ public class FeatureSettings extends AbstractSettings {
     }
 
     // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
-    @SuppressWarnings("deprecation")
     @Override
     public void readSettings(Properties props) {
         activatedFeatures.clear();
@@ -115,7 +114,6 @@ public class FeatureSettings extends AbstractSettings {
     }
 
     // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
-    @SuppressWarnings("deprecation")
     @Override
     public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";

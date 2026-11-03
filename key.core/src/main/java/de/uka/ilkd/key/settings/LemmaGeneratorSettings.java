@@ -37,7 +37,6 @@ public class LemmaGeneratorSettings extends AbstractSettings {
     }
 
     // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
-    @SuppressWarnings("deprecation")
     @Override
     public void readSettings(Properties props) {
         setShowDialogAddingAxioms(SettingsConverter.read(props,
@@ -47,7 +46,6 @@ public class LemmaGeneratorSettings extends AbstractSettings {
     }
 
     // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
-    @SuppressWarnings("deprecation")
     @Override
     public void writeSettings(Properties props) {
         SettingsConverter.store(props, "[" + CATEGORY + "]" + SHOW_DIALOG_ADDING_AXIOMS,
