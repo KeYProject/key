@@ -73,7 +73,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     protected final ArithTreatment arith;
     private final boolean stopAtFirstNonCloseableGoal;
 
-    private final TermOrdering termOrdering;
     private final IIntLdt numbers;
 
     final FeatureConstants<G> fc;
@@ -81,7 +80,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     public IntegerStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
             boolean nonLinearArithmeticEnabled, boolean divAndModuloReasoningEnabled,
             boolean stopAtFirstNonCloseableGoal, FeatureConstants<G> featureConstants,
-            TermOrdering termOrdering, IIntLdt numbers) {
+            IIntLdt numbers) {
         this.tf = tf;
         this.ff = ff;
         // determine configuration
@@ -96,7 +95,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         this.fc = featureConstants;
 
-        this.termOrdering = termOrdering;
         this.numbers = numbers;
     }
 
@@ -189,7 +187,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         bindRuleSet(d, "order_terms",
             add(applyTF("commEqRight", tf.monomial), applyTF("commEqLeft", tf.polynomial),
                 MonomialsSmallerThanFeature.<G>create(instOf("commEqLeft"), instOf("commEqRight"),
-                    termOrdering, numbers),
+                    createTermOrdering(), numbers),
                 CostBand.NORMALIZE.cost()));
 
         final TermBuffer<G> equation = new TermBuffer<>();
@@ -214,7 +212,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                                         add(applyTF(left, tf.nonNegOrNonCoeffMonomial),
                                             applyTF(right, tf.polynomial),
                                             MonomialsSmallerThanFeature.create(right, left,
-                                                termOrdering, numbers)))))))),
+                                                createTermOrdering(), numbers)))))))),
                 longConst(CombinationCost.ORDERED_REWRITING)));
 
         final TermBuffer<G> l = new TermBuffer<>();
@@ -223,7 +221,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             add(let(l, instOf("applyEqLeft"),
                 let(r, instOf("applyEqRight"),
                     add(applyTF(l, tf.nonNegOrNonCoeffMonomial), applyTF(r, tf.polynomial),
-                        MonomialsSmallerThanFeature.create(r, l, termOrdering, numbers)))),
+                        MonomialsSmallerThanFeature.create(r, l, createTermOrdering(), numbers)))),
                 longConst(CombinationCost.CNF_CONVERSION)));
 
         // For taclets that need instantiation, but where the instantiation is
@@ -362,7 +360,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             add(applyTF("homoRight", add(not(tf.zeroLiteral), tf.polynomial)),
                 or(applyTF("homoLeft", or(tf.addF, tf.negMonomial)),
                     not(MonomialsSmallerThanFeature.<G>create(instOf("homoRight"),
-                        instOf("homoLeft"), termOrdering, numbers))),
+                        instOf("homoLeft"), createTermOrdering(), numbers))),
                 longConst(PolynomialCost.EXPAND)));
 
         bindRuleSet(d, "polySimp_pullOutFactor", add(applyTFNonStrict("pullOutLeft", tf.literal),
@@ -376,7 +374,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             applyTF("commLeft", tf.addF),
             add(applyTF("commLeft", tf.atom),
                 AtomsSmallerThanFeature.<G>create(instOf("commLeft"), instOf("commRight"),
-                    termOrdering, numbers))),
+                    createTermOrdering(), numbers))),
             longConst(PolynomialCost.MUL_ORDER)));
 
         bindRuleSet(d, "polySimp_mulAssoc",
@@ -388,7 +386,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             SumFeature.createSum(applyTF("commLeft", tf.monomial),
                 applyTF("commRight", tf.polynomial),
                 MonomialsSmallerThanFeature.<G>create(instOf("commRight"), instOf("commLeft"),
-                    termOrdering, numbers),
+                    createTermOrdering(), numbers),
                 longConst(PolynomialCost.ADD_ORDER)));
 
         bindRuleSet(d, "polySimp_addAssoc",
@@ -411,11 +409,11 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                         ifZero(isInstantiated("sepPosMono"),
                             add(applyTF("sepPosMono", tf.nonNegMonomial),
                                 MonomialsSmallerThanFeature.<G>create(instOf("sepResidue"),
-                                    instOf("sepPosMono"), termOrdering, numbers))),
+                                    instOf("sepPosMono"), createTermOrdering(), numbers))),
                         ifZero(isInstantiated("sepNegMono"),
                             add(applyTF("sepNegMono", tf.negMonomial),
                                 MonomialsSmallerThanFeature.<G>create(instOf("sepResidue"),
-                                    instOf("sepNegMono"), termOrdering, numbers))),
+                                    instOf("sepNegMono"), createTermOrdering(), numbers))),
                         longConst(LinearEquationCost.BALANCE)));
 
         bindRuleSet(d, "polySimp_normalise", add(applyTF("invertRight", tf.zeroLiteral),
@@ -463,7 +461,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         bindRuleSet(d, "polySimp_critPair",
             ifZero(MatchedAssumesFeature.create(),
                 add(MonomialsSmallerThanFeature.<G>create(instOf("cpLeft1"), instOf("cpLeft2"),
-                    termOrdering, numbers),
+                    createTermOrdering(), numbers),
                     not(fc.createTrivialMonomialLCRFeature(instOf("cpLeft1"),
                         instOf("cpLeft2"))))));
     }
@@ -556,7 +554,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                         applyTF("aePseudoLeftCoeff", tf.atLeastTwoLiteral),
                         applyTF("aePseudoRight", tf.polynomial),
                         MonomialsSmallerThanFeature.<G>create(instOf("aePseudoRight"),
-                            instOf("aePseudoLeft"), termOrdering, numbers),
+                            instOf("aePseudoLeft"), createTermOrdering(), numbers),
                         let(divisor, StaticFeatureCollection.instOf("aePseudoLeft"),
                             let(dividend, StaticFeatureCollection.instOf("aePseudoTargetLeft"),
                                 add(fc.createReducibleMonomialFeature(dividend,
@@ -572,7 +570,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             opSub(tf.eq, opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.polynomial));
         final Feature biggerLeftSide =
             MonomialsSmallerThanFeature.create(instOf("newSymLeft"),
-                subAt(antecFor, PosInTerm.getTopLevel().down(0).down(0)), termOrdering, numbers);
+                subAt(antecFor, PosInTerm.getTopLevel().down(0).down(0)), createTermOrdering(),
+                numbers);
         bindRuleSet(d, "polySimp_newSym", add(isInstantiated("newSymDef"), sum(antecFor,
             SequentFormulasGenerator.antecedent(), not(add(columnOpEq, biggerLeftSide)))));
     }
@@ -618,7 +617,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             SumFeature.createSum(applyTF("commRight", tf.monomial),
                 applyTF("commLeft", tf.polynomial),
                 MonomialsSmallerThanFeature.<G>create(instOf("commLeft"), instOf("commRight"),
-                    termOrdering, numbers),
+                    createTermOrdering(), numbers),
                 longConst(LinearInequationCost.COMMUTE)));
 
         // this is copied from "polySimp_homo"
@@ -626,7 +625,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             add(applyTF("homoRight", add(not(tf.zeroLiteral), tf.polynomial)),
                 or(applyTF("homoLeft", or(tf.addF, tf.negMonomial)),
                     not(MonomialsSmallerThanFeature.<G>create(instOf("homoRight"),
-                        instOf("homoLeft"), termOrdering, numbers)))));
+                        instOf("homoLeft"), createTermOrdering(), numbers)))));
 
         // category "direct inequations"
 
@@ -636,10 +635,10 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                 ifZero(isInstantiated("sepPosMono"),
                     add(applyTF("sepPosMono", tf.nonNegMonomial),
                         MonomialsSmallerThanFeature.<G>create(instOf("sepResidue"),
-                            instOf("sepPosMono"), termOrdering, numbers))),
+                            instOf("sepPosMono"), createTermOrdering(), numbers))),
                 ifZero(isInstantiated("sepNegMono"), add(applyTF("sepNegMono", tf.negMonomial),
                     MonomialsSmallerThanFeature.<G>create(instOf("sepResidue"),
-                        instOf("sepNegMono"), termOrdering, numbers)))));
+                        instOf("sepNegMono"), createTermOrdering(), numbers)))));
 
         // this is copied from "polySimp_normalise"
         bindRuleSet(d, "inEqSimp_normalise",
@@ -894,7 +893,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                      * ), longConst ( -100 ), applyTF ( "multFacRight", tf.polynomial ) ),
                      */
                     not(TermSmallerThanFeature.<G>create(FocusProjection.create(),
-                        AssumptionProjection.create(0), termOrdering)),
+                        AssumptionProjection.create(0), createTermOrdering())),
                     onlyExactlyBounded
                             ? ifZero(add(applyTF("multLeft", tf.linearMonomial),
                                 applyTF("multFacLeft", tf.linearMonomial)), longConst(0),
@@ -1174,4 +1173,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     protected abstract Term zTerm(String num);
 
     protected abstract LogicServices getServices();
+
+    protected abstract TermOrdering createTermOrdering();
 }

@@ -16,6 +16,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.strategy.ArithTermFeatures;
 import org.key_project.prover.strategy.ComponentStrategy;
@@ -53,7 +54,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
                                 .getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY)),
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE),
-            new JavaFeatureConstants(), StaticFeatureCollection.createTermOrdering(),
+            new JavaFeatureConstants(),
             proof.getServices().getTypeConverter().getIntegerLDT());
         this.proof = proof;
         init();
@@ -125,5 +126,10 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     @Override
     protected LogicServices getServices() {
         return proof.getServices();
+    }
+
+    @Override
+    protected TermOrdering createTermOrdering() {
+        return StaticFeatureCollection.createTermOrdering();
     }
 }

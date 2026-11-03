@@ -44,19 +44,17 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     protected final ArithTermFeatures tf;
     protected final IFormulaTermFeatures ff;
 
-    private final TermOrdering termOrdering;
     private final IIntLdt numbers;
 
     final FeatureConstants<G> fc;
 
     public FOLStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
-            FeatureConstants<G> featureConstants, TermOrdering termOrdering, IIntLdt numbers) {
+            FeatureConstants<G> featureConstants, IIntLdt numbers) {
         this.tf = tf;
         this.ff = ff;
 
         this.fc = featureConstants;
 
-        this.termOrdering = termOrdering;
         this.numbers = numbers;
     }
 
@@ -130,7 +128,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
         bindRuleSet(d, "order_terms",
             add(TermSmallerThanFeature.<G>create(instOf("commEqLeft"), instOf("commEqRight"),
-                termOrdering),
+                createTermOrdering()),
                 CostBand.NORMALIZE.cost()));
 
         bindRuleSet(d, "try_apply_subst",
@@ -276,7 +274,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
             add(let(left, instOf("applyEqLeft"),
                 let(right, instOf("applyEqRight"),
                     TermSmallerThanFeature.create(right, left,
-                        termOrdering))),
+                        createTermOrdering()))),
                 longConst(CombinationCost.CNF_CONVERSION)));
 
         final ProjectionToTerm<G> focus = FocusProjection.create();
@@ -550,7 +548,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                             let(left, sub(equation, 0),
                                 let(right, sub(equation, 1),
                                     TermSmallerThanFeature.create(right, left,
-                                        termOrdering))))))),
+                                        createTermOrdering()))))))),
                 longConst(CombinationCost.ORDERED_REWRITING)));
 
         bindRuleSet(d, "insert_eq_nonrigid",
@@ -581,4 +579,6 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     protected abstract boolean normalSplitting();
 
     protected abstract LogicServices getServices();
+
+    protected abstract TermOrdering createTermOrdering();
 }

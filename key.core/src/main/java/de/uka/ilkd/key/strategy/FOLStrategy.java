@@ -19,6 +19,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.TermOrdering;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleSet;
@@ -50,7 +51,6 @@ public class FOLStrategy extends org.key_project.prover.strategy.FOLStrategy<Goa
     public FOLStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff, Proof proof,
             StrategyProperties strategyProperties) {
         super(tf, ff, new JavaFeatureConstants(),
-            StaticFeatureCollection.createTermOrdering(),
             proof.getServices().getTypeConverter().getIntegerLDT());
 
         this.proof = proof;
@@ -163,6 +163,11 @@ public class FOLStrategy extends org.key_project.prover.strategy.FOLStrategy<Goa
     @Override
     protected Services getServices() {
         return proof.getServices();
+    }
+
+    @Override
+    protected TermOrdering createTermOrdering() {
+        return StaticFeatureCollection.createTermOrdering();
     }
 
     @Override

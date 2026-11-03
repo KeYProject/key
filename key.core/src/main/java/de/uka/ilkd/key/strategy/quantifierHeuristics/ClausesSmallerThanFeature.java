@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.strategy.StaticFeatureCollection;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.TermOrdering;
@@ -37,7 +38,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature<Goal> {
         this.right = right;
         this.litComparator =
             (LiteralsSmallerThanFeature) LiteralsSmallerThanFeature.create(left, right,
-                termOrdering, numbers);
+                StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
     public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
