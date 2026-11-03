@@ -2,21 +2,25 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
 
 
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.util.collection.ImmutableList;
 
-public abstract class AbstractMonomialSmallerThanFeature extends SmallerThanFeature {
+public abstract class AbstractMonomialSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
+        extends SmallerThanFeature<GOAL> {
 
     private final Function mul;
 
-    protected AbstractMonomialSmallerThanFeature(IIntLdt numbers) {
+    protected AbstractMonomialSmallerThanFeature(TermOrdering termOrdering, IIntLdt numbers) {
+        super(termOrdering);
         this.mul = numbers.getMul();
     }
 

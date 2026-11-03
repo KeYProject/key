@@ -76,7 +76,8 @@ public class JFOLStrategy extends FOLStrategy {
     }
 
     private Feature clausesSmallerThan(String smaller, String bigger, IntegerLDT numbers) {
-        return ClausesSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
+        return ClausesSmallerThanFeature.create(instOf(smaller), instOf(bigger),
+            StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
     @Override

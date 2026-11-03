@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.strategy.termfeature.ParametricFunctionBaseTermFeature;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
+import org.key_project.logic.TermOrdering;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
@@ -41,6 +43,10 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
 public abstract class StaticFeatureCollection {
+
+    public static TermOrdering createTermOrdering() {
+        return new LexPathOrdering();
+    }
 
     protected static Feature loopInvFeature(Feature costStdInv) {
         // NOTE (DS, 2019-04-10): This feature also deactivates the built-in loop
@@ -122,22 +128,25 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static Feature termSmallerThan(String smaller, String bigger) {
-        return TermSmallerThanFeature.create(instOf(smaller), instOf(bigger));
+        return TermSmallerThanFeature.create(instOf(smaller), instOf(bigger), createTermOrdering());
     }
 
     protected static Feature monSmallerThan(String smaller, String bigger,
             IntegerLDT numbers) {
-        return MonomialsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
+        return MonomialsSmallerThanFeature.create(instOf(smaller), instOf(bigger),
+            createTermOrdering(), numbers);
     }
 
     protected static Feature atomSmallerThan(String smaller, String bigger,
             IntegerLDT numbers) {
-        return AtomsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
+        return AtomsSmallerThanFeature.create(instOf(smaller), instOf(bigger), createTermOrdering(),
+            numbers);
     }
 
     protected static Feature literalsSmallerThan(String smaller, String bigger,
             IntegerLDT numbers) {
-        return LiteralsSmallerThanFeature.create(instOf(smaller), instOf(bigger), numbers);
+        return LiteralsSmallerThanFeature.create(instOf(smaller), instOf(bigger),
+            createTermOrdering(), numbers);
     }
 
     protected static Feature longConst(long a) {

@@ -29,9 +29,12 @@ import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.IntegerStrategy;
 import org.key_project.prover.strategy.costbased.DivModCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.AtomsSmallerThanFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.MonomialsSmallerThanFeature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
+import org.key_project.prover.strategy.costbased.feature.TermSmallerThanFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -137,12 +140,14 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     @Override
     protected Feature createMonomialsSmallerThanFeature(ProjectionToTerm<Goal> left,
             ProjectionToTerm<Goal> right, IIntLdt numbers) {
-        return MonomialsSmallerThanFeature.create(left, right, numbers);
+        return MonomialsSmallerThanFeature.create(left, right,
+            StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
     @Override
     protected Feature createAtomSmallerThanFeature(String left, String right, IIntLdt numbers) {
-        return AtomsSmallerThanFeature.create(instOf(left), instOf(right), numbers);
+        return AtomsSmallerThanFeature.<Goal>create(instOf(left), instOf(right),
+            StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
     @Override
@@ -254,12 +259,14 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     @Override
     protected Feature createTermSmallerThanFeature(ProjectionToTerm<Goal> left,
             ProjectionToTerm<Goal> right) {
-        return TermSmallerThanFeature.create(left, right);
+        return TermSmallerThanFeature.create(left, right,
+            StaticFeatureCollection.createTermOrdering());
     }
 
     @Override
     protected Feature createMonomialSmallerThan(String left, String right, IIntLdt numbers) {
-        return MonomialsSmallerThanFeature.create(instOf(left), instOf(right), numbers);
+        return MonomialsSmallerThanFeature.<Goal>create(instOf(left), instOf(right),
+            StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
     @Override

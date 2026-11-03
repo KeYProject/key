@@ -316,7 +316,8 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
         bindRuleSet(d, "apply_equations_andOr",
             add(let(left, instOf("applyEqLeft"),
                 let(right, instOf("applyEqRight"),
-                    TermSmallerThanFeature.create(right, left))),
+                    TermSmallerThanFeature.create(right, left,
+                        StaticFeatureCollection.createTermOrdering()))),
                 longConst(CombinationCost.CNF_CONVERSION)));
 
         final ProjectionToTerm<Goal> focus = FocusProjection.create();
@@ -586,7 +587,8 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                             // been applied
                             let(left, sub(equation, 0),
                                 let(right, sub(equation, 1),
-                                    TermSmallerThanFeature.create(right, left))))))),
+                                    TermSmallerThanFeature.create(right, left,
+                                        StaticFeatureCollection.createTermOrdering()))))))),
                 longConst(CombinationCost.ORDERED_REWRITING)));
 
         bindRuleSet(d, "insert_eq_nonrigid",

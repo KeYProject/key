@@ -2,18 +2,16 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.feature;
-
-import de.uka.ilkd.key.proof.Goal;
+package org.key_project.prover.strategy.costbased.feature;
 
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
@@ -23,7 +21,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  *
  * <p>
  * The value is determined by the compared instantiation terms alone: the atom ordering consists
- * of the number-literal distinction, the term-only {@link de.uka.ilkd.key.logic.LexPathOrdering},
+ * of the number-literal distinction, the term-only {@link TermOrdering},
  * and the introduction time of definitional skolem symbols, which is a constant of the symbol
  * (see {@link AbstractMonomialSmallerThanFeature#introductionTime}). Hence {@link StableCost} --
  * the same classification, for the same reason, as {@link MonomialsSmallerThanFeature}, which
@@ -31,28 +29,30 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * </p>
  */
 @StableCost
-public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature {
+public class AtomsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
+        extends AbstractMonomialSmallerThanFeature<GOAL> {
 
-    private final ProjectionToTerm<Goal> left, right;
+    private final ProjectionToTerm<GOAL> left, right;
     private final Function Z;
 
-    private AtomsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IIntLdt numbers) {
-        super(numbers);
+    private AtomsSmallerThanFeature(ProjectionToTerm<GOAL> left, ProjectionToTerm<GOAL> right,
+            TermOrdering termOrdering, IIntLdt numbers) {
+        super(termOrdering, numbers);
         this.left = left;
         this.right = right;
         this.Z = numbers.getNumberSymbol();
     }
 
 
-    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IIntLdt numbers) {
-        return new AtomsSmallerThanFeature(left, right, numbers);
+    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm<GOAL> left,
+            ProjectionToTerm<GOAL> right,
+            TermOrdering termOrdering, IIntLdt numbers) {
+        return new AtomsSmallerThanFeature<>(left, right, termOrdering, numbers);
     }
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+            GOAL goal, MutableState mState) {
         return lessThan(collectAtoms(left.toTerm(app, pos, goal, mState)),
             collectAtoms(right.toTerm(app, pos, goal, mState)), pos, goal);
     }
@@ -61,7 +61,7 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, GOAL goal) {
         if (t1.op() == Z) {
             if (t2.op() != Z) {
                 return true;
