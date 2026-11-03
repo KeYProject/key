@@ -27,6 +27,7 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
     protected final ProjectionToTerm<GOAL> targetCandidate;
     protected final ProjectionToTerm<GOAL> mult1Candidate;
     protected final ProjectionToTerm<GOAL> mult2Candidate;
+    // creates a monomial from a given term
     protected final BiFunction<Term, LogicServices, Monomial> builder;
 
     /**
@@ -42,7 +43,8 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
             ProjectionToTerm<GOAL> mult1Candidate,
             ProjectionToTerm<GOAL> mult2Candidate, ProjectionToTerm<GOAL> targetCandidate,
             BiFunction<Term, LogicServices, Monomial> builder) {
-        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate, builder) {
+        return new InEquationMultFeature<>(mult1Candidate, mult2Candidate, targetCandidate,
+            builder) {
             @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
                 return !mult2M.reduce(targetM).variablesDisjoint(mult1M)
@@ -58,7 +60,8 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
             ProjectionToTerm<GOAL> mult1Candidate,
             ProjectionToTerm<GOAL> mult2Candidate, ProjectionToTerm<GOAL> targetCandidate,
             BiFunction<Term, LogicServices, Monomial> builder) {
-        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate, builder) {
+        return new InEquationMultFeature<>(mult1Candidate, mult2Candidate, targetCandidate,
+            builder) {
             @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
                 return targetM.variablesSubsume(mult1M.multiply(mult2M));
@@ -73,7 +76,8 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
             ProjectionToTerm<GOAL> mult1Candidate,
             ProjectionToTerm<GOAL> mult2Candidate, ProjectionToTerm<GOAL> targetCandidate,
             BiFunction<Term, LogicServices, Monomial> builder) {
-        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate, builder) {
+        return new InEquationMultFeature<>(mult1Candidate, mult2Candidate, targetCandidate,
+            builder) {
             @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
                 return targetM.variablesEqual(mult1M.multiply(mult2M));
