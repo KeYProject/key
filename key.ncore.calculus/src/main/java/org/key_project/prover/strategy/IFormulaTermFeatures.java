@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy;
 
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 public interface IFormulaTermFeatures {
@@ -58,4 +59,14 @@ public interface IFormulaTermFeatures {
     TermFeature cutAllowedBelowQuantifier();
 
     TermFeature cutPriority();
+
+    TermFeature quantifierF();
+
+    Operator equiv();
+
+    Operator imp();
+
+    Operator all();
+
+    Operator exists();
 }

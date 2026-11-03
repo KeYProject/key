@@ -10,6 +10,7 @@ import de.uka.ilkd.key.strategy.termfeature.AtomTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 
 import org.key_project.logic.op.Function;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -65,6 +66,8 @@ class FormulaTermFeatures extends StaticFeatureCollection implements IFormulaTer
                 ifZero(tf.eqF, longTermConst(100), longTermConst(200))),
             rec(any(), longTermConst(1)));
         // directCutAllowed = add ( tf.intInEquation, notContainsQuery );
+
+        quantiferF = OperatorClassTF.create(Quantifier.class);
     }
 
     final TermFeature forF;
@@ -99,6 +102,7 @@ class FormulaTermFeatures extends StaticFeatureCollection implements IFormulaTer
     final TermFeature cutAllowed;
     final TermFeature cutAllowedBelowQuantifier;
     final TermFeature cutPriority;
+    final TermFeature quantiferF;
 
     @Override
     public TermFeature forF() {
@@ -228,5 +232,30 @@ class FormulaTermFeatures extends StaticFeatureCollection implements IFormulaTer
     @Override
     public TermFeature cutPriority() {
         return cutPriority;
+    }
+
+    @Override
+    public Operator equiv() {
+        return Equality.EQV;
+    }
+
+    @Override
+    public Operator imp() {
+        return Junctor.IMP;
+    }
+
+    @Override
+    public Operator all() {
+        return Quantifier.ALL;
+    }
+
+    @Override
+    public Operator exists() {
+        return Quantifier.EX;
+    }
+
+    @Override
+    public TermFeature quantifierF() {
+        return quantiferF;
     }
 }

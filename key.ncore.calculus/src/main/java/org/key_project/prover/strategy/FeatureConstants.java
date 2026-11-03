@@ -19,11 +19,19 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     Feature notInScopeOfModalityFeature();
 
+    Feature topLevelFindAntecOrSucc();
+
+    Feature topLevelFindAntecOrSuccWithUpdate();
+
+    Feature topLevelFindAntec();
+
     Feature topLevelFindSucc();
 
     Feature checkApplyEqFeature();
 
     Feature findRightishFeature(IIntLdt numbers, Operator equals);
+
+    TermFeature createEliminableQuantifier();
 
     Feature createReducibleMonomialFeature(ProjectionToTerm<G> dividend,
             ProjectionToTerm<G> divisor);
@@ -87,4 +95,32 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
             LogicServices services);
 
     TermGenerator<G> upwardsWithIndexSuperGenerator(TermFeature cond, LogicServices services);
+
+    Feature eqNonDuplicateAppFeature();
+
+    Feature splittableQuantifiedFormula();
+
+    Feature instantiationCostScaler(Feature costF, Feature allowSplittingF);
+
+    TermGenerator<G> superTermGenerator(TermFeature cond, LogicServices services);
+
+    TermGenerator<G> createTriggeredInstantiations(boolean skipConditions);
+
+    Feature diffFindAndReplacewithFeature();
+
+    Feature countMaxDPath();
+
+    Feature purePosDPath();
+
+    Feature countPosDPath();
+
+    TermGenerator<G> allowedCutPositionsGenerator();
+
+    Feature allowedCutPositions();
+
+    TermFeature selectSkolemConstant();
+
+    Feature countOccurrences(ProjectionToTerm<G> target);
+
+    TermFeature containsExecutableCodeTF();
 }

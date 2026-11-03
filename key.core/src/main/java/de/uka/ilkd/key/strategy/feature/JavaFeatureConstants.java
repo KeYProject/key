@@ -9,11 +9,13 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 import de.uka.ilkd.key.strategy.StaticFeatureCollection;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
+import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
-import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.*;
 
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.LogicServices;
@@ -37,8 +39,28 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
+    public Feature eqNonDuplicateAppFeature() {
+        return EqNonDuplicateAppFeature.INSTANCE;
+    }
+
+    @Override
     public Feature notInScopeOfModalityFeature() {
         return NotInScopeOfModalityFeature.INSTANCE;
+    }
+
+    @Override
+    public Feature topLevelFindAntecOrSuccWithUpdate() {
+        return TopLevelFindFeature.ANTEC_OR_SUCC_WITH_UPDATE;
+    }
+
+    @Override
+    public Feature topLevelFindAntecOrSucc() {
+        return TopLevelFindFeature.ANTEC_OR_SUCC;
+    }
+
+    @Override
+    public Feature topLevelFindAntec() {
+        return TopLevelFindFeature.ANTEC;
     }
 
     @Override
@@ -184,5 +206,75 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     public TermGenerator<Goal> upwardsWithIndexSuperGenerator(TermFeature cond,
             LogicServices services) {
         return SuperTermGenerator.upwardsWithIndex(cond, (Services) services);
+    }
+
+    @Override
+    public TermFeature createEliminableQuantifier() {
+        return EliminableQuantifierTF.INSTANCE;
+    }
+
+    @Override
+    public Feature splittableQuantifiedFormula() {
+        return SplittableQuantifiedFormulaFeature.INSTANCE;
+    }
+
+    @Override
+    public Feature instantiationCostScaler(Feature costF, Feature allowSplittingF) {
+        return InstantiationCostScalerFeature.create(costF, allowSplittingF);
+    }
+
+    @Override
+    public TermGenerator<Goal> createTriggeredInstantiations(boolean skipConditions) {
+        return TriggeredInstantiations.create(skipConditions);
+    }
+
+    @Override
+    public TermGenerator<Goal> superTermGenerator(TermFeature cond, LogicServices services) {
+        return SuperTermGenerator.upwards(cond, (Services) services);
+    }
+
+    @Override
+    public Feature diffFindAndReplacewithFeature() {
+        return DiffFindAndReplacewithFeature.INSTANCE;
+    }
+
+    @Override
+    public Feature countMaxDPath() {
+        return CountMaxDPathFeature.INSTANCE;
+    }
+
+    @Override
+    public Feature countPosDPath() {
+        return CountPosDPathFeature.INSTANCE;
+    }
+
+    @Override
+    public Feature purePosDPath() {
+        return PurePosDPathFeature.INSTANCE;
+    }
+
+    @Override
+    public TermGenerator<Goal> allowedCutPositionsGenerator() {
+        return AllowedCutPositionsGenerator.INSTANCE;
+    }
+
+    @Override
+    public Feature allowedCutPositions() {
+        return AllowedCutPositionFeature.INSTANCE;
+    }
+
+    @Override
+    public TermFeature selectSkolemConstant() {
+        return StaticFeatureCollection.selectSkolemConstantTermFeature();
+    }
+
+    @Override
+    public Feature countOccurrences(ProjectionToTerm<Goal> target) {
+        return CountOccurrencesFeature.create(target);
+    }
+
+    @Override
+    public TermFeature containsExecutableCodeTF() {
+        return ContainsExecutableCodeTermFeature.PROGRAMS;
     }
 }

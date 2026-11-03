@@ -29,7 +29,8 @@ import org.key_project.util.collection.ImmutableList;
  * an inequation in the sequent. Required to bound the number of cross-multiplications.
  */
 @VolatileCost
-public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>> extends BinaryTacletAppFeature<GOAL> {
+public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
+        extends BinaryTacletAppFeature<GOAL> {
 
     private final ProjectionToTerm<GOAL> mult1;
     private final ProjectionToTerm<GOAL> mult2;
@@ -55,8 +56,8 @@ public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>> ex
      * @param inEquationFilter term feature describing the shape of the inequation
      */
     public IsBoundedByInequationFeature(ProjectionToTerm<GOAL> mult1, ProjectionToTerm<GOAL> mult2,
-                                        TermFeature inEquationFilter,
-                                        BiFunction<Term, LogicServices, Monomial> monomialBuilder) {
+            TermFeature inEquationFilter,
+            BiFunction<Term, LogicServices, Monomial> monomialBuilder) {
         this.mult1 = mult1;
         this.mult2 = mult2;
         this.inEquations = RelevantSequentFormulasGenerator.sequent(inEquationFilter);

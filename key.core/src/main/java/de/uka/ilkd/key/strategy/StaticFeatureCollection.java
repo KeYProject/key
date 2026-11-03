@@ -488,7 +488,7 @@ public abstract class StaticFeatureCollection {
         return applyTF(svName, selectSkolemConstantTermFeature());
     }
 
-    protected static TermFeature selectSkolemConstantTermFeature() {
+    public static TermFeature selectSkolemConstantTermFeature() {
         return add(OperatorClassTF.create(Function.class),
             constantTermFeature(),
             hasLabel(ParameterlessTermLabel.SELECT_SKOLEM_LABEL));
