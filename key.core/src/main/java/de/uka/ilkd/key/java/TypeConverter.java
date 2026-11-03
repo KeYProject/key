@@ -127,6 +127,8 @@ public final class TypeConverter {
         return getLDT(BooleanLDT.class);
     }
 
+    public SetLDT getSetLDT() { return getLDT(SetLDT.class); }
+
     public LocSetLDT getLocSetLDT() {
         return getLDT(LocSetLDT.class);
     }
@@ -135,8 +137,6 @@ public final class TypeConverter {
         return heapLDT;
     }
 
-
-
     public PermissionLDT getPermissionLDT() {
         return getLDT(PermissionLDT.class);
     }
@@ -144,6 +144,8 @@ public final class TypeConverter {
     public SeqLDT getSeqLDT() {
         return getLDT(SeqLDT.class);
     }
+
+    public PSeqLDT getPSeqLDT() { return getLDT(PSeqLDT.class); }
 
     public SortLDT getSortLDT() {
         return getLDT(SortLDT.class);

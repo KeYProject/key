@@ -18,6 +18,7 @@ import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.*;
 import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
+import de.uka.ilkd.key.util.PerfScope;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
@@ -637,11 +638,11 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             @NonNull PosInOccurrence pio,
             @NonNull GOAL goal,
             @NonNull MutableState mState) {
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         try {
             return costComputationF.computeCost(app, pio, goal, mState);
         } finally {
-            PERF_COMPUTE.addAndGet(System.nanoTime() - time);
+            PerfScope.stop(PERF_COMPUTE, time);
         }
     }
 
@@ -657,12 +658,12 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
     @Override
     public final boolean isApprovedApp(RuleApp app,
             PosInOccurrence pio, Goal goal) {
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         try {
             return !(approvalF.computeCost(app, pio, goal,
                 new MutableState()) == TopRuleAppCost.INSTANCE);
         } finally {
-            PERF_APPROVE.addAndGet(System.nanoTime() - time);
+            PerfScope.stop(PERF_APPROVE, time);
         }
     }
 
@@ -670,11 +671,11 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
     public RuleAppCost instantiateApp(RuleApp app,
             PosInOccurrence pio, Goal goal,
             MutableState mState) {
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         try {
             return instantiationF.computeCost(app, pio, goal, mState);
         } finally {
-            PERF_INSTANTIATE.addAndGet(System.nanoTime() - time);
+            PerfScope.stop(PERF_INSTANTIATE, time);
         }
     }
 

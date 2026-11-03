@@ -2,7 +2,7 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.prover.impl;
+package de.uka.ilkd.key.util;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.SemisequentTacletAppIndex;
 import de.uka.ilkd.key.proof.TacletAppIndex;
+import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.executor.javadl.FindTacletExecutor;
@@ -61,6 +62,37 @@ public class PerfScope {
     };
     private static final DecimalFormat DECIMAL_FORMAT =
         new DecimalFormat("#.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
+
+    /**
+     * Boolean flag set to true if performance counters should be active
+     */
+    public static final boolean ENABLED = Boolean.getBoolean("key.perfScope");
+
+    /**
+     * Starts a measurement.
+     *
+     * @return the current time in ns, or {@code 0} if counters are disabled
+     */
+    public static long start() {
+        return ENABLED ? System.nanoTime() : 0;
+    }
+
+    /**
+     * Ends a measurement. The measured time is added to the specified counter.
+     *
+     * @param counter the counter to be updated
+     * @param start the start time
+     * @return the current time (usefull if another measurement is
+     *         about to start directly afterwards), or {@code 0} if the counters are off
+     */
+    public static long stop(AtomicLong counter, long start) {
+        if (!ENABLED) {
+            return 0;
+        }
+        final long now = System.nanoTime();
+        counter.addAndGet(now - start);
+        return now;
+    }
 
     private final long timeNs = System.nanoTime();
     private final long[] timesBefore = new long[PERF_COUNTERS.length];
