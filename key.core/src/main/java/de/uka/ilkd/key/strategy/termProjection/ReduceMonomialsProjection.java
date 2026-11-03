@@ -6,13 +6,14 @@ package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
@@ -40,9 +41,9 @@ public class ReduceMonomialsProjection implements ProjectionToTerm<Goal> {
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 
         final Services services = goal.proof().getServices();
-        final Monomial mDividend = Monomial.create(dividendT, services);
-        final Monomial mDivisor = Monomial.create(divisorT, services);
+        final Monomial mDividend = JMonomial.create(dividendT, services);
+        final Monomial mDivisor = JMonomial.create(divisorT, services);
 
-        return mDivisor.reduce(mDividend).toTerm(services);
+        return JMonomial.toTerm(mDivisor.reduce(mDividend), services);
     }
 }

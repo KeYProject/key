@@ -11,7 +11,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.TermOrdering;
@@ -20,6 +20,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.SmallerThanFeature;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
@@ -114,8 +115,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
             }
 
             final Services services = goal.proof().getServices();
-            final Polynomial t1RHS = Polynomial.create(t1.sub(1), services);
-            final Polynomial t2RHS = Polynomial.create(t2.sub(1), services);
+            final Polynomial t1RHS = JPolynomial.create(t1.sub(1), services);
+            final Polynomial t2RHS = JPolynomial.create(t2.sub(1), services);
             if (t1RHS.valueLess(t2RHS)) {
                 return true;
             }

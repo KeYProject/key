@@ -12,10 +12,11 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.util.collection.Pair;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
@@ -89,8 +90,8 @@ class HandleArith {
             putInTermCache(provedByArithCache, problem, result);
             return result;
         }
-        Polynomial poly1 = Polynomial.create(arithTerm.sub(0), services);
-        Polynomial poly2 = Polynomial.create(arithTerm.sub(1), services);
+        Polynomial poly1 = JPolynomial.create(arithTerm.sub(0), services);
+        Polynomial poly2 = JPolynomial.create(arithTerm.sub(1), services);
 
         if (poly2.valueLeq(poly1)) {
             putInTermCache(provedByArithCache, problem, trueT);
@@ -131,8 +132,8 @@ class HandleArith {
         if (op == Equality.EQUALS) {
             JTerm sub0 = pro.sub(0);
             JTerm sub1 = pro.sub(1);
-            Polynomial poly1 = Polynomial.create(sub0, services);
-            Polynomial poly2 = Polynomial.create(sub1, services);
+            Polynomial poly1 = JPolynomial.create(sub0, services);
+            Polynomial poly2 = JPolynomial.create(sub1, services);
             boolean gt = poly2.valueLeq(poly1);
             boolean lt = poly1.valueLeq(poly2);
             if (gt && lt) {

@@ -25,7 +25,8 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 // \find(b)), so the formula sits above the find term; a sibling rewrite then changes the formula
 // while the find subterm survives. Reusable only while the find formula is unchanged.
 @WeakStableCost
-public class DiffFindAndAssumesFeature<GOAL extends ProofGoal<GOAL>> extends BinaryTacletAppFeature<GOAL> {
+public class DiffFindAndAssumesFeature<GOAL extends ProofGoal<GOAL>>
+        extends BinaryTacletAppFeature<GOAL> {
     public static <GOAL extends ProofGoal<GOAL>> DiffFindAndAssumesFeature<GOAL> create() {
         return new DiffFindAndAssumesFeature<>();
     }

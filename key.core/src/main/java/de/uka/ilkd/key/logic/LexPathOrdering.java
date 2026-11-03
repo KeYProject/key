@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
-import java.math.BigInteger;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -499,52 +498,5 @@ public class LexPathOrdering implements TermOrdering {
      */
     private boolean isVar(Operator op) {
         return op instanceof QuantifiableVariable;
-    }
-
-    /**
-     * TODO: this should also be used when comparing terms
-     *
-     * The reduction ordering on integers that is described in "A critical-pair/completion algorithm
-     * for finitely generated ideals in rings", with the difference that positive numbers are here
-     * considered as smaller than negative numbers (with the same absolute value)
-     *
-     * @return a negative number, zero, or a positive number, if <code>a</code> is smaller, equal to
-     *         or greater than <code>b</code>
-     */
-    public static int compare(BigInteger a, BigInteger b) {
-        final int c = a.abs().compareTo(b.abs());
-        if (c != 0) {
-            return c;
-        }
-        return b.signum() - a.signum();
-    }
-
-    /**
-     * @return the result of dividing <code>a</code> by <code>c</code>, such that the remainder
-     *         becomes minimal in the reduction ordering <code>LexPathOrdering.compare</code> on
-     *         integers
-     */
-    public static BigInteger divide(BigInteger a, BigInteger c) {
-        final BigInteger[] divRem = a.divideAndRemainder(c);
-        while (true) {
-            // could be done more efficiently. but apparently the rounding
-            // behaviour of BigInteger.divide for negative numbers is not
-            // properly specified. or everything becomes very tedious ...
-
-            final BigInteger newRem1 = divRem[1].subtract(c);
-            if (compare(newRem1, divRem[1]) < 0) {
-                divRem[0] = divRem[0].add(BigInteger.ONE);
-                divRem[1] = newRem1;
-                continue;
-            }
-            final BigInteger newRem2 = divRem[1].add(c);
-            if (compare(newRem2, divRem[1]) < 0) {
-                divRem[0] = divRem[0].subtract(BigInteger.ONE);
-                divRem[1] = newRem2;
-                continue;
-            }
-
-            return divRem[0];
-        }
     }
 }

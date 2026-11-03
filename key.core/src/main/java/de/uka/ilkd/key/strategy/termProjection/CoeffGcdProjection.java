@@ -8,14 +8,16 @@ import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
@@ -47,8 +49,8 @@ public class CoeffGcdProjection implements ProjectionToTerm<Goal> {
         final Term monoT = monomialLeft.toTerm(app, pos, goal, mState);
         final Term polyT = polynomialRight.toTerm(app, pos, goal, mState);
 
-        final Monomial mono = Monomial.create(monoT, services);
-        final Polynomial poly = Polynomial.create(polyT, services);
+        final Monomial mono = JMonomial.create(monoT, services);
+        final Polynomial poly = JPolynomial.create(polyT, services);
 
         final BigInteger gcd = mono.getCoefficient().gcd(poly.coeffGcd());
         return services.getTermBuilder().zTerm(gcd.abs().toString());

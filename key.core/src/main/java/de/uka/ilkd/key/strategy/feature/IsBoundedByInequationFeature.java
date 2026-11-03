@@ -11,7 +11,7 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.ITacletApp;
@@ -19,6 +19,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.VolatileCost;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.RelevantSequentFormulasGenerator;
@@ -63,8 +64,8 @@ public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature<G
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Monomial first = Monomial.create(mult1.toTerm(app, pos, goal, mState), services);
-        final Monomial second = Monomial.create(mult2.toTerm(app, pos, goal, mState), services);
+        final Monomial first = JMonomial.create(mult1.toTerm(app, pos, goal, mState), services);
+        final Monomial second = JMonomial.create(mult2.toTerm(app, pos, goal, mState), services);
         return getInEquations(goal, mState).contains(variables(first, second));
     }
 
@@ -77,7 +78,7 @@ public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature<G
         final Services services = goal.proof().getServices();
         final Set<Map<Term, Integer>> variables = new HashSet<>();
         for (Term formula : selection) {
-            variables.add(variables(Monomial.create(formula.sub(0), services)));
+            variables.add(variables(JMonomial.create(formula.sub(0), services)));
         }
         relations.put(goal, new InequationInfo(selection, variables));
         return variables;

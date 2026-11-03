@@ -6,7 +6,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -14,6 +14,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
@@ -39,8 +40,8 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature<Goal> {
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Monomial aMon = Monomial.create(a.toTerm(app, pos, goal, mState), services);
-        final Monomial bMon = Monomial.create(b.toTerm(app, pos, goal, mState), services);
+        final Monomial aMon = JMonomial.create(a.toTerm(app, pos, goal, mState), services);
+        final Monomial bMon = JMonomial.create(b.toTerm(app, pos, goal, mState), services);
 
         /*
          * final BigInteger ac = aMon.getCoefficient (); final BigInteger bc = bMon.getCoefficient

@@ -13,14 +13,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
@@ -60,11 +62,11 @@ public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
             MutableState mState) {
         final Services services = goal.proof().getServices();
 
-        final Monomial sourceM = Monomial.create(source.toTerm(app, pos, goal, mState), services);
-        final Monomial targetM = Monomial.create(target.toTerm(app, pos, goal, mState), services);
+        final Monomial sourceM = JMonomial.create(source.toTerm(app, pos, goal, mState), services);
+        final Monomial targetM = JMonomial.create(target.toTerm(app, pos, goal, mState), services);
 
         if (targetM.divides(sourceM)) {
-            return toIterator(targetM.reduce(sourceM).toTerm(services));
+            return toIterator(JMonomial.toTerm(targetM.reduce(sourceM), services));
         }
 
         final List<CofactorPolynomial> cofactorPolys = extractPolys(goal, services);
@@ -131,7 +133,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
 
             // do not return zero, that's too easy
             if (!quotient.getParts().isEmpty() || quotient.getConstantTerm().signum() != 0) {
-                return res.prepend(quotient.toTerm(services));
+                return res.prepend(JPolynomial.toTerm(quotient, services));
             }
         }
         return res;
@@ -157,8 +159,8 @@ public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
                 continue;
             }
 
-            final Polynomial left = Polynomial.create(t.sub(0), services);
-            final Polynomial right = Polynomial.create(t.sub(1), services);
+            final Polynomial left = JPolynomial.create(t.sub(0), services);
+            final Polynomial right = JPolynomial.create(t.sub(1), services);
 
             res.add(new CofactorPolynomial(left.sub(right), Polynomial.ZERO));
         }

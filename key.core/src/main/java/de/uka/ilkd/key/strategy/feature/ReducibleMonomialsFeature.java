@@ -6,7 +6,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.ITacletApp;
@@ -15,6 +15,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
@@ -56,8 +57,8 @@ public final class ReducibleMonomialsFeature extends BinaryTacletAppFeature<Goal
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 
         final Services services = goal.proof().getServices();
-        final Monomial mDividend = Monomial.create(dividendT, services);
-        final Monomial mDivisor = Monomial.create(divisorT, services);
+        final Monomial mDividend = JMonomial.create(dividendT, services);
+        final Monomial mDivisor = JMonomial.create(divisorT, services);
 
         return switch (check) {
             case REDUCIBLE -> mDivisor.reducible(mDividend);

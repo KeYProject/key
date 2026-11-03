@@ -18,7 +18,8 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  * rule application is admissible, zero is returned.
  */
 @StableCost
-public class NoSelfApplicationFeature<GOAL extends ProofGoal<GOAL>> extends BinaryTacletAppFeature<GOAL> {
+public class NoSelfApplicationFeature<GOAL extends ProofGoal<GOAL>>
+        extends BinaryTacletAppFeature<GOAL> {
 
     public static <GOAL extends ProofGoal<GOAL>> NoSelfApplicationFeature<GOAL> create() {
         return new NoSelfApplicationFeature<>();

@@ -15,12 +15,13 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
@@ -68,7 +69,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
         final BigInteger lit = new BigInteger(
             AbstractTermTransformer.convertToDecimalString(powerRel.sub(1), services));
 
-        final Monomial mon = Monomial.create(powerRel.sub(0), services);
+        final Monomial mon = JMonomial.create(powerRel.sub(0), services);
         final int pow = mon.getParts().size();
         if (pow <= 1 || !mon.getCoefficient().equals(one)) {
             return emptyIterator();

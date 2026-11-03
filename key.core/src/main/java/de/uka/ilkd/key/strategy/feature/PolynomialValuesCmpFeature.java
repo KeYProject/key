@@ -10,7 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.ITacletApp;
@@ -19,6 +19,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
@@ -117,7 +118,7 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature<Goa
             TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
         final Polynomial poly =
-            Polynomial.create(polyProj.toTerm(app, pos, goal, mState), services);
+            JPolynomial.create(polyProj.toTerm(app, pos, goal, mState), services);
 
         if (coeffProj == null) {
             return poly;

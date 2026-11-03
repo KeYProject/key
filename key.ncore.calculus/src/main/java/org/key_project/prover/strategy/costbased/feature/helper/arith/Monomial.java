@@ -2,57 +2,35 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.rule.metaconstruct.arith;
+package org.key_project.prover.strategy.costbased.feature.helper.arith;
 
 import java.math.BigInteger;
 import java.util.Iterator;
-import java.util.Map;
-
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.LexPathOrdering;
-import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Term;
-import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
 
-/**
- * Class for analysing and modifying monomial expressions over the integers
- */
 public class Monomial {
+    public static final Monomial ONE = new Monomial(ImmutableList.nil(), BigInteger.ONE);
+    protected final ImmutableList<Term> parts;
+    protected final BigInteger coefficient;
 
-    private final ImmutableList<Term> parts;
-    private final BigInteger coefficient;
-
-    private Monomial(final ImmutableList<Term> parts, final BigInteger coefficient) {
+    public Monomial(final ImmutableList<Term> parts, final BigInteger coefficient) {
         this.parts = parts;
         this.coefficient = coefficient;
     }
 
-    public static final Monomial ONE = new Monomial(ImmutableList.nil(), BigInteger.ONE);
-
-    public static Monomial create(Term monoTerm, Services services) {
-        final Map<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
-        monoTerm = TermLabelManager.removeIrrelevantLabels((JTerm) monoTerm,
-            services);
-        // ConcurrentLruCache: get/put are individually atomic, no external lock needed.
-        Monomial res = monomialCache.get(monoTerm);
-
-        if (res == null) {
-            res = createHelp(monoTerm, services);
-            monomialCache.put(monoTerm, res);
+    /**
+     * @return the list of all terms that occur in <code>a</code> but not in <code>b</code>.
+     *         multiplicity is treated as well here, so this is really difference of multisets
+     */
+    private static ImmutableList<Term> difference(ImmutableList<Term> a, ImmutableList<Term> b) {
+        ImmutableList<Term> res = a;
+        final Iterator<Term> it = b.iterator();
+        while (it.hasNext() && !res.isEmpty()) {
+            res = res.removeFirst(it.next());
         }
         return res;
-    }
-
-    private static Monomial createHelp(Term monomial, Services services) {
-        final Analyser a = new Analyser(services);
-        a.analyse(monomial);
-        return new Monomial(a.parts, a.coeff);
     }
 
     public Monomial setCoefficient(BigInteger c) {
@@ -85,7 +63,7 @@ public class Monomial {
             return false;
         }
 
-        return difference(this.parts, m.parts).isEmpty();
+        return Monomial.difference(this.parts, m.parts).isEmpty();
     }
 
     /**
@@ -94,7 +72,8 @@ public class Monomial {
      *         same or a higher power in <code>this</code>
      */
     public boolean variablesSubsume(Monomial m) {
-        return this.parts.size() >= m.parts.size() && difference(m.parts, this.parts).isEmpty();
+        return this.parts.size() >= m.parts.size()
+                && Monomial.difference(m.parts, this.parts).isEmpty();
     }
 
     public boolean variablesEqual(Monomial m) {
@@ -102,7 +81,7 @@ public class Monomial {
     }
 
     public boolean variablesDisjoint(Monomial m) {
-        return difference(m.parts, this.parts).size() == m.parts.size();
+        return Monomial.difference(m.parts, this.parts).size() == m.parts.size();
     }
 
     /**
@@ -113,12 +92,11 @@ public class Monomial {
         final BigInteger a = m.coefficient;
         final BigInteger c = this.coefficient;
 
-        if (LexPathOrdering.compare(a.add(c), a) >= 0
-                && LexPathOrdering.compare(a.subtract(c), a) >= 0) {
+        if (compare(a.add(c), a) >= 0 && compare(a.subtract(c), a) >= 0) {
             return false;
         }
 
-        return difference(this.parts, m.parts).isEmpty();
+        return Monomial.difference(this.parts, m.parts).isEmpty();
     }
 
     /**
@@ -132,7 +110,7 @@ public class Monomial {
             return new Monomial(ImmutableList.nil(), BigInteger.ZERO);
         }
 
-        return new Monomial(difference(m.parts, this.parts), LexPathOrdering.divide(a, c));
+        return new Monomial(Monomial.difference(m.parts, this.parts), divide(a, c));
     }
 
     /**
@@ -140,10 +118,10 @@ public class Monomial {
      *         and <code>this</code> by the monomial <code>this</code>
      */
     public Monomial divideLCR(Monomial m) {
-        Debug.assertFalse(coefficient.signum() == 0);
-        Debug.assertFalse(m.coefficient.signum() == 0);
+        assert coefficient.signum() != 0;
+        assert m.coefficient.signum() != 0;
 
-        final ImmutableList<Term> newParts = difference(m.parts, this.parts);
+        final ImmutableList<Term> newParts = Monomial.difference(m.parts, this.parts);
 
         final BigInteger gcd = coefficient.abs().gcd(m.coefficient.abs());
         return new Monomial(newParts, m.coefficient.divide(gcd));
@@ -192,32 +170,6 @@ public class Monomial {
         return c0;
     }
 
-
-    public Term toTerm(Services services) {
-        final Operator mul = services.getTypeConverter().getIntegerLDT().getMul();
-        Term res = null;
-
-        final Iterator<Term> it = parts.iterator();
-        if (it.hasNext()) {
-            res = it.next();
-            while (it.hasNext()) {
-                res = services.getTermFactory().createTerm(mul, (JTerm) res,
-                    (JTerm) it.next());
-            }
-        }
-
-        final var cTerm = services.getTermBuilder().zTerm(coefficient.toString());
-
-        if (res == null) {
-            res = cTerm;
-        } else if (!BigInteger.ONE.equals(coefficient)) {
-            res = services.getTermFactory().createTerm(mul,
-                (JTerm) res, cTerm);
-        }
-
-        return res;
-    }
-
     @Override
     public String toString() {
         final StringBuilder res = new StringBuilder();
@@ -229,34 +181,6 @@ public class Monomial {
 
         return res.toString();
     }
-
-    private static class Analyser {
-        public BigInteger coeff = BigInteger.ONE;
-        public ImmutableList<Term> parts = ImmutableList.nil();
-        private final Services services;
-        private final Operator numbers, mul;
-
-        public Analyser(final Services services) {
-            this.services = services;
-            final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-            numbers = integerLDT.getNumberSymbol();
-            mul = integerLDT.getMul();
-        }
-
-        public void analyse(Term monomial) {
-            if (monomial.op() == mul) {
-                analyse(monomial.sub(0));
-                analyse(monomial.sub(1));
-            } else if (monomial.op() == numbers) {
-                final BigInteger c = new BigInteger(
-                    AbstractTermTransformer.convertToDecimalString(monomial, services));
-                coeff = coeff.multiply(c);
-            } else {
-                parts = parts.prepend(monomial);
-            }
-        }
-    }
-
 
     @Override
     public boolean equals(Object o) {
@@ -274,7 +198,7 @@ public class Monomial {
         if (parts.size() != m.parts.size()) {
             return false;
         }
-        return difference(parts, m.parts).isEmpty();
+        return Monomial.difference(parts, m.parts).isEmpty();
     }
 
     @Override
@@ -282,19 +206,6 @@ public class Monomial {
         int res = coefficient.hashCode();
         for (Term part : parts) {
             res += part.hashCode();
-        }
-        return res;
-    }
-
-    /**
-     * @return the list of all terms that occur in <code>a</code> but not in <code>b</code>.
-     *         multiplicity is treated as well here, so this is really difference of multisets
-     */
-    private static ImmutableList<Term> difference(ImmutableList<Term> a, ImmutableList<Term> b) {
-        ImmutableList<Term> res = a;
-        final Iterator<Term> it = b.iterator();
-        while (it.hasNext() && !res.isEmpty()) {
-            res = res.removeFirst(it.next());
         }
         return res;
     }
@@ -308,7 +219,53 @@ public class Monomial {
     }
 
     public boolean variablesAreCoprime(Monomial m) {
-        return difference(parts, m.parts).equals(parts);
+        return Monomial.difference(parts, m.parts).equals(parts);
     }
 
+    /**
+     * TODO: this should also be used when comparing terms
+     *
+     * The reduction ordering on integers that is described in "A critical-pair/completion algorithm
+     * for finitely generated ideals in rings", with the difference that positive numbers are here
+     * considered as smaller than negative numbers (with the same absolute value)
+     *
+     * @return a negative number, zero, or a positive number, if <code>a</code> is smaller, equal to
+     *         or greater than <code>b</code>
+     */
+    public static int compare(BigInteger a, BigInteger b) {
+        final int c = a.abs().compareTo(b.abs());
+        if (c != 0) {
+            return c;
+        }
+        return b.signum() - a.signum();
+    }
+
+    /**
+     * @return the result of dividing <code>a</code> by <code>c</code>, such that the remainder
+     *         becomes minimal in the reduction ordering <code>LexPathOrdering.compare</code> on
+     *         integers
+     */
+    public static BigInteger divide(BigInteger a, BigInteger c) {
+        final BigInteger[] divRem = a.divideAndRemainder(c);
+        while (true) {
+            // could be done more efficiently. but apparently the rounding
+            // behaviour of BigInteger.divide for negative numbers is not
+            // properly specified. or everything becomes very tedious ...
+
+            final BigInteger newRem1 = divRem[1].subtract(c);
+            if (compare(newRem1, divRem[1]) < 0) {
+                divRem[0] = divRem[0].add(BigInteger.ONE);
+                divRem[1] = newRem1;
+                continue;
+            }
+            final BigInteger newRem2 = divRem[1].add(c);
+            if (compare(newRem2, divRem[1]) < 0) {
+                divRem[0] = divRem[0].subtract(BigInteger.ONE);
+                divRem[1] = newRem2;
+                continue;
+            }
+
+            return divRem[0];
+        }
+    }
 }
