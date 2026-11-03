@@ -5,9 +5,9 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -30,7 +30,7 @@ public class TermConstructionProjection implements ProjectionToTerm<Goal> {
 
 
     private TermConstructionProjection(Operator op, ProjectionToTerm<Goal>[] subTerms) {
-        assert !(op instanceof JModality); // XXX
+        assert !(op instanceof Modality); // XXX
         this.op = op;
         this.subTerms = subTerms;
         assert op.arity() == subTerms.length;

@@ -388,7 +388,7 @@ public abstract class StaticFeatureCollection {
         return directlyBelowSymbolAtIndex(op(symbol), index);
     }
 
-    protected static Feature directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
+    public static Feature directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
         final var oneUp = FocusProjection.<Goal>create(1);
         if (index == -1) {
             return add(not(TopLevelFindFeature.ANTEC_OR_SUCC), applyTF(oneUp, symbolTF));
