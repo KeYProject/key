@@ -24,7 +24,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
-import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.PerfScope;
 import de.uka.ilkd.key.util.properties.MapProperties;
 
@@ -702,7 +701,7 @@ public final class Goal implements ProofGoal<Goal> {
      * prover's commit lock. The plain {@link #apply(RuleApp)} runs the two back to back, so the
      * single-threaded behaviour is unchanged.
      *
-     * @param ruleApp the rule application to perform
+     * @param p_ruleApp the rule application to perform
      * @return the pending application to be committed, or {@code null} if the rule aborted
      */
     public @Nullable PendingRuleApp computeRuleApp(final RuleApp p_ruleApp) {
