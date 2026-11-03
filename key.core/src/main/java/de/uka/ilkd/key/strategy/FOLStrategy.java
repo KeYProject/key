@@ -77,9 +77,6 @@ public class FOLStrategy extends org.key_project.prover.strategy.FOLStrategy<Goa
 
         bindRuleSet(d, "instanceof_to_exists", TopLevelFindFeature.ANTEC);
 
-        bindRuleSet(d, "try_apply_subst",
-            add(EqNonDuplicateAppFeature.INSTANCE, CostBand.SUBST.cost()));
-
         // delete cast
         bindRuleSet(d, "cast_deletion",
             ifZero(implicitCastNecessary(instOf("castedTerm")),
