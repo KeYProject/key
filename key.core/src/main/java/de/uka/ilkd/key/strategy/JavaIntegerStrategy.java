@@ -113,7 +113,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     @Override
     protected Feature createTrivialMonomialLCRFeature(ProjectionToTerm<Goal> a,
             ProjectionToTerm<Goal> b) {
-        return TrivialMonomialLCRFeature.create(a, b);
+        return TrivialMonomialLCRFeature.create(a, b, JMonomial::create);
     }
 
     @Override
