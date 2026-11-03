@@ -2,17 +2,16 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
+import java.util.function.BiFunction;
 
+import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
-import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
@@ -22,11 +21,13 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * inequations has factors in common with the left side of some other inequation, similarly to how
  * it is decided in the Buchberger algorithm.
  */
-public abstract class InEquationMultFeature extends BinaryTacletAppFeature<Goal> {
+public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
+        extends BinaryTacletAppFeature<GOAL> {
 
-    protected final ProjectionToTerm<Goal> targetCandidate;
-    protected final ProjectionToTerm<Goal> mult1Candidate;
-    protected final ProjectionToTerm<Goal> mult2Candidate;
+    protected final ProjectionToTerm<GOAL> targetCandidate;
+    protected final ProjectionToTerm<GOAL> mult1Candidate;
+    protected final ProjectionToTerm<GOAL> mult2Candidate;
+    protected final BiFunction<Term, LogicServices, Monomial> builder;
 
     /**
      * Return zero iff the multiplication of mult1 and mult2 is allowed, because the resulting
@@ -37,9 +38,11 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature<Goal>
      * @param targetCandidate the left side of the inequation that is supposed to bound the other
      *        two inequations
      */
-    public static Feature partiallyBounded(ProjectionToTerm<Goal> mult1Candidate,
-            ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
-        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
+    public static <GOAL extends ProofGoal<GOAL>> Feature partiallyBounded(
+            ProjectionToTerm<GOAL> mult1Candidate,
+            ProjectionToTerm<GOAL> mult2Candidate, ProjectionToTerm<GOAL> targetCandidate,
+            BiFunction<Term, LogicServices, Monomial> builder) {
+        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate, builder) {
             @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
                 return !mult2M.reduce(targetM).variablesDisjoint(mult1M)
@@ -51,9 +54,11 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature<Goal>
     /**
      * Return zero iff the product of mult1 and mult2 is a factor of target
      */
-    public static Feature totallyBounded(ProjectionToTerm<Goal> mult1Candidate,
-            ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
-        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
+    public static <GOAL extends ProofGoal<GOAL>> Feature totallyBounded(
+            ProjectionToTerm<GOAL> mult1Candidate,
+            ProjectionToTerm<GOAL> mult2Candidate, ProjectionToTerm<GOAL> targetCandidate,
+            BiFunction<Term, LogicServices, Monomial> builder) {
+        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate, builder) {
             @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
                 return targetM.variablesSubsume(mult1M.multiply(mult2M));
@@ -64,9 +69,11 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature<Goal>
     /**
      * Return zero iff the product of mult1 and mult2 is target
      */
-    public static Feature exactlyBounded(ProjectionToTerm<Goal> mult1Candidate,
-            ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
-        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate) {
+    public static <GOAL extends ProofGoal<GOAL>> Feature exactlyBounded(
+            ProjectionToTerm<GOAL> mult1Candidate,
+            ProjectionToTerm<GOAL> mult2Candidate, ProjectionToTerm<GOAL> targetCandidate,
+            BiFunction<Term, LogicServices, Monomial> builder) {
+        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate, builder) {
             @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
                 return targetM.variablesEqual(mult1M.multiply(mult2M));
@@ -74,23 +81,25 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature<Goal>
         };
     }
 
-    protected InEquationMultFeature(ProjectionToTerm<Goal> mult1Candidate,
-            ProjectionToTerm<Goal> mult2Candidate, ProjectionToTerm<Goal> targetCandidate) {
+    protected InEquationMultFeature(ProjectionToTerm<GOAL> mult1Candidate,
+            ProjectionToTerm<GOAL> mult2Candidate, ProjectionToTerm<GOAL> targetCandidate,
+            BiFunction<Term, LogicServices, Monomial> builder) {
         this.mult1Candidate = mult1Candidate;
         this.mult2Candidate = mult2Candidate;
         this.targetCandidate = targetCandidate;
+        this.builder = builder;
     }
 
     @Override
-    protected final boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal,
+    protected final boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal,
             MutableState mState) {
-        final Services services = goal.proof().getServices();
+        final LogicServices services = goal.proof().getServices();
         final Monomial targetM =
-            JMonomial.create(targetCandidate.toTerm(app, pos, goal, mState), services);
+            builder.apply(targetCandidate.toTerm(app, pos, goal, mState), services);
         final Monomial mult1M =
-            JMonomial.create(mult1Candidate.toTerm(app, pos, goal, mState), services);
+            builder.apply(mult1Candidate.toTerm(app, pos, goal, mState), services);
         final Monomial mult2M =
-            JMonomial.create(mult2Candidate.toTerm(app, pos, goal, mState), services);
+            builder.apply(mult2Candidate.toTerm(app, pos, goal, mState), services);
 
         return filter(targetM, mult1M, mult2M);
     }

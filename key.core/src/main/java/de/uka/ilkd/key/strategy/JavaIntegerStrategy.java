@@ -177,7 +177,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
             ProjectionToTerm<Goal> mult1Candidate, ProjectionToTerm<Goal> mult2Candidate,
             ProjectionToTerm<Goal> targetCandidate) {
         return InEquationMultFeature.totallyBounded(mult1Candidate, mult2Candidate,
-            targetCandidate);
+            targetCandidate, JMonomial::create);
     }
 
     @Override
