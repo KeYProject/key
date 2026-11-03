@@ -67,7 +67,7 @@ public class JFOLStrategy extends FOLStrategy {
                         ifZero(notBelowQuantifier(),
                             add(
                                 // prefer cuts over "something = null"
-                                ifZero(applyTF(FocusProjection.create(),
+                                ifZero(applyTF(FocusProjection.<Goal>create(),
                                     opSub(tf.eq, any(), vf.nullTerm)),
                                     longConst(-5), longConst(0)),
                                 // punish cuts over formulas containing anon heap functions

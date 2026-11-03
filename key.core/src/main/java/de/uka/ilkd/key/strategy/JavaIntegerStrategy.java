@@ -32,7 +32,6 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
-import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -232,17 +231,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
 
     @Override
     protected Feature directlyBelowSymbolAtIndex(Operator symbol, int index) {
-        return directlyBelowSymbolAtIndex(op(symbol), index);
-    }
-
-    protected Feature directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
-        final var oneUp = FocusProjection.create(1);
-        if (index == -1) {
-            return add(not(TopLevelFindFeature.ANTEC_OR_SUCC), applyTF(oneUp, symbolTF));
-        }
-        return add(not(TopLevelFindFeature.ANTEC_OR_SUCC),
-            ifZero(applyTF(oneUp, symbolTF), eq(sub(oneUp, index), FocusProjection.create()),
-                inftyConst()));
+        return StaticFeatureCollection.directlyBelowSymbolAtIndex(op(symbol), index);
     }
 
     @Override

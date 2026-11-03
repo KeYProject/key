@@ -376,8 +376,8 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         final TermFeature chain =
             TermPredicateTermFeature.create(
                 t -> getHeapTermSize(t, minHeapSizeForPullout) >= minHeapSizeForPullout);
-        final Feature updateValue = applyTF(FocusProjection.create(1), ff.elemUpdate);
-        return add(applyTF(FocusProjection.create(), chain), updateValue, longConst(-30000));
+        final Feature updateValue = applyTF(FocusProjection.<Goal>create(1), ff.elemUpdate);
+        return add(applyTF(FocusProjection.<Goal>create(), chain), updateValue, longConst(-30000));
     }
 
 
@@ -419,9 +419,8 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
     }
 
     /**
-     * expensive check ensuring that the Skolem constant of teh equation to be hidden is no longer
-     * in the
-     * sequent
+     * expensive check ensuring that the Skolem constant of the equation to be hidden is no longer
+     * in the sequent
      */
     private Feature isSkolemConstantUsedElsewhereInSequent() {
         final TermBuffer sf = new TermBuffer();

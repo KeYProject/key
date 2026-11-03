@@ -29,6 +29,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
 
@@ -163,6 +164,7 @@ public class ModularJavaDLStrategy extends JavaAbstractFeatureStrategy {
     private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs) {
         var folStrat = responsibleStrategyCache.getStrategyByName(JFOLStrategy.NAME);
         var intStrat = responsibleStrategyCache.getStrategyByName(JavaIntegerStrategy.NAME);
+        final ProjectionToTerm<Goal> focus = FocusProjection.create(0);
         switch (rs.name().toString()) {
             case "order_terms" -> {
                 bindRuleSet(d, "order_terms",
@@ -172,14 +174,14 @@ public class ModularJavaDLStrategy extends JavaAbstractFeatureStrategy {
             }
             case "apply_equations" -> {
                 bindRuleSet(d, "apply_equations",
-                    ifZero(applyTF(FocusProjection.create(0), tf.intF),
+                    ifZero(applyTF(focus, tf.intF),
                         intStrat.getDispatcher(StrategyAspect.Cost).remove(rs),
                         folStrat.getDispatcher(StrategyAspect.Cost).remove(rs)));
             }
             case "apply_equations_andOr" -> {
                 if (quantifierInstantiatedEnabled()) {
                     bindRuleSet(d, "apply_equations_andOr",
-                        ifZero(applyTF(FocusProjection.create(0), tf.intF),
+                        ifZero(applyTF(focus, tf.intF),
                             intStrat.getDispatcher(StrategyAspect.Cost).remove(rs),
                             folStrat.getDispatcher(StrategyAspect.Cost).remove(rs)));
                 } else {

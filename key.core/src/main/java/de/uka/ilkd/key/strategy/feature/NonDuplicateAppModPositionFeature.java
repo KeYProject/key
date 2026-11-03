@@ -5,8 +5,9 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
@@ -20,7 +21,7 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
     public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature();
 
     @Override
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
+    protected boolean comparePio(ITacletApp newApp, ITacletApp oldApp,
             PosInOccurrence newPio,
             PosInOccurrence oldPio) {
         final JTerm newFocus = (JTerm) newPio.subTerm();
@@ -35,7 +36,7 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
         // compare the update terms modulo term labels: labels carry history (e.g. origin), and a
         // duplicate check that is sensitive to them misses semantically equal applications
-        return equalUpdateContext(oldApp.instantiations().getUpdateContext(),
-            newApp.instantiations().getUpdateContext());
+        return equalUpdateContext(((SVInstantiations) oldApp.instantiations()).getUpdateContext(),
+            ((SVInstantiations) newApp.instantiations()).getUpdateContext());
     }
 }

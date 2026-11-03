@@ -319,20 +319,21 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                     TermSmallerThanFeature.create(right, left))),
                 longConst(CombinationCost.CNF_CONVERSION)));
 
+        final ProjectionToTerm<Goal> focus = FocusProjection.create();
         bindRuleSet(d, "distrQuantifier",
             add(or(
-                applyTF(FocusProjection.create(),
+                applyTF(focus,
                     add(ff.quantifiedClauseSet, not(opSub(Quantifier.ALL, ff.orF)),
                         EliminableQuantifierTF.INSTANCE)),
                 SumFeature.createSum(onlyInScopeOfQuantifiers(),
                     SplittableQuantifiedFormulaFeature.INSTANCE,
                     ifZero(FocusInAntecFeature.getInstance(),
-                        applyTF(FocusProjection.create(), sub(ff.andF)),
-                        applyTF(FocusProjection.create(), sub(ff.orF))))),
+                        applyTF(focus, sub(ff.andF)),
+                        applyTF(focus, sub(ff.orF))))),
                 longConst(QUANTIFIER_DISTRIBUTION)));
 
         bindRuleSet(d, "swapQuantifiers",
-            add(applyTF(FocusProjection.create(), add(ff.quantifiedClauseSet,
+            add(applyTF(focus, add(ff.quantifiedClauseSet,
                 EliminableQuantifierTF.INSTANCE, sub(not(EliminableQuantifierTF.INSTANCE)))),
                 longConst(QUANTIFIER_DISTRIBUTION)));
 
@@ -372,7 +373,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
 
         final Feature pullOutQuantifierAllowed =
             add(isBelow(OperatorClassTF.create(Quantifier.class)), onlyBelowQuanAndOr, applyTF(
-                FocusProjection.create(0), sub(ff.quantifiedClauseSet, ff.quantifiedClauseSet)));
+                focus, sub(ff.quantifiedClauseSet, ff.quantifiedClauseSet)));
 
         bindRuleSet(d, "pullOutQuantifierUnifying", PULL_OUT_QUANTIFIER);
 
@@ -403,7 +404,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
 
             bindRuleSet(d, "gamma",
                 SumFeature.createSum(FocusInAntecFeature.getInstance(),
-                    applyTF(FocusProjection.create(0),
+                    applyTF(FocusProjection.<Goal>create(0),
                         add(ff.quantifiedClauseSet,
                             instQuantifiersWithQueries() ? longTermConst(0)
                                     : ff.notContainsExecutable)),
@@ -500,11 +501,11 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                 ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0),
                 CostBand.DEFAULT.at(20)));
         TermBuffer superF = new TermBuffer();
-        final ProjectionToTerm<Goal> splitCondition = sub(FocusProjection.create(), 0);
+        final ProjectionToTerm<Goal> focus = FocusProjection.create();
+        final ProjectionToTerm<Goal> splitCondition = sub(focus, 0);
         bindRuleSet(d, "split_cond", add(// do not split over formulas containing auxiliary
             // variables
-            applyTF(FocusProjection.create(),
-                rec(any(), not(selectSkolemConstantTermFeature()))),
+            applyTF(focus, rec(any(), not(selectSkolemConstantTermFeature()))),
             // prefer splits when condition has quantifiers (less
             // likely to be simplified away)
             applyTF(splitCondition,
@@ -513,7 +514,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
             ScaleFeature.createAffine(countOccurrences(splitCondition), -10, 10),
             sum(superF, SuperTermGenerator.upwards(any(), getServices()),
                 applyTF(superF, not(ff.elemUpdate))),
-            ifZero(applyTF(FocusProjection.create(), ContainsExecutableCodeTermFeature.PROGRAMS),
+            ifZero(applyTF(focus, ContainsExecutableCodeTermFeature.PROGRAMS),
                 CostBand.DEFAULT.at(-100), CostBand.DEFAULT.at(25))));
         ProjectionToTerm<Goal> cutFormula = instOf("cutFormula");
         Feature countOccurrencesInSeq =
@@ -589,7 +590,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                 longConst(CombinationCost.ORDERED_REWRITING)));
 
         bindRuleSet(d, "insert_eq_nonrigid",
-            applyTF(FocusProjection.create(0), IsNonRigidTermFeature.INSTANCE));
+            applyTF(FocusProjection.<Goal>create(0), IsNonRigidTermFeature.INSTANCE));
     }
 
     // //////////////////////////////////////////////////////////////////////////
