@@ -432,7 +432,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
 
     private void setupSystemInvariantSimp(RuleSetDispatchFeature d) {
         bindRuleSet(d, "system_invariant",
-            ifZero(MatchedAssumesFeature.INSTANCE, add(applyTF("negLit", tf.negLiteral),
+            ifZero(MatchedAssumesFeature.create(), add(applyTF("negLit", tf.negLiteral),
                 applyTFNonStrict("nonNegLit", tf.nonNegLiteral))));
     }
 

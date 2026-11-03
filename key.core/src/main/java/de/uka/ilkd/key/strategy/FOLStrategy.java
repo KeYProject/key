@@ -117,9 +117,9 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
         bindRuleSet(d, "obsolete", inftyConst());
 
         bindRuleSet(d, "no_self_application",
-            ifZero(MatchedAssumesFeature.INSTANCE, NoSelfApplicationFeature.create()));
+            ifZero(MatchedAssumesFeature.create(), NoSelfApplicationFeature.create()));
 
-        bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedAssumesFeature.INSTANCE,
+        bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedAssumesFeature.create(),
             not(contains(AssumptionProjection.<Goal>create(0), FocusProjection.create(),
                 StaticFeatureCollection::eq))));
 
@@ -468,7 +468,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
 
     private void setupReplaceKnown(RuleSetDispatchFeature d) {
         final Feature commonF =
-            add(ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndAssumesFeature.create()),
+            add(ifZero(MatchedAssumesFeature.create(), DiffFindAndAssumesFeature.create()),
                 CostBand.NORMALIZE.cost(),
                 add(DiffFindAndReplacewithFeature.INSTANCE,
                     ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0)));
@@ -577,7 +577,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
         // summands)
         bindRuleSet(d, "apply_equations",
             SumFeature.createSum(
-                ifZero(MatchedAssumesFeature.INSTANCE,
+                ifZero(MatchedAssumesFeature.create(),
                     add(CheckApplyEqFeature.INSTANCE, let(equation, AssumptionProjection.create(0),
                         add(not(applyTF(equation, ff.update)),
                             // there might be updates in

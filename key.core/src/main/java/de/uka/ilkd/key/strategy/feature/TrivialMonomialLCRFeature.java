@@ -17,7 +17,6 @@ import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-
 /**
  * Return zero of the least common reducible of two monomials is so trivial that it is not necessary
  * to do the critical pair completion

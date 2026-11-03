@@ -18,8 +18,9 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 @StableCost
 public final class MatchedAssumesFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
-
-    public static final Feature INSTANCE = new MatchedAssumesFeature();
+    public static  <GOAL extends ProofGoal<GOAL>> MatchedAssumesFeature<GOAL> create() {
+        return new MatchedAssumesFeature<>();
+    }
 
     private MatchedAssumesFeature() {}
 

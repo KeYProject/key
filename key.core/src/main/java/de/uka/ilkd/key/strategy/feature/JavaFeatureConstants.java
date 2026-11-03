@@ -6,24 +6,17 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
 
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.FeatureConstants;
-import org.key_project.prover.strategy.costbased.feature.DiffFindAndAssumesFeature;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.FindRightishFeature;
-import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
+import org.key_project.prover.strategy.costbased.feature.*;
 
 import org.jspecify.annotations.NullMarked;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 @NullMarked
 public class JavaFeatureConstants implements FeatureConstants<Goal> {
-
-    @Override
-    public Feature matchedAssumesFeature() {
-        return MatchedAssumesFeature.INSTANCE;
-    }
-
     @Override
     public Feature nonDuplicateAppModPositionFeature() {
         return NonDuplicateAppModPositionFeature.INSTANCE;
@@ -32,11 +25,6 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     @Override
     public Feature notInScopeOfModalityFeature() {
         return NotInScopeOfModalityFeature.INSTANCE;
-    }
-
-    @Override
-    public Feature diffFindAndIfFeature() {
-        return DiffFindAndAssumesFeature.create();
     }
 
     @Override
@@ -52,5 +40,11 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     @Override
     public Feature findRightishFeature(IIntLdt numbers, Operator equals) {
         return FindRightishFeature.create(numbers, equals);
+    }
+
+    @Override
+    public Feature createReducibleMonomialFeature(ProjectionToTerm<Goal> dividend,
+                                                     ProjectionToTerm<Goal> divisor) {
+        return ReducibleMonomialsFeature.createReducible(dividend, divisor, JMonomial::create);
     }
 }

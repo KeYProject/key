@@ -145,7 +145,7 @@ public class StringStrategy extends JavaAbstractFeatureStrategy implements Compo
         bindRuleSet(d, "defOpsStartsEndsWith", CostBand.DEFER.at(-250));
 
         bindRuleSet(d, "stringsConcatNotBothLiterals",
-            ifZero(MatchedAssumesFeature.INSTANCE, ifZero(
+            ifZero(MatchedAssumesFeature.create(), ifZero(
                 add(applyTF(StaticFeatureCollection.instOf("leftStr"), seqLiteral),
                     applyTF(StaticFeatureCollection.instOf("rightStr"), seqLiteral)),
                 inftyConst()), inftyConst()));

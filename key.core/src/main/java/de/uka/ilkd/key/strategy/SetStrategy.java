@@ -68,7 +68,7 @@ public class SetStrategy extends AbstractFeatureStrategy<Goal> implements Compon
         final Feature operandCollapses = or(applyTF("distributedSet", collapses),
             applyTF("unionLeft", collapses), applyTF("unionRight", collapses));
         bindRuleSet(d, "setDist",
-            add(ifZero(MatchedAssumesFeature.INSTANCE, operandCollapses, CostBand.DEFAULT.cost()),
+            add(ifZero(MatchedAssumesFeature.create(), operandCollapses, CostBand.DEFAULT.cost()),
                 longConst(DIST)));
 
         bindRuleSet(d, "setAssoc", longConst(-850));

@@ -259,7 +259,7 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
         }
 
         bindRuleSet(d, "confluence_restricted",
-            ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndAssumesFeature.create()));
+            ifZero(MatchedAssumesFeature.create(), DiffFindAndAssumesFeature.create()));
 
         final TermBuffer superFor = new TermBuffer();
         bindRuleSet(d, "split_if",

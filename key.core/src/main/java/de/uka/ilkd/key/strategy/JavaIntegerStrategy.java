@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 
+import de.uka.ilkd.key.logic.LexPathOrdering;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -64,7 +65,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
                                 .getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY)),
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE),
-            new JavaFeatureConstants(), proof.getServices().getTypeConverter().getIntegerLDT());
+            new JavaFeatureConstants(), new LexPathOrdering(), proof.getServices().getTypeConverter().getIntegerLDT());
         this.proof = proof;
         init();
     }
@@ -110,12 +111,6 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     }
 
     @Override
-    protected Feature createReducibleMonomialFeature(ProjectionToTerm<Goal> dividend,
-            ProjectionToTerm<Goal> divisor) {
-        return ReducibleMonomialsFeature.createReducible(dividend, divisor, JMonomial::create);
-    }
-
-    @Override
     protected Feature createTrivialMonomialLCRFeature(ProjectionToTerm<Goal> a,
             ProjectionToTerm<Goal> b) {
         return TrivialMonomialLCRFeature.create(a, b);
@@ -131,19 +126,6 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     protected ProjectionToTerm<Goal> createMonomialColumnOp(ProjectionToTerm<Goal> leftCoefficient,
             ProjectionToTerm<Goal> polynomial) {
         return MonomialColumnOp.create(leftCoefficient, polynomial);
-    }
-
-    @Override
-    protected Feature createMonomialsSmallerThanFeature(ProjectionToTerm<Goal> left,
-            ProjectionToTerm<Goal> right, IIntLdt numbers) {
-        return MonomialsSmallerThanFeature.create(left, right,
-            StaticFeatureCollection.createTermOrdering(), numbers);
-    }
-
-    @Override
-    protected Feature createAtomSmallerThanFeature(String left, String right, IIntLdt numbers) {
-        return AtomsSmallerThanFeature.<Goal>create(instOf(left), instOf(right),
-            StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
     @Override
@@ -210,13 +192,6 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     protected Feature createEqPolynomialValuesCmpFeature(ProjectionToTerm<Goal> left,
             ProjectionToTerm<Goal> right) {
         return PolynomialValuesCmpFeature.eq(left, right);
-    }
-
-    @Override
-    protected Feature createEqPolynomialValuesCmpFeature(ProjectionToTerm<Goal> left,
-            ProjectionToTerm<Goal> right, ProjectionToTerm<Goal> leftCoeff,
-            ProjectionToTerm<Goal> rightCoeff) {
-        return PolynomialValuesCmpFeature.eq(left, right, leftCoeff, rightCoeff);
     }
 
     @Override

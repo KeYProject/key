@@ -76,7 +76,7 @@ public class ModularJavaDLStrategy extends JavaAbstractFeatureStrategy {
         // competing computations
         conflictCostDispatcher = resolveConflicts();
 
-        final Feature ifMatchedF = ifZero(MatchedAssumesFeature.INSTANCE, longConst(+1));
+        final Feature ifMatchedF = ifZero(MatchedAssumesFeature.create(), longConst(+1));
         Feature reduceCostTillMaxF = new ReduceTillMaxFeature(Feature::computeCost,
             (rule) -> responsibleStrategyCache.getResponsibleStrategies(rule, strategies,
                 StrategyAspect.Cost));

@@ -8,20 +8,19 @@ import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 public interface FeatureConstants<G extends ProofGoal<G>> {
-
-    Feature matchedAssumesFeature();
-
     Feature nonDuplicateAppModPositionFeature();
 
     Feature notInScopeOfModalityFeature();
-
-    Feature diffFindAndIfFeature();
 
     Feature topLevelFindSucc();
 
     Feature checkApplyEqFeature();
 
     Feature findRightishFeature(IIntLdt numbers, Operator equals);
+
+    Feature createReducibleMonomialFeature(ProjectionToTerm<G> dividend,
+                                           ProjectionToTerm<G> divisor);
 }
