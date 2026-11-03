@@ -34,6 +34,7 @@ import org.key_project.prover.strategy.costbased.feature.InstantiatedSVFeature;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationProjection;
+import org.key_project.prover.strategy.costbased.termProjection.SubtermProjection;
 import org.key_project.prover.strategy.costbased.termfeature.*;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
