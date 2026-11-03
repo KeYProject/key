@@ -16,8 +16,8 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
-import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
-import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
+import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
@@ -120,7 +120,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
             ifZero(MatchedAssumesFeature.INSTANCE, NoSelfApplicationFeature.INSTANCE));
 
         bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedAssumesFeature.INSTANCE,
-            not(contains(AssumptionProjection.create(0), FocusProjection.INSTANCE,
+            not(contains(AssumptionProjection.create(0), FocusProjection.create(),
                 StaticFeatureCollection::eq))));
 
         bindRuleSet(d, "update_elim",
@@ -143,7 +143,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
             add(not(isTriggerVariableInstantiated()), CostBand.DEFER.cost()));
 
         bindRuleSet(d, "comprehension_split",
-            add(applyTF(FocusFormulaProjection.INSTANCE, ff.notContainsExecutable),
+            add(applyTF(FocusFormulaProjection.<Goal>create(), ff.notContainsExecutable),
                 ifZero(allowQuantifierSplitting(), CostBand.DEFER.at(2000),
                     CostBand.DEFER.at(4500))));
 
@@ -297,7 +297,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
 
         bindRuleSet(d, "moveQuantToLeft",
             add(quantifiersMightSplit() ? CostBand.DEFAULT.cost()
-                    : applyTF(FocusFormulaProjection.INSTANCE, ff.quantifiedPureLitConjDisj),
+                    : applyTF(FocusFormulaProjection.<Goal>create(), ff.quantifiedPureLitConjDisj),
                 CostBand.PREFER.at(-50)));
 
         bindRuleSet(d, "conjNormalForm",
@@ -321,18 +321,18 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
 
         bindRuleSet(d, "distrQuantifier",
             add(or(
-                applyTF(FocusProjection.INSTANCE,
+                applyTF(FocusProjection.create(),
                     add(ff.quantifiedClauseSet, not(opSub(Quantifier.ALL, ff.orF)),
                         EliminableQuantifierTF.INSTANCE)),
                 SumFeature.createSum(onlyInScopeOfQuantifiers(),
                     SplittableQuantifiedFormulaFeature.INSTANCE,
                     ifZero(FocusInAntecFeature.getInstance(),
-                        applyTF(FocusProjection.INSTANCE, sub(ff.andF)),
-                        applyTF(FocusProjection.INSTANCE, sub(ff.orF))))),
+                        applyTF(FocusProjection.create(), sub(ff.andF)),
+                        applyTF(FocusProjection.create(), sub(ff.orF))))),
                 longConst(QUANTIFIER_DISTRIBUTION)));
 
         bindRuleSet(d, "swapQuantifiers",
-            add(applyTF(FocusProjection.INSTANCE, add(ff.quantifiedClauseSet,
+            add(applyTF(FocusProjection.create(), add(ff.quantifiedClauseSet,
                 EliminableQuantifierTF.INSTANCE, sub(not(EliminableQuantifierTF.INSTANCE)))),
                 longConst(QUANTIFIER_DISTRIBUTION)));
 
@@ -500,10 +500,10 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                 ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0),
                 CostBand.DEFAULT.at(20)));
         TermBuffer superF = new TermBuffer();
-        final ProjectionToTerm<Goal> splitCondition = sub(FocusProjection.INSTANCE, 0);
+        final ProjectionToTerm<Goal> splitCondition = sub(FocusProjection.create(), 0);
         bindRuleSet(d, "split_cond", add(// do not split over formulas containing auxiliary
             // variables
-            applyTF(FocusProjection.INSTANCE,
+            applyTF(FocusProjection.create(),
                 rec(any(), not(selectSkolemConstantTermFeature()))),
             // prefer splits when condition has quantifiers (less
             // likely to be simplified away)
@@ -513,7 +513,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
             ScaleFeature.createAffine(countOccurrences(splitCondition), -10, 10),
             sum(superF, SuperTermGenerator.upwards(any(), getServices()),
                 applyTF(superF, not(ff.elemUpdate))),
-            ifZero(applyTF(FocusProjection.INSTANCE, ContainsExecutableCodeTermFeature.PROGRAMS),
+            ifZero(applyTF(FocusProjection.create(), ContainsExecutableCodeTermFeature.PROGRAMS),
                 CostBand.DEFAULT.at(-100), CostBand.DEFAULT.at(25))));
         ProjectionToTerm<Goal> cutFormula = instOf("cutFormula");
         Feature countOccurrencesInSeq =
@@ -533,7 +533,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
                                 longConst(CUT_DIRECT_STANDARD)),
                             SumFeature // check for cuts below quantifiers
                                     .createSum(applyTF(cutFormula, ff.cutAllowedBelowQuantifier),
-                                        applyTF(FocusFormulaProjection.INSTANCE,
+                                        applyTF(FocusFormulaProjection.<Goal>create(),
                                             ff.quantifiedClauseSet),
                                         ifZero(allowQuantifierSplitting(),
                                             CostBand.DEFAULT.cost(),
@@ -541,9 +541,9 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
     }
 
     private void setupSplittingApproval(RuleSetDispatchFeature d) {
-        bindRuleSet(d, "beta", allowSplitting(FocusFormulaProjection.INSTANCE));
+        bindRuleSet(d, "beta", allowSplitting(FocusFormulaProjection.create()));
 
-        bindRuleSet(d, "split_cond", allowSplitting(FocusProjection.INSTANCE));
+        bindRuleSet(d, "split_cond", allowSplitting(FocusProjection.create()));
 
         final TermBuffer subFor = new TermBuffer();
         final Feature compareCutAllowed = ifZero(applyTF(subFor, ff.cutAllowed),
@@ -552,7 +552,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
         final Feature noBetterCut =
             sum(subFor, AllowedCutPositionsGenerator.INSTANCE, compareCutAllowed);
 
-        bindRuleSet(d, "cut_direct", add(allowSplitting(FocusFormulaProjection.INSTANCE),
+        bindRuleSet(d, "cut_direct", add(allowSplitting(FocusFormulaProjection.create()),
             ifZero(notBelowQuantifier(), noBetterCut)));
     }
 

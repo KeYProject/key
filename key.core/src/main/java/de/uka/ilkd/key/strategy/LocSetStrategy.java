@@ -11,9 +11,9 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
-import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
+import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
 import org.key_project.logic.Name;
@@ -69,7 +69,7 @@ public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
         /// rest of the sequent (e.g, ==> l \in allObjects(f) would lead to an application but
         /// allObjects(f) = EQ ==> l \in EQ not)
         bindRuleSet(d, "locSetEqualityBlastingRight",
-            ifZero(applyTF(FocusFormulaProjection.INSTANCE, lsf.requireLocationDecomposition),
+            ifZero(applyTF(FocusFormulaProjection.<Goal>create(), lsf.requireLocationDecomposition),
                 longConst(-100), longConst(-80)));
 
         bindRuleSet(d, "locSetArrayRangeMerge",

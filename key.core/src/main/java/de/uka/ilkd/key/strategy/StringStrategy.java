@@ -26,6 +26,7 @@ import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
@@ -34,7 +35,6 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.strategy.StringCost.*;
-import static org.key_project.prover.strategy.StaticFeatureCollection.*;
 
 /// Strategy for string related rules.
 ///

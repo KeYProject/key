@@ -11,7 +11,7 @@ import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 

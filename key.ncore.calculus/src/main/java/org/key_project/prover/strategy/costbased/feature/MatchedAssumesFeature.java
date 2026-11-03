@@ -2,15 +2,12 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
-
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
@@ -19,15 +16,15 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  * does not have any if-formulas.
  */
 @StableCost
-public final class MatchedAssumesFeature extends BinaryTacletAppFeature {
+public final class MatchedAssumesFeature<GOAL extends ProofGoal<GOAL>> extends BinaryTacletAppFeature<GOAL> {
 
     public static final Feature INSTANCE = new MatchedAssumesFeature();
 
     private MatchedAssumesFeature() {}
 
     @Override
-    protected boolean filter(@MonotonicNonNull TacletApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, GOAL goal,
+                             MutableState mState) {
         return app.assumesInstantionsComplete();
     }
 

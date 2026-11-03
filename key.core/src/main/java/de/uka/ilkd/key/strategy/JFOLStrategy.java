@@ -8,7 +8,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
-import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.strategy.costbased.feature.Feature;
@@ -67,7 +67,7 @@ public class JFOLStrategy extends FOLStrategy {
                         ifZero(notBelowQuantifier(),
                             add(
                                 // prefer cuts over "something = null"
-                                ifZero(applyTF(FocusProjection.INSTANCE,
+                                ifZero(applyTF(FocusProjection.create(),
                                     opSub(tf.eq, any(), vf.nullTerm)),
                                     longConst(-5), longConst(0)),
                                 // punish cuts over formulas containing anon heap functions

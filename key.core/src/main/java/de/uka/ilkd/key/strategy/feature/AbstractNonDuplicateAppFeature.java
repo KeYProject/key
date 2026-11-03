@@ -21,6 +21,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableMapEntry;
@@ -28,7 +29,7 @@ import org.key_project.util.collection.ImmutableMapEntry;
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 
-public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature {
+public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature<Goal> {
     protected AbstractNonDuplicateAppFeature() {}
 
     /**

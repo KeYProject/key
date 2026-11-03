@@ -5,32 +5,16 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
-import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
 
 import org.key_project.ldt.IIntLdt;
 import org.key_project.prover.strategy.FeatureConstants;
 import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NullMarked;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 
 @NullMarked
 public class JavaFeatureConstants implements FeatureConstants<Goal> {
-    @Override
-    public ProjectionToTerm<Goal> focusProjection() {
-        return FocusProjection.INSTANCE;
-    }
-
-    @Override
-    public ProjectionToTerm<Goal> focusProjection(int stepsUpwards) {
-        return FocusProjection.create(stepsUpwards);
-    }
-
-    @Override
-    public ProjectionToTerm<Goal> focusFormulaProjection() {
-        return FocusFormulaProjection.INSTANCE;
-    }
 
     @Override
     public Feature matchedAssumesFeature() {

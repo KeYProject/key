@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy;
 
 
 import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.*;
@@ -33,6 +32,7 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -241,7 +241,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
             return add(not(TopLevelFindFeature.ANTEC_OR_SUCC), applyTF(oneUp, symbolTF));
         }
         return add(not(TopLevelFindFeature.ANTEC_OR_SUCC),
-            ifZero(applyTF(oneUp, symbolTF), eq(sub(oneUp, index), FocusProjection.INSTANCE),
+            ifZero(applyTF(oneUp, symbolTF), eq(sub(oneUp, index), FocusProjection.create()),
                 inftyConst()));
     }
 
@@ -276,16 +276,6 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     @Override
     protected TermGenerator<Goal> createRootsGenerator(ProjectionToTerm<Goal> powerRelation) {
         return RootsGenerator.create(powerRelation, proof.getServices());
-    }
-
-    @Override
-    protected Operator or() {
-        return Junctor.OR;
-    }
-
-    @Override
-    protected Operator and() {
-        return Junctor.AND;
     }
 
     @Override

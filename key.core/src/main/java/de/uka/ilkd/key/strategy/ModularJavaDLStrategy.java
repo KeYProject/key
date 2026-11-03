@@ -10,9 +10,9 @@ import java.util.function.Function;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;

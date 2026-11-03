@@ -36,6 +36,8 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
+import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermPredicateTermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
@@ -306,7 +308,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             // function symbol)
             add(applyTF("h",
                 not(or(PrimitiveHeapTermFeature.create(heapLDT), anonHeapTermFeature()))),
-                ifZero(applyTF(FocusFormulaProjection.INSTANCE, ff.update),
+                ifZero(applyTF(FocusFormulaProjection.<Goal>create(), ff.update),
                     longConst(PULL_OUT_SELECT_BELOW_UPDATE),
                     longConst(PULL_OUT_SELECT)),
                 NonDuplicateAppModPositionFeature.INSTANCE));
@@ -326,7 +328,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             // to be a select term on a non-base- and
             // non-anon-heap)
             add(isSelectSkolemConstantTerm("sk"),
-                applyTF(sub(FocusProjection.INSTANCE, 0),
+                applyTF(sub(FocusProjection.<Goal>create(), 0),
                     not(SimplifiedSelectTermFeature.create(heapLDT))),
                 longConst(SIMPLIFY_SELECT)));
         bindRuleSet(d, "simplify_select_concrete", longConst(-6000));
@@ -375,7 +377,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             TermPredicateTermFeature.create(
                 t -> getHeapTermSize(t, minHeapSizeForPullout) >= minHeapSizeForPullout);
         final Feature updateValue = applyTF(FocusProjection.create(1), ff.elemUpdate);
-        return add(applyTF(FocusProjection.INSTANCE, chain), updateValue, longConst(-30000));
+        return add(applyTF(FocusProjection.create(), chain), updateValue, longConst(-30000));
     }
 
 
@@ -425,7 +427,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         final TermBuffer sf = new TermBuffer();
         return add(sequentContainsNoPrograms(),
             sum(sf, SequentFormulasGenerator.sequent(),
-                or(StaticFeatureCollection.eq(sf, FocusFormulaProjection.INSTANCE),
+                or(StaticFeatureCollection.eq(sf, FocusFormulaProjection.create()),
                     not(ContainsTermFeature.create(sf, instOf("auxiliarySK"))))));
     }
 

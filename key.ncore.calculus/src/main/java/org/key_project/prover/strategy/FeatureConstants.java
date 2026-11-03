@@ -10,11 +10,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 public interface FeatureConstants<G extends ProofGoal<G>> {
-    ProjectionToTerm<G> focusProjection();
-
-    ProjectionToTerm<G> focusProjection(int stepsUpwards);
-
-    ProjectionToTerm<G> focusFormulaProjection();
 
     Feature matchedAssumesFeature();
 

@@ -29,6 +29,7 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.*;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
@@ -382,7 +383,7 @@ public abstract class StaticFeatureCollection {
             return add(not(TopLevelFindFeature.ANTEC_OR_SUCC), applyTF(oneUp, symbolTF));
         }
         return add(not(TopLevelFindFeature.ANTEC_OR_SUCC),
-            ifZero(applyTF(oneUp, symbolTF), eq(sub(oneUp, index), FocusProjection.INSTANCE),
+            ifZero(applyTF(oneUp, symbolTF), eq(sub(oneUp, index), FocusProjection.create()),
                 inftyConst()));
     }
 

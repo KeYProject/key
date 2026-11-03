@@ -2,16 +2,14 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.termProjection;
+package org.key_project.prover.strategy.costbased.termProjection;
 
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.proof.Goal;
-
+import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
-import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
  * Projection of a rule application to its focus (the term or formula that the rule operates on,
@@ -22,9 +20,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 // from the find subterm, so it reads the surrounding find formula -- valid only while that
 // formula is unchanged.
 @WeakStableCost
-public class FocusProjection implements ProjectionToTerm<Goal> {
-
-    public static final ProjectionToTerm<Goal> INSTANCE = create(0);
+public class FocusProjection<Goal extends ProofGoal<Goal>> implements ProjectionToTerm<Goal> {
 
     private final int stepsUpwards;
 
@@ -33,12 +29,16 @@ public class FocusProjection implements ProjectionToTerm<Goal> {
         this.stepsUpwards = stepsUpwards;
     }
 
-    public static ProjectionToTerm<Goal> create(int stepsUpwards) {
+    public static <Goal extends ProofGoal<Goal>> ProjectionToTerm<Goal> create() {
+        return create(0);
+    }
+
+    public static <Goal extends ProofGoal<Goal>> ProjectionToTerm<Goal> create(int stepsUpwards) {
         return new FocusProjection(stepsUpwards);
     }
 
     @Override
-    public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;
@@ -46,7 +46,7 @@ public class FocusProjection implements ProjectionToTerm<Goal> {
             pos = pos.up();
         }
 
-        return (JTerm) pos.subTerm();
+        return pos.subTerm();
     }
 
 }

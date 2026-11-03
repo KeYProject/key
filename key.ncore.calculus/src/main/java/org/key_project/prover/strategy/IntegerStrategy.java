@@ -7,6 +7,8 @@ package org.key_project.prover.strategy;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -71,7 +73,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         MODEL_SEARCH
     }
 
-    /// configuration options extracted from [StrategyProperties]
+    /// configuration options extracted from {@code StrategyProperties}
     protected final ArithTreatment arith;
     private final boolean stopAtFirstNonCloseableGoal;
 
@@ -196,7 +198,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         final TermBuffer<G> right = new TermBuffer<>();
         bindRuleSet(d, "apply_equations",
             SumFeature.createSum(
-                add(applyTF(featureConstants.focusProjection(0), tf.monomial),
+                add(applyTF(FocusProjection.<G>create(), tf.monomial),
                     ScaleFeature.createScaled(featureConstants.findRightishFeature(numbers), 5.0)),
                 ifZero(featureConstants.matchedAssumesFeature(),
                     add(featureConstants.checkApplyEqFeature(),
@@ -429,12 +431,12 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                 StaticFeatureCollection.<G>applyTF(AssumptionProjection.create(0),
                     atLeastTwoLCEquation),
                 add(FocusInAntecFeature.getInstance(),
-                    applyTF(featureConstants.focusFormulaProjection(), atLeastTwoLCEquation))),
+                    applyTF(FocusFormulaProjection.<G>create(), atLeastTwoLCEquation))),
             createReducibleMonomialFeature(focus, eqLeft));
 
         final Feature eqMonomialFeature = add(not(directlyBelowSymbolAtIndex(tf.mul, -1)),
             ifZero(featureConstants.matchedAssumesFeature(),
-                let(focus, featureConstants.focusProjection(0),
+                let(focus, FocusProjection.create(),
                     let(eqLeft, sub(AssumptionProjection.<G>create(0), 0), validEqApplication))));
 
         bindRuleSet(d, "polySimp_applyEq",
@@ -476,7 +478,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         // polynomial division modulo equations of the antecedent
 
         final Feature checkCoeffE = ifZero(
-            contains(divCoeff, featureConstants.focusProjection(0), this::createEqTermFeature),
+            contains(divCoeff, FocusProjection.create(), this::createEqTermFeature),
             // do not apply if the result contains the original term
             longConst(0), add(instantiate("polyDivCoeff", divCoeff), inftyConst()));
 
@@ -859,7 +861,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                      * "multRight", tf.polynomial ) ), ifZero ( applyTF ( "multFacRight", tf.literal
                      * ), longConst ( -100 ), applyTF ( "multFacRight", tf.polynomial ) ),
                      */
-                    not(createTermSmallerThanFeature(featureConstants.focusProjection(0),
+                    not(createTermSmallerThanFeature(FocusProjection.create(),
                         AssumptionProjection.create(0))),
                     onlyExactlyBounded
                             ? ifZero(add(applyTF("multLeft", tf.linearMonomial),
@@ -1017,9 +1019,9 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             add(isRootInferenceProducer(intRel),
                 forEach(rootInf, createRootsGenerator(intRel),
                     add(instantiate("cutFormula", rootInf),
-                        ifZero(applyTF(rootInf, op(or())),
+                        ifZero(applyTF(rootInf, ff.orF()),
                             CostBand.DEFAULT.at(50)),
-                        ifZero(applyTF(rootInf, op(and())),
+                        ifZero(applyTF(rootInf, ff.andF()),
                             CostBand.DEFAULT.at(20)))),
                 longConst(NonlinearArithmeticCost.MULTIPLY)));
 
@@ -1199,10 +1201,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             IIntLdt numbers);
 
     protected abstract TermGenerator<G> createRootsGenerator(ProjectionToTerm<G> powerRelation);
-
-    protected abstract Operator or();
-
-    protected abstract Operator and();
 
     protected abstract TermGenerator<G> upwardsWithIndexSuperGenerator(TermFeature cond);
 
