@@ -13,8 +13,6 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.util.collection.ImmutableList;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-
 /**
  * Binary feature that returns zero iff the <tt>\assumes</tt>- and find-formula of a Taclet are
  * matched to different members of the sequent. If a taclet has more than one formula in its
@@ -34,7 +32,7 @@ public class DiffFindAndAssumesFeature<GOAL extends ProofGoal<GOAL>>
     private DiffFindAndAssumesFeature() {}
 
     @Override
-    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, GOAL goal,
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

@@ -6,11 +6,10 @@ package org.key_project.prover.strategy.costbased.feature;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
+import org.key_project.prover.rules.Trigger;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationProjection;
-
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 public class TriggerVarInstantiatedFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
@@ -23,12 +22,13 @@ public class TriggerVarInstantiatedFeature<GOAL extends ProofGoal<GOAL>>
     }
 
     @Override
-    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, GOAL goal,
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal,
             MutableState mState) {
-        assert app.taclet().hasTrigger();
+        final Trigger trigger = app.taclet().getTrigger();
+        assert trigger != null : "@AssumeAssertion(nullness): Trigger should not be null";
 
-        SVInstantiationProjection<GOAL> instProj = SVInstantiationProjection
-                .create(app.taclet().getTrigger().triggerVar().name(), false);
+        SVInstantiationProjection<GOAL> instProj =
+            SVInstantiationProjection.create(trigger.triggerVar().name(), false);
 
         return instProj.toTerm(app, pos, goal, mState) != null;
     }

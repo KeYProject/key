@@ -34,12 +34,11 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
         implements ComponentStrategy<G> {
     public static final Name NAME = new Name("FOL Strategy");
 
-    protected RuleSetDispatchFeature costComputationDispatcher;
-    protected RuleSetDispatchFeature approvalDispatcher;
-    protected RuleSetDispatchFeature instantiationDispatcher;
-    protected Feature costComputationF;
-    protected Feature approvalF;
-    protected Feature instantiationF;
+    private final RuleSetDispatchFeature costComputationDispatcher = new RuleSetDispatchFeature();
+    private final RuleSetDispatchFeature approvalDispatcher = new RuleSetDispatchFeature();
+    private final RuleSetDispatchFeature instantiationDispatcher = new RuleSetDispatchFeature();
+    private final Feature costComputationF;
+    private final Feature instantiationF;
 
     protected final ArithTermFeatures tf;
     protected final IFormulaTermFeatures ff;
@@ -49,30 +48,25 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     final FeatureConstants<G> fc;
 
     public FOLStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
-            FeatureConstants<G> featureConstants, IIntLdt numbers) {
+            FeatureConstants<G> featureConstants, IIntLdt numbers, Feature globalF) {
         this.tf = tf;
         this.ff = ff;
 
         this.fc = featureConstants;
 
         this.numbers = numbers;
+
+        this.costComputationF = add(costComputationDispatcher, globalF);
+        this.instantiationF = add(instantiationDispatcher, globalF);
     }
 
-    protected void initDispatchersAndFeatures() {
-        costComputationDispatcher = setupCostComputationF(new RuleSetDispatchFeature());
-        approvalDispatcher = setupApprovalDispatcher();
-        instantiationDispatcher = setupInstantiationF();
-
-        costComputationF = setUpGlobalF(costComputationDispatcher);
-        instantiationF = setUpGlobalF(instantiationDispatcher);
-        approvalF = approvalDispatcher;
+    protected void init() {
+        setupCostComputationF(costComputationDispatcher);
+        setupApprovalDispatcher(approvalDispatcher);
+        setupInstantiationF(instantiationDispatcher);
     }
 
-    protected Feature setUpGlobalF(RuleSetDispatchFeature d) {
-        return d;
-    }
-
-    protected RuleSetDispatchFeature setupCostComputationF(RuleSetDispatchFeature d) {
+    protected void setupCostComputationF(RuleSetDispatchFeature d) {
         bindRuleSet(d, "closure", CostBand.CLOSE.cost());
         bindRuleSet(d, "alpha", CostBand.DECOMPOSE.cost());
         bindRuleSet(d, "delta", CostBand.TYPE.cost());
@@ -149,13 +143,9 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
             bindRuleSet(d, "pullOutQuantifierAll", inftyConst());
             bindRuleSet(d, "pullOutQuantifierEx", inftyConst());
         }
-
-        return d;
     }
 
-    private RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-
+    private void setupApprovalDispatcher(RuleSetDispatchFeature d) {
         setupQuantifierInstantiationApproval(d);
         setupSplittingApproval(d);
 
@@ -164,18 +154,14 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
         // without changing the sequent for a really long time. This is tested by
         // TestSymbolicExecutionTreeBuilder#testInstanceOfNotInEndlessLoop()
         bindRuleSet(d, "apply_equations", fc.eqNonDuplicateAppFeature());
-
-        return d;
     }
 
-    private RuleSetDispatchFeature setupInstantiationF() {
+    private void setupInstantiationF(RuleSetDispatchFeature d) {
         enableInstantiate();
 
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         setupQuantifierInstantiation(d);
 
         disableInstantiate();
-        return d;
     }
 
     @Override
@@ -211,7 +197,8 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
     @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, G goal) {
-        return approvalF.computeCost(app, pio, goal, new MutableState()) != TopRuleAppCost.INSTANCE;
+        return approvalDispatcher.computeCost(app, pio, goal,
+            new MutableState()) != TopRuleAppCost.INSTANCE;
     }
 
     @Override

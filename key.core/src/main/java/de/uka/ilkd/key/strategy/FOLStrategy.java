@@ -51,21 +51,15 @@ public class FOLStrategy extends org.key_project.prover.strategy.FOLStrategy<Goa
     public FOLStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff, Proof proof,
             StrategyProperties strategyProperties) {
         super(tf, ff, new JavaFeatureConstants(),
-            proof.getServices().getTypeConverter().getIntegerLDT());
+            proof.getServices().getTypeConverter().getIntegerLDT(),
+            oneStepSimplificationFeature(proof, CostBand.REWRITE.cost()));
 
         this.proof = proof;
         this.strategyProperties = strategyProperties.clone();
-        initDispatchersAndFeatures();
+        init();
     }
 
-    @Override
-    protected Feature setUpGlobalF(RuleSetDispatchFeature d) {
-        final Feature oneStepSimplificationF =
-            oneStepSimplificationFeature(CostBand.REWRITE.cost());
-        return add(d, oneStepSimplificationF);
-    }
-
-    private Feature oneStepSimplificationFeature(Feature cost) {
+    private static Feature oneStepSimplificationFeature(Proof proof, Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MiscTools.findOneStepSimplifier(proof));
         return ConditionalFeature.createConditional(filter, cost);
@@ -73,8 +67,8 @@ public class FOLStrategy extends org.key_project.prover.strategy.FOLStrategy<Goa
 
 
     @Override
-    protected RuleSetDispatchFeature setupCostComputationF(RuleSetDispatchFeature d) {
-        d = super.setupCostComputationF(d);
+    protected void setupCostComputationF(RuleSetDispatchFeature d) {
+        super.setupCostComputationF(d);
         bindRuleSet(d, "simplify_instanceof_static",
             add(EqNonDuplicateAppFeature.INSTANCE, CostBand.PREFER.cost()));
 
@@ -89,8 +83,6 @@ public class FOLStrategy extends org.key_project.prover.strategy.FOLStrategy<Goa
                 inftyConst()));
 
         bindRuleSet(d, "type_hierarchy_def", CostBand.TYPE.at(-500));
-
-        return d;
     }
 
     /** the value of the trigger option, fixed when this strategy was constructed */

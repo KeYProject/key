@@ -9,6 +9,8 @@ import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 public class Polynomial {
     /**
      * The polynomial expression of the BigInteger constant '0'.
@@ -57,7 +59,7 @@ public class Polynomial {
         return oldParts.prepend(m);
     }
 
-    private static ImmutableList<Monomial> addPartHelp(ImmutableList<Monomial> oldParts,
+    private static @Nullable ImmutableList<Monomial> addPartHelp(ImmutableList<Monomial> oldParts,
             Monomial m) {
         if (oldParts.isEmpty()) {
             return null;

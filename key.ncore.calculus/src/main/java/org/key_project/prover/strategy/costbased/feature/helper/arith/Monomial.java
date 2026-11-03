@@ -10,6 +10,8 @@ import java.util.Iterator;
 import org.key_project.logic.Term;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
+
 public class Monomial {
     public static final Monomial ONE = new Monomial(ImmutableList.nil(), BigInteger.ONE);
     protected final ImmutableList<Term> parts;
@@ -183,7 +185,7 @@ public class Monomial {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

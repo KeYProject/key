@@ -74,10 +74,14 @@ public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
             GOAL goal, MutableState mState) {
+        final Term leftTerm = left.toTerm(app, pos, goal, mState);
+        final Term rightTerm = right.toTerm(app, pos, goal, mState);
+        assert leftTerm != null && rightTerm != null
+                : "@AssumeAssertion(nullness): Term should not be null";
         final MonomialCollector m1 = new MonomialCollector();
-        m1.collect(left.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
+        m1.collect(leftTerm, mState, goal.proof().getServices());
         final MonomialCollector m2 = new MonomialCollector();
-        m2.collect(right.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
+        m2.collect(rightTerm, mState, goal.proof().getServices());
 
         return lessThan(m1.getResult(), m2.getResult(), pos, goal);
 

@@ -53,8 +53,11 @@ public class AtomsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
             GOAL goal, MutableState mState) {
-        return lessThan(collectAtoms(left.toTerm(app, pos, goal, mState)),
-            collectAtoms(right.toTerm(app, pos, goal, mState)), pos, goal);
+        final Term leftTerm = left.toTerm(app, pos, goal, mState);
+        final Term rightTerm = right.toTerm(app, pos, goal, mState);
+        assert leftTerm != null && rightTerm != null
+                : "@AssumeAssertion(nullness): Instantiations should not be null";
+        return lessThan(collectAtoms(leftTerm), collectAtoms(rightTerm), pos, goal);
     }
 
     /**
