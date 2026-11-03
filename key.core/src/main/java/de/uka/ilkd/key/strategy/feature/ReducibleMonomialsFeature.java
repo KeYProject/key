@@ -10,8 +10,10 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
@@ -23,7 +25,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * iff it is divided by it ({@link #createDivides}).
  */
 @StableCost
-public final class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
+public final class ReducibleMonomialsFeature extends BinaryTacletAppFeature<Goal> {
     /** Which monomial relation an instance checks. */
     private enum Check {
         REDUCIBLE, DIVIDES
@@ -50,7 +52,7 @@ public final class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 

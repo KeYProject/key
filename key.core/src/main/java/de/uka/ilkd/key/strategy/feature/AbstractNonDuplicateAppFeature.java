@@ -17,6 +17,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
@@ -37,7 +38,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * <code>equals</code> or <code>eqEquals</code> (checking for same or equal formulas), which has
      * to be decided by the subclasses
      */
-    protected abstract boolean comparePio(TacletApp newApp, TacletApp oldApp,
+    protected abstract boolean comparePio(ITacletApp newApp, TacletApp oldApp,
             PosInOccurrence newPio,
             PosInOccurrence oldPio);
 
@@ -46,7 +47,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * application <code>newApp</code> at position <code>newPio</code>.<code>newPio</code> can be
      * <code>null</code>
      */
-    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp, PosInOccurrence newPio) {
+    protected boolean sameApplication(RuleApp ruleCmp, ITacletApp newApp, PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -88,7 +89,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
             }
         }
 
-        return equalInterestingInsts(newApp.instantiations(), cmp.instantiations());
+        return equalInterestingInsts((SVInstantiations) newApp.instantiations(), cmp.instantiations());
     }
 
     private boolean equalInterestingInsts(SVInstantiations inst0, SVInstantiations inst1) {
@@ -178,8 +179,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * soon as we have reached a point where the formula containing the focus no longer occurs in
      * the sequent
      */
-    protected boolean noDuplicateFindTaclet(TacletApp app,
-            PosInOccurrence pos, Goal goal) {
+    protected boolean noDuplicateFindTaclet(ITacletApp app,
+                                            PosInOccurrence pos, Goal goal) {
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();

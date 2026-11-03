@@ -7,9 +7,11 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.util.collection.ImmutableList;
@@ -21,15 +23,15 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  * rule application is admissible, zero is returned.
  */
 @StableCost
-public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
+public class NoSelfApplicationFeature extends BinaryTacletAppFeature<Goal> {
 
     public static final Feature INSTANCE = new NoSelfApplicationFeature();
 
     private NoSelfApplicationFeature() {}
 
     @Override
-    protected boolean filter(@MonotonicNonNull TacletApp p_app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    protected boolean filter(@MonotonicNonNull ITacletApp p_app, PosInOccurrence pos, Goal goal,
+                             MutableState mState) {
         assert pos != null
                 : "NoSelfApplicationFeature: Need to know the position of the application of the taclet";
 

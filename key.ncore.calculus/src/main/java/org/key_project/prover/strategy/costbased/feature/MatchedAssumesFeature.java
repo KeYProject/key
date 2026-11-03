@@ -27,5 +27,4 @@ public final class MatchedAssumesFeature<GOAL extends ProofGoal<GOAL>> extends B
                              MutableState mState) {
         return app.assumesInstantionsComplete();
     }
-
 }

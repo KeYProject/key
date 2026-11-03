@@ -8,13 +8,15 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
+public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature<Goal> {
 
     public static final Feature INSTANCE = new TriggerVarInstantiatedFeature();
 
@@ -22,8 +24,8 @@ public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(@MonotonicNonNull TacletApp app, PosInOccurrence pos, Goal goal,
-            MutableState mState) {
+    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, Goal goal,
+                             MutableState mState) {
         assert app.taclet().hasTrigger();
 
         SVInstantiationProjection instProj = SVInstantiationProjection

@@ -9,8 +9,10 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
@@ -24,7 +26,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * from the goal, so the result is fixed for a given application.
  */
 @StableCost
-public class InstantiatedSVFeature extends BinaryTacletAppFeature {
+public class InstantiatedSVFeature extends BinaryTacletAppFeature<Goal> {
 
     private final ProjectionToTerm<Goal> instProj;
 
@@ -37,7 +39,7 @@ public class InstantiatedSVFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return instProj.toTerm(app, pos, goal, mState) != null;
     }
 

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -17,7 +18,7 @@ import org.key_project.util.collection.ImmutableList;
  * Abstract superclass for features comparing terms (in particular polynomials or monomials) using
  * the term ordering
  */
-public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
+public abstract class SmallerThanFeature extends BinaryTacletAppFeature<Goal> {
 
     private final TermOrdering termOrdering = new LexPathOrdering();
 
