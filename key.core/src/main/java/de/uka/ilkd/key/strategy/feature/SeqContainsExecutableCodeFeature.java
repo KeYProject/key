@@ -20,7 +20,9 @@ import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class SeqContainsExecutableCodeFeature extends BinaryFeature {
 
     private final TermFeature tf;

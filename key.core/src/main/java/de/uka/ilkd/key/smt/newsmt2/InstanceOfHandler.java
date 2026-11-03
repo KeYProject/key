@@ -16,20 +16,24 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This SMT translation handler takes care of instanceof and exactinstanceof functions.
  *
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class InstanceOfHandler implements SMTHandler {
 
-    private ParametricFunctionDecl exactInstanceOfOp;
-    private ParametricFunctionDecl instanceOfOp;
+    private @Nullable ParametricFunctionDecl exactInstanceOfOp;
+    private @Nullable ParametricFunctionDecl instanceOfOp;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.instanceOfOp =
             services.getJavaDLTheory().getInstanceofSymbol(services);
         this.exactInstanceOfOp =

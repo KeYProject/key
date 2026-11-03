@@ -45,10 +45,12 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class ProofManagementDialog extends JDialog {
 
     private static final long serialVersionUID = 3543411893273433386L;
@@ -65,17 +67,17 @@ public final class ProofManagementDialog extends JDialog {
     private static final ImageIcon KEY_CACHED_CLOSED = IconFactory.keyCachedClosed(20, 20);
     private static final Icon KEY_CLOSED = IconFactory.keyHoleClosed(20);
     private boolean startedProof;
-    private JTabbedPane tabbedPane;
-    private Map<Pair<KeYJavaType, IObserverFunction>, Icon> targetIcons;
-    private ClassTree classTree;
-    private JList<ProofWrapper> proofList;
-    private ContractSelectionPanel contractPanelByMethod;
-    private ContractSelectionPanel contractPanelByProof;
-    private JButton startButton;
-    private JButton cancelButton;
+    private @Nullable JTabbedPane tabbedPane;
+    private @Nullable Map<Pair<KeYJavaType, IObserverFunction>, @Nullable Icon> targetIcons;
+    private @Nullable ClassTree classTree;
+    private @Nullable JList<ProofWrapper> proofList;
+    private @Nullable ContractSelectionPanel contractPanelByMethod;
+    private @Nullable ContractSelectionPanel contractPanelByProof;
+    private @Nullable JButton startButton;
+    private @Nullable JButton cancelButton;
     private final KeYMediator mediator;
     private final InitConfig initConfig;
-    private ProofEnvironment env;
+    private @Nullable ProofEnvironment env;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -86,9 +88,11 @@ public final class ProofManagementDialog extends JDialog {
         this.initConfig = initConfig;
 
         // create class tree
-        targetIcons = new LinkedHashMap<>();
-        classTree = new ClassTree(true, true, initConfig.getServices(), targetIcons);
-        classTree.addMouseListener(new MouseAdapter() {
+        Map<Pair<KeYJavaType, IObserverFunction>, @Nullable Icon> icons = new LinkedHashMap<>();
+        ClassTree tree = new ClassTree(true, true, initConfig.getServices(), icons);
+        targetIcons = icons;
+        classTree = tree;
+        tree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Check that it is a double click on an item, not a folder or the background
@@ -111,11 +115,12 @@ public final class ProofManagementDialog extends JDialog {
                 }
             }
         });
-        classTree.addTreeSelectionListener(e -> updateContractPanel());
+        tree.addTreeSelectionListener(e -> updateContractPanel());
 
         // create proof list
-        proofList = new JList<>();
-        proofList.setCellRenderer(new DefaultListCellRenderer() {
+        JList<ProofWrapper> list = new JList<>();
+        proofList = list;
+        list.setCellRenderer(new DefaultListCellRenderer() {
             private static final long serialVersionUID = -7810888250050777877L;
 
             @Override
@@ -143,12 +148,12 @@ public final class ProofManagementDialog extends JDialog {
                 return result;
             }
         });
-        proofList.addListSelectionListener(e -> updateContractPanel());
+        list.addListSelectionListener(e -> updateContractPanel());
 
         // create method list panel, scroll pane
         JPanel listPanelByMethod = new JPanel();
         listPanelByMethod.setLayout(new BoxLayout(listPanelByMethod, BoxLayout.X_AXIS));
-        JScrollPane classScrollPane = new JScrollPane(classTree);
+        JScrollPane classScrollPane = new JScrollPane(tree);
         classScrollPane.setBorder(new TitledBorder("Contract Targets"));
         Dimension classScrollPaneDim = new Dimension(250, 400);
         classScrollPane.setPreferredSize(classScrollPaneDim);
@@ -158,7 +163,7 @@ public final class ProofManagementDialog extends JDialog {
         // create proof list panel, scroll pane
         JPanel listPanelByProof = new JPanel();
         listPanelByProof.setLayout(new BoxLayout(listPanelByProof, BoxLayout.X_AXIS));
-        JScrollPane proofScrollPane = new JScrollPane(proofList);
+        JScrollPane proofScrollPane = new JScrollPane(list);
         proofScrollPane.setBorder(new TitledBorder("Proofs"));
         proofScrollPane.setPreferredSize(classScrollPaneDim);
         proofScrollPane.setMinimumSize(classScrollPaneDim);
@@ -192,16 +197,17 @@ public final class ProofManagementDialog extends JDialog {
         listPanelByProof.add(contractPanelByProof);
 
         // create tabbed pane
-        tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("By Target", listPanelByMethod);
-        tabbedPane.addTab("By Proof", listPanelByProof);
-        tabbedPane.addChangeListener(e -> {
+        JTabbedPane tabPane = new JTabbedPane();
+        tabbedPane = tabPane;
+        tabPane.addTab("By Target", listPanelByMethod);
+        tabPane.addTab("By Proof", listPanelByProof);
+        tabPane.addChangeListener(e -> {
             updateStartButton();
-            if (proofList.getSelectedIndex() == -1 && proofList.getModel().getSize() > 0) {
-                proofList.setSelectedIndex(0);
+            if (list.getSelectedIndex() == -1 && list.getModel().getSize() > 0) {
+                list.setSelectedIndex(0);
             }
         });
-        getContentPane().add(tabbedPane);
+        getContentPane().add(tabPane);
 
         // create button panel
         JPanel buttonPanel = new JPanel();
@@ -265,8 +271,10 @@ public final class ProofManagementDialog extends JDialog {
                 // sort by name
                 .sorted(Comparator.comparing(KeYJavaType::getFullName))
                 // filter out library classes
-                .filter(kjtTmp -> !(kjtTmp.getJavaType() instanceof TypeDeclaration
-                        && ((TypeDeclaration) kjtTmp.getJavaType()).isLibraryClass()))
+                .filter(kjtTmp -> {
+                    Object type = kjtTmp.getJavaType();
+                    return !(type instanceof TypeDeclaration td && td.isLibraryClass());
+                })
                 .toList();
 
         // compare: IProgramMethods by program name, otherwise prefer NOT IProgramMethod
@@ -303,7 +311,7 @@ public final class ProofManagementDialog extends JDialog {
     /**
      * Shows the dialog and selects the passed proof.
      */
-    public static void showInstance(InitConfig initConfig, Proof selectedProof) {
+    public static void showInstance(InitConfig initConfig, @Nullable Proof selectedProof) {
         showInstance(initConfig, null, null, selectedProof);
     }
 
@@ -321,8 +329,8 @@ public final class ProofManagementDialog extends JDialog {
      * @param selectedKJT the selected {@link KeYJavaType}
      * @param selectedTarget the selected target
      */
-    public static void showInstance(InitConfig initConfig, KeYJavaType selectedKJT,
-            IObserverFunction selectedTarget) {
+    public static void showInstance(InitConfig initConfig, @Nullable KeYJavaType selectedKJT,
+            @Nullable IObserverFunction selectedTarget) {
         showInstance(initConfig, selectedKJT, selectedTarget, null);
     }
 
@@ -333,8 +341,8 @@ public final class ProofManagementDialog extends JDialog {
         return showInstance(initConfig, null, null, null);
     }
 
-    private static boolean showInstance(InitConfig initConfig, KeYJavaType selectedKJT,
-            IObserverFunction selectedTarget, Proof selectedProof) {
+    private static boolean showInstance(InitConfig initConfig, @Nullable KeYJavaType selectedKJT,
+            @Nullable IObserverFunction selectedTarget, @Nullable Proof selectedProof) {
         MainWindow mainWindow = MainWindow.getInstance();
         ProofManagementDialog dialog = new ProofManagementDialog(mainWindow, initConfig);
 
@@ -344,7 +352,6 @@ public final class ProofManagementDialog extends JDialog {
         if (previouslySelectedContracts != null) {
             dialog.select(previouslySelectedContracts);
         }
-
 
         dialog.updateGlobalStatus();
 
@@ -361,11 +368,11 @@ public final class ProofManagementDialog extends JDialog {
         dialog.setLocationRelativeTo(mainWindow);
         dialog.setVisible(true);
 
-        if (dialog.getSelectedContract() != null) {
-            Contract c = dialog.getSelectedContract();
-            String kjtName = c.getKJT().getFullName();
-            String contractName = c.getName();
-            String methodName = c.getTarget().name().toString();
+        Contract selectedContract = dialog.getSelectedContract();
+        if (selectedContract != null) {
+            String kjtName = selectedContract.getKJT().getFullName();
+            String contractName = selectedContract.getName();
+            String methodName = selectedContract.getTarget().name().toString();
             previouslySelectedContracts = new ContractId(kjtName, methodName, contractName);
         }
         return dialog.startedProof;
@@ -380,15 +387,21 @@ public final class ProofManagementDialog extends JDialog {
         Optional<KeYJavaType> allJavaTypes =
             servicesLocal.getJavaInfo().getAllKeYJavaTypes().stream()
                     // filter out library classes
-                    .filter(kjtTmp -> !(kjtTmp.getJavaType() instanceof TypeDeclaration
-                            && ((TypeDeclaration) kjtTmp.getJavaType()).isLibraryClass()))
+                    .filter(kjtTmp -> {
+                        Object type = kjtTmp.getJavaType();
+                        return !(type instanceof TypeDeclaration td && td.isLibraryClass());
+                    })
                     .filter(it -> it.getFullName().equals(keyJavaTypeName)).findAny();
 
         if (!allJavaTypes.isPresent()) {
             return;
         }
         KeYJavaType javaType = allJavaTypes.get();
-        Name methodName = new Name(cid.methodName);
+        String methodNameString = cid.methodName;
+        if (methodNameString == null) {
+            return;
+        }
+        Name methodName = new Name(methodNameString);
         Optional<IObserverFunction> target =
             servicesLocal.getSpecificationRepository().getContractTargets(javaType).stream()
                     .filter(targetTmp -> !servicesLocal.getSpecificationRepository()
@@ -404,33 +417,50 @@ public final class ProofManagementDialog extends JDialog {
             Optional<Contract> contract =
                 initConfig.getServices().getSpecificationRepository().getContracts(javaType, method)
                         .stream().filter(it -> it.getName().equals(cid.contractName)).findAny();
-            contract.ifPresent(value -> contractPanelByMethod.selectContract(value));
+            ContractSelectionPanel panel = contractPanelByMethod;
+            if (panel != null) {
+                contract.ifPresent(value -> panel.selectContract(value));
+            }
         }
     }
 
-    private ContractSelectionPanel getActiveContractPanel() {
-        return tabbedPane.getSelectedIndex() == 0 ? contractPanelByMethod : contractPanelByProof;
+    private @Nullable ContractSelectionPanel getActiveContractPanel() {
+        JTabbedPane pane = tabbedPane;
+        if (pane == null) {
+            return null;
+        }
+        return pane.getSelectedIndex() == 0 ? contractPanelByMethod : contractPanelByProof;
     }
 
     private void select(KeYJavaType kjt, IObserverFunction target) {
-        tabbedPane.setSelectedIndex(0);
+        JTabbedPane pane = tabbedPane;
+        if (pane != null) {
+            pane.setSelectedIndex(0);
+        }
         if (classTree != null) {
             classTree.select(kjt, target);
         }
     }
 
     private void select(Proof p) {
-        for (int i = 0, n = proofList.getModel().getSize(); i < n; i++) {
-            if (proofList.getModel().getElementAt(i).proof.equals(p)) {
-                tabbedPane.setSelectedIndex(1);
-                proofList.setSelectedIndex(i);
+        JList<ProofWrapper> list = proofList;
+        JTabbedPane pane = tabbedPane;
+        if (list == null || pane == null) {
+            // the dialog is disposed or not fully built; nothing to select
+            return;
+        }
+        for (int i = 0, n = list.getModel().getSize(); i < n; i++) {
+            if (list.getModel().getElementAt(i).proof.equals(p)) {
+                pane.setSelectedIndex(1);
+                list.setSelectedIndex(i);
                 break;
             }
         }
     }
 
-    private Contract getSelectedContract() {
-        return getActiveContractPanel().getContract();
+    private @Nullable Contract getSelectedContract() {
+        ContractSelectionPanel pan = getActiveContractPanel();
+        return pan == null ? null : pan.getContract();
     }
 
     /**
@@ -453,7 +483,13 @@ public final class ProofManagementDialog extends JDialog {
         // try to find closed proof
         Proof fallback = null;
         for (Proof proof : proofs) {
-            final ProofStatus status = proof.mgt().getStatus();
+            var pcm = proof.mgt();
+            if (pcm == null) {
+                // a proof without correctness management cannot be evaluated; skip it (the
+                // previous code crashed with an NPE here)
+                continue;
+            }
+            final ProofStatus status = pcm.getStatus();
             if (status.getProofClosed()) {
                 return proof;
             } else if (fallback == null || status.getProofClosedButLemmasLeft()) {
@@ -470,8 +506,15 @@ public final class ProofManagementDialog extends JDialog {
 
             ProblemInitializer pi = new ProblemInitializer(ui, initConfig.getServices(), ui);
 
+            var fileRepo = initConfig.getFileRepo();
+            if (fileRepo == null) {
+                // interactive proof management always works on a loaded problem which carries a
+                // file repository; a missing one is an inconsistent state in which the previous
+                // code crashed with an NPE
+                throw new NullPointerException("InitConfig has no file repository.");
+            }
             // enables to access the FileRepo created in AbstractProblemLoader
-            pi.setFileRepo(initConfig.getFileRepo());
+            pi.setFileRepo(fileRepo);
 
             try {
                 final ProofOblInput po =
@@ -499,64 +542,110 @@ public final class ProofManagementDialog extends JDialog {
         }
     }
 
+    /**
+     * Removes the icon from the given button. {@code JButton.setIcon(null)} is runtime-legal and
+     * clears the icon, but the annotated JDK shipped with the nullness checker declares the
+     * parameter non-null, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private static void clearIcon(JButton button) {
+        button.setIcon(null);
+    }
+
     private void updateStartButton() {
+        JButton button = startButton;
+        if (button == null) {
+            // the dialog is disposed; nothing to update
+            return;
+        }
         final Contract contract = getSelectedContract();
         if (contract == null) {
-            startButton.setText("No Contract");
-            startButton.setIcon(null);
-            startButton.setEnabled(false);
+            button.setText("No Contract");
+            clearIcon(button);
+            button.setEnabled(false);
         } else {
             final Proof proof = findPreferablyClosedProof(contract);
             if (proof == null) {
-                startButton.setText("Start Proof");
-                startButton.setIcon(null);
+                button.setText("Start Proof");
+                clearIcon(button);
             } else {
-                final ProofStatus status = proof.mgt().getStatus();
-                startButton.setText("Go to Proof");
-                if (status.getProofOpen()) {
-                    startButton.setIcon(KEY_OPEN);
-                } else if (status.getProofClosedButLemmasLeft()) {
-                    startButton.setIcon(KEY_ALMOST_CLOSED);
-                } else if (status.getProofClosedByCache()) {
-                    startButton.setIcon(KEY_CACHED_CLOSED);
+                var pcm = proof.mgt();
+                if (pcm == null) {
+                    // a proof without correctness management cannot be evaluated; fall back to
+                    // the plain start action (the previous code crashed with an NPE here)
+                    button.setText("Start Proof");
+                    clearIcon(button);
                 } else {
-                    assert status.getProofClosed();
-                    startButton.setIcon(KEY_CLOSED);
+                    final ProofStatus status = pcm.getStatus();
+                    button.setText("Go to Proof");
+                    if (status.getProofOpen()) {
+                        button.setIcon(KEY_OPEN);
+                    } else if (status.getProofClosedButLemmasLeft()) {
+                        button.setIcon(KEY_ALMOST_CLOSED);
+                    } else if (status.getProofClosedByCache()) {
+                        button.setIcon(KEY_CACHED_CLOSED);
+                    } else {
+                        assert status.getProofClosed();
+                        button.setIcon(KEY_CLOSED);
+                    }
                 }
             }
-            startButton.setEnabled(true);
+            button.setEnabled(true);
         }
         validate();
     }
 
-
     private boolean isInstanceMethodOfAbstractClass(KeYJavaType p_class, IObserverFunction obs) {
-        return p_class.getJavaType() instanceof InterfaceDeclaration
-                || (p_class.getSort().isAbstract() && !obs.isStatic());
+        if (p_class.getJavaType() instanceof InterfaceDeclaration) {
+            return true;
+        }
+        var sort = p_class.getSort();
+        return sort != null && sort.isAbstract() && !obs.isStatic();
     }
 
     private void updateContractPanel() {
         ContractSelectionPanel pan = getActiveContractPanel();
+        if (pan == null) {
+            // the dialog is disposed or not fully built; nothing to update
+            return;
+        }
         if (pan == contractPanelByMethod) {
-            final ClassTree.Entry entry = classTree.getSelectedEntry();
-            if (entry != null && entry.target != null
-                    && !isInstanceMethodOfAbstractClass(entry.kjt, entry.target)) {
+            ClassTree tree = classTree;
+            if (tree == null) {
+                return;
+            }
+            final ClassTree.Entry entry = tree.getSelectedEntry();
+            final KeYJavaType entryKjt = entry != null ? entry.kjt : null;
+            final IObserverFunction entryTarget = entry != null ? entry.target : null;
+            if (entryKjt != null && entryTarget != null
+                    && !isInstanceMethodOfAbstractClass(entryKjt, entryTarget)) {
                 final ImmutableSet<Contract> contracts = initConfig.getServices()
-                        .getSpecificationRepository().getContracts(entry.kjt, entry.target);
+                        .getSpecificationRepository().getContracts(entryKjt, entryTarget);
                 pan.setContracts(contracts, "Contracts");
 
-                pan.setGrayOutAuxiliaryContracts(Objects.equals(
-                    targetIcons.get(new Pair<>(entry.kjt, entry.target)), KEY_CLOSED));
+                Map<Pair<KeYJavaType, IObserverFunction>, @Nullable Icon> icons = targetIcons;
+                pan.setGrayOutAuxiliaryContracts(icons != null && Objects.equals(
+                    icons.get(new Pair<>(entryKjt, entryTarget)), KEY_CLOSED));
             } else {
                 pan.setContracts(DefaultImmutableSet.nil(), "Contracts");
             }
         } else if (pan == contractPanelByProof) {
-            if (proofList.getSelectedValue() != null) {
-                final Proof p = proofList.getSelectedValue().proof;
-                final ImmutableSet<Contract> usedContracts = p.mgt().getUsedContracts();
-                pan.setContracts(usedContracts, "Contracts used in proof \"" + p.name() + "\"");
-            } else {
-                pan.setContracts(DefaultImmutableSet.nil(), "Contracts");
+            JList<ProofWrapper> list = proofList;
+            if (list != null) {
+                ProofWrapper selected = list.getSelectedValue();
+                if (selected != null) {
+                    final Proof p = selected.proof;
+                    var pcm = p.mgt();
+                    if (pcm != null) {
+                        final ImmutableSet<Contract> usedContracts = pcm.getUsedContracts();
+                        pan.setContracts(usedContracts,
+                            "Contracts used in proof \"" + p.name() + "\"");
+                    } else {
+                        pan.setContracts(DefaultImmutableSet.nil(), "Contracts");
+                    }
+                } else {
+                    pan.setContracts(DefaultImmutableSet.nil(), "Contracts");
+                }
             }
         }
         updateStartButton();
@@ -568,12 +657,11 @@ public final class ProofManagementDialog extends JDialog {
         Services services = initConfig.getServices();
         SpecificationRepository specRepos = services.getSpecificationRepository();
 
-
         var kjts = services.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType kjt : kjts) {
             // skip library classes, the user isn't shown contracts for them
-            if (kjt.getJavaType() instanceof TypeDeclaration
-                    && ((TypeDeclaration) kjt.getJavaType()).isLibraryClass()) {
+            Object javaType = kjt.getJavaType();
+            if (javaType instanceof TypeDeclaration td && td.isLibraryClass()) {
                 continue;
             }
             ImmutableSet<IObserverFunction> targets = specRepos.getContractTargets(kjt);
@@ -594,56 +682,71 @@ public final class ProofManagementDialog extends JDialog {
                             allClosed = false;
                         } else {
                             startedProving = true;
-                            ProofStatus status = proof.mgt().getStatus();
-                            if (status.getProofOpen()) {
+                            var pcm = proof.mgt();
+                            if (pcm == null) {
+                                // a proof without correctness management cannot be evaluated;
+                                // treat it as open (the previous code crashed with an NPE here)
                                 allClosed = false;
-                            } else if (status.getProofClosedButLemmasLeft()) {
-                                lemmasLeft = true;
-                            }
-                            if (status.getProofClosedByCache()) {
-                                cached = true;
+                            } else {
+                                ProofStatus status = pcm.getStatus();
+                                if (status.getProofOpen()) {
+                                    allClosed = false;
+                                } else if (status.getProofClosedButLemmasLeft()) {
+                                    lemmasLeft = true;
+                                }
+                                if (status.getProofClosedByCache()) {
+                                    cached = true;
+                                }
                             }
                         }
                     }
-                    targetIcons.put(new Pair<>(kjt, target),
-                        startedProving
+                    Map<Pair<KeYJavaType, IObserverFunction>, @Nullable Icon> icons = targetIcons;
+                    if (icons != null) {
+                        Icon icon = startedProving
                                 ? (allClosed
                                         ? (cached ? KEY_CACHED_CLOSED
                                                 : lemmasLeft ? KEY_ALMOST_CLOSED : KEY_CLOSED)
                                         : KEY_OPEN)
-                                : null);
+                                : null;
+                        icons.put(new Pair<KeYJavaType, IObserverFunction>(kjt, target), icon);
+                    }
                 }
             }
         }
-        classTree.updateUI();
+        ClassTree tree = classTree;
+        if (tree != null) {
+            tree.updateUI();
+        }
 
         // proof list
         DefaultListModel<ProofWrapper> model = new DefaultListModel<>();
         for (Proof p : specRepos.getAllProofs()) {
             model.add(0, new ProofWrapper(p));
         }
-        boolean changed;
-        if (model.size() != proofList.getModel().getSize()) {
-            changed = true;
-        } else {
-            changed = false;
-            for (int i = 0, n = model.size(); i < n; i++) {
-                if (!model.get(i).equals(proofList.getModel().getElementAt(i))) {
-                    changed = true;
-                    break;
+        JList<ProofWrapper> list = proofList;
+        if (list != null) {
+            boolean changed;
+            if (model.size() != list.getModel().getSize()) {
+                changed = true;
+            } else {
+                changed = false;
+                for (int i = 0, n = model.size(); i < n; i++) {
+                    if (!model.get(i).equals(list.getModel().getElementAt(i))) {
+                        changed = true;
+                        break;
+                    }
                 }
             }
-        }
-        if (changed) {
-            proofList.setModel(model);
-            proofList.updateUI();
+            if (changed) {
+                list.setModel(model);
+                list.updateUI();
+            }
         }
 
         // others
         updateContractPanel();
         updateStartButton();
     }
-
 
     // -------------------------------------------------------------------------
     // inner classes
@@ -655,7 +758,7 @@ public final class ProofManagementDialog extends JDialog {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             return o instanceof ProofWrapper(Proof proof1) && proof.equals(proof1);
         }
 
@@ -665,7 +768,6 @@ public final class ProofManagementDialog extends JDialog {
         }
 
     }
-
 
     /**
      * Stores the identification of a {@link Contract}, i.e. type, method, contract name.

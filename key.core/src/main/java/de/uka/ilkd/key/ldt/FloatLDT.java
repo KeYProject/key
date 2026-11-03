@@ -21,8 +21,10 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class FloatLDT extends LDT implements FloatingPointLDT {
 
     public static final Name NAME = new Name("float");
@@ -136,7 +138,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(Operator op,
+    public @Nullable Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
         if ((op instanceof UnaryOperator u)
@@ -195,7 +197,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public FloatLiteral translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable FloatLiteral translateTerm(JTerm t, ExtList children, Services services) {
         if (!containsFunction((Function) t.op())) {
             return null;
         }
@@ -215,7 +217,7 @@ public final class FloatLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_FLOAT;
         } else {

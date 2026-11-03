@@ -16,7 +16,9 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * Matches the Java program of a modality whose program is a {@link ContextStatementBlock} (the
@@ -28,6 +30,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @see ContextStatementBlock#match(SourceData, MatchConditions, VMProgramInterpreter)
  */
+@NullMarked
 public final class MatchContextStatementBlockInstruction implements MatchInstruction {
 
     private final ContextStatementBlock contextBlock;

@@ -6,6 +6,7 @@ package org.key_project.isabelletranslation.automation;
 
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.ExternalSolverRule;
 
@@ -16,6 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  *
@@ -46,7 +48,7 @@ public class IsabelleRule implements ExternalSolverRule {
     }
 
     @Override
-    public IsabelleRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public IsabelleRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services) {
         return new IsabelleRuleApp(this, null, "", "");
     }
 
@@ -61,8 +63,12 @@ public class IsabelleRule implements ExternalSolverRule {
     @Override
     @NonNull
     public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
-        if (goal.proof().getInitConfig().getJustifInfo().getJustification(INSTANCE) == null) {
-            goal.proof().getInitConfig().registerRule(INSTANCE, () -> false);
+        InitConfig initConfig = goal.proof().getInitConfig();
+        if (initConfig == null) {
+            throw new NullPointerException("No initialization config for the proof.");
+        }
+        if (initConfig.getJustifInfo().getJustification(INSTANCE) == null) {
+            initConfig.registerRule(INSTANCE, () -> false);
         }
         return goal.split(1);
     }

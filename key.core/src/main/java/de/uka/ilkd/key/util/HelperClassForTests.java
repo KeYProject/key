@@ -35,10 +35,12 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
+@NullMarked
 public class HelperClassForTests {
     public static final Path TESTCASE_DIRECTORY =
         Objects.requireNonNull(FindResources.getTestCasesDirectory());
@@ -240,7 +242,7 @@ public class HelperClassForTests {
      *
      * @param options The taclet options to restore.
      */
-    public static void restoreTacletOptions(Map<String, String> options) {
+    public static void restoreTacletOptions(@Nullable Map<String, String> options) {
         if (options != null) {
             // Assert.assertTrue(ProofSettings.isChoiceSettingInitialised());
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(options);

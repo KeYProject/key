@@ -15,6 +15,9 @@ import de.uka.ilkd.key.gui.configuration.Config;
 
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * The information window is used to present detailed information about the execution of a solver.
@@ -24,12 +27,20 @@ import org.key_project.util.java.StringUtil;
  * <p>
  * Adaptation of {@link de.uka.ilkd.key.gui.smt.InformationWindow} for Isabelle solvers
  */
+@NullMarked
 public class InformationWindow extends JDialog {
     public record Information(String title, String content, String solver) {
     }
 
-    private JTabbedPane tabbedPane;
+    private @Nullable JTabbedPane tabbedPane;
 
+    /**
+     * The dialog-widget calls below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the widget setup is purely
+     * local to this class (the lazy tabbed pane is created before it is used), suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public InformationWindow(Dialog parent, Collection<Information> information,
             String title) {
         super(parent);

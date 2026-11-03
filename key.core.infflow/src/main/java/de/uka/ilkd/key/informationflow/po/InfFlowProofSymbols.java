@@ -30,6 +30,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class InfFlowProofSymbols {
 
     private boolean isFreshContract;
@@ -294,6 +297,9 @@ public class InfFlowProofSymbols {
         int i = 0;
         while (n == null && i < 1000) {
             n = ns.lookup(s + "_" + i);
+        }
+        if (n == null) {
+            throw new NullPointerException("No such program variable " + s + ".");
         }
         assert n instanceof ProgramVariable;
         return (ProgramVariable) n;

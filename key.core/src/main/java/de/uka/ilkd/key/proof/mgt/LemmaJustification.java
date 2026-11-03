@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.mgt;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * {@link RuleJustification} for taclets, that can be proven from other taclets.
  */
+@NullMarked
 public class LemmaJustification implements RuleJustification {
 
     public static final LemmaJustification INSTANCE = new LemmaJustification();

@@ -23,9 +23,13 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  */
+@NullMarked
 public class LexPathOrdering implements TermOrdering {
 
     /**
@@ -37,7 +41,11 @@ public class LexPathOrdering implements TermOrdering {
      * byte-identical results) for 1.68M comparisons on an ips4o goal at 6000 proof steps.
      * ThreadLocal because a LexPathOrdering instance is shared across parallel-prover workers;
      * the map is reused (cleared) per call, so small comparisons pay only an empty-map lookup.
+     * The annotated JDK declares {@code ThreadLocal<@Nullable T>}, which only admits nullable type
+     * arguments; this value is never null in practice, so the difference is suppressed with a
+     * scoped key.
      */
+    @SuppressWarnings("nullness:type.argument.type.incompatible")
     private final ThreadLocal<java.util.HashMap<CacheKey, CompRes>> callMemo =
         ThreadLocal.withInitial(java.util.HashMap::new);
 
@@ -345,7 +353,7 @@ public class LexPathOrdering implements TermOrdering {
             }
         }
 
-        protected abstract Integer getWeight(Operator p_op);
+        protected abstract @Nullable Integer getWeight(Operator p_op);
     }
 
     /**
@@ -382,7 +390,7 @@ public class LexPathOrdering implements TermOrdering {
 
 
 
-        protected Integer getWeight(Operator p_op) {
+        protected @Nullable Integer getWeight(Operator p_op) {
 
             final String opStr = p_op.name().toString();
 
@@ -460,7 +468,7 @@ public class LexPathOrdering implements TermOrdering {
      * C.<nextToCreate> should be smaller than other symbols
      */
     private static class FunctionWeighter extends Weighter {
-        protected Integer getWeight(Operator p_op) {
+        protected @Nullable Integer getWeight(Operator p_op) {
             final String opStr = p_op.name().toString();
 
             if (opStr.equals("heap")) {

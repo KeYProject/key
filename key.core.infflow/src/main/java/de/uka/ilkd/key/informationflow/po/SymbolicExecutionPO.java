@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -28,11 +29,15 @@ import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 import org.key_project.logic.Named;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class SymbolicExecutionPO extends AbstractInfFlowPO
         implements ContractPO, InfFlowCompositePO {
 
@@ -59,19 +64,37 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
 
     public SymbolicExecutionPO(InitConfig initConfig, InformationFlowContract contract,
             ProofObligationVars symbExecVars, Goal initiatingGoal) {
-        super(initConfig,
-            ContractFactory.generateContractName(contract.getPODisplayName(), contract.getKJT(),
-                contract.getTarget(), contract.getTarget().getContainerType(),
-                contract.getTarget().getStartPosition().line()));
+        super(initConfig, buildContractName(contract));
         this.contract = contract;
         this.symbExecVars = symbExecVars;
         this.initiatingGoal = initiatingGoal;
+    }
+
+    /**
+     * Builds the name of this proof obligation from the contract. The
+     * container type of the target method is only available at run time
+     * (hence the null guard), so the name cannot be computed inline in the
+     * {@code super(...)} call.
+     */
+    private static String buildContractName(InformationFlowContract contract) {
+        final KeYJavaType containerType = contract.getTarget().getContainerType();
+        if (containerType == null) {
+            throw new NullPointerException(
+                "No container type for the target method of the contract.");
+        }
+        return ContractFactory.generateContractName(contract.getPODisplayName(),
+            contract.getKJT(), contract.getTarget(), containerType,
+            contract.getTarget().getStartPosition().line());
     }
 
 
     @Override
     public void readProblem() throws ProofInputException {
         postInit();
+        final TermBuilder tb = this.tb;
+        if (tb == null) {
+            throw new NullPointerException("Term builder not initialized.");
+        }
 
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory = POSnippetFactory.getBasicFactory(
@@ -88,8 +111,12 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
         final Proof initiatingProof = initiatingGoal.proof();
         if (initiatingProof != null) {
             // proof is not loaded
-            final AbstractOperationPO initiatingPO =
-                (AbstractOperationPO) specRepos.getProofOblInput(initiatingProof);
+            final ProofOblInput po = specRepos.getProofOblInput(initiatingProof);
+            if (po == null) {
+                throw new NullPointerException(
+                    "No proof obligation input for the initiating proof.");
+            }
+            final AbstractOperationPO initiatingPO = (AbstractOperationPO) po;
             taclets = initiatingPO.getInitialTaclets();
         }
     }
@@ -104,8 +131,19 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * Deliberately nullable: {@code null} is returned when the contract has
+     * no measured-by clause. {@link ContractPO#getMbyAtPre()} is not
+     * nullness-annotated in key.core although all realizations (including
+     * {@code DependencyContractPO}) return {@code null} for absent clauses,
+     * and none of the callers in key.core dereferences the result (all such
+     * call sites are commented out).
+     */
     @Override
-    public JTerm getMbyAtPre() {
+    @SuppressWarnings("nullness:override.return.invalid")
+    public @Nullable JTerm getMbyAtPre() {
         if (contract.hasMby()) {
             return symbExecVars.pre.mbyAtPre;
         } else {
@@ -218,8 +256,17 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
         infFlowSymbols = infFlowSymbols.unionLabeled(symbols);
     }
 
+    /**
+     * Deliberately returns {@code null}: information flow contracts do not
+     * have global defs. {@link AbstractOperationPO} declares a non-null
+     * return type although its only caller,
+     * {@code createApplyGlobalUpdateTerm}, explicitly null-tolerates the
+     * result; the base signature cannot be widened from this module.
+     */
     @Override
-    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+    @SuppressWarnings("nullness:override.return.invalid")
+    protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {
         // information flow contracts do not have global defs
         return null;
@@ -233,9 +280,12 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
         Services initiatingServices = initiatingProof.getServices();
         ProofOblInput initiatingPO =
             initiatingServices.getSpecificationRepository().getProofOblInput(initiatingProof);
-        assert initiatingPO instanceof AbstractInfFlowPO : "Information flow auxiliary "
-            + "proof started from within non-information flow proof!?!";
-        return (AbstractInfFlowPO) initiatingPO;
+        if (initiatingPO instanceof AbstractInfFlowPO infFlowPO) {
+            return infFlowPO;
+        } else {
+            throw new NullPointerException("Information flow auxiliary proof started from "
+                + "within a non-information flow proof.");
+        }
     }
 
 

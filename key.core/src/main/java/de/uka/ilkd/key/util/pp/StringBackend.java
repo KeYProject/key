@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util.pp;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A {@link Backend} which appends all output to a StringBuffer. The {@link #mark(Object o)} method
  * does nothing in this implementation. There is a method {@link #count()} which returns the number
  * of characters written by this so far. The method {@link #toString()} gets the output written so
  * far.
  */
+@NullMarked
 public class StringBackend<M> {
     protected final StringBuilder out;
 

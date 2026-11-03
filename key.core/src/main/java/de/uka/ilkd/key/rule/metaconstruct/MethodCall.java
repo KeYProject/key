@@ -44,6 +44,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +61,7 @@ import org.slf4j.LoggerFactory;
  * argument sound. Behaviour is varied through the taclet/{@link ProgramElement} arguments, not by
  * subclassing, so nothing is lost.
  */
+@NullMarked
 public final class MethodCall extends ProgramTransformer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MethodCall.class);
 

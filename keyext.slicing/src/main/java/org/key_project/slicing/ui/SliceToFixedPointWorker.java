@@ -11,6 +11,8 @@ import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +21,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
     /**
      * Logger.
@@ -32,11 +35,11 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
     /**
      * The proof to dispose after successfully completing analysis + slicing.
      */
-    private Proof proofToDispose;
+    private @Nullable Proof proofToDispose;
     /**
      * Function that provides analysis results for the {@link #proof}.
      */
-    private final Function<Void, AnalysisResults> analyzeButton;
+    private final Function<Void, @Nullable AnalysisResults> analyzeButton;
     /**
      * Callback that starts slicing the {@link #proof}.
      */
@@ -57,8 +60,8 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
      * @param doneCallback called if the proof can not be sliced further
      */
     public SliceToFixedPointWorker(Proof proofToSlice,
-            Proof proofToDispose,
-            Function<Void, AnalysisResults> analyzeButton,
+            @Nullable Proof proofToDispose,
+            Function<Void, @Nullable AnalysisResults> analyzeButton,
             Runnable sliceButton,
             Runnable doneCallback) {
         this.proof = proofToSlice;
@@ -69,21 +72,28 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
     }
 
     @Override
-    protected Void doInBackground() {
+    protected @Nullable Void doInBackground() {
         LOGGER.info("analyzing proof {} (ID: {})", proof.name(), System.identityHashCode(proof));
         if (isCancelled()) {
             doneCallback.run();
             return null;
         }
         AnalysisResults results = analyzeButton.apply(null);
+        if (results == null) {
+            throw new NullPointerException(
+                "No analysis results for proof " + proof.name() + ".");
+        }
         if (!results.indicateSlicingPotential()) {
             LOGGER.info("analysis: no more slicing possible");
             doneCallback.run();
         } else {
-            if (proofToDispose != null) {
-                LOGGER.info("disposing intermediate proof slice {} (ID: {})", proofToDispose.name(),
-                    System.identityHashCode(proofToDispose));
-                proofToDispose.dispose();
+            // capture the field locally: it may be reassigned while this worker runs
+            Proof proofToDisposeLocal = proofToDispose;
+            if (proofToDisposeLocal != null) {
+                LOGGER.info("disposing intermediate proof slice {} (ID: {})",
+                    proofToDisposeLocal.name(),
+                    System.identityHashCode(proofToDisposeLocal));
+                proofToDisposeLocal.dispose();
             }
             proofToDispose = proof;
             LOGGER.info("slicing proof {} (ID: {})", proof.name(), System.identityHashCode(proof));

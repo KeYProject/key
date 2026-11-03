@@ -7,6 +7,7 @@ package de.uka.ilkd.key.smt;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -21,8 +22,13 @@ import de.uka.ilkd.key.smt.lang.Util;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ProblemTypeInformation {
 
+    @Nullable
     Services services;
 
     final Map<String, SMTSort> fieldTypes;
@@ -31,11 +37,11 @@ public class ProblemTypeInformation {
 
     Set<Sort> javaSorts;
 
-    private SMTSettings settings;
+    private @Nullable SMTSettings settings;
 
-    private Map<SMTSort, SMTTermNumber> sortNumbers;
+    private @Nullable Map<SMTSort, SMTTermNumber> sortNumbers;
 
-    private Map<String, SMTSort> sorts;
+    private @Nullable Map<String, SMTSort> sorts;
 
     public ProblemTypeInformation(TermServices services) {
         super();
@@ -49,7 +55,7 @@ public class ProblemTypeInformation {
         originalConstantType.put(c, s);
     }
 
-    public Sort getOriginalConstantType(String c) {
+    public @Nullable Sort getOriginalConstantType(String c) {
         return originalConstantType.get(c);
     }
 
@@ -58,7 +64,7 @@ public class ProblemTypeInformation {
      * @return
      * @see Map#get(Object)
      */
-    public SMTSort getTypeForConstant(Object key) {
+    public @Nullable SMTSort getTypeForConstant(Object key) {
         return constantsTypes.get(key);
     }
 
@@ -68,7 +74,7 @@ public class ProblemTypeInformation {
      * @return
      * @see Map#put(Object, Object)
      */
-    public SMTSort putConstantType(String key, SMTSort value) {
+    public @Nullable SMTSort putConstantType(String key, SMTSort value) {
         return constantsTypes.put(key, value);
     }
 
@@ -88,7 +94,7 @@ public class ProblemTypeInformation {
      * @return
      * @see Map#get(Object)
      */
-    public SMTSort getTypeForField(Object key) {
+    public @Nullable SMTSort getTypeForField(Object key) {
         return fieldTypes.get(key);
     }
 
@@ -98,14 +104,16 @@ public class ProblemTypeInformation {
      * @return
      * @see Map#put(Object, Object)
      */
-    public SMTSort putFieldType(String key, SMTSort value) {
+    public @Nullable SMTSort putFieldType(String key, SMTSort value) {
 
         return fieldTypes.put(key, value);
     }
 
     public Set<String> getFieldsForSort(String name) {
-        JavaInfo info = services.getJavaInfo();
-        Sort s = info.getKeYJavaType(name).getSort();
+        JavaInfo info = Objects.requireNonNull(services, "services").getJavaInfo();
+        KeYJavaType kjt = Objects.requireNonNull(info.getKeYJavaType(name),
+            "KeYJavaType for " + name);
+        Sort s = Objects.requireNonNull(kjt.getSort(), "Sort for " + name);
         return getFieldsForSort(s);
     }
 
@@ -119,7 +127,7 @@ public class ProblemTypeInformation {
         Set<String> result = new HashSet<>();
         result.add(Util.processName("java.lang.Object::#$created"));
 
-        JavaInfo info = services.getJavaInfo();
+        JavaInfo info = Objects.requireNonNull(services, "services").getJavaInfo();
 
         KeYJavaType kjt = info.getKeYJavaType(s);
 
@@ -127,7 +135,8 @@ public class ProblemTypeInformation {
 
             for (KeYJavaType sp : info.getAllSupertypes(kjt)) {
                 if (!sp.equals(kjt)) {
-                    result.addAll(getFieldsForSort(sp.getSort()));
+                    result.addAll(getFieldsForSort(Objects.requireNonNull(sp.getSort(),
+                        "Sort of " + sp)));
                 }
             }
 
@@ -147,7 +156,7 @@ public class ProblemTypeInformation {
         return result;
     }
 
-    public TermServices getServices() {
+    public @Nullable TermServices getServices() {
         return services;
     }
 
@@ -165,14 +174,14 @@ public class ProblemTypeInformation {
 
     }
 
-    public SMTSettings getSettings() {
+    public @Nullable SMTSettings getSettings() {
         return settings;
     }
 
     public String getPrefixForSort(SMTSort sort) {
-        SMTTermNumber n = sortNumbers.get(sort);
+        SMTTermNumber n = Objects.requireNonNull(sortNumbers, "sortNumbers").get(sort);
 
-        long val = n.getIntValue();
+        long val = Objects.requireNonNull(n, "Number for sort " + sort).getIntValue();
 
         StringBuilder s = new StringBuilder(Long.toBinaryString(val));
 
@@ -189,8 +198,8 @@ public class ProblemTypeInformation {
         this.sorts = sorts;
     }
 
-    public SMTSort getSort(String sortName) {
-        return sorts.get(sortName);
+    public @Nullable SMTSort getSort(String sortName) {
+        return Objects.requireNonNull(sorts, "sorts").get(sortName);
     }
 
 

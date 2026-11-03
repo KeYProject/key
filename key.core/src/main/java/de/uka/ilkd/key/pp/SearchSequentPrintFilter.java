@@ -7,6 +7,8 @@ package de.uka.ilkd.key.pp;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,12 +18,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author jschiffl
  */
+@NullMarked
 public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchSequentPrintFilter.class);
 
     /**
      * the String that is to be matched in the sequent view
      */
+    @Nullable
     String searchString;
 
     /**
@@ -33,6 +37,16 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
      * indicating whether the user input should be treated as regular expression
      */
     boolean regex;
+
+    /**
+     * Creates a filter with the given logic printer, which is required by the concrete
+     * {@link #filterSequent()} implementations.
+     *
+     * @param lp the logic printer in use
+     */
+    protected SearchSequentPrintFilter(LogicPrinter lp) {
+        this.lp = lp;
+    }
 
     /**
      * sets the filter's search string
@@ -56,7 +70,8 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
      * @return A pattern matching the input String
      * @throws IllegalRegexException if the given pattern is not a valid regex
      */
-    public static Pattern createPattern(String search, boolean regex) throws IllegalRegexException {
+    public static @Nullable Pattern createPattern(String search, boolean regex)
+            throws IllegalRegexException {
         int searchFlag = 0;
         if (search.toLowerCase().equals(search)) {
             searchFlag = searchFlag | Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE;
@@ -89,10 +104,17 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
 
     /**
      * creates a pattern with the current search string and regex option
+     * <p>
+     * The search string may not be set when the filter is created before any search was entered;
+     * the numeric overload throws on that state as it does on a malformed pattern expression (the
+     * malformed case is caught here, the {@code null} case propagates exactly as it did before the
+     * nullness analysis). Passing the (nullable-typed) search string into the numeric overload is
+     * suppressed scoped on this method.
      *
      * @return a brand new shiny pattern
      */
-    protected Pattern createPattern() {
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    protected @Nullable Pattern createPattern() {
         try {
             return createPattern(this.searchString, this.regex);
         } catch (IllegalRegexException e) {

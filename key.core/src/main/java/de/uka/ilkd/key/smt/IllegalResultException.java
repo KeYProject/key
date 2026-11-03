@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author niederma
  *
  */
+@NullMarked
 public class IllegalResultException extends RuntimeException {
 
 

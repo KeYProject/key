@@ -38,12 +38,16 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class TacletGenerator {
 
     private static final TacletGenerator instance = new TacletGenerator();
@@ -114,7 +118,7 @@ public class TacletGenerator {
 
     public Taclet generateRelationalRepresentsTaclet(Name tacletName, JTerm originalAxiom,
             KeYJavaType kjt, IObserverFunction target, List<LocationVariable> heaps,
-            LocationVariable self, ImmutableList<LocationVariable> paramVars,
+            @Nullable LocationVariable self, ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, boolean satisfiabilityGuard,
             TermServices services) {
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
@@ -201,9 +205,9 @@ public class TacletGenerator {
 
 
     public ImmutableSet<Taclet> generateFunctionalRepresentsTaclets(Name name,
-            JTerm originalPreTerm,
+            @Nullable JTerm originalPreTerm,
             JTerm originalRepresentsTerm, KeYJavaType kjt, IObserverFunction target,
-            List<LocationVariable> heaps, LocationVariable self,
+            List<LocationVariable> heaps, @Nullable LocationVariable self,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars,
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit, boolean satisfiability,
@@ -766,7 +770,7 @@ public class TacletGenerator {
     }
 
 
-    private TermSV createSchemaVariable(ProgramVariable programVar) {
+    private @Nullable TermSV createSchemaVariable(@Nullable ProgramVariable programVar) {
         if (programVar == null) {
             return null;
         } else {

@@ -9,14 +9,20 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class LoopCallWithInvariantPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
-    String generatePredicateName(IProgramMethod pm, StatementBlock block,
-            LoopSpecification loopInv) {
+    String generatePredicateName(@Nullable IProgramMethod pm, @Nullable StatementBlock block,
+            @Nullable LoopSpecification loopInv) {
+        final LoopSpecification loop = requireLoopInv(loopInv);
+        final IProgramMethod method = requirePm(pm);
         final String nameString = MiscTools.toValidTacletName(
-            "EXECUTION_OF_LOOP_" + "at_line_" + loopInv.getLoop().getStartPosition().line()
-                + "_in_" + pm.getUniqueName() + "_WITH_INV").toString();
+            "EXECUTION_OF_LOOP_" + "at_line_" + loop.getLoop().getStartPosition().line()
+                + "_in_" + method.getUniqueName() + "_WITH_INV").toString();
         return nameString;
     }
 }

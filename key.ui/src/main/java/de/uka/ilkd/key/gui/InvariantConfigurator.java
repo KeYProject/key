@@ -33,6 +33,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static java.lang.String.format;
 
 /**
@@ -42,6 +45,7 @@ import static java.lang.String.format;
  *
  * @author Dreiner, bruns
  */
+@NullMarked
 public class InvariantConfigurator {
 
     private static final int INV_IDX = 0;
@@ -52,11 +56,11 @@ public class InvariantConfigurator {
     private static final int IF_OO_IDX = 5;
     private static final String DEFAULT = "Default";
 
-    private static InvariantConfigurator configurator = null;
+    private static @Nullable InvariantConfigurator configurator = null;
     private List<Map<String, String>[]> invariants;
     private final HashMap<LoopStatement, List<Map<String, String>[]>> mapLoopsToInvariants;
     private int index = 0;
-    private LoopSpecification newInvariant = null;
+    private @Nullable LoopSpecification newInvariant = null;
     private boolean userPressedCancel = false;
 
     /**
@@ -90,7 +94,7 @@ public class InvariantConfigurator {
      * @return the user edited/completed loop invariant
      * @throws RuleAbortException if the user cancelled the dialog
      */
-    public LoopSpecification getLoopInvariant(final LoopSpecification loopInv,
+    public @Nullable LoopSpecification getLoopInvariant(final @Nullable LoopSpecification loopInv,
             final Services services, final boolean requiresVariant,
             final List<LocationVariable> heapContext) throws RuleAbortException {
         // Check if there is a LoopInvariant
@@ -119,7 +123,7 @@ public class InvariantConfigurator {
             private JPanel errorPanel;
             private final List<JTabbedPane> heapPanes = new ArrayList<>();
 
-            private JTerm variantTerm = null;
+            private @Nullable JTerm variantTerm = null;
             private final Map<LocationVariable, JTerm> modifiableTerm = new LinkedHashMap<>();
             private final Map<LocationVariable, JTerm> freeModifiableTerm = new LinkedHashMap<>();
             private final Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs =
@@ -127,18 +131,15 @@ public class InvariantConfigurator {
             private final Map<LocationVariable, JTerm> invariantTerm = new LinkedHashMap<>();
             private final Map<LocationVariable, JTerm> freeInvariantTerm = new LinkedHashMap<>();
 
-
             private final JButton applyButton = new JButton("Apply");
             private final JButton cancelButton = new JButton("Cancel");
             private final JButton storeButton = new JButton("Store");
-
 
             /**
              * Creates the Dialog
              */
             public InvariantDialog() throws RuleAbortException {
                 super(MainWindow.getInstance(), true);
-
 
                 // set Title and Layout
                 setTitle("Invariant Configurator");
@@ -155,7 +156,6 @@ public class InvariantConfigurator {
                 inputPane = new JTabbedPane();
                 initInputPane();
                 updateActiveTabs(heapContext);
-
 
                 JTextArea loopRep = initLoopPresentation();
                 JPanel leftPanel = new JPanel();
@@ -180,7 +180,6 @@ public class InvariantConfigurator {
                 initButtonPanel(buttonPanel);
                 getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 
-
                 setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
                 final NamespaceSet nss = services.getNamespaces().copyWithParent();
@@ -192,7 +191,6 @@ public class InvariantConfigurator {
                 setLocationRelativeTo(getOwner());
                 setVisible(true);
             }
-
 
             /**
              * Sets up the Button Panel on the Bottom of the Invariant Dialog
@@ -438,7 +436,6 @@ public class InvariantConfigurator {
 
                 rightPane.setMinimumSize(new Dimension(charXWidth * 72, fontHeight * 15));
                 rightPane.setPreferredSize(new Dimension(charXWidth * 80, fontHeight * 20));
-
 
                 return rightPane;
 

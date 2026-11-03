@@ -21,6 +21,10 @@ import de.uka.ilkd.key.proof.*;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class AutoModeAction extends MainWindowAction {
 
     private static final KeyStroke START_KEY =
@@ -31,7 +35,7 @@ public class AutoModeAction extends MainWindowAction {
     private static final Icon STOP_ICON =
         IconFactory.iconWithOverlay(IconFactory.autoModeStopLogo(MainWindow.TOOLBAR_ICON_SIZE), "");
 
-    private Proof associatedProof;
+    private @Nullable Proof associatedProof;
 
     private final ProofTreeListener ptl = new ProofTreeAdapter() {
 
@@ -65,6 +69,14 @@ public class AutoModeAction extends MainWindowAction {
         this(mainWindow, IconFactory.automationWithOverlay(MainWindow.TOOLBAR_ICON_SIZE, ""));
     }
 
+    /**
+     * The action-configuration calls, the mediator queries and the listener registrations below
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since these configure the local action only and the
+     * registered listeners and the proof-control only react to later events, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public AutoModeAction(MainWindow mainWindow, Icon startIcon) {
         super(mainWindow);
         associatedProof = getMediator().getSelectedProof();
@@ -144,7 +156,8 @@ public class AutoModeAction extends MainWindowAction {
     }
 
     private String getStartCommand() {
-        if (associatedProof != null && !associatedProof.root().leaf()) {
+        Node root = associatedProof != null ? associatedProof.root() : null;
+        if (root != null && !root.leaf()) {
             return "Continue";
         } else {
             return "Start";
@@ -159,7 +172,9 @@ public class AutoModeAction extends MainWindowAction {
         if (!getMediator().isInAutoMode()) {
             KeYMediator r = getMediator();
             Proof proof = r.getSelectedProof();
-            if (r.getUI().getProofControl().isAutoModeSupported(proof)) {
+            // {@code getSelectedProof()} may be {@code null} (no proof loaded); the proof control
+            // rejects a {@code null} proof anyway, so skip the auto-mode start.
+            if (proof != null && r.getUI().getProofControl().isAutoModeSupported(proof)) {
                 // This method delegates the request only to the UserInterfaceControl which
                 // implements the functionality.
                 // No functionality is allowed in this method body!

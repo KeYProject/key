@@ -17,6 +17,8 @@ import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Adapter for {@link KeYGuiExtension.KeyboardShortcuts} interface.
  * <p>
@@ -26,6 +28,7 @@ import de.uka.ilkd.key.gui.sourceview.SourceView;
  * @author Alexander Weigl
  * @version 1 (08.05.19)
  */
+@NullMarked
 public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.KeyboardShortcuts {
     @Override
     public final Collection<Action> getShortcuts(KeYMediator mediator, String componentId,

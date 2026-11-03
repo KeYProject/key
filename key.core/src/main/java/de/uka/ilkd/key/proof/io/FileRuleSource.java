@@ -14,13 +14,15 @@ import java.util.Objects;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class FileRuleSource extends RuleSource {
 
     /**
      * The non-<code>null</code> reference to the file from which rules are read.
      */
-    protected @NonNull final Path ruleFile;
+    protected final @NonNull Path ruleFile;
 
     private final long numberOfChars;
 

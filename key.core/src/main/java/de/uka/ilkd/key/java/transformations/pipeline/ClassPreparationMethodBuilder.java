@@ -20,6 +20,7 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Objects;
 
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.NodeList;
@@ -33,6 +34,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.VoidType;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * <code>&lt;clprepare&gt;</code> responsible for the class
  * preparation.
  */
+@NullMarked
 public class ClassPreparationMethodBuilder extends JavaTransformerAbstract {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(ClassPreparationMethodBuilder.class);
@@ -94,7 +97,9 @@ public class ClassPreparationMethodBuilder extends JavaTransformerAbstract {
                                 new AssignExpr(
                                     new KeyPassiveExpression(
                                         new NameExpr(ident.clone())),
-                                    services.getDefaultValue(variable.getType()),
+                                    Objects.requireNonNull(
+                                        services.getDefaultValue(variable.getType()),
+                                        "no default value for static final field"),
                                     AssignExpr.Operator.ASSIGN)));
                     }
                 }

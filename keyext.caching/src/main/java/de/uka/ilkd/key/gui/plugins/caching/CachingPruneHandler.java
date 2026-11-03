@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.plugins.caching.settings.CachingSettingsProvider;
 import de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 import de.uka.ilkd.key.proof.ProofTreeListener;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.proof.io.IntermediateProofReplayer;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class CachingPruneHandler implements ProofTreeListener {
     public static final Logger LOGGER = LoggerFactory.getLogger(CachingPruneHandler.class);
 
@@ -54,7 +57,11 @@ public class CachingPruneHandler implements ProofTreeListener {
                 if (c == null || c.proof() != proofToBePruned) {
                     continue;
                 }
-                var commonAncestor = e.getNode().commonAncestor(c.node());
+                Node node = e.getNode();
+                if (node == null) {
+                    throw new NullPointerException("No node available in the prune event.");
+                }
+                var commonAncestor = node.commonAncestor(c.node());
                 if (commonAncestor == c.node()) {
                     boolean copySteps = CachingSettingsProvider.getCachingSettings().getPrune()
                             .equals(ProofCachingSettings.PRUNE_COPY);

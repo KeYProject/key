@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.merge;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
@@ -64,7 +65,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
             ImmutableList<PosInOccurrence> ifInsts, Node mergeNode,
             ImmutableList<MergePartner> mergePartners, MergeProcedure concreteRule,
             SymbolicExecutionStateWithProgCnt thisSEState,
-            ImmutableList<SymbolicExecutionState> mergePartnerStates, JTerm distForm,
+            ImmutableList<SymbolicExecutionState> mergePartnerStates, @Nullable JTerm distForm,
             ArrayList<MergeRuleProgressListener> progressListeners) {
         super(rule, pio, ifInsts);
         this.mergeNode = mergeNode;
@@ -76,6 +77,11 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
         this.progressListeners.addAll(progressListeners);
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable MergeRuleBuiltInRuleApp replacePos(PosInOccurrence newPos) {
         return null;
@@ -94,6 +100,11 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
         // merging is still possible, but then this method shouldn't be called
         // (completion task is done by the corresponding visual dialogs).
 
+        // The inherited pio field is declared nullable, but an application reaching this method
+        // (a merge point is the active statement) always carries a position; guard it once and
+        // shadow the field with the non-null local for all subsequent uses.
+        final PosInOccurrence pio = Objects.requireNonNull(this.pio);
+
         final ImmutableList<MergePartner> mergePartners =
             MergeRule.findPotentialMergePartners(goal, pio);
 
@@ -110,7 +121,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
 
         final Node node = goal.node();
 
-        return new MergeRuleBuiltInRuleApp(super.builtInRule, super.pio, super.ifInsts, node,
+        return new MergeRuleBuiltInRuleApp(super.builtInRule, pio, super.ifInsts, node,
             mergePartners, mc.getInstantiatedMergeProcedure(services),
             MergeRuleUtils.sequentToSETriple(node, pio, services),
             MergeRuleUtils.sequentsToSEPairs(mergePartners), null, new ArrayList<>());
@@ -124,6 +135,16 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
                 && mergeNode != null && distinguishablePathConditionsRequirement();
     }
 
+    /**
+     * Checks whether the distinguishing path conditions of this merge application are
+     * distinguishable.
+     * <p>
+     * This method is only invoked from {@link #complete()}, which ensures the merge node, the
+     * concrete rule and this state are present beforehand; the dereferences of the (nullable)
+     * fields holding them are suppressed with a scoped key. The partner states are always derived
+     * together with the (non-null-checked) merge partners, hence also present here.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private boolean distinguishablePathConditionsRequirement() {
         final Services services = mergeNode.proof().getServices();
 
@@ -139,7 +160,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
         if (concreteRule.requiresDistinguishablePathConditions()
                 || concreteRule instanceof MergeWithLatticeAbstraction) {
             ImmutableList<SymbolicExecutionState> allStates = ImmutableList.nil();
-            allStates = allStates.prepend(mergePartnerStates);
+            allStates = allStates.prepend(Objects.requireNonNull(mergePartnerStates));
             allStates = allStates.prepend(thisSEState.toSymbolicExecutionState());
 
             for (SymbolicExecutionState state1 : allStates) {
@@ -161,6 +182,11 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
 
     // GETTERS AND SETTERS //
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public ImmutableList<MergePartner> getMergePartners() {
         return mergePartners;
     }
@@ -170,6 +196,11 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
         mergePartnerStates = MergeRuleUtils.sequentsToSEPairs(mergePartners);
     }
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public MergeProcedure getConcreteRule() {
         return concreteRule;
     }
@@ -178,6 +209,11 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
         this.concreteRule = concreteRule;
     }
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public Node getMergeNode() {
         return mergeNode;
     }
@@ -185,7 +221,8 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
     public void setMergeNode(Node mergeNode) {
         this.mergeNode = mergeNode;
         this.thisSEState =
-            MergeRuleUtils.sequentToSETriple(mergeNode, super.pio, mergeNode.proof().getServices());
+            MergeRuleUtils.sequentToSETriple(mergeNode, Objects.requireNonNull(super.pio),
+                mergeNode.proof().getServices());
     }
 
     public void setDistinguishingFormula(JTerm distForm) {
@@ -197,14 +234,29 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
         this.distForm = distForm;
     }
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public JTerm getDistinguishingFormula() {
         return distForm;
     }
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public SymbolicExecutionStateWithProgCnt getMergeSEState() {
         return thisSEState;
     }
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public ImmutableList<SymbolicExecutionState> getMergePartnerStates() {
         return mergePartnerStates;
     }

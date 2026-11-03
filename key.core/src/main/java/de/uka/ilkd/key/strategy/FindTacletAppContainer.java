@@ -19,13 +19,15 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Instances of this class are immutable
  */
+@NullMarked
 public class FindTacletAppContainer extends TacletAppContainer {
 
     /**
@@ -53,7 +55,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      * object's
      * fields are visible.
      */
-    private volatile PosInOccurrence currentPositionCache;
+    private volatile @Nullable PosInOccurrence currentPositionCache;
 
     /**
      * Creates a FindTacletAppContainer for applying a find taclet.
@@ -114,7 +116,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
      *         altered since the creation of this object or if a preceding update has changed
      */
     private boolean subformulaOrPreceedingUpdateHasChanged(Goal goal) {
-        ImmutableList<@NonNull FormulaChangeInfo> infoList =
+        ImmutableList<FormulaChangeInfo> infoList =
             goal.getFormulaTagManager().getModifications(positionTag);
 
         while (!infoList.isEmpty()) {

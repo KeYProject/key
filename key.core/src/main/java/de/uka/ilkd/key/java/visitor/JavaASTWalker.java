@@ -7,11 +7,14 @@ package de.uka.ilkd.key.java.visitor;
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * walks through a java AST in depth-left-fist-order at default. Implementing method doAction
  * specifies its behaviour at the different Nodes. The depth-left-fist behaviour can be changed by
  * overwriting the method <code> walk(ProgramElement) </code>.
  */
+@NullMarked
 public abstract class JavaASTWalker {
 
     /**

@@ -12,7 +12,6 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -23,6 +22,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Generate term "self != null".
@@ -30,17 +32,23 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author christoph
  */
+@NullMarked
 abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     @Override
     public JTerm produce(BasicSnippetData d, ProofObligationVars poVars)
             throws UnsupportedOperationException {
 
-        IObserverFunction targetMethod =
-            (IObserverFunction) d.get(BasicSnippetData.Key.TARGET_METHOD);
-        final IProgramMethod pm = (IProgramMethod) targetMethod;
-        StatementBlock targetBlock = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
-        LoopSpecification loopInv = (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
+        final Object targetMethodObject = d.get(BasicSnippetData.Key.TARGET_METHOD);
+        if (targetMethodObject == null) {
+            throw new NullPointerException(
+                "No target method for generating the two state method predicate.");
+        }
+        final IProgramMethod pm = (IProgramMethod) targetMethodObject;
+        final StatementBlock targetBlock =
+            (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
+        final LoopSpecification loopInv =
+            (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         String nameString = generatePredicateName(pm, targetBlock, loopInv);
         final ImmutableList<JTerm> termList = extractTermListForPredicate(pm, poVars, d.hasMby);
         final Sort[] argSorts = generateContApplArgumentSorts(termList, pm);
@@ -70,13 +78,18 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             Services services) {
         final Name name = new Name(nameString);
         Namespace<Function> functionNS = services.getNamespaces().functions();
+        if (functionNS == null) {
+            throw new NullPointerException(
+                "No function namespace available for the two state method predicate.");
+        }
 
         /*
          * This predicate needs to present on all branches and, therefore, must be added to the
          * toplevel function namespace. Hence, we rewind to the parent namespace here.
          */
-        while (functionNS.parent() != null) {
-            functionNS = functionNS.parent();
+        Namespace<Function> parent;
+        while ((parent = functionNS.parent()) != null) {
+            functionNS = parent;
         }
 
         Function pred = functionNS.lookup(name);
@@ -105,8 +118,36 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
     }
 
 
-    abstract String generatePredicateName(IProgramMethod pm, StatementBlock block,
-            LoopSpecification loopInv);
+    abstract String generatePredicateName(@Nullable IProgramMethod pm,
+            @Nullable StatementBlock block,
+            @Nullable LoopSpecification loopInv);
+
+
+    static IProgramMethod requirePm(@Nullable IProgramMethod pm) {
+        if (pm == null) {
+            throw new NullPointerException(
+                "No target method for generating the two state method predicate.");
+        }
+        return pm;
+    }
+
+
+    static StatementBlock requireBlock(@Nullable StatementBlock block) {
+        if (block == null) {
+            throw new NullPointerException(
+                "No target block for generating the two state block predicate.");
+        }
+        return block;
+    }
+
+
+    static LoopSpecification requireLoopInv(@Nullable LoopSpecification loopInv) {
+        if (loopInv == null) {
+            throw new NullPointerException(
+                "No loop invariant for generating the two state loop predicate.");
+        }
+        return loopInv;
+    }
 
 
     /**
@@ -124,8 +165,12 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         if (!pm.isStatic()) {
             // self is relevant in the pre and post state for constructors
             // (if the method is static, then there is no self)
-            relevantPreVars = relevantPreVars.append(poVars.pre.self);
-            relevantPostVars = relevantPostVars.append(poVars.post.self);
+            if (poVars.pre.self != null) {
+                relevantPreVars = relevantPreVars.append(poVars.pre.self);
+            }
+            if (poVars.post.self != null) {
+                relevantPostVars = relevantPostVars.append(poVars.post.self);
+            }
         }
 
         // local variables which are not changed during execution or whose
@@ -144,9 +189,13 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         // post state
         if (poVars.pre.guard != null) {
             // in case of an information flow loop invariant
-            assert poVars.post.guard != null;
+            final JTerm guardPost = poVars.post.guard;
+            if (guardPost == null) {
+                throw new NullPointerException(
+                    "No post-state guard term although the pre-state guard term exists.");
+            }
             relevantPreVars = relevantPreVars.append(poVars.pre.guard);
-            relevantPostVars = relevantPostVars.append(poVars.post.guard);
+            relevantPostVars = relevantPostVars.append(guardPost);
         }
 
         // the result and possible exceptions are relevant only in the post
@@ -163,7 +212,12 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         if (hasMby) {
             // if the contract has a measured by clause, then mbyAtPre is also
             // relevant
-            relevantPreVars = relevantPreVars.append(poVars.pre.mbyAtPre);
+            final JTerm mbyAtPre = poVars.pre.mbyAtPre;
+            if (mbyAtPre == null) {
+                throw new NullPointerException(
+                    "No measured-by-at-pre term although the contract has a measured-by clause.");
+            }
+            relevantPreVars = relevantPreVars.append(mbyAtPre);
         }
 
         // the heap is relevant in the pre and post state

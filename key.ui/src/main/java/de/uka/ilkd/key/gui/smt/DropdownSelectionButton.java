@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.smt;
 
-
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -15,6 +14,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A button consisting of an action component (normal button) and a selection component (dropdown
@@ -31,16 +33,17 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
  * @author Christoph Scheben (2011)
  * @author Alicia Appelhagen (2022)
  */
+@NullMarked
 public class DropdownSelectionButton {
 
     /**
      * The dropdown opening button.
      */
-    private JButton selectionComponent;
+    private @Nullable JButton selectionComponent;
     /**
      * The action starting button.
      */
-    private JButton actionComponent;
+    private @Nullable JButton actionComponent;
     /**
      * The actions that can be selected.
      */
@@ -50,7 +53,7 @@ public class DropdownSelectionButton {
      * only used if more than one item can be selected at the same time. If only one action can be
      * selected, the function that will be used is just the identity.
      */
-    private Function<Action[], Action> reduceChoice;
+    private Function<Action[], @Nullable Action> reduceChoice;
     /**
      * The maximum amount of actions that can be selected at the same time.
      */
@@ -94,7 +97,7 @@ public class DropdownSelectionButton {
     /**
      * The dropdown menu that opens when clicking the selection button.
      */
-    private JPopupMenu menu;
+    private @Nullable JPopupMenu menu;
 
     /**
      * True iff the next time the selection button's action is carried out it should open the popup
@@ -110,6 +113,11 @@ public class DropdownSelectionButton {
      */
     public DropdownSelectionButton(int iconSize) {
         this.iconSize = iconSize;
+        // The items and reducer are normally installed by {@link #setItems} before the button is
+        // displayed; default to an empty item list and the identity reducer so the button (and in
+        // particular {@link #setEnabled}) works even before that.
+        this.items = new Action[0];
+        this.reduceChoice = a -> a[0];
     }
 
     /**
@@ -229,7 +237,10 @@ public class DropdownSelectionButton {
             getAction().putValue(Action.NAME,
                 isEmptyItem() ? executedAction.toString() : prefix + executedAction.toString());
             if (isEmptyItem()) {
-                getAction().putValue(Action.SHORT_DESCRIPTION, emptyItem.getToolTip());
+                String toolTip = emptyItem.getToolTip();
+                if (toolTip != null) {
+                    getAction().putValue(Action.SHORT_DESCRIPTION, toolTip);
+                }
             }
         }
         if (maxChoiceAmount == 1) {
@@ -254,14 +265,13 @@ public class DropdownSelectionButton {
         return false;
     }
 
-
     /**
      * Set the executedAction to be the given one and update the action button. Notify the
      * ChangeListeners of this change.
      *
      * @param item the new executedAction
      */
-    public void setSelectedItem(Action item) {
+    public void setSelectedItem(@Nullable Action item) {
         if (item == null) {
             return;
         }
@@ -339,15 +349,20 @@ public class DropdownSelectionButton {
      * @return the action button
      */
     protected JButton getActionButton() {
-        if (actionComponent == null) {
-            actionComponent = new JButton();
+        JButton component = actionComponent;
+        if (component == null) {
+            JButton created = new JButton();
+            actionComponent = created;
             // actionComponent.setFont(actionComponent.getFont().deriveFont(iconSize*0.8f));
-            // Enable the selection button iff the action button is enabled as well.
-            actionComponent.addChangeListener(
-                e -> getSelectionButton().setEnabled(actionComponent.isEnabled()));
-            actionComponent.setFocusPainted(false);
+            // Enable the selection button iff the action button is enabled as well. The listener
+            // refers to the (effectively final) local so it stays valid even though
+            // {@code actionComponent} is a {@code @Nullable} field.
+            created.addChangeListener(
+                e -> getSelectionButton().setEnabled(created.isEnabled()));
+            created.setFocusPainted(false);
+            component = created;
         }
-        return actionComponent;
+        return component;
     }
 
     /**
@@ -376,10 +391,12 @@ public class DropdownSelectionButton {
      * @param maxChoice the maximum amount of actions that can be selected, this is assumed to be at
      *        least 1 (otherwise it is changed to be 1)
      */
-    public void setItems(Action[] it, Function<Action[], Action> reduce, int maxChoice) {
-        items = it;
+    public void setItems(Action @Nullable [] it, Function<Action[], @Nullable Action> reduce,
+            int maxChoice) {
         if (it == null) {
             items = new Action[0];
+        } else {
+            items = it;
         }
         reduceChoice = reduce;
         // make maxChoiceAmount at least 1
@@ -500,15 +517,16 @@ public class DropdownSelectionButton {
 
         /**
          * The text that will be displayed in a DropdownSelectionButton's action component when its
-         * {@link #emptyItem} is selected.
+         * {@link #emptyItem} is selected. {@code null} until {@link #setText} is invoked.
          */
-        private String text;
+        private @Nullable String text;
 
         /**
          * The tooltip text that will be displayed in a DropdownSelectionButton's action component
-         * when its {@link #emptyItem} is selected.
+         * when its {@link #emptyItem} is selected. {@code null} until {@link #setToolTip} is
+         * invoked.
          */
-        private String toolTip;
+        private @Nullable String toolTip;
 
         /**
          * True iff action and selection button of the DropdownSelectionButton should stay enabled
@@ -520,7 +538,13 @@ public class DropdownSelectionButton {
          * Create a new EmptyAction with text "empty".
          *
          * @param enabled the EmptyAction's {@link #leaveButtonsEnabled} attribute
+         *
+         *        The {@code setText} call in the constructor body writes to the action's fields
+         *        and its value map; the invocation is made on {@code this} while it is still under
+         *        initialization (EISOP initialization check) but does not read any uninitialized
+         *        state, suppressed with a scoped key.
          */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public EmptyAction(boolean enabled) {
             leaveButtonsEnabled = enabled;
             setText("empty");
@@ -534,7 +558,10 @@ public class DropdownSelectionButton {
         public void setText(String t) {
             text = t;
             putValue(NAME, text);
-            putValue(SHORT_DESCRIPTION, toolTip);
+            String tip = toolTip;
+            if (tip != null) {
+                putValue(SHORT_DESCRIPTION, tip);
+            }
         }
 
         /**
@@ -549,7 +576,7 @@ public class DropdownSelectionButton {
         /**
          * @return this EmptyItem's {@link #toolTip}
          */
-        public String getToolTip() {
+        public @Nullable String getToolTip() {
             return toolTip;
         }
 
@@ -558,7 +585,7 @@ public class DropdownSelectionButton {
          */
         @Override
         public String toString() {
-            return text;
+            return text == null ? "" : text;
         }
 
         @Override
@@ -593,7 +620,13 @@ public class DropdownSelectionButton {
          * Create a new DoubleClickCheckBoxMenuItem.
          *
          * @param action the {@link #doubleClickAction} of this menu item
+         *
+         *        The {@code setAction}/{@code setToolTipText} calls below operate on {@code this}
+         *        while it is still under initialization (EISOP initialization check); they only
+         *        register display and click behavior that is used after construction completes,
+         *        suppressed with a scoped key.
          */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         private DoubleClickCheckBoxMenuItem(Action action) {
             super();
             DoubleClickCheckBoxMenuItem menuItem = this;
@@ -657,13 +690,12 @@ public class DropdownSelectionButton {
         protected void processMouseEvent(MouseEvent e) {
             if (e.getClickCount() >= 2) {
                 doubleClickAction
-                        .actionPerformed(new ActionEvent(e, MouseEvent.MOUSE_CLICKED, null));
+                        .actionPerformed(new ActionEvent(e, MouseEvent.MOUSE_CLICKED, ""));
                 setSelected(true);
                 return;
             }
             super.processMouseEvent(e);
         }
-
 
     }
 
@@ -685,7 +717,12 @@ public class DropdownSelectionButton {
          * Create a new SelectionMenuItem.
          *
          * @param item the menu item's {@link #action}.
+         *
+         *        The {@code setAction} call below operates on {@code this} while it is still under
+         *        initialization (EISOP initialization check); it only registers the click handler
+         *        that is used after construction completes, suppressed with a scoped key.
          */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public SelectionMenuItem(Action item) {
             super();
             /*

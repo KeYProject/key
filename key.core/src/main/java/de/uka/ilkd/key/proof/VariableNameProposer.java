@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,9 +26,13 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Proposes names for variables (except program variables).
  */
+@NullMarked
 public class VariableNameProposer implements InstantiationProposer {
 
     /**
@@ -46,8 +51,8 @@ public class VariableNameProposer implements InstantiationProposer {
      * skolemterm SVs, variable SVs, and labels.
      */
     @Override
-    public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
-            ImmutableList<String> previousProposals) {
+    public @Nullable String getProposal(TacletApp app, SchemaVariable var, Services services,
+            Node undoAnchor, @Nullable ImmutableList<String> previousProposals) {
         if (var instanceof SkolemTermSV) {
             return getNameProposalForSkolemTermVariable(app, var, services, undoAnchor,
                 previousProposals);
@@ -91,7 +96,8 @@ public class VariableNameProposer implements InstantiationProposer {
      * declared as skolem term SV.
      */
     private String getNameProposalForSkolemTermVariable(TacletApp p_app, SchemaVariable p_var,
-            Services services, Node undoAnchor, ImmutableList<String> previousProposals) {
+            Services services, Node undoAnchor,
+            @Nullable ImmutableList<String> previousProposals) {
         return getNameProposalForSkolemTermVariable(
             createBaseNameProposalBasedOnCorrespondence(p_app, p_var, services), services,
             undoAnchor, previousProposals);
@@ -105,7 +111,7 @@ public class VariableNameProposer implements InstantiationProposer {
     protected static String createBaseNameProposalBasedOnCorrespondence(TacletApp p_app,
             SchemaVariable p_var, Services services) {
         final String result;
-        final SchemaVariable v = p_app.taclet().getNameCorrespondent(p_var, services);
+        final @Nullable SchemaVariable v = p_app.taclet().getNameCorrespondent(p_var, services);
         if (v != null && p_app.instantiations().isInstantiated(v)) {
 
             final Object inst = p_app.instantiations().getInstantiation(v);
@@ -132,8 +138,10 @@ public class VariableNameProposer implements InstantiationProposer {
 
 
     private String getNameProposalForSkolemTermVariable(String name, Services services,
-            Node undoAnchor, ImmutableList<String> previousProposals) {
+            Node undoAnchor, @Nullable ImmutableList<String> previousProposals) {
 
+        Objects.requireNonNull(previousProposals,
+            "skolem name proposals need the previous proposals of this application");
         final NamespaceSet nss = services.getNamespaces();
         Name l_name;
         final String basename = name + SKOLEMTERM_VARIABLE_NAME_POSTFIX;
@@ -177,7 +185,7 @@ public class VariableNameProposer implements InstantiationProposer {
      * variables.
      */
     private String getNameProposalForVariableSV(TacletApp app, SchemaVariable var,
-            TermServices services, ImmutableList<String> previousProposals) {
+            TermServices services, @Nullable ImmutableList<String> previousProposals) {
 
         String baseName = var.name().toString();
         if (previousProposals == null || !previousProposals.contains(baseName)) {
@@ -203,10 +211,14 @@ public class VariableNameProposer implements InstantiationProposer {
      * @param previousProposals
      */
     private String getNameProposalForLabel(TacletApp app, SchemaVariable var, Services services,
-            Node undoAnchor, ImmutableList<String> previousProposals) {
+            Node undoAnchor, @Nullable ImmutableList<String> previousProposals) {
 
+        Objects.requireNonNull(previousProposals,
+            "label name proposals need the previous proposals of this application");
+        var contextInstantiation =
+            app.matchConditions().getInstantiations().getContextInstantiation();
         ProgramElement contextProgram =
-            app.matchConditions().getInstantiations().getContextInstantiation().program();
+            contextInstantiation == null ? null : contextInstantiation.program();
 
         if (contextProgram == null) {
             contextProgram = new StatementBlock();

@@ -9,6 +9,7 @@ import java.util.Objects;
 import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -16,9 +17,10 @@ import org.jspecify.annotations.Nullable;
  * this node will be highlighted in the tree with a border and if an ExplorationAction is set this
  * action is displayed in the ExplorationStepsList Tab
  */
+@NullMarked
 public class ExplorationNodeData {
 
-    private String explorationAction;
+    private @Nullable String explorationAction;
 
     public static @NonNull ExplorationNodeData get(@NonNull Node node) {
         @Nullable
@@ -33,7 +35,7 @@ public class ExplorationNodeData {
     /**
      * Return the String of the Exploration action that was applied to the node
      */
-    public String getExplorationAction() {
+    public @Nullable String getExplorationAction() {
         return explorationAction;
     }
 
@@ -46,7 +48,7 @@ public class ExplorationNodeData {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

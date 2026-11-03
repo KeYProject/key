@@ -22,12 +22,15 @@ import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Listener object to record various user actions (currently only rule applications)
  * in the undo buffer.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class StateChangeListener implements InteractionListener {
     /**
      * The KeY mediator.
@@ -37,8 +40,14 @@ public class StateChangeListener implements InteractionListener {
     /**
      * Construct and register a new state change listener.
      *
+     * <p>
+     * The listener registers itself with the proof control while the receiver is still under
+     * initialization (EISOP initialization check); the control only invokes the listener after
+     * construction completes, suppressed with a scoped key.
+     *
      * @param mediator mediator
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     StateChangeListener(KeYMediator mediator) {
         this.mediator = mediator;
         mediator.getUI().getProofControl().addInteractionListener(this);

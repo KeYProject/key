@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Load the file saved at the location described by {@link QuickSaveAction}. Use the F6 key to
  * access this feature.
@@ -16,6 +18,7 @@ import de.uka.ilkd.key.gui.MainWindow;
  * @author daniel
  *
  */
+@NullMarked
 public class QuickLoadAction extends MainWindowAction {
     private static final long serialVersionUID = -7149996409297248408L;
 
@@ -24,6 +27,11 @@ public class QuickLoadAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public QuickLoadAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Quickload");

@@ -14,9 +14,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Replace a program variable that is a compile-time constant with the value of the initializer
  */
+@NullMarked
 public final class ConstantValue extends AbstractTermTransformer {
 
 

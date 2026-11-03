@@ -13,12 +13,14 @@ import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (3/27/20)
  */
+@NullMarked
 public class BuildingException extends RuntimeException implements HasLocation {
     private final @Nullable Token offendingSymbol;
 
@@ -101,7 +103,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
      * @param e the causing throwable, may be null
      */
     public BuildingException(@Nullable Token t, @Nullable Position overridePosition, String message,
-            Throwable e) {
+            @Nullable Throwable e) {
         super(message + " at " + getPosition(t, overridePosition), e);
         offendingSymbol = t;
         this.overridePosition = overridePosition;

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.init;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Instances of this class are used to get a default {@link Profile} instance.
  * <p>
@@ -13,6 +15,7 @@ package de.uka.ilkd.key.proof.init;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public interface DefaultProfileResolver {
     /**
      * Returns the profile name.

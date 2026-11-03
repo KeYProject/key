@@ -38,6 +38,7 @@ import org.key_project.util.collection.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -49,6 +50,7 @@ import org.jspecify.annotations.Nullable;
  * @author weigl
  * @version 1
  */
+@NullMarked
 public class DefaultBuilder extends AbstractBuilder<Object> {
     public static final String LIMIT_SUFFIX = "$lmtd";
 
@@ -80,7 +82,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         String id = ctx.IDENT().getText();
         RuleSet h = ruleSets().lookup(new Name(id));
         if (h == null) {
-            semanticError(ctx, "Rule set %s was not previous defined.", id);
+            return semanticError(ctx, "Rule set %s was not previous defined.", id);
         }
         return h;
     }
@@ -90,13 +92,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return ctx.getText();
     }
 
-    protected Named lookup(Name n) {
+    protected @Nullable Named lookup(Name n) {
         final Namespace<?>[] lookups =
             { programVariables(), variables(), schemaVariables(), functions() };
         return doLookup(n, lookups);
     }
 
-    protected <T> T doLookup(Name n, Namespace<?>... lookups) {
+    protected <T> @Nullable T doLookup(Name n, Namespace<?>... lookups) {
         for (Namespace<?> lookup : lookups) {
             Object l;
             if (lookup != null && (l = lookup.lookup(n)) != null) {
@@ -127,8 +129,9 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return mapOf(ctx.arg_sorts_or_formula_helper());
     }
 
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
-    public Sort visitArg_sorts_or_formula_helper(
+    public @Nullable Sort visitArg_sorts_or_formula_helper(
             JavaKeYParser.Arg_sorts_or_formula_helperContext ctx) {
         if (ctx.FORMULA() != null) {
             return JavaDLTheory.FORMULA;
@@ -149,10 +152,14 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      *
      * @param varfuncName
      *        the String with the symbols name
+     * @param genericArgsCtxt
+     *        the formal sort arguments, may be {@code null} when no parametric function arguments
+     *        are present in the parse tree
      */
     protected Operator lookupVarfuncId(ParserRuleContext ctx, String varfuncName,
-            JavaKeYParser.Formal_sort_argsContext genericArgsCtxt) {
+            JavaKeYParser.@Nullable Formal_sort_argsContext genericArgsCtxt) {
         Name name = new Name(varfuncName);
+        @Nullable
         Operator[] operators =
             { schemaVariables().lookup(name), variables().lookup(name),
                 programVariables().lookup(new ProgramElementName(varfuncName)),
@@ -160,7 +167,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 AbstractTermTransformer.name2metaop(varfuncName),
             };
 
-        for (Operator op : operators) {
+        for (@Nullable
+        Operator op : operators) {
             if (op != null) {
                 if (genericArgsCtxt != null) {
                     semanticError(genericArgsCtxt,
@@ -174,14 +182,12 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         if (genericArgsCtxt != null) {
             var d = nss.parametricFunctions().lookup(name);
             if (d == null) {
-                semanticError(ctx, "Could not find parametric function: %s", name);
-                return null;
+                return semanticError(ctx, "Could not find parametric function: %s", name);
             }
             var args = getGenericArgs(genericArgsCtxt, d.getParameters());
             return ParametricFunctionInstance.get(d, args, services);
         }
-        semanticError(ctx, "Could not find (program) variable or constant %s", varfuncName);
-        return null;
+        return semanticError(ctx, "Could not find (program) variable or constant %s", varfuncName);
     }
 
     public Sort toArraySort(Pair<Sort, Type> p, int numOfDimensions) {
@@ -206,13 +212,13 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * is not found for the first time, the name is expanded with "java.lang." and the look up
      * restarts
      */
-    protected Sort lookupSort(String name) {
+    protected @Nullable Sort lookupSort(String name) {
         Sort result = sorts().lookup(new Name(name));
         if (result == null) {
             if (name.equals(NullSort.NAME.toString())) {
                 Sort objectSort = sorts().lookup(new Name("java.lang.Object"));
                 if (objectSort == null) {
-                    semanticError(null,
+                    return semanticError(null,
                         "Null sort cannot be used before java.lang.Object is declared");
                 }
                 result = new NullSort(objectSort);
@@ -285,14 +291,21 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         this.schemaVariablesNamespace = ns;
     }
 
+    /**
+     * Resolves the given list of variable identifiers against the current namespaces.
+     * <p>
+     * The identifier list of a variable-ids context is always present; the dereference of the
+     * (nullable) accepted list is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public Object visitVarIds(JavaKeYParser.VarIdsContext ctx) {
         Collection<String> ids = accept(ctx.simple_ident_comma_list());
         List<ParsableVariable> list = new ArrayList<>(ids.size());
         for (String id : ids) {
             ParsableVariable v = (ParsableVariable) lookup(new Name(id));
             if (v == null) {
-                semanticError(ctx, "Variable " + id + " not declared.");
+                return semanticError(ctx, "Variable " + id + " not declared.");
             }
             list.add(v);
         }
@@ -329,6 +342,15 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return mapOf(ctx.sortId());
     }
 
+    /**
+     * The array-sort path forwards a possibly-absent primitive Java type ({@code t} remains
+     * {@code null} for non-primitive sort aliases) through {@code Pair}, which only admits non-null
+     * type arguments; the pre-existing nullable component cannot be expressed, so the type
+     * inference difference is suppressed with a scoped key. The looked-up parametric sort
+     * declaration is asserted present below; its dereference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:type.arguments.not.inferred",
+        "nullness:dereference.of.nullable" })
     @Override
     public Sort visitSortId(JavaKeYParser.SortIdContext ctx) {
         String primitiveName = ctx.id.getText();
@@ -370,7 +392,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }
         Sort s = lookupSort(primitiveName);
         if (s == null) {
-            semanticError(ctx, "Could not find sort: %s", ctx.getText());
+            return semanticError(ctx, "Could not find sort: %s", ctx.getText());
         }
 
         if (!ctx.EMPTYBRACKETS().isEmpty()) {
@@ -394,7 +416,15 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return args;
     }
 
+    /**
+     * Resolves the KeY Java type for the given type mapping, trying the Java info lookup and the
+     * array-sort parser before falling back to a sort-only type.
+     * <p>
+     * The synthesized array declaration's type reference is guaranteed to carry a KeY Java type;
+     * the dereference of the (nullable) type reference is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public KeYJavaType visitTypemapping(JavaKeYParser.TypemappingContext ctx) {
         boolean array = false;
         StringBuilder type = new StringBuilder(visitSimple_ident_dots(ctx.simple_ident_dots()));
@@ -434,7 +464,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         }
 
         if (kjt == null) {
-            semanticError(ctx, "Unknown type: " + type);
+            return semanticError(ctx, "Unknown type: " + type);
         }
 
         return kjt;
@@ -445,12 +475,22 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return ctx.getText();
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable List<GenericParameter> visitFormal_sort_param_decls(
             JavaKeYParser.Formal_sort_param_declsContext ctx) {
         return mapOf(ctx.formal_sort_param_decl());
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable GenericParameter visitFormal_sort_param_decl(
             JavaKeYParser.Formal_sort_param_declContext ctx) {
@@ -467,16 +507,16 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         var name = ctx.simple_ident().getText();
         Sort paramSort = sorts().lookup(name);
         if (paramSort == null) {
-            semanticError(ctx, "Parameter sort %s not found", name);
+            return semanticError(ctx, "Parameter sort %s not found", name);
         }
         if (!(paramSort instanceof GenericSort)) {
-            semanticError(ctx, "Parameter sort %s is not a generic sort", name);
+            return semanticError(ctx, "Parameter sort %s is not a generic sort", name);
         }
         return new GenericParameter((GenericSort) paramSort, variance);
     }
 
 
-    protected String processDocumentation(TerminalNode terminalNode) {
+    protected @Nullable String processDocumentation(TerminalNode terminalNode) {
         if (terminalNode != null)
             return processDocumentation(terminalNode.getSymbol());
         return null;
@@ -486,7 +526,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return maindoc.stream().map(this::processDocumentation).collect(Collectors.joining("\n\n"));
     }
 
-    protected String processDocumentation(Token doc) {
+    protected @Nullable String processDocumentation(Token doc) {
         if (doc == null) {
             return null;
         }

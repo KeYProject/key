@@ -11,6 +11,9 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface SMTSettings {
 
     /**

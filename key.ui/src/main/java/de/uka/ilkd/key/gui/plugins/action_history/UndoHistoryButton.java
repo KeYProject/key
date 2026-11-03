@@ -18,6 +18,9 @@ import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A button consisting of an action component (normal button) and a selection menu (dropdown
  * button). Selecting an entry from the dropdown executes an action based on that entry,
@@ -30,18 +33,20 @@ import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class UndoHistoryButton {
 
     /**
      * The dropdown opening button.
      */
-    private JButton selectionComponent;
+    private @Nullable JButton selectionComponent;
     /**
      * The action starting button.
      */
     private final UndoAction action;
     /**
-     * The actions that can be selected.
+     * The actions that can be selected, populated by {@link #setItems(List)} before the button
+     * is used.
      */
     private List<UserAction> items;
     /**
@@ -56,7 +61,7 @@ public class UndoHistoryButton {
     /**
      * The dropdown menu that opens when clicking the selection button.
      */
-    private JPopupMenu menu;
+    private @Nullable JPopupMenu menu;
 
     /**
      * True iff the next time the selection button's action is carried out it should open the popup
@@ -85,6 +90,11 @@ public class UndoHistoryButton {
      * Create a new UndoHistoryButton with a given icon size used to display the selection
      * component's icon.
      *
+     * <p>
+     * The item list is only populated by {@link #setItems(List)} before the button is shown;
+     * the EISOP initialization check cannot see those external assignments, so the
+     * uninitialized field is suppressed with a scoped key.
+     *
      * @param mainWindow the main window
      * @param iconSize the size of the selection component's icon (e.g. down-arrow)
      * @param actionIcon icon for the action button
@@ -93,6 +103,7 @@ public class UndoHistoryButton {
      * @param pressedSelection callback if a dropdown entry is selected
      * @param actionSupplier callback that provides the list of actions to display
      */
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
     public UndoHistoryButton(MainWindow mainWindow, int iconSize, IconFontProvider actionIcon,
             String prefix,
             Consumer<UserAction> pressedAction, Consumer<UserAction> pressedSelection,
@@ -267,9 +278,15 @@ public class UndoHistoryButton {
         /**
          * Construct a new undo action.
          *
+         * <p>
+         * The action sets its icon and tooltip while the receiver is still under initialization
+         * (EISOP initialization check); both only materialize once the action is displayed after
+         * construction, suppressed with a scoped key.
+         *
          * @param mainWindow main window
          * @param callback callback responsible for undoing actions
          */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         UndoAction(MainWindow mainWindow, Consumer<UserAction> callback) {
             super(mainWindow);
             setIcon(actionIcon.get(iconSize));

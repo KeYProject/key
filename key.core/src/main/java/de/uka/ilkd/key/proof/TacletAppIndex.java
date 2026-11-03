@@ -25,6 +25,8 @@ import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -35,14 +37,15 @@ import org.jspecify.annotations.NonNull;
  * calculate new TacletApps.
  */
 
+@NullMarked
 public class TacletAppIndex {
     public static final AtomicLong PERF_CREATE_ALL = new AtomicLong();
     public static final AtomicLong PERF_UPDATE = new AtomicLong();
 
     private final TacletIndex tacletIndex;
 
-    private SemisequentTacletAppIndex antecIndex;
-    private SemisequentTacletAppIndex succIndex;
+    private @Nullable SemisequentTacletAppIndex antecIndex;
+    private @Nullable SemisequentTacletAppIndex succIndex;
 
     private TermTacletAppIndexCacheSet indexCaches;
 
@@ -65,7 +68,7 @@ public class TacletAppIndex {
      * <code>seq != null</code> implies that the indices <code>antecIndex</code>,
      * <code>succIndex</code> are up-to-date for the sequent <code>seq</code>
      */
-    private Sequent seq;
+    private @Nullable Sequent seq;
 
     private final Map<CacheKey, TermTacletAppIndex> cache;
 
@@ -75,8 +78,9 @@ public class TacletAppIndex {
             services.getCaches().getTermTacletAppIndexCache());
     }
 
-    private TacletAppIndex(TacletIndex tacletIndex, SemisequentTacletAppIndex antecIndex,
-            SemisequentTacletAppIndex succIndex, @NonNull Goal goal, Sequent seq,
+    private TacletAppIndex(TacletIndex tacletIndex, @Nullable SemisequentTacletAppIndex antecIndex,
+            @Nullable SemisequentTacletAppIndex succIndex, @NonNull Goal goal,
+            @Nullable Sequent seq,
             RuleFilter ruleFilter,
             TermTacletAppIndexCacheSet indexCaches, Map<CacheKey, TermTacletAppIndex> cache) {
         this.tacletIndex = tacletIndex;
@@ -141,6 +145,15 @@ public class TacletAppIndex {
         ensureIndicesExist();
     }
 
+    /**
+     * Builds both sequent-oriented taclet indices from the current goal's sequent.
+     * <p>
+     * The method assigns {@link #seq} from the goal node's sequent immediately before the index
+     * construction, so {@link #getSequent()} is non-null here due to the field invariant (see the
+     * {@code seq} field documentation). The (nullable-typed) access is suppressed scoped on this
+     * method.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private void createAllFromGoal() {
         final long time = PerfScope.start();
         try {
@@ -174,6 +187,12 @@ public class TacletAppIndex {
         return getGoal() == null || getSequent() != getNode().sequent();
     }
 
+    /**
+     * At least one of the two indices is always non-null once {@link #ensureIndicesExist()} has
+     * run, but the holding fields are {@code @Nullable}; the difference is suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     private SemisequentTacletAppIndex getIndex(PosInOccurrence pos) {
         ensureIndicesExist();
         return pos.isInAntec() ? antecIndex : succIndex;
@@ -223,7 +242,7 @@ public class TacletAppIndex {
         return result;
     }
 
-    static TacletApp createTacletApp(NoPosTacletApp tacletApp,
+    static @Nullable TacletApp createTacletApp(NoPosTacletApp tacletApp,
             PosInOccurrence pos,
             Services services) {
         if (tacletApp.taclet() instanceof FindTaclet) {
@@ -317,6 +336,16 @@ public class TacletAppIndex {
         }
     }
 
+    /**
+     * Updates the antecedent and succedent indices after the sequent of the goal changed.
+     *
+     * @param sci The sequent change information.
+     *        <p>
+     *        The indices are lazily created before any change reaches this method; the dereferences
+     *        of
+     *        the (nullable) index fields are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void updateIndices(SequentChangeInfo sci) {
         seq = sci.sequent();
 
@@ -327,6 +356,16 @@ public class TacletAppIndex {
             succIndex.sequentChanged(sci, getServices(), tacletIndex, newRuleListener);
     }
 
+    /**
+     * Updates the antecedent and succedent indices after new taclets were added to the index.
+     *
+     * @param newTaclets The filter over the freshly added taclets.
+     *        <p>
+     *        The indices are lazily created before any change reaches this method; the dereferences
+     *        of
+     *        the (nullable) index fields are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void updateIndices(final SetRuleFilter newTaclets) {
         antecIndex =
             antecIndex.addTaclets(newTaclets, getServices(), tacletIndex, newRuleListener);
@@ -342,7 +381,11 @@ public class TacletAppIndex {
      * reusing the identical {@code getList}/match logic, so the resulting apps are unchanged. Used
      * for the common single-taclet add; the goal's rule filter is still applied (the candidate
      * filter passed here is {@link TacletFilter#TRUE}).
+     * <p>
+     * The indices are lazily created before any change reaches this method; the dereferences of
+     * the (nullable) index fields are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void updateIndices(final TacletIndex newTacletsIndex) {
         antecIndex = antecIndex.addTaclets(TacletFilter.TRUE, getServices(), newTacletsIndex,
             newRuleListener);
@@ -354,9 +397,14 @@ public class TacletAppIndex {
     /**
      * updates the internal caches after a new Taclet with instantiation information has been added
      * to the TacletIndex.
+     * <p>
+     * A {@code NoFindTaclet} has no find section, so the listener is notified without a position
+     * (the {@link NewRuleListener} interface declares the position non-null, but
+     * {@code createAppContainer} tolerates {@code null}, suppressed with a scoped key).
      *
      * @param tacletApp the partially instantiated Taclet to add
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void addedNoPosTacletApp(NoPosTacletApp tacletApp) {
         if (indexCaches.isRelevantTaclet(tacletApp.taclet())) {
             // we must flush the index cache, and we must no longer use a cache
@@ -395,9 +443,14 @@ public class TacletAppIndex {
     /**
      * updates the internal caches after a new Taclet with instantiation information has been added
      * to the TacletIndex.
+     * <p>
+     * {@code NoFindTaclet}s have no find section, so the listener is notified without a position
+     * (the {@link NewRuleListener} interface declares the position non-null, but
+     * {@code createAppContainer} tolerates {@code null}, suppressed with a scoped key).
      *
-     * @param tacletApps set of partially instantiated {@link Taclet}s to add
+     * @param tacletApps set of partially instantiated {@code Taclet}s to add
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void addedNoPosTacletApps(Iterable<NoPosTacletApp> tacletApps) {
         for (TacletApp tacletApp : tacletApps) {
             if (indexCaches.isRelevantTaclet(tacletApp.taclet())) {
@@ -470,7 +523,7 @@ public class TacletAppIndex {
         return goal;
     }
 
-    private Sequent getSequent() {
+    private @Nullable Sequent getSequent() {
         return seq;
     }
 
@@ -496,7 +549,12 @@ public class TacletAppIndex {
     /**
      * Reports all cached rule apps. Calls ruleAdded on the given NewRuleListener for every cached
      * taclet app.
+     * <p>
+     * The cached {@link NoFindTaclet}s have no find section, so they are reported without a
+     * position (the {@link NewRuleListener} interface declares the position non-null, but
+     * {@code createAppContainer} tolerates {@code null}, suppressed with a scoped key).
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void reportRuleApps(NewRuleListener l, Services services) {
         if (antecIndex != null) {
             antecIndex.reportRuleApps(l);

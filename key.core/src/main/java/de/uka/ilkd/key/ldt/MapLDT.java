@@ -18,11 +18,15 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * LDT for maps.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 public final class MapLDT extends LDT {
 
     public static final Name NAME = new Name("Map");
@@ -47,7 +51,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public boolean isResponsible(Operator op, JTerm sub, TermServices services,
+    public boolean isResponsible(Operator op, @Nullable JTerm sub, TermServices services,
             ExecutionContext ec) {
         return false;
     }
@@ -59,7 +63,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public Function getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
+    public @Nullable Function getFunctionFor(Operator op, Services serv, ExecutionContext ec) {
         assert false;
         return null;
     }
@@ -70,7 +74,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op().equals(mapEmpty)) {
             return EmptyMapLiteral.INSTANCE;
         }
@@ -79,7 +83,7 @@ public final class MapLDT extends LDT {
     }
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false;
         return null;
     }

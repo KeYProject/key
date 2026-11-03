@@ -19,6 +19,9 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Defines a concrete merge procedure, in particular the result of merging two terms for a given
  * location variable in two Symbolic Execution states.
@@ -37,6 +40,7 @@ import org.key_project.util.collection.ImmutableSet;
  * @see MergeIfThenElseAntecedent
  * @see MergeTotalWeakening
  */
+@NullMarked
 public abstract class MergeProcedure {
 
     /** Concrete merge procedures. */
@@ -89,7 +93,7 @@ public abstract class MergeProcedure {
      * @param procName Name of the merge procedure.
      * @return The merge procedure of the given name; null if there is no such procedure.
      */
-    public static MergeProcedure getProcedureByName(String procName) {
+    public static @Nullable MergeProcedure getProcedureByName(String procName) {
         for (MergeProcedure proc : CONCRETE_RULES) {
             if (proc.toString().equals(procName)) {
                 return proc;

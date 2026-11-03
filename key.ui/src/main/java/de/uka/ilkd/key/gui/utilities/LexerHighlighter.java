@@ -50,7 +50,12 @@ public abstract class LexerHighlighter {
 
         var prefixLength = getPatternPrefixLength();
         while (match.find()) {
-            var lexer = ParsingFacade.createLexer(CharStreams.fromString(match.group(1)));
+            String lexerInput = match.group(1);
+            if (lexerInput == null) {
+                // the markdown pattern always captures a group
+                throw new NullPointerException("No lexer input available.");
+            }
+            var lexer = ParsingFacade.createLexer(CharStreams.fromString(lexerInput));
             var toks = lexer.getAllTokens();
             int startIdx = match.start() + prefixLength;
             for (var tok : toks) {
@@ -88,7 +93,6 @@ public abstract class LexerHighlighter {
         highlightPaneAll(contentPane, 0, -1);
     }
 
-
     private void highlightToken(StyledDocument sd, int startIdx, Token tok) {
         var attribute = getStyle(tok.getType());
         if (attribute != null) {
@@ -122,16 +126,33 @@ public abstract class LexerHighlighter {
         public static final ColorSettings.ColorProperty COLOR_MODALITY =
             ColorSettings.define("infotree.syntax.modality", "", Color.PINK, Color.PINK);
 
+        private final AttributeSet STYLE_OPERATORS;
+        private final AttributeSet STYLE_ERROR;
+        private final AttributeSet STYLE_LITERALS;
+        private final AttributeSet STYLE_KEYWORDS;
+        private final AttributeSet STYLE_IDENTIFIER;
+        private final AttributeSet STYLE_COMMENT;
+        private final AttributeSet STYLE_MODALITY;
+        private final AttributeSet STYLE_DEFAULT;
 
-        private final AttributeSet STYLE_OPERATORS = define(COLOR_OPERATORS.get(), false, false);
-        private final AttributeSet STYLE_ERROR = define(COLOR_ERROR.get(), false, false);
-        private final AttributeSet STYLE_LITERALS = define(COLOR_LITERALS.get(), false, true);
-        private final AttributeSet STYLE_KEYWORDS = define(COLOR_KEYWORD.get(), true, false);
-        private final AttributeSet STYLE_IDENTIFIER = define(COLOR_IDENTIFIER.get(), true, false);
-        private final AttributeSet STYLE_COMMENT = define(COLOR_COMMENT.get(), false, true);
-        private final AttributeSet STYLE_MODALITY = define(COLOR_MODALITY.get(), false, true);
-        private final AttributeSet STYLE_DEFAULT = define(COLOR_IDENTIFIER.get(), false, false);
-
+        /**
+         * The style fields are initialized while the receiver is still under initialization (EISOP
+         * initialization check); {@link LexerHighlighter#define} only reads the style context of
+         * the superclass that is initialized by the time the subclass fields are set, suppressed
+         * with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
+        public KeYLexerHighlighter() {
+            super();
+            STYLE_OPERATORS = define(COLOR_OPERATORS.get(), false, false);
+            STYLE_ERROR = define(COLOR_ERROR.get(), false, false);
+            STYLE_LITERALS = define(COLOR_LITERALS.get(), false, true);
+            STYLE_KEYWORDS = define(COLOR_KEYWORD.get(), true, false);
+            STYLE_IDENTIFIER = define(COLOR_IDENTIFIER.get(), true, false);
+            STYLE_COMMENT = define(COLOR_COMMENT.get(), false, true);
+            STYLE_MODALITY = define(COLOR_MODALITY.get(), false, true);
+            STYLE_DEFAULT = define(COLOR_IDENTIFIER.get(), false, false);
+        }
 
         @Override
         protected @Nullable AttributeSet getStyle(int tokType) {

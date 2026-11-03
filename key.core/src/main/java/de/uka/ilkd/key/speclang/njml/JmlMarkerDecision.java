@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Externalize algorithm to decide whether a JML comment is active given a set of enabled keys.
@@ -21,6 +22,7 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (9/24/21)
  * @see #isComment(String)
  */
+@NullMarked
 public class JmlMarkerDecision {
     private final JmlLexer lexer;
     private Set<String> enabledKeys = new HashSet<>();
@@ -30,6 +32,12 @@ public class JmlMarkerDecision {
      *
      * @param lexer a lexer instance which stream is used
      */
+    /**
+     * The key registration operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because it only stores the
+     * caller-provided collection, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public JmlMarkerDecision(JmlLexer lexer) {
         this.lexer = lexer;
         setEnabledKeys(

@@ -10,12 +10,15 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.reference.VariableReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Creates a true or false literal if the given program element is or is not a static variable
  * reference.
  *
  * @author N/A
  */
+@NullMarked
 public class IsStatic extends ProgramTransformer {
 
     /**

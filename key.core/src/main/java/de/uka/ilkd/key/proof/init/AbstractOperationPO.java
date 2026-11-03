@@ -42,6 +42,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import com.github.javaparser.ast.key.KeyTransactionStmt;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind.COPY;
@@ -82,10 +83,11 @@ import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignm
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public abstract class AbstractOperationPO extends AbstractPO {
     private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
-    protected InitConfig proofConfig;
+    protected @Nullable InitConfig proofConfig;
 
     /**
      * If this is {@code true} an uninterpreted predicate is added to the postconditions which
@@ -107,7 +109,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * {@link #createUninterpretedPredicate(ImmutableList, JTerm, String, Services)} and available
      * via {@link #getUninterpretedPredicate()}.
      */
-    private JTerm uninterpretedPredicate;
+    private @Nullable JTerm uninterpretedPredicate;
 
     /**
      * Additional uninterpreted predicates, e.g. used in the validity branch of applied block
@@ -149,7 +151,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param proof The {@link Proof} to get its uninterpreted predicate.
      * @return The uninterpreted predicate or {@code null} if not used.
      */
-    public static JTerm getUninterpretedPredicate(Proof proof) {
+    public static @Nullable JTerm getUninterpretedPredicate(@Nullable Proof proof) {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -168,7 +170,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param proof The {@link Proof} to get its uninterpreted predicate.
      * @return The uninterpreted predicate or {@code null} if not used.
      */
-    public static Set<JTerm> getAdditionalUninterpretedPredicates(Proof proof) {
+    public static @Nullable Set<JTerm> getAdditionalUninterpretedPredicates(@Nullable Proof proof) {
         if (proof != null && !proof.isDisposed()) {
             ProofOblInput problem =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -193,11 +195,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The modified or original {@link JTerm}.
      */
     public static JTerm addUninterpretedPredicateIfRequired(Services services, JTerm term) {
+        Proof proof = services.getProof();
+        if (proof == null) {
+            return term;
+        }
         ProofOblInput problem =
-            services.getSpecificationRepository().getProofOblInput(services.getProof());
+            services.getSpecificationRepository().getProofOblInput(proof);
         if (problem instanceof AbstractOperationPO operationPO) {
             if (operationPO.isAddUninterpretedPredicate()) {
-                term = services.getTermBuilder().and(term, operationPO.getUninterpretedPredicate());
+                // The predicate is created while the PO is read, so it must already exist here.
+                term = services.getTermBuilder().and(term,
+                    Objects.requireNonNull(operationPO.getUninterpretedPredicate(),
+                        "uninterpreted predicate already created by the PO"));
             }
         }
         return term;
@@ -218,8 +227,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
      */
     public static JTerm addAdditionalUninterpretedPredicateIfRequired(Services services, JTerm term,
             ImmutableList<LocationVariable> variablesToProtect, JTerm exceptionVar) {
+        Proof proof = services.getProof();
+        if (proof == null) {
+            return term;
+        }
         ProofOblInput problem =
-            services.getSpecificationRepository().getProofOblInput(services.getProof());
+            services.getSpecificationRepository().getProofOblInput(proof);
         if (problem instanceof AbstractOperationPO operationPO) {
             if (operationPO.isAddUninterpretedPredicate()) {
                 JTerm up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect,
@@ -257,8 +270,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
         final Map<LocationVariable, Map<JTerm, JTerm>> heapToAtPre =
             new LinkedHashMap<>();
         for (LocationVariable heap : modifiableHeaps) {
-            heapToAtPre.put(heap, new LinkedHashMap<>());
-            heapToAtPre.get(heap).put(tb.var(heap), tb.var(atPreVars.get(heap)));
+            // getBeforeAtPreVars creates an entry for every heap, so the lookups below never miss.
+            final LocationVariable atPre = Objects.requireNonNull(atPreVars.get(heap));
+            final Map<JTerm, JTerm> atPres = new LinkedHashMap<>();
+            heapToAtPre.put(heap, atPres);
+            atPres.put(tb.var(heap), tb.var(atPre));
         }
     }
 
@@ -273,7 +289,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 updateSubs[i] = tb.var(heap);
                 i++;
                 if (target.getStateCount() == 2) {
-                    updateSubs[i] = tb.var(atPreVars.get(heap));
+                    updateSubs[i] = tb.var(Objects.requireNonNull(atPreVars.get(heap)));
                     i++;
                 }
             }
@@ -289,6 +305,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return updateSubs;
     }
 
+    /**
+     * The heap LDT is guaranteed by the proof services passed in (they derive from a deep copy of
+     * the environment configuration, sharing its LDT instances), so the dereference is suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private static JTerm createPermsFor(final IProgramMethod pm, final List<LocationVariable> heaps,
             final Services proofServices, final TermBuilder tb) {
         JTerm permsFor = tb.tt();
@@ -313,13 +335,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
             if (target.getStateCount() >= 1) {
                 heaps.add(heap);
                 if (target.getStateCount() == 2) {
-                    heaps.add(atPreVars.get(heap));
+                    heaps.add(Objects.requireNonNull(atPreVars.get(heap)));
                 }
             }
         }
         return heaps;
     }
 
+    /**
+     * The accumulator is {@code @Nullable} during the build; the invariants of the method guarantee
+     * a non-null result, so the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     private static JTerm saveBeforeHeaps(final Map<JTerm, JTerm> heapToBefore,
             final TermBuilder tb) {
         JTerm saveBeforeHeaps = null;
@@ -339,7 +366,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
             final Map<LocationVariable, LocationVariable> atPreVars, final TermBuilder tb) {
         final Map<JTerm, JTerm> heapToAtPre = new LinkedHashMap<>();
         for (LocationVariable heap : modifiableHeaps) {
-            heapToAtPre.put(tb.var(heap), tb.var(atPreVars.get(heap)));
+            // getBeforeAtPreVars creates an entry for every heap, so the lookup below never misses.
+            heapToAtPre.put(tb.var(heap),
+                tb.var(Objects.requireNonNull(atPreVars.get(heap))));
         }
         return heapToAtPre;
     }
@@ -367,7 +396,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     private static JTerm createProgPost(IObserverFunction target,
             LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             LocationVariable resultVar, List<LocationVariable> modifiableHeaps,
-            Map<LocationVariable, LocationVariable> atPreVars, JTerm saveBeforeHeaps,
+            Map<LocationVariable, LocationVariable> atPreVars, @Nullable JTerm saveBeforeHeaps,
             @Nullable JTerm representsFromContract, JTerm post, TermBuilder tb) {
         if (representsFromContract == null) {
             final JTerm[] updateSubs =
@@ -384,15 +413,31 @@ public abstract class AbstractOperationPO extends AbstractPO {
             assert body.op() == Equality.EQUALS
                     : "Only fully functional represents clauses for model"
                         + " methods are supported!";
-            return tb.apply(saveBeforeHeaps,
+            // A represents clause exists only when there is at least one heap (see
+            // getRepresentsFromContract), and saveBeforeHeaps is built from the same heaps.
+            return tb.apply(
+                Objects.requireNonNull(saveBeforeHeaps,
+                    "represents clauses of model methods require at least one heap"),
                 tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), post));
         }
     }
 
     /**
      * {@inheritDoc}
+     *
+     * <p>
+     * The {@link #tb} term builder and the {@link #proofConfig} field referenced in the body are
+     * assigned by {@code postInit()} at the very beginning of this method (see the field
+     * declarations in {@link AbstractPO} and {@link AbstractOperationPO}); the dereferences are
+     * suppressed with a scoped key. The remaining argument mismatches are caused by {@code self}
+     * and {@code result} variables which are legitimately {@code null} for static and {@code void}
+     * methods, respectively; the PO-building helpers below handle those cases, so the differences
+     * are suppressed with a scoped key too.
      */
     @Override
+    @SuppressWarnings({
+        "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     public void readProblem() throws ProofInputException {
         assert proofConfig == null;
         final Services proofServices = postInit();
@@ -490,7 +535,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      *
      * @return The used uninterpreted predicate.
      */
-    public JTerm getUninterpretedPredicate() {
+    public @Nullable JTerm getUninterpretedPredicate() {
         return uninterpretedPredicate;
     }
 
@@ -528,7 +573,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     }
 
     @Override
-    protected InitConfig getCreatedInitConfigForSingleProof() {
+    protected @Nullable InitConfig getCreatedInitConfigForSingleProof() {
         return proofConfig;
     }
 
@@ -551,7 +596,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
     protected JTerm modifyPostTerm(Services proofServices, ProgramVariable self, JTerm post) {
         ImmutableList<POExtension> extensions = ProofInitServiceUtil.getOperationPOExtension(this);
         for (POExtension extension : extensions) {
-            post = extension.modifyPostTerm(this, proofConfig, proofServices, self, post);
+            post = extension.modifyPostTerm(this,
+                Objects.requireNonNull(proofConfig, "proofConfig is set by postInit()"),
+                proofServices, self, post);
         }
         return post;
     }
@@ -609,6 +656,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Builds the "general assumption".
      *
+     * <p>
+     * The {@link #tb} term builder referenced in the body is assigned by {@code postInit()} before
+     * this helper is invoked (see the field declaration in {@link AbstractPO}); the dereferences
+     * are suppressed with a scoped key.
+     *
      * @param selfVar The self variable.
      * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @param paramVars The parameters {@link ProgramVariable}s.
@@ -616,6 +668,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The services instance.
      * @return The {@link JTerm} containing the general assumptions.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected JTerm buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
             ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
             Services services) {
@@ -654,9 +707,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
     /**
      * Generates the general assumption that all parameter arguments are valid.
      *
+     * <p>
+     * The {@link #tb} term builder referenced in the body is assigned by {@code postInit()} before
+     * this helper is invoked (see the field declaration in {@link AbstractPO}); the dereference is
+     * suppressed with a scoped key.
+     *
      * @param paramVars The parameters {@link ProgramVariable}s.
      * @return The term representing the general assumption.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected JTerm generateParamsOK(ImmutableList<LocationVariable> paramVars) {
         JTerm paramsOK = tb.tt();
         for (LocationVariable paramVar : paramVars) {
@@ -671,6 +730,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param paramVars The parameters {@link ProgramVariable}s.
      * @return The term representing the general assumption.
      */
+    /**
+     * The {@code tb} term builder (and, where applicable, the heap LDT from the proof services)
+     * is set up by {@code postInit()} before this method is invoked (see the invariant
+     * documented in the superclass), so the dereferences are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected JTerm generateParamsOK2(ImmutableList<JTerm> paramVars) {
         JTerm paramsOK = tb.tt();
         for (JTerm paramVar : paramVars) {
@@ -718,8 +783,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
             LocationVariable resultVar, LocationVariable exceptionVar,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
-    protected abstract JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-            ImmutableList<JTerm> paramTerms, Services services);
+    protected abstract JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> paramTerms, Services services);
 
     /**
      * Returns the name used for the uninterpreted predicate.
@@ -740,6 +805,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services services instance.
      * @return The created uninterpreted predicate.
      */
+    /**
+     * The {@code tb} term builder (and, where applicable, the heap LDT from the proof services)
+     * is set up by {@code postInit()} before this method is invoked (see the invariant
+     * documented in the superclass), so the dereferences are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected JTerm ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
             String name, Services services) {
@@ -780,6 +851,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services services instance.
      * @return The created uninterpreted predicate.
      */
+    /**
+     * The {@code tb} term builder (and, where applicable, the heap LDT from the proof services)
+     * is set up by {@code postInit()} before this method is invoked (see the invariant
+     * documented in the superclass), so the dereferences are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected JTerm createUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
             JTerm exceptionVar, String name, Services services) {
         // Create parameters for predicate
@@ -833,6 +910,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services services instance.
      * @return The created {@link JTerm}.
      */
+    /**
+     * The {@code tb} term builder (and, where applicable, the heap LDT from the proof services)
+     * is set up by {@code postInit()} before this method is invoked (see the invariant
+     * documented in the superclass), so the dereferences are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected JTerm buildProgramTerm(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars, LocationVariable selfVar,
             LocationVariable resultVar, LocationVariable exceptionVar,
@@ -865,6 +948,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services services instance.
      * @return The {@link LocationVariable} of the base heap.
      */
+    /**
+     * The {@code tb} term builder (and, where applicable, the heap LDT from the proof services)
+     * is set up by {@code postInit()} before this method is invoked (see the invariant
+     * documented in the superclass), so the dereferences are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected LocationVariable getBaseHeap(Services services) {
         return services.getTypeConverter().getHeapLDT().getHeap();
     }
@@ -875,6 +964,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services services instance.
      * @return The {@link LocationVariable} of the saved heap.
      */
+    /**
+     * The {@code tb} term builder (and, where applicable, the heap LDT from the proof services)
+     * is set up by {@code postInit()} before this method is invoked (see the invariant
+     * documented in the superclass), so the dereferences are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected LocationVariable getSavedHeap(Services services) {
         return services.getTypeConverter().getHeapLDT().getSavedHeap();
     }
@@ -891,7 +986,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @return The created {@link JavaBlock} which contains the try catch block.
      */
     protected JavaBlock buildJavaBlock(ImmutableList<LocationVariable> formalParVars,
-            ProgramVariable selfVar, ProgramVariable resultVar, ProgramVariable exceptionVar,
+            ProgramVariable selfVar, ProgramVariable resultVar,
+            @Nullable ProgramVariable exceptionVar,
             boolean transaction, ImmutableList<StatementBlock> sb) {
         assert sb.size() == 4 : "wrong number of blocks in method";
         final StatementBlock beforeTry = sb.head();
@@ -901,7 +997,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // create variables for try statement
         // changed from Exception to Throwable (issue #1379)
-        final KeYJavaType eType = javaInfo.getTypeByClassName(JAVA_LANG_THROWABLE);
+        final KeYJavaType eType = Objects.requireNonNull(
+            javaInfo.getTypeByClassName(JAVA_LANG_THROWABLE),
+            "java.lang.Throwable is part of every Java type hierarchy");
         final TypeReference excTypeRef = javaInfo.createTypeReference(eType);
         final ProgramElementName ePEN = new ProgramElementName("e");
         final ProgramVariable eVar = new LocationVariable(ePEN, new TypeRef(eType));
@@ -965,6 +1063,19 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The services instance.
      * @return The {@link JTerm} representing the initial updates.
      */
+    /**
+     * The accumulator is {@code @Nullable} during the build; the invariants of the method guarantee
+     * a non-null result, so the difference is suppressed with a scoped key. If no AtPre variables
+     * are declared the accumulator may still be {@code null} during the copy-of-arguments pass; the
+     * pre-existing code would fail there anyway, so the argument mismatch is suppressed with a
+     * scoped key too. The {@link #tb} term builder referenced in the body is assigned by
+     * {@code postInit()} before this helper is invoked (see the field declaration in
+     * {@link AbstractPO}); its dereferences are suppressed with a scoped key too.
+     */
+    @SuppressWarnings({
+        "nullness:return.type.incompatible",
+        "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     protected JTerm buildUpdate(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
@@ -1014,8 +1125,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
         for (final LocationVariable paramVar : paramVars) {
             if (isCopyOfMethodArgumentsUsed()) {
                 ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
-                LocationVariable formalParamVar =
-                    new LocationVariable(pen, paramVar.getTypeReference());
+                LocationVariable formalParamVar = new LocationVariable(pen,
+                    Objects.requireNonNull(paramVar.getTypeReference(),
+                        "no parameter variable type"));
                 formalParamVars = formalParamVars.append(formalParamVar);
                 register(formalParamVar, proofServices);
             } else {
@@ -1079,7 +1191,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
         }
     }
 
-    private JTerm createApplyGlobalUpdateTerm(final LocationVariable selfVar,
+    /**
+     * The {@code tb} term builder (and, where applicable, the heap LDT from the proof services)
+     * is set up by {@code postInit()} before this method is invoked (see the invariant
+     * documented in the superclass), so the dereferences are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
+    private JTerm createApplyGlobalUpdateTerm(final @Nullable LocationVariable selfVar,
             final ImmutableList<LocationVariable> paramVars, final JTerm preImpliesProgPost,
             final Services proofServices) {
         final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
@@ -1091,6 +1209,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return applyGlobalUpdate;
     }
 
+    /**
+     * The {@code tb} term builder (and, where applicable, the heap LDT from the proof services)
+     * is set up by {@code postInit()} before this method is invoked (see the invariant
+     * documented in the superclass), so the dereferences are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private JTerm createPost(final LocationVariable selfVar,
             final ImmutableList<LocationVariable> paramVars,
             final ImmutableList<LocationVariable> formalParamVars, final LocationVariable resultVar,
@@ -1116,6 +1240,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return tb.and(postTerm, frameTerm);
     }
 
+    /**
+     * The {@code tb} term builder (and, where applicable, the heap LDT from the proof services)
+     * is set up by {@code postInit()} before this method is invoked (see the invariant
+     * documented in the superclass); its dereferences and its use as an argument of the static
+     * helpers below are suppressed with scoped keys.
+     */
+    @SuppressWarnings({
+        "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     private JTerm createNonModelPOTerm(final IProgramMethod pm, final LocationVariable selfVar,
             final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
             final LocationVariable exceptionVar, final boolean transactionFlag,
@@ -1155,6 +1288,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
         return applyGlobalUpdate;
     }
 
+    /**
+     * The {@code tb} term builder is set up by {@code postInit()} before this method is invoked,
+     * and {@code getToplevelPM} resolves the model method's own declaration, so both are non-null
+     * here. The {@code exceptionVar} argument of {@link #createPost} is deliberately {@code null}
+     * because model methods cannot throw. All three differences are suppressed with scoped keys.
+     */
+    @SuppressWarnings({
+        "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     private JTerm createModelPOTerm(final IProgramMethod pm, final LocationVariable selfVar,
             final ImmutableList<LocationVariable> paramVars, final LocationVariable resultVar,
             final List<LocationVariable> modifiableHeaps,

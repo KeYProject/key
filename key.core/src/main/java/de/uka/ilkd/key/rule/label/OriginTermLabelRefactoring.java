@@ -29,6 +29,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Refactoring for {@link OriginTermLabel}s.
  *
@@ -36,10 +39,11 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author lanzinger
  */
+@NullMarked
 public class OriginTermLabelRefactoring implements TermLabelRefactoring {
 
     @Override
-    public ImmutableList<Name> getSupportedRuleNames() {
+    public @Nullable ImmutableList<Name> getSupportedRuleNames() {
         return null;
     }
 
@@ -47,7 +51,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
+            Object hint, @Nullable JTerm tacletTerm) {
         if (rule instanceof BuiltInRule
                 && !TermLabelRefactoring.shouldRefactorOnBuiltInRule(rule, goal, hint)) {
             return RefactoringScope.NONE;
@@ -61,7 +65,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
     @Override
     public void refactorLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
+            Object hint, @Nullable JTerm tacletTerm, JTerm term, LabelCollection labels) {
         if (services.getProof() == null) {
             return;
         }

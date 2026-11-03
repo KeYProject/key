@@ -10,10 +10,13 @@ import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A schema variable that is used as placeholder for terms.
  */
+@NullMarked
 public final class TermSV extends JOperatorSV implements TerminalSyntaxElement {
 
     /**

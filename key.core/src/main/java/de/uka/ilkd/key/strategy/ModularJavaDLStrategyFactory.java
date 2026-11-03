@@ -20,8 +20,10 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import org.key_project.logic.Name;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// Creates a [ModularJavaDLStrategy] and handles strategy settings relevant to it.
+@NullMarked
 public class ModularJavaDLStrategyFactory implements StrategyFactory {
     private final List<StrategyFactory> componentFactories =
         Arrays.asList(new JFOLStrategyFactory(),

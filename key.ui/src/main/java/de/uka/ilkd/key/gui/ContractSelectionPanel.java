@@ -15,6 +15,7 @@ import javax.swing.event.ListSelectionListener;
 import de.uka.ilkd.key.informationflow.impl.InformationFlowContractImpl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.DependencyContractImpl;
 import de.uka.ilkd.key.util.LinkedHashMap;
@@ -22,10 +23,13 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A panel for selecting contracts.
  */
+@NullMarked
 public class ContractSelectionPanel extends JPanel {
 
     /**
@@ -55,14 +59,21 @@ public class ContractSelectionPanel extends JPanel {
      */
     private boolean grayOutAuxiliaryContracts = false;
 
-
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
     /**
      * Creates a contract selection panel containing the specified contracts.
+     *
+     * <p>
+     * The panel lays itself out, builds its scroll pane and list while the receiver is still under
+     * initialization (EISOP initialization check), including passing the under-construction
+     * receiver to its own {@link BoxLayout}; the effects only take place after construction
+     * completes, suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public ContractSelectionPanel(Services services, boolean multipleSelection) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.services = services;
@@ -190,16 +201,16 @@ public class ContractSelectionPanel extends JPanel {
         scrollPane.setViewportView(contractList);
     }
 
-
     // -------------------------------------------------------------------------
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Proof getClosedProof(Contract c) {
+    private @Nullable Proof getClosedProof(Contract c) {
         ImmutableSet<Proof> proofs = services.getSpecificationRepository().getProofs(c);
 
         for (Proof proof : proofs) {
-            if (proof.mgt().getStatus().getProofClosed()) {
+            ProofCorrectnessMgt proofManagement = proof.mgt();
+            if (proofManagement != null && proofManagement.getStatus().getProofClosed()) {
                 return proof;
             }
         }
@@ -214,7 +225,6 @@ public class ContractSelectionPanel extends JPanel {
     public synchronized void addMouseListener(MouseListener ml) {
         contractList.addMouseListener(ml);
     }
-
 
     public void addListSelectionListener(ListSelectionListener lsl) {
         contractList.addListSelectionListener(lsl);
@@ -231,8 +241,7 @@ public class ContractSelectionPanel extends JPanel {
         this.grayOutAuxiliaryContracts = grayOutAuxiliaryContracts;
     }
 
-
-    public void setContracts(Contract[] contracts, String title) {
+    public void setContracts(Contract @Nullable [] contracts, @Nullable String title) {
         if (contracts == null || contracts.length == 0) {
             this.contracts = new Contract[0];
             contractList.setListData(this.contracts);
@@ -274,7 +283,6 @@ public class ContractSelectionPanel extends JPanel {
         updateUI();
     }
 
-
     public void setContracts(ImmutableSet<Contract> contracts, String title) {
         setContracts(contracts.toArray(new Contract[contracts.size()]), title);
     }
@@ -288,7 +296,7 @@ public class ContractSelectionPanel extends JPanel {
         contractList.setSelectedValue(contract, true);
     }
 
-    public Contract getContract() {
+    public @Nullable Contract getContract() {
         final List<Contract> selection = contractList.getSelectedValuesList();
         return computeContract(services, selection);
     }
@@ -305,7 +313,7 @@ public class ContractSelectionPanel extends JPanel {
      * @param selection The selected contracts.
      * @return The selected {@link Contract} or {@code null} if not available.
      */
-    public static Contract computeContract(Services services, List<Contract> selection) {
+    public static @Nullable Contract computeContract(Services services, List<Contract> selection) {
         if (selection.isEmpty()) {
             return null;
         } else if (selection.size() == 1) {

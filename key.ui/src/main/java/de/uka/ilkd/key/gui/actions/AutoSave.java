@@ -11,10 +11,18 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class AutoSave extends MainWindowAction {
     private static final long serialVersionUID = -2598146925208531491L;
     public static final int DEFAULT_PERIOD = 2000;
 
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public AutoSave(MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Proofs will be automatically saved to +" + IOUtil.getTempDirectory()

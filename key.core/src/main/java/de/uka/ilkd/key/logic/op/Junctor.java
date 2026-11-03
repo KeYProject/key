@@ -10,12 +10,15 @@ import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Class of junctor operators, i.e., operators connecting a given number of formula to create
  * another formula. There are six such operators: true, false, conjunction, disjunction, negation,
  * and implication.
  */
+@NullMarked
 public final class Junctor extends JAbstractSortedOperator {
 
     /**

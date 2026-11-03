@@ -13,7 +13,9 @@ import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.Contract;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ContractConfigurator extends JDialog {
 
     /**
@@ -26,24 +28,43 @@ public class ContractConfigurator extends JDialog {
 
     private boolean successful = false;
 
-
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
+    /**
+     * Creates a contract configurator dialog for the given owner.
+     *
+     * <p>
+     * The panel and the buttons are created by {@link #init(Services, Contract[], String,
+     * boolean)}, which is invoked unconditionally from this constructor; the EISOP initialization
+     * check cannot see the assignments inside the delegated method, so both the fields and the
+     * delegated call are suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public ContractConfigurator(JDialog owner, Services services, Contract[] contracts,
             String title, boolean allowMultipleContracts) {
         super(owner, "Contract Configurator", true);
         init(services, contracts, title, allowMultipleContracts);
     }
 
-
+    /**
+     * Creates a contract configurator dialog for the given owner frame.
+     *
+     * <p>
+     * The panel and the buttons are created by {@link #init(Services, Contract[], String,
+     * boolean)}, which is invoked unconditionally from this constructor; the EISOP initialization
+     * check cannot see the assignments inside the delegated method, so both the fields and the
+     * delegated call are suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public ContractConfigurator(Frame owner, Services services, Contract[] contracts, String title,
             boolean allowMultipleContracts) {
         super(owner, "Contract Configurator", true);
         init(services, contracts, title, allowMultipleContracts);
     }
-
 
     // -------------------------------------------------------------------------
     // internal methods
@@ -99,15 +120,12 @@ public class ContractConfigurator extends JDialog {
         buttonPanel.add(cancelButton);
         GuiUtilities.attachClickOnEscListener(cancelButton);
 
-
         // show
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         pack();
         setLocationRelativeTo(getOwner());
         setVisible(true);
     }
-
-
 
     // -------------------------------------------------------------------------
     // public interface
@@ -120,11 +138,15 @@ public class ContractConfigurator extends JDialog {
         return successful;
     }
 
-
     /**
      * Returns the selected contract.
      */
     public Contract getContract() {
-        return contractPanel.getContract();
+        Contract contract = contractPanel.getContract();
+        if (contract == null) {
+            // only invoked after an "OK" leaves a selection in the list
+            throw new NullPointerException("No contract selected.");
+        }
+        return contract;
     }
 }

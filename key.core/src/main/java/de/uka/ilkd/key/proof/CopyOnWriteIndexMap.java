@@ -7,6 +7,9 @@ package de.uka.ilkd.key.proof;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A copy-on-write map used for the {@link TacletIndex}'s find-taclet lists. {@link #copy()} shares
  * the backing map in O(1); the first mutating call ({@link #put}/{@link #remove}) clones it, so a
@@ -26,6 +29,7 @@ import java.util.LinkedHashMap;
  * @param <K> key type
  * @param <V> value type
  */
+@NullMarked
 final class CopyOnWriteIndexMap<K, V> {
     private LinkedHashMap<K, V> map;
     /**
@@ -58,6 +62,7 @@ final class CopyOnWriteIndexMap<K, V> {
         }
     }
 
+    @Nullable
     V get(Object key) {
         return map.get(key);
     }
@@ -66,11 +71,13 @@ final class CopyOnWriteIndexMap<K, V> {
         return map.values();
     }
 
+    @Nullable
     V put(K key, V value) {
         ensureExclusive();
         return map.put(key, value);
     }
 
+    @Nullable
     V remove(Object key) {
         ensureExclusive();
         return map.remove(key);

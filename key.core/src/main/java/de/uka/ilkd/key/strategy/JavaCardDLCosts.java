@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /*
  * Theory-internal cost constants for the JavaCardDL strategy, grouped per sub-area
  * (Integer-style, one file per theory): JavaCardDLCost for the axiom / observer /
@@ -26,6 +29,7 @@ package de.uka.ilkd.key.strategy;
  * runAllProofs.
  * </p>
  */
+@NullMarked
 final class JavaCardDLCost {
     private JavaCardDLCost() {}
 
@@ -96,6 +100,7 @@ final class JavaCardDLCost {
  * (as for {@link org.key_project.prover.strategy.costbased.CostBand}).
  * </p>
  */
+@NullMarked
 final class HeapSelectCost {
     private HeapSelectCost() {}
 

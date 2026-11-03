@@ -18,7 +18,11 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public final class EqualUniqueCondition implements VariableCondition {
     private final TermSV t;
     private final TermSV t2;
@@ -32,7 +36,7 @@ public final class EqualUniqueCondition implements VariableCondition {
     }
 
 
-    private static JTerm equalUnique(JTerm t1, JTerm t2, TermServices services) {
+    private static @Nullable JTerm equalUnique(JTerm t1, JTerm t2, TermServices services) {
         if (!(t1.op() instanceof Function && t2.op() instanceof Function
                 && ((Function) t1.op()).isUnique() && ((Function) t2.op()).isUnique())) {
             return null;
@@ -50,7 +54,7 @@ public final class EqualUniqueCondition implements VariableCondition {
 
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
             MatchResultInfo mc,
             LogicServices services) {
         var svInst = (SVInstantiations) mc.getInstantiations();

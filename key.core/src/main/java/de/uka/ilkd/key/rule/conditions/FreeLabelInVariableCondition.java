@@ -14,7 +14,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public final class FreeLabelInVariableCondition extends VariableConditionAdapter {
 
     private final SchemaVariable label;

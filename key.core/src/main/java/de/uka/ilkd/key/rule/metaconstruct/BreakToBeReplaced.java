@@ -7,6 +7,9 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.ast.statement.Break;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 class BreakToBeReplaced {
 
     private final Break brk;

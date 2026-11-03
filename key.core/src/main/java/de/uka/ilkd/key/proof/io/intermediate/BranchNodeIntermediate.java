@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.io.intermediate;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Node in an intermediate proof representation modeling a branch node. This node has a title
  * (branch identifier) should have exactly one child. Only exception: An empty proof; in this case,
@@ -11,8 +13,15 @@ package de.uka.ilkd.key.proof.io.intermediate;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class BranchNodeIntermediate extends NodeIntermediate {
 
+    /**
+     * The branch title of this branch node. It is always assigned by the single constructor before
+     * the node is used; the {@code null} initializer merely marks the intermediate's pre-writing
+     * state and is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     private String branchTitle = null;
 
     public BranchNodeIntermediate(String branchTitle) {

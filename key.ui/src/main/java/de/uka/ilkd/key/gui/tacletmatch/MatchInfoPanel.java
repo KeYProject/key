@@ -30,6 +30,8 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Overview of how the selected taclet matched the sequent: the schematic find pattern, the concrete
  * sub-term it was matched against, and the schema-variable bindings that the match determined.
@@ -41,6 +43,7 @@ import org.key_project.util.collection.ImmutableList;
  * given a stable colour, used both for its binding chip and to highlight the sub-term it matched
  * inside the concrete matched term.
  */
+@NullMarked
 public class MatchInfoPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
@@ -58,6 +61,17 @@ public class MatchInfoPanel extends JPanel {
      */
     private final Map<SchemaVariable, Integer> svColors = new LinkedHashMap<>();
 
+    /**
+     * Creates the match-info panel for the given application model.
+     *
+     * <p>
+     * The panel lays itself out, binds its mediator and builds its rows while the receiver is
+     * still under initialization (EISOP initialization check), including passing the
+     * under-construction receiver to its own {@link BoxLayout}; the effects only take place
+     * after construction completes, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public MatchInfoPanel(TacletInstantiationModel model, KeYMediator mediator) {
         this.mediator = mediator;
 
@@ -218,12 +232,13 @@ public class MatchInfoPanel extends JPanel {
             List<SvSpan> spans = new ArrayList<>();
             collectSvSpans(find, matched, new ArrayDeque<>(), spans);
             TmPrint.Positioned printed = TmPrint.termWithPositions(mediator, matched);
-            if (printed.positions() == null || spans.isEmpty()
+            InitialPositionTable positions = printed.positions();
+            if (positions == null || spans.isEmpty()
                     || TmText.lineCount(printed.text()) > MATCHED_PREVIEW_LINES) {
                 return new ExpandableText(printed.text());
             }
             return styledTerm(printed.text(),
-                resolveRanges(printed.text(), printed.positions(), spans));
+                resolveRanges(printed.text(), positions, spans));
         } catch (RuntimeException ex) {
             return new ExpandableText(TmPrint.term(mediator, matched));
         }

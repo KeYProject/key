@@ -13,6 +13,9 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class EliminableQuantifierTF extends BinaryTermFeature {
 
     public static final TermFeature INSTANCE = new EliminableQuantifierTF();

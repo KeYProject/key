@@ -6,6 +6,9 @@ package de.uka.ilkd.key.util;
 
 import java.util.Comparator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Compares arrays of comparable objects (e.g., Integer). Returns negative numbers if o1 is less
  * than o2, positive numbers if o2 is less than o1, and 0 if they are equal. If the arrays are equal
@@ -13,10 +16,11 @@ import java.util.Comparator;
  *
  * @author bruns
  */
+@NullMarked
 public final class LexicographicComparator<U> implements Comparator<Comparable<U>[]> {
 
     @Override
-    public int compare(Comparable<U>[] o1, Comparable<U>[] o2) {
+    public int compare(@Nullable Comparable<U>[] o1, @Nullable Comparable<U>[] o2) {
         if (o1 == null && o2 == null) {
             return 0;
         }

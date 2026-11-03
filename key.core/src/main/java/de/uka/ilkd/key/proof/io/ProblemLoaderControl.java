@@ -14,6 +14,7 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -21,6 +22,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public interface ProblemLoaderControl extends ProblemInitializerListener, ProgressMonitor {
     /**
      * The loading has started.
@@ -39,7 +41,8 @@ public interface ProblemLoaderControl extends ProblemInitializerListener, Progre
      * @throws ProblemLoaderException Occurred Exception.
      */
     void loadingFinished(AbstractProblemLoader loader, @Nullable LoadedPOContainer poContainer,
-            @Nullable ProofAggregate proofList, ReplayResult result) throws ProblemLoaderException;
+            @Nullable ProofAggregate proofList, @Nullable ReplayResult result)
+            throws ProblemLoaderException;
 
     /**
      * This method is called if no {@link LoadedPOContainer} was created via

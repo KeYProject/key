@@ -7,6 +7,7 @@ package de.uka.ilkd.key.util.pp;
 import java.util.*;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class pretty-prints information using line breaks and indentation. For instance, it can be
@@ -159,6 +160,7 @@ import org.jspecify.annotations.NonNull;
  *
  */
 
+@NullMarked
 public class Layouter<M> {
 
     /** The Printer used for output. */
@@ -631,7 +633,9 @@ public class Layouter<M> {
      */
     private void advanceLeft() {
         StreamToken<M> t;
-        while (!queue.isEmpty() && ((t = queue.peek()).followingSizeKnown())) {
+        // the queue is non-empty, so the peeked token is present; the extra null check keeps the
+        // flow analysis sound
+        while (!queue.isEmpty() && (t = queue.peek()) != null && t.followingSizeKnown()) {
             t.print(out);
             queue.poll();
             totalOutput += t.size();

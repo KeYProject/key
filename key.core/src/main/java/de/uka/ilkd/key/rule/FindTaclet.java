@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.*;
 
 import org.key_project.logic.ChoiceExpr;
@@ -20,7 +22,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 
 /**
@@ -30,9 +34,10 @@ import org.jspecify.annotations.NonNull;
  * ({@link AntecTaclet}), to the succedent ({@link SuccTaclet}) or to an arbitrary term that matches
  * the find part somewhere in the sequent ({@link RewriteTaclet}).
  */
+@NullMarked
 public abstract class FindTaclet extends Taclet {
     /** Set of schema variables of the assumes sequent and the (optional) find expression/sequent */
-    private ImmutableSet<SchemaVariable> assumesAndFindSchemaVariables = null;
+    private @Nullable ImmutableSet<SchemaVariable> assumesAndFindSchemaVariables = null;
 
     /**
      * creates a FindTaclet
@@ -54,7 +59,7 @@ public abstract class FindTaclet extends Taclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, SyntaxElement find,
-            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         super(name, find, applPart, goalTemplates, ruleSets, attrs, prefixMap, choices,
@@ -82,7 +87,7 @@ public abstract class FindTaclet extends Taclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, SyntaxElement find,
-            ImmutableMap<@NonNull SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, org.key_project.prover.rules.TacletPrefix> prefixMap,
             ChoiceExpr choices, ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap, choices, false,
             tacletAnnotations);
@@ -95,7 +100,16 @@ public abstract class FindTaclet extends Taclet {
 
     /**
      * @return Set of schemavariables of the if and the (optional) find part
+     *         <p>
+     *         The field is {@code @Nullable} only because it is lazily built; once non-null it is
+     *         never
+     *         cleared, so the difference from the {@code @NonNull} result is suppressed with a
+     *         scoped key.
+     *         During the (single-threaded) lazy build, the accumulator under construction is still
+     *         {@code null} when it is extended; those dereferences are suppressed with a scoped
+     *         key.
      */
+    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
     public ImmutableSet<SchemaVariable> getAssumesAndFindVariables() {
         if (assumesAndFindSchemaVariables == null) {
             TacletSchemaVariableCollector svc = new TacletSchemaVariableCollector();
@@ -122,16 +136,16 @@ public abstract class FindTaclet extends Taclet {
 
     /** {@inheritDoc} */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!super.equals(o)) {
             return false;
         }
-        return find.equals(((FindTaclet) o).find);
+        return Objects.requireNonNull(find).equals(((FindTaclet) o).find);
     }
 
     /** {@inheritDoc} */
     public int hashCode() {
-        return 13 * super.hashCode() + find.hashCode();
+        return 13 * super.hashCode() + Objects.requireNonNull(find).hashCode();
     }
 
     /**

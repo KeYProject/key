@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -25,6 +26,10 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;
@@ -33,7 +38,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     private final Map<Label, LocationVariable> breakFlags;
     private final Map<Label, LocationVariable> continueFlags;
     private final LocationVariable returnFlag;
-    private final LocationVariable returnValue;
+    private final @Nullable LocationVariable returnValue;
     private final LocationVariable exception;
 
     private final ArrayDeque<ExtList> stack = new ArrayDeque<>();
@@ -43,11 +48,17 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     private StatementBlock result;
 
+    /**
+     * The replacement result is produced by the traversal in {@code replace()}, which runs after
+     * construction; no meaningful initial value exists, so the difference is suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
     public OuterBreakContinueAndReturnReplacer(final StatementBlock block,
             final Iterable<Label> alwaysInnerLabels, final Label breakOutLabel,
             final Map<Label, LocationVariable> breakFlags,
             final Map<Label, LocationVariable> continueFlags, final LocationVariable returnFlag,
-            final LocationVariable returnValue, final LocationVariable exception,
+            final @Nullable LocationVariable returnValue, final LocationVariable exception,
             final Services services) {
         super(block, services);
         for (Label label : alwaysInnerLabels) {
@@ -71,7 +82,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         loopAndSwitchCascadeDepth = 0;
         stack.push(new ExtList());
         super.start();
-        ExtList el = stack.peek();
+        ExtList el = stack.getFirst();
         int i = (el.get(0) == CHANGED ? 1 : 0);
         result = (StatementBlock) el.get(i);
     }
@@ -110,7 +121,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     @Override
     public String toString() {
-        return stack.peek().toString();
+        return stack.getFirst().toString();
     }
 
     @Override
@@ -131,10 +142,16 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     private void performActionOnJump(final LabelJumpStatement x,
             final Map<Label, LocationVariable> flags) {
         if (isJumpToOuterLabel(x)) {
-            final LocationVariable flag = flags.get(x.getLabel());
+            // An outer jump is necessarily labeled (see {@link #isJumpToOuterLabel}); an unlabeled
+            // break/continue at loop depth 0 cannot occur in a well-formed program.
+            final Label label = Objects.requireNonNull(x.getLabel(),
+                "an outer break/continue must carry a label");
+            final LocationVariable flag = flags.get(label);
             assert flag != null : "a label flag must not be null";
-            final Statement assign =
-                KeYJavaASTFactory.assign(flag, BooleanLiteral.TRUE, x.getPositionInfo());
+            // The flag is guaranteed present by the caller-supplied map (see the constructor);
+            // asserts do not refine the nullness checker, so the check is explicit.
+            final Statement assign = KeYJavaASTFactory.assign(Objects.requireNonNull(flag),
+                BooleanLiteral.TRUE, x.getPositionInfo());
             final Statement[] statements = { assign, breakOut };
             addChild(new StatementBlock(statements));
             changed();
@@ -151,7 +168,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     @Override
     public void performActionOnReturn(final Return x) {
         if (frames.isEmpty()) {
-            final ExtList changeList = stack.peek();
+            final ExtList changeList = stack.getFirst();
             if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
             }
@@ -161,8 +178,12 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             if (returnValue == null) {
                 statements = new Statement[] { assignFlag, breakOut };
             } else {
-                Statement assignValue =
-                    KeYJavaASTFactory.assign(returnValue, x.getExpression(), x.getPositionInfo());
+                // The return value flag is only non-null for value-returning methods, whose
+                // body cannot end with a bare {@code return;}.
+                Statement assignValue = KeYJavaASTFactory.assign(returnValue,
+                    Objects.requireNonNull(x.getExpression(),
+                        "a value-returning method body cannot contain a bare 'return'"),
+                    x.getPositionInfo());
                 statements = new Statement[] { assignFlag, assignValue, breakOut };
             }
             addChild(new StatementBlock(statements));
@@ -196,12 +217,13 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     @Override
     public void performActionOnWhile(final While x) {
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
-            While newLoop = new While(guard, body, x.getPositionInfo());
+            // A while loop always has a body; the defensive null above cannot trigger.
+            While newLoop = new While(guard, Objects.requireNonNull(body), x.getPositionInfo());
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
@@ -238,13 +260,16 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     @Override
     public void performActionOnDo(final Do x) {
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             Statement body = changeList.removeFirstOccurrence(Statement.class);
             Guard g = changeList.removeFirstOccurrence(Guard.class);
             Expression guard = g == null ? null : g.getExpression();
-            Do newLoop = new Do(guard, body, x.getPositionInfo());
+            // A do-while loop always has a guard and a body; the defensive nulls above cannot
+            // trigger.
+            Do newLoop = new Do(Objects.requireNonNull(guard), Objects.requireNonNull(body),
+                x.getPositionInfo());
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
             addChild(newLoop);
             changed();
@@ -289,13 +314,16 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     @Override
     public void performActionOnLabeledStatement(final LabeledStatement x) {
         Label l = null;
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             if (x.getLabel() != null) {
                 l = (Label) changeList.removeFirst();
             }
-            addChild(new LabeledStatement(changeList, l, x.getPositionInfo()));
+            // A labeled statement always carries a label ({@code LabeledStatement#getLabel} is
+            // non-null), so the defensive branch cannot leave {@code l} null.
+            addChild(new LabeledStatement(changeList, Objects.requireNonNull(l),
+                x.getPositionInfo()));
             changed();
         } else {
             doDefaultAction(x);
@@ -304,7 +332,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     @Override
     public void performActionOnMethodFrame(final MethodFrame x) {
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (!changeList.isEmpty() && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             if (x.getChildCount() == 3) {
@@ -382,13 +410,15 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
     @Override
     public void performActionOnCase(final Case x) {
         Expression e = null;
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             if (x.getExpression() != null) {
                 e = (Expression) changeList.removeFirst();
             }
-            addChild(new Case(changeList, e, x.getPositionInfo()));
+            // A case branch always carries an expression (a default branch is a {@link Default}
+            // node), so the defensive branch cannot leave {@code e} null.
+            addChild(new Case(changeList, Objects.requireNonNull(e), x.getPositionInfo()));
             changed();
         } else {
             doDefaultAction(x);
@@ -428,10 +458,18 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         def.doAction(x);
     }
 
+    /**
+     * Handles a {@code finally} block by declaring fresh flags, resetting them to their defaults,
+     * executing the block, and mapping the old flags back afterwards.
+     * <p>
+     * The flags are introduced as typed program variables before the walk; their KeY Java types
+     * and the derived default values are suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "nullness:argument.type.incompatible" })
     public void performActionOnFinally(final Finally x) {
         final ExtList statements;
-        final ExtList changeList = stack.peek();
+        final ExtList changeList = stack.getFirst();
         if (changeList.size() > 0 && changeList.getFirst() == CHANGED) {
             changeList.removeFirst();
             statements = changeList;
@@ -483,7 +521,8 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         changed();
     }
 
-    private void addOldFlag(Map<ProgramVariable, ProgramVariable> oldFlags, ProgramVariable flag) {
+    private void addOldFlag(Map<ProgramVariable, ProgramVariable> oldFlags,
+            @Nullable ProgramVariable flag) {
         if (flag == null) {
             return;
         }
@@ -492,11 +531,12 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
             new LocationVariable(
                 new ProgramElementName(
                     flag.getProgramElementName().toString() + "__BEFORE_FINALLY"),
-                flag.getTypeReference()));
+                Objects.requireNonNull(flag.getTypeReference(),
+                    "a flag variable must have a type reference")));
     }
 
     private void changed() {
-        ExtList list = stack.peek();
+        ExtList list = stack.getFirst();
         if (list.getFirst() != CHANGED) {
             list.addFirst(CHANGED);
         }
@@ -504,7 +544,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
 
     private void addChild(final SourceElement x) {
         stack.pop();
-        ExtList list = stack.peek();
+        ExtList list = stack.getFirst();
         list.add(x);
     }
 
@@ -518,7 +558,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
         }
 
         public void doAction(final ProgramElement x) {
-            final ExtList changeList = stack.peek();
+            final ExtList changeList = stack.getFirst();
             if (changeList.size() > 0 && changeList.getFirst() == CHANGED) {
                 changeList.removeFirst();
                 addNewChild(changeList);

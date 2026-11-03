@@ -7,30 +7,37 @@ package de.uka.ilkd.key.pp;
 import java.util.Iterator;
 
 import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
  * Filter a given sequent to prepare it for the SequentPrinter class by adjusting constraints,
  * deleting formulas, etc.
  */
+@NullMarked
 public abstract class SequentPrintFilter {
     /**
      * the original sequent
      */
-    Sequent originalSequent;
+    Sequent originalSequent = JavaDLSequentKit.getInstance().getEmptySequent();
 
     /**
      * the antecedent of the filtered formula
      */
+    @Nullable
     ImmutableList<SequentPrintFilterEntry> antec = ImmutableList.nil();
 
     /**
      * the antecedent of the filtered formula
      */
+    @Nullable
     ImmutableList<SequentPrintFilterEntry> succ = ImmutableList.nil();
 
     /**
@@ -63,7 +70,7 @@ public abstract class SequentPrintFilter {
      *
      * @return the filtered antecedent
      */
-    public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
+    public @Nullable ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
         return antec;
     }
 
@@ -73,14 +80,18 @@ public abstract class SequentPrintFilter {
      *
      * @return the filtered succcedent
      */
-    public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
+    public @Nullable ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
         return succ;
     }
 
     /**
      * converts the complete original sequent into antecedent/succendent lists of print filter
      * entries.
+     * <p>
+     * The antecedent and succedent filter lists are re-initialized before they are appended to
+     * below; the dereferences of the (nullable) list fields are suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected void filterIdentity() {
         antec = ImmutableList.nil();
         Iterator<SequentFormula> it = originalSequent.antecedent().iterator();

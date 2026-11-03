@@ -6,6 +6,9 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * A list of {@link JMLModifier}s that apply to some class-level element (e.g., field declaration,
@@ -13,6 +16,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author lanzinger
  */
+@NullMarked
 public final class TextualJMLModifierList extends TextualJMLConstruct {
 
     public TextualJMLModifierList(ImmutableList<JMLModifier> modifiers) {
@@ -26,7 +30,7 @@ public final class TextualJMLModifierList extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof TextualJMLModifierList ci)) {
             return false;
         }

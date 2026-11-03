@@ -14,6 +14,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author bruns
  */
+@NullMarked
 public final class QuickSaveAction extends MainWindowAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(QuickSaveAction.class);
     private static final long serialVersionUID = -7084304175671744403L;
@@ -38,6 +40,14 @@ public final class QuickSaveAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public QuickSaveAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Quicksave");
@@ -53,7 +63,10 @@ public final class QuickSaveAction extends MainWindowAction {
     public static void quickSave(MainWindow mainWindow) {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             final String filename = QUICK_SAVE_PATH;
-            final Proof proof = mainWindow.getMediator().getSelectedProof();
+            Proof proof = mainWindow.getMediator().getSelectedProof();
+            if (proof == null) {
+                throw new NullPointerException("No proof selected for quick save.");
+            }
 
             String status = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION).save();
 

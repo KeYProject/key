@@ -28,6 +28,10 @@ public class AbbrevMap {
     /// Enabled is set true if an abbreviation should be used when printing the term.
     private final Set<JTerm> isTermEnabled = new HashSet<>();
 
+    /// The receiver is passed to the JDK {@code PropertyChangeSupport} constructor while the
+    /// enclosing object is still under initialization; the JDK class is outside our annotated
+    /// sources, so the resulting (under-initialization) value is suppressed with a scoped key.
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     private final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     /// Creates a AbbrevMap.
@@ -65,7 +69,10 @@ public class AbbrevMap {
             }
 
             final var old = term2String.get(t);
-            string2Term.remove(old);
+            // no previously registered abbreviation: {@code HashMap.remove(null)} is a no-op
+            if (old != null) {
+                string2Term.remove(old);
+            }
             term2String.put(t, abbreviation);
             string2Term.put(abbreviation, t);
 
@@ -83,7 +90,10 @@ public class AbbrevMap {
                 throw new AbbrevException("A abbreviation for " + t + " already exists", true);
             }
             final var old = term2String.get(t);
-            string2Term.remove(old);
+            // no previously registered abbreviation: {@code HashMap.remove(null)} is a no-op
+            if (old != null) {
+                string2Term.remove(old);
+            }
             term2String.put(t, abbreviation);
             string2Term.put(abbreviation, t);
 
@@ -139,6 +149,11 @@ public class AbbrevMap {
     }
 
     /// Exports the current abbreviation map as an entry set.
+    /**
+     * The entry view carries {@code @KeyFor} annotations on its keys which the declared return
+     * type does not; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public Set<Map.Entry<JTerm, String>> export() {
         return term2String.entrySet();
 
@@ -146,9 +161,18 @@ public class AbbrevMap {
 
     /// Removes the given `term` and its abbreviation completely from the underlying
     /// data structures.
+    ///
+    /// When the term was not registered, no abbreviation exists and the map lookup yields
+    /// {@code null}; the generic change event then deliberately carries a {@code null} property
+    /// name (the JDK's 3-argument form fires an unnamed event for that case), which the checker's
+    /// JDK model does not express, so it is suppressed with a scoped key.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void remove(JTerm term) {
         var s = term2String.get(term);
-        string2Term.remove(s);
+        // no registered abbreviation for this term: {@code HashMap.remove(null)} is a no-op
+        if (s != null) {
+            string2Term.remove(s);
+        }
         term2String.remove(term);
         isTermEnabled.remove(term);
         changeSupport.firePropertyChange(s, term, null);

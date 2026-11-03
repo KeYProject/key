@@ -18,11 +18,13 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /*
  * Abstract parent class of SequentSearchBar and ProofTreeSearchPanel. Might be used for additional
  * search bars.
  */
+@NullMarked
 public abstract class SearchBar extends JPanel {
     protected final JTextField searchField = new JTextField(20);
     private final JButton prev;
@@ -33,6 +35,12 @@ public abstract class SearchBar extends JPanel {
             new Color(255, 178, 178),
             new Color(85, 40, 40));
 
+    /**
+     * The ctor wires the buttons and listeners while the receiver is still under initialization
+     * (EISOP initialization check); the listeners only fire after construction completes,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     protected SearchBar() {
         prev = new JButton(IconFactory.previous(16));
         next = new JButton(IconFactory.next(16));
@@ -75,7 +83,12 @@ public abstract class SearchBar extends JPanel {
 
         // prepare search buttons
 
-        Font font = prev.getFont().deriveFont(20.0f);
+        Font prevFont = prev.getFont();
+        if (prevFont == null) {
+            // a button always obtains its font from the look and feel
+            throw new NullPointerException("No font available.");
+        }
+        Font font = prevFont.deriveFont(20.0f);
         prev.setFont(font);
         next.setFont(font);
         close.setFont(font);

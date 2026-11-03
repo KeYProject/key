@@ -17,6 +17,9 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static org.key_project.logic.op.Function.FunctionKind.ORDINARY;
 
 
@@ -27,6 +30,7 @@ import static org.key_project.logic.op.Function.FunctionKind.ORDINARY;
  * <strong>As soon as {@link AbstractTermTransformer#METASORT} is generalized, this class
  * may be deleted.</strong>
  */
+@NullMarked
 public class JFunction extends Function implements Sorted, Operator {
 
     // -------------------------------------------------------------------------
@@ -34,7 +38,15 @@ public class JFunction extends Function implements Sorted, Operator {
     // -------------------------------------------------------------------------
 
     /**
-     * Creates a function symbol with the specified signature and kind
+     * Creates a function symbol with the specified signature and kind.
+     *
+     * <p>
+     * A {@code null} {@code whereToBind} is the designed "no binding" marker used for all
+     * symbols that are not binders. The key.ncore {@link Function} superclass constructor
+     * leaves its {@code whereToBind} parameter unannotated although its package
+     * ({@code org.key_project.logic.op}) is {@code @NullMarked}, so it counts as
+     * {@code @NonNull} here; the warning is suppressed for that reason. An honest
+     * {@code @Nullable} widening of the superclass parameter is tracked as follow-up work.
      *
      * @param name the Name of the function symbol
      * @param sort the Sort of the function symbol
@@ -49,8 +61,9 @@ public class JFunction extends Function implements Sorted, Operator {
      * @param introductionTime the introduction time of the symbol, or a
      *        {@link Function#UNRECORDED}, if none available (e.g. existed from the beginning)
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
             FunctionKind kind, int introductionTime) {
         super(name, argSorts, sort, whereToBind, isRigid, unique, kind, introductionTime);
 
@@ -61,7 +74,7 @@ public class JFunction extends Function implements Sorted, Operator {
     }
 
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique) {
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, ORDINARY, UNRECORDED);
     }
 
@@ -79,12 +92,12 @@ public class JFunction extends Function implements Sorted, Operator {
      *        {@link Function#UNRECORDED}, if none available (e.g. existed from the beginning)
      */
     public JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
-            ImmutableArray<Boolean> whereToBind, boolean unique, FunctionKind kind,
+            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, FunctionKind kind,
             int introductionTime) {
         this(name, sort, argSorts, whereToBind, unique, true, kind, introductionTime);
     }
 
-    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean[] whereToBind,
+    public JFunction(Name name, Sort sort, Sort[] argSorts, Boolean @Nullable [] whereToBind,
             boolean unique) {
         this(name, sort, new ImmutableArray<>(argSorts),
             whereToBind == null ? null : new ImmutableArray<>(whereToBind), unique);
@@ -99,7 +112,7 @@ public class JFunction extends Function implements Sorted, Operator {
     }
 
     public JFunction(Name name, Sort sort, Sort... argSorts) {
-        this(name, sort, argSorts, null, false);
+        this(name, sort, new ImmutableArray<>(argSorts), null, false);
     }
 
     public JFunction(Name name, Sort sort) {

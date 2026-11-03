@@ -16,6 +16,8 @@ import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.*;
 
 /**
@@ -25,6 +27,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * subterms are matched by the enclosing
  * {@link org.key_project.prover.rules.matcher.compiler.OperatorPlan}.
  */
+@NullMarked
 public final class ParametricFunctionHead implements MatchHead {
 
     /**

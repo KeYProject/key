@@ -21,6 +21,9 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 import org.key_project.prover.engine.ProverTaskListener;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides the user interface independent logic to manage multiple proofs. This includes:
  * <ul>
@@ -35,20 +38,21 @@ import org.key_project.prover.engine.ProverTaskListener;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public interface UserInterfaceControl {
     /**
      * Registers the given {@link ProverTaskListener} which will be informed about all events.
      *
      * @param ptl The {@link ProverTaskListener} to add.
      */
-    void addProverTaskListener(ProverTaskListener ptl);
+    void addProverTaskListener(@Nullable ProverTaskListener ptl);
 
     /**
      * Removes the given {@link ProverTaskListener}.
      *
      * @param ptl The {@link ProverTaskListener} to remove.
      */
-    void removeProverTaskListener(ProverTaskListener ptl);
+    void removeProverTaskListener(@Nullable ProverTaskListener ptl);
 
     /**
      * <p>
@@ -75,10 +79,12 @@ public interface UserInterfaceControl {
      * @return The opened {@link AbstractProblemLoader}.
      * @throws ProblemLoaderException Occurred Exception.
      */
-    AbstractProblemLoader load(Profile profile, Path file, List<Path> classPaths,
-            Path bootClassPath, List<Path> includes, Properties poPropertiesToForce,
+    AbstractProblemLoader load(@Nullable Profile profile, Path file,
+            @Nullable List<Path> classPaths,
+            @Nullable Path bootClassPath, @Nullable List<Path> includes,
+            @Nullable Properties poPropertiesToForce,
             boolean forceNewProfileOfNewProofs,
-            Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;
+            @Nullable Consumer<Proof> callbackProofLoaded) throws ProblemLoaderException;
 
     /**
      * Instantiates a new {@link Proof} in this {@link UserInterfaceControl} for the given

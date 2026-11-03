@@ -32,7 +32,8 @@ import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Encapsulates the application engine of taclets.
@@ -47,8 +48,9 @@ import org.jspecify.annotations.NonNull;
  * </ul>
  *
  */
+@NullMarked
 public abstract class TacletExecutor
-        extends org.key_project.prover.rules.TacletExecutor<@NonNull Goal, @NonNull TacletApp> {
+        extends org.key_project.prover.rules.TacletExecutor<Goal, TacletApp> {
 
     protected TacletExecutor(Taclet taclet) {
         super(taclet);
@@ -103,8 +105,8 @@ public abstract class TacletExecutor
     protected Term syntacticalReplace(Term term,
             PosInOccurrence applicationPosInOccurrence,
             MatchResultInfo mc,
-            @NonNull Goal goal,
-            @NonNull TacletApp tacletApp,
+            Goal goal,
+            TacletApp tacletApp,
             LogicServices services,
             Object... /* TermLabelState, TacletLabelHint */ instantiationInfo) {
         final SyntacticalReplaceVisitor srVisitor =
@@ -177,7 +179,7 @@ public abstract class TacletExecutor
      */
     @Override
     protected void applyAddrule(ImmutableList<? extends org.key_project.prover.rules.Taclet> rules,
-            @NonNull Goal goal,
+            Goal goal,
             LogicServices services,
             MatchResultInfo p_matchCond) {
         var matchCond = (MatchConditions) p_matchCond;

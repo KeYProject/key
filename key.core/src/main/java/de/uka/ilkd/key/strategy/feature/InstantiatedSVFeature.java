@@ -15,6 +15,8 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Feature that returns zero iff a certain schema variable is instantiated. If the schemavariable is
  * not instantiated schema variable or does not occur in the taclet infinity costs are returned.
@@ -23,6 +25,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * {@link StableCost}: the instantiation is read from the rule application's own instantiations, not
  * from the goal, so the result is fixed for a given application.
  */
+@NullMarked
 @StableCost
 public class InstantiatedSVFeature extends BinaryTacletAppFeature {
 

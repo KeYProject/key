@@ -39,7 +39,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -58,6 +58,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @see TacletMatcherKit
  */
+@NullMarked
 public class VMTacletMatcher implements TacletMatcher {
 
     /**
@@ -74,16 +75,16 @@ public class VMTacletMatcher implements TacletMatcher {
     public static final String INTERPRETER_MATCHER_PROPERTY = "key.matcher.interpreter";
 
     /** the matcher for the find expression of the taclet */
-    private final MatchProgram findMatchProgram;
+    private final @Nullable MatchProgram findMatchProgram;
     /** the matcher for the taclet's assumes formulas */
-    private final HashMap<Term, @NonNull MatchProgram> assumesMatchPrograms =
+    private final HashMap<Term, MatchProgram> assumesMatchPrograms =
         new HashMap<>();
     /**
      * per assumes formula, the summary of how it accepts terms, for indexing (see
      * {@link #assumesKeySource}); computed once here so it comes from the same dispatch as the
      * match programs above
      */
-    private final HashMap<Term, @NonNull PatternKeySource> assumesKeySources = new HashMap<>();
+    private final HashMap<Term, PatternKeySource> assumesKeySources = new HashMap<>();
 
     /**
      * the variable conditions of the taclet that need to be satisfied by found schema variable
@@ -107,7 +108,7 @@ public class VMTacletMatcher implements TacletMatcher {
     /**
      * the find expression of the taclet of {@code null} if it is a {@link NoFindTaclet}
      */
-    private final JTerm findExp;
+    private final @Nullable JTerm findExp;
 
     /**
      * @param taclet the Taclet matched by this matcher
@@ -198,11 +199,11 @@ public class VMTacletMatcher implements TacletMatcher {
      *      LogicServices)
      */
     @Override
-    public final @NonNull AssumesMatchResult matchAssumes(
-            @NonNull Iterable<@NonNull AssumesFormulaInstantiation> p_toMatch,
-            @NonNull Term p_template,
-            @NonNull MatchResultInfo p_matchCond,
-            @NonNull LogicServices p_services) {
+    public final AssumesMatchResult matchAssumes(
+            Iterable<AssumesFormulaInstantiation> p_toMatch,
+            Term p_template,
+            MatchResultInfo p_matchCond,
+            LogicServices p_services) {
         final MatchProgram program = assumesMatchPrograms.get(p_template);
         if (program == null) {
             throw new IllegalArgumentException(
@@ -251,7 +252,8 @@ public class VMTacletMatcher implements TacletMatcher {
      * @return {@code null} if the update context does not match the one of the formula or the
      *         formula without the update context
      */
-    private JTerm matchUpdateContext(ImmutableList<UpdateLabelPair> context, JTerm formula) {
+    private @Nullable JTerm matchUpdateContext(ImmutableList<UpdateLabelPair> context,
+            JTerm formula) {
         ImmutableList<UpdateLabelPair> curContext = context;
         for (int i = 0, size = context.size(); i < size; i++) {
             if (formula.op() instanceof UpdateApplication) {
@@ -276,9 +278,9 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public final @Nullable MatchResultInfo matchAssumes(
-            @NonNull Iterable<AssumesFormulaInstantiation> p_toMatch,
-            @NonNull MatchResultInfo p_matchCond,
-            @NonNull LogicServices p_services) {
+            Iterable<AssumesFormulaInstantiation> p_toMatch,
+            MatchResultInfo p_matchCond,
+            LogicServices p_services) {
 
         final Iterator<SequentFormula> anteIterator = assumesSequent.antecedent().iterator();
         final Iterator<SequentFormula> succIterator = assumesSequent.succedent().iterator();
@@ -324,7 +326,7 @@ public class VMTacletMatcher implements TacletMatcher {
     @Override
     public final @Nullable MatchResultInfo checkConditions(
             @Nullable MatchResultInfo cond,
-            @NonNull LogicServices services) {
+            LogicServices services) {
         var result = (MatchConditions) cond;
         if (result != null) {
             final var svIterator = result.getInstantiations().svIterator();
@@ -381,7 +383,7 @@ public class VMTacletMatcher implements TacletMatcher {
     public final @Nullable MatchResultInfo checkVariableConditions(@Nullable SchemaVariable var,
             @Nullable SyntaxElement instantiationCandidate,
             @Nullable MatchResultInfo matchCond,
-            @NonNull LogicServices services) {
+            LogicServices services) {
         if (matchCond != null) {
             if (instantiationCandidate instanceof JTerm term) {
                 if (!(term.op() instanceof QuantifiableVariable)) {
@@ -431,9 +433,9 @@ public class VMTacletMatcher implements TacletMatcher {
      */
     @Override
     public final @Nullable MatchResultInfo matchFind(
-            @NonNull Term term,
-            @NonNull MatchResultInfo p_matchCond,
-            @NonNull LogicServices services) {
+            Term term,
+            MatchResultInfo p_matchCond,
+            LogicServices services) {
         if (findMatchProgram == null) {
             return null;
         }
@@ -453,10 +455,10 @@ public class VMTacletMatcher implements TacletMatcher {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable MatchResultInfo matchSV(@NonNull SchemaVariable sv,
-            @NonNull SyntaxElement syntaxElement,
-            @NonNull MatchResultInfo matchCond,
-            @NonNull LogicServices services) {
+    public @Nullable MatchResultInfo matchSV(SchemaVariable sv,
+            SyntaxElement syntaxElement,
+            MatchResultInfo matchCond,
+            LogicServices services) {
 
         final MatchSchemaVariableInstruction instr =
             JavaDLMatchVMInstructionSet.getMatchInstructionForSV(sv);

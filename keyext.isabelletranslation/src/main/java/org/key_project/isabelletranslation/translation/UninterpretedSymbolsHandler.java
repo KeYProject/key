@@ -16,19 +16,23 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This handler is a fallback handler that introduces a new uninterpreted function symbol with
  * prefix in subscript
  * <p>
  * According declarations are added.
  */
+@NullMarked
 public class UninterpretedSymbolsHandler implements IsabelleHandler {
 
     public final static String POSTFIX = "\\<^sub>v\\<^sub>a\\<^sub>r";
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets,
+            @Nullable Properties handlerSnippets,
             String[] handlerOptions) {
     }
 

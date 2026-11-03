@@ -8,11 +8,14 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Walks through a java AST in depth-left-fist-order. You can set the type of nodes you want to
  * collect and then {@link #start()} the walker. The found nodes of the given type are returned as a
  * list of {@link ProgramElement}.
  */
+@NullMarked
 public class JavaASTCollector extends JavaASTWalker {
 
     /** the type of nodes to be collected */

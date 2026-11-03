@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.proofevent;
 
-
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Node;
 
@@ -18,16 +18,20 @@ import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Information about a node replacing its parent after a rule application, currently giving
  * information about added and removed formulas
  */
+@NullMarked
 public class NodeReplacement {
 
     final Node node;
     final Node parent;
     ImmutableList<SequentChangeInfo> rawChanges;
+    @Nullable
     ImmutableList<NodeChange> changes = null;
 
     /**
@@ -173,11 +177,11 @@ public class NodeReplacement {
     }
 
     private void addNodeChange(NodeChange p_nc) {
-        changes = changes.prepend(p_nc);
+        changes = Objects.requireNonNull(changes, "changes").prepend(p_nc);
     }
 
     private void removeNodeChanges(SequentFormula p_cf, boolean p_inAntec) {
-        Iterator<NodeChange> it = changes.iterator();
+        Iterator<NodeChange> it = Objects.requireNonNull(changes, "changes").iterator();
         changes = ImmutableList.nil();
         NodeChange oldNC;
         PosInOccurrence oldPio;
@@ -202,7 +206,11 @@ public class NodeReplacement {
 
     /**
      * @return Modifications that have been made to node
+     *         <p>
+     *         The change list is initialized with an empty list below before it is filled; the
+     *         dereference of the (nullable) change list field is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public Iterator<NodeChange> getNodeChanges() {
         if (changes == null) {
             changes = ImmutableList.nil();

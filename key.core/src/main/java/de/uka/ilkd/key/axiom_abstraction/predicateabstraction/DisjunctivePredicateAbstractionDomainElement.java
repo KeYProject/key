@@ -9,12 +9,16 @@ import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An abstract domain element for a predicate abstraction lattice based on the disjunction of
  * predicates.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class DisjunctivePredicateAbstractionDomainElement
         extends AbstractPredicateAbstractionDomainElement {
 
@@ -63,7 +67,7 @@ public class DisjunctivePredicateAbstractionDomainElement
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         return obj instanceof DisjunctivePredicateAbstractionDomainElement
                 && (this != TOP || obj == TOP) && (this != BOTTOM || obj == BOTTOM)
                 && this.getPredicates().equals(

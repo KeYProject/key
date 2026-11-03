@@ -42,6 +42,7 @@ import de.uka.ilkd.key.util.KeYConstants;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,10 +57,10 @@ import picocli.CommandLine.Parameters;
  * This has been extracted from MainWindow to keep GUI and control further
  * apart.
  */
+@NullMarked
 public final class Main implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-    private static Path workingDir;
-
+    private static @Nullable Path workingDir;
 
     // @Option(names = "--help", description = "display this text")
     // private boolean showHelp = false;
@@ -165,14 +166,12 @@ public final class Main implements Callable<Integer> {
             + LemmataAutoModeOptions.DEFAULT_TIMEOUT + ", i.e., no timeout)")
     private int timeout = -1;
 
-
     @CommandLine.ArgGroup(
         heading = "Options for justify rules. autoprove taclets (options always with prefix --jr) needs the path to the rule file as argument       The JUSTIFY_RULES option has a number of additional parameters you can set. The following options only apply if --jr-enable is used.")
     private @Nullable LemmataAutoModeOptions justifyRulesOptions;
 
     @Option(names = { "--verbose", "-v" }, arity = "*", defaultValue = "2")
     private int verbosity = 2;
-
 
     /**
      * The user interface modes KeY can operate in.
@@ -207,9 +206,7 @@ public final class Main implements Callable<Integer> {
      */
     private boolean loadOnly = false;
 
-
     private ProofMacro autoMacro = new SkipMacro();
-
 
     /**
      * <p>
@@ -252,7 +249,11 @@ public final class Main implements Callable<Integer> {
         Debug.ENABLE_DEBUG = debug;
 
         // weigl: the configuration folder is not fixed anymore since v3.0
-        LOGGER.info("The configuration folder is here {}", PathConfig.currentPaths.keyConfigDir);
+        PathConfig.KeyPaths currentPaths = PathConfig.currentPaths;
+        if (currentPaths == null) {
+            throw new NullPointerException("KeY key paths are not set up.");
+        }
+        LOGGER.info("The configuration folder is here {}", currentPaths.keyConfigDir);
 
         try {
             // weigl: You can set assertion status via the system class loader,
@@ -362,9 +363,10 @@ public final class Main implements Callable<Integer> {
             }
         }
 
-        if (macro != null) {
+        String macroName = macro;
+        if (macroName != null) {
             for (ProofMacro m : ClassLoaderUtil.loadServices(ProofMacro.class)) {
-                if (macro.equals(m.getClass().getSimpleName())) {
+                if (macroName.equals(m.getClass().getSimpleName())) {
                     // memorize macro for later
                     try {
                         autoMacro = m.getClass().getDeclaredConstructor().newInstance();
@@ -380,7 +382,7 @@ public final class Main implements Callable<Integer> {
                     break;
                 }
             }
-            if (macro.isEmpty() || autoMacro instanceof SkipMacro) {
+            if (macroName.isEmpty() || autoMacro instanceof SkipMacro) {
                 LOGGER.warn("No automatic proof macro specified.");
             }
         }
@@ -410,11 +412,17 @@ public final class Main implements Callable<Integer> {
     }
 
     private void logInformation() {
-        LOGGER.debug("Java Version: {}", System.getProperty("java.version"));
-        LOGGER.debug("Java Runtime: {}", System.getProperty("java.specification.version"));
-        LOGGER.debug("Java VM: {}", System.getProperty("java.vm"));
-        LOGGER.debug("OS: {}", System.getProperty("java.os"));
-        LOGGER.debug("Hardware: {}", System.getProperty("java.hw"));
+        String javaVersion = System.getProperty("java.version");
+        LOGGER.debug("Java Version: {}", javaVersion == null ? "null" : javaVersion);
+        String javaSpecificationVersion = System.getProperty("java.specification.version");
+        LOGGER.debug("Java Runtime: {}",
+            javaSpecificationVersion == null ? "null" : javaSpecificationVersion);
+        String javaVm = System.getProperty("java.vm");
+        LOGGER.debug("Java VM: {}", javaVm == null ? "null" : javaVm);
+        String javaOs = System.getProperty("java.os");
+        LOGGER.debug("OS: {}", javaOs == null ? "null" : javaOs);
+        String javaHw = System.getProperty("java.hw");
+        LOGGER.debug("Hardware: {}", javaHw == null ? "null" : javaHw);
         Runtime rt = Runtime.getRuntime();
         LOGGER.info("Memory: total {} MB, max {} MB, free {} MB",
             rt.totalMemory() / 1048576.0,
@@ -495,8 +503,13 @@ public final class Main implements Callable<Integer> {
     }
 
     public static void ensureExamplesAvailable() {
-        Path examplesDir =
-            getExamplesDir() == null ? ExampleChooser.lookForExamples() : getExamplesDir();
+        Path examplesDir = getExamplesDir();
+        if (examplesDir == null) {
+            examplesDir = ExampleChooser.lookForExamples();
+        }
+        if (examplesDir == null) {
+            throw new NullPointerException("No examples directory found.");
+        }
         if (!Files.exists(examplesDir)) {
             examplesDir = setupExamples();
         }
@@ -524,7 +537,7 @@ public final class Main implements Callable<Integer> {
         }
     }
 
-    private static File createTempDirectory() throws IOException {
+    private static @Nullable File createTempDirectory() throws IOException {
         final File tempDir = File.createTempFile("keyheap-examples-", null);
         tempDir.delete();
         if (!tempDir.mkdir()) {
@@ -547,10 +560,9 @@ public final class Main implements Callable<Integer> {
      *
      * @return {@link File} object representing working directory.
      */
-    public static Path getWorkingDir() {
+    public static @Nullable Path getWorkingDir() {
         return workingDir;
     }
-
 
     /**
      * Perform necessary actions before loading any problem files. Currently only
@@ -573,7 +585,7 @@ public final class Main implements Callable<Integer> {
         }
     }
 
-    private static Path EXAMPLE_DIR = null;
+    private static @Nullable Path EXAMPLE_DIR = null;
 
     public static @Nullable Path getExamplesDir() {
         return EXAMPLE_DIR;

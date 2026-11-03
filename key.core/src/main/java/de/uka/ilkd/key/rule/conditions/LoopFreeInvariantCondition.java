@@ -27,12 +27,16 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Extracts the free loop invariants for the given loop term. Free invariants are only assumed, but
  * not proven (like an axiom).
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class LoopFreeInvariantCondition implements VariableCondition {
     private final ProgramSV loopStmtSV;
     private final SchemaVariable modalitySV;
@@ -46,7 +50,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices p_services) {
         final Services services = (Services) p_services;
         final var svInst =

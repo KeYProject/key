@@ -7,6 +7,7 @@ package de.uka.ilkd.key.proof.delayedcut;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -25,6 +26,9 @@ import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -62,6 +66,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Benjamin Niedermann
  */
+@NullMarked
 public class DelayedCutProcessor implements Runnable {
 
     /**
@@ -101,7 +106,7 @@ public class DelayedCutProcessor implements Runnable {
         this.mode = mode;
     }
 
-    private Goal find(Proof proof, Node node) {
+    private @Nullable Goal find(Proof proof, Node node) {
         for (Goal goal : proof.openGoals()) {
             if (goal.node() == node) {
                 return goal;
@@ -121,7 +126,7 @@ public class DelayedCutProcessor implements Runnable {
         }
         // do not change the order of the following two statements!
         RuleApp firstAppliedRuleApp = node.getAppliedRuleApp();
-        ImmutableList<Node> subtrees = proof.pruneProof(node, false);
+        ImmutableList<Node> subtrees = Objects.requireNonNull(proof.pruneProof(node, false));
 
         DelayedCut delayedCut =
             new DelayedCut(proof, node, descisionPredicate, subtrees, mode, firstAppliedRuleApp);
@@ -149,6 +154,17 @@ public class DelayedCutProcessor implements Runnable {
         return delayedCut;
     }
 
+    /**
+     * Applies the delayed-cut rule at the node of the given delayed cut object.
+     *
+     * @param cut The delayed cut data object.
+     * @return The two goals resulting from the cut application.
+     *         <p>
+     *         The delayed-cut preprocessing stores the cut node as an open goal of the proof; the
+     *         dereference of the (nullable) goal returned by the lookup is suppressed with a scoped
+     *         key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private ImmutableList<Goal> cut(DelayedCut cut) {
         Goal goal = find(cut.getProof(), cut.getNode());
 
@@ -166,7 +182,11 @@ public class DelayedCutProcessor implements Runnable {
 
         app = app.addCheckedInstantiation(app.uninstantiatedVars().iterator().next(),
             cut.getFormula(), cut.getServices(), true);
-        return goal.apply(app);
+        ImmutableList<Goal> goals = goal.apply(Objects.requireNonNull(app));
+        if (goals == null) {
+            throw new IllegalStateException("Cut rule application was not applicable to the goal");
+        }
+        return goals;
     }
 
     private ImmutableList<Goal> apply(final String tacletName, Goal goal,
@@ -183,8 +203,14 @@ public class DelayedCutProcessor implements Runnable {
         assert apps.size() == 1;
         NoPosTacletApp app = apps.head();
 
-        PosTacletApp app2 = app.setPosInOccurrence(pio, goal.proof().getServices());
-        return goal.apply(app2);
+        PosTacletApp app2 = Objects.requireNonNull(
+            app.setPosInOccurrence(pio, goal.proof().getServices()));
+        ImmutableList<Goal> goals = goal.apply(app2);
+        if (goals == null) {
+            throw new IllegalStateException(
+                "Taclet " + tacletName + " was not applicable to the goal");
+        }
+        return goals;
     }
 
     /**
@@ -206,7 +232,11 @@ public class DelayedCutProcessor implements Runnable {
     /**
      * After applying the cut rule two goal result. The pruned subtree is added to one of these
      * goals. This method finds the the goal.
+     * <p>
+     * The branch label of a cut goal's node is always present; the dereference of the (nullable)
+     * node annotation is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private int getGoalForHiding(ImmutableList<Goal> goals, DelayedCut cut) {
         assert goals.size() == 2;
         Goal[] goal = { goals.head(), goals.tail().head() };
@@ -254,7 +284,7 @@ public class DelayedCutProcessor implements Runnable {
         int currentNumber = 0;
         while (!pairs.isEmpty()) {
 
-            NodeGoalPair pair = pairs.pollLast();
+            NodeGoalPair pair = Objects.requireNonNull(pairs.pollLast());
 
             RuleApp app = createNewRuleApp(pair, cut.getServices());
 
@@ -278,8 +308,13 @@ public class DelayedCutProcessor implements Runnable {
      * @param goal
      * @param app
      * @return
+     *         <p>
+     *         The instantiation of a schema variable of a checked taclet application is always
+     *         present;
+     *         the dereference of the (nullable) instantiation is suppressed with a scoped key.
      */
-    private LinkedList<Goal> apply(Goal goal, RuleApp app, TermServices services) {
+    @SuppressWarnings("nullness:dereference.of.nullable")
+    private LinkedList<Goal> apply(Goal goal, @Nullable RuleApp app, TermServices services) {
         if (app instanceof TacletApp tapp) {
             final SVInstantiations insts = tapp.instantiations();
             for (var entry : insts.getInstantiationMap()) {
@@ -292,19 +327,20 @@ public class DelayedCutProcessor implements Runnable {
         }
 
         LinkedList<Goal> goals = new LinkedList<>();
-        ImmutableList<Goal> childs = goal.apply(app);
+        ImmutableList<Goal> childs = goal.apply(Objects.requireNonNull(app));
 
         // if the rule is a SMT rule, <code>childs</code> can be null.
-        // if(childs == null){
-        // return goals;
-        // }
+        if (childs == null) {
+            return goals;
+        }
         for (Goal child : childs) {
             goals.addFirst(child);
         }
         return goals;
     }
 
-    private LinkedList<Goal> apply(Node oldNode, Goal goal, RuleApp app, TermServices services) {
+    private LinkedList<Goal> apply(Node oldNode, Goal goal, @Nullable RuleApp app,
+            TermServices services) {
         try {
             return apply(goal, app, services);
         } catch (Throwable e) {
@@ -316,8 +352,8 @@ public class DelayedCutProcessor implements Runnable {
      * Based on an old rule application a new rule application is built. Mainly the position is
      * updated.
      */
-    private RuleApp createNewRuleApp(NodeGoalPair pair, Services services) {
-        RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
+    private @Nullable RuleApp createNewRuleApp(NodeGoalPair pair, Services services) {
+        RuleApp oldRuleApp = Objects.requireNonNull(pair.node.getAppliedRuleApp());
 
         PosInOccurrence newPos = translate(pair, services);
         try {
@@ -328,11 +364,11 @@ public class DelayedCutProcessor implements Runnable {
 
         if (oldRuleApp instanceof PosTacletApp app) {
             return PosTacletApp.createPosTacletApp((FindTaclet) app.taclet(), app.instantiations(),
-                app.assumesFormulaInstantiations(), newPos, services);
+                app.assumesFormulaInstantiations(), Objects.requireNonNull(newPos), services);
         }
 
         if (oldRuleApp instanceof IBuiltInRuleApp app) {
-            return app.replacePos(newPos);
+            return app.replacePos(Objects.requireNonNull(newPos));
         }
 
         return oldRuleApp;
@@ -340,7 +376,7 @@ public class DelayedCutProcessor implements Runnable {
     }
 
     private void check(Goal goal, final RuleApp app,
-            PosInOccurrence newPos, Services services) {
+            @Nullable PosInOccurrence newPos, Services services) {
         if (newPos == null) {
             return;
         }
@@ -388,24 +424,27 @@ public class DelayedCutProcessor implements Runnable {
 
     }
 
-    private PosInOccurrence translate(NodeGoalPair pair, TermServices services) {
+    private @Nullable PosInOccurrence translate(NodeGoalPair pair, TermServices services) {
         RuleApp oldRuleApp = pair.node.getAppliedRuleApp();
-        if (oldRuleApp == null || oldRuleApp.posInOccurrence() == null) {
+        PosInOccurrence oldPos = oldRuleApp == null ? null : oldRuleApp.posInOccurrence();
+        if (oldPos == null) {
             return null;
         }
         int formulaNumber =
-            pair.node.sequent().formulaNumberInSequent(oldRuleApp.posInOccurrence().isInAntec(),
-                oldRuleApp.posInOccurrence().sequentFormula());
-        return PosInOccurrence.findInSequent(pair.goal.sequent(),
-            formulaNumber,
-            oldRuleApp.posInOccurrence().posInTerm());
+            pair.node.sequent().formulaNumberInSequent(oldPos.isInAntec(), oldPos.sequentFormula());
+        return PosInOccurrence.findInSequent(pair.goal.sequent(), formulaNumber,
+            oldPos.posInTerm());
     }
 
     /**
      * Used for rebuilding the tree: Joins the node of the old sub trees and the corresponding goals
      * in the new tree to one object. Return by reference: both <code>pairs</code> and
      * <code>openLeaves</code> are manipulated.
+     * <p>
+     * The number of iterator steps and the number of goals are kept in sync by the caller; the
+     * dereference of the (nullable) polled goal is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private int add(LinkedList<NodeGoalPair> pairs, LinkedList<NodeGoalPair> openLeaves,
             Iterator<Node> iterator, LinkedList<Goal> goals) {
 
@@ -414,7 +453,7 @@ public class DelayedCutProcessor implements Runnable {
             return leafNumber;
         }
         while (iterator.hasNext()) {
-            Goal matchedGoal = goals.pollFirst();
+            Goal matchedGoal = Objects.requireNonNull(goals.pollFirst());
             Node child = iterator.next();
 
             if (!child.leaf()) {
@@ -432,12 +471,17 @@ public class DelayedCutProcessor implements Runnable {
 
     /**
      * This function uncovers the decision predicate that is hidden after applying the cut rule.
+     * <p>
+     * The application of the hide rule on an uncovered goal always yields a goal; the dereference
+     * of the (nullable) application result is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void uncoverDecisionPredicate(DelayedCut cut, List<NodeGoalPair> openLeaves) {
         ImmutableList<NodeGoalPair> list = ImmutableList.nil();
         for (NodeGoalPair pair : openLeaves) {
             list =
-                list.append(new NodeGoalPair(pair.node, pair.goal.apply(cut.getHideApp()).head()));
+                list.append(new NodeGoalPair(pair.node,
+                    pair.goal.apply(Objects.requireNonNull(cut.getHideApp())).head()));
         }
         cut.setGoalsAfterUncovering(list);
     }

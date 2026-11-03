@@ -20,20 +20,24 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.ParsableVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Resolves property calls of any kind. Keeps a list of resolvers doing the actual work, and a stack
  * of namespaces to deal with several levels of local variables (e.g. "self", or iterator variables
  * in forall() or select() subtrees).
  */
+@NullMarked
 public abstract class SLResolverManager {
 
     public final SLExceptionFactory excManager;
 
     private ImmutableList<SLExpressionResolver> resolvers =
         ImmutableList.nil();
-    private final KeYJavaType specInClass;
-    private final LocationVariable selfVar;
+    private final @Nullable KeYJavaType specInClass;
+    private final @Nullable LocationVariable selfVar;
     private final TermBuilder tb;
 
     private ImmutableList<Namespace<LocationVariable>> localVariablesNamespaces =
@@ -48,8 +52,8 @@ public abstract class SLResolverManager {
     // constructors
     // -------------------------------------------------------------------------
 
-    protected SLResolverManager(SLExceptionFactory excManager, KeYJavaType specInClass,
-            LocationVariable selfVar, TermBuilder tb) {
+    protected SLResolverManager(SLExceptionFactory excManager, @Nullable KeYJavaType specInClass,
+            @Nullable LocationVariable selfVar, TermBuilder tb) {
         // assert excManager != null;
         this.excManager = excManager;
         this.specInClass = specInClass;
@@ -81,7 +85,7 @@ public abstract class SLResolverManager {
     /**
      * Tries to resolve a name as a local variable.
      */
-    private SLExpression resolveLocal(String name) {
+    private @Nullable SLExpression resolveLocal(String name) {
         Name n = new Name(name);
         for (Namespace<LogicVariable> ns : logicVariablesNamespaces) {
             var logicVar = ns.lookup(n);
@@ -105,7 +109,7 @@ public abstract class SLResolverManager {
     /**
      * Tries to resolve a name as a property call on any available implicit receiver.
      */
-    private SLExpression resolveImplicit(String name, SLParameters parameters)
+    private @Nullable SLExpression resolveImplicit(String name, @Nullable SLParameters parameters)
             throws SLTranslationException {
         if (selfVar != null) {
             SLExpression receiver = new SLExpression(tb.var(selfVar), specInClass);
@@ -130,7 +134,8 @@ public abstract class SLResolverManager {
      * Tries to resolve a name as a property call on an explicitly given receiver, by calling the
      * registered resolvers.
      */
-    private SLExpression resolveExplicit(SLExpression receiver, String name, SLParameters params)
+    private @Nullable SLExpression resolveExplicit(SLExpression receiver, String name,
+            @Nullable SLParameters params)
             throws SLTranslationException {
         for (SLExpressionResolver resolver : resolvers) {
             SLExpression result = resolver.resolve(receiver, name, params);
@@ -146,8 +151,8 @@ public abstract class SLResolverManager {
     /**
      * Helper for resolve().
      */
-    private SLExpression resolveIt(SLExpression receiver, String name, SLParameters parameters)
-            throws SLTranslationException {
+    private @Nullable SLExpression resolveIt(@Nullable SLExpression receiver, String name,
+            @Nullable SLParameters parameters) throws SLTranslationException {
         SLExpression result;
 
         if (receiver != null) {
@@ -178,8 +183,8 @@ public abstract class SLResolverManager {
      * @param parameters actual parameters of the property call, or null
      * @return corresponding term, type or collection if successful, null otherwise
      */
-    public SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)
-            throws SLTranslationException {
+    public @Nullable SLExpression resolve(@Nullable SLExpression receiver, String name,
+            @Nullable SLParameters parameters) throws SLTranslationException {
         String shortName = name;
 
         if (isFullyQualified(name)) {
@@ -262,7 +267,7 @@ public abstract class SLResolverManager {
      * Returns a specification-language based visibility level for the passed member that should
      * take precedence over Java's ordinary visibility, or null.
      */
-    public Modifier getSpecVisibility(MemberDeclaration md) {
+    public @Nullable Modifier getSpecVisibility(MemberDeclaration md) {
         return null;
     }
 }

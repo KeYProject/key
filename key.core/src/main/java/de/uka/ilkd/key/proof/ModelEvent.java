@@ -6,7 +6,10 @@ package de.uka.ilkd.key.proof;
 
 import java.util.EventObject;
 
+import org.jspecify.annotations.NullMarked;
+
 /** this class represents a Model event */
+@NullMarked
 public class ModelEvent extends EventObject {
 
     /**

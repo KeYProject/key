@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.statement;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -14,9 +16,13 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Labeled statement.
  */
+@NullMarked
 public class LabeledStatement extends JavaStatement
         implements StatementContainer, NamedProgramElement, ProgramPrefix {
 
@@ -34,20 +40,26 @@ public class LabeledStatement extends JavaStatement
     private final PosInProgram firstActiveChildPos;
 
     private final int prefixLength;
-    private final MethodFrame innerMostMethodFrame;
+    private final @Nullable MethodFrame innerMostMethodFrame;
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param children
      *        the children of this AST element as KeY classes. May contain: a Label (as
      *        name of the label) a Statement (as body of the labeled statement) Comments
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public LabeledStatement(ExtList children, Label label, PositionInfo pos) {
         super(children, pos);
         name = label;
 
-        body = children.get(Statement.class);
+        body = Objects.requireNonNull(children.get(Statement.class),
+            "labeled statement needs a body statement");
         firstActiveChildPos = body instanceof StatementBlock
                 ? ((StatementBlock) body).isEmpty() ? PosInProgram.TOP : PosInProgram.ONE_ZERO
                 : PosInProgram.ONE;
@@ -63,10 +75,15 @@ public class LabeledStatement extends JavaStatement
 
     /**
      * Labeled statement.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param name
      *        an identifier.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public LabeledStatement(Label name) {
         this.name = name;
         body = new EmptyStatement();
@@ -80,12 +97,17 @@ public class LabeledStatement extends JavaStatement
 
     /**
      * Labeled statement.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param id
      *        a Label.
      * @param statement
      *        a statement.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public LabeledStatement(Label id, Statement statement, PositionInfo pos) {
         super(pos);
         this.name = id;
@@ -168,7 +190,12 @@ public class LabeledStatement extends JavaStatement
      *
      * @return the string.
      */
-    public final String getName() {
+    // The label is always present (all constructors require a non-null Label), so the
+    // @Nullable return is defensive; the override cannot be widened to @NullMarked's @NonNull
+    // without rippling into NamedModelElement.getName(), whose contract cannot be widened
+    // without ripple (see TypeDeclaration.getName()).
+    @SuppressWarnings("NullAway")
+    public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
 
@@ -187,7 +214,12 @@ public class LabeledStatement extends JavaStatement
      *
      * @return the identifier.
      */
-    public ProgramElementName getProgramElementName() {
+    // The label of a labeled statement is always a ProgramElementName (all constructors
+    // require a non-null Label); the final null return is defensive for schema-variable
+    // labels. The override cannot be widened to the @NonNull contract of
+    // NamedProgramElement.getProgramElementName(), which cannot be widened without ripple.
+    @SuppressWarnings("NullAway")
+    public @Nullable ProgramElementName getProgramElementName() {
         if ((name instanceof ProgramElementName) || (name == null)) {
             return (ProgramElementName) name;
         }
@@ -291,7 +323,7 @@ public class LabeledStatement extends JavaStatement
     }
 
     @Override
-    public MethodFrame getInnerMostMethodFrame() {
+    public @Nullable MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;
     }
 

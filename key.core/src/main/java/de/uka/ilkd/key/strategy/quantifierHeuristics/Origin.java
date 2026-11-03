@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  * Why an instance is offered for a quantified formula.
  *
@@ -13,6 +16,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
  * origin that reads the instance off a term the formula itself names ranks before one that does
  * not.
  */
+@NullMarked
 enum Origin {
 
     /** A term of the formula matched a sequent term structurally. */

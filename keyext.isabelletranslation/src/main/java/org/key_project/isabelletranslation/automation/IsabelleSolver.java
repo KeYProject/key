@@ -8,10 +8,14 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.Callable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An Isabelle solver. May use different methods to arrive at the result.
  * Implements callable. Thread management must be handled by callers.
  */
+@NullMarked
 public interface IsabelleSolver extends Callable<IsabelleResult> {
     /**
      * UI component index
@@ -46,6 +50,7 @@ public interface IsabelleSolver extends Callable<IsabelleResult> {
      *
      * @return exception encountered during proof search, if any was encountered.
      */
+    @Nullable
     Throwable getException();
 
     /**
@@ -58,6 +63,7 @@ public interface IsabelleSolver extends Callable<IsabelleResult> {
      *
      * @return Time solver started computing (after preparation)
      */
+    @Nullable
     Instant getStartTime();
 
     /**
@@ -65,6 +71,7 @@ public interface IsabelleSolver extends Callable<IsabelleResult> {
      *
      * @return computation time before solver stopped
      */
+    @Nullable
     Duration getComputationTime();
 
     /**
@@ -100,6 +107,7 @@ public interface IsabelleSolver extends Callable<IsabelleResult> {
      *
      * @return raw input of solver
      */
+    @Nullable
     String getRawSolverInput();
 
     /**
@@ -107,5 +115,6 @@ public interface IsabelleSolver extends Callable<IsabelleResult> {
      *
      * @return final result of solver
      */
+    @Nullable
     IsabelleResult getFinalResult();
 }

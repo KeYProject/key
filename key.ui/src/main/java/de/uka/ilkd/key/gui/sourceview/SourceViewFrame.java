@@ -14,12 +14,16 @@ import javax.swing.JTabbedPane;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.utilities.ClosableTabComponent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This frame contains the {@link SourceView}. Other components may be added in a
  * {@link JTabbedPane} below the {@link SourceView} via {@link #addComponent(JComponent)}
  *
  * @author lanzinger
  */
+@NullMarked
 public class SourceViewFrame extends JSplitPane {
     /** The source view contained in this frame. */
     private final SourceView sourceView;
@@ -37,7 +41,13 @@ public class SourceViewFrame extends JSplitPane {
      * Creates a new {@code SourceViewFrame}
      *
      * @param mainWindow the main window.
+     *
+     *        <p>
+     *        The ctor configures the split pane while the receiver is still under initialization
+     *        (EISOP initialization check); all configuration is finished before the frame is
+     *        shown, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SourceViewFrame(MainWindow mainWindow) {
         super(VERTICAL_SPLIT);
 
@@ -110,12 +120,15 @@ public class SourceViewFrame extends JSplitPane {
      * @param toolTipText the tool tip text for the new tab.
      * @param closeAction the action to perform when the tab is closed.
      */
-    public void addComponent(JComponent component, String toolTipText, Action closeAction) {
+    public void addComponent(JComponent component, @Nullable String toolTipText,
+            Action closeAction) {
         tabbedPane.add(component);
         tabbedPane.setTabComponentAt(tabbedPane.indexOfComponent(component),
             new ClosableTabComponent(component.getName(), closeAction));
 
-        tabbedPane.setToolTipTextAt(tabbedPane.indexOfComponent(component), toolTipText);
+        if (toolTipText != null) {
+            tabbedPane.setToolTipTextAt(tabbedPane.indexOfComponent(component), toolTipText);
+        }
 
         if (!tabbedPaneShown) {
             showTabbedPane();

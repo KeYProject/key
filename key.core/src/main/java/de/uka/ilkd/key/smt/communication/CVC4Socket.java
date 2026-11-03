@@ -10,10 +10,13 @@ import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class CVC4Socket extends AbstractSolverSocket {
 
-    public CVC4Socket(String name, ModelExtractor query) {
+    public CVC4Socket(String name, @Nullable ModelExtractor query) {
         super(name, query);
     }
 

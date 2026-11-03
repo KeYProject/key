@@ -19,6 +19,8 @@ import de.uka.ilkd.key.gui.lemmatagenerator.ItemChooser.ItemFilter;
 import de.uka.ilkd.key.gui.lemmatagenerator.SelectionPanel.Side;
 import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The panel ItemChooser offers the user the possibility to select certain items a list. It consists
@@ -29,17 +31,16 @@ import de.uka.ilkd.key.taclettranslation.lemma.TacletSoundnessPOLoader.TacletInf
  * information in which of both tables it should be shown.
  */
 
-
-
+@NullMarked
 class ItemChooser<T> extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    private SelectionPanel<T> suppliedList;
-    private SelectionPanel<T> selectedList;
-    private JPanel middlePanel;
-    private JPanel contentPanel;
-    private JButton leftButton;
-    private JButton rightButton;
+    private @Nullable SelectionPanel<T> suppliedList;
+    private @Nullable SelectionPanel<T> selectedList;
+    private @Nullable JPanel middlePanel;
+    private @Nullable JPanel contentPanel;
+    private @Nullable JButton leftButton;
+    private @Nullable JButton rightButton;
     private List<TableItem<T>> items = new LinkedList<>();
     private final List<ItemFilter<T>> filtersForMovingItems =
         new LinkedList<>();
@@ -47,15 +48,19 @@ class ItemChooser<T> extends JPanel {
     // this data structure is shared with suppliedList and selectedList.
     private final List<ItemFilter<T>> userFilter = new LinkedList<>();
 
-
     public interface ItemFilter<T> {
         boolean include(T itemData);
     }
 
-
-
     static private final Dimension MAX = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
 
+    /**
+     * The panel configures its layout, size and content panel while the receiver is still under
+     * initialization (EISOP initialization check) and passes itself to {@link BoxLayout}; the
+     * effects only take place after construction completes, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     ItemChooser(String searchTitle) {
         this.searchTitle = searchTitle;
         this.setMaximumSize(MAX);
@@ -84,19 +89,17 @@ class ItemChooser<T> extends JPanel {
         return contentPanel;
     }
 
-
-
     private JPanel getMiddlePanel() {
         if (middlePanel == null) {
-            middlePanel = new JPanel();
-            middlePanel.setLayout(new BoxLayout(middlePanel, BoxLayout.Y_AXIS));
-            middlePanel.add(getLeftButton());
-            middlePanel.add(Box.createVerticalStrut(10));
-            middlePanel.add(getRightButton());
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.add(getLeftButton());
+            panel.add(Box.createVerticalStrut(10));
+            panel.add(getRightButton());
             Dimension dim = getLeftButton().getPreferredSize();
             dim.height = dim.height + 10 + getRightButton().getPreferredSize().height;
-            middlePanel.setMaximumSize(dim);
-
+            panel.setMaximumSize(dim);
+            middlePanel = panel;
         }
         return middlePanel;
     }
@@ -119,8 +122,6 @@ class ItemChooser<T> extends JPanel {
 
     }
 
-
-
     private void cut(SelectionPanel<T> srcList, SelectionPanel<T> destList) {
         List<TableItem<T>> tableItems = srcList.getSelectedItems();
         for (TableItem<T> item : tableItems) {
@@ -138,10 +139,7 @@ class ItemChooser<T> extends JPanel {
         srcList.update();
         destList.update();
 
-
     }
-
-
 
     private SelectionPanel<T> getSuppliedList() {
         if (suppliedList == null) {
@@ -157,7 +155,6 @@ class ItemChooser<T> extends JPanel {
         return selectedList;
     }
 
-
     public void setItems(List<T> dataForItems, String columnName) {
 
         items = new LinkedList<>();
@@ -171,15 +168,11 @@ class ItemChooser<T> extends JPanel {
             model.addRow(new Object[] { item });
         }
 
-
-
         getSuppliedList().setModel(model);
         getSelectedList().setModel(model);
         getSuppliedList().selectAll();
 
     }
-
-
 
     public List<T> getDataOfSelectedItems() {
 
@@ -229,7 +222,6 @@ class ItemChooser<T> extends JPanel {
         filtersForMovingItems.remove(filter);
     }
 
-
     public void update() {
         getSelectedList().update();
         getSuppliedList().update();
@@ -237,25 +229,23 @@ class ItemChooser<T> extends JPanel {
 }
 
 
+@NullMarked
 class SelectionPanel<T> extends JPanel {
     enum Side {
         LEFT, RIGHT
     }
 
     private static final long serialVersionUID = 1L;
-    private JTextField textField;
-    private JTable list;
-    private JScrollPane scrollPane;
+    private @Nullable JTextField textField;
+    private @Nullable JTable list;
+    private @Nullable JScrollPane scrollPane;
     private final Side side;
     private RowFilter<ItemModel, Integer> filter;
 
     private String findPattern = "";
     private final List<ItemFilter<T>> userFilters;
 
-
-
     static private final Dimension MAX = new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE);
-
 
     private JScrollPane getScrollPane() {
         if (scrollPane == null) {
@@ -268,11 +258,19 @@ class SelectionPanel<T> extends JPanel {
         return scrollPane;
     }
 
+    /**
+     * The panel creates its filter, layout, scroll pane, search field and borders while the
+     * receiver is still under initialization (EISOP initialization check) and passes itself to
+     * {@link BoxLayout}; the effects only take place after construction completes, suppressed
+     * with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public SelectionPanel(String title, String searchTitle, Side side,
             List<ItemFilter<T>> filters) {
         this.side = side;
         this.userFilters = filters;
-        createFilter();
+        this.filter = createFilter();
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(getScrollPane());
         this.add(Box.createVerticalStrut(5));
@@ -285,13 +283,12 @@ class SelectionPanel<T> extends JPanel {
         this.add(box);
         this.setBorder(BorderFactory.createTitledBorder(title));
 
-
     }
 
     private JTextField getTextField() {
         if (textField == null) {
-            textField = new JTextField();
-            textField.getDocument().addDocumentListener(new DocumentListener() {
+            JTextField field = new JTextField();
+            field.getDocument().addDocumentListener(new DocumentListener() {
 
                 @Override
                 public void removeUpdate(DocumentEvent e) {
@@ -304,11 +301,10 @@ class SelectionPanel<T> extends JPanel {
                 @Override
                 public void changedUpdate(DocumentEvent arg0) {}
             });
+            textField = field;
         }
         return textField;
     }
-
-
 
     void addItems(List<TacletInfo> infoList) {
         for (TacletInfo info : infoList) {
@@ -321,9 +317,13 @@ class SelectionPanel<T> extends JPanel {
     }
 
     private void search() {
-        findPattern = textField.getText().toLowerCase();
+        JTextField field = textField;
+        if (field == null) {
+            // the search field is always created before any document events occur
+            throw new NullPointerException("No search field available.");
+        }
+        findPattern = field.getText().toLowerCase();
         update();
-
 
     }
 
@@ -333,18 +333,18 @@ class SelectionPanel<T> extends JPanel {
             ItemModel model = new ItemModel("");
             setModel(model);
 
-
-
         }
-
-
-        return list;
+        JTable current = list;
+        if (current == null) {
+            // the table is created above and never cleared
+            throw new NullPointerException("No table available.");
+        }
+        return current;
     }
 
     DefaultTableModel getModel() {
         return (DefaultTableModel) getList().getModel();
     }
-
 
     List<T> getSelectedValues() {
 
@@ -372,9 +372,8 @@ class SelectionPanel<T> extends JPanel {
         getList().getSelectionModel().setSelectionInterval(anchor, lead);
     }
 
-
-    void createFilter() {
-        filter = new RowFilter<>() {
+    private RowFilter<ItemModel, Integer> createFilter() {
+        return new RowFilter<>() {
 
             @Override
             public boolean include(
@@ -402,16 +401,13 @@ class SelectionPanel<T> extends JPanel {
 
     }
 
-
     void setModel(ItemModel model) {
-
 
         getList().setSelectionModel(new DefaultListSelectionModel());
         TableRowSorter<ItemModel> sorter = new TableRowSorter<>(model);
         getList().setModel(model);
         sorter.setMaxSortKeys(1);
         sorter.setSortsOnUpdates(true);
-
 
         sorter.setRowFilter(filter);
         sorter.setComparator(0, Comparator
@@ -426,7 +422,6 @@ class SelectionPanel<T> extends JPanel {
         getList().clearSelection();
     }
 
-
     public Side getSide() {
         return side;
     }
@@ -436,16 +431,21 @@ class SelectionPanel<T> extends JPanel {
         ((TableRowSorter<ItemModel>) getList().getRowSorter()).setRowFilter(filter);
     }
 
-
-
 }
 
 // SOME DATA STRUCTURES FOR THE ITEM CHOOSER.
 
 
+@NullMarked
 class ItemModel extends DefaultTableModel {
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The model adds its column while the receiver is still under initialization (EISOP
+     * initialization check); the effect only takes place after construction completes,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     ItemModel(String columnName) {
         this.addColumn(columnName);
 
@@ -458,7 +458,7 @@ class ItemModel extends DefaultTableModel {
 }
 
 
-
+@NullMarked
 class TableItem<T> {
 
     private final T data;

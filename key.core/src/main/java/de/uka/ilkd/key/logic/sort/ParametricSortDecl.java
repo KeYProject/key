@@ -15,12 +15,13 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// Abstract declaration of a parametric sort, e.g., `List<E>`.
 ///
 /// Get instantiated versions using [ParametricSortInstance#get(ParametricSortDecl, ImmutableList,
 /// Services)].
+@NullMarked
 public class ParametricSortDecl implements Named, HasMetaSpaceKey {
     private final Name name;
     private final boolean isAbstract;
@@ -42,7 +43,7 @@ public class ParametricSortDecl implements Named, HasMetaSpaceKey {
     }
 
     @Override
-    public @NonNull Name name() {
+    public Name name() {
         return name;
     }
 

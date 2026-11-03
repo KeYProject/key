@@ -21,24 +21,39 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class completes the instantiation for a dependency contract applications. The user is
  * queried for the heap with which to instantiate the app.
  */
+@NullMarked
 public class DependencyContractCompletion implements InteractiveRuleApplicationCompletion {
 
     @Override
-    public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
+    public @Nullable IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         UseDependencyContractApp cApp = (UseDependencyContractApp) app;
 
         Services services = goal.proof().getServices();
 
         cApp = cApp.tryToInstantiateContract(services);
 
-        final List<PosInOccurrence> steps = UseDependencyContractRule
-                .getSteps(cApp.getHeapContext(), cApp.posInOccurrence(), goal.sequent(), services);
+        List<LocationVariable> heapContext = cApp.getHeapContext();
+        if (heapContext == null) {
+            // the rule always resolves a heap context for instantiated contract apps
+            throw new NullPointerException("No heap context available.");
+        }
+        PosInOccurrence posInOccurrence = cApp.posInOccurrence();
+        if (posInOccurrence == null) {
+            // an operation-contract rule app always carries a position
+            throw new NullPointerException("No position in occurrence available.");
+        }
+
+        final List<PosInOccurrence> steps = UseDependencyContractRule.getSteps(heapContext,
+            posInOccurrence, goal.sequent(), services);
         PosInOccurrence step =
-            letUserChooseStep(cApp.getHeapContext(), steps, forced, services);
+            letUserChooseStep(heapContext, steps, forced, services);
         if (step == null) {
             return null;
         }
@@ -54,7 +69,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
      * @param services
      * @return
      */
-    private static PosInOccurrence letUserChooseStep(
+    private static @Nullable PosInOccurrence letUserChooseStep(
             List<LocationVariable> heapContext,
             List<PosInOccurrence> steps, boolean forced,
             Services services) {
@@ -90,7 +105,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
         return findCorrespondingStep(steps, resultHeaps);
     }
 
-    public static PosInOccurrence findCorrespondingStep(
+    public static @Nullable PosInOccurrence findCorrespondingStep(
             List<PosInOccurrence> steps,
             JTerm[] resultHeaps) {
         // find corresponding step

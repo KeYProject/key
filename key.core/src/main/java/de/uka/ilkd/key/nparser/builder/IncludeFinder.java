@@ -16,12 +16,20 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
- * This visitor finds all includes in the given ASTs.
+ * This visitor finds all includes in the given ASTs. It uses {@link Void} as visitor result type,
+ * which is treated as {@code @Nullable} under null-marking and therefore cannot satisfy the
+ * {@code @NonNull} bound of {@link AbstractBuilder}'s type parameter; the difference is suppressed
+ * with a scoped key.
  *
  * @author weigl
  * @see #getIncludes()
  */
+@NullMarked
+@SuppressWarnings("nullness:type.argument.type.incompatible")
 public class IncludeFinder extends AbstractBuilder<Void> {
     private final Path base;
     private final Includes includes = new Includes();
@@ -32,14 +40,15 @@ public class IncludeFinder extends AbstractBuilder<Void> {
     }
 
     @Override
-    public Void visitOne_include_statement(JavaKeYParser.One_include_statementContext ctx) {
+    public @Nullable Void visitOne_include_statement(
+            JavaKeYParser.One_include_statementContext ctx) {
         ldt = ctx.INCLUDELDTS() != null;
         mapOf(ctx.one_include());
         return null;
     }
 
     @Override
-    public Void visitOne_include(JavaKeYParser.One_includeContext ctx) {
+    public @Nullable Void visitOne_include(JavaKeYParser.One_includeContext ctx) {
         String value = StringUtil.trim(ctx.getText(), "\"'");
         try {
             addInclude(value);

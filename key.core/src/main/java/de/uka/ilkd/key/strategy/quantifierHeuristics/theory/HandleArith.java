@@ -18,6 +18,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
@@ -26,6 +28,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * knowing that {@code c>=d} or {@code c<=d;}
  *
  */
+@NullMarked
 class HandleArith {
 
     private HandleArith() {}

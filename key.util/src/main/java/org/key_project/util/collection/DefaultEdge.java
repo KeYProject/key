@@ -4,22 +4,24 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.collection;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Directed graph edge for use in {@link DirectedGraph} that simply stores the source and target
  * graph nodes.
  *
  * @author Arne Keller
  */
-@SuppressWarnings("nullness")
+@SuppressWarnings({ "nullness", "NullAway" })
 public class DefaultEdge implements GraphEdge {
     /**
      * Source node of this edge.
      */
-    private Object source;
+    private @Nullable Object source;
     /**
      * Target node of this edge.
      */
-    private Object target;
+    private @Nullable Object target;
 
     @Override
     public Object getSource() {

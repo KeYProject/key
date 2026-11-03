@@ -8,20 +8,25 @@ import javax.swing.JFrame;
 
 import de.uka.ilkd.key.gui.notification.actions.ProofClosedJTextPaneDisplay;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The proof closed notification notifies the user about a successful attempt closing a proof.
  *
  * @author bubel
  */
+@NullMarked
 public class ProofClosedNotification extends NotificationTask {
-
 
     /**
      * Creates a proof closed notification task.
+     *
+     * <p>
+     * The task registers its notification action while the receiver is still under initialization
+     * (EISOP initialization check); the action only fires once the task is executed after
+     * construction, suppressed with a scoped key.
      */
-    public ProofClosedNotification() {
-    }
-
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ProofClosedNotification(JFrame comp) {
         addNotificationAction(new ProofClosedJTextPaneDisplay(comp));
     }

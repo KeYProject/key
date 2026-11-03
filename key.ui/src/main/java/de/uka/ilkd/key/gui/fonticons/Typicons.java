@@ -6,6 +6,10 @@ package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /*
  * Copyright (c) 2016 jIconFont <BR> <BR> Permission is hereby granted, free of charge, to any
@@ -21,6 +25,7 @@ import java.io.IOException;
  * TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+@NullMarked
 public enum Typicons implements IconFont {
 
     ADJUST_BRIGHTNESS('\uE000'), ADJUST_CONTRAST('\uE001'), ANCHOR('\uE003'),
@@ -120,7 +125,7 @@ public enum Typicons implements IconFont {
     ZOOM_IN('\uE14B'), ZOOM_IN_OUTLINE('\uE14A'), ZOOM_OUT('\uE14D'), ZOOM_OUTLINE('\uE14E'),
     ZOOM_OUT_OUTLINE('\uE14C');
 
-    private static Font font;
+    private static @Nullable Font font;
     private final char character;
 
     Typicons(char character) {
@@ -130,8 +135,12 @@ public enum Typicons implements IconFont {
     @Override
     public Font getFont() throws IOException, FontFormatException {
         if (font == null) {
-            font = Font.createFont(Font.TRUETYPE_FONT,
-                getClass().getResourceAsStream("/fonts/typicons.ttf"));
+            InputStream stream = getClass().getResourceAsStream("/fonts/typicons.ttf");
+            if (stream == null) {
+                // the font is bundled with the application
+                throw new NullPointerException("Missing font resource /fonts/typicons.ttf");
+            }
+            font = Font.createFont(Font.TRUETYPE_FONT, stream);
         }
         return font;
 

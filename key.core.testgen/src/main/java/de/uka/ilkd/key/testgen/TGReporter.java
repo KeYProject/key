@@ -7,6 +7,8 @@ package de.uka.ilkd.key.testgen;
 import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
 import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Reporter for test case generation.
  *
@@ -14,7 +16,12 @@ import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
  * @version 1 (24.05.24)
  */
 public record TGReporter(TestGenerationLifecycleListener log) {
-    public void writeln(String message) {
+    /**
+     * Writes a message to the underlying log; a {@code null} message is accepted and handled by
+     * the listener ({@link TestGenerationLifecycleListener#writeln(Object, String)}), which
+     * ignores it.
+     */
+    public void writeln(@Nullable String message) {
         log.writeln(this, message);
     }
 

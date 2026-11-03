@@ -30,7 +30,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * <p>
@@ -50,6 +52,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author lanzinger
  */
+@NullMarked
 public class LoopContractInternalRule extends AbstractLoopContractRule {
 
     /**
@@ -236,7 +239,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public JTerm getLastFocusTerm() {
+    public @Nullable JTerm getLastFocusTerm() {
         return lastFocusTerm.get();
     }
 
@@ -246,7 +249,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public Instantiation getLastInstantiation() {
+    public @Nullable Instantiation getLastInstantiation() {
         return lastInstantiation.get();
     }
 
@@ -256,7 +259,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    protected void setLastInstantiation(Instantiation lastInstantiation) {
+    protected void setLastInstantiation(@Nullable Instantiation lastInstantiation) {
         this.lastInstantiation.set(lastInstantiation);
     }
 
@@ -267,7 +270,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(final Goal goal,
+    public ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractInternalBuiltInRuleApp;
         LoopContractInternalBuiltInRuleApp application =

@@ -18,6 +18,9 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Proof-of-concept implementation of a textual sequent comparison.
  * <p>
@@ -29,6 +32,7 @@ import de.uka.ilkd.key.proof.Proof;
  * @author mattias ulbrich
  */
 
+@NullMarked
 public class ProofDiffFrame extends JFrame {
     /**
      * The action to show a new frame of this class. Is used in {@link MainWindow}.
@@ -36,6 +40,15 @@ public class ProofDiffFrame extends JFrame {
     public static class Action extends MainWindowAction {
         private final MainWindow mainWindow;
 
+        /**
+         * Creates the visual node-diff action.
+         *
+         * <p>
+         * The action fills its value table while the receiver is still under initialization
+         * (EISOP initialization check); the values only materialize once the action is displayed
+         * after construction, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public Action(MainWindow mainWindow) {
             super(mainWindow);
             this.mainWindow = mainWindow;
@@ -76,8 +89,14 @@ public class ProofDiffFrame extends JFrame {
     /**
      * Instantiates a new proof-diff frame.
      *
-     * @param mainWindow the main window of the system
+     * <p>
+     * The UI fields are initialized by {@link #guiInit()} while the receiver is still under
+     * initialization (EISOP initialization check); the EISOP initialization check cannot see the
+     * assignments inside the delegated call, so both the fields and the delegated call are
+     * suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public ProofDiffFrame(MainWindow mainWindow) {
         super("Visual difference between two sequents");
         this.mainWindow = mainWindow;
@@ -248,7 +267,11 @@ public class ProofDiffFrame extends JFrame {
             throw new IllegalArgumentException("There is no open proof!");
         }
 
-        Node node = findNode(proof.root(), no);
+        Node root = proof.root();
+        if (root == null) {
+            throw new IllegalArgumentException("The proof has no root node");
+        }
+        Node node = findNode(root, no);
         if (node == null) {
             throw new IllegalArgumentException(no + " is not a node in the proof");
         }
@@ -291,7 +314,11 @@ public class ProofDiffFrame extends JFrame {
             throw new IllegalArgumentException("There is no open proof!");
         }
 
-        Node node = findNode(proof.root(), nodeNumber);
+        Node root = proof.root();
+        if (root == null) {
+            throw new IllegalArgumentException("The proof has no root node");
+        }
+        Node node = findNode(root, nodeNumber);
 
         if (node == null) {
             throw new IllegalArgumentException(nodeNumber + " does not denote a valid node");
@@ -300,10 +327,8 @@ public class ProofDiffFrame extends JFrame {
         return LogicPrinter.quickPrintSequent(node.sequent(), proof.getServices());
     }
 
-
-
     // This must have been implemented already, somewhere
-    private Node findNode(Node node, int number) {
+    private @Nullable Node findNode(Node node, int number) {
         if (node.serialNr() == number) {
             return node;
         }
@@ -348,7 +373,14 @@ public class ProofDiffFrame extends JFrame {
             + "component as displayed proof node.";
     }
 
-    // Use this to test the layout of this class.
+    /**
+     * Use this to test the layout of this class.
+     *
+     * <p>
+     * The test frame is opened without a main window; the deliberate {@code null} for the
+     * non-null constructor parameter is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static void main(String[] args) {
         ProofDiffFrame pdf = new ProofDiffFrame(null);
         pdf.setDefaultCloseOperation(EXIT_ON_CLOSE);

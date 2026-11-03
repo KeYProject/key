@@ -11,19 +11,23 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Expression jump statement.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public abstract class ExpressionJumpStatement extends JumpStatement implements ExpressionContainer {
 
     /**
      * Expression.
      */
 
-    protected final Expression expression;
+    protected final @Nullable Expression expression;
 
     /**
      * Expression jump statement. May contain: an Expression (as expression of the
@@ -45,13 +49,14 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      * Expression jump statement.
      *
      * @param expr
-     *        an Expression used to jump
+     *        an Expression used to jump, or {@code null} for a bare jump (e.g. {@code return;})
      */
-    protected ExpressionJumpStatement(Expression expr) {
+    protected ExpressionJumpStatement(@Nullable Expression expr) {
         expression = expr;
     }
 
-    public ExpressionJumpStatement(Expression expression, PositionInfo pi, List<Comment> comments) {
+    public ExpressionJumpStatement(@Nullable Expression expression, PositionInfo pi,
+            List<Comment> comments) {
         super(pi, comments);
         this.expression = expression;
     }
@@ -86,7 +91,7 @@ public abstract class ExpressionJumpStatement extends JumpStatement implements E
      *
      * @return the expression.
      */
-    public Expression getExpression() {
+    public @Nullable Expression getExpression() {
         return expression;
     }
 

@@ -9,6 +9,8 @@ import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.logic.Named;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An element of an abstract domain. Elements are described by defining axioms; the main function of
  * this class is to create such defining axioms for given terms, usually Skolem constants or program
@@ -16,6 +18,7 @@ import org.key_project.logic.Named;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class AbstractDomainElement implements Named {
 
     /**

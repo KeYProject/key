@@ -28,6 +28,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.MapUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Default implementation of {@link BlockContract}.
  *
@@ -35,13 +38,14 @@ import org.key_project.util.java.MapUtil;
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         implements BlockContract {
 
     /**
      * @see #toLoopContract()
      */
-    private LoopContract loopContract = null;
+    private @Nullable LoopContract loopContract = null;
 
     /**
      * @param baseName the base name.
@@ -66,7 +70,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final List<Label> labels, final IProgramMethod method,
             final JModality.JavaModalityKind modalityKind,
             final Map<LocationVariable, JTerm> preconditions,
-            final Map<LocationVariable, JTerm> freePreconditions, final JTerm measuredBy,
+            final Map<LocationVariable, JTerm> freePreconditions, final @Nullable JTerm measuredBy,
             final Map<LocationVariable, JTerm> postconditions,
             final Map<LocationVariable, JTerm> freePostconditions,
             final Map<LocationVariable, JTerm> modifiableClauses,
@@ -98,7 +102,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
      * @param loopContract the loop contract from which this block contract was created.
      * @see #toLoopContract()
      */
-    void setLoopContract(LoopContract loopContract) {
+    void setLoopContract(@Nullable LoopContract loopContract) {
         if (this.loopContract != null) {
             throw new IllegalStateException();
         }
@@ -107,7 +111,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
     }
 
     @Override
-    public LoopContract toLoopContract() {
+    public @Nullable LoopContract toLoopContract() {
         return loopContract;
     }
 
@@ -179,7 +183,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, JTerm> newModifiableClauses,
             final Map<LocationVariable, JTerm> newFreeModifiableClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
-            JTerm newMeasuredBy) {
+            @Nullable JTerm newMeasuredBy) {
         BlockContractImpl result = new BlockContractImpl(baseName, newBlock, labels, method,
             modalityKind, newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
             newFreePostconditions, newModifiableClauses, newFreeModifiableClauses, newinfFlowSpecs,

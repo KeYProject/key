@@ -7,6 +7,8 @@ package org.key_project.slicing;
 import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.control.ProofControl;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
@@ -27,7 +29,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * fast-click crash (a tracking failure used to escape into the proof search).
  */
 public class ProofListenerIsolationTest {
-    private static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
+    private static final Path testCaseDirectory = requireTestCasesDirectory();
+
+    private static Path requireTestCasesDirectory() {
+        Path directory = FindResources.getTestCasesDirectory();
+        if (directory == null) {
+            throw new NullPointerException("Test case directory not found.");
+        }
+        return directory;
+    }
 
     @Test
     void aThrowingRuleAppListenerDoesNotBreakTheProofAndIsUnregistered() throws Exception {
@@ -37,6 +47,9 @@ public class ProofListenerIsolationTest {
         var env = KeYEnvironment.load(file);
         try {
             var proof = env.getLoadedProof();
+            if (proof == null) {
+                throw new NullPointerException("No proof loaded.");
+            }
 
             // A rogue listener that always throws when a rule is applied.
             int[] callCount = { 0 };
@@ -47,9 +60,17 @@ public class ProofListenerIsolationTest {
             proof.addRuleAppListener(rogue);
 
             // Re-run auto mode so rules are applied and the listener fires.
-            proof.pruneProof(proof.findAny(x -> x.serialNr() == 13));
-            env.getProofControl().startAutoMode(proof, proof.openEnabledGoals());
-            env.getProofControl().waitWhileAutoMode();
+            Node cuttingPoint = proof.findAny(x -> x.serialNr() == 13);
+            if (cuttingPoint == null) {
+                throw new NullPointerException("Node with serial number 13 not found.");
+            }
+            proof.pruneProof(cuttingPoint);
+            ProofControl proofControl = env.getProofControl();
+            if (proofControl == null) {
+                throw new NullPointerException("No proof control available.");
+            }
+            proofControl.startAutoMode(proof, proof.openEnabledGoals());
+            proofControl.waitWhileAutoMode();
 
             // The rogue listener did not stop the proof search ...
             assertTrue(proof.closed(), "a throwing listener must not stop the proof from closing");

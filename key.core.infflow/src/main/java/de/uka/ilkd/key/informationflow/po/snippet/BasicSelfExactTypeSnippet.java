@@ -12,11 +12,14 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Generate term "MyClass::exactInstance(self) = TRUE".
  *
  * @author christoph
  */
+@NullMarked
 class BasicSelfExactTypeSnippet implements FactoryMethod {
 
     @Override
@@ -32,6 +35,10 @@ class BasicSelfExactTypeSnippet implements FactoryMethod {
         JTerm result = d.tb.tt();
         if (forClass != null) {
             final Sort contractSort = forClass.getSort();
+            if (contractSort == null) {
+                throw new NullPointerException(
+                    "No sort for the type " + forClass.getName() + ".");
+            }
             result = (poVars.pre.self == null || pm.isConstructor()) ? d.tb.tt()
                     : d.tb.exactInstance(contractSort, poVars.pre.self);
         } else if (d.get(BasicSnippetData.Key.LOOP_INVARIANT_TERM) != null) {

@@ -27,11 +27,13 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Instances of this class are immutable
  */
+@NullMarked
 public abstract class TacletAppContainer extends RuleAppContainer {
 
     // Implementation note (DB 21/02/2014):
@@ -94,7 +96,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     protected static TacletAppContainer createContainer(NoPosTacletApp p_app,
-            PosInOccurrence p_pio,
+            @Nullable PosInOccurrence p_pio,
             Goal p_goal, boolean p_initial) {
         // the cost is the regular strategy cost, so it may be reused
         return createContainer(p_app, p_pio, p_goal,
@@ -102,7 +104,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     private static TacletAppContainer createContainer(NoPosTacletApp p_app,
-            PosInOccurrence p_pio,
+            @Nullable PosInOccurrence p_pio,
             Goal p_goal, RuleAppCost p_ageFreeCost, boolean p_ageFreeCostIsRegular,
             boolean p_initial) {
         // This relies on the fact that the method <code>Goal.getTime()</code>
@@ -293,7 +295,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
     protected static ImmutableList<RuleAppContainer> createInitialAppContainers(
             ImmutableList<NoPosTacletApp> p_app,
-            PosInOccurrence p_pio, Goal p_goal) {
+            @Nullable PosInOccurrence p_pio, Goal p_goal) {
 
         List<RuleAppCost> costs = new LinkedList<>();
 
@@ -321,7 +323,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      *         of <code>TopRuleAppCost</code>.
      */
     static RuleAppContainer createAppContainers(NoPosTacletApp p_app,
-            PosInOccurrence p_pio,
+            @Nullable PosInOccurrence p_pio,
             Goal p_goal) {
         if (!(p_pio == null ? p_app.taclet() instanceof NoFindTaclet
                 : p_app.taclet() instanceof FindTaclet))
@@ -377,7 +379,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      */
     protected abstract boolean isStillApplicable(Goal p_goal);
 
-    protected PosInOccurrence getPosInOccurrence(Goal p_goal) {
+    protected @Nullable PosInOccurrence getPosInOccurrence(Goal p_goal) {
         return null;
     }
 
@@ -385,7 +387,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * Create a <code>RuleApp</code> that is suitable to be applied or <code>null</code>.
      */
     @Override
-    public TacletApp completeRuleApp(Goal p_goal) {
+    public @Nullable TacletApp completeRuleApp(Goal p_goal) {
         if (!(isStillApplicable(p_goal) && assumesFormulasStillValid(p_goal))) {
             return null;
         }

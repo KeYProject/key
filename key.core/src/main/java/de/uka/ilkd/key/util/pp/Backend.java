@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util.pp;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The backend for a {@link Layouter}. An object satisfying this interface can act as a receiver for
  * the layed out text produced by a {@link Layouter}. A <code>Backend</code> must also provide the
@@ -17,6 +19,7 @@ package de.uka.ilkd.key.util.pp;
  *
  */
 
+@NullMarked
 public interface Backend<M> {
     /**
      * Append a String <code>s</code> to the output. <code>s</code> contains no newlines.

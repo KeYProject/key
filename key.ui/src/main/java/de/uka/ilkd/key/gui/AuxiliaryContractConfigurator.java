@@ -13,11 +13,15 @@ import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A window to contain a {@link AuxiliaryContractSelectionPanel}.
  *
  * @param <T>
  */
+@NullMarked
 public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends JDialog {
 
     private static final long serialVersionUID = 4882043118399402599L;
@@ -28,6 +32,13 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends 
 
     private boolean successful = false;
 
+    /**
+     * {@code init()} and its helpers assign all window fields before any of them is used; the
+     * invocations operate on {@code this} while it is still under initialization (EISOP
+     * initialization check), suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public AuxiliaryContractConfigurator(final String name,
             final AuxiliaryContractSelectionPanel<T> contractPanel, final JDialog owner,
             final Services services, final T[] contracts, final String title) {
@@ -35,6 +46,9 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends 
         init(services, contractPanel, contracts, title);
     }
 
+    /** See the {@code AuxiliaryContractConfigurator(String, ...)} constructor. */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public AuxiliaryContractConfigurator(final String name,
             final AuxiliaryContractSelectionPanel<T> contractPanel, final Frame owner,
             final Services services, final T[] contracts, final String title) {
@@ -115,8 +129,10 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends 
 
     /**
      * Returns the selected contract.
+     *
+     * @return the selected contract, or {@code null} if the user did not select one
      */
-    public T getContract() {
+    public @Nullable T getContract() {
         return contractPanel.getContract();
     }
 

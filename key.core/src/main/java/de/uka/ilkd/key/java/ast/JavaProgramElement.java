@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
@@ -13,7 +14,8 @@ import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +24,12 @@ import org.slf4j.LoggerFactory;
  * Top level implementation of a Java {@link ProgramElement}. taken from COMPOST and changed to
  * achieve an immutable structure
  */
+@NullMarked
 public abstract class JavaProgramElement extends JavaSourceElement implements ProgramElement {
     public static final Logger LOGGER = LoggerFactory.getLogger(JavaProgramElement.class);
 
     private static final Comment[] NO_COMMENTS = new Comment[0];
 
-    @NonNull
     private final Comment[] comments;
 
     private int hashCode = -1;
@@ -66,7 +68,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
         comments = extractComments(children);
     }
 
-    public JavaProgramElement(@NonNull PositionInfo pi, @Nullable List<Comment> comments) {
+    public JavaProgramElement(@Nullable PositionInfo pi, @Nullable List<Comment> comments) {
         super(pi);
         this.comments = comments == null ? NO_COMMENTS : comments.toArray(new Comment[0]);
     }
@@ -78,7 +80,8 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
      * @param list
      *        the ExtList with children and comments of this node
      */
-    private Comment[] extractComments(ExtList list) {
+    private Comment[] extractComments(@UnderInitialization JavaProgramElement this,
+            ExtList list) {
         final Comment[] c = list.collect(Comment.class);
         return c == null ? NO_COMMENTS : c;
     }
@@ -116,7 +119,7 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -158,8 +161,9 @@ public abstract class JavaProgramElement extends JavaSourceElement implements Pr
 
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
-        final ProgramElement src = source.getSource();
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
+        final ProgramElement src = Objects.requireNonNull(source.getSource(),
+            "source data has no source element");
 
         if (src.getClass() != getClass()) {
             return null;

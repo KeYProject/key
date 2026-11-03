@@ -15,6 +15,9 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Policy for {@link OriginTermLabel}s.
  *
@@ -22,12 +25,14 @@ import org.key_project.prover.sequent.PosInOccurrence;
  *
  * @author lanzinger
  */
+@NullMarked
 public class OriginTermLabelPolicy implements TermLabelPolicy {
 
     @Override
-    public TermLabel keepLabel(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm,
+    public @Nullable TermLabel keepLabel(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence,
+            @Nullable JTerm applicationTerm, Rule rule, @Nullable Goal goal,
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm, TermLabel label) {
         if (services.getProof() == null) {
             return label;

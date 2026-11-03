@@ -6,6 +6,9 @@ package org.key_project.isabelletranslation.automation;
 
 import java.io.IOException;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class IsabelleNotFoundException extends IOException {
     public IsabelleNotFoundException(String message) {
         super(message);

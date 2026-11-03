@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.proof.Proof;
@@ -18,6 +19,9 @@ import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Parses a KeY proof file into an intermediate representation. The parsed intermediate result can
@@ -59,6 +63,7 @@ import org.key_project.util.collection.Pair;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class IntermediatePresentationProofFileParser implements IProofFileParser {
 
     /* + The proof object for storing meta information */
@@ -68,11 +73,11 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     private final ArrayDeque<NodeIntermediate> stack = new ArrayDeque<>();
 
     /* + State Information */
-    private RuleInformation ruleInfo = null;
+    private @Nullable RuleInformation ruleInfo = null;
 
     /* + State information that is returned after parsing */
-    private BranchNodeIntermediate root = null; // the "dummy ID" branch
-    private NodeIntermediate currNode;
+    private @Nullable BranchNodeIntermediate root = null; // the "dummy ID" branch
+    private @Nullable NodeIntermediate currNode;
     private final LinkedList<Throwable> errors = new LinkedList<>();
 
     /**
@@ -82,8 +87,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         this.proof = proof;
     }
 
+    /**
+     * The parser state machine guarantees that the {@code ruleInfo} and {@code currNode} fields
+     * are set and consistent whenever {@code beginExpr} is invoked on a structural element; the
+     * dereferences of these fields (and of narrowed casts on them) are suppressed with a scoped
+     * key. The {@code unchecked} suppression covers the parser-overloaded generic containers.
+     */
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "nullness:dereference.of.nullable" })
     public void beginExpr(ProofElementID eid, String str) {
         switch (eid) {
             case BRANCH -> {
@@ -94,7 +105,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                     currNode = newNode;
                     stack.push(newNode);
                 } else {
-                    stack.push(currNode);
+                    stack.push(Objects.requireNonNull(currNode));
                     currNode.addChild(newNode);
                     currNode = newNode;
                 }
@@ -229,7 +240,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
 
     }
 
+    /**
+     * The parser state machine guarantees that the {@code ruleInfo} and {@code currNode} fields
+     * are set and consistent whenever {@code endExpr} is invoked on a structural element; the
+     * dereferences of these fields (and of narrowed casts on them) are suppressed with a scoped
+     * key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void endExpr(ProofElementID eid, int lineNr) {
         switch (eid) {
             case BRANCH -> currNode = stack.pop();
@@ -254,8 +272,9 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
             case ASSUMES_INST_BUILT_IN -> { // ifInst (for built in rules)
                 BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
                 builtinInfo.builtinIfInsts =
-                    builtinInfo.builtinIfInsts.append(new Pair<>(
-                        builtinInfo.currIfInstFormula, builtinInfo.currIfInstPosInTerm));
+                    builtinInfo.builtinIfInsts.append(new Pair<Integer, PosInTerm>(
+                        builtinInfo.currIfInstFormula,
+                        Objects.requireNonNull(builtinInfo.currIfInstPosInTerm)));
             }
             default -> {
             }
@@ -283,13 +302,18 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * @return The parsed intermediate representation in form of the top level branch node (the
      *         "dummy ID" branch).
      */
-    public BranchNodeIntermediate getParsedResult() {
+    public @Nullable BranchNodeIntermediate getParsedResult() {
         return root;
     }
 
     /**
+     * The parser state machine guarantees that {@code ruleInfo} holds a
+     * {@code TacletInformation} when a taclet application is to be constructed; the dereference
+     * of the narrowed cast is suppressed with a scoped key.
+     *
      * @return An intermediate taclet application generated from previously parsed information.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private TacletAppIntermediate constructTacletApp() {
         TacletInformation tacletInfo = (TacletInformation) ruleInfo;
         return new TacletAppIntermediate(tacletInfo.currRuleName,
@@ -299,9 +323,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     }
 
     /**
+     * The parser state machine guarantees that {@code ruleInfo} holds a
+     * {@code BuiltinRuleInformation} when a built-in application is to be constructed; the
+     * dereference of the narrowed cast is suppressed with a scoped key.
+     *
      * @return An intermediate built-in rule application generated from previously parsed
      *         information.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private BuiltInAppIntermediate constructBuiltInApp() {
         BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
         return switch (builtinInfo.currRuleName) {
@@ -335,9 +364,14 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
     }
 
     /**
+     * The parser state machine guarantees that {@code ruleInfo} holds a
+     * {@code BuiltinRuleInformation} while if-instantiations of a built-in rule are parsed; the
+     * dereference of the narrowed cast is suppressed with a scoped key.
+     *
      * @return True iff we are currently parsing a built-in rule and are inside an if-insts sub
      *         expression.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private boolean insideBuiltinIfInsts() {
         return ruleInfo.isBuiltinInfo()
                 && ((BuiltinRuleInformation) ruleInfo).builtinIfInsts != null;
@@ -353,8 +387,8 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
         protected String currRuleName;
         protected int currFormula = 0;
         protected PosInTerm currPosInTerm = PosInTerm.getTopLevel();
-        protected ImmutableList<Name> currNewNames = null;
-        protected String notes = null;
+        protected @Nullable ImmutableList<Name> currNewNames = null;
+        protected @Nullable String notes = null;
 
         protected RuleInformation(String ruleName) {
             this.currRuleName = ruleName.trim();
@@ -372,7 +406,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     private static class TacletInformation extends RuleInformation {
         /* + Taclet Information */
-        protected List<String> loadedInsts = null;
+        protected @Nullable List<String> loadedInsts = null;
         protected ImmutableList<String> ifSeqFormulaList = ImmutableList.nil();
         protected ImmutableList<String> ifDirectFormulaList = ImmutableList.nil();
 
@@ -388,23 +422,23 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     private static class BuiltinRuleInformation extends RuleInformation {
         /* + Built-In Formula Information */
-        protected ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
+        protected @Nullable ImmutableList<Pair<Integer, PosInTerm>> builtinIfInsts;
         protected int currIfInstFormula;
-        protected PosInTerm currIfInstPosInTerm;
+        protected @Nullable PosInTerm currIfInstPosInTerm;
         /* > Method Contract */
-        protected String currContract = null;
-        protected String currContractModality = null;
+        protected @Nullable String currContract = null;
+        protected @Nullable String currContractModality = null;
         /* > Merge Rule */
-        protected String currMergeProc = null;
+        protected @Nullable String currMergeProc = null;
         protected int currNrPartners = 0;
         protected int currCorrespondingMergeNodeId = 0;
         protected int currMergeNodeId = 0;
-        protected String currDistFormula = null;
-        protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
+        protected @Nullable String currDistFormula = null;
+        protected @Nullable Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
             null;
-        protected String currAbstractionPredicates = null;
-        protected String currUserChoices = null;
-        protected String solver;
+        protected @Nullable String currAbstractionPredicates = null;
+        protected @Nullable String currUserChoices = null;
+        protected @Nullable String solver;
 
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);
@@ -418,7 +452,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      */
     public record Result(
             List<Throwable> errors, String status,
-            BranchNodeIntermediate parsedResult) {
+            @Nullable BranchNodeIntermediate parsedResult) {
     }
 
 }

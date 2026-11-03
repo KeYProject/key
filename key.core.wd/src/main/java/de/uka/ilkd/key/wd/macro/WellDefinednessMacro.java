@@ -26,6 +26,8 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This macro resolves the well-definedness transformer, i.e. it applies exactly all applicable
@@ -37,6 +39,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class WellDefinednessMacro extends StrategyProofMacro {
 
     public static final String WD_PREFIX = "wd_";
@@ -48,7 +51,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     }
 
     @Override
-    public String getCategory() {
+    public @Nullable String getCategory() {
         return null;
     }
 
@@ -59,13 +62,13 @@ public class WellDefinednessMacro extends StrategyProofMacro {
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return new WellDefinednessStrategy();
     }
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         if (proof == null || proof.isDisposed()
                 || !WellDefinednessCheck.isOn(proof.getServices())) {
             return false;
@@ -82,8 +85,8 @@ public class WellDefinednessMacro extends StrategyProofMacro {
             while (n != null) {
                 // Applicable in a well-definedness branch (e.g. of a loop statement or a block
                 // contract)
-                if (n.getNodeInfo().getBranchLabel() != null
-                        && n.getNodeInfo().getBranchLabel().equals(WD_BRANCH)) {
+                final String branchLabel = n.getNodeInfo().getBranchLabel();
+                if (branchLabel != null && branchLabel.equals(WD_BRANCH)) {
                     return true;
                 }
                 n = n.parent();

@@ -16,6 +16,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * resolve a program variable to an integer literal.
  *
@@ -24,6 +26,7 @@ import org.key_project.logic.op.Operator;
  *
  * @author mulbrich
  */
+@NullMarked
 public final class EnumConstantValue extends AbstractTermTransformer {
 
     public EnumConstantValue() {

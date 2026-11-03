@@ -12,9 +12,12 @@ import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Collects all labels found in a given program.
  */
+@NullMarked
 public class LabelCollector extends JavaASTVisitor {
 
     private final HashSet<Label> labels;

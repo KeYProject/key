@@ -14,19 +14,23 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Throws.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public class Throws extends JavaNonTerminalProgramElement implements TypeReferenceContainer {
 
 
     /**
      * Exceptions thrown.
      */
-    protected final ImmutableArray<TypeReference> exceptions;
+    protected final @Nullable ImmutableArray<TypeReference> exceptions;
 
     /**
      * Throws.
@@ -68,7 +72,8 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
         this.exceptions = new ImmutableArray<>(children.collect(TypeReference.class));
     }
 
-    public Throws(PositionInfo pi, List<Comment> c, ImmutableArray<TypeReference> exc) {
+    public Throws(@Nullable PositionInfo pi, @Nullable List<Comment> c,
+            ImmutableArray<TypeReference> exc) {
         super(pi, c);
         this.exceptions = exc;
     }
@@ -114,7 +119,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      *
      * @return the type reference mutable list.
      */
-    public ImmutableArray<TypeReference> getExceptions() {
+    public @Nullable ImmutableArray<TypeReference> getExceptions() {
         return exceptions;
     }
 

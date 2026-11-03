@@ -9,6 +9,7 @@ import java.util.function.UnaryOperator;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -18,30 +19,37 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A contract for checking the well-definedness of a specification for a class invariant.
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     private final ClassInvariant inv;
 
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
             LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, ClassInvariant inv,
+            @Nullable JTerm accessible, Condition ensures, @Nullable JTerm mby, @Nullable JTerm rep,
+            ClassInvariant inv,
             TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
         this.inv = inv;
     }
 
-    public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target, JTerm accessible,
-            JTerm mby, Services services) {
+    public ClassWellDefinedness(ClassInvariant inv, IObserverFunction target,
+            @Nullable JTerm accessible,
+            @Nullable JTerm mby, Services services) {
         super(inv.getKJT().getFullName() + "." + "JML class invariant", 0, target,
             inv.getOrigVars(), Type.CLASS_INVARIANT, services);
         assert inv != null;
@@ -55,13 +63,19 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     @Override
     public ClassWellDefinedness map(UnaryOperator<JTerm> op, Services services) {
+        final JTerm accessible = getAccessible();
+        final JTerm mby = getMby();
+        final JTerm represents = getRepresents();
         return new ClassWellDefinedness(getName(), id(), type(), getTarget(), getHeap(),
             getOrigVars(), getRequires().map(op), op.apply(getModifiable()),
-            op.apply(getAccessible()), getEnsures().map(op), op.apply(getMby()),
-            op.apply(getRepresents()), inv.map(op, services), services.getTermBuilder());
+            accessible == null ? null : op.apply(accessible), getEnsures().map(op),
+            mby == null ? null : op.apply(mby),
+            represents == null ? null : op.apply(represents), inv.map(op, services),
+            services.getTermBuilder());
     }
 
     @Override
+    @Nullable
     Function generateMbyAtPreFunc(Services services) {
         return null;
     }
@@ -83,10 +97,19 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final TermBuilder TB = services.getTermBuilder();
         final KeYJavaType kjt = services.getJavaInfo().getJavaLangObject();
         final String prefix = INV_TACLET;
-        final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException(
+                "No heap type defined in the services type converter.");
+        }
+        final LocationVariable heap = heapLDT.getHeap();
         final TermSV heapSV =
             SchemaVariableFactory.createTermSV(new Name("h"), heap.sort());
-        final TermSV sv = SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
+        final Sort kjtSort = kjt.getSort();
+        if (kjtSort == null) {
+            throw new NullPointerException("No sort for the invariant's context type.");
+        }
+        final TermSV sv = SchemaVariableFactory.createTermSV(new Name("a"), kjtSort);
         final JTerm var = TB.var(sv);
         final JTerm wdSelf = TB.wd(var);
         final JTerm[] heaps = { TB.var(heapSV) };
@@ -156,7 +179,7 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return inv.getVisibility();
     }
 
@@ -166,12 +189,12 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public JTerm getGlobalDefs() {
+    public @Nullable JTerm getGlobalDefs() {
         return null;
     }
 
     @Override
-    public JTerm getAxiom() {
+    public @Nullable JTerm getAxiom() {
         return null;
     }
 }

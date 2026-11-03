@@ -7,6 +7,8 @@ package de.uka.ilkd.key.proof.io.intermediate;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Represents an intermediate rule / taclet application.
  *
@@ -14,6 +16,7 @@ import org.key_project.util.collection.ImmutableList;
  * @see TacletAppIntermediate
  * @see BuiltInAppIntermediate
  */
+@NullMarked
 public abstract class AppIntermediate {
     private int lineNr = -1;
 

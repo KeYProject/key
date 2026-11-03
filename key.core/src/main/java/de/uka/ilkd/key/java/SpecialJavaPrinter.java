@@ -28,6 +28,7 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -35,6 +36,7 @@ import org.jspecify.annotations.Nullable;
  * @author Alexander Weigl
  * @version 1 (3/30/26)
  */
+@NullMarked
 public class SpecialJavaPrinter extends DefaultPrettyPrinterVisitor {
     public SpecialJavaPrinter(PrinterConfiguration configuration) {
         super(configuration);
@@ -105,6 +107,13 @@ public class SpecialJavaPrinter extends DefaultPrettyPrinterVisitor {
         }
     }
 
+    /**
+     * Prints the given set of JML modifiers together with their dependency constructs.
+     * <p>
+     * The dependencies of a JML construct are present whenever the modifiers are printed; the
+     * dereference of the (nullable) dependency pair component is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void print(ImmutableList<JMLModifier> modifiers,
             ImmutableList<LabeledParserRuleContext> depends) {
         printer.print("\n/*@ ");
@@ -258,7 +267,7 @@ class ToStringVisitor extends JmlParserBaseVisitor<String> {
             + ";";
     }
 
-    private String accept(TerminalNode terminalNode) {
+    private String accept(@Nullable TerminalNode terminalNode) {
         if (terminalNode != null)
             return terminalNode.getText();
         return "";

@@ -7,12 +7,14 @@ package de.uka.ilkd.key.gui.notification.events;
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * NotificationEvent used to inform the user about a closed proof.
  *
  * @author bubel
  */
+@NullMarked
 public class ProofClosedNotificationEvent extends NotificationEvent {
 
     /** the closed proof */
@@ -32,7 +34,5 @@ public class ProofClosedNotificationEvent extends NotificationEvent {
     public Proof getProof() {
         return proof;
     }
-
-
 
 }

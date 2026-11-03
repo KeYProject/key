@@ -20,11 +20,15 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The default implementation of {@link ProofControl}.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class DefaultProofControl extends AbstractProofControl {
     private static final org.slf4j.Logger LOGGER =
         org.slf4j.LoggerFactory.getLogger(DefaultProofControl.class);
@@ -39,7 +43,7 @@ public class DefaultProofControl extends AbstractProofControl {
      * {@code volatile} so the null-out from the run thread's {@code finally} is visible to callers
      * of {@link #isInAutoMode()} / {@link #startAutoMode} / {@link #runMacro} on other threads.
      */
-    private volatile Thread autoModeThread;
+    private volatile @Nullable Thread autoModeThread;
 
     /**
      * Constructor.
@@ -64,14 +68,14 @@ public class DefaultProofControl extends AbstractProofControl {
      */
     public DefaultProofControl(UserInterfaceControl ui,
             DefaultUserInterfaceControl defaultProverTaskListener,
-            RuleCompletionHandler ruleCompletionHandler) {
+            @Nullable RuleCompletionHandler ruleCompletionHandler) {
         super(defaultProverTaskListener, ruleCompletionHandler);
         this.ui = ui;
     }
 
     @Override
     public synchronized void startAutoMode(Proof proof, ImmutableList<Goal> goals,
-            ProverTaskListener ptl) {
+            @Nullable ProverTaskListener ptl) {
         if (proof.isErroneous()) {
             // A previous run marked the proof erroneous (an essential proof listener failed); it
             // may be inconsistent, so no new search is started. The proof can still be saved.
@@ -84,7 +88,14 @@ public class DefaultProofControl extends AbstractProofControl {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The auto-mode thread is running whenever auto mode is active, which is checked here; the
+     * dereference of the (nullable) thread field is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public synchronized void stopAutoMode() {
         if (isInAutoMode()) {
             autoModeThread.interrupt();
@@ -112,9 +123,10 @@ public class DefaultProofControl extends AbstractProofControl {
 
         private final ImmutableList<Goal> goals;
 
-        private final ProverTaskListener ptl;
+        private final @Nullable ProverTaskListener ptl;
 
-        public AutoModeThread(Proof proof, ImmutableList<Goal> goals, ProverTaskListener ptl) {
+        public AutoModeThread(Proof proof, ImmutableList<Goal> goals,
+                @Nullable ProverTaskListener ptl) {
             this.proof = proof;
             this.goals = goals;
             this.ptl = ptl;
@@ -173,7 +185,18 @@ public class DefaultProofControl extends AbstractProofControl {
             this.posInOcc = posInOcc;
         }
 
+        /**
+         * {@inheritDoc}
+         * <p>
+         * The finished task info may be {@code null} when the macro failed before producing a
+         * result: it is only assigned once {@link ProofMacro#applyTo} returned, yet the listener is
+         * still notified of the task's end as a best-effort cleanup. Listeners are expected to
+         * tolerate a {@code null} finished info (the GUI's finished-event handling explicitly
+         * checks for it), so the nullable argument is passed through deliberately and the warning
+         * is suppressed with a scoped key.
+         */
         @Override
+        @SuppressWarnings("nullness:argument.type.incompatible")
         public void run() {
             Proof proof = node.proof();
             ProverTaskListener ptl = getDefaultProverTaskListener();

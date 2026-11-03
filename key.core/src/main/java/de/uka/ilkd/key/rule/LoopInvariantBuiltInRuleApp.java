@@ -49,8 +49,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     protected final While loop;
 
     protected @Nullable LoopSpecification spec;
-    @Nullable
-    protected final List<LocationVariable> heapContext;
+    protected final @Nullable List<LocationVariable> heapContext;
     private @Nullable ExecutionContext executionContext;
     private @Nullable JTerm guard;
 
@@ -298,7 +297,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         return pio != null && loop != null;
     }
 
-    public JTerm programTerm() {
+    public @Nullable JTerm programTerm() {
         if (posInOccurrence() != null) {
             return TermBuilder.goBelowUpdates((JTerm) posInOccurrence().subTerm());
         }
@@ -363,7 +362,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     }
 
     @Override
-    public List<LocationVariable> getHeapContext() {
+    public @Nullable List<LocationVariable> getHeapContext() {
         return heapContext;
     }
 

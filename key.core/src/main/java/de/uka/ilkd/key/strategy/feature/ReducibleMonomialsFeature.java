@@ -16,12 +16,15 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Return zero iff the monomial <code>dividend</code> can be made smaller (in the polynomial
  * reduction ordering) by adding or subtracting <code>divisor</code> ({@link #createReducible}), or
  * iff it is divided by it ({@link #createDivides}).
  */
+@NullMarked
 @StableCost
 public final class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
     /** Which monomial relation an instance checks. */

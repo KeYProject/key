@@ -13,12 +13,16 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Filters for the proof tree view.
  *
  * @author bruns
  * @author lanzinger
  */
+@NullMarked
 public abstract class ProofTreeViewFilter {
 
     /**
@@ -155,7 +159,7 @@ public abstract class ProofTreeViewFilter {
          *         filters.
          * @see #countChild(TreeNode, TreeNode, int)
          */
-        public Object getChild(Object parent, int index) {
+        public @Nullable Object getChild(Object parent, int index) {
             TreeNode child;
             int count = -1;
             for (int i = 0; i < ((TreeNode) parent).getChildCount(); i++) {
@@ -191,7 +195,6 @@ public abstract class ProofTreeViewFilter {
             return -1;
         }
 
-
         /**
          * Decides whether a child should be counted while iterating all children. A child should
          * not be counted if it is hidden by one of the active filters.
@@ -219,10 +222,16 @@ public abstract class ProofTreeViewFilter {
                 return true;
             }
 
+            Node guiNode = node.getNode();
+            if (guiNode == null) {
+                // a tree node always wraps a proof node; the original code dereferences it
+                throw new NullPointerException("No proof node available.");
+            }
+
             // count if child is inlined because of a hidden subtree
             for (ProofTreeViewFilter filter : ALL_GLOBAL_FILTERS) {
                 if (filter.isActive() && !(parent.getChildAt(pos + 1) instanceof GUIBranchNode)
-                        && node.getNode().childrenCount() != 1) {
+                        && guiNode.childrenCount() != 1) {
                     return true;
                 }
             }
@@ -250,6 +259,10 @@ public abstract class ProofTreeViewFilter {
         @Override
         public boolean showSubtree(Node node) {
             Node parent = node.parent();
+            if (parent == null) {
+                // only the root node has no parent, which is always shown
+                return true;
+            }
             return node.equals(parent.child(parent.childrenCount() - 1));
         }
     }
@@ -258,7 +271,12 @@ public abstract class ProofTreeViewFilter {
 
         @Override
         protected boolean countChild(GUIProofTreeNode node, TreeNode parent, int pos) {
-            if (node.getNode().getNodeInfo().getInteractiveRuleApplication()) {
+            Node guiNode = node.getNode();
+            if (guiNode == null) {
+                // a tree node always wraps a proof node; the original code dereferences it
+                throw new NullPointerException("No proof node available.");
+            }
+            if (guiNode.getNodeInfo().getInteractiveRuleApplication()) {
                 return true;
             }
 
@@ -269,7 +287,7 @@ public abstract class ProofTreeViewFilter {
             // count if child is inlined because of a hidden subtree
             for (ProofTreeViewFilter filter : ALL_GLOBAL_FILTERS) {
                 if (filter.isActive() && !(parent.getChildAt(pos + 1) instanceof GUIBranchNode)
-                        && node.getNode().childrenCount() != 1) {
+                        && guiNode.childrenCount() != 1) {
                     return true;
                 }
             }
@@ -396,7 +414,7 @@ public abstract class ProofTreeViewFilter {
          *
          * @param query the search query, as entered into the proof tree's search bar.
          */
-        void setQuery(String query) {
+        void setQuery(@Nullable String query) {
             this.query = query == null ? "" : query.toLowerCase();
             containsMatchCache.clear();
         }

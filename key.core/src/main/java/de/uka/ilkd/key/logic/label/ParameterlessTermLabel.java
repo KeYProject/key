@@ -8,6 +8,7 @@ import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -19,6 +20,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public final class ParameterlessTermLabel implements TermLabel {
     /**
      * Name of {@link #ANON_HEAP_LABEL}.
@@ -186,7 +188,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      * This object is equal to another {@link ParameterlessTermLabel} iff they bear the same name.
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj instanceof ParameterlessTermLabel other) {
             return name.equals(other.name);
         } else {

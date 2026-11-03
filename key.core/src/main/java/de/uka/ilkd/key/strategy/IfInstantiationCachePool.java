@@ -16,6 +16,9 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Direct-mapped cache of lists of formulas (potential instantiations of if-formulas of taclets)
  * that were modified after a certain point of time
@@ -25,6 +28,7 @@ import org.key_project.util.collection.ImmutableArray;
  * <p>
  * Keys: Long Values: IList<IfFormulaInstantiation>
  */
+@NullMarked
 public class IfInstantiationCachePool {
 
     /**
@@ -82,7 +86,7 @@ public class IfInstantiationCachePool {
         private final ReadLock readLock = lock.readLock();
         private final WriteLock writeLock = lock.writeLock();
 
-        public ImmutableArray<AssumesFormulaInstantiation> get(boolean antec, Long key) {
+        public @Nullable ImmutableArray<AssumesFormulaInstantiation> get(boolean antec, Long key) {
             try {
                 readLock.lock();
                 final HashMap<Long, ImmutableArray<AssumesFormulaInstantiation>> cache =

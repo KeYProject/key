@@ -17,11 +17,15 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class handles the translation of boolean operations and Boolean formulae
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class BooleanOpHandler implements IsabelleHandler {
     /**
      * Map of the operators supported by this handler and their respective translation.
@@ -31,7 +35,7 @@ public class BooleanOpHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         BooleanLDT ldt = services.getTypeConverter().getBooleanLDT();
         Operator logicFalse = ldt.getFalseConst();
         supportedOperators.put(logicFalse, new StringBuilder("False"));

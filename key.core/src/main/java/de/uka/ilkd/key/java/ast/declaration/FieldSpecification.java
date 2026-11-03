@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -17,10 +18,14 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /*
  * FieldSpecification taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public class FieldSpecification extends VariableSpecification implements Field {
 
     /**
@@ -29,6 +34,9 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     public FieldSpecification() {}
 
+    // May be created for a schema program variable whose KeYJavaType is null (see
+    // ProgramSV.getKeYJavaType()); the delegated constructor's Type parameter stays @NonNull.
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public FieldSpecification(IProgramVariable var) {
         this(var, var.getKeYJavaType());
     }
@@ -96,7 +104,7 @@ public class FieldSpecification extends VariableSpecification implements Field {
         super(children, var, dimensions, type);
     }
 
-    public FieldSpecification(PositionInfo pi, List<Comment> comments, Expression init,
+    public FieldSpecification(PositionInfo pi, List<Comment> comments, @Nullable Expression init,
             IProgramVariable var, int dim, Type type) {
         super(pi, comments, init, var, dim, type);
     }
@@ -183,15 +191,17 @@ public class FieldSpecification extends VariableSpecification implements Field {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
         FieldSpecification other = (FieldSpecification) o;
         if (programVariable instanceof ProgramVariable thisPV) {
-            if (!(other.programVariable instanceof ProgramVariable otherPV) ||
-                    !thisPV.getContainerType().equals(otherPV.getContainerType())) {
+            if (!(other.programVariable instanceof ProgramVariable otherPV)) {
+                return false;
+            }
+            if (!Objects.equals(thisPV.getContainerType(), otherPV.getContainerType())) {
                 return false;
             }
         }

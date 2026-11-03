@@ -6,12 +6,11 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
-import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -101,7 +100,7 @@ final class ChaosMonkey {
                     }
                     String title = window instanceof JDialog ? ((JDialog) window).getTitle()
                             : window.getClass().toString();
-                    LOGGER.info("closing: {}", title);
+                    LOGGER.info("closing: {}", String.valueOf(title));
                     SwingUtilities.invokeLater(() -> {
                         window.dispatchEvent(new WindowEvent(window, WindowEvent.WINDOW_CLOSING));
                     });
@@ -116,9 +115,13 @@ final class ChaosMonkey {
 
                 // now, find a random button to press >:)
                 var buttons = SwingUtil.findAllComponents(MainWindow.getInstance(), JButton.class);
-                var keyActions = KeyStrokeManager.getAllActions()
-                        .stream().map(Reference::get).filter(Objects::nonNull)
-                        .collect(Collectors.toSet());
+                Set<Action> keyActions = new HashSet<>();
+                for (WeakReference<Action> ref : KeyStrokeManager.getAllActions()) {
+                    Action action = ref.get();
+                    if (action != null) {
+                        keyActions.add(action);
+                    }
+                }
                 var allMenuItems =
                     SwingUtil.findAllComponents(MainWindow.getInstance(), JMenuItem.class);
                 var actions = new ArrayList<>();
@@ -142,12 +145,13 @@ final class ChaosMonkey {
                     if (action instanceof JButton button) {
                         // only enabled buttons
                         // (the "Show log" button is broken in test cases)
-                        if (!button.isEnabled() || (button.getToolTipText() != null
-                                && BANNED_ACTIONS.contains(button.getToolTipText()))) {
+                        String toolTip = button.getToolTipText();
+                        if (!button.isEnabled() || (toolTip != null
+                                && BANNED_ACTIONS.contains(toolTip))) {
                             continue;
                         }
                         LOGGER.info("monkey clicks on {} {} {}", button.getClass(),
-                            button.getName(), button.getToolTipText());
+                            String.valueOf(button.getName()), String.valueOf(toolTip));
                         var hierarchy = new ArrayList<>();
                         var container = button.getParent();
                         while (container != null) {
@@ -158,7 +162,7 @@ final class ChaosMonkey {
                             if (x instanceof AbstractDockable c) {
                                 LOGGER.info(" {}", c.getTitleText());
                             } else {
-                                LOGGER.info(" {}", x);
+                                LOGGER.info(" {}", String.valueOf(x));
                             }
                         }
                         SwingUtilities.invokeLater(() -> {

@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.Throws;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.ArraySort;
+import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -112,6 +114,12 @@ public class TestCaseGenerator {
 
     private final TestGenerationSettings settings;
 
+    /**
+     * The {@code getOracleAssertion} call below is made on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here since all fields are
+     * assigned before the call, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TestCaseGenerator(Proof proof, TestGenerationSettings settings, TGReporter log) {
         this.reporter = log;
         this.settings = settings;
@@ -120,8 +128,15 @@ public class TestCaseGenerator {
         this.rflAsInternalClass = settings.isRFLAsInternalClass();
         services = proof.getServices();
 
-        modDirName = Objects.requireNonNull(services.getJavaModel().getModelDir(),
-            "No Java Source given in the JavaModel");
+        final JavaModel javaModel = services.getJavaModel();
+        if (javaModel == null) {
+            throw new NullPointerException("No Java source given in the JavaModel.");
+        }
+        final Path modelDir = javaModel.getModelDir();
+        if (modelDir == null) {
+            throw new NullPointerException("No Java source given in the JavaModel.");
+        }
+        modDirName = modelDir;
         outputFolder = new OutputEnvironment(Paths.get(settings.getOutputFolderPath()),
             settings.isOnlyTestClasses());
         outputModDir = outputFolder.getSourceDir();
@@ -140,6 +155,9 @@ public class TestCaseGenerator {
         final JavaInfo jinfo = services.getJavaInfo();
         final KeYJavaType kjt = jinfo.getKeYJavaType(sort);
         final String className = getDummyClassNameFor(sort);
+        if (kjt == null) {
+            return ClassName.get("", className);
+        }
         if (!sortDummyClass.add(sort)) {
             return ClassName.get("", className);
         }
@@ -150,13 +168,17 @@ public class TestCaseGenerator {
         // TODO:extends or implements depending if it is a class or interface.
 
         for (IProgramMethod m : jinfo.getAllProgramMethods(kjt)) {
-            if (m.getFullName().indexOf('<') > -1) {
+            final String fullName = m.getFullName();
+            if (fullName == null || fullName.indexOf('<') > -1) {
                 continue;
             }
             if (m.isPrivate() || m.isFinal() || !m.isAbstract()) {
                 continue;
             }
             final MethodDeclaration md = m.getMethodDeclaration();
+            if (md == null) {
+                continue;
+            }
             var ms = MethodSpec.methodBuilder(m.getName());
             if (m.isProtected())
                 ms.addModifiers(Modifier.PROTECTED);
@@ -169,15 +191,16 @@ public class TestCaseGenerator {
             if (m.isSynchronized())
                 ms.addModifiers(Modifier.SYNCHRONIZED);
 
-            if (md.getTypeReference() != null) {
-                ms.returns(getTypeName(md.getTypeReference()));
+            final TypeReference typeReference = md.getTypeReference();
+            if (typeReference != null) {
+                ms.returns(getTypeName(typeReference));
             }
 
             var pdIter = md.getParameters();
             int varcount = 0;
             for (ParameterDeclaration pd : pdIter) {
-                var type = pd.getTypeReference() == null ? TypeName.VOID
-                        : getTypeName(pd.getTypeReference());
+                final TypeReference pdTypeRef = pd.getTypeReference();
+                var type = pdTypeRef == null ? TypeName.VOID : getTypeName(pdTypeRef);
 
                 var name = pd.getVariables().isEmpty()
                         ? "var" + varcount
@@ -190,13 +213,14 @@ public class TestCaseGenerator {
                 varcount++;
             }
 
-            if (md.getThrown() != null) {
-                ms.addException(getTypeName(md.getThrown().getTypeReferenceAt(0)));
+            final Throws thrown = md.getThrown();
+            if (thrown != null) {
+                ms.addException(getTypeName(thrown.getTypeReferenceAt(0)));
             }
-            if (md.getTypeReference() == null) {
+            if (typeReference == null) {
                 ms.addStatement(CodeBlock.builder().build());
             } else {
-                final String type = md.getTypeReference().toString();
+                final String type = typeReference.toString();
                 if (isNumericType(type)) {
                     ms.addStatement("return 0");
                 } else if (type.equals("boolean")) {
@@ -205,9 +229,10 @@ public class TestCaseGenerator {
                     ms.addStatement("return 'a'");
                 } else {
                     boolean returnNull = true;
-                    final String retType =
-                        md.getTypeReference().getKeYJavaType().getSort().name().toString();
-                    if (retType.equals("java.lang.String")) {
+                    final KeYJavaType mdKjt = typeReference.getKeYJavaType();
+                    final Sort mdSort = mdKjt == null ? null : mdKjt.getSort();
+                    if (mdSort != null
+                            && mdSort.name().toString().equals("java.lang.String")) {
                         ms.addStatement("{ return $S;", className);
                         returnNull = false;
                     }
@@ -335,14 +360,22 @@ public class TestCaseGenerator {
         int counter = 0;
         for (final SMTSolver solver : problemSolvers) {
             try {
-                var goal = solver.getProblem().getGoal();
+                var problem = solver.getProblem();
+                if (problem == null) {
+                    throw new NullPointerException("SMT problem is not available.");
+                }
+                var goal = problem.getGoal();
+                if (goal == null) {
+                    throw new NullPointerException("No open goal for the SMT problem.");
+                }
                 var node = goal.node();
                 final String originalNodeName = node.proof().name().toString();
                 var ms = MethodSpec.methodBuilder("testcode_" + counter);
 
                 boolean success = false;
-                if (solver.getSocket().getQuery() != null) {
-                    final Model m = solver.getSocket().getQuery().getModel();
+                var modelExtractor = solver.getSocket().getQuery();
+                if (modelExtractor != null) {
+                    final Model m = modelExtractor.getModel();
                     if (modelIsOK(m)) {
                         reporter.writeln("Generate: " + originalNodeName);
                         Map<String, Sort> typeInfMap = generateTypeInferenceMap(goal.node());
@@ -354,7 +387,13 @@ public class TestCaseGenerator {
                         Set<JTerm> vars = new HashSet<>();
                         info.getProgramVariables(info.getPO(), vars);
                         ms.addComment("Other variables");
-                        getRemainingConstants(ms, m.getConstants().keySet(), vars);
+                        // copy the keys into a plain collection to drop the map-key refinement
+                        // (Set<@KeyFor String> is not assignable to Collection<String>)
+                        List<String> existingConstants = new LinkedList<>();
+                        for (String constantName : m.getConstants().keySet()) {
+                            existingConstants.add(constantName);
+                        }
+                        getRemainingConstants(ms, existingConstants, vars);
                         ms.addComment("Calling the method under test   ")
                                 .addStatement(
                                     info.getCode()
@@ -413,8 +452,8 @@ public class TestCaseGenerator {
     }
 
     public TypeName inferSort(Map<String, Sort> typeInfMap, String progVar) {
-        if (typeInfMap.containsKey(progVar)) {
-            var sort = typeInfMap.get(progVar);
+        Sort sort = typeInfMap.get(progVar);
+        if (sort != null) {
             return getSafeType(sort);
         }
         LOGGER.warn("Warning: inferSort did not find:  {}", progVar);
@@ -440,8 +479,9 @@ public class TestCaseGenerator {
                     LOGGER.warn("Warning: ProgramVariable {} is ambiguous.", name);
                 }
             } else {
+                final KeYJavaType pvKjt = pv.getKeYJavaType();
                 LOGGER.debug("PV {} Sort: {} KeYJavaType: {}", name, pv.sort(),
-                    pv.getKeYJavaType());
+                    pvKjt == null ? "null" : pvKjt);
                 map.put(name, pv.sort());
             }
         } else if (op instanceof Function && !(op instanceof ObserverFunction)) {
@@ -452,7 +492,7 @@ public class TestCaseGenerator {
             String name = func.name().toString();
             Sort sort = func.sort();
             HeapLDT hLDT = services.getTypeConverter().getHeapLDT();
-            if (sort == hLDT.getFieldSort()) {
+            if (hLDT != null && sort == hLDT.getFieldSort()) {
                 var pv = getProgramVariable(t);
                 if (pv == null)
                     return;
@@ -474,14 +514,17 @@ public class TestCaseGenerator {
         }
     }
 
-    @Nullable
-    private ProgramVariable getProgramVariable(Term locationTerm) {
+    private @Nullable ProgramVariable getProgramVariable(Term locationTerm) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         ProgramVariable result = null;
         // Make sure that the function is not an array
-        if (locationTerm.op() instanceof JFunction function && heapLDT.getArr() != function) {
+        if (heapLDT != null && locationTerm.op() instanceof JFunction function
+                && heapLDT.getArr() != function) {
             String typeName = HeapLDT.getClassName(function);
-            KeYJavaType type = services.getJavaInfo().getKeYJavaType(typeName);
+            KeYJavaType type = null;
+            if (typeName != null) {
+                type = services.getJavaInfo().getKeYJavaType(typeName);
+            }
             if (type != null) {
                 String fieldName = HeapLDT.getPrettyFieldName(function);
                 result = services.getJavaInfo().getAttribute(fieldName, type);
@@ -560,14 +603,17 @@ public class TestCaseGenerator {
                 if (o.getName().equals("#o0")) {
                     continue;
                 }
-                final TypeName type = getSafeType(o.getSort());
+                final Sort sort = o.getSort();
                 String right;
-                if (type instanceof ArrayTypeName arrayTypeName) {
-                    right = "new " + arrayTypeName.componentType + "[" + o.getLength() + "]";
-                } else if (o.getSort() == null || o.getSort().toString().equals("Null")) {
+                final TypeName type;
+                if (sort == null || sort.toString().equals("Null")) {
+                    type = TypeName.OBJECT;
                     right = "null";
                 } else {
-                    if (settings.isUseRFL()) {
+                    type = getSafeType(sort);
+                    if (type instanceof ArrayTypeName arrayTypeName) {
+                        right = "new " + arrayTypeName.componentType + "[" + o.getLength() + "]";
+                    } else if (settings.isUseRFL()) {
                         right = "RFL.new" + ReflectionClassCreator.cleanTypeName(type) + "()";
                         rflCreator.addSort(type);
                         LOGGER.debug("Adding sort (create Object): {}", type);
@@ -625,8 +671,10 @@ public class TestCaseGenerator {
         // init fields
         if (heap != null) {
             for (final ObjectVal o : heap.getObjects()) {
+                final Sort objSort = o.getSort();
                 if (o.getName().equals("#o0")
-                        || o.getSort().name().toString().endsWith("Exception")) {
+                        || (objSort != null
+                                && objSort.name().toString().endsWith("Exception"))) {
                     continue;
                 }
                 final String receiverObject = createObjectName(o);
@@ -645,7 +693,7 @@ public class TestCaseGenerator {
 
                     LOGGER.debug("Added sort (init fields): {}", vType);
                     val = translateValueExpression(val);
-                    final TypeName rcObjType = getSafeType(o.getSort());
+                    final @Nullable TypeName rcObjType = getSafeType(o.getSort());
 
                     if (rcObjType != null) { // add cast
                         mb.addStatement("(($T)%N).$N = ($T) %N",
@@ -674,14 +722,17 @@ public class TestCaseGenerator {
                     }
 
                 }
-                if (o.getSort() != null && o.getSort() instanceof ArraySort) {
-                    var safeType = (ArrayTypeName) getSafeType(o.getSort());
+                if (objSort != null && objSort instanceof ArraySort) {
+                    var safeType = (ArrayTypeName) getSafeType(objSort);
                     var elementType = safeType.componentType;
                     rflCreator.addSort(safeType);
                     LOGGER.debug("Added sort (init array fields): {}", safeType);
 
                     for (int i = 0; i < o.getLength(); i++) {
                         String val = o.getArrayValue(i);
+                        if (val == null) {
+                            continue;
+                        }
                         val = translateValueExpression(val);
 
                         mb.addStatement("$N[$L] = $L", receiverObject, i, val);
@@ -702,7 +753,9 @@ public class TestCaseGenerator {
         createOldMap(mb, objects);
         createBoolSet(mb);
         createIntSet(mb);
-        createObjSet(mb, heap);
+        if (heap != null) {
+            createObjSet(mb, heap);
+        }
     }
 
     private static final ClassName NAME_HASH_MAP = ClassName.get(HashMap.class);
@@ -728,6 +781,9 @@ public class TestCaseGenerator {
     private String getDummyClassNameFor(Sort sort) {
         final JavaInfo jinfo = services.getJavaInfo();
         final KeYJavaType kjt = jinfo.getKeYJavaType(sort);
+        if (kjt == null) {
+            return "Unknown" + DUMMY_POSTFIX;
+        }
         return kjt.getName() + DUMMY_POSTFIX;
     }
 
@@ -774,8 +830,7 @@ public class TestCaseGenerator {
         }
     }
 
-    @PolyNull
-    public @Nullable TypeName getSafeType(@Nullable Sort sort) {
+    public @PolyNull TypeName getSafeType(@PolyNull Sort sort) {
         if (sort == null) {
             return null;
         }
@@ -812,6 +867,10 @@ public class TestCaseGenerator {
     }
 
     private static TypeName getTypeName(TypeReference tr) {
-        return ClassName.get("", tr.getName());
+        final String name = tr.getName();
+        if (name == null) {
+            return TypeName.OBJECT;
+        }
+        return ClassName.get("", name);
     }
 }

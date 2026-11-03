@@ -16,6 +16,8 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This action is one part of the previous UndoLastStepAction: It prunes the proof tree below the
  * selected node. It now also works on closed branches if not the flag "--no-pruning-closed" is set
@@ -25,6 +27,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
  *
  * @author Pfeifer (enabled pruning in closed branches)
  */
+@NullMarked
 public final class PruneProofAction extends MainWindowAction {
 
     /**
@@ -110,6 +113,10 @@ public final class PruneProofAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        getMediator().setBack(getMediator().getSelectedNode());
+        Node selectedNode = getMediator().getSelectedNode();
+        if (selectedNode == null) {
+            throw new NullPointerException("No node selected to prune.");
+        }
+        getMediator().setBack(selectedNode);
     }
 }

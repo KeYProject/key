@@ -6,12 +6,15 @@ package de.uka.ilkd.key.java.ast.abstraction;
 
 import de.uka.ilkd.key.java.ast.NamedModelElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An entity of the program meta model.
  *
  * @author AL
  * @author RN
  */
+@NullMarked
 public interface ProgramModelElement extends NamedModelElement {
 
     /**

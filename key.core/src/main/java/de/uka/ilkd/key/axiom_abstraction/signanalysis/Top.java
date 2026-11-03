@@ -10,11 +10,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The Top element of the sign lattice, representing all integers.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class Top extends SignAnalysisDomainElem {
 
     private static final Top INSTANCE = new Top();

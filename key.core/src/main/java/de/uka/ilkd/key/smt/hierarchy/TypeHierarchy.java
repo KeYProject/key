@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * @author mihai
  */
 
+@NullMarked
 public class TypeHierarchy {
     private static final Logger LOGGER = LoggerFactory.getLogger(TypeHierarchy.class);
 

@@ -17,6 +17,14 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tests for the {@link DependencyGraph}.
  */
 class DependencyGraphTest {
+    /**
+     * The proof-step node passed to {@link DependencyGraph#addRuleApplication} is deliberately
+     * {@code null}: this test only exercises the graph structure. The node is used solely as an
+     * identity key (in an {@code IdentityHashMap}, which supports null keys) stored inside an
+     * {@code AnnotatedEdge}, so a {@code null} node is runtime-legal. The nullness checker
+     * requires a non-null node argument, hence the scoped suppression.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Test
     void basicTest() {
         var graph = new DependencyGraph();

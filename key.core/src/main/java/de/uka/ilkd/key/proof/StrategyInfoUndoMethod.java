@@ -6,11 +6,13 @@ package de.uka.ilkd.key.proof;
 
 import de.uka.ilkd.key.util.properties.Properties;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public interface StrategyInfoUndoMethod {
 
     void undo(Properties strategyInfos);

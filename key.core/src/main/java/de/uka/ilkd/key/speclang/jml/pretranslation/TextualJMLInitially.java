@@ -8,12 +8,16 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * A JML initially clause declaration in textual form.
  *
  * @author Daniel Bruns
  */
+@NullMarked
 public final class TextualJMLInitially extends TextualJMLConstruct {
 
     private final LabeledParserRuleContext inv;
@@ -37,7 +41,7 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof TextualJMLInitially ci)) {
             return false;
         }

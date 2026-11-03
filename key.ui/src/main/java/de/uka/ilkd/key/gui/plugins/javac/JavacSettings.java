@@ -8,11 +8,14 @@ import java.io.Serializable;
 
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Settings for the javac extention.
  *
  * @author Daniel Grévent
  */
+@NullMarked
 public class JavacSettings extends AbstractPropertiesSettings implements Serializable {
 
     /**
@@ -37,19 +40,37 @@ public class JavacSettings extends AbstractPropertiesSettings implements Seriali
 
     /**
      * The type annotation processors to be run.
+     *
+     * <p>
+     * The property is created while the receiver is still under initialization (EISOP
+     * initialization check); the property only takes effect once the settings are loaded after
+     * construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final PropertyEntry<Boolean> useProcessors =
         createBooleanProperty(KEY_USE_PROCESSORS, false);
 
     /**
      * The type annotation processors to be run.
+     *
+     * <p>
+     * The property is created while the receiver is still under initialization (EISOP
+     * initialization check); the property only takes effect once the settings are loaded after
+     * construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final PropertyEntry<String> processors =
         createStringProperty(KEY_PROCESSORS, "");
 
     /**
      * Additional class paths, needed for example by annotation processors
+     *
+     * <p>
+     * The property is created while the receiver is still under initialization (EISOP
+     * initialization check); the property only takes effect once the settings are loaded after
+     * construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final PropertyEntry<String> classPaths =
         createStringProperty(KEY_CLASS_PATHS, "");
 

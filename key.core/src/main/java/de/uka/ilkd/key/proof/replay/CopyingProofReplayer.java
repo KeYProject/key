@@ -16,11 +16,14 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Replayer that copies proof steps from one proof to another.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class CopyingProofReplayer extends AbstractProofReplayer {
     /**
      * Construct a new replayer.
@@ -72,8 +75,10 @@ public class CopyingProofReplayer extends AbstractProofReplayer {
                 continue;
             }
             ImmutableList<Goal> newGoals = reApplyRuleApp(nextNode, nextGoal);
-            for (Goal g : newGoals) {
-                queue.addFirst(g);
+            if (newGoals != null) {
+                for (Goal g : newGoals) {
+                    queue.addFirst(g);
+                }
             }
         }
         newNode.proof().setMutedProofCloseEvents(false);

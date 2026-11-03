@@ -24,9 +24,12 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Enumerates the formulas of the sequent that satisfy a term feature.
  */
+@NullMarked
 @VolatileCost
 public final class RelevantSequentFormulasGenerator implements TermGenerator<Goal> {
 

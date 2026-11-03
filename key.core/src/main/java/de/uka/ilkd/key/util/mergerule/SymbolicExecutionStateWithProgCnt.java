@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -24,6 +25,7 @@ import org.jspecify.annotations.Nullable;
  * @param correspondingNode The node corresponding to this SE state.
  * @author Dominic Scheurer
  */
+@NullMarked
 public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathCondition,
         JTerm programCounter, @Nullable Node correspondingNode) {
     /**
@@ -44,7 +46,7 @@ public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathC
     /**
      * @return The node corresponding to this SE state.
      */
-    public Node getCorrespondingNode() { return correspondingNode; }
+    public @Nullable Node getCorrespondingNode() { return correspondingNode; }
 
     /**
      * @return The corresponding SE state (without the program counter).
@@ -53,7 +55,13 @@ public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathC
         return new SymbolicExecutionState(symbolicState, pathCondition);
     }
 
+    /**
+     * The corresponding node of a symbolic execution state with program counter is set whenever
+     * the state is created; the dereference of the (nullable) node is suppressed with a scoped
+     * key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public String toString() {
         final Services services = getCorrespondingNode().proof().getServices();
 

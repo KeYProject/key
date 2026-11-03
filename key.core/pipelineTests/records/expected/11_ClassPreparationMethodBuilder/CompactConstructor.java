@@ -30,9 +30,9 @@ final class Mapping extends Record {
             from = "abc";
             to = "def";
         }
-        //Created by RecordClassBuilder.java:132
+        //Created by RecordClassBuilder.java:135
         this.from = from;
-        //Created by RecordClassBuilder.java:132
+        //Created by RecordClassBuilder.java:135
         this.to = to;
     }
 
@@ -91,9 +91,9 @@ final class Mapping extends Record {
             from = "abc";
             to = "def";
         }
-        //Created by RecordClassBuilder.java:132
+        //Created by RecordClassBuilder.java:135
         this.from = from;
-        //Created by RecordClassBuilder.java:132
+        //Created by RecordClassBuilder.java:135
         this.to = to;
     }
 

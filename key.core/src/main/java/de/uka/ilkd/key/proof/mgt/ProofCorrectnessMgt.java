@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof.mgt;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -25,10 +26,12 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+@NullMarked
 public final class ProofCorrectnessMgt {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofCorrectnessMgt.class);
 
@@ -74,8 +77,9 @@ public final class ProofCorrectnessMgt {
     // public interface
     // -------------------------------------------------------------------------
 
-    public RuleJustification getJustification(RuleApp r) {
-        return proof.getInitConfig().getJustifInfo().getJustification(r, proof.getServices());
+    public @Nullable RuleJustification getJustification(RuleApp r) {
+        return Objects.requireNonNull(proof.getInitConfig(), "no initial configuration")
+                .getJustifInfo().getJustification(r, proof.getServices());
     }
 
 
@@ -118,7 +122,8 @@ public final class ProofCorrectnessMgt {
                     final ImmutableSet<Proof> proofsForEnd = specRepos.getProofs(end);
                     for (Proof proofForEnd : proofsForEnd) {
                         final ImmutableSet<Contract> contractsUsedForEnd =
-                            proofForEnd.mgt().getUsedContracts();
+                            Objects.requireNonNull(proofForEnd.mgt(), "no proof management")
+                                    .getUsedContracts();
                         for (Contract contractUsedForEnd : contractsUsedForEnd) {
                             if (!path.contains(contractUsedForEnd)) {
                                 final ImmutableList<Contract> extendedPath =
@@ -155,7 +160,8 @@ public final class ProofCorrectnessMgt {
 
             while (it.hasNext()) {
                 final Proof p = it.next();
-                for (Contract contract : p.mgt().getUsedContracts()) {
+                for (Contract contract : Objects.requireNonNull(p.mgt(), "no proof management")
+                        .getUsedContracts()) {
                     ImmutableSet<Proof> proofsForContractTarget =
                         specRepos.getProofs(contract.getKJT(), contract.getTarget());
                     newProofs = newProofs.union(proofsForContractTarget);
@@ -166,7 +172,8 @@ public final class ProofCorrectnessMgt {
 
         // is one of those proofs about the target under verification?
         for (Proof p : proofs) {
-            final IObserverFunction target2 = specRepos.getTargetOfProof(p);
+            final IObserverFunction target2 =
+                Objects.requireNonNull(specRepos.getTargetOfProof(p), "no target for proof");
             if (target2.equals(targetUnderVerification)) {
                 return false;
             }
@@ -186,13 +193,16 @@ public final class ProofCorrectnessMgt {
                 // some branch is closed via cache:
                 if (p.openGoals().size() == 0 && p.closedGoals().stream()
                         .anyMatch(goal -> goal.node().lookup(ClosedBy.class) != null)) {
-                    p.mgt().proofStatus = ProofStatus.CLOSED_BY_CACHE;
+                    Objects.requireNonNull(p.mgt(), "no proof management").proofStatus =
+                        ProofStatus.CLOSED_BY_CACHE;
                 } else if (p.openGoals().size() > 0) {
                     // some branch is open
-                    p.mgt().proofStatus = ProofStatus.OPEN;
+                    Objects.requireNonNull(p.mgt(), "no proof management").proofStatus =
+                        ProofStatus.OPEN;
                 } else {
                     // all branches are properly closed
-                    p.mgt().proofStatus = ProofStatus.CLOSED;
+                    Objects.requireNonNull(p.mgt(), "no proof management").proofStatus =
+                        ProofStatus.CLOSED;
                     presumablyClosed = presumablyClosed.add(p);
                 }
             }
@@ -204,16 +214,20 @@ public final class ProofCorrectnessMgt {
         while (changed) {
             changed = false;
             for (Proof p : presumablyClosed) {
-                for (Contract usedContract : p.mgt().getUsedContracts()) {
+                for (Contract usedContract : Objects
+                        .requireNonNull(p.mgt(), "no proof management").getUsedContracts()) {
                     final ImmutableSet<Proof> usedProofs = specRepos.getProofs(usedContract);
                     if (usedProofs.isEmpty()) {
-                        p.mgt().proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
+                        Objects.requireNonNull(p.mgt(), "no proof management").proofStatus =
+                            ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
                         presumablyClosed = presumablyClosed.remove(p);
                         changed = true;
                     } else {
                         for (Proof usedProof : usedProofs) {
-                            if (usedProof.mgt().proofStatus != ProofStatus.CLOSED) {
-                                p.mgt().proofStatus = ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
+                            if (Objects.requireNonNull(usedProof.mgt(),
+                                "no proof management").proofStatus != ProofStatus.CLOSED) {
+                                Objects.requireNonNull(p.mgt(), "no proof management").proofStatus =
+                                    ProofStatus.CLOSED_BUT_LEMMAS_LEFT;
                                 presumablyClosed = presumablyClosed.remove(p);
                                 changed = true;
                                 break;
@@ -280,7 +294,8 @@ public final class ProofCorrectnessMgt {
     private class DefaultMgtProofListener implements RuleAppListener, EssentialProofListener {
         @Override
         public void ruleApplied(ProofEvent e) {
-            ProofCorrectnessMgt.this.ruleApplied(e.getRuleAppInfo().getRuleApp());
+            ProofCorrectnessMgt.this.ruleApplied(
+                Objects.requireNonNull(e.getRuleAppInfo(), "no rule app info").getRuleApp());
         }
     }
 

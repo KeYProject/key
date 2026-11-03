@@ -9,6 +9,8 @@ import java.util.function.Predicate;
 
 import de.uka.ilkd.key.java.Services;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A generic {@link JTerm} replace visitor based on a filter predicate and a replacement function
  * for
@@ -16,6 +18,7 @@ import de.uka.ilkd.key.java.Services;
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class GenericTermReplacer {
     public static JTerm replace(final JTerm t, final Predicate<JTerm> filter,
             final Function<JTerm, JTerm> replacer, Services services) {

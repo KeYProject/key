@@ -5,11 +5,13 @@
 package de.uka.ilkd.key.nparser.varexp;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (12/9/19)
  */
+@NullMarked
 public abstract class AbstractConditionBuilder extends AbstractTacletBuilderCommand
         implements ConditionBuilder {
     protected AbstractConditionBuilder(@NonNull String triggerName,

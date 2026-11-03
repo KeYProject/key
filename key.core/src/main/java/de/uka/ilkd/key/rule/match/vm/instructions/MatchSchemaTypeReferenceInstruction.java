@@ -12,7 +12,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * Matches a {@link SchemaTypeReference} against the source element, replicating
@@ -22,6 +24,7 @@ import org.jspecify.annotations.Nullable;
  * other single-position program instructions the cursor advance is the emitted {@code
  * gotoNextSibling}.
  */
+@NullMarked
 public final class MatchSchemaTypeReferenceInstruction implements MatchInstruction {
 
     private final SchemaTypeReference pattern;

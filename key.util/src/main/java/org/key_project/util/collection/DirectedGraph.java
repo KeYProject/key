@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -109,7 +110,7 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
         if (incoming != null) {
             incoming.forEach(e -> {
                 edges.remove(e);
-                outgoingEdges.get(e.getSource()).remove(e);
+                Objects.requireNonNull(outgoingEdges.get(e.getSource())).remove(e);
             });
             incomingEdges.remove(v);
         }
@@ -117,7 +118,7 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
         if (outgoing != null) {
             outgoing.forEach(e -> {
                 edges.remove(e);
-                incomingEdges.get(e.getTarget()).remove(e);
+                Objects.requireNonNull(incomingEdges.get(e.getTarget())).remove(e);
             });
             outgoingEdges.remove(v);
         }
@@ -128,8 +129,8 @@ public class DirectedGraph<V, E extends GraphEdge> implements Graph<V, E> {
 
     @Override
     public void removeEdge(E e) {
-        outgoingEdges.get(e.getSource()).remove(e);
-        incomingEdges.get(e.getTarget()).remove(e);
+        Objects.requireNonNull(outgoingEdges.get(e.getSource())).remove(e);
+        Objects.requireNonNull(incomingEdges.get(e.getTarget())).remove(e);
         edges.remove(e);
     }
 }

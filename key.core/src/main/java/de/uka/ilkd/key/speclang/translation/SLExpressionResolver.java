@@ -11,11 +11,15 @@ import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.reference.PackageReference;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Expression resolvers are used by specification parsers (e.g. for JML or OCL) to translate complex
  * expressions to terms. Subclasses of this abstract base class deal with specific operators that
  * may occur in specification expressions.
  */
+@NullMarked
 public abstract class SLExpressionResolver {
 
     protected final JavaInfo javaInfo;
@@ -40,7 +44,7 @@ public abstract class SLExpressionResolver {
      * Cuts off names of enclosing classes from a "package reference". Helper for
      * areInSamePackage().
      */
-    private String trimPackageRef(String ref) {
+    private @Nullable String trimPackageRef(@Nullable String ref) {
         if (ref == null || javaInfo.isPackage(ref)) {
             return ref;
         }
@@ -139,12 +143,13 @@ public abstract class SLExpressionResolver {
      * @return a suitable term or collection if successful, null otherwise
      * @throws SLTranslationException
      */
-    protected abstract SLExpression doResolving(SLExpression receiver, String name,
-            SLParameters parameters) throws SLTranslationException;
+    protected abstract @Nullable SLExpression doResolving(@Nullable SLExpression receiver,
+            String name,
+            @Nullable SLParameters parameters) throws SLTranslationException;
 
 
-    public final SLExpression resolve(SLExpression receiver, String name, SLParameters parameters)
-            throws SLTranslationException {
+    public final @Nullable SLExpression resolve(@Nullable SLExpression receiver, String name,
+            @Nullable SLParameters parameters) throws SLTranslationException {
         if (!canHandleReceiver(receiver)) {
             return null;
         }
@@ -152,5 +157,5 @@ public abstract class SLExpressionResolver {
     }
 
 
-    protected abstract boolean canHandleReceiver(SLExpression receiver);
+    protected abstract boolean canHandleReceiver(@Nullable SLExpression receiver);
 }

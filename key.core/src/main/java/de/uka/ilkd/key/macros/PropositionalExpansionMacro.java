@@ -6,6 +6,8 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The macro PropositionalExpansionMacro apply rules to decompose propositional toplevel formulas;
  * but does not split the goal.
@@ -14,6 +16,7 @@ import java.util.Set;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public class PropositionalExpansionMacro extends AbstractPropositionalExpansionMacro {
 
     @Override

@@ -16,6 +16,8 @@ import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A special purpose border that prints a warning window if the search bar filtering removes
  * formulas from the display.
@@ -24,6 +26,7 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class SequentHideWarningBorder extends TitledBorder {
     private static final long serialVersionUID = 5688994897006894795L;
 
@@ -49,9 +52,15 @@ public class SequentHideWarningBorder extends TitledBorder {
     /**
      * Instantiates a new sequent border.
      *
+     * <p>
+     * The border measures its original insets while the receiver is still under initialization
+     * (EISOP initialization check); the measured height only materializes once the border is
+     * used for painting after construction, suppressed with a scoped key.
+     *
      * @param title the title to display
      * @param sequentView the sequent view which will be wrapped by the component
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SequentHideWarningBorder(String title, SequentView sequentView) {
         super(title);
         this.sequentView = sequentView;

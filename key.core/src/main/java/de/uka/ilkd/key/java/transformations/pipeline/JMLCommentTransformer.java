@@ -23,12 +23,13 @@ import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.utils.PositionUtils;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class contains the old logic for attaching comments containing JML to AST nodes of
  * JavaParser. It should not be used anymore.
  */
+@NullMarked
 @Deprecated(forRemoval = true)
 public class JMLCommentTransformer extends JavaTransformerAbstract {
     public static final DataKey<List<Comment>> BEFORE_COMMENTS = new DataKey<>() {
@@ -42,7 +43,7 @@ public class JMLCommentTransformer extends JavaTransformerAbstract {
      * @param services the CrossReferenceServiceConfiguration to access
      *        model information
      */
-    public JMLCommentTransformer(@NonNull TransformationPipelineServices services) {
+    public JMLCommentTransformer(TransformationPipelineServices services) {
         super(services);
     }
 

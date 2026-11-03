@@ -34,6 +34,12 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
     private @Nullable JTerm pc;
     private @Nullable Set<Name> newNames;
 
+    /**
+     * The state-setting calls below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because each setter only stores the
+     * freshly-computed merge/partner data, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public CloseAfterMergeRuleBuiltInRuleApp(CloseAfterMerge builtInRule, PosInOccurrence pio,
             Node thePartnerNode, Node correspondingMergeNode, SymbolicExecutionState mergeNodeState,
             SymbolicExecutionState partnerState, JTerm pc, Set<Name> newNames) {
@@ -50,6 +56,11 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
         super(builtInRule, pio);
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable CloseAfterMergeRuleBuiltInRuleApp replacePos(PosInOccurrence newPos) {
         return null;
@@ -75,6 +86,11 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
 
     // // GETTERS AND SETTERS // //
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public Node getThePartnerNode() {
         return partnerNode;
     }
@@ -83,6 +99,11 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
         this.partnerNode = thePartnerNode;
     }
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public Node getCorrespondingMergeNode() {
         return correspondingMergeNode;
     }
@@ -91,6 +112,11 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
         this.correspondingMergeNode = correspondingMergeNode;
     }
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public SymbolicExecutionState getMergeState() {
         return mergeNodeState;
     }
@@ -99,6 +125,11 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
         this.mergeNodeState = mergeState;
     }
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public SymbolicExecutionState getPartnerSEState() {
         return partnerState;
     }
@@ -107,6 +138,11 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
         this.partnerState = thisSEState;
     }
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public JTerm getPc() {
         return pc;
     }
@@ -115,6 +151,11 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
         this.pc = pc;
     }
 
+    /**
+     * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
+     * {@link #complete()} returns true); the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public Set<Name> getNewNames() {
         return newNames;
     }

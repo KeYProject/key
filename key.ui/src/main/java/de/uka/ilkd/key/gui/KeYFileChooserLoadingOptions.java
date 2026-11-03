@@ -20,12 +20,14 @@ import net.miginfocom.layout.AC;
 import net.miginfocom.layout.CC;
 import net.miginfocom.layout.LC;
 import net.miginfocom.swing.MigLayout;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// Panel for loading options to be used in {@link KeYFileChooser}
 /// @see KeYFileChooser#addLoadingOptions()
 /// @author weigl
+@NullMarked
 public class KeYFileChooserLoadingOptions extends JPanel {
     private final JLabel lblProfile = new JLabel("Profile:");
     private final JComboBox<ProfileWrapper> cboProfile = new JComboBox<>();
@@ -49,9 +51,17 @@ public class KeYFileChooserLoadingOptions extends JPanel {
     private final Map<Profile, KeYGuiExtension.OptionPanel> additionalOptionPanels =
         KeYGuiExtensionFacade.createAdditionalOptionPanels();
 
-
     private KeYGuiExtension.@Nullable OptionPanel currentOptionPanel = null;
 
+    /**
+     * Creates the loading options panel for the selected file chooser.
+     *
+     * <p>
+     * The panel registers its profile listener and queries the current profile info while the
+     * receiver is still under initialization (EISOP initialization check); both only matter once
+     * the panel is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public KeYFileChooserLoadingOptions(KeYFileChooser chooser) {
         setLayout(new MigLayout(new LC().fillX().wrapAfter(3).maxWidth("400"),
             new AC().growPrio(10, 1).align("right", 0)));
@@ -105,8 +115,9 @@ public class KeYFileChooserLoadingOptions extends JPanel {
             lblProfileInfo.setText("");
         } else {
             lblProfileInfo.setText(selectedItem.description());
-            if (additionalOptionPanels.containsKey(selectedItem.profile)) {
-                currentOptionPanel = additionalOptionPanels.get(selectedItem.profile);
+            Profile profile = selectedItem.profile();
+            if (profile != null && additionalOptionPanels.containsKey(profile)) {
+                currentOptionPanel = additionalOptionPanels.get(profile);
                 currentOptionPanel.install(this);
             }
         }

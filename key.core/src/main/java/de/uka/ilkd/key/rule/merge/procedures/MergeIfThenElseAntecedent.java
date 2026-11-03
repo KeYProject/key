@@ -19,6 +19,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two locations are
  * assigned different values in the states, the value in the merged state is chosen based on the
@@ -30,6 +32,7 @@ import org.key_project.util.collection.ImmutableSet;
  * @see MergeByIfThenElse
  * @see MergeRule
  */
+@NullMarked
 public class MergeIfThenElseAntecedent extends MergeProcedure
         implements UnparametricMergeProcedure {
 

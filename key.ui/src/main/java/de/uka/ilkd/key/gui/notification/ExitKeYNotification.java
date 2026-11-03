@@ -9,6 +9,7 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author bubel
  */
+@NullMarked
 public class ExitKeYNotification extends NotificationTask {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExitKeYNotification.class);
 

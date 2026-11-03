@@ -6,6 +6,10 @@ package de.uka.ilkd.key.proof;
 
 import java.io.Serializable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ProofNodeDescription implements Serializable {
     /**
      * Collects the information from the tree to which branch the current node belongs:
@@ -18,8 +22,13 @@ public class ProofNodeDescription implements Serializable {
      *
      * @param node the current node
      * @return a String containing the path information to display
+     *         <p>
+     *         The branch label of a node is present whenever the node carries one; the dereferences
+     *         of
+     *         the (nullable) label are suppressed with a scoped key.
      */
-    public static String collectPathInformation(Node node) {
+    @SuppressWarnings("nullness:dereference.of.nullable")
+    public static String collectPathInformation(@Nullable Node node) {
         while (node != null) {
             if (node.getNodeInfo() != null && node.getNodeInfo().getBranchLabel() != null) {
                 String label = node.getNodeInfo().getBranchLabel();

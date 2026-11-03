@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.ldt;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import de.uka.ilkd.key.java.Services;
@@ -105,7 +106,7 @@ public abstract class LDT extends AbstractLDT {
      * Returns the sort associated with the LDT.
      */
     public final Sort targetSort() {
-        return sort;
+        return Objects.requireNonNull(sort, "LDT " + name() + " not found");
     }
 
     // -------------------------------------------------------------------------
@@ -113,5 +114,5 @@ public abstract class LDT extends AbstractLDT {
     // -------------------------------------------------------------------------
 
 
-    public abstract Type getType(JTerm t);
+    public abstract @Nullable Type getType(JTerm t);
 }

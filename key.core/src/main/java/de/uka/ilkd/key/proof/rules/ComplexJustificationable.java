@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.rules;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Marker interface, s.t. {@link de.uka.ilkd.key.proof.init.JavaProfile} returns a
  * {@link de.uka.ilkd.key.proof.mgt.ComplexRuleJustification} instance for a marked rule.
  *
  * @author weigl
  */
+@NullMarked
 public interface ComplexJustificationable {
 }

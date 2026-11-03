@@ -8,12 +8,16 @@ import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Node in an intermediate proof representation. Responsible for storing information about children
  * of nodes.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class NodeIntermediate {
 
     /**
@@ -30,7 +34,15 @@ public abstract class NodeIntermediate {
         return children;
     }
 
-    public void setChildren(LinkedList<NodeIntermediate> children) {
+    /**
+     * Sets the children of this node. A {@code null} argument is a designed state of the
+     * intermediate representation: it marks the children as consumed and no longer needed and is
+     * only ever passed by the replay machinery to free memory; it is never written to a proof file.
+     * The assignment of the (nullable) argument to the non-null field is suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
+    public void setChildren(@Nullable LinkedList<NodeIntermediate> children) {
         this.children = children;
         this.subtreeSize = -1;
     }
@@ -42,7 +54,14 @@ public abstract class NodeIntermediate {
 
     /**
      * @return number of NodeIntermediates in this tree of nodes (including this node)
+     *         <p>
+     *         The breadth-first queue below is drained only while it is non-empty, so a polled node
+     *         is
+     *         always present; the dereference of the (nullable) polled node is suppressed with a
+     *         scoped
+     *         key.
      */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public int countAllChildren() {
         if (subtreeSize != -1) {
             return subtreeSize;

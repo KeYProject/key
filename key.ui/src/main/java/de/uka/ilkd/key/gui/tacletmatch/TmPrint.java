@@ -21,11 +21,15 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Pretty-printing for the taclet-match dialog. Term labels are never shown here: the dialog
  * displays
  * the logical content (find/matched/bindings/preview), where origin and other labels are noise.
  */
+@NullMarked
 final class TmPrint {
 
     /** a label visibility that hides every term label */
@@ -50,7 +54,7 @@ final class TmPrint {
     }
 
     /** a printed term together with the position table that maps its sub-terms to char ranges. */
-    record Positioned(String text, InitialPositionTable positions) {
+    record Positioned(String text, @Nullable InitialPositionTable positions) {
     }
 
     /**
@@ -59,6 +63,10 @@ final class TmPrint {
      */
     static Positioned termWithPositions(KeYMediator mediator, Term t) {
         Services services = mediator.getServices();
+        if (services == null) {
+            // the mediator always carries services when a term is displayed
+            throw new NullPointerException("No services available.");
+        }
         NotationInfo ni = new NotationInfo();
         SequentViewLogicPrinter p =
             SequentViewLogicPrinter.positionPrinter(ni, services, NO_LABELS);
@@ -85,11 +93,25 @@ final class TmPrint {
         if (o instanceof Term t) {
             return term(mediator, t);
         }
-        return ProofSaver.printAnything(o, mediator.getServices());
+        Services services = mediator.getServices();
+        if (services == null) {
+            // the mediator always carries services when an instantiation is displayed
+            throw new NullPointerException("No services available.");
+        }
+        String printed = ProofSaver.printAnything(o, services);
+        if (printed == null) {
+            // the default printer always renders representable objects
+            throw new NullPointerException("No printable representation available.");
+        }
+        return printed;
     }
 
     private static SequentViewLogicPrinter printer(KeYMediator mediator) {
         Services services = mediator.getServices();
+        if (services == null) {
+            // the mediator always carries services when a term is displayed
+            throw new NullPointerException("No services available.");
+        }
         NotationInfo ni = new NotationInfo();
         SequentViewLogicPrinter p = SequentViewLogicPrinter.purePrinter(ni, services, NO_LABELS);
         ni.refresh(services, mediator.getNotationInfo().isPrettySyntax(), false, false);

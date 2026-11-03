@@ -18,7 +18,10 @@ import de.uka.ilkd.key.gui.SearchBar;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     private final ProofTreeView proofTreeView;
     private int startRow = 0;
@@ -29,7 +32,7 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
      * needed to reach them); when deselected, the search only highlights matches without hiding
      * anything. Created in {@link #createUI()}.
      */
-    private JToggleButton collapseToggle;
+    private @Nullable JToggleButton collapseToggle;
 
     /** whether the {@link ProofTreeViewFilter#SEARCH} filter is currently applied to the model */
     private boolean filterApplied = false;
@@ -142,8 +145,14 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
             tp = this.proofTreeView.selectBranchNode((GUIBranchNode) node);
         }
 
-        this.proofTreeView.delegateView.scrollPathToVisible(tp);
-        this.proofTreeView.delegateView.setSelectionPath(tp);
+        TreePath visiblePath = tp;
+        if (visiblePath == null) {
+            // no match: the tree selection is cleared, nothing is scrolled into view
+            this.proofTreeView.delegateView.clearSelection();
+        } else {
+            this.proofTreeView.delegateView.scrollPathToVisible(visiblePath);
+            this.proofTreeView.delegateView.setSelectionPath(visiblePath);
+        }
 
         return currentRow != -1;
     }
@@ -164,10 +173,10 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         reset();
     }
 
-    private List<Pair<GUIAbstractTreeNode, String>> cache;
+    private List<Pair<GUIAbstractTreeNode, String>> cache = new ArrayList<>();
 
     public synchronized void reset() {
-        cache = null;
+        cache.clear();
         // The proof tree changed (e.g. a strategy run added nodes). If the collapsing search is
         // active, the rebuilt tree is collapsed again; re-expand it so newly matching nodes become
         // visible. Deferred to run after the current tree-change event has been processed.
@@ -187,13 +196,14 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
     }
 
     private void fillCache() {
-        if (cache == null) {
-            cache = new ArrayList<>();
+        if (cache.isEmpty()) {
             final GUIProofTreeModel delegateModel = this.proofTreeView.getDelegateModel();
-            if (delegateModel != null
-                    && delegateModel.getRoot() != null) {
-                addNodeToCache((GUIAbstractTreeNode) delegateModel.getRoot());
-                fillCacheHelp((GUIBranchNode) delegateModel.getRoot());
+            if (delegateModel != null) {
+                Object root = delegateModel.getRoot();
+                if (root != null) {
+                    addNodeToCache((GUIAbstractTreeNode) root);
+                    fillCacheHelp((GUIBranchNode) root);
+                }
             }
         }
     }
@@ -202,9 +212,17 @@ class ProofTreeSearchBar extends SearchBar implements TreeModelListener {
         if (branch == null) {
             return;
         }
-        final GUIProofTreeModel delegateModel = this.proofTreeView.getDelegateModel();
+        GUIProofTreeModel delegateModel = this.proofTreeView.getDelegateModel();
+        if (delegateModel == null) {
+            // the cache is only built while a delegate model is available
+            throw new NullPointerException("No delegate model available.");
+        }
         for (int i = 0; i < delegateModel.getChildCount(branch); i++) {
             final GUIAbstractTreeNode n = (GUIAbstractTreeNode) delegateModel.getChild(branch, i);
+            if (n == null) {
+                // a valid child index always yields a node
+                throw new NullPointerException("No tree node available.");
+            }
             addNodeToCache(n);
             if (n instanceof GUIBranchNode branchNode) {
                 fillCacheHelp(branchNode);

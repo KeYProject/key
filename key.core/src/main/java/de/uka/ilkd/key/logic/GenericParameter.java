@@ -6,12 +6,13 @@ package de.uka.ilkd.key.logic;
 
 import de.uka.ilkd.key.logic.sort.GenericSort;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// Abstract parameter for [ParametricFunctionDecl] or [ParametricSortDecl]
+@NullMarked
 public record GenericParameter(GenericSort sort, Variance variance) {
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         return sort.toString();
     }
 

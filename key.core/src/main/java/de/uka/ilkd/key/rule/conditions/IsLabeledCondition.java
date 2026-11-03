@@ -19,12 +19,16 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Checks whether the given statement is labeled, i.e., actual a LabeledStatement. This information
  * is obtained from the program prefix.
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class IsLabeledCondition implements VariableCondition {
     private final boolean negated;
     private final ProgramSV stmtSV;
@@ -35,7 +39,7 @@ public class IsLabeledCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable sv, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(SchemaVariable sv, SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices services) {
         final var svInst =
             (SVInstantiations) matchCond.getInstantiations();

@@ -31,6 +31,8 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.util.IconManager;
 import bibliothek.gui.dock.util.Priority;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,19 +44,43 @@ import org.slf4j.LoggerFactory;
  */
 @KeYGuiExtension.Info(name = "Docking Helpers", optional = false, experimental = false,
     priority = 1)
+@NullMarked
 public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Startup,
         KeYGuiExtension.MainMenu {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockingLayout.class);
 
     private static final float SIZE_ICON_DOCK = 12f;
-    private static final Path LAYOUT_FILE =
-        PathConfig.currentPaths.keyConfigDir.resolve("layout.xml");
+    private static final Path LAYOUT_FILE = layoutFile();
+
+    /**
+     * Resolves the layout file inside the KeY configuration directory.
+     */
+    private static Path layoutFile() {
+        PathConfig.KeyPaths currentPaths = PathConfig.currentPaths;
+        if (currentPaths == null) {
+            // the layout file is only needed once the configuration paths are known
+            throw new NullPointerException("No configuration paths available.");
+        }
+        return currentPaths.keyConfigDir.resolve("layout.xml");
+    }
 
     private static final String[] LAYOUT_NAMES = { "Default", "Slot 1", "Slot 2" };
     private static final int[] LAYOUT_KEYS =
         { KeyEvent.VK_F10, KeyEvent.VK_F11, KeyEvent.VK_F12 };
 
     private MainWindow window;
+
+    /**
+     * Creates the docking layout extension.
+     *
+     * <p>
+     * The main window is only assigned when the extension is initialized by
+     * {@link #init(MainWindow, KeYMediator)}; the EISOP initialization check cannot see the
+     * assignment inside the framework callback, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    public DockingLayout() {
+    }
 
     private void installIcons(MainWindow mw) {
         CControl globalPort = mw.getDockControl();
@@ -155,11 +181,12 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
 }
 
 
+@NullMarked
 final class SaveLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = -2646217961498111734L;
     private final String layoutName;
 
-    SaveLayoutAction(MainWindow mainWindow, String name, Integer key) {
+    SaveLayoutAction(MainWindow mainWindow, String name, @Nullable Integer key) {
         super(mainWindow);
         this.layoutName = name;
         setName("Save " + name);
@@ -180,11 +207,12 @@ final class SaveLayoutAction extends MainWindowAction {
 }
 
 
+@NullMarked
 final class LoadLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 3378477658914832831L;
     private final String layoutName;
 
-    LoadLayoutAction(MainWindow mainWindow, String name, Integer key) {
+    LoadLayoutAction(MainWindow mainWindow, String name, @Nullable Integer key) {
         super(mainWindow);
         this.layoutName = name;
         setName("Load " + name);
@@ -210,6 +238,7 @@ final class LoadLayoutAction extends MainWindowAction {
 }
 
 
+@NullMarked
 final class ResetLayoutAction extends MainWindowAction {
     private static final long serialVersionUID = 8772915552504055750L;
 

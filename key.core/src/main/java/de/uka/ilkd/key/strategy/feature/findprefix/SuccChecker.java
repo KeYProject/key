@@ -6,11 +6,14 @@ package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Checks, whether the position in occurrence is in the succedent.
  *
  * @author christoph
  */
+@NullMarked
 class SuccChecker implements Checker {
 
     @Override

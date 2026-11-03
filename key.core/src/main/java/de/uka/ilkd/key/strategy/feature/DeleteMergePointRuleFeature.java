@@ -18,6 +18,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Costs for the {@link DeleteMergePointRuleFeature}; incredibly cheap if the previous rule
@@ -29,6 +30,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class DeleteMergePointRuleFeature implements Feature {
     public static final Feature INSTANCE = new DeleteMergePointRuleFeature();
 

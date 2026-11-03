@@ -15,6 +15,9 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 import de.uka.ilkd.key.util.UnicodeHelper;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class UnicodeToggleAction extends MainWindowAction {
     private static final long serialVersionUID = 6078839876754730405L;
 
@@ -30,9 +33,20 @@ public class UnicodeToggleAction extends MainWindowAction {
      * <p>
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
+     *
+     * The bound method reference binds {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the listener only ever fires
+     * after construction completes, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:methodref.receiver.bound.invalid")
     private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
 
+    /**
+     * The action-configuration calls and the listener registration below operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * since these configure the local action only, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public UnicodeToggleAction(MainWindow window) {
         super(window);
         setName(NAME);

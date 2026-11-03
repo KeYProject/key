@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (04.12.23)
  */
+@NullMarked
 public class FeatureSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(FeatureSettings.class);
     private static final String CATEGORY = "Feature";
@@ -36,6 +38,13 @@ public class FeatureSettings extends AbstractSettings {
      */
     private final Set<String> activatedFeatures = new TreeSet<>();
 
+    /**
+     * The feature activation operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because it only reads system
+     * properties and writes the {@link #activatedFeatures} set initialized inline, suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public FeatureSettings() {
         readFromSystemProperties();
     }
@@ -201,6 +210,13 @@ public class FeatureSettings extends AbstractSettings {
 
         public static final List<Feature> FEATURES = new ArrayList<>();
 
+        /**
+         * Registers the feature in the global {@link #FEATURES} registry. The still-under-init
+         * receiver ({@code this}) is only stored here and never dereferenced during construction;
+         * the list is only read after construction completes, so the
+         * {@code nullness:argument.type.incompatible} warning is suppressed.
+         */
+        @SuppressWarnings("nullness:argument.type.incompatible")
         public Feature {
             FEATURES.add(this);
         }

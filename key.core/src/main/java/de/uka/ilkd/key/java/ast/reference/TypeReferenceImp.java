@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.reference;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.annotation.Annotation;
@@ -15,6 +17,9 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * TypeReferences reference Types by name. A TypeReference can refer to
  * an outer or inner type and hence can also be a {@link MemberReference}, but does not have to. A
@@ -23,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
  * {@link TypeReferenceContainer}.
  */
 
+@NullMarked
 public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
         implements TypeReference {
 
@@ -30,7 +36,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     /**
      * Prefix.
      */
-    protected final ReferencePrefix prefix;
+    protected final @Nullable ReferencePrefix prefix;
 
     /**
      * Dimensions.
@@ -38,9 +44,10 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     protected final int dimensions;
 
     /**
-     * Name.
+     * Name. Nullable because the {@link ExtList} constructor tolerates a missing
+     * {@code ProgramElementName} child (cf. {@link #getName()}).
      */
-    protected final ProgramElementName name;
+    protected final @Nullable ProgramElementName name;
 
     /**
      * Java Annotations (like @NonNull or @Rep).
@@ -75,7 +82,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
             ProgramElementName name,
             ImmutableList<Annotation> annotations,
             int dimension,
-            ReferencePrefix prefix) {
+            @Nullable ReferencePrefix prefix) {
         this.name = name;
         this.annotations = annotations;
         this.dimensions = dimension;
@@ -84,12 +91,13 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
 
 
     public SourceElement getFirstElement() {
-        return (prefix == null) ? name : prefix.getFirstElement();
+        return (prefix == null) ? Objects.requireNonNull(name) : prefix.getFirstElement();
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-        return (prefix == null) ? name : prefix.getFirstElementIncludingBlocks();
+        return (prefix == null) ? Objects.requireNonNull(name)
+                : prefix.getFirstElementIncludingBlocks();
     }
 
     /**
@@ -193,7 +201,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      *
      * @return the reference prefix.
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
@@ -202,7 +210,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      *
      * @return the package reference.
      */
-    public PackageReference getPackageReference() {
+    public @Nullable PackageReference getPackageReference() {
         return (prefix instanceof PackageReference) ? (PackageReference) prefix : null;
     }
 
@@ -220,11 +228,11 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      *
      * @return the string.
      */
-    public final String getName() {
+    public final @Nullable String getName() {
         return (name == null) ? null : name.toString();
     }
 
-    public abstract KeYJavaType getKeYJavaType();
+    public abstract @Nullable KeYJavaType getKeYJavaType();
 
     /**
      * Get identifier.
@@ -232,7 +240,12 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
      * @return the identifier.
      */
 
-    public ProgramElementName getProgramElementName() {
+    // The name of a type reference is genuinely nullable (see the {@link ExtList} constructor),
+    // but the {@link MemberReference}/{@link de.uka.ilkd.key.java.ast.NamedProgramElement}
+    // contract demands @NonNull here; the interfaces cannot be widened without ripple into
+    // e.g. EqualityModuloProofIrrelevancy (cf. LabeledStatement#getProgramElementName()).
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
+    public @Nullable ProgramElementName getProgramElementName() {
         return name;
     }
 
@@ -249,7 +262,7 @@ public abstract class TypeReferenceImp extends JavaNonTerminalProgramElement
     }
 
 
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, @Nullable MatchConditions matchCond) {
         final ProgramElement pe = source.getSource();
         if (!(pe instanceof TypeReference)
                 || ((TypeReference) pe).getDimensions() != getDimensions()) {

@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A short little hack, but completely working and fast, for replaying proofs inside KeY files.
@@ -28,6 +29,7 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (12/5/19)
  * @see #run(Token, CharStream, IProofFileParser, URI)
  */
+@NullMarked
 public class ProofReplayer {
     /**
      * This map is for the translation between symbols in the sexpr and the corresponding proof tag.
@@ -72,7 +74,15 @@ public class ProofReplayer {
      * @param prl the proof replayer interface
      * @param startLine the starting of the sexpr needed for {@code prl}
      * @param source the source of the stream, used for producing exceptions with locations
+     *        <p>
+     *        The sexpr grammar makes the string argument of a proof element optional, and
+     *        argument-less elements (e.g. {@code (userinteraction)}, as written by the proof
+     *        saver) legally reach {@link IProofFileParser#beginExpr} with {@code null}. The
+     *        implementations are written for that protocol and ignore absent arguments, so the
+     *        interface's non-null {@code str} parameter under-documents the contract; the pass of
+     *        the (nullable) argument is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static void run(CharStream input, IProofFileParser prl, final int startLine,
             URI source) {
         JavaKeYLexer lexer = ParsingFacade.createLexer(input);

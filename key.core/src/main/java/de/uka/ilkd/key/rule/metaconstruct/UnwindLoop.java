@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a
  * loop. It unwinds the loop: e.g.
@@ -40,6 +42,7 @@ import org.key_project.util.collection.ImmutableList;
  * </pre>
  *
  */
+@NullMarked
 public class UnwindLoop extends ProgramTransformer {
 
     /** the outer label that is used to leave the while loop ('l1') */

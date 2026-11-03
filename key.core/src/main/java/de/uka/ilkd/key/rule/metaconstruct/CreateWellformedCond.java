@@ -17,6 +17,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Creates the wellformedness condition for the given anonymizing heap terms if they apply for the
  * current profile and modality type. At least generates the "wellFormed(anon_heap_LOOP)" condition
@@ -24,6 +26,7 @@ import org.key_project.logic.op.Operator;
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public final class CreateWellformedCond extends AbstractTermTransformer {
 
     public CreateWellformedCond() {

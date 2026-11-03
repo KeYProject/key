@@ -11,7 +11,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.antlr.v4.runtime.CharStream;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract class RuleSource {
 
     // key-file containing ldt declarations

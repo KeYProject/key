@@ -15,9 +15,12 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * creates an assignment instantiationOf(#newObjectsV).$initialized = true
  */
+@NullMarked
 public class PostWork extends ProgramTransformer {
 
     private final static String POST_WORK = "post-work";

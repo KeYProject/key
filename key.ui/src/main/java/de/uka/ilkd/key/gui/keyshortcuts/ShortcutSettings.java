@@ -19,18 +19,33 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.gui.settings.SimpleSettingsPanel;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * UI for configuring the {@link KeyStroke}s inside KeY.
  *
  * @author Alexander Weigl
  * @version 1 (09.05.19)
  */
+@NullMarked
 public class ShortcutSettings extends SimpleSettingsPanel implements SettingsProvider {
     @Serial
     private static final long serialVersionUID = -7609149706562761596L;
     private final JTable tblShortcuts = new JTable();
     private ShortcutsTableModel modelShortcuts;
 
+    /**
+     * Creates the shortcut settings panel.
+     *
+     * <p>
+     * The table model is built lazily by {@link #getPanel(MainWindow)}, which the settings
+     * framework always calls before {@link #applySettings(MainWindow)}; the EISOP initialization
+     * check can therefore not verify the model field, and the header texts are set while the
+     * receiver is still under initialization, both suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid" })
     public ShortcutSettings() {
         super();
         setHeaderText("Keyboard Shortcuts");
@@ -54,10 +69,15 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
             p.keySet().stream().sorted().map(Object::toString).collect(Collectors.toList());
 
         // for the view, we hide "pressed" to increase readability
-        List<String> shortcuts = actionNames.stream().map(p::getProperty)
-                .map(s -> s.replace("pressed ", "")).collect(Collectors.toList());
+        List<String> shortcuts = actionNames.stream().map(p::getProperty).map(s -> {
+            if (s == null) {
+                // every stored key has a non-empty shortcut
+                throw new NullPointerException("No shortcut available.");
+            }
+            return s.replace("pressed ", "");
+        }).collect(Collectors.toList());
 
-        List<Action> actions =
+        List<@Nullable Action> actions =
             actionNames.stream().map(KeyStrokeManager::findAction).collect(Collectors.toList());
 
         modelShortcuts = new ShortcutsTableModel(actionNames, shortcuts, actions);
@@ -69,7 +89,6 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         List<RowSorter.SortKey> sortKeys = new ArrayList<>(25);
         sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
         sorter.setSortKeys(sortKeys);
-
 
         JTextField txtCaptureShortcut = new JTextField();
         DefaultCellEditor cellEditor = new DefaultCellEditor(txtCaptureShortcut);
@@ -142,6 +161,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
             String key = modelShortcuts.actionName.get(i);
             KeyStroke ks = keystrokes.get(i);
             KeyStrokeManager.getSettings().setKeyStroke(key, ks, true);
+            @Nullable
             Action action = modelShortcuts.actions.get(i);
             if (action != null) {
                 action.putValue(Action.ACCELERATOR_KEY, ks);
@@ -155,10 +175,10 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
         private static final String[] COLUMNS = { "Name", "Description", "Shortcut" };
         private final List<String> actionName;
         private final List<String> shortcut;
-        private final List<Action> actions;
+        private final List<@Nullable Action> actions;
 
         private ShortcutsTableModel(List<String> actionName, List<String> shortcut,
-                List<Action> actions) {
+                List<@Nullable Action> actions) {
             this.actionName = actionName;
             this.shortcut = shortcut;
             this.actions = actions;

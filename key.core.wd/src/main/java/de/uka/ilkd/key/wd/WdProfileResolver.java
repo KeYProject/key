@@ -7,10 +7,13 @@ package de.uka.ilkd.key.wd;
 import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
 import de.uka.ilkd.key.proof.init.Profile;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (8/3/25)
  */
+@NullMarked
 public class WdProfileResolver implements DefaultProfileResolver {
     @Override
     public String getProfileName() {

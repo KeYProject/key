@@ -26,6 +26,7 @@ import org.key_project.exploration.Icons;
 
 import bibliothek.gui.dock.common.action.CAction;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -34,30 +35,40 @@ import org.jspecify.annotations.Nullable;
  * @author Sarah Grebing
  */
 @HelpInfo(path = "/Using Key/Exploration/")
+@NullMarked
 public class ExplorationStepsList extends JPanel implements TabPanel {
     private final JLabel hasExplorationSteps = new JLabel();
     private final PruneExplorationAction actionPruneExploration = new PruneExplorationAction();
     private final JumpToNodeAction actionJumpToNode = new JumpToNodeAction();
     private final DefaultListModel<Node> listModelExploration = new DefaultListModel<>();
     private final JList<Node> listExplorations = new JList<>(listModelExploration);
-    private final DefaultTreeModel treeModelExploration = new DefaultTreeModel(null);
+    private final ExplorationStepsModel treeModelExploration = new ExplorationStepsModel();
     private final JTree treeExploration = new JTree(treeModelExploration);
     private final transient KeYMediator mediator;
 
-    private final transient RuleAppListener ruleAppListener = e1 -> {
-        createModel(e1.getSource());
+    private final transient RuleAppListener ruleAppListener;
+
+    private transient @Nullable Proof currentProof;
+    private boolean enabled;
+
+    /**
+     * The initialization of the {@link #ruleAppListener} and the call to {@link #initialize()}
+     * happen on {@code this} while the receiver is still under construction (EISOP
+     * initialization check); safe here since all fields are set before the calls, suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    public ExplorationStepsList(MainWindow window) throws HeadlessException {
+        this.mediator = window.getMediator();
+        this.ruleAppListener = e -> onRuleApplied(e.getSource());
+        initialize();
+    }
+
+    private void onRuleApplied(@NonNull Proof proof) {
+        createModel(proof);
         TreePath selectionPath = treeExploration.getSelectionModel().getSelectionPath();
         setTreeExpandedState(treeExploration, true);
         treeExploration.setSelectionPath(selectionPath);
-    };
-
-    private transient Proof currentProof;
-    private boolean enabled;
-
-
-    public ExplorationStepsList(MainWindow window) throws HeadlessException {
-        this.mediator = window.getMediator();
-        initialize();
     }
 
     /**
@@ -85,20 +96,25 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         }
     }
 
-    public Proof getProof() { return currentProof; }
+    public @Nullable Proof getProof() { return currentProof; }
 
     private void createModel(@Nullable Proof model) {
         listModelExploration.clear();
         if (enabled && model != null && !model.isDisposed()) {
             Node root = model.root();
+            if (root == null) {
+                throw new NullPointerException("Proof has no root node.");
+            }
             // build the treemodel
             MyTreeNode rootNode = new MyTreeNode(root);
             treeModelExploration.setRoot(rootNode);
+            treeExploration.setRootVisible(true);
             List<Node> explorationNodes =
                 collectAllExplorationSteps(root, treeModelExploration, rootNode);
             explorationNodes.forEach(listModelExploration::addElement);
         } else {
             treeModelExploration.setRoot(null);
+            treeExploration.setRootVisible(false);
         }
         updateLabel();
     }
@@ -234,10 +250,12 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     // region Tree and ListUtils
     private void setTreeExpandedState(JTree tree, boolean expanded) {
-        MyTreeNode node = (MyTreeNode) tree.getModel().getRoot();
-        if (node != null) {
-            setNodeExpanded(tree, node, expanded);
+        TreeNode root = (TreeNode) tree.getModel().getRoot();
+        if (root == ExplorationStepsModel.EMPTY_ROOT) {
+            return;
         }
+        MyTreeNode node = (MyTreeNode) root;
+        setNodeExpanded(tree, node, expanded);
     }
 
     private void setNodeExpanded(JTree tree, MyTreeNode node, boolean expanded) {
@@ -260,8 +278,12 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
         }
     }
 
-    private TreePath getTreePath(Node n) {
-        MyTreeNode rootNode = (MyTreeNode) treeModelExploration.getRoot();
+    private @Nullable TreePath getTreePath(Node n) {
+        TreeNode root = (TreeNode) treeModelExploration.getRoot();
+        if (root == ExplorationStepsModel.EMPTY_ROOT) {
+            return null;
+        }
+        MyTreeNode rootNode = (MyTreeNode) root;
         Enumeration<TreeNode> treeNodeEnumeration = rootNode.depthFirstEnumeration();
         while (treeNodeEnumeration.hasMoreElements()) {
             TreeNode treeNode = treeNodeEnumeration.nextElement();
@@ -288,11 +310,14 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     private static class MyCellRenderer extends DefaultListCellRenderer {
         @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<?> list, @Nullable Object value,
+                int index, boolean isSelected, boolean cellHasFocus) {
             JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,
                 cellHasFocus);
             Node n = (Node) value;
+            if (n == null) {
+                throw new NullPointerException("List entry has no proof node.");
+            }
 
             ExplorationNodeData expData = n.lookup(ExplorationNodeData.class);
             if (expData != null && expData.getExplorationAction() != null) {
@@ -305,11 +330,14 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
     private static class MyTreeCellRenderer extends DefaultTreeCellRenderer {
         @Override
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel,
-                boolean expanded, boolean leaf, int row, boolean hasFocus) {
+        public Component getTreeCellRendererComponent(JTree tree, @Nullable Object value,
+                boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             JLabel lbl = (JLabel) super.getTreeCellRendererComponent(tree, value, sel, expanded,
                 leaf, row, hasFocus);
             MyTreeNode n = (MyTreeNode) value;
+            if (n == null) {
+                throw new NullPointerException("Tree entry has no tree node.");
+            }
             ExplorationNodeData expData = n.getData().lookup(ExplorationNodeData.class);
 
             if (n.isRoot()) {
@@ -352,10 +380,37 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
             return Integer.toString(data.serialNr());
         }
     }
+
+    /**
+     * A {@link DefaultTreeModel} whose root may be {@code null}. The JDK model treats a
+     * {@code null} root as an empty model, but its annotated signature in this build requires
+     * a non-null one, so the empty state is stored in a hidden sentinel root instead; the
+     * {@link JTree} hides that root (see {@link #createModel}), which renders the same empty
+     * tree as a {@code null} root.
+     */
+    private static final class ExplorationStepsModel extends DefaultTreeModel {
+        /** Hidden root while the model is logically empty ({@code null} root). */
+        private static final TreeNode EMPTY_ROOT = new DefaultMutableTreeNode();
+
+        ExplorationStepsModel() {
+            super(EMPTY_ROOT);
+        }
+
+        @Override
+        public void setRoot(@Nullable TreeNode root) {
+            super.setRoot(root == null ? EMPTY_ROOT : root);
+        }
+    }
     // endregion
 
     // region Actions
     private class PruneExplorationAction extends KeyAction {
+        /**
+         * The {@link #setName(String)} call happens on {@code this} while the receiver is
+         * still under initialization (EISOP initialization check); safe here, suppressed with
+         * a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public PruneExplorationAction() {
             setName("Prune selected exploration");
         }
@@ -383,7 +438,9 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
 
             if (explorationNode != null) {
                 ExplorationNodeData lookup = explorationNode.lookup(ExplorationNodeData.class);
-                explorationNode.deregister(lookup, ExplorationNodeData.class);
+                if (lookup != null) {
+                    explorationNode.deregister(lookup, ExplorationNodeData.class);
+                }
                 // update list and tree with current proof
             }
             createModel(mediator.getSelectedProof());
@@ -391,6 +448,12 @@ public class ExplorationStepsList extends JPanel implements TabPanel {
     }
 
     private class JumpToNodeAction extends KeyAction {
+        /**
+         * The {@link #setName(String)} call happens on {@code this} while the receiver is
+         * still under initialization (EISOP initialization check); safe here, suppressed with
+         * a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public JumpToNodeAction() {
             setName("Jump To Node");
         }

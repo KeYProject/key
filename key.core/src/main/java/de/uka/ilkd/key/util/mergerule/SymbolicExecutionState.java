@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util.mergerule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -11,15 +13,19 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A symbolic execution state is a pair of a symbolic state in form of a parallel update, and a path
  * condition in form of a JavaDL formula.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class SymbolicExecutionState extends Pair<JTerm, JTerm> {
 
-    private Node correspondingNode = null;
+    private @Nullable Node correspondingNode = null;
 
     /**
      * @param symbolicState The symbolic state (parallel update).
@@ -57,7 +63,7 @@ public class SymbolicExecutionState extends Pair<JTerm, JTerm> {
     /**
      * @return The node corresponding to this SE state.
      */
-    public Node getCorrespondingNode() {
+    public @Nullable Node getCorrespondingNode() {
         return correspondingNode;
     }
 
@@ -70,7 +76,8 @@ public class SymbolicExecutionState extends Pair<JTerm, JTerm> {
 
     @Override
     public String toString() {
-        final Services services = getCorrespondingNode().proof().getServices();
+        final Services services = Objects.requireNonNull(getCorrespondingNode(),
+            "corresponding node must be set").proof().getServices();
 
         return "SymbolicExecutionStateWithProgCnt [Symbolic State=("
             + rmN(LogicPrinter.quickPrintTerm(getSymbolicState(), services)) + "), Path Condition=("

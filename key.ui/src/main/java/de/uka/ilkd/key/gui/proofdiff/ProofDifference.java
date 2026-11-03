@@ -17,10 +17,14 @@ import de.uka.ilkd.key.util.Levensthein;
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Semisequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (24.05.19)
  */
+@NullMarked
 public class ProofDifference {
     private static final Integer THRESHOLD = 25;
     private List<String> leftAntec = new LinkedList<>(), rightAntec = new LinkedList<>(),
@@ -85,6 +89,10 @@ public class ProofDifference {
                 min = d;
             }
         }
+        if (current == null) {
+            // a nearest match only exists for a non-empty candidate list
+            throw new NullPointerException("No match available in an empty list.");
+        }
         right.remove(current);
         return current;
     }
@@ -115,6 +123,10 @@ public class ProofDifference {
         boolean[] matchedRight = new boolean[right.size()];
         while (!queue.isEmpty()) {
             QueueEntry t = queue.poll();
+            if (t == null) {
+                // the loop condition guarantees a non-empty queue
+                break;
+            }
             /*
              * if(t.elseTerm>=THRESHOLD) { break; }
              */
@@ -186,7 +198,14 @@ public class ProofDifference {
         return findPairs(getLeftAntec(), getRightAntec());
     }
 
-    record Matching(String left, String right, int distance) {
+    /**
+     * A pair of (possibly unmatched) formulas with their edit distance.
+     *
+     * @param left the formula of the left sequent; {@code null} when unmatched
+     * @param right the formula of the right sequent; {@code null} when unmatched
+     * @param distance the edit distance between the two formulas
+     */
+    record Matching(@Nullable String left, @Nullable String right, int distance) {
 
         @Override
         public String toString() {

@@ -15,6 +15,9 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A theory's contribution to the choice of what a quantified formula is instantiated with.
  *
@@ -29,6 +32,7 @@ import org.key_project.util.collection.ImmutableSet;
  * A front end without a heap has nothing to contribute here and still reuses
  * {@link TheoryReasoning}.
  */
+@NullMarked
 public interface TriggerSupport {
 
     /**
@@ -77,7 +81,7 @@ public interface TriggerSupport {
      * @param services access to the theory operators
      * @return the verdict
      */
-    CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services);
+    CandidateVerdict verdictOn(JTerm candidate, @Nullable JTerm enclosing, Services services);
 
     /**
      * Additional triggers derived from the accepted trigger {@code term}, for example a read

@@ -26,11 +26,15 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Checks whether a loop has an invariant (either normal or "free").
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class HasLoopInvariantCondition implements VariableCondition {
     private final ProgramSV loopStmtSV;
     private final SchemaVariable modalitySV;
@@ -41,7 +45,7 @@ public class HasLoopInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices p_services) {
         final Services services = (Services) p_services;
         final var svInst =

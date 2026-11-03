@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This program is a little for debugging KeY Lexer.
@@ -27,6 +28,7 @@ import org.antlr.v4.runtime.Token;
  * @author weigl
  * @version 2019-12-09
  */
+@NullMarked
 public class DebugKeyLexer {
     private static final String DEFAULT_FORMAT = "%02d %20s %d:%-50s\n";
     private final PrintStream stream;
@@ -41,14 +43,15 @@ public class DebugKeyLexer {
 
     public DebugKeyLexer(List<File> files) {
         stream = System.out;
-        lexer = files.stream().map(it -> {
+        final List<JavaKeYLexer> lexers = new ArrayList<>(files.size());
+        for (File file : files) {
             try {
-                return ParsingFacade.createLexer(it.toPath());
+                lexers.add(ParsingFacade.createLexer(file.toPath()));
             } catch (IOException e) {
                 e.printStackTrace(stream);
             }
-            return null;
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        }
+        lexer = lexers;
         format = DEFAULT_FORMAT;
     }
 

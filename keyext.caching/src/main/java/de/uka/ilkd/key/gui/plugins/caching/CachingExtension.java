@@ -36,6 +36,7 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
+import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.CopyReferenceResolver;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
@@ -48,6 +49,8 @@ import org.key_project.prover.engine.impl.DefaultProver;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +59,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 @KeYGuiExtension.Info(name = "Proof Caching", optional = true,
     description = "Functionality related to reusing previous proof results in similar proofs",
     experimental = false)
@@ -68,9 +72,9 @@ public class CachingExtension
     private static final Logger LOGGER = LoggerFactory.getLogger(CachingExtension.class);
 
     /**
-     * The mediator.
+     * The mediator, set in {@link #preInit}.
      */
-    private KeYMediator mediator;
+    private @Nullable KeYMediator mediator;
     /**
      * Whether to try to close the current proof (by caching) after a rule application.
      * Will be false when running certain macros, like the "close provable goals" macro.
@@ -81,16 +85,17 @@ public class CachingExtension
      * Proofs tracked for automatic reference search.
      */
     private final Set<Proof> trackedProofs = new HashSet<>();
-    private ReferenceSearchButton referenceSearchButton;
-    private CachingToggleAction toggleAction = null;
-    private CachingPruneHandler cachingPruneHandler = null;
+    private @Nullable ReferenceSearchButton referenceSearchButton;
+    private @Nullable CachingToggleAction toggleAction = null;
+    private @Nullable CachingPruneHandler cachingPruneHandler = null;
 
     private void initActions(MainWindow mainWindow) {
         if (toggleAction == null) {
-            toggleAction = new CachingToggleAction(mainWindow);
+            CachingToggleAction action = new CachingToggleAction(mainWindow);
+            toggleAction = action;
             // Proof caching is single-core only: greying the action covers every toolbar button and
             // menu item bound to it while the multi-core prover is active.
-            SingleCoreFeatureGate.registerAutoDisabled(toggleAction);
+            SingleCoreFeatureGate.registerAutoDisabled(action);
         }
     }
 
@@ -100,15 +105,23 @@ public class CachingExtension
      * @param proof the currently open proof
      */
     public void updateGUIState(Proof proof) {
-        referenceSearchButton.updateState(proof);
+        ReferenceSearchButton button = referenceSearchButton;
+        if (button == null) {
+            throw new NullPointerException("Reference-search button not initialized.");
+        }
+        button.updateState(proof);
     }
 
     @Override
     public @NonNull JToolBar getToolbar(MainWindow mainWindow) {
         initActions(mainWindow);
+        CachingToggleAction action = toggleAction;
+        if (action == null) {
+            throw new NullPointerException("Proof-caching toggle action not initialized.");
+        }
         JToolBar tb = new JToolBar("Proof Caching");
-        JToggleButton comp = new JToggleButton(toggleAction);
-        comp.setToolTipText((String) toggleAction.getValue(Action.LONG_DESCRIPTION));
+        JToggleButton comp = new JToggleButton(action);
+        comp.setToolTipText((String) action.getValue(Action.LONG_DESCRIPTION));
         tb.add(comp);
         return tb;
     }
@@ -116,14 +129,22 @@ public class CachingExtension
     @Override
     public @NonNull List<Action> getMainMenuActions(@NonNull MainWindow mainWindow) {
         initActions(mainWindow);
-        return List.of(toggleAction);
+        CachingToggleAction action = toggleAction;
+        if (action == null) {
+            throw new NullPointerException("Proof-caching toggle action not initialized.");
+        }
+        return List.of(action);
     }
 
     public boolean getProofCachingEnabled() {
         // Proof caching is a single-core-only feature: the multi-core prover closes goals on worker
         // threads, which does not mix with caching's reference search and goal disabling. It is
         // forced off (and reported as such in the UI) while the multi-core prover is active.
-        return toggleAction.isSelected() && !SingleCoreFeatureGate.isActive();
+        CachingToggleAction action = toggleAction;
+        if (action == null) {
+            throw new NullPointerException("Proof-caching toggle action not initialized.");
+        }
+        return action.isSelected() && !SingleCoreFeatureGate.isActive();
     }
 
     @Override
@@ -135,7 +156,11 @@ public class CachingExtension
         trackedProofs.add(p);
         p.addRuleAppListener(this);
         p.addProofDisposedListener(this);
-        p.addProofTreeListener(cachingPruneHandler);
+        CachingPruneHandler pruneHandler = cachingPruneHandler;
+        if (pruneHandler == null) {
+            throw new NullPointerException("Caching prune handler not initialized.");
+        }
+        p.addProofTreeListener(pruneHandler);
     }
 
     @Override
@@ -159,18 +184,28 @@ public class CachingExtension
             return;
         }
         Proof p = e.getSource();
-        if (e.getRuleAppInfo().getOriginalNode().getNodeInfo().getInteractiveRuleApplication()) {
+        RuleAppInfo ruleAppInfo = e.getRuleAppInfo();
+        if (ruleAppInfo == null) {
+            throw new NullPointerException("No rule application info for the applied rule.");
+        }
+        if (ruleAppInfo.getOriginalNode().getNodeInfo().getInteractiveRuleApplication()) {
             return; // only applies for automatic proof search
         }
         ImmutableList<Goal> newGoals = e.getNewGoals();
+        if (newGoals == null) {
+            throw new NullPointerException("No new goals for the applied rule.");
+        }
         if (newGoals.size() <= 1) {
             return;
+        }
+        KeYMediator m = mediator;
+        if (m == null) {
+            throw new NullPointerException("Mediator not initialized for rule application.");
         }
         for (Goal goal : newGoals) {
             ClosedBy c = null;
             try {
-                c = ReferenceSearcher.findPreviousProof(mediator.getCurrentlyOpenedProofs(),
-                    goal.node());
+                c = ReferenceSearcher.findPreviousProof(m.getCurrentlyOpenedProofs(), goal.node());
             } catch (Exception exception) {
                 LOGGER.warn("error during reference search ", exception);
             }
@@ -179,9 +214,7 @@ public class CachingExtension
                 goal.setEnabled(false);
 
                 goal.node().register(c, ClosedBy.class);
-                c.proof()
-                        .addProofDisposedListenerFirst(
-                            new CopyBeforeDispose(mediator, c.proof(), p));
+                c.proof().addProofDisposedListenerFirst(new CopyBeforeDispose(m, c.proof(), p));
             }
         }
     }
@@ -228,8 +261,14 @@ public class CachingExtension
 
     @Override
     public List<JComponent> getStatusLineComponents() {
-        referenceSearchButton = new ReferenceSearchButton(mediator);
-        return List.of(referenceSearchButton);
+        KeYMediator m = mediator;
+        if (m == null) {
+            throw new NullPointerException("Mediator not initialized before status-line setup.");
+        }
+        ReferenceSearchButton button = new ReferenceSearchButton(m);
+        button.registerListeners();
+        referenceSearchButton = button;
+        return List.of(button);
     }
 
     @Override
@@ -319,11 +358,18 @@ public class CachingExtension
                 }
             } else {
                 newProof.closedGoals().stream()
-                        .filter(x -> x.node().lookup(ClosedBy.class) != null
-                                && x.node().lookup(ClosedBy.class).proof() == referencedProof)
+                        .filter(x -> {
+                            ClosedBy closedBy = x.node().lookup(ClosedBy.class);
+                            return closedBy != null && closedBy.proof() == referencedProof;
+                        })
                         .forEach(x -> {
                             newProof.reOpenGoal(x);
-                            x.node().deregister(x.node().lookup(ClosedBy.class), ClosedBy.class);
+                            ClosedBy closedBy = x.node().lookup(ClosedBy.class);
+                            if (closedBy == null) {
+                                throw new NullPointerException(
+                                    "Closed goal lost its closed-by reference.");
+                            }
+                            x.node().deregister(closedBy, ClosedBy.class);
                         });
             }
         }

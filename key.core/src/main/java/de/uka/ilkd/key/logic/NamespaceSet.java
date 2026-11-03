@@ -69,7 +69,15 @@ public class NamespaceSet {
             choiceNS, programVarNS, new org.key_project.logic.MetaSpace());
     }
 
+    /**
+     * The namespace registrations below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because {@link #register} only
+     * writes into the {@code namespaces} map, suppressed with a scoped key.
+     *
+     * @deprecated use one of the other constructors
+     */
     @Deprecated
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
             Namespace<Function> funcNS,
             Namespace<Sort> sortNS,
@@ -326,7 +334,11 @@ public class NamespaceSet {
             Namespace<?> parent = b.parent();
             newSpaces.put(a, parent != null ? parent : new Namespace<>());
         });
-        return new NamespaceSet(newSpaces, documentation.parent());
+        // same convention for the documentation space: no parent means an empty MetaSpace
+        // rather than null, keeping the "no null values" invariant for `documentation` too
+        org.key_project.logic.MetaSpace docParent = documentation.parent();
+        return new NamespaceSet(newSpaces,
+            docParent != null ? docParent : new org.key_project.logic.MetaSpace());
     }
 
     public org.key_project.logic.MetaSpace docs() {

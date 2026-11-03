@@ -27,6 +27,10 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 class GenericTranslator {
     private final VariablePool pool;
     private final ArrayList<TranslationListener> listener = new ArrayList<>();
@@ -39,7 +43,7 @@ class GenericTranslator {
     /**
      * Translates generic variables.
      */
-    public Collection<JTerm> translate(JTerm term, ImmutableSet<Sort> sorts, Taclet t,
+    public Collection<JTerm> translate(JTerm term, @Nullable ImmutableSet<Sort> sorts, Taclet t,
             TacletConditions conditions, Services serv, int maxGeneric)
             throws IllegalTacletException {
         this.services = serv;
@@ -85,7 +89,8 @@ class GenericTranslator {
      *         <code>term</code> is of type {@link ParametricFunctionInstance} and
      *         <code>instantiation</code> is of type {PrimitiveSort}.
      */
-    private JTerm instantiateGeneric(JTerm term, GenericSort generic, Sort instantiation, Taclet t)
+    private @Nullable JTerm instantiateGeneric(JTerm term, GenericSort generic, Sort instantiation,
+            Taclet t)
             throws IllegalArgumentException, IllegalTacletException {
         JTerm[] subTerms = new JTerm[term.arity()];
         ImmutableArray<QuantifiableVariable> variables = term.boundVars();
@@ -214,8 +219,10 @@ class GenericTranslator {
      *         generic variable the original term is returned.
      * @throws IllegalTacletException
      */
-    private ImmutableList<JTerm> instantiateGeneric(JTerm term, Set<GenericSort> genericSorts,
-            ImmutableSet<Sort> instSorts, Taclet t, TacletConditions conditions, int maxGeneric)
+    private @Nullable ImmutableList<JTerm> instantiateGeneric(JTerm term,
+            Set<GenericSort> genericSorts,
+            @Nullable ImmutableSet<Sort> instSorts, Taclet t, TacletConditions conditions,
+            int maxGeneric)
             throws IllegalTacletException {
         ImmutableList<JTerm> instantiatedTerms = ImmutableList.nil();
         if (maxGeneric < genericSorts.size()) {

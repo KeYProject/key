@@ -16,8 +16,11 @@ import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class provides means to run macros with key bindings such that these can be bound to the
@@ -25,6 +28,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class MacroKeyBinding extends AbstractAction {
     private static final long serialVersionUID = 1529344940571000989L;
 
@@ -52,7 +56,11 @@ public class MacroKeyBinding extends AbstractAction {
             }
         }
 
-        if (macro.canApplyTo(mediator.getSelectedNode(), posInOcc)) {
+        Node selectedNode = mediator.getSelectedNode();
+        if (selectedNode == null) {
+            throw new NullPointerException("No node selected for macro invocation.");
+        }
+        if (macro.canApplyTo(selectedNode, posInOcc)) {
             new ProofMacroUserAction(mediator, macro, posInOcc).actionPerformed(e);
         }
     }

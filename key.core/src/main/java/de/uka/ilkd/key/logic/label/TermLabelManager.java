@@ -30,6 +30,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -66,6 +69,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * @author Mattias Ulbrich
  * @see TermLabel
  */
+@NullMarked
 public class TermLabelManager {
     /**
      * {@link Map}s the {@link Name} of a {@link TermLabel} to its {@link TermLabelFactory}.
@@ -148,8 +152,17 @@ public class TermLabelManager {
      *
      * @param configurations The {@link TermLabelConfiguration} which defines how to support each
      *        {@link TermLabel}.
+     *
+     *        <p>
+     *        The {@code analyze*} policy calls below operate on {@code this} while the receiver is
+     *        still under initialization (EISOP initialization check); safe here because the maps
+     *        they
+     *        populate are final fields initialized inline and the per-label entries they read come
+     *        from
+     *        the freshly-built {@code TermLabelConfiguration}, suppressed with a scoped key.
      */
-    public TermLabelManager(ImmutableList<TermLabelConfiguration> configurations) {
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    public TermLabelManager(@Nullable ImmutableList<TermLabelConfiguration> configurations) {
         if (configurations != null) {
             for (TermLabelConfiguration conf : configurations) {
                 supportedTermLabelnames = supportedTermLabelnames.prepend(conf.getTermLabelName());
@@ -178,7 +191,7 @@ public class TermLabelManager {
      * @param termLabelName The name of the supported {@link TermLabel}.
      * @param termLabelMerger The {@link TermLabelMerger} to use.
      */
-    private void analyzeMerger(Name termLabelName, TermLabelMerger termLabelMerger) {
+    private void analyzeMerger(Name termLabelName, @Nullable TermLabelMerger termLabelMerger) {
         if (termLabelMerger != null) {
             mergerMap.put(termLabelName, termLabelMerger);
         }
@@ -196,7 +209,8 @@ public class TermLabelManager {
      * @param policies The {@link TermLabelPolicy} instances to analyze.
      * @param policyMap The policy {@link Map} to update.
      */
-    private void analyzeTermPolicies(Name termLabelName, ImmutableList<TermLabelPolicy> policies,
+    private void analyzeTermPolicies(Name termLabelName,
+            @Nullable ImmutableList<TermLabelPolicy> policies,
             Map<Name, TermLabelPolicy> policyMap) {
         if (policies != null) {
             for (TermLabelPolicy policy : policies) {
@@ -219,7 +233,7 @@ public class TermLabelManager {
      * @param ruleSpecificPolicyMap The rule specific policy {@link Map} to update.
      */
     private void analyzeChildTermPolicies(Name termLabelName,
-            ImmutableList<ChildTermLabelPolicy> policies,
+            @Nullable ImmutableList<ChildTermLabelPolicy> policies,
             Map<Name, ChildTermLabelPolicy> allRulesPolicyMap,
             Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicyMap) {
         if (policies != null) {
@@ -252,7 +266,7 @@ public class TermLabelManager {
      *
      * @param updates The {@link TermLabelUpdate}s to analyze.
      */
-    private void analyzeUpdates(ImmutableList<TermLabelUpdate> updates) {
+    private void analyzeUpdates(@Nullable ImmutableList<TermLabelUpdate> updates) {
         if (updates != null) {
             for (TermLabelUpdate update : updates) {
                 ImmutableList<Name> supportedRules = update.getSupportedRuleNames();
@@ -282,7 +296,7 @@ public class TermLabelManager {
      * </p>
      * param updates The {@link TermLabelUpdate}s to analyze.
      */
-    private void analyzeRefactorings(ImmutableList<TermLabelRefactoring> refactorings) {
+    private void analyzeRefactorings(@Nullable ImmutableList<TermLabelRefactoring> refactorings) {
         if (refactorings != null) {
             for (TermLabelRefactoring refactoring : refactorings) {
                 ImmutableList<Name> supportedRules = refactoring.getSupportedRuleNames();
@@ -310,7 +324,7 @@ public class TermLabelManager {
      * @param services The {@link Services} which provides the {@link TermLabelManager}.
      * @return The {@link TermLabelManager}s or {@code null} if not available.
      */
-    public static TermLabelManager getTermLabelManager(Services services) {
+    public static @Nullable TermLabelManager getTermLabelManager(@Nullable Services services) {
         TermLabelManager result = null;
         if (services != null) {
             Profile profile = services.getProfile();
@@ -437,7 +451,8 @@ public class TermLabelManager {
      * @param newTerm The new {@link JTerm} to update its labels.
      * @return The {@link JTerm} with updates labels.
      */
-    public static JTerm label(Services services, TermLabelState state, JTerm applicationTerm,
+    public static JTerm label(Services services, TermLabelState state,
+            @Nullable JTerm applicationTerm,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
             RuleApp ruleApp, Goal goal,
             Object hint, JTerm tacletTerm, JTerm newTerm) {
@@ -475,7 +490,7 @@ public class TermLabelManager {
      * @param newTerm The new {@link JTerm} to update its labels.
      * @return The {@link JTerm} with updates labels.
      */
-    public JTerm label(TermLabelState state, Services services, JTerm applicationTerm,
+    public JTerm label(TermLabelState state, Services services, @Nullable JTerm applicationTerm,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
             RuleApp ruleApp, Goal goal,
             Object hint, JTerm tacletTerm, JTerm newTerm) {
@@ -517,7 +532,7 @@ public class TermLabelManager {
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
             Services services,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
-            RuleApp ruleApp, Goal goal, Object hint, JTerm tacletTerm,
+            RuleApp ruleApp, Goal goal, Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm) {
         JTerm applicationTerm =
             applicationPosInOccurrence != null ? (JTerm) applicationPosInOccurrence.subTerm()
@@ -557,10 +572,10 @@ public class TermLabelManager {
      * @return The {@link TermLabel}s to add to the new {@link JTerm} which should be created.
      */
     public static ImmutableArray<TermLabel> instantiateLabels(TermLabelState state,
-            Services services, JTerm applicationTerm,
+            Services services, @Nullable JTerm applicationTerm,
             PosInOccurrence applicationPosInOccurrence,
             Rule rule, RuleApp ruleApp, Goal goal, Object hint,
-            JTerm tacletTerm, JTerm newTerm) {
+            @Nullable JTerm tacletTerm, JTerm newTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             return manager.instantiateLabels(state, services, applicationPosInOccurrence,
@@ -595,8 +610,8 @@ public class TermLabelManager {
      */
     private void addLabelsBasedOnApplicationTerm(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm, Set<TermLabel> newLabels) {
+            @Nullable JTerm applicationTerm, Rule rule, Goal goal,
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm, Set<TermLabel> newLabels) {
         if (applicationTerm == null) {
             return;
         }
@@ -662,8 +677,8 @@ public class TermLabelManager {
      */
     public ImmutableArray<TermLabel> instantiateLabels(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule,
-            RuleApp ruleApp, Goal goal, Object hint, JTerm tacletTerm,
+            @Nullable JTerm applicationTerm, Rule rule,
+            RuleApp ruleApp, Goal goal, Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm) {
         // Compute current rule specific updates
         ImmutableList<TermLabelUpdate> currentRuleSpecificUpdates =
@@ -753,7 +768,8 @@ public class TermLabelManager {
     protected void performTermLabelPolicies(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm, Map<Name, TermLabelPolicy> policies,
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm,
+            Map<Name, TermLabelPolicy> policies,
             Set<TermLabel> newLabels) {
         if (applicationTerm.hasLabels() && !policies.isEmpty()) {
             for (TermLabel label : applicationTerm.getLabels()) {
@@ -796,14 +812,17 @@ public class TermLabelManager {
     protected void performTermLabelPolicies(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm, Map<Name, TermLabelPolicy> policies,
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm,
+            Map<Name, TermLabelPolicy> policies,
             Set<TermLabel> newLabels, TermLabel label) {
         TermLabelPolicy policy = policies.get(label.name());
         if (policy != null) {
-            label = policy.keepLabel(state, services, applicationPosInOccurrence, applicationTerm,
-                rule, goal, hint, tacletTerm, newTerm, label);
-            if (label != null) {
-                newLabels.add(label);
+            @Nullable
+            TermLabel newLabel =
+                policy.keepLabel(state, services, applicationPosInOccurrence, applicationTerm,
+                    rule, goal, hint, tacletTerm, newTerm, label);
+            if (newLabel != null) {
+                newLabels.add(newLabel);
             }
         }
     }
@@ -840,7 +859,7 @@ public class TermLabelManager {
     protected Map<Name, ChildTermLabelPolicy> computeActiveChildPolicies(TermServices services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm,
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm,
             Map<Name, Map<Name, ChildTermLabelPolicy>> ruleSpecificPolicies,
             Map<Name, ChildTermLabelPolicy> ruleIndependentPolicies) {
         Map<Name, ChildTermLabelPolicy> activeDirectChildPolicies =
@@ -899,7 +918,7 @@ public class TermLabelManager {
     protected void performDirectChildPolicies(TermServices services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm,
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm,
             Map<Name, ChildTermLabelPolicy> policies, Set<TermLabel> newLabels) {
         for (JTerm child : applicationTerm.subs()) {
             for (TermLabel label : child.getLabels()) {
@@ -942,7 +961,7 @@ public class TermLabelManager {
     protected void performChildAndGrandchildPolicies(final TermServices services,
             final PosInOccurrence applicationPosInOccurrence,
             final JTerm applicationTerm,
-            final Rule rule, final Goal goal, final Object hint, final JTerm tacletTerm,
+            final Rule rule, final Goal goal, final Object hint, final @Nullable JTerm tacletTerm,
             final JTerm newTerm, final Map<Name, ChildTermLabelPolicy> policies,
             final Set<TermLabel> newLabels) {
         applicationTerm.execPreOrder((DefaultVisitor) p_visited -> {
@@ -990,8 +1009,8 @@ public class TermLabelManager {
      */
     protected void performUpdater(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, JTerm modalityTerm,
-            Rule rule, RuleApp ruleApp, Object hint, JTerm tacletTerm,
+            @Nullable JTerm applicationTerm, @Nullable JTerm modalityTerm,
+            Rule rule, RuleApp ruleApp, Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm,
             ImmutableList<TermLabelUpdate> updater,
             Set<TermLabel> newLabels) {
@@ -1099,9 +1118,9 @@ public class TermLabelManager {
      * @return The updated application {@link JTerm}.
      */
     public static JTerm refactorTerm(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
+            Object hint, @Nullable JTerm tacletTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             return manager.refactorTerm(state, services, applicationPosInOccurrence,
@@ -1129,9 +1148,9 @@ public class TermLabelManager {
      * @return The updated application {@link JTerm}.
      */
     public JTerm refactorTerm(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Goal goal,
-            Object hint, Rule rule, JTerm tacletTerm) {
+            Object hint, Rule rule, @Nullable JTerm tacletTerm) {
         // Compute active refactorings
         RefactoringsContainer refactorings = computeRefactorings(state, services,
             applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
@@ -1165,8 +1184,8 @@ public class TermLabelManager {
      */
     public static void refactorGoal(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence, Rule rule,
-            Goal goal, Object hint,
-            JTerm tacletTerm) {
+            Goal goal, @Nullable Object hint,
+            @Nullable JTerm tacletTerm) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             JTerm applicationTerm =
@@ -1202,8 +1221,8 @@ public class TermLabelManager {
      */
     public void refactorGoal(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
+            @Nullable JTerm applicationTerm, Rule rule, Goal goal,
+            @Nullable Object hint, @Nullable JTerm tacletTerm) {
         // Compute active refactorings
         RefactoringsContainer refactorings = computeRefactorings(state, services,
             applicationPosInOccurrence, applicationTerm, rule, goal, hint, tacletTerm);
@@ -1218,8 +1237,10 @@ public class TermLabelManager {
                 applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
             goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
         } else if (!refactorings.childAndGrandchildRefactoringsAndParents().isEmpty()) {
-            JTerm root = replaceTerm(state, applicationPosInOccurrence, applicationTerm, tf,
-                refactorings.childAndGrandchildRefactoringsAndParents(), services,
+            JTerm root = replaceTerm(state, applicationPosInOccurrence,
+                Objects.requireNonNull(applicationTerm,
+                    "application term required for parent refactoring"),
+                tf, refactorings.childAndGrandchildRefactoringsAndParents(), services,
                 applicationPosInOccurrence, newApplicationTerm, rule, goal, hint, tacletTerm);
             goal.changeFormula(new SequentFormula(root), applicationPosInOccurrence.topLevel());
         }
@@ -1295,7 +1316,7 @@ public class TermLabelManager {
      */
     public void refactorSequent(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
+            @Nullable JTerm applicationTerm, Rule rule, Goal goal,
             Object hint, JTerm tacletTerm) {
         // Compute active refactorings
         RefactoringsContainer refactorings = computeRefactorings(state, services,
@@ -1333,20 +1354,26 @@ public class TermLabelManager {
      * @param tacletTerm The optional taclet {@link JTerm}.
      * @return The root of the {@link PosInOccurrence} containing the new {@link JTerm} at the
      *         specified {@link PosInOccurrence}.
+     *         <p>
+     *         The {@code null} assigned to {@code pio} in the loop below is a sentinel to terminate
+     *         the {@code do...while} once the top level of the {@link PosInOccurrence} tree is
+     *         reached; {@code pio} itself is guaranteed non-{@code null} whenever it is
+     *         dereferenced, so the assignment is suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     protected JTerm replaceTerm(TermLabelState state,
             PosInOccurrence pio, JTerm newTerm,
             TermFactory tf, Set<TermLabelRefactoring> parentRefactorings,
             Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm,
-            Rule rule, Goal goal, Object hint, JTerm tacletTerm) {
+            @Nullable JTerm applicationTerm,
+            Rule rule, Goal goal, @Nullable Object hint, @Nullable JTerm tacletTerm) {
         do {
             if (pio.isTopLevel()) {
                 pio = null;
             } else {
                 int childIndex = pio.getIndex();
-                pio = pio.up();
+                pio = Objects.requireNonNull(pio.up());
                 JTerm newChild = newTerm;
                 newTerm = (JTerm) pio.subTerm();
                 ImmutableArray<TermLabel> newLabels;
@@ -1390,9 +1417,9 @@ public class TermLabelManager {
      */
     private void determineAndCollectRuleSpecificRefactorings(TermLabelState state,
             Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm,
-            Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
+            @Nullable JTerm applicationTerm,
+            Rule rule, Goal goal, @Nullable Object hint, @Nullable JTerm tacletTerm,
             RefactoringsContainer refactorings) {
         if (rule != null) {
             ImmutableList<TermLabelRefactoring> ruleRefactorings =
@@ -1439,9 +1466,9 @@ public class TermLabelManager {
      */
     private void determineAndRuleIndependentRefactorings(TermLabelState state,
             Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm,
-            Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
+            @Nullable JTerm applicationTerm,
+            Rule rule, Goal goal, @Nullable Object hint, @Nullable JTerm tacletTerm,
             RefactoringsContainer refactorings) {
         for (TermLabelRefactoring refactoring : allRulesRefactorings) {
             RefactoringScope scope = refactoring.defineRefactoringScope(state, services,
@@ -1480,9 +1507,9 @@ public class TermLabelManager {
      * @return The {@link RefactoringsContainer} with the {@link TermLabelRefactoring}s to consider.
      */
     protected RefactoringsContainer computeRefactorings(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm) {
+            @Nullable PosInOccurrence applicationPosInOccurrence,
+            @Nullable JTerm applicationTerm, Rule rule, Goal goal,
+            @Nullable Object hint, @Nullable JTerm tacletTerm) {
         final RefactoringsContainer refactorings = new RefactoringsContainer();
         determineAndCollectRuleSpecificRefactorings(state, services, applicationPosInOccurrence,
             applicationTerm, rule, goal, hint, tacletTerm, refactorings);
@@ -1557,9 +1584,10 @@ public class TermLabelManager {
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
     private JTerm refactorChildTerms(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf) {
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
+            RefactoringsContainer refactorings, TermFactory tf) {
         JTerm newApplicationTerm = applicationTerm;
         if (!refactorings.directChildRefactorings().isEmpty()) {
             boolean changed = false;
@@ -1609,9 +1637,10 @@ public class TermLabelManager {
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
     private JTerm refactorBelowUpdates(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
+            RefactoringsContainer refactorings, TermFactory tf,
             JTerm newApplicationTerm) {
         if (!refactorings.belowUpdatesRefactorings().isEmpty()) {
             Pair<ImmutableList<JTerm>, JTerm> pair =
@@ -1652,9 +1681,10 @@ public class TermLabelManager {
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
     private JTerm refactorChildrenRecursively(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf,
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
+            RefactoringsContainer refactorings, TermFactory tf,
             JTerm newApplicationTerm) {
         final Set<TermLabelRefactoring> allChildAndGrandchildRefactorings =
             refactorings.getAllApplicationChildAndGrandchildRefactorings();
@@ -1698,10 +1728,11 @@ public class TermLabelManager {
      * @param tf The {@link TermFactory} to create the term.
      * @return The new application {@link JTerm} or {@code null} if no refactoring was performed.
      */
-    protected JTerm refactorApplicationTerm(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, RefactoringsContainer refactorings, TermFactory tf) {
+    protected @Nullable JTerm refactorApplicationTerm(TermLabelState state, Services services,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
+            @Nullable JTerm applicationTerm, Rule rule, Goal goal,
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
+            RefactoringsContainer refactorings, TermFactory tf) {
         if (applicationTerm != null && (!refactorings.directChildRefactorings().isEmpty()
                 || !refactorings.childAndGrandchildRefactorings().isEmpty()
                 || !refactorings.belowUpdatesRefactorings().isEmpty())) {
@@ -1744,8 +1775,9 @@ public class TermLabelManager {
      */
     protected void refactorSemisequent(TermLabelState state, Services services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, Semisequent semisequent, boolean inAntec,
+            @Nullable JTerm applicationTerm, Rule rule, Goal goal,
+            @Nullable Object hint, @Nullable JTerm tacletTerm, Semisequent semisequent,
+            boolean inAntec,
             Set<TermLabelRefactoring> activeRefactorings) {
         if (!activeRefactorings.isEmpty()) {
             for (SequentFormula sfa : semisequent) {
@@ -1781,9 +1813,9 @@ public class TermLabelManager {
      * @return The refactored {@link JTerm} in which the {@link TermLabel}s may have changed.
      */
     protected JTerm refactorLabelsRecursive(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
+            @Nullable JTerm applicationTerm, Rule rule, Goal goal,
+            @Nullable Object hint, @Nullable JTerm tacletTerm, JTerm term,
             Set<TermLabelRefactoring> activeRefactorings) {
         boolean subsChanged = false;
         JTerm[] newSubs = new JTerm[term.arity()];
@@ -1823,9 +1855,9 @@ public class TermLabelManager {
      * @return The new {@link TermLabel} which should be used for the given {@link JTerm}.
      */
     protected ImmutableArray<TermLabel> performRefactoring(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm term,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
+            @Nullable JTerm applicationTerm, Rule rule, Goal goal,
+            @Nullable Object hint, @Nullable JTerm tacletTerm, JTerm term,
             Set<TermLabelRefactoring> activeRefactorings) {
         // Create list with all old labels
         LabelCollection newLabels = new LabelCollection(term.getLabels());
@@ -1862,37 +1894,37 @@ public class TermLabelManager {
         /**
          * The {@link TermLabelPolicy} instances applied on the application term.
          */
-        private final ImmutableList<TermLabelPolicy> applicationTermPolicies;
+        private final @Nullable ImmutableList<TermLabelPolicy> applicationTermPolicies;
 
         /**
          * The {@link TermLabelPolicy} instances applied on the modality term.
          */
-        private final ImmutableList<TermLabelPolicy> modalityTermPolicies;
+        private final @Nullable ImmutableList<TermLabelPolicy> modalityTermPolicies;
 
         /**
          * The direct {@link ChildTermLabelPolicy} instances to use.
          */
-        private final ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies;
+        private final @Nullable ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies;
 
         /**
          * The child and grandchild {@link ChildTermLabelPolicy} instances to use.
          */
-        private final ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies;
+        private final @Nullable ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies;
 
         /**
          * The {@link TermLabelUpdate} instances.
          */
-        private final ImmutableList<TermLabelUpdate> termLabelUpdates;
+        private final @Nullable ImmutableList<TermLabelUpdate> termLabelUpdates;
 
         /**
          * The {@link TermLabelRefactoring} instances.
          */
-        private final ImmutableList<TermLabelRefactoring> termLabelRefactorings;
+        private final @Nullable ImmutableList<TermLabelRefactoring> termLabelRefactorings;
 
         /**
          * The {@link TermLabelMerger} instance.
          */
-        private final TermLabelMerger termLabelMerger;
+        private final @Nullable TermLabelMerger termLabelMerger;
 
         /**
          * Constructor.
@@ -1922,13 +1954,13 @@ public class TermLabelManager {
          * @param termLabelMerger The {@link TermLabelMerger} instance.
          */
         public TermLabelConfiguration(Name termLabelName, TermLabelFactory<?> factory,
-                ImmutableList<TermLabelPolicy> applicationTermPolicies,
-                ImmutableList<TermLabelPolicy> modalityTermPolicies,
-                ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies,
-                ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies,
-                ImmutableList<TermLabelUpdate> termLabelUpdates,
-                ImmutableList<TermLabelRefactoring> termLabelRefactorings,
-                TermLabelMerger termLabelMerger) {
+                @Nullable ImmutableList<TermLabelPolicy> applicationTermPolicies,
+                @Nullable ImmutableList<TermLabelPolicy> modalityTermPolicies,
+                @Nullable ImmutableList<ChildTermLabelPolicy> directChildTermLabelPolicies,
+                @Nullable ImmutableList<ChildTermLabelPolicy> childAndGrandchildTermLabelPolicies,
+                @Nullable ImmutableList<TermLabelUpdate> termLabelUpdates,
+                @Nullable ImmutableList<TermLabelRefactoring> termLabelRefactorings,
+                @Nullable TermLabelMerger termLabelMerger) {
             assert termLabelName != null;
             assert factory != null;
             this.termLabelName = termLabelName;
@@ -1965,7 +1997,7 @@ public class TermLabelManager {
          *
          * @return The {@link TermLabelPolicy} instances applied on the application term.
          */
-        public ImmutableList<TermLabelPolicy> getApplicationTermPolicies() {
+        public @Nullable ImmutableList<TermLabelPolicy> getApplicationTermPolicies() {
             return applicationTermPolicies;
         }
 
@@ -1974,7 +2006,7 @@ public class TermLabelManager {
          *
          * @return The {@link TermLabelPolicy} instances applied on the modality term.
          */
-        public ImmutableList<TermLabelPolicy> getModalityTermPolicies() {
+        public @Nullable ImmutableList<TermLabelPolicy> getModalityTermPolicies() {
             return modalityTermPolicies;
         }
 
@@ -1983,7 +2015,7 @@ public class TermLabelManager {
          *
          * @return The direct {@link ChildTermLabelPolicy} instances to use.
          */
-        public ImmutableList<ChildTermLabelPolicy> getDirectChildTermLabelPolicies() {
+        public @Nullable ImmutableList<ChildTermLabelPolicy> getDirectChildTermLabelPolicies() {
             return directChildTermLabelPolicies;
         }
 
@@ -1992,7 +2024,7 @@ public class TermLabelManager {
          *
          * @return The child and grandchild {@link ChildTermLabelPolicy} instances to use.
          */
-        public ImmutableList<ChildTermLabelPolicy> getChildAndGrandchildTermLabelPolicies() {
+        public @Nullable ImmutableList<ChildTermLabelPolicy> getChildAndGrandchildTermLabelPolicies() {
             return childAndGrandchildTermLabelPolicies;
         }
 
@@ -2001,7 +2033,7 @@ public class TermLabelManager {
          *
          * @return The {@link TermLabelUpdate} instances.
          */
-        public ImmutableList<TermLabelUpdate> getTermLabelUpdates() {
+        public @Nullable ImmutableList<TermLabelUpdate> getTermLabelUpdates() {
             return termLabelUpdates;
         }
 
@@ -2010,7 +2042,7 @@ public class TermLabelManager {
          *
          * @return The {@link TermLabelRefactoring} instances.
          */
-        public ImmutableList<TermLabelRefactoring> getTermLabelRefactorings() {
+        public @Nullable ImmutableList<TermLabelRefactoring> getTermLabelRefactorings() {
             return termLabelRefactorings;
         }
 
@@ -2019,7 +2051,7 @@ public class TermLabelManager {
          *
          * @return The {@link TermLabelMerger} instance.
          */
-        public TermLabelMerger getTermLabelMerger() {
+        public @Nullable TermLabelMerger getTermLabelMerger() {
             return termLabelMerger;
         }
     }
@@ -2032,8 +2064,8 @@ public class TermLabelManager {
      * @param termLabelName The {@link Name} of the {@link TermLabel} to search.
      * @return The found {@link TermLabel} or {@code null} if not available.
      */
-    public static TermLabel findInnerMostParentLabel(
-            PosInOccurrence pio, Name termLabelName) {
+    public static @Nullable TermLabel findInnerMostParentLabel(
+            @Nullable PosInOccurrence pio, Name termLabelName) {
         TermLabel label = null;
         while (label == null && pio != null) {
             JTerm subTerm = (JTerm) pio.subTerm();

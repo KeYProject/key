@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This interface provides the class Debug with the possibility to be administrated from within
  * management tools such as "jconsole". Debugging can be switched on / off dynamically using a
@@ -11,6 +13,7 @@ package de.uka.ilkd.key.util;
  *
  * @author mulbrich
  */
+@NullMarked
 public interface DebugMBean {
 
     /**

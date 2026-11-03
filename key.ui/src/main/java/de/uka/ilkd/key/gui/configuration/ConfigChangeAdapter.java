@@ -6,7 +6,9 @@ package de.uka.ilkd.key.gui.configuration;
 
 import javax.swing.JComponent;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ConfigChangeAdapter implements ConfigChangeListener {
 
     private final JComponent compRef;

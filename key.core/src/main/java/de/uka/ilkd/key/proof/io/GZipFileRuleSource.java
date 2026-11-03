@@ -15,6 +15,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This file rule source derivative wraps its input stream into a {@link GZIPInputStream} thus
@@ -22,6 +23,7 @@ import org.antlr.v4.runtime.CharStreams;
  *
  * @author tbormer on 12.02.16.
  */
+@NullMarked
 public class GZipFileRuleSource extends FileRuleSource {
 
     /**

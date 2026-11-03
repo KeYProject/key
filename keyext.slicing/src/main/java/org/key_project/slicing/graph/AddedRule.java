@@ -8,11 +8,15 @@ import java.util.Objects;
 
 import de.uka.ilkd.key.proof.BranchLocation;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Graph node that represents a rule added by some rule application.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class AddedRule extends GraphNode {
     /**
      * The name of the added rule.
@@ -36,7 +40,7 @@ public class AddedRule extends GraphNode {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

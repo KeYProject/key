@@ -11,6 +11,7 @@ import de.uka.ilkd.key.informationflow.ProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -29,6 +30,9 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Builds the rule which inserts information flow contract applications.
@@ -36,6 +40,7 @@ import org.key_project.util.collection.Pair;
  *
  * @author christoph
  */
+@NullMarked
 abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletBuilder {
 
     private static final String SCHEMA_PREFIX = "sv_";
@@ -44,9 +49,9 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
     /** Counter to allow several side-proofs. */
     static int unfoldCounter = 0;
 
-    private IFProofObligationVars ifVars;
+    private @Nullable IFProofObligationVars ifVars;
 
-    private JTerm replacewith;
+    private @Nullable JTerm replacewith;
 
 
     protected AbstractInfFlowUnfoldTacletBuilder(Services services) {
@@ -65,21 +70,31 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
 
     public Taclet buildTaclet() {
+        final IFProofObligationVars infFlowVars = ifVars;
+        if (infFlowVars == null) {
+            throw new NullPointerException(
+                "No information flow variables for building the unfold taclet.");
+        }
+        final JTerm replaceWithTerm = replacewith;
+        if (replaceWithTerm == null) {
+            throw new NullPointerException(
+                "No replace-with term for building the unfold taclet.");
+        }
         Name tacletName = getTacletName();
         unfoldCounter++;
 
         // create schema vars
-        IFProofObligationVars schemaVars = generateApplicationDataSVs(ifVars, services);
+        IFProofObligationVars schemaVars = generateApplicationDataSVs(infFlowVars, services);
 
         // create find term and replace information flow variables by
         // schema variables
-        final JTerm find = createFindTerm(ifVars);
+        final JTerm find = createFindTerm(infFlowVars);
 
-        JTerm schemaFind = replace(find, ifVars, schemaVars, services);
+        JTerm schemaFind = replace(find, infFlowVars, schemaVars, services);
 
         // create replacewith term and replace information flow variables by
         // schema variables in the replacewith term, too
-        JTerm schemaReplaceWith = replace(replacewith, ifVars, schemaVars, services);
+        JTerm schemaReplaceWith = replace(replaceWithTerm, infFlowVars, schemaVars, services);
 
         // collect quantifiable variables of the find term and replacewith term
         // and replace all quantifiable variables by schema variables
@@ -88,8 +103,18 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         quantifiableVarsToSchemaVars
                 .putAll(collectQuantifiableVariables(schemaReplaceWith, services));
         final OpReplacer or = new OpReplacer(quantifiableVarsToSchemaVars, tf());
-        schemaFind = or.replace(schemaFind);
-        schemaReplaceWith = or.replace(schemaReplaceWith);
+        final JTerm replacedFind = or.replace(schemaFind);
+        if (replacedFind == null) {
+            throw new NullPointerException(
+                "No find term after replacing the quantifiable variables.");
+        }
+        schemaFind = replacedFind;
+        final JTerm replacedReplaceWith = or.replace(schemaReplaceWith);
+        if (replacedReplaceWith == null) {
+            throw new NullPointerException(
+                "No replace-with term after replacing the quantifiable variables.");
+        }
+        schemaReplaceWith = replacedReplaceWith;
 
         // create taclet
         final RewriteTacletBuilder<RewriteTaclet> tacletBuilder =
@@ -118,7 +143,12 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
 
     private ProofObligationVars generateApplicationDataSVs(String schemaPrefix,
             ProofObligationVars poVars, Services services) {
-        Function n = services.getTypeConverter().getHeapLDT().getNull();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException(
+                "No heap type defined in the services type converter.");
+        }
+        final Function n = heapLDT.getNull();
 
         // generate a new schema variable for any pre variable
         JTerm selfAtPreSV = createTermSV(poVars.pre.self, schemaPrefix, services);
@@ -127,7 +157,8 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         JTerm guardAtPreSV = createTermSV(poVars.pre.guard, schemaPrefix, services);
         JTerm resAtPreSV = null;
         JTerm excAtPreSV = null;
-        JTerm heapAtPreSV = createTermSV(poVars.pre.heap, schemaPrefix, services);
+        JTerm heapAtPreSV = requireTerm(createTermSV(poVars.pre.heap, schemaPrefix, services),
+            "heap-at-pre schema variable");
         JTerm mbyAtPreSV = createTermSV(poVars.pre.mbyAtPre, schemaPrefix, services);
 
         // generate a new schema variable only for those post variables
@@ -145,8 +176,9 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             if (appDataPostLocalVar == appDataPreLocalVar) {
                 localVarsAtPostSVs = localVarsAtPostSVs.append(localPreVar);
             } else {
-                localVarsAtPostSVs = localVarsAtPostSVs
-                        .append(createTermSV(appDataPostLocalVar, schemaPrefix, services));
+                localVarsAtPostSVs = localVarsAtPostSVs.append(
+                    requireTerm(createTermSV(appDataPostLocalVar, schemaPrefix, services),
+                        "local-variable schema variable"));
             }
         }
 
@@ -158,7 +190,8 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
             (poVars.post.exception == null || poVars.post.exception.op().equals(n)) ? null
                     : createTermSV(poVars.post.exception, schemaPrefix, services);
         JTerm heapAtPostSV = (poVars.pre.heap == poVars.post.heap ? heapAtPreSV
-                : createTermSV(poVars.post.heap, schemaPrefix, services));
+                : requireTerm(createTermSV(poVars.post.heap, schemaPrefix, services),
+                    "heap-at-post schema variable"));
 
         // build state variable container for pre and post state
         StateVars pre = new StateVars(selfAtPreSV, guardAtPreSV, localVarsAtPreSVs, resAtPreSV,
@@ -212,9 +245,20 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         }
         OpReplacer or = new OpReplacer(map, services.getTermFactory(), services.getProof());
         term = TermLabelManager.removeIrrelevantLabels(term, services.getTermFactory());
-        JTerm result = or.replace(term);
+        final JTerm replaced = or.replace(term);
+        if (replaced == null) {
+            throw new NullPointerException(
+                "Schema variable replacement produced no term.");
+        }
+        return replaced;
+    }
 
-        return result;
+
+    private static JTerm requireTerm(@Nullable JTerm t, String what) {
+        if (t == null) {
+            throw new NullPointerException("No " + what + ".");
+        }
+        return t;
     }
 
 
@@ -258,6 +302,12 @@ abstract class AbstractInfFlowUnfoldTacletBuilder extends AbstractInfFlowTacletB
         }
         if (origVars.mbyAtPre == null) {
             mbyAtPre = null;
+        }
+        if (localVars == null) {
+            throw new NullPointerException("No schema local variables.");
+        }
+        if (heap == null) {
+            throw new NullPointerException("No schema heap term.");
         }
         return new StateVars(self, guard, localVars, result, exception, heap, mbyAtPre);
     }

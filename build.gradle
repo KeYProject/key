@@ -17,6 +17,11 @@ plugins {
     // EISOP Checker Framework
     alias(libs.plugins.checkerframework)
 
+    // NullAway (fast JSpecify-aware nullness trials) and its Error Prone host.
+    // Both are opt-in via -DENABLE_NULLAWAY and off by default.
+    alias(libs.plugins.errorprone) apply false
+    alias(libs.plugins.nullaway) apply false
+
     // Plugin for publishing via the new Nexus API
     alias(libs.plugins.maven.publish) apply false
 
@@ -62,6 +67,8 @@ subprojects {
 
     apply plugin: "com.diffplug.spotless"
     apply plugin: "org.checkerframework"
+    apply plugin: "net.ltgt.errorprone"
+    apply plugin: "net.ltgt.nullaway"
     apply plugin: "com.vanniktech.maven.publish"
     //apply plugin: "maven-publish"
 
@@ -92,6 +99,11 @@ subprojects {
         checkerFramework(libs.checkerframework.qual)
         checkerFramework(libs.checkerframework)
 
+        // NullAway runs as an Error Prone checker; both jars go on the
+        // `errorprone` configuration so the compiler plugin can load them.
+        errorprone(libs.errorprone.core)
+        errorprone(libs.nullaway)
+
         testImplementation(platform(libs.junit.bom))
         testImplementation(libs.junit.jupiter.api)
         testImplementation(libs.junit.jupiter.params)
@@ -111,6 +123,25 @@ subprojects {
         options.encoding = "UTF-8"
         // Setting the release to Java 21
         options.release = 21
+        // Fast JSpecify-aware nullness trial (Uber NullAway). It is an Error
+        // Prone checker, so it needs the Error Prone compiler plugin; both are
+        // opt-in via -DENABLE_NULLAWAY and off by default. EISOP's
+        // NullnessChecker (-DENABLE_NULLNESS) remains the conformance gate.
+        options.errorprone.enabled = false
+        if (System.getProperty("ENABLE_NULLAWAY")) {
+            options.errorprone.enabled = true
+            options.errorprone.disableAllChecks = true
+            // Report more than the javac default (100) errors so the full
+            // NullAway finding set is visible in one pass.
+            options.compilerArgs.addAll(["-Xmaxerrs", "10000"])
+            // NullAway options live as a "nullaway" extension on the
+            // ErrorProne options of each JavaCompile task.
+            options.errorprone.nullaway.severity.set(
+                net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
+            options.errorprone.nullaway.annotatedPackages.addAll(
+                ["de.uka.ilkd.key", "org.key_project"])
+            options.errorprone.nullaway.jspecifyMode.set(true)
+        }
     }
 
     tasks.withType(Javadoc).configureEach {

@@ -6,11 +6,14 @@ package de.uka.ilkd.key.pp;
 
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * One element of a sequent as delivered by SequentPrintFilter
  */
 
+@NullMarked
 public interface SequentPrintFilterEntry {
 
     /**

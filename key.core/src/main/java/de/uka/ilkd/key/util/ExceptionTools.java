@@ -29,6 +29,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -38,6 +39,7 @@ import org.jspecify.annotations.Nullable;
  * @author bruns
  * @since 2.4.0
  */
+@NullMarked
 public final class ExceptionTools {
 
     /**
@@ -151,7 +153,9 @@ public final class ExceptionTools {
         if (result.isEmpty()) {
             // Generic case: a single message. getMessage() already unwraps the common wrappers and
             // produces the friendly text for ANTLR exceptions.
-            result.add(new PositionedString(getMessage(throwable), safeLocation(throwable)));
+            String generic = getMessage(throwable);
+            result.add(new PositionedString(generic != null ? generic : throwable.toString(),
+                safeLocation(throwable)));
         }
         result.sort((a, b) -> a.getLocation().compareTo(b.getLocation()));
         return result;
