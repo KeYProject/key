@@ -8,12 +8,12 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
-import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.anonHeapTermFeature;

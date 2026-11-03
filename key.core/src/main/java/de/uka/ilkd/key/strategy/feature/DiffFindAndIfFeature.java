@@ -5,13 +5,14 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.util.collection.ImmutableList;
@@ -28,7 +29,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 // \find(b)), so the formula sits above the find term; a sibling rewrite then changes the formula
 // while the find subterm survives. Reusable only while the find formula is unchanged.
 @WeakStableCost
-public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
+public class DiffFindAndIfFeature extends BinaryTacletAppFeature<Goal> {
 
     /** the single instance of this feature */
     public static final Feature INSTANCE = new DiffFindAndIfFeature();
@@ -36,7 +37,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
     private DiffFindAndIfFeature() {}
 
     @Override
-    protected boolean filter(@MonotonicNonNull TacletApp app, PosInOccurrence pos, Goal goal,
+    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

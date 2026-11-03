@@ -7,7 +7,6 @@ package org.key_project.prover.strategy;
 import org.key_project.ldt.IIntLdt;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 public interface FeatureConstants<G extends ProofGoal<G>> {
 

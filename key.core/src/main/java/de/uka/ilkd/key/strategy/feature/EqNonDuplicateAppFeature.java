@@ -5,8 +5,8 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
@@ -27,7 +27,7 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
     private EqNonDuplicateAppFeature() {}
 
     @Override
-    public boolean filter(@MonotonicNonNull TacletApp app, PosInOccurrence pos,
+    public boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
@@ -39,7 +39,7 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
     }
 
     @Override
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
+    protected boolean comparePio(ITacletApp newApp, ITacletApp oldApp,
             PosInOccurrence newPio,
             PosInOccurrence oldPio) {
         return oldPio.eqEquals(newPio);

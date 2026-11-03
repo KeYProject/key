@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -24,7 +23,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     @Override
     public boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos,
-                          Goal goal, MutableState mState) {
+            Goal goal, MutableState mState) {
         if (!app.assumesInstantionsComplete()) {
             return true;
         }
@@ -33,7 +32,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
     }
 
     @Override
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
+    protected boolean comparePio(ITacletApp newApp, ITacletApp oldApp,
             PosInOccurrence newPio, PosInOccurrence oldPio) {
         return oldPio.equals(newPio);
     }

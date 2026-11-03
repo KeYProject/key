@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.SetTermFeatures;
 
 import org.key_project.logic.Term;
@@ -40,7 +39,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
-                             Goal goal, MutableState mState) {
+            Goal goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 

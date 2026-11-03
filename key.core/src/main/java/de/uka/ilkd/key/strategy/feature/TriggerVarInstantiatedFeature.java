@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 import org.key_project.prover.rules.ITacletApp;
@@ -25,7 +24,7 @@ public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature<Goal> 
 
     @Override
     protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, Goal goal,
-                             MutableState mState) {
+            MutableState mState) {
         assert app.taclet().hasTrigger();
 
         SVInstantiationProjection instProj = SVInstantiationProjection

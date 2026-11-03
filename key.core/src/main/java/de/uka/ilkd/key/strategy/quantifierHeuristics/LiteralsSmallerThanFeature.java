@@ -11,7 +11,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
 import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
 
@@ -44,7 +43,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
-                             Goal goal, MutableState mState) {
+            Goal goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 

@@ -38,7 +38,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * <code>equals</code> or <code>eqEquals</code> (checking for same or equal formulas), which has
      * to be decided by the subclasses
      */
-    protected abstract boolean comparePio(ITacletApp newApp, TacletApp oldApp,
+    protected abstract boolean comparePio(ITacletApp newApp, ITacletApp oldApp,
             PosInOccurrence newPio,
             PosInOccurrence oldPio);
 
@@ -89,7 +89,8 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
             }
         }
 
-        return equalInterestingInsts((SVInstantiations) newApp.instantiations(), cmp.instantiations());
+        return equalInterestingInsts((SVInstantiations) newApp.instantiations(),
+            cmp.instantiations());
     }
 
     private boolean equalInterestingInsts(SVInstantiations inst0, SVInstantiations inst1) {
@@ -180,7 +181,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
      * the sequent
      */
     protected boolean noDuplicateFindTaclet(ITacletApp app,
-                                            PosInOccurrence pos, Goal goal) {
+            PosInOccurrence pos, Goal goal) {
         final Node node = goal.node();
         final AppliedRuleAppsNameCache cache =
             node.proof().getServices().getCaches().getAppliedRuleAppsNameCache();

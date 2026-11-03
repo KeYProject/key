@@ -16,7 +16,8 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  * does not have any if-formulas.
  */
 @StableCost
-public final class MatchedAssumesFeature<GOAL extends ProofGoal<GOAL>> extends BinaryTacletAppFeature<GOAL> {
+public final class MatchedAssumesFeature<GOAL extends ProofGoal<GOAL>>
+        extends BinaryTacletAppFeature<GOAL> {
 
     public static final Feature INSTANCE = new MatchedAssumesFeature();
 
@@ -24,7 +25,7 @@ public final class MatchedAssumesFeature<GOAL extends ProofGoal<GOAL>> extends B
 
     @Override
     protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, GOAL goal,
-                             MutableState mState) {
+            MutableState mState) {
         return app.assumesInstantionsComplete();
     }
 }

@@ -7,8 +7,6 @@ package org.key_project.prover.strategy;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
-import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -22,6 +20,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.*;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.termProjection.AssumptionProjection;
+import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;

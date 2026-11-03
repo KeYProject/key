@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 
 import org.key_project.prover.rules.ITacletApp;

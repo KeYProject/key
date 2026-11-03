@@ -9,9 +9,9 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.ldt.IIntLdt;
 import org.key_project.prover.strategy.FeatureConstants;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 
 import org.jspecify.annotations.NullMarked;
-import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 
 @NullMarked
 public class JavaFeatureConstants implements FeatureConstants<Goal> {

@@ -6,11 +6,12 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
@@ -20,7 +21,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * inequations has factors in common with the left side of some other inequation, similarly to how
  * it is decided in the Buchberger algorithm.
  */
-public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
+public abstract class InEquationMultFeature extends BinaryTacletAppFeature<Goal> {
 
     protected final ProjectionToTerm<Goal> targetCandidate;
     protected final ProjectionToTerm<Goal> mult1Candidate;
@@ -80,7 +81,7 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected final boolean filter(TacletApp app, PosInOccurrence pos, Goal goal,
+    protected final boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Services services = goal.proof().getServices();
         final Monomial targetM =

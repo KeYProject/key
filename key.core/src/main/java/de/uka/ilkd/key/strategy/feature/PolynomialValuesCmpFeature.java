@@ -84,7 +84,7 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature<Goa
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
-                             Goal goal, MutableState mState) {
+            Goal goal, MutableState mState) {
         final TacletApp tacletApp = (TacletApp) app;
         return compare(getPolynomial(left, leftCoeff, tacletApp, pos, goal, mState),
             getPolynomial(right, rightCoeff, tacletApp, pos, goal, mState));

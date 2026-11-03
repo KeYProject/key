@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
@@ -31,7 +30,7 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature<Goal> {
 
     @Override
     protected boolean filter(@MonotonicNonNull ITacletApp p_app, PosInOccurrence pos, Goal goal,
-                             MutableState mState) {
+            MutableState mState) {
         assert pos != null
                 : "NoSelfApplicationFeature: Need to know the position of the application of the taclet";
 

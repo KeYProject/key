@@ -5,11 +5,11 @@
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 
 
 /**
@@ -17,7 +17,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
  *
  * @author christoph
  */
-public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
+public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature<Goal> {
 
     public enum PrefixChecker {
         // checks, whether the position in occurrence is in the antecedent
@@ -109,7 +109,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos,
+    protected boolean filter(ITacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

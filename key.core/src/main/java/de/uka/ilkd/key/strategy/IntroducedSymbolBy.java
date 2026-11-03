@@ -42,7 +42,7 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature<Goal> {
 
     @Override
     protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, Goal goal,
-                             MutableState mState) {
+            MutableState mState) {
         final Node root = goal.proof().root();
 
         Node n = goal.node();

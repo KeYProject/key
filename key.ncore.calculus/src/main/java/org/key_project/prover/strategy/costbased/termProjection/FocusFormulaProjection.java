@@ -15,7 +15,8 @@ import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 // WeakStable, not Stable: returns the whole find formula (pos.sequentFormula().formula()), i.e.
 // it reads above the find subterm -- valid only while that formula is unchanged.
 @WeakStableCost
-public class FocusFormulaProjection<GOAL extends ProofGoal<GOAL>> implements ProjectionToTerm<GOAL> {
+public class FocusFormulaProjection<GOAL extends ProofGoal<GOAL>>
+        implements ProjectionToTerm<GOAL> {
 
 
     public static <GOAL extends ProofGoal<GOAL>> FocusFormulaProjection<GOAL> create() {

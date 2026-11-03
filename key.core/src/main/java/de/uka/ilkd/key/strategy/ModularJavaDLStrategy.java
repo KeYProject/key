@@ -10,9 +10,7 @@ import java.util.function.Function;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
-import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
@@ -28,7 +26,9 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.AutomatedRuleFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 
 import org.jspecify.annotations.NonNull;
 

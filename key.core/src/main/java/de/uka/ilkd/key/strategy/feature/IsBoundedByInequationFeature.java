@@ -11,12 +11,13 @@ import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.VolatileCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -30,7 +31,7 @@ import org.key_project.util.collection.ImmutableList;
  * an inequation in the sequent. Required to bound the number of cross-multiplications.
  */
 @VolatileCost
-public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature {
+public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature<Goal> {
 
     private final ProjectionToTerm<Goal> mult1;
     private final ProjectionToTerm<Goal> mult2;
@@ -60,7 +61,7 @@ public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
         final Monomial first = Monomial.create(mult1.toTerm(app, pos, goal, mState), services);
         final Monomial second = Monomial.create(mult2.toTerm(app, pos, goal, mState), services);

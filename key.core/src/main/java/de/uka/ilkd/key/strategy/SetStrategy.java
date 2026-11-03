@@ -11,7 +11,6 @@ import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
@@ -28,6 +27,7 @@ import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 

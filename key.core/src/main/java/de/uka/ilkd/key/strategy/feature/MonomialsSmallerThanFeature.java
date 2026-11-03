@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.Term;
@@ -74,7 +73,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
-                             Goal goal, MutableState mState) {
+            Goal goal, MutableState mState) {
         final MonomialCollector m1 = new MonomialCollector();
         m1.collect(left.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
         final MonomialCollector m2 = new MonomialCollector();
