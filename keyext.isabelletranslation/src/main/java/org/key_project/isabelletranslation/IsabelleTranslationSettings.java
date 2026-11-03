@@ -155,7 +155,6 @@ public class IsabelleTranslationSettings extends AbstractSettings {
 
     // Legacy Properties-based overload; the Settings interface still requires it. The
     // Configuration-based readSettings is the non-deprecated path.
-    @SuppressWarnings("deprecation")
     @Override
     public void readSettings(Properties props) {
         isabellePath = Path.of(props.getProperty(isabellePathKey));
@@ -169,7 +168,6 @@ public class IsabelleTranslationSettings extends AbstractSettings {
 
     // Legacy Properties-based overload; the Settings interface still requires it. The
     // Configuration-based writeSettings is the non-deprecated path.
-    @SuppressWarnings("deprecation")
     @Override
     public void writeSettings(Properties props) {
         props.setProperty(isabellePathKey, isabellePath.toString());
