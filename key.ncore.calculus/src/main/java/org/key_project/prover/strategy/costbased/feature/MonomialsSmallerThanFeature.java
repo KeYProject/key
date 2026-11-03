@@ -2,22 +2,19 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.feature;
-
-import de.uka.ilkd.key.proof.Goal;
+package org.key_project.prover.strategy.costbased.feature;
 
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermOrdering;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.BinarySumTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.ConstTermFeature;
@@ -34,21 +31,22 @@ import org.key_project.util.collection.ImmutableList;
  * <p>
  * {@link StableCost}: the monomial ordering is determined by the compared instantiation terms alone
  * -- multiplication degree, atom counts, the term-only
- * {@link de.uka.ilkd.key.logic.LexPathOrdering}, and the introduction time of basis symbols, which
+ * {@link TermOrdering}, and the introduction time of basis symbols, which
  * is a constant for every operator a cost evaluation can encounter (the argument is given at
  * {@link AbstractMonomialSmallerThanFeature#introductionTime}).
  * </p>
  */
 @StableCost
-public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeature {
+public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
+        extends AbstractMonomialSmallerThanFeature<GOAL> {
 
     private final TermFeature hasCoeff;
 
-    private final ProjectionToTerm<Goal> left, right;
+    private final ProjectionToTerm<GOAL> left, right;
     private final Function Z, mul, add;
 
 
-    private MonomialsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    private MonomialsSmallerThanFeature(ProjectionToTerm<GOAL> left, ProjectionToTerm<GOAL> right,
             TermOrdering termOrdering, IIntLdt numbers) {
         super(termOrdering, numbers);
         this.left = left;
@@ -67,14 +65,15 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
                     OperatorTF.create(numbers.getNumberSymbol()) }));
     }
 
-    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm<GOAL> left,
+            ProjectionToTerm<GOAL> right,
             TermOrdering termOrdering, IIntLdt numbers) {
         return new MonomialsSmallerThanFeature(left, right, termOrdering, numbers);
     }
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+            GOAL goal, MutableState mState) {
         final MonomialCollector m1 = new MonomialCollector();
         m1.collect(left.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
         final MonomialCollector m2 = new MonomialCollector();
@@ -88,7 +87,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, GOAL goal) {
 
         // here, the ordering is graded concerning multiplication on integers
         final int t1Deg = degree(t1);
@@ -136,7 +135,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     private int compareLexNewSyms(ImmutableList<Term> atoms1, ImmutableList<Term> atoms2,
-            Goal goal) {
+            GOAL goal) {
         while (!atoms1.isEmpty()) {
             final Term t1 = atoms1.head();
             final Term t2 = atoms2.head();

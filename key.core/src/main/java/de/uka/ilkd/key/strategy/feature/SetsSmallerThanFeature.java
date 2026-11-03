@@ -14,11 +14,12 @@ import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.SmallerThanFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.util.collection.ImmutableList;
 
 
-public class SetsSmallerThanFeature extends SmallerThanFeature {
+public class SetsSmallerThanFeature extends SmallerThanFeature<Goal> {
 
     private final ProjectionToTerm<Goal> left, right;
     private final SetTermFeatures setFeatures;

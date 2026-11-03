@@ -29,7 +29,9 @@ import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.IntegerStrategy;
 import org.key_project.prover.strategy.costbased.DivModCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.AtomsSmallerThanFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.MonomialsSmallerThanFeature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
@@ -143,7 +145,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
 
     @Override
     protected Feature createAtomSmallerThanFeature(String left, String right, IIntLdt numbers) {
-        return AtomsSmallerThanFeature.create(instOf(left), instOf(right),
+        return AtomsSmallerThanFeature.<Goal>create(instOf(left), instOf(right),
             StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
@@ -262,7 +264,7 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
 
     @Override
     protected Feature createMonomialSmallerThan(String left, String right, IIntLdt numbers) {
-        return MonomialsSmallerThanFeature.create(instOf(left), instOf(right),
+        return MonomialsSmallerThanFeature.<Goal>create(instOf(left), instOf(right),
             StaticFeatureCollection.createTermOrdering(), numbers);
     }
 

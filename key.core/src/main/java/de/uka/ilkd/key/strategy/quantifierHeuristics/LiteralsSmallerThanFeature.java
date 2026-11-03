@@ -12,7 +12,6 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
-import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.TermOrdering;
@@ -20,9 +19,10 @@ import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.SmallerThanFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-public class LiteralsSmallerThanFeature extends SmallerThanFeature {
+public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
 
     private final ProjectionToTerm<Goal> left, right;
     private final IntegerLDT numbers;

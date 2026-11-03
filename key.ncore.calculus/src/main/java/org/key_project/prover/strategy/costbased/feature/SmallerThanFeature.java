@@ -2,14 +2,12 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.feature;
-
-import de.uka.ilkd.key.proof.Goal;
+package org.key_project.prover.strategy.costbased.feature;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.TermOrdering;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -17,7 +15,8 @@ import org.key_project.util.collection.ImmutableList;
  * Abstract superclass for features comparing terms (in particular polynomials or monomials) using
  * the term ordering
  */
-public abstract class SmallerThanFeature extends BinaryTacletAppFeature<Goal> {
+public abstract class SmallerThanFeature<GOAL extends ProofGoal<GOAL>>
+        extends BinaryTacletAppFeature<GOAL> {
 
     private final TermOrdering termOrdering;
 
@@ -26,7 +25,7 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature<Goal> {
     }
 
     protected boolean lessThan(Term t1, Term t2,
-            PosInOccurrence focus, Goal currentGoal) {
+            PosInOccurrence focus, GOAL currentGoal) {
         return compare(t1, t2) < 0;
     }
 
@@ -39,7 +38,7 @@ public abstract class SmallerThanFeature extends BinaryTacletAppFeature<Goal> {
      *         elements of <code>list2</code>
      */
     protected final boolean lessThan(ImmutableList<Term> list1, ImmutableList<Term> list2,
-            PosInOccurrence focus, Goal currentGoal) {
+            PosInOccurrence focus, GOAL currentGoal) {
         if (list2.isEmpty()) {
             return false;
         }
