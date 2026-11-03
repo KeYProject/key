@@ -38,6 +38,4 @@ public class SVNeedsInstantiation extends InstantiatedSVFeature {
         }
         return false;
     }
-
-
 }

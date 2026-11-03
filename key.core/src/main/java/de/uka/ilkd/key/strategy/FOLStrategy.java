@@ -117,7 +117,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
         bindRuleSet(d, "obsolete", inftyConst());
 
         bindRuleSet(d, "no_self_application",
-            ifZero(MatchedAssumesFeature.INSTANCE, NoSelfApplicationFeature.INSTANCE));
+            ifZero(MatchedAssumesFeature.INSTANCE, NoSelfApplicationFeature.create()));
 
         bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedAssumesFeature.INSTANCE,
             not(contains(AssumptionProjection.create(0), FocusProjection.create(),
@@ -467,7 +467,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
 
     private void setupReplaceKnown(RuleSetDispatchFeature d) {
         final Feature commonF =
-            add(ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE),
+            add(ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndAssumesFeature.create()),
                 CostBand.NORMALIZE.cost(),
                 add(DiffFindAndReplacewithFeature.INSTANCE,
                     ScaleFeature.createScaled(CountMaxDPathFeature.INSTANCE, 10.0)));

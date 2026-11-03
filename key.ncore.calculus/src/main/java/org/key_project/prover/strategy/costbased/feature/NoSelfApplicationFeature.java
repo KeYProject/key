@@ -2,17 +2,13 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
-import de.uka.ilkd.key.proof.Goal;
-
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.util.collection.ImmutableList;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
@@ -22,14 +18,16 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  * rule application is admissible, zero is returned.
  */
 @StableCost
-public class NoSelfApplicationFeature extends BinaryTacletAppFeature<Goal> {
+public class NoSelfApplicationFeature<GOAL extends ProofGoal<GOAL>> extends BinaryTacletAppFeature<GOAL> {
 
-    public static final Feature INSTANCE = new NoSelfApplicationFeature();
+    public static <GOAL extends ProofGoal<GOAL>> NoSelfApplicationFeature<GOAL> create() {
+        return new NoSelfApplicationFeature<>();
+    }
 
     private NoSelfApplicationFeature() {}
 
     @Override
-    protected boolean filter(@MonotonicNonNull ITacletApp p_app, PosInOccurrence pos, Goal goal,
+    protected boolean filter(@MonotonicNonNull ITacletApp p_app, PosInOccurrence pos, GOAL goal,
             MutableState mState) {
         assert pos != null
                 : "NoSelfApplicationFeature: Need to know the position of the application of the taclet";
@@ -52,5 +50,4 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature<Goal> {
         }
         return noSelfApplication;
     }
-
 }

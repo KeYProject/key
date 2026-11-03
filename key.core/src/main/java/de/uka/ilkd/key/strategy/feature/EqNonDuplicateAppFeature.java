@@ -13,7 +13,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-
 /**
  * Binary feature that returns zero iff a certain Taclet app has not already been performed.
  * Contrary to <code>NonDuplicateAppFeature</code>, this feature is also able to handle failing
