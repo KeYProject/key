@@ -2,9 +2,8 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.feature;
+package org.key_project.prover.strategy.costbased.feature;
 
-import de.uka.ilkd.key.logic.op.Equality;
 
 import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.op.Operator;
@@ -15,8 +14,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 import org.jspecify.annotations.NonNull;
 
@@ -29,13 +26,15 @@ import org.jspecify.annotations.NonNull;
 public class FindRightishFeature implements Feature {
     private final Operator add;
     private final static RuleAppCost one = NumberRuleAppCost.create(1);
+    private final Operator equals;
 
-    public static Feature create(IIntLdt numbers) {
-        return new FindRightishFeature(numbers);
+    public static Feature create(IIntLdt numbers, Operator equals) {
+        return new FindRightishFeature(numbers, equals);
     }
 
-    private FindRightishFeature(IIntLdt numbers) {
+    private FindRightishFeature(IIntLdt numbers, Operator equals) {
         add = numbers.getAdd();
+        this.equals = equals;
     }
 
     @Override
@@ -50,7 +49,7 @@ public class FindRightishFeature implements Feature {
         while (it.next() != -1) {
             final var op = it.getSubTerm().op();
             final int index = it.getChild();
-            if (index == 0 && op == add || index == 1 && op == Equality.EQUALS) {
+            if (index == 0 && op == add || index == 1 && op == equals) {
                 res = res.add(one);
             }
         }

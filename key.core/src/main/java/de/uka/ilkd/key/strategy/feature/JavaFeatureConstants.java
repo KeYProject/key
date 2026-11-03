@@ -7,9 +7,11 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.ldt.IIntLdt;
+import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.FeatureConstants;
 import org.key_project.prover.strategy.costbased.feature.DiffFindAndAssumesFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.FindRightishFeature;
 import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 
 import org.jspecify.annotations.NullMarked;
@@ -48,7 +50,7 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public Feature findRightishFeature(IIntLdt numbers) {
-        return FindRightishFeature.create(numbers);
+    public Feature findRightishFeature(IIntLdt numbers, Operator equals) {
+        return FindRightishFeature.create(numbers, equals);
     }
 }
