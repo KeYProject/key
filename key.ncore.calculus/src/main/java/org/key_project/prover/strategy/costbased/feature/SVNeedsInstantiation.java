@@ -2,19 +2,17 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.feature;
-
-import de.uka.ilkd.key.proof.Goal;
+package org.key_project.prover.strategy.costbased.feature;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
-import org.key_project.prover.strategy.costbased.feature.Feature;
 
-public class SVNeedsInstantiation extends InstantiatedSVFeature {
-
+public class SVNeedsInstantiation<GOAL extends ProofGoal<GOAL>>
+        extends InstantiatedSVFeature<GOAL> {
     public static Feature create(String svName) {
         return new SVNeedsInstantiation(new Name(svName));
     }
@@ -27,7 +25,7 @@ public class SVNeedsInstantiation extends InstantiatedSVFeature {
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
         boolean res = super.filter(app, pos, goal, mState);
         if (!res) {
             for (SchemaVariable sv : app.uninstantiatedVars()) {

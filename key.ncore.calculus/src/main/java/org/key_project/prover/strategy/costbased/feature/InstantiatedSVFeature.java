@@ -13,14 +13,18 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationProjection;
 
 /// Feature that returns zero iff a certain schema variable is instantiated. If the schemavariable
-/// is not instantiated schema variable or does not occur in the taclet infinity costs are returned.
+/// is
+/// not instantiated schema variable or does not occur in the taclet infinity costs are returned.
+///
+/// [StableCost]: the instantiation is read from the rule application's own instantiations, not
+/// from the goal, so the result is fixed for a given application.
 @StableCost
-public class InstantiatedSVFeature<G extends ProofGoal<G>> extends BinaryTacletAppFeature<G> {
+public class InstantiatedSVFeature<GOAL extends ProofGoal<GOAL>>
+        extends BinaryTacletAppFeature<GOAL> {
+    private final ProjectionToTerm<GOAL> instProj;
 
-    private final ProjectionToTerm<G> instProj;
-
-    public static <G extends ProofGoal<G>> Feature create(Name svName) {
-        return new InstantiatedSVFeature<G>(svName);
+    public static Feature create(Name svName) {
+        return new InstantiatedSVFeature<>(svName);
     }
 
     protected InstantiatedSVFeature(Name svName) {
@@ -28,7 +32,7 @@ public class InstantiatedSVFeature<G extends ProofGoal<G>> extends BinaryTacletA
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, G goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
         return instProj.toTerm(app, pos, goal, mState) != null;
     }
 }

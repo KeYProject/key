@@ -15,7 +15,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
-import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
@@ -34,6 +33,7 @@ import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.*;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
+import org.key_project.prover.strategy.costbased.termProjection.AssumptionProjection;
 import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
@@ -120,7 +120,7 @@ public class FOLStrategy extends JavaAbstractFeatureStrategy implements Componen
             ifZero(MatchedAssumesFeature.INSTANCE, NoSelfApplicationFeature.create()));
 
         bindRuleSet(d, "find_term_not_in_assumes", ifZero(MatchedAssumesFeature.INSTANCE,
-            not(contains(AssumptionProjection.create(0), FocusProjection.create(),
+            not(contains(AssumptionProjection.<Goal>create(0), FocusProjection.create(),
                 StaticFeatureCollection::eq))));
 
         bindRuleSet(d, "update_elim",

@@ -14,7 +14,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.*;
-import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
@@ -31,8 +30,10 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
+import org.key_project.prover.strategy.costbased.feature.InstantiatedSVFeature;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationProjection;
 import org.key_project.prover.strategy.costbased.termfeature.*;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
@@ -336,7 +337,7 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static Feature isTriggerVariableInstantiated() {
-        return TriggerVarInstantiatedFeature.INSTANCE;
+        return TriggerVarInstantiatedFeature.create();
     }
 
     protected static TermFeature op(Operator op) {

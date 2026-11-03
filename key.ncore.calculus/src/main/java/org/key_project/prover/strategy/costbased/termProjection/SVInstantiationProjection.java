@@ -45,7 +45,7 @@ public class SVInstantiationProjection<G extends ProofGoal<G>> implements Projec
         if (!(instObj instanceof Term instantiation)) {
             if (demandInst) {
                 throw new IllegalArgumentException("Did not find schema variable " + svName
-                    + " that I was supposed to examine" + " (taclet " + tapp.taclet().name() + ")");
+                    + " that I was supposed to examine (taclet " + tapp.taclet().name() + ")");
             }
             return null;
         }
