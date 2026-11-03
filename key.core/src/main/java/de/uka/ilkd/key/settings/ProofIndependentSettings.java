@@ -84,7 +84,6 @@ public class ProofIndependentSettings {
     }
 
     // Legacy Properties-based snapshot from a .props/.key load; re-apply to settings added later.
-    @SuppressWarnings("deprecation")
     public void addSettings(Settings settings) {
         if (!this.settings.contains(settings)) {
             this.settings.add(settings);
@@ -115,7 +114,6 @@ public class ProofIndependentSettings {
 
     // Legacy branch loading .key/.props files uses the deprecated Properties Settings API; the
     // Configuration overload handles the JSON branch below.
-    @SuppressWarnings("deprecation")
     private void load(File file) throws IOException {
         if (!file.getName().endsWith(".json")) {
             try (FileInputStream in = new FileInputStream(file)) {
@@ -135,7 +133,6 @@ public class ProofIndependentSettings {
     }
 
     // Legacy non-JSON branch writes .key/.props files via the deprecated Properties Settings API.
-    @SuppressWarnings("deprecation")
     public void saveSettings() {
         if (!filename.getName().endsWith(".json")) {
             Properties result = lastReadProperties == null

@@ -348,7 +348,6 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
     }
 
     // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
-    @SuppressWarnings("deprecation")
     public void readSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
 
@@ -388,7 +387,6 @@ public final class ProofIndependentSMTSettings extends AbstractSettings {
     }
 
     // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
-    @SuppressWarnings("deprecation")
     public void writeSettings(Properties props) {
         var prefix = "[" + CATEGORY + "]";
         SettingsConverter.store(props, prefix + KEY_TIMEOUT, timeout);
