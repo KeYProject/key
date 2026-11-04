@@ -24,11 +24,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
-import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.PerfScope;
 import de.uka.ilkd.key.util.properties.MapProperties;
-import de.uka.ilkd.key.util.properties.Properties;
-import de.uka.ilkd.key.util.properties.Properties.Property;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
@@ -44,11 +41,14 @@ import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.DelegationBasedRuleApplicationManager;
 import org.key_project.prover.strategy.RuleApplicationManager;
+import org.key_project.prover.strategy.Strategy;
+import org.key_project.util.Properties;
+import org.key_project.util.Properties.Property;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
+import static org.key_project.prover.indexing.RuleAppIndexMode.INTERACTIVE;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
@@ -467,7 +467,7 @@ public final class Goal implements ProofGoal<Goal> {
      * puts the NoPosTacletApp to the set of TacletApps at the node of the goal and to the current
      * RuleAppIndex.
      *
-     * @param app the TacletApp
+     * @param app the ITacletApp
      */
     public void addNoPosTacletApp(NoPosTacletApp app) {
         node().addNoPosTacletApp(app);
@@ -475,11 +475,11 @@ public final class Goal implements ProofGoal<Goal> {
     }
 
     /**
-     * creates a new TacletApp and puts it to the set of TacletApps at the node of the goal and to
+     * creates a new ITacletApp and puts it to the set of TacletApps at the node of the goal and to
      * the current RuleAppIndex.
      *
-     * @param rule the Taclet of the TacletApp to create
-     * @param insts the given instantiations of the TacletApp to be created
+     * @param rule the Taclet of the ITacletApp to create
+     * @param insts the given instantiations of the ITacletApp to be created
      */
     public void addTaclet(Taclet rule, SVInstantiations insts, boolean isAxiom) {
         NoPosTacletApp tacletApp =
@@ -701,7 +701,7 @@ public final class Goal implements ProofGoal<Goal> {
      * prover's commit lock. The plain {@link #apply(RuleApp)} runs the two back to back, so the
      * single-threaded behaviour is unchanged.
      *
-     * @param ruleApp the rule application to perform
+     * @param p_ruleApp the rule application to perform
      * @return the pending application to be committed, or {@code null} if the rule aborted
      */
     public @Nullable PendingRuleApp computeRuleApp(final RuleApp p_ruleApp) {

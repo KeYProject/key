@@ -9,7 +9,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
@@ -26,6 +25,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleAbortException;
@@ -190,7 +190,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
 
     @Override
     public LoopContractExternalBuiltInRuleApp<?> createApp(PosInOccurrence pos,
-            TermServices services) {
+            LogicServices services) {
         return new LoopContractExternalBuiltInRuleApp<>(this, pos);
     }
 

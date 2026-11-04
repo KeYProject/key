@@ -10,13 +10,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm<Goal> {
@@ -51,7 +52,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
             return services.getTermBuilder().func(add, left, right);
         }
 
-        final Monomial rightMono = Monomial.create(rightPoly, services);
+        final Monomial rightMono = JMonomial.create(rightPoly, services);
         return (JTerm) divide(rightMono, monoCoeff, services);
     }
 

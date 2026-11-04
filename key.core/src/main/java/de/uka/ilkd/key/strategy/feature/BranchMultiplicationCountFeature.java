@@ -6,12 +6,13 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.properties.Properties.Property;
 
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.util.Properties;
 
 /**
  * Counts how often a rule has already been applied on the branch leading to a goal, and admits a
@@ -25,7 +26,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * pilot prune heavily.
  * </p>
  */
-public final class BranchMultiplicationCountFeature extends BinaryTacletAppFeature {
+public final class BranchMultiplicationCountFeature extends BinaryTacletAppFeature<Goal> {
 
     /**
      * The count as computed for one node. The serial number records which node that was, so a goal
@@ -39,8 +40,8 @@ public final class BranchMultiplicationCountFeature extends BinaryTacletAppFeatu
     private record BranchCount(int nodeSerial, int count) {
     }
 
-    private static final Property<BranchCount> COUNT_ON_BRANCH =
-        new Property<>(BranchCount.class, "crossMultiplicationsOnBranch");
+    private static final Properties.Property<BranchCount> COUNT_ON_BRANCH =
+        new Properties.Property<>(BranchCount.class, "crossMultiplicationsOnBranch");
 
 
     private final String rulePrefix;
@@ -101,7 +102,7 @@ public final class BranchMultiplicationCountFeature extends BinaryTacletAppFeatu
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         return countFor(goal) <= maxOnBranch;
     }
 }

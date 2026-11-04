@@ -8,10 +8,11 @@ import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 @StableCost
@@ -28,7 +29,7 @@ public abstract class DividePolynomialsProjection extends AbstractDividePolynomi
             @Override
             protected Term divide(Monomial numerator, BigInteger denominator, Services services) {
                 final BigInteger newRightCoeff = divide(numerator.getCoefficient(), denominator);
-                return numerator.setCoefficient(newRightCoeff).toTerm(services);
+                return JMonomial.toTerm(numerator.setCoefficient(newRightCoeff), services);
             }
 
         };
@@ -42,7 +43,7 @@ public abstract class DividePolynomialsProjection extends AbstractDividePolynomi
                     Services services) {
                 final BigInteger newRightCoeff =
                     divide(numerator.getCoefficient().negate(), denominator).negate();
-                return numerator.setCoefficient(newRightCoeff).toTerm(services);
+                return JMonomial.toTerm(numerator.setCoefficient(newRightCoeff), services);
             }
 
         };

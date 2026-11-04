@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Sequent;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.InstantiationCostScalerFeature;
 
 /**
  * The within-band ordering of tied quantifier instantiation candidates.
@@ -26,7 +27,7 @@ import org.key_project.prover.sequent.Sequent;
  * A strategy runs in two phases: {@link #prepare} computes the facts shared by all candidates of
  * one quantified formula once and returns a {@link Scorer}; the scorer then answers each candidate.
  * The tie-break value stays far below the distance of the scaled cost bands (see
- * {@link de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature}), so the
+ * {@link InstantiationCostScalerFeature}), so the
  * prediction itself is never overridden.
  */
 public interface QuantifierInstantiationTieBreak {

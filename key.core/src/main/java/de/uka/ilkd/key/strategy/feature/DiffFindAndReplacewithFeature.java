@@ -7,14 +7,17 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -25,7 +28,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 // Stable: compares the find term against the taclet's replacewith template, both fixed for a given
 // rule application.
 @StableCost
-public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
+public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature<Goal> {
 
     /** the single instance of this feature */
     public static final Feature INSTANCE = new DiffFindAndReplacewithFeature();
@@ -33,15 +36,18 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
     private DiffFindAndReplacewithFeature() {}
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         assert pos != null && app.rule() instanceof RewriteTaclet
                 : "Feature is only applicable to rewrite taclets";
 
-        for (TacletGoalTemplate template : app.rule().goalTemplates()) {
-            final JTerm replaceWith = ((RewriteTacletGoalTemplate) template).replaceWith();
-            if (replaceWith.equalsModProperty(pos.subTerm(),
-                IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                return false;
+        for (TacletGoalTemplate template : app.taclet().goalTemplates()) {
+            if (template instanceof RewriteTacletGoalTemplate rwTGT) {
+                final JTerm replaceWith = rwTGT.replaceWith();
+                if (replaceWith.equalsModProperty(pos.subTerm(),
+                    IRRELEVANT_TERM_LABELS_PROPERTY)) {
+                    return false;
+                }
             }
         }
         return true;

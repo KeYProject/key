@@ -81,7 +81,7 @@ public class MutableState {
     /// returns the backtracking manager to access [ChoicePoint]s
     ///
     /// @return the backtracking manager
-    public @Nullable BackTrackingManager getBacktrackingManager() {
+    public BackTrackingManager getBacktrackingManager() {
         if (btManager == null) {
             btManager = new BackTrackingManager();
         }
