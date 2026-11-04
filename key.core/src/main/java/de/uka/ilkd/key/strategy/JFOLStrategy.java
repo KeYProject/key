@@ -23,7 +23,7 @@ import static de.uka.ilkd.key.strategy.StaticFeatureCollection.anonHeapTermFeatu
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.literalsSmallerThan;
 import static org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment.*;
 
-/// This strategy extends the classical [FOLStrategy] with heuristics
+/// This strategy extends the classical [AbstractFOLStrategy] with heuristics
 /// for quantifier instantiation based on E-matching, which involves
 /// normalization of quantified formulas, as well as term features depending on
 /// integer theory.

@@ -11,7 +11,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.feature.*;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
@@ -23,6 +22,7 @@ import org.key_project.logic.TermOrdering;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleSet;
+import org.key_project.prover.strategy.AbstractFOLStrategy;
 import org.key_project.prover.strategy.ArithTermFeatures;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.IFormulaTermFeatures;
@@ -42,7 +42,7 @@ import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
 /// In particular, instantiation of quantifiers is not supported by this
 /// strategy, as the current E-matching depends on the theory of integers.
 /// For that reason, instantiation can be found [JFOLStrategy].
-public class FOLStrategy extends org.key_project.prover.strategy.FOLStrategy<Goal>
+public class FOLStrategy extends AbstractFOLStrategy<Goal>
         implements ComponentStrategy<Goal> {
 
     protected final StrategyProperties strategyProperties;

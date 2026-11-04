@@ -30,7 +30,7 @@ import static org.key_project.prover.strategy.costbased.FOLCost.*;
 ///
 /// In particular, instantiation of quantifiers is not supported by this
 /// strategy, as the current E-matching depends on the theory of integers.
-public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatureStrategy<G>
+public abstract class AbstractFOLStrategy<G extends ProofGoal<G>> extends AbstractFeatureStrategy<G>
         implements ComponentStrategy<G> {
     public static final Name NAME = new Name("FOL Strategy");
 
@@ -47,8 +47,8 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
     final FeatureConstants<G> fc;
 
-    public FOLStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
-            FeatureConstants<G> featureConstants, IIntLdt numbers, Feature globalF) {
+    public AbstractFOLStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
+                               FeatureConstants<G> featureConstants, IIntLdt numbers, Feature globalF) {
         this.tf = tf;
         this.ff = ff;
 
