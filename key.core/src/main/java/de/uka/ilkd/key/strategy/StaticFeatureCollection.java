@@ -280,7 +280,7 @@ public abstract class StaticFeatureCollection {
      * @return projection of taclet applications
      */
     protected static ProjectionToTerm<Goal> instOfTriggerVariable() {
-        return new TriggerVariableInstantiationProjection();
+        return new TriggerVariableInstantiationProjection<>();
     }
 
     /**
