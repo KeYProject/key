@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -13,6 +12,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.util.GenerationalCache;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NonNull;
@@ -30,7 +30,7 @@ public final class TermFactory {
 
 
     private static final ImmutableArray<JTerm> NO_SUBTERMS = new ImmutableArray<>();
-    private final Map<JTerm, JTerm> cache;
+    private final GenerationalCache<JTerm, JTerm> cache;
 
 
     // -------------------------------------------------------------------------
@@ -42,7 +42,7 @@ public final class TermFactory {
         this.cache = null;
     }
 
-    public TermFactory(Map<JTerm, JTerm> cache) {
+    public TermFactory(GenerationalCache<JTerm, JTerm> cache) {
         this.cache = cache;
     }
 
