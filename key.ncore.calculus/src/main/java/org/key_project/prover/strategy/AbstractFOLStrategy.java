@@ -48,7 +48,7 @@ public abstract class AbstractFOLStrategy<G extends ProofGoal<G>> extends Abstra
     final FeatureConstants<G> fc;
 
     public AbstractFOLStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
-                               FeatureConstants<G> featureConstants, IIntLdt numbers, Feature globalF) {
+            FeatureConstants<G> featureConstants, IIntLdt numbers, Feature globalF) {
         this.tf = tf;
         this.ff = ff;
 
