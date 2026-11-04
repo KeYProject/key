@@ -8,6 +8,7 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
@@ -16,15 +17,13 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
-import org.key_project.prover.rules.RuleApp;
+import org.key_project.logic.TermOrdering;
 import org.key_project.prover.rules.RuleSet;
-import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ArithTermFeatures;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.IntegerStrategy;
 import org.key_project.prover.strategy.costbased.DivModCost;
-import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
@@ -56,8 +55,9 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
                                 .getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY)),
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE),
-            new JavaFeatureConstants(), StaticFeatureCollection.createTermOrdering(),
-            proof.getServices().getTypeConverter().getIntegerLDT());
+            new JavaFeatureConstants(),
+            proof.getServices().getTypeConverter().getIntegerLDT(),
+            JMonomial::create);
         this.proof = proof;
         init();
     }
@@ -115,15 +115,9 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
 
     @Override
     protected Feature isBelow(TermFeature t) {
-        final de.uka.ilkd.key.strategy.termProjection.TermBuffer superTerm =
-            new de.uka.ilkd.key.strategy.termProjection.TermBuffer();
+        final TermBuffer superTerm = new TermBuffer();
         return not(sum(superTerm, SuperTermGenerator.upwards(any(), proof.getServices()),
             not(applyTF(superTerm, t))));
-    }
-
-    @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return null;
     }
 
     @Override
@@ -134,5 +128,10 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     @Override
     protected LogicServices getServices() {
         return proof.getServices();
+    }
+
+    @Override
+    protected TermOrdering createTermOrdering() {
+        return StaticFeatureCollection.createTermOrdering();
     }
 }

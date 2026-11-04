@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.LexPathOrdering;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
@@ -16,7 +17,6 @@ import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
-import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.ParametricFunctionBaseTermFeature;
 
 import org.key_project.logic.Name;
@@ -126,7 +126,8 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static Feature countOccurrences(ProjectionToTerm<Goal> cutFormula) {
-        return CountOccurrencesFeature.create(cutFormula);
+        return CountOccurrencesFeature.create(cutFormula,
+            RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
 
     protected static Feature termSmallerThan(String smaller, String bigger) {
@@ -375,7 +376,7 @@ public abstract class StaticFeatureCollection {
 
     protected static TermFeature eq(
             org.key_project.prover.strategy.costbased.termProjection.TermBuffer<Goal> t) {
-        return EqTermFeature.create(t);
+        return EqTermFeature.create(t, RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
 
     protected static Feature eq(ProjectionToTerm<Goal> t1, ProjectionToTerm<Goal> t2) {

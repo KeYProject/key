@@ -2,12 +2,11 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package org.key_project.prover.strategy.costbased.quantifierHeuristics;
 
 import java.util.EnumSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
  * How much the quantifier instantiation heuristic is told about the theories, as the strategy's
@@ -40,12 +39,6 @@ public enum TriggerTreatment {
         this.admittedOrigins = admittedOrigins;
     }
 
-    public static TriggerTreatment forOption(String option) {
-        if (StrategyProperties.TRIGGERS_CLASSIC.equals(option)) {
-            return CLASSIC;
-        }
-        return StrategyProperties.TRIGGERS_GOOD.equals(option) ? GOOD : BEST;
-    }
 
     /** Whether only the classic supports are consulted, and candidates are left unordered. */
     public boolean isClassic() {
@@ -53,7 +46,7 @@ public enum TriggerTreatment {
     }
 
     /** Whether an instance of the given origin is offered under this treatment. */
-    boolean admits(Origin origin) {
+    public boolean admits(Origin origin) {
         return admittedOrigins.contains(origin);
     }
 }

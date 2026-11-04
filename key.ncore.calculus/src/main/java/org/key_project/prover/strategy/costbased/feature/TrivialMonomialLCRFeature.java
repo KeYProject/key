@@ -44,8 +44,12 @@ public class TrivialMonomialLCRFeature<GOAL extends ProofGoal<GOAL>>
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
         final LogicServices services = goal.proof().getServices();
-        final Monomial aMon = builder.apply(a.toTerm(app, pos, goal, mState), services);
-        final Monomial bMon = builder.apply(b.toTerm(app, pos, goal, mState), services);
+        final Term aTerm = a.toTerm(app, pos, goal, mState);
+        final Term bTerm = b.toTerm(app, pos, goal, mState);
+        assert aTerm != null && bTerm != null
+                : "@AssumeAssertion(nullness): Term should not be null";
+        final Monomial aMon = builder.apply(aTerm, services);
+        final Monomial bMon = builder.apply(bTerm, services);
 
         /*
          * final BigInteger ac = aMon.getCoefficient (); final BigInteger bc = bMon.getCoefficient

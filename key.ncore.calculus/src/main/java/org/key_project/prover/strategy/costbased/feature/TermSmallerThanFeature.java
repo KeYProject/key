@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy.costbased.feature;
 
+import org.key_project.logic.Term;
 import org.key_project.logic.TermOrdering;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
@@ -34,9 +35,11 @@ public class TermSmallerThanFeature<GOAL extends ProofGoal<GOAL>> extends Smalle
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
-        return lessThan(left.toTerm(app, pos, goal, mState),
-            right.toTerm(app, pos, goal, mState),
-            pos, goal);
+        final Term leftTerm = left.toTerm(app, pos, goal, mState);
+        final Term rightTerm = right.toTerm(app, pos, goal, mState);
+        assert leftTerm != null && rightTerm != null
+                : "@AssumeAssertion(nullness): Term should not be null";
+        return lessThan(leftTerm, rightTerm, pos, goal);
     }
 
 }

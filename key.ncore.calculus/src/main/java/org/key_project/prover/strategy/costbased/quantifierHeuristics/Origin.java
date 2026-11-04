@@ -2,7 +2,7 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.strategy.quantifierHeuristics;
+package org.key_project.prover.strategy.costbased.quantifierHeuristics;
 
 /**
  * Why an instance is offered for a quantified formula.
@@ -13,7 +13,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
  * origin that reads the instance off a term the formula itself names ranks before one that does
  * not.
  */
-enum Origin {
+public enum Origin {
 
     /** A term of the formula matched a sequent term structurally. */
     OWN_PATTERN,

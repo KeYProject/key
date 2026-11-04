@@ -77,6 +77,8 @@ public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
     protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
+        assert dividendT != null && divisorT != null
+                : "@AssumeAssertion(nullness): Term should not be null";
 
         final LogicServices services = goal.proof().getServices();
         final Monomial mDividend = builder.apply(dividendT, services);

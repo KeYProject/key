@@ -98,12 +98,14 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
     protected final boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal,
             MutableState mState) {
         final LogicServices services = goal.proof().getServices();
-        final Monomial targetM =
-            builder.apply(targetCandidate.toTerm(app, pos, goal, mState), services);
-        final Monomial mult1M =
-            builder.apply(mult1Candidate.toTerm(app, pos, goal, mState), services);
-        final Monomial mult2M =
-            builder.apply(mult2Candidate.toTerm(app, pos, goal, mState), services);
+        final Term target = targetCandidate.toTerm(app, pos, goal, mState);
+        final Term mult1 = mult1Candidate.toTerm(app, pos, goal, mState);
+        final Term mult2 = mult2Candidate.toTerm(app, pos, goal, mState);
+        assert target != null && mult1 != null && mult2 != null
+                : "@AssumeAssertion(nullness): instantiations should not be null";
+        final Monomial targetM = builder.apply(target, services);
+        final Monomial mult1M = builder.apply(mult1, services);
+        final Monomial mult2M = builder.apply(mult2, services);
 
         return filter(targetM, mult1M, mult2M);
     }

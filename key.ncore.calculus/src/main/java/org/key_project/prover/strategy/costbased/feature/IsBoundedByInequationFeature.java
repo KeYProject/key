@@ -67,10 +67,12 @@ public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
         final LogicServices services = goal.proof().getServices();
-        final Monomial first =
-            monomialBuilder.apply(mult1.toTerm(app, pos, goal, mState), services);
-        final Monomial second =
-            monomialBuilder.apply(mult2.toTerm(app, pos, goal, mState), services);
+        final Term firstTerm = mult1.toTerm(app, pos, goal, mState);
+        final Term secondTerm = mult2.toTerm(app, pos, goal, mState);
+        assert firstTerm != null && secondTerm != null
+                : "@AssumeAssertion(nullness): Term should not be null";
+        final Monomial first = monomialBuilder.apply(firstTerm, services);
+        final Monomial second = monomialBuilder.apply(secondTerm, services);
         return getInEquations(goal, mState).contains(variables(first, second));
     }
 

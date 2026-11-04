@@ -6,4 +6,3 @@
 
 # toggled only while the feature tree is built at strategy construction (enableInstantiate/disableInstantiate in the strategy setup); never read or written during proof search
 org.key_project.prover.strategy.AbstractFeatureStrategy#instantiateActive
-de.uka.ilkd.key.strategy.JavaAbstractFeatureStrategy#instantiateActive

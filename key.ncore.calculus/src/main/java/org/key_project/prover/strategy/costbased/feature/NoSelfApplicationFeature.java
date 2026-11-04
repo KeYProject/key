@@ -11,8 +11,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.util.collection.ImmutableList;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
-
 /**
  * This feature checks that the position of application is not contained in the if-formulas. If the
  * rule application is admissible, zero is returned.
@@ -28,7 +26,7 @@ public class NoSelfApplicationFeature<GOAL extends ProofGoal<GOAL>>
     private NoSelfApplicationFeature() {}
 
     @Override
-    protected boolean filter(@MonotonicNonNull ITacletApp p_app, PosInOccurrence pos, GOAL goal,
+    protected boolean filter(ITacletApp p_app, PosInOccurrence pos, GOAL goal,
             MutableState mState) {
         assert pos != null
                 : "NoSelfApplicationFeature: Need to know the position of the application of the taclet";

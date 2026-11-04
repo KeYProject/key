@@ -30,7 +30,7 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
     /// cost computation and instantiation.
     ///
     /// Counts nesting depth of instantiation activation to avoid premature deactivation.
-    private short instantiateActive = 0;
+    protected short instantiateActive = 0;
 
     protected void enableInstantiate() {
         instantiateActive++;
@@ -59,6 +59,14 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
     }
 
     protected abstract RuleSet getHeuristic(String p_name);
+
+    protected Feature instantiateTriggeredVariable(ProjectionToTerm<G> value) {
+        if (instantiateActive != 0) {
+            return SVInstantiationCP.createTriggeredVarCP(value);
+        } else {
+            return longConst(0);
+        }
+    }
 
     protected Feature instantiate(String sv, ProjectionToTerm<G> value) {
         return instantiate(new Name(sv), value);

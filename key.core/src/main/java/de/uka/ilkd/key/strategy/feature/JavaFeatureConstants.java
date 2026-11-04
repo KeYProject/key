@@ -6,24 +6,26 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 import de.uka.ilkd.key.strategy.StaticFeatureCollection;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationTieBreakFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.*;
 
-import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.FeatureConstants;
 import org.key_project.prover.strategy.costbased.feature.*;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
+import org.key_project.prover.strategy.costbased.termfeature.EqTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
@@ -74,23 +76,6 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public Feature findRightishFeature(IIntLdt numbers, Operator equals) {
-        return FindRightishFeature.create(numbers, equals);
-    }
-
-    @Override
-    public Feature createReducibleMonomialFeature(ProjectionToTerm<Goal> dividend,
-            ProjectionToTerm<Goal> divisor) {
-        return ReducibleMonomialsFeature.createReducible(dividend, divisor, JMonomial::create);
-    }
-
-    @Override
-    public Feature createTrivialMonomialLCRFeature(ProjectionToTerm<Goal> a,
-            ProjectionToTerm<Goal> b) {
-        return TrivialMonomialLCRFeature.create(a, b, JMonomial::create);
-    }
-
-    @Override
     public ProjectionToTerm<Goal> createReduceMonomialsProjection(
             ProjectionToTerm<Goal> dividend, ProjectionToTerm<Goal> divisor) {
         return ReduceMonomialsProjection.create(dividend, divisor);
@@ -118,22 +103,6 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     public ProjectionToTerm<Goal> createCoeffGcdProjection(ProjectionToTerm<Goal> monomialLeft,
             ProjectionToTerm<Goal> monomialRight) {
         return CoeffGcdProjection.create(monomialLeft, monomialRight);
-    }
-
-    @Override
-    public Feature createExactlyBoundedInEquationMultFeature(
-            ProjectionToTerm<Goal> mult1Candidate, ProjectionToTerm<Goal> mult2Candidate,
-            TermFeature targetCandidate) {
-        return new IsBoundedByInequationFeature<>(mult1Candidate, mult2Candidate,
-            targetCandidate, JMonomial::create);
-    }
-
-    @Override
-    public Feature createTotalyBoundedInEquationMultFeature(
-            ProjectionToTerm<Goal> mult1Candidate, ProjectionToTerm<Goal> mult2Candidate,
-            ProjectionToTerm<Goal> targetCandidate) {
-        return InEquationMultFeature.totallyBounded(mult1Candidate, mult2Candidate,
-            targetCandidate, JMonomial::create);
     }
 
     @Override
@@ -176,7 +145,7 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
 
     @Override
     public TermFeature createEqTermFeature(TermBuffer<Goal> t) {
-        return EqTermFeature.create(t);
+        return EqTermFeature.create(t, RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
 
     @Override
@@ -216,11 +185,6 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     @Override
     public Feature splittableQuantifiedFormula() {
         return SplittableQuantifiedFormulaFeature.INSTANCE;
-    }
-
-    @Override
-    public Feature instantiationCostScaler(Feature costF, Feature allowSplittingF) {
-        return InstantiationCostScalerFeature.create(costF, allowSplittingF);
     }
 
     @Override
@@ -270,11 +234,27 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
 
     @Override
     public Feature countOccurrences(ProjectionToTerm<Goal> target) {
-        return CountOccurrencesFeature.create(target);
+        return CountOccurrencesFeature.create(target, RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
 
     @Override
     public TermFeature containsExecutableCodeTF() {
         return ContainsExecutableCodeTermFeature.PROGRAMS;
+    }
+
+    @Override
+    public TermGenerator<Goal> heuristicGenerator(TriggerTreatment option) {
+        return HeuristicInstantiation.forOption(option);
+    }
+
+    @Override
+    public Feature computeInstantiationCostOf(ProjectionToTerm<Goal> instOf_t,
+            TriggerTreatment option) {
+        return InstantiationCost.create(instOf_t, option);
+    }
+
+    @Override
+    public Feature getInstantiationTieBreakFeature(TermBuffer<Goal> varInst, String s) {
+        return InstantiationTieBreakFeature.create(varInst, s);
     }
 }

@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy;
 
-import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
@@ -29,14 +29,7 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     Feature checkApplyEqFeature();
 
-    Feature findRightishFeature(IIntLdt numbers, Operator equals);
-
     TermFeature createEliminableQuantifier();
-
-    Feature createReducibleMonomialFeature(ProjectionToTerm<G> dividend,
-            ProjectionToTerm<G> divisor);
-
-    Feature createTrivialMonomialLCRFeature(ProjectionToTerm<G> a, ProjectionToTerm<G> b);
 
     ProjectionToTerm<G> createReduceMonomialsProjection(ProjectionToTerm<G> dividend,
             ProjectionToTerm<G> divisor);
@@ -52,14 +45,6 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     ProjectionToTerm<G> createCoeffGcdProjection(
             ProjectionToTerm<G> monomialLeft, ProjectionToTerm<G> monomialRight);
-
-    Feature createExactlyBoundedInEquationMultFeature(
-            ProjectionToTerm<G> mult1Candidate, ProjectionToTerm<G> mult2Candidate,
-            TermFeature targetCandidate);
-
-    Feature createTotalyBoundedInEquationMultFeature(
-            ProjectionToTerm<G> mult1Candidate, ProjectionToTerm<G> mult2Candidate,
-            ProjectionToTerm<G> targetCandidate);
 
     Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
             ProjectionToTerm<G> right);
@@ -100,8 +85,6 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     Feature splittableQuantifiedFormula();
 
-    Feature instantiationCostScaler(Feature costF, Feature allowSplittingF);
-
     TermGenerator<G> superTermGenerator(TermFeature cond, LogicServices services);
 
     TermGenerator<G> createTriggeredInstantiations(boolean skipConditions);
@@ -123,4 +106,11 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
     Feature countOccurrences(ProjectionToTerm<G> target);
 
     TermFeature containsExecutableCodeTF();
+
+    TermGenerator<G> heuristicGenerator(TriggerTreatment option);
+
+    Feature computeInstantiationCostOf(ProjectionToTerm<G> instOfT,
+            TriggerTreatment triggerTreatment);
+
+    Feature getInstantiationTieBreakFeature(TermBuffer<G> varInst, String s);
 }

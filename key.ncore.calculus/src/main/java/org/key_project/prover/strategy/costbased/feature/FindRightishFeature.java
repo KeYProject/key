@@ -6,6 +6,7 @@ package org.key_project.prover.strategy.costbased.feature;
 
 
 import org.key_project.ldt.IIntLdt;
+import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -47,7 +48,9 @@ public class FindRightishFeature implements Feature {
         final PIOPathIterator it = pos.iterator();
 
         while (it.next() != -1) {
-            final var op = it.getSubTerm().op();
+            final Term subTerm = it.getSubTerm();
+            assert subTerm != null : "@AssumeAssertion(nullness): subterm should not be null";
+            final var op = subTerm.op();
             final int index = it.getChild();
             if (index == 0 && op == add || index == 1 && op == equals) {
                 res = res.add(one);
