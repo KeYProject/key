@@ -467,6 +467,6 @@ def envOrPropertyValue(String key) {
     if(key in System.getenv()) {
         return System.getenv(key)
     }else{
-        return project.properties.getOrDefault(key, "")
+        return providers.gradleProperty(key).getOrElse("")
     }
 }

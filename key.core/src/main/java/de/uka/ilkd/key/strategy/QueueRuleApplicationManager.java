@@ -12,6 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.util.PerfScope;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -176,9 +177,9 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
             return;
         }
 
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         RuleAppContainer c = RuleAppContainer.createAppContainer(rule, pos, goal);
-        PERF_CREATE_CONTAINER.addAndGet(System.nanoTime() - time);
+        PerfScope.stop(PERF_CREATE_CONTAINER, time);
 
         ensureQueueExists();
         addRuleApp(c);
@@ -197,10 +198,10 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
             return;
         }
 
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         final ImmutableList<RuleAppContainer> containers =
             RuleAppContainer.createAppContainers(rules, pos, goal);
-        PERF_CREATE_CONTAINER.addAndGet(System.nanoTime() - time);
+        PerfScope.stop(PERF_CREATE_CONTAINER, time);
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
             addRuleApp(rac);
@@ -208,11 +209,11 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     }
 
     private void addRuleApp(RuleAppContainer rac) {
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         try {
             queue = push(rac, queue);
         } finally {
-            PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+            PerfScope.stop(PERF_QUEUE_OPS, time);
         }
     }
 
@@ -256,11 +257,11 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
             }
             actualApps.add(app);
         }
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         try {
             return ImmutableLeftistHeap.<RuleAppContainer>nilHeap().insert(actualApps.iterator());
         } finally {
-            PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+            PerfScope.stop(PERF_QUEUE_OPS, time);
         }
     }
 
@@ -272,7 +273,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      */
     @Override
     public RuleApp peekNext() {
-        var otime = System.nanoTime();
+        final long otime = PerfScope.start();
         try {
             ensureQueueExists();
 
@@ -299,7 +300,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
             computeNextRuleApp(furtherAppsQueue);
             return nextRuleApp;
         } finally {
-            PERF_PEEK.addAndGet(System.nanoTime() - otime);
+            PerfScope.stop(PERF_PEEK, otime);
         }
     }
 
@@ -349,27 +350,27 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
             if (queue.isEmpty()) {
                 // Use furtherAppsQueue in case queue is empty.
                 furtherAppsQueueUsed = true;
-                var time = System.nanoTime();
+                final long time = PerfScope.start();
                 try {
                     minRuleAppContainer = furtherAppsQueue.findMin();
                     furtherAppsQueue = furtherAppsQueue.deleteMin();
                 } finally {
-                    PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+                    PerfScope.stop(PERF_QUEUE_OPS, time);
                 }
             } else if (furtherAppsQueue.isEmpty()) {
                 // Use queue in case furtherAppsQueueUsed is empty.
                 furtherAppsQueueUsed = false;
-                var time = System.nanoTime();
+                final long time = PerfScope.start();
                 try {
                     minRuleAppContainer = queue.findMin();
                     queue = queue.deleteMin();
                 } finally {
-                    PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+                    PerfScope.stop(PERF_QUEUE_OPS, time);
                 }
             } else {
                 // Neither queue is empty. Find a minimum that ranges over both
                 // queues.
-                var time = System.nanoTime();
+                final long time = PerfScope.start();
                 try {
                     RuleAppContainer queueMin = queue.findMin();
                     RuleAppContainer furtherAppsQueueMin = furtherAppsQueue.findMin();
@@ -383,7 +384,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
                         minRuleAppContainer = queueMin;
                     }
                 } finally {
-                    PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+                    PerfScope.stop(PERF_QUEUE_OPS, time);
                 }
             }
 
@@ -418,11 +419,11 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
                             && park(base)) {
                         continue;
                     }
-                    var time = System.nanoTime();
+                    final long time = PerfScope.start();
                     try {
                         furtherAppsQueue = push(further.iterator(), furtherAppsQueue);
                     } finally {
-                        PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+                        PerfScope.stop(PERF_QUEUE_OPS, time);
                     }
                 }
             } else {
@@ -436,12 +437,12 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         /*
          * Put remaining elements into main queue, so they can be considered in the upcoming rounds.
          */
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         try {
             queue = queue.insert(workingList.iterator());
             queue = queue.insert(furtherAppsQueue);
         } finally {
-            PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+            PerfScope.stop(PERF_QUEUE_OPS, time);
         }
     }
 
@@ -466,11 +467,11 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     private void wakeParkedBases() {
         final Collection<RuleAppContainer> woken = parking.getAndClearWokenApplications();
         if (!woken.isEmpty()) {
-            var time = System.nanoTime();
+            final long time = PerfScope.start();
             try {
                 queue = queue.insert(woken.iterator());
             } finally {
-                PERF_QUEUE_OPS.addAndGet(System.nanoTime() - time);
+                PerfScope.stop(PERF_QUEUE_OPS, time);
             }
         }
     }

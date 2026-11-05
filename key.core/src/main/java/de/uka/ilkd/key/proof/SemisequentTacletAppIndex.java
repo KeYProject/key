@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.PerfScope;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.rulefilter.RuleFilter;
@@ -256,17 +257,15 @@ public class SemisequentTacletAppIndex {
         if (sci.hasChanged(antec)) {
             final SemisequentTacletAppIndex result = copy();
 
-            var time = System.nanoTime();
+            final long time = PerfScope.start();
             result.removeTermIndices(sci.removedFormulas(antec));
-            PERF_REMOVE.getAndAdd(System.nanoTime() - time);
+            final long time1 = PerfScope.stop(PERF_REMOVE, time);
 
-            time = System.nanoTime();
             result.updateTermIndices(sci.modifiedFormulas(antec), services, tacletIndex, listener);
-            PERF_UPDATE.getAndAdd(System.nanoTime() - time);
+            final long time2 = PerfScope.stop(PERF_UPDATE, time1);
 
-            time = System.nanoTime();
             result.addTermIndices(sci.addedFormulas(antec), services, tacletIndex, listener);
-            PERF_ADD.getAndAdd(System.nanoTime() - time);
+            PerfScope.stop(PERF_ADD, time2);
             return result;
         }
 
