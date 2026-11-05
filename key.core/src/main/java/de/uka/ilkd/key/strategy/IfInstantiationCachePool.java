@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
-import org.key_project.util.ConcurrentLruCache;
+import org.key_project.util.GenerationalCache;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -40,11 +40,11 @@ public class IfInstantiationCachePool {
      */
     private static final int CACHE_CAPACITY = 64;
 
-    public final ConcurrentLruCache<Node, AssumesInstantiationCache> cacheMgr =
-        new ConcurrentLruCache<>(CACHE_CAPACITY);
+    public final GenerationalCache<Node, AssumesInstantiationCache> cacheMgr =
+        new GenerationalCache<>(CACHE_CAPACITY);
 
     public AssumesInstantiationCache getCache(Node n) {
-        // cacheMgr is a ConcurrentLruCache; get/putIfAbsent/clear/remove are individually atomic,
+        // cacheMgr is a GenerationalCache; get/putIfAbsent/clear/remove are individually atomic,
         // so no external synchronization is needed. The create-then-putIfAbsent idiom below already
         // resolves a concurrent-miss race (the loser adopts the winner's cache via the return).
         AssumesInstantiationCache cache = cacheMgr.get(n);
@@ -65,7 +65,7 @@ public class IfInstantiationCachePool {
     }
 
     public void release(Node n) {
-        AssumesInstantiationCache cache = cacheMgr.remove(n);
+        final AssumesInstantiationCache cache = cacheMgr.remove(n);
         if (cache != null) {
             cache.reset();
         }
