@@ -2,9 +2,9 @@
 
 \settings {
     "Choice" : {
-        "JavaCard" : "JavaCard:off",
+        "JavaCard" : "JavaCard:on",
         "Strings" : "Strings:on",
-        "assertions" : "assertions:safe",
+        "assertions" : "assertions:on",
         "bigint" : "bigint:on",
         "finalFields" : "finalFields:immutable",
         "floatRules" : "floatRules:strictfpOnly",
@@ -15,13 +15,16 @@
         "mergeGenerateIsWeakeningGoal" : "mergeGenerateIsWeakeningGoal:off",
         "methodExpansion" : "methodExpansion:modularOnly",
         "modelFields" : "modelFields:treatAsAxiom",
-        "moreSeqRules" : "moreSeqRules:off",
+        "moreSeqRules" : "moreSeqRules:on",
+        "optimisedSelectRules" : "optimisedSelectRules:on",
         "permissions" : "permissions:off",
         "programRules" : "programRules:Java",
         "reach" : "reach:on",
-        "runtimeExceptions" : "runtimeExceptions:ban",
+        "runtimeExceptions" : "runtimeExceptions:allow",
         "sequences" : "sequences:on",
-        "soundDefaultContracts" : "soundDefaultContracts:on"
+        "soundDefaultContracts" : "soundDefaultContracts:on",
+        "wdChecks" : "wdChecks:off",
+        "wdOperator" : "wdOperator:L"
     },
     "Labels" : {
         "UseOriginLabels" : true
@@ -45,7 +48,7 @@
     },
     "Strategy" : {
         "ActiveStrategy" : "Modular JavaDL Strategy",
-        "MaximumNumberOfAutomaticApplications" : 10000,
+        "MaximumNumberOfAutomaticApplications" : 9000,
         "Timeout" : -1,
         "options" : {
             "AUTO_INDUCTION_OPTIONS_KEY" : "AUTO_INDUCTION_OFF",
@@ -53,14 +56,14 @@
             "CLASS_AXIOM_OPTIONS_KEY" : "CLASS_AXIOM_FREE",
             "DEP_OPTIONS_KEY" : "DEP_ON",
             "HEAP_REDUCTION_OPTIONS_KEY" : "HEAP_REDUCTION_NORMAL",
-            "LOOP_OPTIONS_KEY" : "LOOP_SCOPE_INV_TACLET",
+            "LOOP_OPTIONS_KEY" : "LOOP_INVARIANT",
             "METHOD_OPTIONS_KEY" : "METHOD_CONTRACT",
             "MPS_OPTIONS_KEY" : "MPS_MERGE",
             "NON_LIN_ARITH_OPTIONS_KEY" : "NON_LIN_ARITH_NONE",
             "OSS_OPTIONS_KEY" : "OSS_ON",
             "QUANTIFIERS_OPTIONS_KEY" : "QUANTIFIERS_NON_SPLITTING_WITH_PROGS",
-            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_ON",
-            "QUERY_NEW_OPTIONS_KEY" : "QUERY_OFF",
+            "QUERYAXIOM_OPTIONS_KEY" : "QUERYAXIOM_OFF",
+            "QUERY_NEW_OPTIONS_KEY" : "QUERY_RESTRICTED",
             "SPLITTING_OPTIONS_KEY" : "SPLITTING_DELAYED",
             "STOPMODE_OPTIONS_KEY" : "STOPMODE_DEFAULT",
             "SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY" : "SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER",
@@ -84,9 +87,9 @@
 }
 
 \proof {
-(keyLog "0" (keyUser "daniel" ) (keyVersion "09537e2f528de5206241ebeaa80c271927f98547"))
+(keyLog "0" (keyUser "daniel" ) (keyVersion "caeda3b1e7936a9a605e9d9f73ca2d706a8dbf46"))
 
-(autoModeTime "99")
+(autoModeTime "186")
 
 (branch "dummy ID"
 (rule "defPMapRemove" (formula "1") (term "0,0") (inst "kv=kv:P_K") (userinteraction))
@@ -103,8 +106,9 @@
     (builtin "One Step Simplification" (formula "2") (ifInst ""  (formula "1")))
    (rule "orRight" (formula "2"))
    (rule "eqSymm" (formula "3"))
-   (rule "pmapNotInDomain" (formula "2"))
-   (rule "close" (formula "4") (ifseqformula "1"))
+   (rule "pmapGetNotInDomain" (formula "3") (term "0") (ifseqformula "2"))
+    (builtin "One Step Simplification" (formula "3"))
+   (rule "closeTrue" (formula "3"))
 )
 )
 }

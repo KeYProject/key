@@ -84,22 +84,23 @@
 }
 
 \proof {
-(keyLog "0" (keyUser "daniel" ) (keyVersion "09537e2f528de5206241ebeaa80c271927f98547"))
+(keyLog "0" (keyUser "daniel" ) (keyVersion "caeda3b1e7936a9a605e9d9f73ca2d706a8dbf46"))
+(keyLog "1" (keyUser "daniel" ) (keyVersion "caeda3b1e7936a9a605e9d9f73ca2d706a8dbf46"))
 
-(autoModeTime "227")
+(autoModeTime "0")
 
 (branch "dummy ID"
-(rule "equiv_right" (formula "1") (userinteraction))
+(rule "equiv_right" (formula "1") (newnames "f_m,f_key,f_value") (userinteraction))
 (branch "Case '->'"
    (rule "andRight" (formula "2"))
-   (branch "Case 1"
+   (branch
       (rule "applyEqRigid" (formula "2") (term "0") (ifseqformula "1") (userinteraction))
       (rule "defPMapUpdate" (formula "2") (term "0") (inst "kv=kv:P_K") (userinteraction))
       (rule "inDomainOfPMapForeach" (formula "2") (userinteraction))
-       (builtin "One Step Simplification" (formula "2") (userinteraction))
+       (builtin "One Step Simplification" (formula "2"))
       (rule "closeTrue" (formula "2") (userinteraction))
    )
-   (branch "Case 2"
+   (branch
       (rule "applyEqRigid" (formula "2") (term "0,0") (ifseqformula "1") (userinteraction))
       (rule "defPMapUpdate" (formula "2") (term "0,0") (inst "kv=kv:P_K") (userinteraction))
       (rule "getOfPMapForeach" (formula "2") (term "0") (userinteraction))
@@ -111,18 +112,17 @@
 (branch "Case '<-'"
    (rule "pmapEqualityRight" (formula "2") (inst "kv=kv:P_K") (userinteraction))
    (rule "allRight" (formula "2") (inst "sk=kv_0:P_K") (userinteraction))
-   (rule "andRight" (formula "2") (userinteraction))
-   (branch "Case 1"
-      (rule "equiv_right" (formula "2") (userinteraction))
+   (rule "andLeft" (formula "1") (userinteraction))
+   (rule "andRight" (formula "3") (userinteraction))
+   (branch
+      (rule "equiv_right" (formula "3") (userinteraction))
       (branch "Case '->'"
-         (rule "andLeft" (formula "2") (userinteraction))
          (rule "defPMapUpdate" (formula "4") (term "0") (inst "kv=kv:P_K") (userinteraction))
          (rule "inDomainOfPMapForeach" (formula "4") (userinteraction))
-          (builtin "One Step Simplification" (formula "4") (ifInst ""  (formula "1")) (userinteraction))
+          (builtin "One Step Simplification" (formula "4") (ifInst ""  (formula "1")))
          (rule "closeTrue" (formula "4") (userinteraction))
       )
       (branch "Case '<-'"
-         (rule "andLeft" (formula "2") (userinteraction))
          (rule "defPMapUpdate" (formula "1") (term "0") (inst "kv=kv:P_K") (userinteraction))
          (rule "inDomainOfPMapForeach" (formula "1") (userinteraction))
           (builtin "One Step Simplification" (formula "1") (ifInst ""  (formula "4")))
@@ -130,13 +130,12 @@
          (rule "close" (formula "4") (ifseqformula "2"))
       )
    )
-   (branch "Case 2"
-      (rule "impRight" (formula "2") (userinteraction))
-      (rule "defPMapUpdate" (formula "3") (term "0,1") (inst "kv=kv:P_K") (userinteraction))
-      (rule "getOfPMapForeach" (formula "3") (term "1") (userinteraction))
-      (rule "inDomainOfPMapForeach" (formula "3") (term "0,1") (userinteraction))
-       (builtin "One Step Simplification" (formula "3") (ifInst ""  (formula "1")))
-      (rule "andLeft" (formula "2"))
+   (branch
+      (rule "impRight" (formula "3") (userinteraction))
+      (rule "defPMapUpdate" (formula "4") (term "0,1") (inst "kv=kv:P_K") (userinteraction))
+      (rule "getOfPMapForeach" (formula "4") (term "1") (userinteraction))
+      (rule "inDomainOfPMapForeach" (formula "4") (term "0,1") (userinteraction))
+       (builtin "One Step Simplification" (formula "4") (ifInst ""  (formula "1")))
       (rule "eqSymm" (formula "4"))
        (builtin "One Step Simplification" (formula "4"))
       (rule "orRight" (formula "4"))

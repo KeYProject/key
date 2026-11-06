@@ -87,17 +87,16 @@
 }
 
 \proof {
-(keyLog "0" (keyUser "daniel" ) (keyVersion "09537e2f528de5206241ebeaa80c271927f98547"))
+(keyLog "0" (keyUser "daniel" ) (keyVersion "caeda3b1e7936a9a605e9d9f73ca2d706a8dbf46"))
 
-(autoModeTime "21")
+(autoModeTime "78")
 
 (branch "dummy ID"
 (rule "impRight" (formula "1"))
 (rule "orRight" (formula "2"))
 (rule "notLeft" (formula "1"))
 (rule "notRight" (formula "2"))
-(rule "pmapNotInDomain" (formula "2") (userinteraction))
-(rule "applyEqRigid" (formula "2") (term "0") (ifseqformula "1") (userinteraction))
-(rule "close" (formula "4") (ifseqformula "2") (userinteraction))
+(rule "pmapGetNotInDomain" (formula "1") (term "0") (ifseqformula "2") (userinteraction))
+(rule "closeAntec" (formula "1") (ifseqformula "3") (userinteraction))
 )
 }
