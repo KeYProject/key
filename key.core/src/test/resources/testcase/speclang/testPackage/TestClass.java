@@ -1,6 +1,9 @@
 package testPackage;
 
-public /*@ spec_java_math @*/ class TestClass {
+// The former class-level `/*@ spec_java_math @*/` pragma was removed: JMLtk does
+// not accept standalone spec-math-mode comments (it only knows code_*_math
+// modifiers). Tests that need JAVA spec math set SpecMathMode.JAVA explicitly.
+public class TestClass {
 
     byte b;
     short s;

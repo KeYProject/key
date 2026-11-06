@@ -9,10 +9,8 @@ import java.util.List;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * Do.
@@ -44,12 +42,7 @@ public class Do extends LoopStatement {
     }
 
     public Do(PositionInfo pi, List<Comment> comments, Guard guard, Statement body) {
-        super(pi, comments, null, null, guard, body, ImmutableList.nil());
-    }
-
-    public Do(PositionInfo pi, List<Comment> comments, Guard guard, Statement body,
-            List<TextualJMLConstruct> specs) {
-        super(pi, comments, null, null, guard, body, ImmutableList.fromList(specs));
+        super(pi, comments, null, null, guard, body);
     }
 
     public SourceElement getLastElement() {

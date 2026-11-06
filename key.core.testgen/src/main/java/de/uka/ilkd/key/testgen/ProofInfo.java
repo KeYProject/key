@@ -19,7 +19,6 @@ import de.uka.ilkd.key.pp.PosTableLayouter;
 import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -41,8 +40,7 @@ public record ProofInfo(Proof proof, Services services) {
 
     @Nullable
     public IProgramMethod getMUT() {
-        SpecificationRepository spec = services.getSpecificationRepository();
-        IObserverFunction f = spec.getTargetOfProof(proof);
+        IObserverFunction f = services.getProofRegistry().getTargetOfProof(proof);
         if (f instanceof IProgramMethod pm) {
             return pm;
         } else {
@@ -101,7 +99,7 @@ public record ProofInfo(Proof proof, Services services) {
     }
 
     public Contract getContract() {
-        ContractPO po = services.getSpecificationRepository().getPOForProof(proof);
+        ContractPO po = services.getProofRegistry().getPOForProof(proof);
         return Objects.requireNonNull(po).getContract();
     }
 

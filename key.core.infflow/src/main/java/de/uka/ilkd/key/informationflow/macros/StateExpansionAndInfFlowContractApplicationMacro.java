@@ -70,7 +70,7 @@ public class StateExpansionAndInfFlowContractApplicationMacro extends Sequential
             return false;
         }
         final ProofOblInput poForProof =
-            services.getSpecificationRepository().getProofOblInput(proof);
+            services.getProofRegistry().getProofOblInput(proof);
         return (poForProof instanceof AbstractInfFlowPO)
                 && super.canApplyTo(proof, goals, posInOcc);
     }

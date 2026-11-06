@@ -1,8 +1,7 @@
-// position: 11/9
+// exceptionClass: UnsolvedSymbolException
+// msgContains: Unsolved symbol : set
 // verbose: true
 // broken: false
-// exceptionClass: ConvertException
-// msgContains: A set assignment only allowed inside of a method body
 
 class SetInClass {
 

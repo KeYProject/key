@@ -116,7 +116,7 @@ public abstract class AbstractProofReplayer {
                 || ruleApp.rule() instanceof UseDependencyContractRule) {
             RuleJustification justification = originalProof.getInitConfig().getJustifInfo()
                     .getJustification(ruleApp, originalProof.getServices());
-            currContract = proof.getServices().getSpecificationRepository()
+            currContract = proof.getServices().getContractRegistry()
                     .getContractByName(
                         ((RuleJustificationBySpec) justification).spec().getName());
         }

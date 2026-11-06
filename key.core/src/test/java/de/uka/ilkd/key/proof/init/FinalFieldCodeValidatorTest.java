@@ -17,8 +17,8 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
 import org.junit.jupiter.api.Assertions;
@@ -52,7 +52,7 @@ class FinalFieldCodeValidatorTest {
         Set<Contract> contracts = new HashSet<>();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
-                SpecificationRepository specRepo = env.getSpecificationRepository();
+                ContractRegistry specRepo = env.getServices().getContractRegistry();
                 for (Contract c : specRepo.getAllContracts()) {
                     var target = c.getTarget();
                     if (target instanceof ProgramMethod pm &&

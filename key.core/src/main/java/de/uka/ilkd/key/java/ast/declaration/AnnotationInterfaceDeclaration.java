@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -29,9 +28,9 @@ public class AnnotationInterfaceDeclaration extends TypeDeclaration {
             @NonNull ImmutableArray<Modifier> modArray,
             ProgramElementName name, ProgramElementName fullName,
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
-            boolean isLibrary, List<TextualJMLConstruct> jmlAttachments) {
+            boolean isLibrary) {
         super(pi, comments, modArray, name, fullName, members, parentIsInterfaceDeclaration,
-            isLibrary, ImmutableList.fromList(jmlAttachments));
+            isLibrary);
     }
 
     /**

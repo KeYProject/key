@@ -23,7 +23,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 
@@ -137,15 +136,6 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
      */
     public JavaInfo getJavaInfo() {
         return getServices().getJavaInfo();
-    }
-
-    /**
-     * Returns the used {@link SpecificationRepository}.
-     *
-     * @return The used {@link SpecificationRepository}.
-     */
-    public SpecificationRepository getSpecificationRepository() {
-        return getServices().getSpecificationRepository();
     }
 
     public Profile getProfile() {
@@ -343,10 +333,10 @@ public class KeYEnvironment<U extends UserInterfaceControl> implements AutoClose
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
                 ImmutableSet<IObserverFunction> targets =
-                    getSpecificationRepository().getContractTargets(type);
+                    getServices().getContractRegistry().getContractTargets(type);
                 for (IObserverFunction target : targets) {
                     ImmutableSet<Contract> contracts =
-                        getSpecificationRepository().getContracts(type, target);
+                        getServices().getContractRegistry().getContracts(type, target);
                     for (Contract contract : contracts) {
                         proofContracts.add(contract);
                     }

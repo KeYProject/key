@@ -91,7 +91,7 @@ public final class InfFlowMethodContractTacletBuilder
     private ImmutableSet<InformationFlowContract> getInformFlowContracts(IProgramMethod pm,
             Services services) {
         ImmutableSet<Contract> contracts =
-            services.getSpecificationRepository().getContracts(pm.getContainerType(), pm);
+            services.getContractRegistry().getContracts(pm.getContainerType(), pm);
         ImmutableSet<InformationFlowContract> ifContracts =
             DefaultImmutableSet.nil();
         for (Contract c : contracts) {

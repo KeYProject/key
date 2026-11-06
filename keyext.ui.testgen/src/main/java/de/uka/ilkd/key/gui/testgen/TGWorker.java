@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.SingleProof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.proof.mgt.ProofRegistry;
 import de.uka.ilkd.key.testgen.smt.testgen.AbstractTestGenerator;
 import de.uka.ilkd.key.testgen.smt.testgen.StopRequest;
 
@@ -147,8 +147,8 @@ class MainWindowTestGenerator extends AbstractTestGenerator {
             proof.setNamespaces(oldProof.getNamespaces());
 
             Services services = mediator.getServices();
-            SpecificationRepository spec = services.getSpecificationRepository();
-            spec.registerProof(spec.getProofOblInput(oldProof), proof);
+            ProofRegistry proofRegistry = services.getProofRegistry();
+            proofRegistry.registerProof(proofRegistry.getProofOblInput(oldProof), proof);
             final ProofAggregate pa = new SingleProof(proof, "XXX");
             ui.registerProofAggregate(pa);
             return proof;

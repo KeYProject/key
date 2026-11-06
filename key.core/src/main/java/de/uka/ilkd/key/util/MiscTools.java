@@ -92,7 +92,7 @@ public final class MiscTools {
 
         final LoopStatement loop = (LoopStatement) pe.getFirstElement();
 
-        return services.getSpecificationRepository().getLoopSpec(loop);
+        return loop.getLoopInvariant();
     }
 
     /**
@@ -626,7 +626,7 @@ public final class MiscTools {
                     declaredPVs = declaredPVs.add(pv);
                 }
             } else if (node instanceof SetStatement s) {
-                var spec = services.getSpecificationRepository().getStatementSpec(s);
+                var spec = s.getSpec();
                 if (spec != null) {
                     var targetTerm = spec.getTerm(services, null, SetStatement.INDEX_TARGET);
                     if (targetTerm.op() instanceof LocationVariable lv) {

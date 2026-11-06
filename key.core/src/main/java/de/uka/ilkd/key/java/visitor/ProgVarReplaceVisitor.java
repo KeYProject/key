@@ -24,7 +24,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -33,6 +32,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -236,66 +236,69 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnBlockContract(final StatementBlock oldBlock,
             final StatementBlock newBlock) {
-        ImmutableSet<BlockContract> oldContracts =
-            services.getSpecificationRepository().getBlockContracts(oldBlock);
-        for (BlockContract oldContract : oldContracts) {
-            BlockContract newContract =
-                createNewBlockContract(oldContract, newBlock, !oldBlock.equals(newBlock));
-
-            if (newContract != oldContract) {
-                if (oldBlock.equals(newBlock)) {
-                    services.getSpecificationRepository().removeBlockContract(oldContract);
-                }
-                services.getSpecificationRepository().addBlockContract(newContract);
-            }
+        // The block contracts are attached to the block node; rebuild the set for the new
+        // block, replacing the contracts whose terms changed.
+        ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
+        for (BlockContract oldContract : oldBlock.getBlockContracts()) {
+            result = result.add(
+                createNewBlockContract(oldContract, newBlock, !oldBlock.equals(newBlock)));
         }
+        newBlock.setBlockContracts(result);
     }
 
     @Override
     public void performActionOnLoopContract(final StatementBlock oldBlock,
             final StatementBlock newBlock) {
-        ImmutableSet<LoopContract> oldContracts =
-            services.getSpecificationRepository().getLoopContracts(oldBlock);
-        for (LoopContract oldContract : oldContracts) {
-            LoopContract newContract =
-                createNewLoopContract(oldContract, newBlock, !oldBlock.equals(newBlock));
-
-            if (newContract != oldContract) {
-                if (oldBlock.equals(newBlock)) {
-                    services.getSpecificationRepository().removeLoopContract(oldContract);
-                }
-                services.getSpecificationRepository().addLoopContract(newContract);
-            }
+        // The on-block loop contracts are attached to the block node; rebuild the set for the
+        // new block, replacing the contracts whose terms changed.
+        ImmutableSet<LoopContract> result = DefaultImmutableSet.nil();
+        for (LoopContract oldContract : oldBlock.getLoopContracts()) {
+            result = result.add(
+                createNewLoopContract(oldContract, newBlock, !oldBlock.equals(newBlock)));
         }
+        newBlock.setLoopContracts(result);
     }
 
     @Override
     public void performActionOnLoopContract(final LoopStatement oldLoop,
             final LoopStatement newLoop) {
-        ImmutableSet<LoopContract> oldContracts =
-            services.getSpecificationRepository().getLoopContracts(oldLoop);
+        // Loop contracts on loops are attached to the loop node. As in the old repository-based
+        // code, every contract of the old loop is (re-)registered on the new loop; a contract
+        // whose terms did not change is added again (which is a no-op on the immutable set unless
+        // it was displaced by a changed copy).
+        ImmutableSet<LoopContract> oldContracts = oldLoop.getLoopContracts();
         for (LoopContract oldContract : oldContracts) {
-            services.getSpecificationRepository().addLoopContract(
+            newLoop.addLoopContract(
                 createNewLoopContract(oldContract, newLoop, !oldLoop.equals(newLoop)));
         }
     }
 
     @Override
     public void performActionOnMergeContract(MergeContract oldContract) {
-        services.getSpecificationRepository()
-                .removeMergeContracts(oldContract.getMergePointStatement());
-        services.getSpecificationRepository().addMergeContract(
-            createNewMergeContract(oldContract, oldContract.getMergePointStatement(), false));
+        MergePointStatement mps = oldContract.getMergePointStatement();
+        // Atomic replacement: the former removeMergeContracts() + addMergeContract() sequence
+        // left a window in which concurrent readers (parallel prover) could observe an empty
+        // merge contract set.
+        mps.setMergeContracts(
+            ImmutableSet.singleton(createNewMergeContract(oldContract, mps, false)));
     }
 
     @Override
     protected void performActionOnMergeContract(MergePointStatement oldMps,
             MergePointStatement newMps) {
-        ImmutableSet<MergeContract> oldContracts =
-            services.getSpecificationRepository().getMergeContracts(oldMps);
-        services.getSpecificationRepository().removeMergeContracts(oldMps);
-        oldContracts.forEach(c -> services.getSpecificationRepository()
-                .addMergeContract(createNewMergeContract(c, newMps, !oldMps.equals(newMps))));
+        ImmutableSet<MergeContract> oldContracts = oldMps.getMergeContracts();
+        ImmutableSet<MergeContract> newContracts = DefaultImmutableSet.nil();
+        for (MergeContract c : oldContracts) {
+            newContracts = newContracts
+                    .add(createNewMergeContract(c, newMps, !oldMps.equals(newMps)));
+        }
+        if (oldMps == newMps) {
+            // same node: replace in one atomic step so readers never observe an empty set
+            newMps.setMergeContracts(newContracts);
+        } else {
+            oldMps.removeMergeContracts();
+            newMps.setMergeContracts(newContracts);
+        }
     }
 
     private MergeContract createNewMergeContract(final MergeContract oldContract,
@@ -539,7 +542,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnLoopInvariant(LoopStatement oldLoop, LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
-        LoopSpecification inv = services.getSpecificationRepository().getLoopSpec(oldLoop);
+        LoopSpecification inv = oldLoop.getLoopInvariant();
         if (inv == null) {
             return;
         }
@@ -601,7 +604,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         LoopSpecification newInv = inv.create(newLoop, newInvariants, newFreeInvariants, newMods,
             newFreeMods, newInfFlowSpecs, newVariant, newSelfTerm, newLocalIns, newLocalOuts,
             atPres);
-        services.getSpecificationRepository().addLoopInvariant(newInv);
+        newLoop.setLoopInvariant(newInv);
     }
 
     @Override
@@ -614,9 +617,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         handleJmlStatements(x, SetStatement::new);
     }
 
-    public <T extends Statement> void handleJmlStatements(T x, Function<T, T> cloner) {
-        var spec = Objects.requireNonNull(
-            services.getSpecificationRepository().getStatementSpec(x));
+    public <T extends Statement & JmlSpecCarrier> void handleJmlStatements(T x,
+            Function<T, T> cloner) {
+        var spec = Objects.requireNonNull(x.getSpec());
 
         ProgramVariableCollection vars = spec.vars();
         Map<LocationVariable, JTerm> atPres = vars.atPres;
@@ -644,10 +647,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
 
         var newTerms = spec.terms().map(this::replaceVariablesInTerm);
-        var newSpec = new SpecificationRepository.JmlStatementSpec(newVars, newTerms);
+        var newSpec = new JmlStatementSpec(newVars, newTerms);
 
         var c = cloner.apply(x);
-        services.getSpecificationRepository().addStatementSpec(c, newSpec);
+        c.setSpec(newSpec);
 
         /*
          * if (!newAtPres.equals(vars.atPres)) {

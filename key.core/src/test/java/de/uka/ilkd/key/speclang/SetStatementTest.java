@@ -16,16 +16,15 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
 import de.uka.ilkd.key.speclang.jml.translation.Context;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
+import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.parsing.Position;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -93,12 +92,12 @@ public class SetStatementTest {
 
     @Test
     public void test() {
-        testError("//@ set this.ghostArray[0] = 0;", "write to array");
-        testError("//@ set this.normalField = 0;", "write to normal field");
-        testNoError("//@ set this.ghostArray[0].ghostField = 0;", "write ghost field");
-        testNoError("//@ set this.ghostField = 0;", "write to ghost field");
-        testNoError("//@ set ghostLocal = 0;", "write to ghost local");
-        testError("//@ set normalLocal = 0;", "write to normal local");
+        testError("set this.ghostArray[0] = 0;", "write to array");
+        testError("set this.normalField = 0;", "write to normal field");
+        testNoError("set this.ghostArray[0].ghostField = 0;", "write ghost field");
+        testNoError("set this.ghostField = 0;", "write to ghost field");
+        testNoError("set ghostLocal = 0;", "write to ghost local");
+        testError("set normalLocal = 0;", "write to normal local");
     }
 
     private void testError(String statement, String reason) {
@@ -113,13 +112,10 @@ public class SetStatementTest {
 
     private String parseAndCheck(String statementText) {
         JMLSpecFactory jsf = new JMLSpecFactory(services);
-        ImmutableList<TextualJMLConstruct> constructs =
-            new de.uka.ilkd.key.speclang.njml.PreParser().parseMethodLevel(statementText, null,
-                Position.newOneBased(1, 1));
-        assertEquals(1, constructs.size());
-        assertInstanceOf(TextualJMLSetStatement.class, constructs.head());
-        var statement = (TextualJMLSetStatement) constructs.head();
-        JmlParser.Set_statementContext context = statement.getAssignment();
+        JmlLexer lexer = JmlFacade.createLexer(statementText);
+        JmlParser parser = JmlFacade.createParser(lexer);
+        JmlParser.Set_statementContext context = parser.set_statement();
+        parser.getErrorReporter().throwException();
         JTerm assignee = jmlIO.translateTerm(context.assignee);
         return jsf.checkSetStatementAssignee(assignee);
     }

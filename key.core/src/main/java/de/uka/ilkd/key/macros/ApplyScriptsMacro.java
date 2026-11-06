@@ -22,13 +22,13 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.pp.Notation;
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.rule.JmlAssertBuiltInRuleApp;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.scripts.ScriptException;
 import de.uka.ilkd.key.scripts.TermWithHoles;
+import de.uka.ilkd.key.speclang.JmlStatementSpec;
 import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.speclang.njml.JmlParser.ProofArgContext;
@@ -289,8 +289,8 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
 
     private Map<ParserRuleContext, JTerm> getTermMap(JmlAssert jmlAssert, JavaBlock javaBlock,
             Services services) {
-        SpecificationRepository.@Nullable JmlStatementSpec jmlspec =
-            services.getSpecificationRepository().getStatementSpec(jmlAssert);
+        @Nullable
+        JmlStatementSpec jmlspec = jmlAssert.getSpec();
         if (jmlspec == null) {
             throw new IllegalStateException(
                 "No specification found for JML assert statement at " + jmlAssert);
@@ -314,7 +314,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
      * be corrected.
      */
     private JTerm correctSelfVar(int index, JavaBlock javaBlock,
-            SpecificationRepository.JmlStatementSpec spec, Services services) {
+            JmlStatementSpec spec, Services services) {
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(javaBlock, services);
         final JTerm self = MiscTools.getSelfTerm(frame, services);
         return spec.getTerm(services, self, index);

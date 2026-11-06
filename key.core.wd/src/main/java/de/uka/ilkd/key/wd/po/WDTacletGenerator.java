@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.wd.po;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.AbstractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.TacletPOGenerator;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.wd.ClassWellDefinedness;
+import de.uka.ilkd.key.wd.ContractRegistryWD;
 import de.uka.ilkd.key.wd.MethodWellDefinedness;
-import de.uka.ilkd.key.wd.SpecificationRepositoryWD;
 import de.uka.ilkd.key.wd.WellDefinednessCheck;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -30,15 +30,14 @@ public class WDTacletGenerator implements TacletPOGenerator {
      * @param proofConfig the proof configuration
      */
     @Override
-    public void generate(AbstractPO abstractPO, InitConfig proofConfig,
-            SpecificationRepository specRepos) {
+    public void generate(AbstractPO abstractPO, InitConfig proofConfig, Services services) {
         if (!WellDefinednessCheck.isOn(proofConfig.getProfile())) {
             return;
         }
         ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.nil();
         ImmutableSet<String> names = DefaultImmutableSet.nil();
 
-        var repo = (SpecificationRepositoryWD) specRepos;
+        var repo = (ContractRegistryWD) services.getContractRegistry();
         for (WellDefinednessCheck ch : repo.getAllWdChecks()) {
             if (ch instanceof MethodWellDefinedness mwd) {
                 // WD(callee.m(...))

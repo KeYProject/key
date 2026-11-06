@@ -21,6 +21,7 @@ import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.util.LimitedObservers;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
@@ -929,7 +930,7 @@ public class TacletGenerator {
                 if (pair.second.equals(t.op())
                         && (obs.isStatic() || t.sub(1).sort().extendsTrans(pair.first))) {
                     Pair<IObserverFunction, ImmutableSet<Taclet>> limited =
-                        services.getSpecificationRepository().limitObs(obs);
+                        LimitedObservers.limitObs(obs, services);
                     newOp = limited.first;
                     taclets = taclets.union(limited.second);
                 }

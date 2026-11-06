@@ -18,6 +18,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
@@ -71,6 +73,91 @@ public abstract class AbstractAuxiliaryContractRule implements BuiltInRule {
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
         }
+    }
+
+    // ---------------------------------------------------------------------
+    // modality filtering of node-attached block/loop contracts
+    // (formerly SpecificationRepository.getBlockContracts/getLoopContracts)
+    // ---------------------------------------------------------------------
+
+    /**
+     * The modality kind used to match contracts for the given goal modality (transactions compare
+     * against the corresponding non-transaction modality).
+     *
+     * @param kind the goal's modality kind.
+     * @return the modality kind a contract must have to be applicable.
+     */
+    protected static JModality.JavaModalityKind matchModality(JModality.JavaModalityKind kind) {
+        if (kind.transaction()) {
+            return kind == JModality.JavaModalityKind.DIA_TRANSACTION
+                    ? JModality.JavaModalityKind.DIA
+                    : JModality.JavaModalityKind.BOX;
+        } else {
+            return kind;
+        }
+    }
+
+    /**
+     * Filters the block contracts attached to the given block by the given modality.
+     *
+     * @param block the block; the contracts are read off its AST node.
+     * @param modalityKind the goal's modality kind.
+     * @param services services.
+     * @return the applicable block contracts.
+     */
+    protected static ImmutableSet<BlockContract> getBlockContracts(StatementBlock block,
+            JModality.JavaModalityKind modalityKind, Services services) {
+        ImmutableSet<BlockContract> result = block.getBlockContracts();
+        final JModality.JavaModalityKind matchModality = matchModality(modalityKind);
+        for (BlockContract contract : result) {
+            if (!contract.getModalityKind().equals(matchModality) || (modalityKind.transaction()
+                    && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
+                result = result.remove(contract);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Filters the loop contracts attached to the given block by the given modality.
+     *
+     * @param block the block; the contracts are read off its AST node.
+     * @param modalityKind the goal's modality kind.
+     * @param services services.
+     * @return the applicable loop contracts.
+     */
+    protected static ImmutableSet<LoopContract> getLoopContracts(StatementBlock block,
+            JModality.JavaModalityKind modalityKind, Services services) {
+        ImmutableSet<LoopContract> result = block.getLoopContracts();
+        final JModality.JavaModalityKind matchModality = matchModality(modalityKind);
+        for (LoopContract contract : result) {
+            if (!contract.getModalityKind().equals(matchModality) || (modalityKind.transaction()
+                    && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
+                result = result.remove(contract);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Filters the loop contracts attached to the given loop by the given modality.
+     *
+     * @param loop the loop; the contracts are read off its AST node.
+     * @param modalityKind the goal's modality kind.
+     * @param services services.
+     * @return the applicable loop contracts.
+     */
+    protected static ImmutableSet<LoopContract> getLoopContracts(LoopStatement loop,
+            JModality.JavaModalityKind modalityKind, Services services) {
+        ImmutableSet<LoopContract> result = loop.getLoopContracts();
+        final JModality.JavaModalityKind matchModality = matchModality(modalityKind);
+        for (LoopContract contract : result) {
+            if (!contract.getModalityKind().equals(matchModality) || (modalityKind.transaction()
+                    && !contract.isTransactionApplicable() && !contract.isReadOnly(services))) {
+                result = result.remove(contract);
+            }
+        }
+        return result;
     }
 
     /**

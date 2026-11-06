@@ -16,8 +16,8 @@ import de.uka.ilkd.key.logic.op.JFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.label.OriginTermLabelRefactoring;
+import de.uka.ilkd.key.util.LimitedObservers;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
@@ -236,7 +236,7 @@ public class OriginTermLabel implements TermLabel {
                 return !sort.extendsTrans(tc.getHeapLDT().targetSort())
                         && !sort.extendsTrans(tc.getLocSetLDT().targetSort())
                         && !op.name().equals(ji.getInv().name())
-                        && !op.name().toString().endsWith(SpecificationRepository.LIMIT_SUFFIX);
+                        && !op.name().toString().endsWith(LimitedObservers.LIMIT_SUFFIX);
             } else {
                 return false;
             }

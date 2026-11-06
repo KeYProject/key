@@ -7,8 +7,9 @@ package de.uka.ilkd.key.rule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.ContractRegistry;
+import de.uka.ilkd.key.util.LimitedObservers;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
@@ -48,10 +49,10 @@ public abstract class AbstractContractRuleApp<T extends BuiltInRule>
         if (instantiation != null && posInOccurrence() != null) {
             IObserverFunction target = instantiation.getTarget();
             IObserverFunction observerFunctionAtPos = getObserverFunction(services);
-            final SpecificationRepository specRepo = services.getSpecificationRepository();
+            final ContractRegistry specRepo = services.getContractRegistry();
 
-            target = specRepo.unlimitObs(target);
-            observerFunctionAtPos = specRepo.unlimitObs(observerFunctionAtPos);
+            target = LimitedObservers.unlimitObs(target);
+            observerFunctionAtPos = LimitedObservers.unlimitObs(observerFunctionAtPos);
 
             if (!target.equals(observerFunctionAtPos)) {
 
