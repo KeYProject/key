@@ -106,8 +106,10 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         addMouseListener(listener);
 
         // and here comes the drag'n'drop stuff that allows the user to copy
-        // the currently highlighted subterm/formula by mere drag'n'dop actions
-        dragSource = new DragSource();
+        // the currently highlighted subterm/formula by mere drag'n'dop actions.
+        // The default drag source is used so that global drag source listeners
+        // (e.g. the print mode hint of the LLM chat panel) observe the drags.
+        dragSource = DragSource.getDefaultDragSource();
         dragSource.createDefaultDragGestureRecognizer(this, DnDConstants.ACTION_COPY, listener);
 
         // And now the Drag'n'drop stuff ...

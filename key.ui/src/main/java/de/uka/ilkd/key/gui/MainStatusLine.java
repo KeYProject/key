@@ -11,6 +11,10 @@ import javax.swing.border.BevelBorder;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import net.miginfocom.layout.CC;
+import net.miginfocom.layout.LC;
+import net.miginfocom.swing.MigLayout;
+
 /**
  * Status line of the KeY MainWindow.
  * <p>
@@ -33,7 +37,11 @@ class MainStatusLine extends JPanel {
     private final JProgressBar progressBar = new JProgressBar();
 
     MainStatusLine(String initialText, Font font) {
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        // one baseline-aligned row: the status text pushes the extension components to the right
+        // edge and takes the remaining width; all components sit directly in this layout (no
+        // nested toolbar), so their baselines are aligned. Baseline alignment is set per component
+        // (CC), not on the layout (LC would set the row alignment, which MigLayout cannot handle).
+        setLayout(new MigLayout(new LC().fillX().insets("1", "6", "1", "6")));
 
         setBorder(new BevelBorder(BevelBorder.LOWERED));
         setBackground(Color.gray);
@@ -44,25 +52,17 @@ class MainStatusLine extends JPanel {
         lblStatusText.setIcon(IconFactory.keyLogo(35, 20));
         lblStatusText.setBorder(BorderFactory.createCompoundBorder(lblStatusText.getBorder(),
             BorderFactory.createEmptyBorder(0, 10, 0, 0)));
-
-        // add(Box.createHorizontalGlue());
-        add(lblStatusText);
-        add(Box.createHorizontalStrut(50));
+        add(lblStatusText, new CC().alignY("baseline").pushX(1000f));
 
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
         progressBar.setMaximumSize(new Dimension(100, Short.MAX_VALUE));
         progressBar.setEnabled(true);
         progressBar.setVisible(false);
-        add(progressBar);
+        add(progressBar, new CC().alignY("baseline").gapLeft("30px"));
 
-        add(Box.createHorizontalGlue());
-        JToolBar bar = new JToolBar();
-        bar.setFloatable(false);
-        bar.setRollover(false);
-        bar.setBorderPainted(false);
-        add(bar);
-        KeYGuiExtensionFacade.getStatusLineComponents().forEach(bar::add);
+        KeYGuiExtensionFacade.getStatusLineComponents()
+                .forEach(c -> add(c, new CC().alignY("baseline")));
     }
 
     /*

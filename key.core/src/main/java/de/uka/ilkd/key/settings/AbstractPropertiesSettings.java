@@ -173,6 +173,15 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         return pe;
     }
 
+    protected PropertyEntry<Set<String>> createStringSetProperty(String key, Set<String> defValue) {
+        PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key, defValue,
+            AbstractPropertiesSettings::parseStringSet,
+            AbstractPropertiesSettings::stringSetToString,
+            (it) -> new LinkedHashSet<>(it != null ? (Collection<String>) it : List.of()));
+        propertyEntries.add(pe);
+        return pe;
+    }
+
     /**
      * Creates a string list property.
      *
@@ -195,7 +204,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
         void parseFrom(String value);
 
-        void set(T value);
+        void set(Object value);
 
         T get();
 
@@ -242,7 +251,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         }
 
         @Override
-        public void set(T value) {
+        public void set(Object value) {
             T old = get();
             // only store non-null values
             if (value != null) {
