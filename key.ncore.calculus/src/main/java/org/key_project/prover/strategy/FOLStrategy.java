@@ -7,7 +7,6 @@ package org.key_project.prover.strategy;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.key_project.ldt.IIntLdt;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermOrdering;
@@ -30,7 +29,7 @@ import static org.key_project.prover.strategy.costbased.FOLCost.*;
 ///
 /// In particular, instantiation of quantifiers is not supported by this
 /// strategy, as the current E-matching depends on the theory of integers.
-public abstract class AbstractFOLStrategy<G extends ProofGoal<G>> extends AbstractFeatureStrategy<G>
+public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatureStrategy<G>
         implements ComponentStrategy<G> {
     public static final Name NAME = new Name("FOL Strategy");
 
@@ -40,21 +39,14 @@ public abstract class AbstractFOLStrategy<G extends ProofGoal<G>> extends Abstra
     private final Feature costComputationF;
     private final Feature instantiationF;
 
-    protected final ArithTermFeatures tf;
     protected final IFormulaTermFeatures ff;
-
-    private final IIntLdt numbers;
 
     final FeatureConstants<G> fc;
 
-    public AbstractFOLStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff,
-            FeatureConstants<G> featureConstants, IIntLdt numbers, Feature globalF) {
-        this.tf = tf;
+    public FOLStrategy(IFormulaTermFeatures ff,
+            FeatureConstants<G> featureConstants, Feature globalF) {
         this.ff = ff;
-
         this.fc = featureConstants;
-
-        this.numbers = numbers;
 
         this.costComputationF = add(costComputationDispatcher, globalF);
         this.instantiationF = add(instantiationDispatcher, globalF);

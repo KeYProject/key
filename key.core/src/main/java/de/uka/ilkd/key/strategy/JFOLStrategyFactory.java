@@ -12,6 +12,7 @@ import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.strategy.FOLStrategy;
 
 /// Factory for [JFOLStrategy]. Additionally, handles all strategy settings
 /// relevant to it.
