@@ -733,8 +733,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(TypeExpr n, Void arg) {
         ResolvedType rt = n.calculateResolvedType();
         KeYJavaType kjt = getKeYJavaType(rt);
-        ImmutableArray<Annotation> annots = map(n.getType().getAnnotations());
-        return new TypeRef(kjt, annots.toImmutableList(), 0);
+        ImmutableList<Annotation> annots = map(n.getType().getAnnotations());
+        return new TypeRef(kjt, annots, 0);
     }
 
     private KeYJavaType getCachedKeYJavaType(ResolvedType rtype) {
@@ -1144,8 +1144,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             type.getScope().map(JP2KeYVisitor::convertScopeToReferencePrefix).orElse(null);
         ProgramElementName name = createProgramElementName(type.getName());
         KeYJavaType resolvedType = getKeYJavaType(type.resolve());
-        ImmutableArray<Annotation> annots = map(type.getAnnotations());
-        return new TypeRef(name, annots.toImmutableList(), 0, prefix, resolvedType);
+        ImmutableList<Annotation> annots = map(type.getAnnotations());
+        return new TypeRef(name, annots, 0, prefix, resolvedType);
     }
 
     private ParameterDeclaration visitNoMap(Parameter n) {
@@ -1185,8 +1185,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public TypeReference visit(PrimitiveType n, Void arg) {
-        ImmutableArray<Annotation> annots = map(n.getAnnotations());
-        return new TypeRef(getKeYJavaType(n.resolve()), annots.toImmutableList(), 0);
+        ImmutableList<Annotation> annots = map(n.getAnnotations());
+        return new TypeRef(getKeYJavaType(n.resolve()), annots, 0);
     }
 
     @Override
@@ -1212,8 +1212,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             System.out.println(e);
         }
 
-        ImmutableArray<Annotation> annots = map(n.getAnnotations());
-        return new TypeRef(getKeYJavaType(n.resolve()), annots.toImmutableList(), 0);
+        ImmutableList<Annotation> annots = map(n.getAnnotations());
+        return new TypeRef(getKeYJavaType(n.resolve()), annots, 0);
     }
 
     @Override
@@ -1536,8 +1536,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(VoidType n, Void arg) {
-        ImmutableArray<Annotation> annots = map(n.annotations());
-        return new TypeRef(getKeYJavaType(ResolvedVoidType.INSTANCE), annots.toImmutableList(), 0);
+        ImmutableList<Annotation> annots = map(n.annotations());
+        return new TypeRef(getKeYJavaType(ResolvedVoidType.INSTANCE), annots, 0);
     }
 
     @Override
@@ -2050,9 +2050,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ProgramElementName name = createProgramElementName(n.getName());
         ProgramElementName fullName = new ProgramElementName(n.getFullyQualifiedName().get());
         boolean isLibrary = mapping.isParsingLibraries();
-        ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> modArray =
+        ImmutableList<de.uka.ilkd.key.java.ast.declaration.Modifier> modArray =
             map(n.getModifiers());
-        ImmutableArray<MemberDeclaration> members = map(n.getMembers());
+        ImmutableList<MemberDeclaration> members = map(n.getMembers());
         boolean parentIsInterface = false;
 
         TypeDeclaration td = new AnnotationInterfaceDeclaration(
@@ -2072,7 +2072,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
 
         TypeReference typeRef = requireTypeReference(n.getType());
-        ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> modifiers =
+        ImmutableList<de.uka.ilkd.key.java.ast.declaration.Modifier> modifiers =
             map(n.getModifiers());
         ProgramElementName name = createProgramElementName(n.getName());
         var decl = new AnnotationInterfaceMemberDeclaration(typeRef, name, modifiers);
@@ -2185,8 +2185,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(VarType n, Void arg) {
         var kjt = getKeYJavaType(n.resolve());
-        ImmutableArray<Annotation> annots = map(n.getAnnotations());
-        return new TypeRef(kjt, annots.toImmutableList(), 0);
+        ImmutableList<Annotation> annots = map(n.getAnnotations());
+        return new TypeRef(kjt, annots, 0);
     }
 
     @Override
