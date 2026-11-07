@@ -17,17 +17,16 @@ import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationP
 import org.jspecify.annotations.Nullable;
 
 @StableCost
-public class TriggerVariableInstantiationProjection<GOAL extends ProofGoal<GOAL>>
-        implements ProjectionToTerm<GOAL> {
+public class TriggerVariableInstantiationProjection implements ProjectionToTerm {
     @Override
-    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, GOAL goal,
+    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal goal,
             MutableState mState) {
         assert app.rule() instanceof Taclet;
         final Taclet t = (Taclet) app.rule();
         final Trigger trigger = t.getTrigger();
         assert trigger != null : "@AssumeAssertion(nullness): Trigger should not be null";
 
-        final SVInstantiationProjection<GOAL> instProj =
+        final SVInstantiationProjection instProj =
             SVInstantiationProjection.create(trigger.triggerVar().name(), true);
         return instProj.toTerm(app, pos, goal, mState);
     }

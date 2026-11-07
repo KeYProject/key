@@ -102,7 +102,7 @@ public class JFOLStrategy extends FOLStrategy<Goal> implements ComponentStrategy
         super.setupSplitting(d);
         var heapLDT = getServices().getTypeConverter().getHeapLDT();
         var vf = new ValueTermFeature(op(heapLDT.getNull()));
-        ProjectionToTerm<Goal> cutFormula = instOf("cutFormula");
+        ProjectionToTerm cutFormula = instOf("cutFormula");
         bindRuleSet(d, "cut_direct",
             SumFeature
                     .createSum(
@@ -198,7 +198,7 @@ public class JFOLStrategy extends FOLStrategy<Goal> implements ComponentStrategy
     }
 
     @Override
-    protected Feature allowSplitting(ProjectionToTerm<Goal> focus) {
+    protected Feature allowSplitting(ProjectionToTerm focus) {
         if (normalSplitting()) {
             return longConst(0);
         }

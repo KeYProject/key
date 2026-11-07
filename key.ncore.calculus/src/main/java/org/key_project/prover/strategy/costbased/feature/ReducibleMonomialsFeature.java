@@ -29,12 +29,12 @@ public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
         REDUCIBLE, DIVIDES
     }
 
-    private final ProjectionToTerm<GOAL> dividend, divisor;
+    private final ProjectionToTerm dividend, divisor;
     private final Check check;
     private final BiFunction<Term, LogicServices, Monomial> builder;
 
-    private ReducibleMonomialsFeature(ProjectionToTerm<GOAL> dividend,
-            ProjectionToTerm<GOAL> divisor, Check check,
+    private ReducibleMonomialsFeature(ProjectionToTerm dividend,
+            ProjectionToTerm divisor, Check check,
             BiFunction<Term, LogicServices, Monomial> monBuilder) {
         this.dividend = dividend;
         this.divisor = divisor;
@@ -52,8 +52,8 @@ public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
      * @param <GOAL>
      */
     public static <GOAL extends ProofGoal<GOAL>> Feature createReducible(
-            ProjectionToTerm<GOAL> dividend,
-            ProjectionToTerm<GOAL> divisor,
+            ProjectionToTerm dividend,
+            ProjectionToTerm divisor,
             BiFunction<Term, LogicServices, Monomial> monBuilder) {
         return new ReducibleMonomialsFeature<>(dividend, divisor, Check.REDUCIBLE, monBuilder);
     }
@@ -68,8 +68,8 @@ public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
      * @param <GOAL>
      */
     public static <GOAL extends ProofGoal<GOAL>> Feature createDivides(
-            ProjectionToTerm<GOAL> dividend,
-            ProjectionToTerm<GOAL> divisor, BiFunction<Term, LogicServices, Monomial> monBuilder) {
+            ProjectionToTerm dividend,
+            ProjectionToTerm divisor, BiFunction<Term, LogicServices, Monomial> monBuilder) {
         return new ReducibleMonomialsFeature<>(dividend, divisor, Check.DIVIDES, monBuilder);
     }
 

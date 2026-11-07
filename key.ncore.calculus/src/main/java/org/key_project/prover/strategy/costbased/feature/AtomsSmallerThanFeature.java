@@ -32,10 +32,10 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 public class AtomsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         extends AbstractMonomialSmallerThanFeature<GOAL> {
 
-    private final ProjectionToTerm<GOAL> left, right;
+    private final ProjectionToTerm left, right;
     private final Function Z;
 
-    private AtomsSmallerThanFeature(ProjectionToTerm<GOAL> left, ProjectionToTerm<GOAL> right,
+    private AtomsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
             TermOrdering termOrdering, IIntLdt numbers) {
         super(termOrdering, numbers);
         this.left = left;
@@ -44,8 +44,8 @@ public class AtomsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
     }
 
 
-    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm<GOAL> left,
-            ProjectionToTerm<GOAL> right,
+    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm left,
+            ProjectionToTerm right,
             TermOrdering termOrdering, IIntLdt numbers) {
         return new AtomsSmallerThanFeature<>(left, right, termOrdering, numbers);
     }

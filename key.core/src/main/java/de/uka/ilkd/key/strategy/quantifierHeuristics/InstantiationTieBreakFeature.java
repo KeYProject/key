@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.GenPolTieBreak;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.PolarityTieBreak;
@@ -37,11 +36,11 @@ import org.jspecify.annotations.NonNull;
  */
 public class InstantiationTieBreakFeature implements Feature {
 
-    private final ProjectionToTerm<Goal> varInst;
+    private final ProjectionToTerm varInst;
     /** the resolved tie-break, or {@code null} for the classic option */
     private final QuantifierInstantiationTieBreak strategy;
 
-    private InstantiationTieBreakFeature(ProjectionToTerm<Goal> var,
+    private InstantiationTieBreakFeature(ProjectionToTerm var,
             QuantifierInstantiationTieBreak strategy) {
         varInst = var;
         this.strategy = strategy;
@@ -55,7 +54,7 @@ public class InstantiationTieBreakFeature implements Feature {
      * @param triggersOption the value of {@link StrategyProperties#TRIGGERS_OPTIONS_KEY}
      * @return the feature
      */
-    public static Feature create(ProjectionToTerm<Goal> varInst, String triggersOption) {
+    public static Feature create(ProjectionToTerm varInst, String triggersOption) {
         final QuantifierInstantiationTieBreak strategy = switch (triggersOption) {
             case StrategyProperties.TRIGGERS_GOOD -> GenPolTieBreak.INSTANCE;
             case StrategyProperties.TRIGGERS_CLASSIC -> null;

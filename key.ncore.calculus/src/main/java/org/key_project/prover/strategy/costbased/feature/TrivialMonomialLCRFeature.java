@@ -24,19 +24,19 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 @StableCost
 public class TrivialMonomialLCRFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
-    private final ProjectionToTerm<GOAL> a, b;
+    private final ProjectionToTerm a, b;
     // creates a monomial from a given term
     private final BiFunction<Term, LogicServices, Monomial> builder;
 
-    private TrivialMonomialLCRFeature(ProjectionToTerm<GOAL> a, ProjectionToTerm<GOAL> b,
+    private TrivialMonomialLCRFeature(ProjectionToTerm a, ProjectionToTerm b,
             BiFunction<Term, LogicServices, Monomial> builder) {
         this.a = a;
         this.b = b;
         this.builder = builder;
     }
 
-    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm<GOAL> a,
-            ProjectionToTerm<GOAL> b,
+    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm a,
+            ProjectionToTerm b,
             BiFunction<Term, LogicServices, Monomial> builder) {
         return new TrivialMonomialLCRFeature(a, b, builder);
     }

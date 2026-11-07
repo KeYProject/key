@@ -76,75 +76,75 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public ProjectionToTerm<Goal> createReduceMonomialsProjection(
-            ProjectionToTerm<Goal> dividend, ProjectionToTerm<Goal> divisor) {
+    public ProjectionToTerm createReduceMonomialsProjection(
+            ProjectionToTerm dividend, ProjectionToTerm divisor) {
         return ReduceMonomialsProjection.create(dividend, divisor);
     }
 
     @Override
-    public ProjectionToTerm<Goal> createMonomialColumnOp(ProjectionToTerm<Goal> leftCoefficient,
-            ProjectionToTerm<Goal> polynomial) {
+    public ProjectionToTerm createMonomialColumnOp(ProjectionToTerm leftCoefficient,
+            ProjectionToTerm polynomial) {
         return MonomialColumnOp.create(leftCoefficient, polynomial);
     }
 
     @Override
-    public ProjectionToTerm<Goal> createRoundingUpDividePolynomialsProjection(
-            ProjectionToTerm<Goal> leftCoefficient, ProjectionToTerm<Goal> polynomial) {
+    public ProjectionToTerm createRoundingUpDividePolynomialsProjection(
+            ProjectionToTerm leftCoefficient, ProjectionToTerm polynomial) {
         return DividePolynomialsProjection.createRoundingUp(leftCoefficient, polynomial);
     }
 
     @Override
-    public ProjectionToTerm<Goal> createRoundingDownDividePolynomialsProjection(
-            ProjectionToTerm<Goal> leftCoefficient, ProjectionToTerm<Goal> polynomial) {
+    public ProjectionToTerm createRoundingDownDividePolynomialsProjection(
+            ProjectionToTerm leftCoefficient, ProjectionToTerm polynomial) {
         return DividePolynomialsProjection.createRoundingDown(leftCoefficient, polynomial);
     }
 
     @Override
-    public ProjectionToTerm<Goal> createCoeffGcdProjection(ProjectionToTerm<Goal> monomialLeft,
-            ProjectionToTerm<Goal> monomialRight) {
+    public ProjectionToTerm createCoeffGcdProjection(ProjectionToTerm monomialLeft,
+            ProjectionToTerm monomialRight) {
         return CoeffGcdProjection.create(monomialLeft, monomialRight);
     }
 
     @Override
-    public Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm<Goal> left,
-            ProjectionToTerm<Goal> right) {
+    public Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right) {
         return PolynomialValuesCmpFeature.lt(left, right);
     }
 
     @Override
-    public Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm<Goal> left,
-            ProjectionToTerm<Goal> right, ProjectionToTerm<Goal> leftCoeff,
-            ProjectionToTerm<Goal> rightCoeff) {
+    public Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right, ProjectionToTerm leftCoeff,
+            ProjectionToTerm rightCoeff) {
         return PolynomialValuesCmpFeature.lt(left, right, leftCoeff, rightCoeff);
     }
 
     @Override
-    public Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm<Goal> left,
-            ProjectionToTerm<Goal> right) {
+    public Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right) {
         return PolynomialValuesCmpFeature.leq(left, right);
     }
 
     @Override
-    public Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm<Goal> left,
-            ProjectionToTerm<Goal> right, ProjectionToTerm<Goal> leftCoeff,
-            ProjectionToTerm<Goal> rightCoeff) {
+    public Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right, ProjectionToTerm leftCoeff,
+            ProjectionToTerm rightCoeff) {
         return PolynomialValuesCmpFeature.leq(left, right, leftCoeff, rightCoeff);
     }
 
     @Override
-    public Feature createEqPolynomialValuesCmpFeature(ProjectionToTerm<Goal> left,
-            ProjectionToTerm<Goal> right) {
+    public Feature createEqPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right) {
         return PolynomialValuesCmpFeature.eq(left, right);
     }
 
     @Override
-    public Feature createDividesPolynomialValuesCmpFeature(ProjectionToTerm<Goal> left,
-            ProjectionToTerm<Goal> right) {
+    public Feature createDividesPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right) {
         return PolynomialValuesCmpFeature.divides(left, right);
     }
 
     @Override
-    public TermFeature createEqTermFeature(TermBuffer<Goal> t) {
+    public TermFeature createEqTermFeature(TermBuffer t) {
         return EqTermFeature.create(t, RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
 
@@ -155,18 +155,18 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
 
     @Override
     public TermGenerator<Goal> createMultiplesModEquationsGenerator(
-            ProjectionToTerm<Goal> source, ProjectionToTerm<Goal> target) {
+            ProjectionToTerm source, ProjectionToTerm target) {
         return MultiplesModEquationsGenerator.create(source, target);
     }
 
     @Override
-    public ProjectionToTerm<Goal> opTerm(Operator op, ProjectionToTerm<Goal> subTerm0,
-            ProjectionToTerm<Goal> subTerm1) {
+    public ProjectionToTerm opTerm(Operator op, ProjectionToTerm subTerm0,
+            ProjectionToTerm subTerm1) {
         return TermConstructionProjection.create(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
 
     @Override
-    public TermGenerator<Goal> createRootsGenerator(ProjectionToTerm<Goal> powerRelation,
+    public TermGenerator<Goal> createRootsGenerator(ProjectionToTerm powerRelation,
             LogicServices services) {
         return RootsGenerator.create(powerRelation, (TermServices) services);
     }
@@ -233,7 +233,7 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public Feature countOccurrences(ProjectionToTerm<Goal> target) {
+    public Feature countOccurrences(ProjectionToTerm target) {
         return CountOccurrencesFeature.create(target, RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
 
@@ -248,13 +248,13 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public Feature computeInstantiationCostOf(ProjectionToTerm<Goal> instOf_t,
+    public Feature computeInstantiationCostOf(ProjectionToTerm instOf_t,
             TriggerTreatment option) {
         return InstantiationCost.create(instOf_t, option);
     }
 
     @Override
-    public Feature getInstantiationTieBreakFeature(TermBuffer<Goal> varInst, String s) {
+    public Feature getInstantiationTieBreakFeature(TermBuffer varInst, String s) {
         return InstantiationTieBreakFeature.create(varInst, s);
     }
 }

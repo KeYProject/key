@@ -35,11 +35,11 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature<Goa
         LT, LEQ, EQ, DIVIDES
     }
 
-    private final ProjectionToTerm<Goal> left, right, leftCoeff, rightCoeff;
+    private final ProjectionToTerm left, right, leftCoeff, rightCoeff;
     private final Cmp cmp;
 
-    private PolynomialValuesCmpFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff, Cmp cmp) {
+    private PolynomialValuesCmpFeature(ProjectionToTerm left, ProjectionToTerm right,
+            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff, Cmp cmp) {
         this.left = left;
         this.right = right;
         this.leftCoeff = leftCoeff;
@@ -47,39 +47,39 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature<Goa
         this.cmp = cmp;
     }
 
-    public static Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static Feature lt(ProjectionToTerm left, ProjectionToTerm right) {
         return lt(left, right, null, null);
     }
 
-    public static Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+    public static Feature lt(ProjectionToTerm left, ProjectionToTerm right,
+            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.LT);
     }
 
-    public static Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static Feature leq(ProjectionToTerm left, ProjectionToTerm right) {
         return leq(left, right, null, null);
     }
 
-    public static Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+    public static Feature leq(ProjectionToTerm left, ProjectionToTerm right,
+            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.LEQ);
     }
 
-    public static Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static Feature eq(ProjectionToTerm left, ProjectionToTerm right) {
         return eq(left, right, null, null);
     }
 
-    public static Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+    public static Feature eq(ProjectionToTerm left, ProjectionToTerm right,
+            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.EQ);
     }
 
-    public static Feature divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static Feature divides(ProjectionToTerm left, ProjectionToTerm right) {
         return divides(left, right, null, null);
     }
 
-    public static Feature divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+    public static Feature divides(ProjectionToTerm left, ProjectionToTerm right,
+            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.DIVIDES);
     }
 
@@ -113,8 +113,8 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature<Goa
         return leftPoly.getConstantTerm().mod(rightPoly.getConstantTerm().abs()).signum() == 0;
     }
 
-    private Polynomial getPolynomial(ProjectionToTerm<Goal> polyProj,
-            ProjectionToTerm<Goal> coeffProj,
+    private Polynomial getPolynomial(ProjectionToTerm polyProj,
+            ProjectionToTerm coeffProj,
             TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
         final Polynomial poly =

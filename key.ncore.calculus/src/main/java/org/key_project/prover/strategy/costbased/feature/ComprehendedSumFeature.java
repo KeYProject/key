@@ -27,7 +27,7 @@ import org.jspecify.annotations.NonNull;
 @StableCost
 public class ComprehendedSumFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
 
-    private final TermBuffer<Goal> var;
+    private final TermBuffer var;
     private final TermGenerator<Goal> generator;
     private final Feature body;
 
@@ -37,13 +37,13 @@ public class ComprehendedSumFeature<Goal extends ProofGoal<@NonNull Goal>> imple
      * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(TermBuffer<Goal> var,
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(TermBuffer var,
             TermGenerator<Goal> generator,
             Feature body) {
         return new ComprehendedSumFeature<>(var, generator, body);
     }
 
-    private ComprehendedSumFeature(TermBuffer<Goal> var, TermGenerator<Goal> generator,
+    private ComprehendedSumFeature(TermBuffer var, TermGenerator<Goal> generator,
             Feature body) {
         this.var = var;
         this.generator = generator;

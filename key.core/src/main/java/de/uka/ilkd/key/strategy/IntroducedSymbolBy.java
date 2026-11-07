@@ -24,16 +24,16 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 public class IntroducedSymbolBy extends BinaryTacletAppFeature<Goal> {
     private final Name ruleSetName;
     private final Name schemaVar;
-    private final ProjectionToTerm<Goal> term;
+    private final ProjectionToTerm term;
 
-    public static Feature create(ProjectionToTerm<Goal> termWithTopLevelOpToCheck,
+    public static Feature create(ProjectionToTerm termWithTopLevelOpToCheck,
             String ruleSetName,
             String schemaVar) {
         return new IntroducedSymbolBy(termWithTopLevelOpToCheck, new Name(ruleSetName),
             new Name(schemaVar));
     }
 
-    protected IntroducedSymbolBy(ProjectionToTerm<Goal> termWithTopLevelOpToCheck, Name ruleSetName,
+    protected IntroducedSymbolBy(ProjectionToTerm termWithTopLevelOpToCheck, Name ruleSetName,
             Name schemaVar) {
         this.term = termWithTopLevelOpToCheck;
         this.ruleSetName = ruleSetName;

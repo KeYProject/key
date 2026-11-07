@@ -20,7 +20,7 @@ import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 // from the find subterm, so it reads the surrounding find formula -- valid only while that
 // formula is unchanged.
 @WeakStableCost
-public class FocusProjection<Goal extends ProofGoal<Goal>> implements ProjectionToTerm<Goal> {
+public class FocusProjection implements ProjectionToTerm {
 
     private final int stepsUpwards;
 
@@ -29,16 +29,17 @@ public class FocusProjection<Goal extends ProofGoal<Goal>> implements Projection
         this.stepsUpwards = stepsUpwards;
     }
 
-    public static <Goal extends ProofGoal<Goal>> ProjectionToTerm<Goal> create() {
+    public static ProjectionToTerm create() {
         return create(0);
     }
 
-    public static <Goal extends ProofGoal<Goal>> ProjectionToTerm<Goal> create(int stepsUpwards) {
+    public static ProjectionToTerm create(int stepsUpwards) {
         return new FocusProjection(stepsUpwards);
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mutableState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         int n = stepsUpwards;

@@ -27,7 +27,7 @@ public class TriggerVarInstantiatedFeature<GOAL extends ProofGoal<GOAL>>
         final Trigger trigger = app.taclet().getTrigger();
         assert trigger != null : "@AssumeAssertion(nullness): Trigger should not be null";
 
-        SVInstantiationProjection<GOAL> instProj =
+        SVInstantiationProjection instProj =
             SVInstantiationProjection.create(trigger.triggerVar().name(), false);
 
         return instProj.toTerm(app, pos, goal, mState) != null;

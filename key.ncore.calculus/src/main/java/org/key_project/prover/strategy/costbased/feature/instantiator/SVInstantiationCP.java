@@ -31,19 +31,19 @@ import org.jspecify.annotations.Nullable;
 /// it will always have exactly one branch
 public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
     private final @Nullable Name svToInstantiate;
-    private final ProjectionToTerm<G> value;
+    private final ProjectionToTerm value;
 
     public static <G extends ProofGoal<G>> Feature create(Name svToInstantiate,
-            ProjectionToTerm<G> value) {
+            ProjectionToTerm value) {
         return new SVInstantiationCP<G>(svToInstantiate, value);
     }
 
-    public static <G extends ProofGoal<G>> Feature createTriggeredVarCP(ProjectionToTerm<G> value) {
+    public static <G extends ProofGoal<G>> Feature createTriggeredVarCP(ProjectionToTerm value) {
         return new SVInstantiationCP<G>(null, value);
     }
 
 
-    private SVInstantiationCP(@Nullable Name svToInstantiate, ProjectionToTerm<G> value) {
+    private SVInstantiationCP(@Nullable Name svToInstantiate, ProjectionToTerm value) {
         this.svToInstantiate = svToInstantiate;
         this.value = value;
     }

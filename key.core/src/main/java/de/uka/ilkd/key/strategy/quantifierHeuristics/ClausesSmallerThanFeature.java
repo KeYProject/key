@@ -25,13 +25,13 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  */
 public class ClausesSmallerThanFeature extends SmallerThanFeature<Goal> {
 
-    private final ProjectionToTerm<Goal> left, right;
+    private final ProjectionToTerm left, right;
 
     private final QuanEliminationAnalyser quanAnalyser = new QuanEliminationAnalyser();
 
     private final LiteralsSmallerThanFeature litComparator;
 
-    private ClausesSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    private ClausesSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
             TermOrdering termOrdering, IntegerLDT numbers) {
         super(termOrdering);
         this.left = left;
@@ -41,7 +41,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature<Goal> {
                 StaticFeatureCollection.createTermOrdering(), numbers);
     }
 
-    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
             TermOrdering termOrdering, IntegerLDT numbers) {
         return new ClausesSmallerThanFeature(left, right, termOrdering, numbers);
     }

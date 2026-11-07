@@ -32,8 +32,8 @@ import org.key_project.util.collection.ImmutableList;
 public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
 
-    private final ProjectionToTerm<GOAL> mult1;
-    private final ProjectionToTerm<GOAL> mult2;
+    private final ProjectionToTerm mult1;
+    private final ProjectionToTerm mult2;
     private final RelevantSequentFormulasGenerator inEquations;
     // creates a monomial from a given term
     private final BiFunction<Term, LogicServices, Monomial> monomialBuilder;
@@ -55,7 +55,7 @@ public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
      * @param mult2 the left side of the second inequation to be multiplied
      * @param inEquationFilter term feature describing the shape of the inequation
      */
-    public IsBoundedByInequationFeature(ProjectionToTerm<GOAL> mult1, ProjectionToTerm<GOAL> mult2,
+    public IsBoundedByInequationFeature(ProjectionToTerm mult1, ProjectionToTerm mult2,
             TermFeature inEquationFilter,
             BiFunction<Term, LogicServices, Monomial> monomialBuilder) {
         this.mult1 = mult1;

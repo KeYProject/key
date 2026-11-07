@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
 /// be partial and undefined for those apps that do not instantiate the schema variable in
 /// question, or it can raise an error for such applications
 @StableCost
-public class SVInstantiationProjection<G extends ProofGoal<G>> implements ProjectionToTerm<G> {
+public class SVInstantiationProjection implements ProjectionToTerm {
 
     private final Name svName;
     private final boolean demandInst;
@@ -29,13 +29,13 @@ public class SVInstantiationProjection<G extends ProofGoal<G>> implements Projec
         this.demandInst = demandInst;
     }
 
-    public static <G extends ProofGoal<G>> SVInstantiationProjection<G> create(Name svName,
+    public static SVInstantiationProjection create(Name svName,
             boolean demandInst) {
-        return new SVInstantiationProjection<>(svName, demandInst);
+        return new SVInstantiationProjection(svName, demandInst);
     }
 
     @Override
-    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, G goal,
+    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal goal,
             MutableState mutableState) {
         if (!(app instanceof final ITacletApp tapp)) {
             throw new IllegalArgumentException(

@@ -125,7 +125,7 @@ public abstract class StaticFeatureCollection {
         return not(SeqContainsExecutableCodeFeature.PROGRAMS);
     }
 
-    protected static Feature countOccurrences(ProjectionToTerm<Goal> cutFormula) {
+    protected static Feature countOccurrences(ProjectionToTerm cutFormula) {
         return CountOccurrencesFeature.create(cutFormula,
             RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
@@ -280,8 +280,8 @@ public abstract class StaticFeatureCollection {
      *
      * @return projection of taclet applications
      */
-    protected static ProjectionToTerm<Goal> instOfTriggerVariable() {
-        return new TriggerVariableInstantiationProjection<>();
+    protected static ProjectionToTerm instOfTriggerVariable() {
+        return new TriggerVariableInstantiationProjection();
     }
 
     /**
@@ -292,7 +292,7 @@ public abstract class StaticFeatureCollection {
      * @param schemaVar schema variable
      * @return projection of taclet applications
      */
-    protected static ProjectionToTerm<Goal> instOf(String schemaVar) {
+    protected static ProjectionToTerm instOf(String schemaVar) {
         return SVInstantiationProjection.create(new Name(schemaVar), true);
     }
 
@@ -304,32 +304,32 @@ public abstract class StaticFeatureCollection {
      * @param schemaVar schema variable
      * @return projection of taclet applications
      */
-    protected static ProjectionToTerm<Goal> instOfNonStrict(String schemaVar) {
+    protected static ProjectionToTerm instOfNonStrict(String schemaVar) {
         return SVInstantiationProjection.create(new Name(schemaVar), false);
     }
 
-    protected static ProjectionToTerm<Goal> subAt(ProjectionToTerm<Goal> t, PosInTerm pit) {
+    protected static ProjectionToTerm subAt(ProjectionToTerm t, PosInTerm pit) {
         return SubtermProjection.create(t, pit);
     }
 
-    protected static ProjectionToTerm<Goal> sub(ProjectionToTerm<Goal> t, int index) {
+    protected static ProjectionToTerm sub(ProjectionToTerm t, int index) {
         return SubtermProjection.create(t, PosInTerm.getTopLevel().down(index));
     }
 
-    protected static ProjectionToTerm<Goal> opTerm(Operator op,
-            ProjectionToTerm<Goal>[] subTerms) {
+    protected static ProjectionToTerm opTerm(Operator op,
+            ProjectionToTerm[] subTerms) {
         return TermConstructionProjection.create(op, subTerms);
     }
 
-    protected static ProjectionToTerm<Goal> opTerm(Operator op,
-            ProjectionToTerm<Goal> subTerm) {
+    protected static ProjectionToTerm opTerm(Operator op,
+            ProjectionToTerm subTerm) {
         // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
-    protected static ProjectionToTerm<Goal> opTerm(Operator op,
-            ProjectionToTerm<Goal> subTerm0,
-            ProjectionToTerm<Goal> subTerm1) {
+    protected static ProjectionToTerm opTerm(Operator op,
+            ProjectionToTerm subTerm0,
+            ProjectionToTerm subTerm1) {
         // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
@@ -375,11 +375,11 @@ public abstract class StaticFeatureCollection {
     }
 
     protected static TermFeature eq(
-            org.key_project.prover.strategy.costbased.termProjection.TermBuffer<Goal> t) {
+            org.key_project.prover.strategy.costbased.termProjection.TermBuffer t) {
         return EqTermFeature.create(t, RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
 
-    protected static Feature eq(ProjectionToTerm<Goal> t1, ProjectionToTerm<Goal> t2) {
+    protected static Feature eq(ProjectionToTerm t1, ProjectionToTerm t2) {
         final TermBuffer buf = new TermBuffer();
         return let(buf, t1, applyTF(t2, eq(buf)));
     }
@@ -399,13 +399,13 @@ public abstract class StaticFeatureCollection {
                 inftyConst()));
     }
 
-    protected static Feature contains(ProjectionToTerm<Goal> bigTerm,
-            ProjectionToTerm<Goal> searchedTerm) {
+    protected static Feature contains(ProjectionToTerm bigTerm,
+            ProjectionToTerm searchedTerm) {
         final TermBuffer buf = new TermBuffer();
         return let(buf, searchedTerm, applyTF(bigTerm, not(rec(any(), not(eq(buf))))));
     }
 
-    protected static Feature println(ProjectionToTerm<Goal> t) {
+    protected static Feature println(ProjectionToTerm t) {
         return applyTF(t, PrintTermFeature.INSTANCE);
     }
 
@@ -448,7 +448,7 @@ public abstract class StaticFeatureCollection {
      * @param tf term feature
      * @return feature
      */
-    protected static Feature applyTF(ProjectionToTerm<Goal> term, TermFeature tf) {
+    protected static Feature applyTF(ProjectionToTerm term, TermFeature tf) {
         return ApplyTFFeature.create(term, tf);
     }
 
@@ -461,7 +461,7 @@ public abstract class StaticFeatureCollection {
      * @param tf term feature
      * @return feature
      */
-    protected static Feature applyTFNonStrict(ProjectionToTerm<Goal> term, TermFeature tf) {
+    protected static Feature applyTFNonStrict(ProjectionToTerm term, TermFeature tf) {
         return ApplyTFFeature.createNonStrict(term, tf, NumberRuleAppCost.getZeroCost());
     }
 
@@ -469,19 +469,19 @@ public abstract class StaticFeatureCollection {
         return ComprehendedSumFeature.create(x, gen, body);
     }
 
-    protected static Feature let(TermBuffer x, ProjectionToTerm<Goal> value,
+    protected static Feature let(TermBuffer x, ProjectionToTerm value,
             Feature body) {
         return LetFeature.create(x, value, body);
     }
 
-    protected static Feature isSubSortFeature(ProjectionToTerm<Goal> s1,
-            ProjectionToTerm<Goal> s2) {
+    protected static Feature isSubSortFeature(ProjectionToTerm s1,
+            ProjectionToTerm s2) {
         return SortComparisonFeature.create(s1, s2, SortComparisonFeature.SUBSORT);
     }
 
     // Specific features
 
-    protected static Feature implicitCastNecessary(ProjectionToTerm<Goal> s1) {
+    protected static Feature implicitCastNecessary(ProjectionToTerm s1) {
         return ImplicitCastNecessary.create(s1);
     }
 

@@ -31,52 +31,52 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     TermFeature createEliminableQuantifier();
 
-    ProjectionToTerm<G> createReduceMonomialsProjection(ProjectionToTerm<G> dividend,
-            ProjectionToTerm<G> divisor);
+    ProjectionToTerm createReduceMonomialsProjection(ProjectionToTerm dividend,
+            ProjectionToTerm divisor);
 
-    ProjectionToTerm<G> createMonomialColumnOp(ProjectionToTerm<G> leftCoefficient,
-            ProjectionToTerm<G> polynomial);
+    ProjectionToTerm createMonomialColumnOp(ProjectionToTerm leftCoefficient,
+            ProjectionToTerm polynomial);
 
-    ProjectionToTerm<G> createRoundingUpDividePolynomialsProjection(
-            ProjectionToTerm<G> leftCoefficient, ProjectionToTerm<G> polynomial);
+    ProjectionToTerm createRoundingUpDividePolynomialsProjection(
+            ProjectionToTerm leftCoefficient, ProjectionToTerm polynomial);
 
-    ProjectionToTerm<G> createRoundingDownDividePolynomialsProjection(
-            ProjectionToTerm<G> leftCoefficient, ProjectionToTerm<G> polynomial);
+    ProjectionToTerm createRoundingDownDividePolynomialsProjection(
+            ProjectionToTerm leftCoefficient, ProjectionToTerm polynomial);
 
-    ProjectionToTerm<G> createCoeffGcdProjection(
-            ProjectionToTerm<G> monomialLeft, ProjectionToTerm<G> monomialRight);
+    ProjectionToTerm createCoeffGcdProjection(
+            ProjectionToTerm monomialLeft, ProjectionToTerm monomialRight);
 
-    Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
-            ProjectionToTerm<G> right);
+    Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right);
 
-    Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
-            ProjectionToTerm<G> right, ProjectionToTerm<G> leftCoeff,
-            ProjectionToTerm<G> rightCoeff);
+    Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right, ProjectionToTerm leftCoeff,
+            ProjectionToTerm rightCoeff);
 
-    Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
-            ProjectionToTerm<G> right);
+    Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right);
 
-    Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
-            ProjectionToTerm<G> right, ProjectionToTerm<G> leftCoeff,
-            ProjectionToTerm<G> rightCoeff);
+    Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right, ProjectionToTerm leftCoeff,
+            ProjectionToTerm rightCoeff);
 
-    Feature createEqPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
-            ProjectionToTerm<G> right);
+    Feature createEqPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right);
 
-    Feature createDividesPolynomialValuesCmpFeature(ProjectionToTerm<G> left,
-            ProjectionToTerm<G> right);
+    Feature createDividesPolynomialValuesCmpFeature(ProjectionToTerm left,
+            ProjectionToTerm right);
 
-    TermFeature createEqTermFeature(TermBuffer<G> t);
+    TermFeature createEqTermFeature(TermBuffer t);
 
     Feature directlyBelowSymbolAtIndex(Operator symbol, int index);
 
     TermGenerator<G> createMultiplesModEquationsGenerator(
-            ProjectionToTerm<G> source, ProjectionToTerm<G> target);
+            ProjectionToTerm source, ProjectionToTerm target);
 
-    ProjectionToTerm<G> opTerm(Operator op, ProjectionToTerm<G> subTerm0,
-            ProjectionToTerm<G> subTerm1);
+    ProjectionToTerm opTerm(Operator op, ProjectionToTerm subTerm0,
+            ProjectionToTerm subTerm1);
 
-    TermGenerator<G> createRootsGenerator(ProjectionToTerm<G> powerRelation,
+    TermGenerator<G> createRootsGenerator(ProjectionToTerm powerRelation,
             LogicServices services);
 
     TermGenerator<G> upwardsWithIndexSuperGenerator(TermFeature cond, LogicServices services);
@@ -103,14 +103,14 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     TermFeature selectSkolemConstant();
 
-    Feature countOccurrences(ProjectionToTerm<G> target);
+    Feature countOccurrences(ProjectionToTerm target);
 
     TermFeature containsExecutableCodeTF();
 
     TermGenerator<G> heuristicGenerator(TriggerTreatment option);
 
-    Feature computeInstantiationCostOf(ProjectionToTerm<G> instOfT,
+    Feature computeInstantiationCostOf(ProjectionToTerm instOfT,
             TriggerTreatment triggerTreatment);
 
-    Feature getInstantiationTieBreakFeature(TermBuffer<G> varInst, String s);
+    Feature getInstantiationTieBreakFeature(TermBuffer varInst, String s);
 }

@@ -39,16 +39,16 @@ import org.jspecify.annotations.NonNull;
  */
 public class CountOccurrencesFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
 
-    private final ProjectionToTerm<Goal> target;
+    private final ProjectionToTerm target;
     private final Property<Term> equalsProp;
 
-    private CountOccurrencesFeature(ProjectionToTerm<Goal> target, Property<Term> equalsProp) {
+    private CountOccurrencesFeature(ProjectionToTerm target, Property<Term> equalsProp) {
         this.equalsProp = equalsProp;
         this.target = target;
     }
 
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
-            ProjectionToTerm<Goal> target, Property<Term> equalsProp) {
+            ProjectionToTerm target, Property<Term> equalsProp) {
         return new CountOccurrencesFeature<>(target, equalsProp);
     }
 

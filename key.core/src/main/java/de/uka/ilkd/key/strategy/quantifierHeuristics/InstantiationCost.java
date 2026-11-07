@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
@@ -24,17 +23,17 @@ import org.jspecify.annotations.NonNull;
  */
 public class InstantiationCost implements Feature {
 
-    final private ProjectionToTerm<Goal> varInst;
+    final private ProjectionToTerm varInst;
 
     /** how much the prediction is told about the theories */
     private final TriggerTreatment treatment;
 
-    private InstantiationCost(ProjectionToTerm<Goal> var, TriggerTreatment treatment) {
+    private InstantiationCost(ProjectionToTerm var, TriggerTreatment treatment) {
         varInst = var;
         this.treatment = treatment;
     }
 
-    public static Feature create(ProjectionToTerm<Goal> varInst, TriggerTreatment treatment) {
+    public static Feature create(ProjectionToTerm varInst, TriggerTreatment treatment) {
         return new InstantiationCost(varInst, treatment);
     }
 

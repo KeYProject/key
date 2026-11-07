@@ -25,13 +25,13 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 
 public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
 
-    private final ProjectionToTerm<Goal> left, right;
+    private final ProjectionToTerm left, right;
     private final IntegerLDT numbers;
 
     private final QuanEliminationAnalyser quanAnalyser = new QuanEliminationAnalyser();
 
 
-    private LiteralsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    private LiteralsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
             TermOrdering termOrdering, IntegerLDT numbers) {
         super(termOrdering);
         this.left = left;
@@ -39,7 +39,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
         this.numbers = numbers;
     }
 
-    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
             TermOrdering termOrdering, IntegerLDT numbers) {
         return new LiteralsSmallerThanFeature(left, right, termOrdering, numbers);
     }

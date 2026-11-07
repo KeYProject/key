@@ -15,23 +15,23 @@ import org.key_project.prover.strategy.costbased.feature.StableCost;
 /// Projection for computing a subterm of a given term. The position of the subterm within the
 /// complete term is described using a `PosInTerm`.
 @StableCost
-public class SubtermProjection<G extends ProofGoal<G>> implements ProjectionToTerm<G> {
+public class SubtermProjection implements ProjectionToTerm {
     private final PosInTerm pit;
-    private final ProjectionToTerm<G> completeTerm;
+    private final ProjectionToTerm completeTerm;
 
-    public static <G extends ProofGoal<G>> ProjectionToTerm<G> create(
-            ProjectionToTerm<G> completeTerm,
+    public static ProjectionToTerm create(
+            ProjectionToTerm completeTerm,
             PosInTerm pit) {
-        return new SubtermProjection<G>(completeTerm, pit);
+        return new SubtermProjection(completeTerm, pit);
     }
 
-    private SubtermProjection(ProjectionToTerm<G> completeTerm, PosInTerm pit) {
+    private SubtermProjection(ProjectionToTerm completeTerm, PosInTerm pit) {
         this.completeTerm = completeTerm;
         this.pit = pit;
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, G goal, MutableState mState) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         final Term completeTermInst = completeTerm.toTerm(app, pos, goal, mState);
         assert completeTermInst != null : "@AssumeAssertion(nullness): Term should not be null";
         return pit.getSubTerm(completeTermInst);

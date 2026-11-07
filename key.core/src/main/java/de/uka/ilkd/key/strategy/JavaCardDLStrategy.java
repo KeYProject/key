@@ -425,7 +425,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
     private Feature isSkolemConstantUsedElsewhereInSequent() {
         final TermBuffer sf = new TermBuffer();
         return add(sequentContainsNoPrograms(),
-            sum(sf, SequentFormulasGenerator.sequent(),
+            sum(sf, SequentFormulasGenerator.<Goal>sequent(),
                 or(StaticFeatureCollection.eq(sf, FocusFormulaProjection.create()),
                     not(ContainsTermFeature.create(sf, instOf("auxiliarySK"))))));
     }
@@ -509,7 +509,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         final TermBuffer secondObject = new TermBuffer();
         bindRuleSet(d, "derive_inequality",
             let(firstObject, instOf("o"), let(secondObject, instOf("o2"),
-                sum(succedentFormula, SequentFormulasGenerator.succedent(),
+                sum(succedentFormula, SequentFormulasGenerator.<Goal>succedent(),
                     not(applyTF(succedentFormula,
                         or(opSub(Equality.EQUALS, StaticFeatureCollection.eq(firstObject),
                             StaticFeatureCollection.eq(secondObject)),

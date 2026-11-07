@@ -23,7 +23,7 @@ import org.jspecify.annotations.NonNull;
 /// `TermGenerator`. The terms are stored in a `TermBuffer` one after the other
 /// and can subsequently be used to instantiate a rule application
 public class ForEachCP<G extends ProofGoal<G>> implements Feature {
-    private final TermBuffer<@NonNull G> var;
+    private final TermBuffer var;
     private final TermGenerator<@NonNull G> generator;
     private final Feature body;
 
@@ -33,13 +33,13 @@ public class ForEachCP<G extends ProofGoal<G>> implements Feature {
      * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
      *        <code>var</code>
      */
-    public static <G extends ProofGoal<G>> Feature create(TermBuffer<@NonNull G> var,
+    public static <G extends ProofGoal<G>> Feature create(TermBuffer var,
             TermGenerator<@NonNull G> generator,
             Feature body) {
         return new ForEachCP<>(var, generator, body);
     }
 
-    private ForEachCP(TermBuffer<@NonNull G> var, TermGenerator<@NonNull G> generator,
+    private ForEachCP(TermBuffer var, TermGenerator<@NonNull G> generator,
             Feature body) {
         this.var = var;
         this.generator = generator;

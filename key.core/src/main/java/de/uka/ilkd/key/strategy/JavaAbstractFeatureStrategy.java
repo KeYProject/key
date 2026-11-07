@@ -125,7 +125,7 @@ public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrateg
         return oneOf(new Feature[] { feature0, feature1 });
     }
 
-    protected Feature instantiate(Name sv, ProjectionToTerm<Goal> value) {
+    protected Feature instantiate(Name sv, ProjectionToTerm value) {
         if (instantiateActive != 0) {
             return SVInstantiationCP.create(sv, value);
         } else {
@@ -133,7 +133,7 @@ public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrateg
         }
     }
 
-    protected Feature instantiate(String sv, ProjectionToTerm<Goal> value) {
+    protected Feature instantiate(String sv, ProjectionToTerm value) {
         return instantiate(new Name(sv), value);
     }
 }

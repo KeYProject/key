@@ -21,7 +21,7 @@ import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationP
 @StableCost
 public class InstantiatedSVFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
-    private final ProjectionToTerm<GOAL> instProj;
+    private final ProjectionToTerm instProj;
 
     public static Feature create(Name svName) {
         return new InstantiatedSVFeature<>(svName);

@@ -63,7 +63,7 @@ public class StaticFeatureCollection {
         return BinarySumTermFeature.createSum(a, b);
     }
 
-    public static <G extends ProofGoal<G>> Feature sum(TermBuffer<G> x, TermGenerator<G> gen,
+    public static <G extends ProofGoal<G>> Feature sum(TermBuffer x, TermGenerator<G> gen,
             Feature body) {
         return ComprehendedSumFeature.create(x, gen, body);
     }
@@ -136,10 +136,10 @@ public class StaticFeatureCollection {
         return CompareCostsFeature.eq(a, b);
     }
 
-    public static <G extends ProofGoal<G>> Feature eq(ProjectionToTerm<G> t1,
-            ProjectionToTerm<G> t2,
-            java.util.function.Function<TermBuffer<G>, TermFeature> createEqTermFeature) {
-        final TermBuffer<G> buf = new TermBuffer<>();
+    public static <G extends ProofGoal<G>> Feature eq(ProjectionToTerm t1,
+            ProjectionToTerm t2,
+            java.util.function.Function<TermBuffer, TermFeature> createEqTermFeature) {
+        final TermBuffer buf = new TermBuffer();
         return let(buf, t1, applyTF(t2, createEqTermFeature.apply(buf)));
     }
 
@@ -165,7 +165,7 @@ public class StaticFeatureCollection {
     ///
     /// @param schemaVar schema variable
     /// @return projection of taclet applications
-    public static <G extends ProofGoal<G>> ProjectionToTerm<G> instOf(String schemaVar) {
+    public static <G extends ProofGoal<G>> ProjectionToTerm instOf(String schemaVar) {
         return SVInstantiationProjection.create(new Name(schemaVar), true);
     }
 
@@ -175,7 +175,7 @@ public class StaticFeatureCollection {
     ///
     /// @param schemaVar schema variable
     /// @return projection of taclet applications
-    public static <G extends ProofGoal<G>> ProjectionToTerm<G> instOfNonStrict(
+    public static <G extends ProofGoal<G>> ProjectionToTerm instOfNonStrict(
             String schemaVar) {
         return SVInstantiationProjection.create(new Name(schemaVar), false);
     }
@@ -188,7 +188,7 @@ public class StaticFeatureCollection {
         return RecSubTermFeature.create(cond, summand);
     }
 
-    public static <G extends ProofGoal<G>> ProjectionToTerm<G> subAt(ProjectionToTerm<G> t,
+    public static <G extends ProofGoal<G>> ProjectionToTerm subAt(ProjectionToTerm t,
             PosInTerm pit) {
         return SubtermProjection.create(t, pit);
     }
@@ -201,7 +201,7 @@ public class StaticFeatureCollection {
         return SubTermFeature.create(new TermFeature[] { sub0, sub1 });
     }
 
-    public static <G extends ProofGoal<G>> ProjectionToTerm<G> sub(ProjectionToTerm<G> t,
+    public static <G extends ProofGoal<G>> ProjectionToTerm sub(ProjectionToTerm t,
             int index) {
         return SubtermProjection.create(t, PosInTerm.getTopLevel().down(index));
     }
@@ -214,21 +214,21 @@ public class StaticFeatureCollection {
         return add(op(op), sub(sub0, sub1));
     }
 
-    public static <G extends ProofGoal<G>> Feature contains(ProjectionToTerm<G> bigTerm,
-            ProjectionToTerm<G> searchedTerm,
-            java.util.function.Function<TermBuffer<G>, TermFeature> createEqTermFeature) {
-        final TermBuffer<G> buf = new TermBuffer<>();
+    public static <G extends ProofGoal<G>> Feature contains(ProjectionToTerm bigTerm,
+            ProjectionToTerm searchedTerm,
+            java.util.function.Function<TermBuffer, TermFeature> createEqTermFeature) {
+        final TermBuffer buf = new TermBuffer();
         return let(buf, searchedTerm,
             applyTF(bigTerm, not(rec(any(), not(createEqTermFeature.apply(buf))))));
     }
 
-    public static <G extends ProofGoal<G>> Feature let(TermBuffer<G> x,
-            ProjectionToTerm<G> value,
+    public static <G extends ProofGoal<G>> Feature let(TermBuffer x,
+            ProjectionToTerm value,
             Feature body) {
         return LetFeature.create(x, value, body);
     }
 
-    public static <G extends ProofGoal<G>> Feature println(ProjectionToTerm<G> t) {
+    public static <G extends ProofGoal<G>> Feature println(ProjectionToTerm t) {
         return applyTF(t, PrintTermFeature.INSTANCE);
     }
 
@@ -266,7 +266,7 @@ public class StaticFeatureCollection {
     /// @param term term describing the projection
     /// @param tf term feature
     /// @return feature
-    public static <G extends ProofGoal<G>> Feature applyTF(ProjectionToTerm<G> term,
+    public static <G extends ProofGoal<G>> Feature applyTF(ProjectionToTerm term,
             TermFeature tf) {
         return ApplyTFFeature.create(term, tf);
     }
@@ -278,7 +278,7 @@ public class StaticFeatureCollection {
     /// @param term term describing the projection
     /// @param tf term feature
     /// @return feature
-    public static <G extends ProofGoal<G>> Feature applyTFNonStrict(ProjectionToTerm<G> term,
+    public static <G extends ProofGoal<G>> Feature applyTFNonStrict(ProjectionToTerm term,
             TermFeature tf) {
         return ApplyTFFeature.createNonStrict(term, tf, NumberRuleAppCost.getZeroCost());
     }

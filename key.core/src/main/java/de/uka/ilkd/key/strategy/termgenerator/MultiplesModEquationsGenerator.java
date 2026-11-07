@@ -43,17 +43,17 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
 
-    private final ProjectionToTerm<Goal> source;
-    private final ProjectionToTerm<Goal> target;
+    private final ProjectionToTerm source;
+    private final ProjectionToTerm target;
 
-    private MultiplesModEquationsGenerator(ProjectionToTerm<Goal> source,
-            ProjectionToTerm<Goal> target) {
+    private MultiplesModEquationsGenerator(ProjectionToTerm source,
+            ProjectionToTerm target) {
         this.source = source;
         this.target = target;
     }
 
-    public static TermGenerator<Goal> create(ProjectionToTerm<Goal> source,
-            ProjectionToTerm<Goal> target) {
+    public static TermGenerator<Goal> create(ProjectionToTerm source,
+            ProjectionToTerm target) {
         return new MultiplesModEquationsGenerator(source, target);
     }
 

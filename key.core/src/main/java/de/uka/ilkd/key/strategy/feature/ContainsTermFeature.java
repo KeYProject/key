@@ -35,9 +35,9 @@ public class ContainsTermFeature implements Feature {
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST = TopRuleAppCost.INSTANCE;
 
-    private final ProjectionToTerm<Goal> proj1;
+    private final ProjectionToTerm proj1;
 
-    private final ProjectionToTerm<Goal> proj2;
+    private final ProjectionToTerm proj2;
 
 
     /**
@@ -48,13 +48,13 @@ public class ContainsTermFeature implements Feature {
      * @param proj2 the ProjectionToTerm resolving to the term to be checked whether it is a subterm
      *        of the first one
      */
-    private ContainsTermFeature(ProjectionToTerm<Goal> proj1, ProjectionToTerm<Goal> proj2) {
+    private ContainsTermFeature(ProjectionToTerm proj1, ProjectionToTerm proj2) {
         this.proj1 = proj1;
         this.proj2 = proj2;
     }
 
 
-    public static Feature create(ProjectionToTerm<Goal> proj1, ProjectionToTerm<Goal> proj2) {
+    public static Feature create(ProjectionToTerm proj1, ProjectionToTerm proj2) {
         return new ContainsTermFeature(proj1, proj2);
     }
 

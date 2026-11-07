@@ -21,7 +21,7 @@ import org.jspecify.annotations.NonNull;
 @StableCost
 public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
 
-    private final ProjectionToTerm<Goal> proj;
+    private final ProjectionToTerm proj;
     private final TermFeature termFeature;
     private final RuleAppCost noInstCost;
     private final boolean demandInst;
@@ -31,7 +31,7 @@ public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
     /// @param noInstCost result if <code>schemaVar</code> is not instantiated
     /// @param demandInst if <code>true</code> then raise an exception if <code>schemaVar</code> is
     /// not instantiated (otherwise: return <code>noInstCost</code>)
-    private ApplyTFFeature(ProjectionToTerm<Goal> proj, TermFeature termFeature,
+    private ApplyTFFeature(ProjectionToTerm proj, TermFeature termFeature,
             RuleAppCost noInstCost,
             boolean demandInst) {
         this.proj = proj;
@@ -41,13 +41,13 @@ public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
     }
 
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature createNonStrict(
-            ProjectionToTerm<Goal> proj,
+            ProjectionToTerm proj,
             TermFeature tf, RuleAppCost noInstCost) {
         return new ApplyTFFeature<>(proj, tf, noInstCost, false);
     }
 
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
-            ProjectionToTerm<Goal> proj, TermFeature tf) {
+            ProjectionToTerm proj, TermFeature tf) {
         return new ApplyTFFeature<>(proj, tf, TopRuleAppCost.INSTANCE, true);
     }
 

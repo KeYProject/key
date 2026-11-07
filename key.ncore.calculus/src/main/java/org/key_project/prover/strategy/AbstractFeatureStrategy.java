@@ -60,7 +60,7 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
 
     protected abstract RuleSet getHeuristic(String p_name);
 
-    protected Feature instantiateTriggeredVariable(ProjectionToTerm<G> value) {
+    protected Feature instantiateTriggeredVariable(ProjectionToTerm value) {
         if (instantiateActive != 0) {
             return SVInstantiationCP.createTriggeredVarCP(value);
         } else {
@@ -68,11 +68,11 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
         }
     }
 
-    protected Feature instantiate(String sv, ProjectionToTerm<G> value) {
+    protected Feature instantiate(String sv, ProjectionToTerm value) {
         return instantiate(new Name(sv), value);
     }
 
-    protected Feature instantiate(Name sv, ProjectionToTerm<G> value) {
+    protected Feature instantiate(Name sv, ProjectionToTerm value) {
         if (instantiateActive != 0) {
             return SVInstantiationCP.create(sv, value);
         } else {
@@ -80,7 +80,7 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
         }
     }
 
-    protected Feature forEach(TermBuffer<G> x, TermGenerator<G> gen, Feature body) {
+    protected Feature forEach(TermBuffer x, TermGenerator<G> gen, Feature body) {
         return ForEachCP.create(x, gen, body);
     }
 

@@ -20,15 +20,15 @@ import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
  */
 public class EqTermFeature<GOAL extends ProofGoal<GOAL>> extends BinaryTermFeature {
 
-    private final TermBuffer<GOAL> pattern;
+    private final TermBuffer pattern;
     private final Property<Term> equalsProp;
 
-    public static <GOAL extends ProofGoal<GOAL>> TermFeature create(TermBuffer<GOAL> pattern,
+    public static <GOAL extends ProofGoal<GOAL>> TermFeature create(TermBuffer pattern,
             Property<Term> equalsProp) {
         return new EqTermFeature<>(pattern, equalsProp);
     }
 
-    private EqTermFeature(TermBuffer<GOAL> pattern, Property<Term> equalsProp) {
+    private EqTermFeature(TermBuffer pattern, Property<Term> equalsProp) {
         this.pattern = pattern;
         this.equalsProp = equalsProp;
     }

@@ -15,7 +15,7 @@ import org.key_project.prover.strategy.costbased.feature.StableCost;
 /// Term projection that delivers the assumptions of a taclet application (the formulas that the
 /// \assumes clause of the taclet refers to).
 @StableCost
-public class AssumptionProjection<G extends ProofGoal<G>> implements ProjectionToTerm<G> {
+public class AssumptionProjection implements ProjectionToTerm {
 
     private final int no;
 
@@ -23,12 +23,13 @@ public class AssumptionProjection<G extends ProofGoal<G>> implements ProjectionT
         this.no = no;
     }
 
-    public static <G extends ProofGoal<G>> ProjectionToTerm<G> create(int no) {
+    public static ProjectionToTerm create(int no) {
         return new AssumptionProjection(no);
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, G goal, MutableState mutableState) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal goal,
+            MutableState mutableState) {
         assert app instanceof ITacletApp
                 : "Projection is only applicable to taclet apps," + " but got " + app;
         final var tapp = (ITacletApp) app;

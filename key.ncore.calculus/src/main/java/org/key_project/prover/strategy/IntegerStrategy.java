@@ -195,9 +195,9 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                     createTermOrdering(), numbers),
                 CostBand.NORMALIZE.cost()));
 
-        final TermBuffer<G> equation = new TermBuffer<>();
-        final TermBuffer<G> left = new TermBuffer<>();
-        final TermBuffer<G> right = new TermBuffer<>();
+        final TermBuffer equation = new TermBuffer();
+        final TermBuffer left = new TermBuffer();
+        final TermBuffer right = new TermBuffer();
         bindRuleSet(d, "apply_equations",
             SumFeature.createSum(
                 add(applyTF(FocusProjection.<G>create(), tf.monomial),
@@ -220,8 +220,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                                                 createTermOrdering(), numbers)))))))),
                 longConst(CombinationCost.ORDERED_REWRITING)));
 
-        final TermBuffer<G> l = new TermBuffer<>();
-        final TermBuffer<G> r = new TermBuffer<>();
+        final TermBuffer l = new TermBuffer();
+        final TermBuffer r = new TermBuffer();
         bindRuleSet(d, "apply_equations_andOr",
             add(let(l, instOf("applyEqLeft"),
                 let(r, instOf("applyEqRight"),
@@ -285,10 +285,10 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     private void setupInEqCaseDistinctionsApproval(RuleSetDispatchFeature d) {
-        final TermBuffer<G> atom = new TermBuffer<>();
-        final TermBuffer<G> literal = new TermBuffer<>();
-        final TermBuffer<G> intRel = new TermBuffer<>();
-        final TermBuffer<G> rootInf = new TermBuffer<>();
+        final TermBuffer atom = new TermBuffer();
+        final TermBuffer literal = new TermBuffer();
+        final TermBuffer intRel = new TermBuffer();
+        final TermBuffer rootInf = new TermBuffer();
 
         bindRuleSet(d, "inEqSimp_signCases", add(isInstantiated("signCasesLeft"),
             let(atom, instOf("signCasesLeft"), allowPosNegCaseDistinction(atom))));
@@ -297,7 +297,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         // rule application so that they can be recognised again later
         bindRuleSet(d, "cut",
             add(isInstantiated("cutFormula"), or(
-                not(sum(intRel, SequentFormulasGenerator.antecedent(),
+                not(sum(intRel, SequentFormulasGenerator.<G>antecedent(),
                     ifZero(isRootInferenceProducer(intRel),
                         sum(rootInf, fc.createRootsGenerator(intRel, getServices()),
                             not(eq(instOf("cutFormula"), rootInf)))))),
@@ -307,11 +307,11 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                         allowInEqStrengthening(atom, literal)))))));
     }
 
-    private Feature allowInEqStrengthening(TermBuffer<G> atom, TermBuffer<G> literal) {
-        final TermBuffer<G> antecFor = new TermBuffer<>();
+    private Feature allowInEqStrengthening(TermBuffer atom, TermBuffer literal) {
+        final TermBuffer antecFor = new TermBuffer();
 
         return add(not(succIntEquationExists()),
-            not(sum(antecFor, SequentFormulasGenerator.antecedent(),
+            not(sum(antecFor, SequentFormulasGenerator.<G>antecedent(),
                 not(applyTF(antecFor, add(or(tf.leqF, tf.geqF),
                     sub(fc.createEqTermFeature(atom),
                         fc.createEqTermFeature(literal))))))));
@@ -427,8 +427,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         // application of equations: some specialised rules that handle
         // monomials and their coefficients properly
 
-        final TermBuffer<G> eqLeft = new TermBuffer<>();
-        final TermBuffer<G> focus = new TermBuffer<>();
+        final TermBuffer eqLeft = new TermBuffer();
+        final TermBuffer focus = new TermBuffer();
 
         final TermFeature atLeastTwoLCEquation =
             opSub(tf.eq, opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.intF);
@@ -472,9 +472,9 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     private void setupDivModDivision(RuleSetDispatchFeature d) {
-        final TermBuffer<G> denomLC = new TermBuffer<>();
-        final TermBuffer<G> numTerm = new TermBuffer<>();
-        final TermBuffer<G> divCoeff = new TermBuffer<>();
+        final TermBuffer denomLC = new TermBuffer();
+        final TermBuffer numTerm = new TermBuffer();
+        final TermBuffer divCoeff = new TermBuffer();
 
         // exact polynomial division
 
@@ -486,8 +486,10 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                 inftyConst()));
 
         final Feature isReduciblePoly =
-            sum(numTerm, SubtermGenerator.rightTraverse(StaticFeatureCollection.<G>instOf("divNum"),
-                tf.addF), checkNumTerm);
+            sum(numTerm,
+                SubtermGenerator.<G>rightTraverse(StaticFeatureCollection.<G>instOf("divNum"),
+                    tf.addF),
+                checkNumTerm);
 
         // polynomial division modulo equations of the antecedent
 
@@ -498,7 +500,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         final Feature isReduciblePolyE =
             sum(numTerm,
-                SubtermGenerator.rightTraverse(StaticFeatureCollection.<G>instOf("divNum"),
+                SubtermGenerator.<G>rightTraverse(StaticFeatureCollection.<G>instOf("divNum"),
                     tf.addF),
                 ifZero(applyTF(numTerm, tf.addF), longConst(0), sum(divCoeff,
                     fc.createMultiplesModEquationsGenerator(numTerm, denomLC),
@@ -547,8 +549,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                     fc.createMonomialColumnOp(instOf("newSymLeftCoeff"),
                         instOf("newSymRight"))))));
 
-        final TermBuffer<G> divisor = new TermBuffer<>();
-        final TermBuffer<G> dividend = new TermBuffer<>();
+        final TermBuffer divisor = new TermBuffer();
+        final TermBuffer dividend = new TermBuffer();
 
         bindRuleSet(d, "polySimp_applyEqPseudo",
             add(applyTF("aePseudoTargetLeft", tf.monomial),
@@ -570,7 +572,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     private void setupNewSymApproval(RuleSetDispatchFeature d, IIntLdt numbers) {
-        final TermBuffer<G> antecFor = new TermBuffer<>();
+        final TermBuffer antecFor = new TermBuffer();
         final Feature columnOpEq = applyTF(antecFor,
             opSub(tf.eq, opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral), tf.polynomial));
         final Feature biggerLeftSide =
@@ -578,11 +580,11 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                 subAt(antecFor, PosInTerm.getTopLevel().down(0).down(0)), createTermOrdering(),
                 numbers);
         bindRuleSet(d, "polySimp_newSym", add(isInstantiated("newSymDef"), sum(antecFor,
-            SequentFormulasGenerator.antecedent(), not(add(columnOpEq, biggerLeftSide)))));
+            SequentFormulasGenerator.<G>antecedent(), not(add(columnOpEq, biggerLeftSide)))));
     }
 
     private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet, boolean roundingUp) {
-        final TermBuffer<G> gcd = new TermBuffer<>();
+        final TermBuffer gcd = new TermBuffer();
 
         final Feature instantiateDivs;
         if (roundingUp) {
@@ -757,7 +759,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                     instOf("subsumRightSmaller"), instOf("subsumRightBigger"))));
 
         final Term tOne = zTerm("1");
-        final TermBuffer<G> one = new TermBuffer<>() {
+        final TermBuffer one = new TermBuffer() {
             @Override
             public void setContent(@Nullable Term term, MutableState mState) {}
 
@@ -768,14 +770,14 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
             @Override
             public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
-                    G goal, MutableState mState) {
+                    ProofGoal<?> goal, MutableState mState) {
                 return tOne;
             }
 
         };
 
         final Term tTwo = zTerm("2");
-        final TermBuffer<G> two = new TermBuffer<>() {
+        final TermBuffer two = new TermBuffer() {
             @Override
             public void setContent(@Nullable Term term, MutableState mState) {}
 
@@ -786,7 +788,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
             @Override
             public @NonNull Term toTerm(RuleApp app, PosInOccurrence pos,
-                    G goal, MutableState mState) {
+                    ProofGoal<?> goal, MutableState mState) {
                 return tTwo;
             }
 
@@ -849,7 +851,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         // The branch limit exists to stop DefOps saturating; Model Search is expected to
         // saturate and keeps its unlimited behaviour.
         final boolean capBranch = atApproval && arith == ArithTreatment.DEF_OPS;
-        final TermBuffer<G> intRel = new TermBuffer<>();
+        final TermBuffer intRel = new TermBuffer();
 
         /*
          * final Feature partiallyBounded = not ( sum ( intRel, SequentFormulasGenerator.sequent (),
@@ -955,8 +957,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         // category "handling of non-linear inequations"
 
-        final TermBuffer<G> divisor = new TermBuffer<>();
-        final TermBuffer<G> dividend = new TermBuffer<>();
+        final TermBuffer divisor = new TermBuffer();
+        final TermBuffer dividend = new TermBuffer();
 
         bindRuleSet(d, "inEqSimp_nonLin_divide", SumFeature.createSum(
             applyTF("divProd", tf.nonCoeffMonomial),
@@ -978,10 +980,10 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     private void setupNonLinTermIsPosNeg(RuleSetDispatchFeature d, String ruleSet, boolean pos) {
-        final TermBuffer<G> divisor = new TermBuffer<>();
-        final TermBuffer<G> dividend = new TermBuffer<>();
-        final TermBuffer<G> quotient = new TermBuffer<>();
-        final TermBuffer<G> antecFor = new TermBuffer<>();
+        final TermBuffer divisor = new TermBuffer();
+        final TermBuffer dividend = new TermBuffer();
+        final TermBuffer quotient = new TermBuffer();
+        final TermBuffer antecFor = new TermBuffer();
 
         bindRuleSet(d, ruleSet,
             SumFeature
@@ -1001,7 +1003,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                                         fc.createReduceMonomialsProjection(dividend,
                                             divisor),
                                         add(
-                                            sum(antecFor, SequentFormulasGenerator.antecedent(),
+                                            sum(antecFor, SequentFormulasGenerator.<G>antecedent(),
                                                 not(applyTF(antecFor,
                                                     pos ? opSub(tf.geq,
                                                         fc
@@ -1016,9 +1018,9 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     private void setupSquaresAreNonNegative(RuleSetDispatchFeature d) {
-        final TermBuffer<G> intRel = new TermBuffer<>();
-        final TermBuffer<G> product = new TermBuffer<>();
-        final TermBuffer<G> factor = new TermBuffer<>();
+        final TermBuffer intRel = new TermBuffer();
+        final TermBuffer product = new TermBuffer();
+        final TermBuffer factor = new TermBuffer();
 
         final Feature productContainsSquare =
             applyTF(sub(product, 0),
@@ -1035,9 +1037,9 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     private void setupInEqCaseDistinctions(RuleSetDispatchFeature d) {
-        final TermBuffer<G> intRel = new TermBuffer<>();
-        final TermBuffer<G> atom = new TermBuffer<>();
-        final TermBuffer<G> rootInf = new TermBuffer<>();
+        final TermBuffer intRel = new TermBuffer();
+        final TermBuffer atom = new TermBuffer();
+        final TermBuffer rootInf = new TermBuffer();
 
         final Feature posNegSplitting = forEach(intRel, SequentFormulasGenerator.antecedent(),
             add(applyTF(intRel, tf.intRelation),
@@ -1077,24 +1079,24 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         bindRuleSet(d, "cut", oneOf(new Feature[] { strengthening, rootInferences }));
     }
 
-    private Feature isRootInferenceProducer(TermBuffer<G> intRel) {
+    private Feature isRootInferenceProducer(TermBuffer intRel) {
         return applyTF(intRel, add(tf.intRelation, sub(tf.nonCoeffMonomial, tf.literal)));
     }
 
-    private Feature allowPosNegCaseDistinction(TermBuffer<G> atom) {
-        final TermBuffer<G> antecFor = new TermBuffer<>();
+    private Feature allowPosNegCaseDistinction(TermBuffer atom) {
+        final TermBuffer antecFor = new TermBuffer();
         final TermFeature eqAtom = fc.createEqTermFeature(atom);
 
         return add(not(succIntEquationExists()),
-            sum(antecFor, SequentFormulasGenerator.antecedent(),
+            sum(antecFor, SequentFormulasGenerator.<G>antecedent(),
                 not(applyTF(antecFor, or(opSub(tf.eq, eqAtom, any()),
                     opSub(tf.leq, eqAtom, tf.negLiteral), opSub(tf.geq, eqAtom, tf.posLiteral))))));
     }
 
     private Feature succIntEquationExists() {
-        final TermBuffer<G> succFor = new TermBuffer<>();
+        final TermBuffer succFor = new TermBuffer();
 
-        return not(sum(succFor, RelevantSequentFormulasGenerator.succedent(tf.intEquation),
+        return not(sum(succFor, RelevantSequentFormulasGenerator.<G>succedent(tf.intEquation),
             not(applyTF(succFor, tf.intEquation))));
     }
 
@@ -1136,7 +1138,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     private void setupDefOpsExpandMod(RuleSetDispatchFeature d) {
-        final TermBuffer<G> superTerm = new TermBuffer<>();
+        final TermBuffer superTerm = new TermBuffer();
 
         final Feature subsumedModulus =
             add(applyTF(superTerm, sub(opSub(tf.mod, any(), tf.literal), tf.zeroLiteral)),
@@ -1171,8 +1173,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         setupInEqSimpInstantiationWithoutRetry(d);
     }
 
-    protected Feature eq(ProjectionToTerm<G> t1, ProjectionToTerm<G> t2) {
-        final TermBuffer<G> buf = new TermBuffer<>();
+    protected Feature eq(ProjectionToTerm t1, ProjectionToTerm t2) {
+        final TermBuffer buf = new TermBuffer();
         return let(buf, t1, applyTF(t2, fc.createEqTermFeature(buf)));
     }
 

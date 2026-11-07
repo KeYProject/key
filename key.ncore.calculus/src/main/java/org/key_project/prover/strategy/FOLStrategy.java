@@ -247,8 +247,8 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
         bindRuleSet(d, "elimQuantifier", CostBand.PREFER.at(-500));
         bindRuleSet(d, "elimQuantifierWithCast", CostBand.DEFAULT.at(50));
 
-        final TermBuffer<G> left = new TermBuffer<>();
-        final TermBuffer<G> right = new TermBuffer<>();
+        final TermBuffer left = new TermBuffer();
+        final TermBuffer right = new TermBuffer();
         bindRuleSet(d, "apply_equations_andOr",
             add(let(left, instOf("applyEqLeft"),
                 let(right, instOf("applyEqRight"),
@@ -256,7 +256,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                         createTermOrdering()))),
                 longConst(CombinationCost.CNF_CONVERSION)));
 
-        final ProjectionToTerm<G> focus = FocusProjection.create();
+        final ProjectionToTerm focus = FocusProjection.create();
         bindRuleSet(d, "distrQuantifier",
             add(or(
                 applyTF(focus,
@@ -292,7 +292,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                     longConst(CNF_RESTRUCTURE + 20), applyTF("distLeft", ff.clauseSet())),
                 longConst(CNF_RESTRUCTURE)));
 
-        final TermBuffer<G> superFor = new TermBuffer<>();
+        final TermBuffer superFor = new TermBuffer();
         final Feature onlyBelowQuanAndOr =
             sum(superFor, fc.superTermGenerator(any(), getServices()),
                 applyTF(superFor, or(ff.quantifiedFor(), ff.andF(), ff.orF())));
@@ -334,7 +334,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
     private void setupQuantifierInstantiation(RuleSetDispatchFeature d) {
         if (quantifierInstantiatedEnabled()) {
-            final TermBuffer<G> varInst = new TermBuffer<>();
+            final TermBuffer varInst = new TermBuffer();
             final Feature branchPrediction = InstantiationCostScalerFeature.create(
                 fc.computeInstantiationCostOf(varInst, triggerTreatment()),
                 allowQuantifierSplitting());
@@ -352,7 +352,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                                 // orders candidates of one predicted-cost band by their
                                 // connection to the sequent instead of formula position
                                 fc.getInstantiationTieBreakFeature(varInst, triggersOption()))))));
-            final TermBuffer<G> splitInst = new TermBuffer<>();
+            final TermBuffer splitInst = new TermBuffer();
 
             bindRuleSet(d, "triggered",
                 SumFeature.createSum(forEach(splitInst, fc.createTriggeredInstantiations(true),
@@ -369,9 +369,9 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
     private void setupQuantifierInstantiationApproval(RuleSetDispatchFeature d) {
         if (quantifierInstantiatedEnabled()) {
-            final TermBuffer<G> varInst = new TermBuffer<>();
+            final TermBuffer varInst = new TermBuffer();
 
-            ProjectionToTerm<G> instOf_t = instOf("t");
+            ProjectionToTerm instOf_t = instOf("t");
             bindRuleSet(d, "gamma", add(isInstantiated("t"),
                 not(sum(varInst, fc.heuristicGenerator(triggerTreatment()),
                     not(StaticFeatureCollection.eq(instOf_t, varInst, fc::createEqTermFeature)))),
@@ -379,7 +379,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                     fc.computeInstantiationCostOf(instOf_t, triggerTreatment()),
                     longConst(0))));
 
-            final TermBuffer<G> splitInst = new TermBuffer<>();
+            final TermBuffer splitInst = new TermBuffer();
             bindRuleSet(d, "triggered",
                 add(TriggerVarInstantiatedFeature.create(),
                     not(sum(splitInst, fc.createTriggeredInstantiations(false),
@@ -393,13 +393,13 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
 
     protected final Feature onlyInScopeOfQuantifiers() {
-        final TermBuffer<G> buf = new TermBuffer<>();
+        final TermBuffer buf = new TermBuffer();
         return sum(buf, fc.superTermGenerator(any(), getServices()),
             applyTF(buf, ff.quantifiedFor()));
     }
 
     protected Feature notBelowQuantifier() {
-        final TermBuffer<G> superFor = new TermBuffer<>();
+        final TermBuffer superFor = new TermBuffer();
         return or(fc.topLevelFindAntecOrSucc(),
             sum(superFor, fc.superTermGenerator(any(), getServices()),
                 not(applyTF(superFor, ff.quantifierF()))));
@@ -431,7 +431,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     // //////////////////////////////////////////////////////////////////////////
 
     protected void setupSplitting(RuleSetDispatchFeature d) {
-        final TermBuffer<G> subFor = new TermBuffer<>();
+        final TermBuffer subFor = new TermBuffer();
         final Feature noCutsAllowed =
             sum(subFor, fc.allowedCutPositionsGenerator(), not(applyTF(subFor, ff.cutAllowed())));
         bindRuleSet(d, "beta",
@@ -440,9 +440,9 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                 ScaleFeature.createScaled(fc.countPosDPath(), -3.0),
                 ScaleFeature.createScaled(fc.countMaxDPath(), 10.0),
                 CostBand.DEFAULT.at(20)));
-        TermBuffer<G> superF = new TermBuffer<>();
-        final ProjectionToTerm<G> focus = FocusProjection.create();
-        final ProjectionToTerm<G> splitCondition = sub(focus, 0);
+        TermBuffer superF = new TermBuffer();
+        final ProjectionToTerm focus = FocusProjection.create();
+        final ProjectionToTerm splitCondition = sub(focus, 0);
         bindRuleSet(d, "split_cond", add(// do not split over formulas containing auxiliary
             // variables
             applyTF(focus, rec(any(), not(fc.selectSkolemConstant()))),
@@ -456,7 +456,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                 applyTF(superF, not(ff.elemUpdate()))),
             ifZero(applyTF(focus, fc.containsExecutableCodeTF()),
                 CostBand.DEFAULT.at(-100), CostBand.DEFAULT.at(25))));
-        ProjectionToTerm<G> cutFormula = instOf("cutFormula");
+        ProjectionToTerm cutFormula = instOf("cutFormula");
         Feature countOccurrencesInSeq =
             ScaleFeature.createAffine(fc.countOccurrences(cutFormula), -10, 10);
         bindRuleSet(d, "cut_direct",
@@ -486,7 +486,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
         bindRuleSet(d, "split_cond", allowSplitting(FocusProjection.create()));
 
-        final TermBuffer<G> subFor = new TermBuffer<>();
+        final TermBuffer subFor = new TermBuffer();
         final Feature compareCutAllowed = ifZero(applyTF(subFor, ff.cutAllowed()),
             leq(applyTF("cutFormula", ff.cutPriority()), applyTF(subFor, ff.cutPriority())));
 
@@ -506,9 +506,9 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     // //////////////////////////////////////////////////////////////////////////
 
     private void setupEquationReasoning(RuleSetDispatchFeature d) {
-        final TermBuffer<G> equation = new TermBuffer<>();
-        final TermBuffer<G> left = new TermBuffer<>();
-        final TermBuffer<G> right = new TermBuffer<>();
+        final TermBuffer equation = new TermBuffer();
+        final TermBuffer left = new TermBuffer();
+        final TermBuffer right = new TermBuffer();
 
         // applying equations less deep/less leftish in terms/formulas is
         // preferred
@@ -553,7 +553,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
     protected abstract boolean quantifierInstantiatedEnabled();
 
-    protected abstract Feature allowSplitting(ProjectionToTerm<G> focus);
+    protected abstract Feature allowSplitting(ProjectionToTerm focus);
 
     protected abstract boolean normalSplitting();
 

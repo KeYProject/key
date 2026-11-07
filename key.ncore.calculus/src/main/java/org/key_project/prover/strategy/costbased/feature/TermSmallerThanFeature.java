@@ -18,15 +18,15 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 @StableCost
 public class TermSmallerThanFeature<GOAL extends ProofGoal<GOAL>> extends SmallerThanFeature<GOAL> {
 
-    private final ProjectionToTerm<GOAL> left, right;
+    private final ProjectionToTerm left, right;
 
-    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm<GOAL> left,
-            ProjectionToTerm<GOAL> right,
+    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm left,
+            ProjectionToTerm right,
             TermOrdering termOrdering) {
         return new TermSmallerThanFeature(left, right, termOrdering);
     }
 
-    private TermSmallerThanFeature(ProjectionToTerm<GOAL> left, ProjectionToTerm<GOAL> right,
+    private TermSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
             TermOrdering termOrdering) {
         super(termOrdering);
         this.left = left;

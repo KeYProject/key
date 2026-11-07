@@ -18,15 +18,15 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  */
 public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeature<Goal> {
 
-    private final ProjectionToTerm<Goal> for0, for1;
+    private final ProjectionToTerm for0, for1;
 
-    private ExistentiallyConnectedFormulasFeature(ProjectionToTerm<Goal> for0,
-            ProjectionToTerm<Goal> for1) {
+    private ExistentiallyConnectedFormulasFeature(ProjectionToTerm for0,
+            ProjectionToTerm for1) {
         this.for0 = for0;
         this.for1 = for1;
     }
 
-    public static Feature create(ProjectionToTerm<Goal> for0, ProjectionToTerm<Goal> for1) {
+    public static Feature create(ProjectionToTerm for0, ProjectionToTerm for1) {
         return new ExistentiallyConnectedFormulasFeature(for0, for1);
     }
 

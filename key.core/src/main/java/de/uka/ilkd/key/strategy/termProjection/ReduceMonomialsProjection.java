@@ -5,10 +5,11 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -20,27 +21,27 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * Projection for dividing one monomial by another.
  */
 @StableCost
-public class ReduceMonomialsProjection implements ProjectionToTerm<Goal> {
+public class ReduceMonomialsProjection implements ProjectionToTerm {
 
-    private final ProjectionToTerm<Goal> dividend, divisor;
+    private final ProjectionToTerm dividend, divisor;
 
-    private ReduceMonomialsProjection(ProjectionToTerm<Goal> dividend,
-            ProjectionToTerm<Goal> divisor) {
+    private ReduceMonomialsProjection(ProjectionToTerm dividend,
+            ProjectionToTerm divisor) {
         this.dividend = dividend;
         this.divisor = divisor;
     }
 
-    public static ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> dividend,
-            ProjectionToTerm<Goal> divisor) {
+    public static ProjectionToTerm create(ProjectionToTerm dividend,
+            ProjectionToTerm divisor) {
         return new ReduceMonomialsProjection(dividend, divisor);
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 
-        final Services services = goal.proof().getServices();
+        final Services services = ((Proof) goal.proof()).getServices();
         final Monomial mDividend = JMonomial.create(dividendT, services);
         final Monomial mDivisor = JMonomial.create(divisorT, services);
 

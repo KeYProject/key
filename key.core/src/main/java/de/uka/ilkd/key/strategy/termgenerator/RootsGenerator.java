@@ -38,18 +38,18 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  */
 public class RootsGenerator implements TermGenerator<Goal> {
 
-    private final ProjectionToTerm<Goal> powerRelation;
+    private final ProjectionToTerm powerRelation;
 
     private final TermBuilder tb;
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf(2);
 
-    public static TermGenerator<Goal> create(ProjectionToTerm<Goal> powerRelation,
+    public static TermGenerator<Goal> create(ProjectionToTerm powerRelation,
             TermServices services) {
         return new RootsGenerator(powerRelation, services.getTermBuilder());
     }
 
-    private RootsGenerator(ProjectionToTerm<Goal> powerRelation, TermBuilder tb) {
+    private RootsGenerator(ProjectionToTerm powerRelation, TermBuilder tb) {
         this.powerRelation = powerRelation;
         this.tb = tb;
     }

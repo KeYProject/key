@@ -42,11 +42,11 @@ public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
 
     private final TermFeature hasCoeff;
 
-    private final ProjectionToTerm<GOAL> left, right;
+    private final ProjectionToTerm left, right;
     private final Function Z, mul, add;
 
 
-    private MonomialsSmallerThanFeature(ProjectionToTerm<GOAL> left, ProjectionToTerm<GOAL> right,
+    private MonomialsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
             TermOrdering termOrdering, IIntLdt numbers) {
         super(termOrdering, numbers);
         this.left = left;
@@ -65,8 +65,8 @@ public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
                     OperatorTF.create(numbers.getNumberSymbol()) }));
     }
 
-    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm<GOAL> left,
-            ProjectionToTerm<GOAL> right,
+    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm left,
+            ProjectionToTerm right,
             TermOrdering termOrdering, IIntLdt numbers) {
         return new MonomialsSmallerThanFeature(left, right, termOrdering, numbers);
     }

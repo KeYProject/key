@@ -164,7 +164,7 @@ public class ModularJavaDLStrategy extends JavaAbstractFeatureStrategy {
     private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs) {
         var folStrat = responsibleStrategyCache.getStrategyByName(JFOLStrategy.NAME);
         var intStrat = responsibleStrategyCache.getStrategyByName(JavaIntegerStrategy.NAME);
-        final ProjectionToTerm<Goal> focus = FocusProjection.create(0);
+        final ProjectionToTerm focus = FocusProjection.create(0);
         switch (rs.name().toString()) {
             case "order_terms" -> {
                 bindRuleSet(d, "order_terms",

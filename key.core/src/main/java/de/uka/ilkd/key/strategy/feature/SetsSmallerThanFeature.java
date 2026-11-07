@@ -21,11 +21,11 @@ import org.key_project.util.collection.ImmutableList;
 
 public class SetsSmallerThanFeature extends SmallerThanFeature<Goal> {
 
-    private final ProjectionToTerm<Goal> left, right;
+    private final ProjectionToTerm left, right;
     private final SetTermFeatures setFeatures;
 
 
-    private SetsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    private SetsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
             SetTermFeatures setFeatures, TermOrdering termOrdering) {
         super(termOrdering);
         this.left = left;
@@ -34,7 +34,7 @@ public class SetsSmallerThanFeature extends SmallerThanFeature<Goal> {
     }
 
 
-    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
+    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
             SetTermFeatures setFeatures, TermOrdering termOrdering) {
         return new SetsSmallerThanFeature(left, right, setFeatures, termOrdering);
     }
