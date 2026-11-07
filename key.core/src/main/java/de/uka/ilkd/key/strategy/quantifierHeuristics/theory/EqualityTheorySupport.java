@@ -154,6 +154,10 @@ final class EqualityTheorySupport implements QuantifierTheorySupport {
     /// @param lit the JTerm representing an uncovered literal
     /// @param services the Services class provides access to term construction and other services
     /// @return list of solved equations that describe triggers
+
+    // Constraint is deprecated wholesale (quantifierHeuristics.constraint); no replacement API
+    // exists.
+    @SuppressWarnings("deprecation")
     private List<JTerm> solveEquation(Set<Metavariable> mvs, Substitution qv2mv,
             OpReplacer mv2qv, JTerm lit,
             Services services) {

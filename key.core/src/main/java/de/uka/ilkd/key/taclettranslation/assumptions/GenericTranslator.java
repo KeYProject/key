@@ -28,11 +28,11 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 class GenericTranslator {
-    private final VariablePool pool;
+    private final AssumptionGenerator pool;
     private final ArrayList<TranslationListener> listener = new ArrayList<>();
     private Services services;
 
-    GenericTranslator(VariablePool pool) {
+    GenericTranslator(AssumptionGenerator pool) {
         this.pool = pool;
     }
 

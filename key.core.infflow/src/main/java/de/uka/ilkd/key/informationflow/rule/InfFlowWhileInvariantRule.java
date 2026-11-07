@@ -164,7 +164,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final Goal infFlowGoal,
             final AnonUpdateData anonUpdateData,
             final JTerm guardTerm, final Instantiation inst,
-            LoopSpecification spec, Services services, LoopInvariantBuiltInRuleApp ruleApp,
+            LoopSpecification spec, Services services, LoopInvariantBuiltInRuleApp<?> ruleApp,
             final ImmutableSet<LocationVariable> localIns,
             final ImmutableSet<LocationVariable> localOuts, final JTerm anonUpdate,
             final JavaBlock guardJb) throws RuleAbortException {

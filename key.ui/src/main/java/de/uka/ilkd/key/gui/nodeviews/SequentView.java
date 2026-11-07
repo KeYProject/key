@@ -259,6 +259,8 @@ public abstract class SequentView extends JEditorPane {
      * Dispose this SequentView.
      * Before calling this method, the view should be removed from the UI.
      */
+    // GeneralFailureEvent remains in use here (its successor IssueDialog has a different API)
+    @SuppressWarnings("deprecation")
     public void dispose() {
         try {
             unregisterListener();
@@ -429,6 +431,9 @@ public abstract class SequentView extends JEditorPane {
      * one given by viewToModel, subtract it from the given x value, and get the character at the
      * new position. That is the correct one.
      */
+    // viewToModel() is deprecated, but its replacement viewToModel2 changes the return semantics
+    // the code below relies on (see the note above about inter-character spaces).
+    @SuppressWarnings("deprecation")
     public int correctedViewToModel(Point p) {
         String seqText = getText();
         int cursorPosition = viewToModel(p);
@@ -761,8 +766,8 @@ public abstract class SequentView extends JEditorPane {
                 for (int j = 0; j < max_age && j < sortedArray.length; ++j) {
                     if (sortedArray[j].equals(entry)) {
                         Color color = computeColorForAge(max_age, j);
-                        ImmutableList<Integer> list = (ImmutableList<Integer>) ImmutableList
-                                .<Integer>nil().prepend(0).append(i);
+                        ImmutableList<Integer> list = ImmutableList.<Integer>nil().prepend(0)
+                                .append(i);
                         Range r = ipt.rangeForPath(list);
                         // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView.
                         // rangeForPath ist schuld
@@ -780,8 +785,7 @@ public abstract class SequentView extends JEditorPane {
                     form, max_age + 2);
                 if (age < max_age) {
                     Color color = computeColorForAge(max_age, age);
-                    ImmutableList<Integer> list = (ImmutableList<Integer>) ImmutableList
-                            .<Integer>nil().prepend(0).append(i);
+                    ImmutableList<Integer> list = ImmutableList.<Integer>nil().prepend(0).append(i);
                     Range r = ipt.rangeForPath(list);
                     // Off-by-one: siehe updateUpdateHighlights bzw in InnerNodeView. rangeForPath
                     // ist schuld
@@ -1082,6 +1086,11 @@ public abstract class SequentView extends JEditorPane {
                 return this.age == c.age && this.pio == c.pio;
             }
             return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(age, pio);
         }
     }
 }

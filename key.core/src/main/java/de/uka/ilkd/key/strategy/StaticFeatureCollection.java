@@ -166,7 +166,6 @@ public abstract class StaticFeatureCollection {
         return SumFeature.createSum(a, b, c);
     }
 
-    @SafeVarargs
     protected static Feature add(Feature... features) {
         return SumFeature.createSum(features);
     }
@@ -204,7 +203,6 @@ public abstract class StaticFeatureCollection {
         return or(a, or(b, c));
     }
 
-    @SafeVarargs
     protected static Feature or(Feature... features) {
         Feature orFeature = inftyConst();
         for (Feature f : features) {
@@ -239,7 +237,7 @@ public abstract class StaticFeatureCollection {
         return ifZero(f, ConstTermFeature.createConst(TopRuleAppCost.INSTANCE), longTermConst(0));
     }
 
-    protected static Feature eq(Feature a, Feature b) {
+    protected static Feature eqCost(Feature a, Feature b) {
         return CompareCostsFeature.eq(a, b);
     }
 
@@ -307,16 +305,18 @@ public abstract class StaticFeatureCollection {
         return TermConstructionProjection.create(op, subTerms);
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" }) // building a generic array is inherently
+                                                   // unchecked
     protected static ProjectionToTerm<Goal> opTerm(Operator op,
             ProjectionToTerm<Goal> subTerm) {
-        // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" }) // building a generic array is inherently
+                                                   // unchecked
     protected static ProjectionToTerm<Goal> opTerm(Operator op,
             ProjectionToTerm<Goal> subTerm0,
             ProjectionToTerm<Goal> subTerm1) {
-        // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
 

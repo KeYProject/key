@@ -313,7 +313,7 @@ public class LexPathOrdering implements TermOrdering {
         return res + 1;
     }
 
-    ////////////////////////////////////////////////////////////////////////////
+    // --------------------------------------------------------------------------
 
     /**
      * Base class for metrics on symbols that are used to construct an ordering
@@ -491,7 +491,7 @@ public class LexPathOrdering implements TermOrdering {
     private final Weighter literalWeighter = new LiteralWeighter();
     private final Weighter functionWeighter = new FunctionWeighter();
 
-    ////////////////////////////////////////////////////////////////////////////
+    // --------------------------------------------------------------------------
 
     /**
      * @return true iff <code>op</code> is a logic variable

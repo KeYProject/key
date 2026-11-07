@@ -78,16 +78,16 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * The plans form a small immutable tree that mirrors the pattern, with one node kind per way of
  * matching:
  * <ul>
- * <li>{@link LeafPlan}: a plan-tree leaf matched by a single instruction (schema variables,
+ * <li>{@code ProgramLeafPlan}: a plan-tree leaf matched by a single instruction (schema variables,
  * schema type references, and value-carrying leaves such as literals);</li>
- * <li>{@link ListSVPlan}: a list program schema variable, which matches a run of source children
- * and is driven by its enclosing {@link StructuralPlan};</li>
- * <li>{@link StructuralPlan}: the default <b>generic match</b>, i.e. same concrete class as the
- * pattern, an optional extra field check (the {@code guard}, e.g. array dimensions), and the
- * children matched recursively;</li>
- * <li>{@link FieldReferencePlan}: a schematic field reference, which accepts any source
+ * <li>{@code ProgramListSVPlan}: a list program schema variable, which matches a run of source
+ * children and is driven by its enclosing {@code ProgramStructuralPlan};</li>
+ * <li>{@code ProgramStructuralPlan}: the default <b>generic match</b>, i.e. same concrete class
+ * as the pattern, an optional extra field check (the {@code guard}, e.g. array dimensions), and
+ * the children matched recursively;</li>
+ * <li>{@code FieldReferencePlan}: a schematic field reference, which accepts any source
  * {@link FieldReference} instead of one exact class;</li>
- * <li>{@link ContextBlockPlan}: the {@code .. ...} context pattern of symbolic-execution
+ * <li>{@code ContextBlockPlan}: the {@code .. ...} context pattern of symbolic-execution
  * taclets.</li>
  * </ul>
  * "Generic" is used throughout in the sense of {@link #isGenericMatch}: the

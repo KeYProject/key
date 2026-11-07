@@ -26,6 +26,7 @@ public class TermLabelSettings extends AbstractSettings {
 
     private boolean useOriginLabels = true;
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void readSettings(Properties props) {
         String str = props.getProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS);
@@ -37,6 +38,7 @@ public class TermLabelSettings extends AbstractSettings {
         }
     }
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void writeSettings(Properties props) {
         props.setProperty("[" + CATEGORY + "]" + USE_ORIGIN_LABELS,

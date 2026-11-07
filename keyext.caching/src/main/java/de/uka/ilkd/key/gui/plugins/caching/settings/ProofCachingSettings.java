@@ -34,16 +34,19 @@ public class ProofCachingSettings extends AbstractPropertiesSettings {
     /**
      * Whether proof caching is enabled.
      */
+    // createBooleanProperty is overridable; invoked before subclasses finish initializing
     private final AbstractPropertiesSettings.PropertyEntry<Boolean> enabled =
         createBooleanProperty(ENABLED_KEY, true);
     /**
      * Behaviour when disposing a proof that is referenced elsewhere.
      */
+    // createStringProperty is overridable; invoked before subclasses finish initializing
     private final AbstractPropertiesSettings.PropertyEntry<String> dispose =
         createStringProperty(DISPOSE_KEY, DISPOSE_COPY);
     /**
      * Behaviour when pruning a proof that is referenced elsewhere.
      */
+    // createStringProperty is overridable; invoked before subclasses finish initializing
     private final AbstractPropertiesSettings.PropertyEntry<String> prune =
         createStringProperty(PRUNE_KEY, PRUNE_COPY);
 

@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableSet;
 public final class GenericSort extends SortImpl {
 
 
-    /**
+    /*
      * A possible instantiation of this generic sort by a concrete sort must satisfy each of these
      * conditions:
      *

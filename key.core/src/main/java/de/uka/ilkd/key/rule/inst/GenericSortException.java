@@ -4,10 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.inst;
 
-/**
- * This exception thrown if there is no appropriate instantiation of the generic sorts occurring
- * within an "SVInstantiations"-object
- */
 import org.key_project.util.collection.ImmutableList;
 
 /**

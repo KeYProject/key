@@ -50,6 +50,8 @@ public class MergeRuleMultiThreadGuardTest {
     }
 
     @Test
+    @SuppressWarnings("try") // close() of the run-marker scopes is the effect; the handles are
+                             // intentionally unused
     void runScopeIsPerProofAndBalances() {
         final Proof a = loadDummyProof();
         final Proof b = loadDummyProof();
@@ -87,6 +89,8 @@ public class MergeRuleMultiThreadGuardTest {
     }
 
     @Test
+    @SuppressWarnings("try") // close() of the run-marker scope is the effect; the handle is
+                             // intentionally unused
     void mergeRuleIsDisabledOnlyOnTheProofWithTheActiveRun() {
         final Proof a = loadDummyProof();
         final Proof b = loadDummyProof();

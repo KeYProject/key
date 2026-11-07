@@ -32,7 +32,11 @@ public class GeneralFailureJTextPaneDisplay extends ShowDisplayPane {
      * de.uka.ilkd.key.gui.notification.NotificationAction#execute(de.uka.ilkd.key.gui.notification.
      * events.NotificationEvent)
      */
+    // GeneralFailureEvent is deprecated (successor: IssueDialog), but the notification-event
+    // pipeline (NotificationManager/tasks) still dispatches these events; switching would change
+    // behavior.
     @Override
+    @SuppressWarnings("deprecation")
     public boolean execute(NotificationEvent event) {
         if (event instanceof GeneralFailureEvent) {
             setMessage(((GeneralFailureEvent) event).getErrorMessage());

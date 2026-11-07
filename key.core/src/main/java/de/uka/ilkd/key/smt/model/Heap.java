@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt.model;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a heap in the SMT model.
@@ -85,6 +86,9 @@ public class Heap {
 
     }
 
-
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 
 }

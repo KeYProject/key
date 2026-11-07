@@ -99,6 +99,9 @@ public final class DiskFileRepo extends AbstractFileRepo {
 
             // we have to create the URL as string:
             String entryStr = "jar:file:///" + jarCopy.toString() + "!/" + juc.getEntryName();
+            // the lenient URL constructor is kept: the jar: entry is built from a filesystem
+            // path, which is not a valid URI on Windows (backslashes)
+            @SuppressWarnings("deprecation")
             URL entryURL = new URL(entryStr);
 
             return entryURL.openStream();

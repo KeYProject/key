@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Highlighter;
 import javax.swing.text.JTextComponent;
@@ -54,10 +55,11 @@ public class CurrentLineHighlighter implements Highlighter {
             int currentRow =
                 component.getDocument().getDefaultRootElement().getElementIndex(caretPosition);
             try {
-                Rectangle modelToView = component.modelToView(component.getDocument()
+                Rectangle2D modelToView = component.modelToView2D(component.getDocument()
                         .getDefaultRootElement().getElement(currentRow).getStartOffset());
                 graphics.setColor(color);
-                graphics.fillRect(0, modelToView.y, component.getWidth(), modelToView.height);
+                graphics.fillRect(0, (int) modelToView.getY(), component.getWidth(),
+                    (int) modelToView.getHeight());
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }

@@ -45,6 +45,8 @@ public class HelperClassForTests {
     public static final Path DUMMY_KEY_FILE = TESTCASE_DIRECTORY.resolve("dummyTrue.key");
 
 
+    @SuppressWarnings("unchecked") // the anonymous profile inherits the specialized goal-chooser
+    // builders, see AbstractProfile
     private static final Profile profile = new JavaProfile() {
         // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
         // library (HACK)
@@ -297,6 +299,8 @@ public class HelperClassForTests {
         return field;
     }
 
+    @SuppressWarnings("unchecked") // reflection cannot be checked statically; callers declare the
+    // expected type via the type parameter
     public static <T> T get(Object o, String fieldName)
             throws NoSuchFieldException, IllegalAccessException {
         final Field field = field(o, fieldName);

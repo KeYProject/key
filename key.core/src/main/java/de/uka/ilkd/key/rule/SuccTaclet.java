@@ -26,6 +26,8 @@ import org.jspecify.annotations.NonNull;
  * A SuccTaclet represents a taclet whose find part has to match a top level formula in the
  * succedent of the sequent.
  */
+@SuppressWarnings({ "unchecked", "rawtypes" }) // inherits the deliberately raw getExecutor(), see
+                                               // Taclet
 public class SuccTaclet extends FindTaclet {
     /**
      * creates a {@link Taclet} (old name Schematic Theory Specific Rule) with the given parameters

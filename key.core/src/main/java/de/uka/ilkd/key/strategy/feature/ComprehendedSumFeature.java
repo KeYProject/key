@@ -53,6 +53,8 @@ public class ComprehendedSumFeature<Goal extends ProofGoal<@NonNull Goal>> imple
     }
 
     @Override
+    @SuppressWarnings("unchecked") // the goal is the class-bound Goal; the feature's G type
+    // parameter is a proof-goal subtype used for interface compatibility
     public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, G goal, MutableState mState) {
         final Term outerVarContent = var.getContent(mState);

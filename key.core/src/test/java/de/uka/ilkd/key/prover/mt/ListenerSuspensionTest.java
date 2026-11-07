@@ -80,6 +80,8 @@ public class ListenerSuspensionTest {
      * suspension scope closes -- otherwise the GUI's "proof closed" notification never appears.
      */
     @Test
+    @SuppressWarnings("try") // close() of the suspension scope is the effect; the handle is
+                             // intentionally unused
     void proofClosedIsRedeliveredToSuspendedListenersAfterTheRun() throws Exception {
         KeYEnvironment<?> env = load("prop_chain.key");
         try {
@@ -102,6 +104,8 @@ public class ListenerSuspensionTest {
     }
 
     @Test
+    @SuppressWarnings("try") // close() of the suspension scope is the effect; the handle is
+                             // intentionally unused
     void nonEssentialObserverIsSilencedWhileSuspended() throws Exception {
         KeYEnvironment<?> env = load("prop_chain.key");
         try {
@@ -122,6 +126,8 @@ public class ListenerSuspensionTest {
     }
 
     @Test
+    @SuppressWarnings("try") // close() of the suspension scope is the effect; the handle is
+                             // intentionally unused
     void observerIsReattachedAfterSuspensionScope() throws Exception {
         KeYEnvironment<?> env = load("prop_chain.key");
         try {
@@ -145,6 +151,8 @@ public class ListenerSuspensionTest {
     }
 
     @Test
+    @SuppressWarnings("try") // close() of the suspension scope is the effect; the handle is
+                             // intentionally unused
     void essentialObserverKeepsFiringWhileSuspended() throws Exception {
         KeYEnvironment<?> env = load("prop_chain.key");
         try {
@@ -165,6 +173,8 @@ public class ListenerSuspensionTest {
     }
 
     @Test
+    @SuppressWarnings("try") // close() of the two suspension scopes is the effect; the handles are
+                             // intentionally unused
     void suspendingObserversDoesNotChangeTheProof() throws Exception {
         // Baseline: prove with no extra observer attached.
         ProofFingerprint baseline;

@@ -6,6 +6,9 @@ package de.uka.ilkd.key.gui.notification.events;
 
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 
+// GeneralFailureEvent is deprecated (successor: IssueDialog), but the notification-event pipeline
+// (NotificationManager/tasks) still dispatches these events; switching would change behavior.
+@SuppressWarnings("deprecation")
 public class ExceptionFailureEvent extends GeneralFailureEvent {
 
     private final Throwable error;

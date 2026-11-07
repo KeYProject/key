@@ -77,7 +77,7 @@ public class QueueRuleApplicationManagerParkingLocalityTest {
             "a sibling must not record keys for heads only the other sibling parked under");
         orig.recordWakeKeysOf(orFormula, true);
         assertTrue(orig.pendingWakeKeys.stream()
-                .anyMatch(k -> ((WakeKey) k).head() == Junctor.OR),
+                .anyMatch(k -> k.head() == Junctor.OR),
             "the parking sibling must record the key for its own parked head");
 
         // The manager-level clone must route through the same deep copy.

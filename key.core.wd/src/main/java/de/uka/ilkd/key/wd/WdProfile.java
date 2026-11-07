@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (7/27/25)
  */
+@SuppressWarnings("unchecked") // unchecked override of the generic goal-chooser builders in
+// Profile (see AbstractProfile); reported against every concrete profile subclass.
 public class WdProfile extends JavaProfile {
     private static final Logger LOGGER = LoggerFactory.getLogger(WdProfile.class);
 

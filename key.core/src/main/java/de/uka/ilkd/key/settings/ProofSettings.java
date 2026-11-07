@@ -102,8 +102,9 @@ public class ProofSettings {
      */
     public ProofSettings(ProofSettings toCopy) {
         this();
-        Properties result = new Properties();
+        Configuration result = new Configuration();
         lastLoadedProperties = toCopy.lastLoadedProperties;
+        lastLoadedConfiguration = toCopy.lastLoadedConfiguration;
         for (Settings s : toCopy.settings) {
             s.writeSettings(result);
         }
@@ -113,6 +114,7 @@ public class ProofSettings {
     }
 
 
+    // Legacy Properties-based snapshot from a .props/.key load; re-apply to settings added later.
     public void addSettings(Settings settings) {
         this.settings.add(settings);
         settings.addPropertyChangeListener(listener);
@@ -292,6 +294,7 @@ public class ProofSettings {
      *
      * @param props a non-<code>null</code> object with KeY properties.
      */
+    // Legacy update path for .key settings sections.
     public void update(Properties props) {
         for (Settings s : settings) {
             s.readSettings(props);

@@ -27,8 +27,11 @@ public class SMTRule implements ExternalSolverRule {
     public static final SMTRule INSTANCE = new SMTRule();
 
     @Override
-    public SMTRuleApp createApp(String successfulSolverName) {
-        return new SMTRuleApp(this, null, successfulSolverName);
+    @SuppressWarnings("unchecked") // the app type is fixed (SMTRuleApp); the type parameter only
+    // exists for the ExternalSolverRule interface contract
+    public <T extends ExternalSolverRule> AbstractExternalSolverRuleApp<T> createApp(
+            String successfulSolverName) {
+        return (AbstractExternalSolverRuleApp<T>) new SMTRuleApp(this, null, successfulSolverName);
     }
 
     /**
@@ -39,12 +42,11 @@ public class SMTRule implements ExternalSolverRule {
      * @return rule application instance
      */
     @Override
+    @SuppressWarnings("unchecked") // see createApp(String)
     public <T extends ExternalSolverRule> AbstractExternalSolverRuleApp<T> createApp(
             String successfulSolverName, ImmutableList<PosInOccurrence> unsatCore) {
-        // weigl strange
-        AbstractExternalSolverRuleApp<?> x =
-            new SMTRuleApp(this, null, unsatCore, successfulSolverName);
-        return (AbstractExternalSolverRuleApp<T>) x;
+        return (AbstractExternalSolverRuleApp<T>) new SMTRuleApp(this, null, unsatCore,
+            successfulSolverName);
     }
 
 

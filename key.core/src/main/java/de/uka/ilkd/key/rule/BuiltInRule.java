@@ -21,6 +21,10 @@ import org.jspecify.annotations.Nullable;
  * has to ensure that the goal split is done only iff the application was successful.
  */
 @NullMarked
+// The default getExecutor() implements the generic <G>getExecutor() from Rule by returning this,
+// which is a RuleExecutor<Goal> by contract. The unchecked override warning cannot be silenced at
+// method scope, and the generic signature cannot be replicated without an unchecked cast.
+@SuppressWarnings("unchecked")
 public interface BuiltInRule extends Rule, RuleExecutor<Goal> {
 
     /**
