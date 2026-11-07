@@ -18,7 +18,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
@@ -146,7 +146,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         }
 
         return services.getTermFactory().createTerm(phi.op(), updatedSubs,
-            new ImmutableArray<>(boundVarsInPhi), null);
+            ImmutableList.of(boundVarsInPhi), null);
     }
 
     /**

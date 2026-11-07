@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
+import java.util.HashMap;
+import java.util.List;
+
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -11,12 +14,12 @@ import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +51,8 @@ public class TestTerm {
     private final LogicVariable w = new LogicVariable(new Name("w"), sort2); // w:S2
     private final Function f = new JFunction(new Name("f"), sort1, sort3);
     // f(:S3):S1
+    private final Function h = new JFunction(new Name("h"), JavaDLTheory.FORMULA, sort1, sort3);
+    // h(:S1, :S3):BOOL
 
     private final ProgramVariable pv0 = new LocationVariable(new ProgramElementName("pv0"), sort1); // pv0:S1
 
@@ -245,19 +250,49 @@ public class TestTerm {
             JavaBlock.createJavaBlock(new StatementBlock(new LocalVariableDeclaration()));
         JTerm withJB =
             tf.createTerm(JModality.getModality(JModality.JavaModalityKind.DIA, javaBlock),
-                new ImmutableArray<>(noJB), null, null);
+                ImmutableList.of(noJB), null, null);
         JTerm withJBChild = tf.createTerm(Junctor.NOT, withJB);
         JTerm withJBChildChild = tf.createTerm(Junctor.NOT, withJBChild);
         // a modality whose program has no statements still carries a JavaBlock
         JTerm withEmptyJB = tf.createTerm(
             JModality.getModality(JModality.JavaModalityKind.DIA,
                 JavaBlock.createJavaBlock(new StatementBlock())),
-            new ImmutableArray<>(noJB), null, null);
+            ImmutableList.of(noJB), null, null);
         assertFalse(noJB.containsJavaBlockRecursive());
         assertFalse(noJBWithChild.containsJavaBlockRecursive());
         assertTrue(withJB.containsJavaBlockRecursive());
         assertTrue(withJBChild.containsJavaBlockRecursive());
         assertTrue(withJBChildChild.containsJavaBlockRecursive());
         assertTrue(withEmptyJB.containsJavaBlockRecursive());
+    }
+
+    /**
+     * Terms with the same content must be equal (and have the same hash code) regardless of
+     * whether their subterm list was built by {@code ImmutableList.of(...)} (array backed) or
+     * {@code ImmutableList.fromList(...)} (list backed), see
+     * <a href="https://github.com/KeYProject/key/pull/4001">PR #4001</a>.
+     */
+    @Test
+    public void testEqualsOfDifferentBuildTerms() {
+        JTerm viaArray = tf.createTerm(h, ImmutableList.of(tb.var(x), tb.var(y)), null, null);
+        JTerm viaList = tf.createTerm(h, ImmutableList.fromList(List.of(tb.var(x), tb.var(y))),
+            null, null);
+
+        assertEquals(viaArray.subs(), viaList.subs());
+        assertEquals(viaArray.hashCode(), viaList.hashCode());
+        assertEquals(viaArray, viaList);
+    }
+
+    /**
+     * Rebuilding a term via {@link MergeRuleUtils#substConstantsByFreshVars} must produce a term
+     * equal to the input, see <a href="https://github.com/KeYProject/key/pull/4001">PR #4001</a>.
+     */
+    @Test
+    public void mergeRuleRebuildEqualsInput() {
+        JTerm term = tf.createTerm(h, tb.var(x), tb.var(y));
+        JTerm rebuilt = MergeRuleUtils.substConstantsByFreshVars(term, new HashMap<>(),
+            TacletForTests.services());
+
+        assertEquals(term, rebuilt);
     }
 }

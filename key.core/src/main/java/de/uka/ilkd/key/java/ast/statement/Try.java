@@ -13,7 +13,7 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -25,12 +25,12 @@ import org.jspecify.annotations.NonNull;
 public class Try extends BranchStatement implements StatementContainer, ProgramPrefix {
 
     private final StatementBlock body;
-    private final ImmutableArray<Branch> branches;
+    private final ImmutableList<Branch> branches;
     private final MethodFrame innerMostMethodFrame;
     private final int prefixLength;
 
     public Try(PositionInfo pi, List<Comment> comments, StatementBlock body,
-            ImmutableArray<Branch> branches,
+            ImmutableList<Branch> branches,
             MethodFrame innerMostMethodFrame, int prefixLength) {
         super(pi, comments);
         this.body = body;
@@ -67,7 +67,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     public Try(StatementBlock body, Branch[] branches) {
         super(null, null);
         this.body = body;
-        this.branches = new ImmutableArray<>(branches);
+        this.branches = ImmutableList.ofFixedSize(branches);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -83,7 +83,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      *        a branch array.
      */
 
-    public Try(StatementBlock body, ImmutableArray<Branch> branches) {
+    public Try(StatementBlock body, ImmutableList<Branch> branches) {
         super(null, null);
         this.body = body;
         this.branches = branches;
@@ -102,7 +102,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     public Try(ExtList children) {
         super(children);
         this.body = children.get(StatementBlock.class);
-        this.branches = new ImmutableArray<>(children.collect(Branch.class));
+        this.branches = ImmutableList.ofFixedSize(children.collect(Branch.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -139,7 +139,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+    public ImmutableList<ProgramPrefix> getPrefixElements() {
         return StatementBlock.computePrefixElements(body.getBody(), this);
     }
 
@@ -265,7 +265,7 @@ public class Try extends BranchStatement implements StatementContainer, ProgramP
      *
      * @return the array wrapper of the branches
      */
-    public ImmutableArray<Branch> getBranchList() {
+    public ImmutableList<Branch> getBranchList() {
         return branches;
     }
 

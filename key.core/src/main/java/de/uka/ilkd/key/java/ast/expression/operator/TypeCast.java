@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -49,7 +49,7 @@ public class TypeCast extends TypeOperator {
     }
 
     public TypeCast(PositionInfo pi, List<Comment> c, Expression expr, TypeReference type) {
-        super(pi, c, new ImmutableArray<>(expr), type);
+        super(pi, c, ImmutableList.ofFixedSize(expr), type);
     }
 
 

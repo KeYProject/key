@@ -6,7 +6,7 @@ package de.uka.ilkd.key.speclang;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NullMarked;
@@ -22,10 +22,10 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class PositionedLabeledString extends PositionedString {
 
-    public final ImmutableArray<TermLabel> labels;
+    public final ImmutableList<TermLabel> labels;
 
     public PositionedLabeledString(String text, Location location,
-            ImmutableArray<TermLabel> labels) {
+            ImmutableList<TermLabel> labels) {
         super(text, location);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
@@ -34,7 +34,7 @@ public class PositionedLabeledString extends PositionedString {
     }
 
     public PositionedLabeledString(String text, Location location, TermLabel label) {
-        this(text, location, new ImmutableArray<>(label));
+        this(text, location, ImmutableList.of(label));
     }
 
     /**
@@ -49,7 +49,7 @@ public class PositionedLabeledString extends PositionedString {
      * returns the labels attached to this positioned string
      */
     @Override
-    public ImmutableArray<TermLabel> getLabels() {
+    public ImmutableList<TermLabel> getLabels() {
         return labels;
     }
 

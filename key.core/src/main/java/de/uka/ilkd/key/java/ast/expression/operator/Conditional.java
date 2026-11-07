@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /** The most weird ternary C operator ?: */
 
@@ -39,7 +39,7 @@ public class Conditional extends Operator {
     public Conditional(
             PositionInfo pi, List<Comment> c, Expression accept, Expression accept1,
             Expression accept2) {
-        super(pi, c, new ImmutableArray<>(accept, accept1, accept2));
+        super(pi, c, ImmutableList.of(accept, accept1, accept2));
     }
 
 

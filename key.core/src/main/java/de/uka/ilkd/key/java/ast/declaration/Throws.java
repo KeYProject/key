@@ -12,7 +12,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Throws.
@@ -26,7 +26,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
     /**
      * Exceptions thrown.
      */
-    protected final ImmutableArray<TypeReference> exceptions;
+    protected final ImmutableList<TypeReference> exceptions;
 
     /**
      * Throws.
@@ -42,7 +42,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      *        a type reference.
      */
     public Throws(TypeReference exception) {
-        this.exceptions = new ImmutableArray<>(exception);
+        this.exceptions = ImmutableList.of(exception);
     }
 
     /**
@@ -52,7 +52,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      *        a type reference array.
      */
     public Throws(TypeReference[] list) {
-        this.exceptions = new ImmutableArray<>(list);
+        this.exceptions = ImmutableList.of(list);
     }
 
 
@@ -65,10 +65,10 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      */
     public Throws(ExtList children) {
         super(children);
-        this.exceptions = new ImmutableArray<>(children.collect(TypeReference.class));
+        this.exceptions = ImmutableList.of(children.collect(TypeReference.class));
     }
 
-    public Throws(PositionInfo pi, List<Comment> c, ImmutableArray<TypeReference> exc) {
+    public Throws(PositionInfo pi, List<Comment> c, ImmutableList<TypeReference> exc) {
         super(pi, c);
         this.exceptions = exc;
     }
@@ -114,7 +114,7 @@ public class Throws extends JavaNonTerminalProgramElement implements TypeReferen
      *
      * @return the type reference mutable list.
      */
-    public ImmutableArray<TypeReference> getExceptions() {
+    public ImmutableList<TypeReference> getExceptions() {
         return exceptions;
     }
 

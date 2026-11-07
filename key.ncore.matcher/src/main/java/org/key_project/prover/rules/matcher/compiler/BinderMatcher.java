@@ -7,7 +7,7 @@ package org.key_project.prover.rules.matcher.compiler;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Language SPI (service provider interface) for matching <em>bound variables</em> (the variables
@@ -20,7 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
  * <p>
  * The match-plan framework owns the <em>scaffolding</em>: it binds the pattern's bound variables
  * before matching the operator and subterms and unbinds them afterwards, on both back-ends. A
- * language plugs in the two operations here. The {@linkplain #binder(ImmutableArray) binder} is an
+ * language plugs in the two operations here. The {@linkplain #binder(ImmutableList) binder} is an
  * element-based instruction (it reads the source element's own bound variables), so both back-ends
  * apply it as it is; {@link #unbind} reads no element at all (it only transforms the match
  * state), so the framework calls it directly on the compiled back-end and wraps it into a
@@ -35,7 +35,7 @@ public interface BinderMatcher {
      * @param boundVars the pattern's bound variables
      * @return the binding instruction
      */
-    MatchInstruction binder(ImmutableArray<? extends QuantifiableVariable> boundVars);
+    MatchInstruction binder(ImmutableList<? extends QuantifiableVariable> boundVars);
 
     /**
      * Closes the binding scope opened by {@link #binder} for the same variables. A front-end
@@ -47,5 +47,5 @@ public interface BinderMatcher {
      * @return the match result with the binding scope closed
      */
     MatchResultInfo unbind(MatchResultInfo mc,
-            ImmutableArray<? extends QuantifiableVariable> boundVars);
+            ImmutableList<? extends QuantifiableVariable> boundVars);
 }
