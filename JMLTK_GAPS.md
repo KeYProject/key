@@ -5,10 +5,17 @@ were possible with KeY's pre-takeover JML front-end (`PreParser` /
 `TextualJML*` / `JmlParser.g4`) and are rejected, mis-parsed, or changed by the
 JMLtk front-end shipped in PR #3997.
 
-- Status below was **measured at HEAD `8fe1be5b6c`** (rebased branch tip,
-  Nov 2 2026) by running the named test classes (Appendix A). It supersedes
-  the earlier historical triage in `HANDOFF.md §5.2` (which was recorded at
-  an older baseline and is stale in both directions).
+- Status below was **measured at HEAD `53dcefd914`** (branch tip,
+  Nov 8 2026, jmltk `1.2.1-SNAPSHOT`) by running the named test classes
+  (Appendix A). It supersedes the earlier historical triage in
+  `HANDOFF.md §5.2` (which was recorded at an older baseline and is stale in
+  both directions).
+- Re-measured at `53dcefd914`: the loop-invariant structural-lookup fix
+  (`6a07c20e63`) resolved 3 previously-recorded reds — §9 (labeled
+  break/continue) and 2 of the §5 `\sum` "proof doesn't close" cases
+  (`arrayMax.key`, `polishFlagSort.key`, both loop proofs — mis-attributed to
+  `\sum` fidelity). key.core red count is now **11** (was 14). See the
+  per-section status for the re-measured state.
 - Every entry has a fixture path so it can be re-verified.
 
 ## Status legend
@@ -26,22 +33,23 @@ JMLtk front-end shipped in PR #3997.
 
 | # | Construct | Example | Fixtures | Status at HEAD |
 |---|---|---|---|---|
-| 1 | comment-form `merge_point` (`merge_proc`/`merge_params`) | `//@ merge_point;` | `testcase/merge/A.java`, `Gcd.java` | ✔ RESOLVED (fallback) |
+| 1 | comment-form `merge_point` (`merge_proc`/`merge_params`) | `//@ merge_point;` | `testcase/merge/A.java`, `Gcd.java` | ✔ RESOLVED (fallback; 1.2.1 typed `JmlMergePointStmt` handled at `53dcefd914`) |
 | 2 | `\by {…}` assertion-proof scripts / `obtain` | `/*@ assert x > 2 \by {…} */` | `scripts/jml/*.java`, `exceptional/AssertProofScript.java` | ✔ RESOLVED (fallback) |
 | 3 | `\seq(0)` inside a model-method body | `… : \seq_concat(b(n-1), \seq(0));` | `nparser/fix3452/fix/Issue3452Fixture.java` | ✔ RESOLVED — ⚠ was mis-attributed to JMLtk |
 | 4 | comma-separated store-ref `represents` | `//@ represents footprint = this.*, o.*;` | `key.ui/examples/heap/simple/src/MySubclass.java`, `heap/list/src/ArrayList.java` | ✘ OPEN (4 load fails) |
-| 5 | `\sum` comprehension fidelity | `ensures \result == (\sum int i; …)` | `comprehensions/sum0.key`, `sum1.key`, `standard_key/java_dl/{arrayMax,polishFlagSort}.key` | ✘ OPEN (proofs don't close) |
+| 5 | `\sum` comprehension fidelity | `ensures \result == (\sum int i; …)` | `comprehensions/{sum0,sum1}.key` | ✘ OPEN (sum0/sum1 don't close; `arrayMax`/`polishFlagSort` were loop-invariant, resolved by `6a07c20e63`) |
 | 6 | record-level `/*@ nullable */` + record pipeline output | `/*@ nullable */ record MyRecord(…)` | `pipelineTests/records/**` | ✔ RESOLVED — goldens regenerated for the JMLtk output; `KeyJavaPipelineTest` 142/0 |
 | 7 | `spec_*_math` class/method pragmas | `/*@ spec_java_math @*/` | `testcase/specMath/{java,bigint}/Test.java`, `testPackage/TestClass.java` | ✔ RESOLVED (JML modifiers → `SpecMathMode`; `SpecMathModeTest` 2 + `ContractLoadingTests` 6 green) |
 | 8 | `ensures \result = max;` (single `=`) | — | `exceptional/WrongEquals.java` | ✔ RESOLVED (guarded via `JmlSideEffectChecker`) |
-| 9 | labeled `break`/`continue` proofs | — | `LoopScopeInvRuleTests` bench | ✘ OPEN (1 proof fails) |
-| 10 | assert-level `\by`-scripted proof replay | — | `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof` | ✘ OPEN (2 replays fail) |
+| 9 | labeled `break`/`continue` proofs | — | `LoopScopeInvRuleTests` bench | ✔ RESOLVED (loop-invariant fix `6a07c20e63`) |
+| 10 | `relax.proof` scripted-proof replay | — | `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof` | ✘ OPEN (2 key.core replays + keyext.caching `TestReferenceSearcher`) |
 | 11 | block-contract combination | — | `ParallelProverDeterminismTest` | ✘ OPEN — non-JML real KeY bug (pre-existing) |
 | 12 | absent clause keywords | `when`, `duration`, `working_space`, `captures`, and the legacy clause-name `name "..."` | — | ⚠ mostly OPEN — `name` replaced by the native `[behavior] <name>:` prefix (✔ RESOLVED) |
 | 13 | pragma-statements | `//@ nowarn;`, `//@ debug;` | `exceptional/NowarnDebug.java`, `exceptional/NowarnDebugInMethod.java` | ⚠ pinned: class level loud (`ProofInputException`), method level dropped (fallback) |
 | 14 | datagroup / monitor clauses | `monitors_for`, `readable_if`, `writable_if`, `in_group`, `maps_into` | `exceptional/{Datagroup,MonitorsFor,ReadableIf,WritableIf,InGroup,MapsInto}.java` | ✔ RESOLVED (loud guard, no spurious fields) |
 | 15 | `\strictly_nothing`, `\nothing`, `\everything` | — | — | ✘ OPEN (plain `NameExpr`; locset meaning must be re-added) |
 | 16 | assert label *after* `assert` | `//@ assert LAB: e;` | — | ✘ OPEN (only JML-standard `LAB: assert e;`) |
+| 17 | origin-label file info for re-parsed JML | `Precondition @ [no file]` | any JMLtk-converted spec (assert/assume/set, fallback clauses) | ✘ OPEN (cosmetic only — labels are proof-irrelevant) |
 
 ---
 
@@ -64,6 +72,15 @@ JMLtk front-end shipped in PR #3997.
   Measured (Appendix A at `8fe1be5b6c`): `MergeRuleTests` (12) and
   `PredicateAbstractionLatticeTests` (3) green; `MtMergePointTest` (1) and
   `TestTacletEquality` (2137) were green at the original measurement.
+- **JMLtk 1.2.1 (commit `53dcefd914`):** the comment form is now parsed by
+  JMLtk into a *typed* `JmlMergePointStmt` (`com.github.javaparser.ast.jml.stmt`,
+  new in 1.2.1) instead of remaining an unparsed leftover — so the fallback path
+  no longer sees it. The converter now has a `visit(JmlMergePointStmt)` (temp
+  boolean location var, like the fallback) and the merge *contract* is re-derived
+  by re-serializing the node's `merge_proc`/`merge_params` metadata to the
+  textual `merge_point` statement (`JMLSpecFactory#createJMLMergeContracts`).
+  Measured at `53dcefd914`: `MergeRuleTests` (12) and
+  `PredicateAbstractionLatticeTests` (3) green.
 
 ## 2. `\by {…}` assertion-proof scripts  — ✔ RESOLVED (fallback)
 
@@ -119,19 +136,22 @@ JMLtk front-end shipped in PR #3997.
   `heap/list/ArrayList_add.key`, `heap/list/ArrayList_get_dep.key`,
   `heap/simple/dependency_contracts.key`, `heap/simple/selection_sort.key` (4).
 
-## 5. `\sum` comprehension fidelity  — ✘ OPEN (proofs don't close)
+## 5. `\sum` comprehension fidelity  — ✘ OPEN (sum0/sum1 don't close)
 
 ```java
 @   ensures \result == (\sum int i; 0 <= i && i < a.length; a[i]);
 ```
-- Fixtures: `key.ui/examples/heap/comprehensions/{sum0,sum1}.key`,
-  `key.ui/examples/standard_key/java_dl/{arrayMax,polishFlagSort}.key`;
+- Fixtures: `key.ui/examples/heap/comprehensions/{sum0,sum1}.key`;
   `exceptional/SumClause.java`.
 - **Before:** parsed and proved by KeY's own front-end.
 - **After (JMLtk):** parses, but the resulting terms don't close automode
-  proofs. Measured at HEAD: `ScDeterminismTest` 3 proof failures
-  (`sum1.key`, `arrayMax.key`, `polishFlagSort.key`),
-  `RealProofMtEquivalenceTest` 1 (`sum0.key`).
+  proofs. Measured at `53dcefd914`: `ScDeterminismTest` 1 proof failure
+  (`sum1.key`), `RealProofMtEquivalenceTest` 1 (`sum0.key`).
+- **CORRECTION (re-measured at `53dcefd914`):** `arrayMax.key` and
+  `polishFlagSort.key` (previously listed here) are **not** `\sum`-fidelity
+  failures — they are loop proofs whose `loop_invariant` was lost to the
+  fresh-substituted-loop regression, now resolved by the structural-lookup
+  fix (`6a07c20e63`). They close again and are removed from this gap.
 - Not strictly a "parse" gap — semantics/fidelity difference (same family as
   #3, but unresolved).
 
@@ -204,22 +224,35 @@ public class Test { … }
 - **Status:** guarded — the `JmlSideEffectChecker` now rejects the clause
   structurally (`WrongEquals` expects `JmlSideEffectException`).
 
-## 9. labeled `break`/`continue` proofs  — ✘ OPEN
+## 9. labeled `break`/`continue` proofs  — ✔ RESOLVED (`6a07c20e63`)
 
 - Test: `LoopScopeInvRuleTests.testDoAutomaticProofOfBenchmarkWithLabeledBreaksAndContinues`.
 - **Before:** label-based benchmarks proved automatically.
-- **After:** parsed, but proof does not close. Not a parse gap — proof-level
-  behavior difference.
+- **After (at `8fe1be5b6c`):** parsed, but proof did not close.
+- **Root cause (re-measured at `53dcefd914`):** not a parse gap and not a
+  break/continue-specific difference — the benchmark's loop invariant was lost
+  to the fresh-substituted-loop regression (the `loopScopeInvDia` family binds a
+  structurally-equal, position-UNDEFINED loop on which the node-attached
+  invariant is null). The structural-lookup fix (`6a07c20e63`) restores it.
+  Measured at `53dcefd914`: `LoopScopeInvRuleTests` green.
 
-## 10. assert-level `\by`-scripted proof replay  — ✘ OPEN
+## 10. `relax.proof` scripted-proof replay  — ✘ OPEN
 
 - Tests: `TestCopyingReplayer.testJavaProof`,
-  `TestEqualsModProofIrrelevancy.testJavaProof` — replay
-  `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof`.
+  `TestEqualsModProofIrrelevancy.testJavaProof` (key.core), and
+  `TestReferenceSearcher#testFindsReferenceInSameProof` (keyext.caching) — all
+  load `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof`.
 - **Before:** replayed byte-identical.
-- **After:** the replayed proof text differs (assert `\by`/loop proof-script
-  constructs, cf. #2). The scripts *load* (fallback) but stored proof replay
-  does not match.
+- **After:** the loaded proof does not match the stored (closed) proof.
+  Re-measured at `53dcefd914`: the replay reports "Proof replayed
+  successfully" but leaves **node 40 open** — the `Null Reference (_pat = null)`
+  case whose postcondition frame derives from `assignable \strictly_nothing`
+  (cf. gap #15). The source `Relaxed.java` has a `maintaining`/`decreasing` loop
+  and `assignable \strictly_nothing` (no `\by` scripts, no model methods/JML
+  fields), so the mismatch is the loop + `\strictly_nothing` frame, not the
+  `\by`-script attribution recorded at `8fe1be5b6c`. `TestReferenceSearcher`
+  fails at `assertTrue(p.closed())` (line 83) because that open goal survives
+  the prune + close-by-reference.
 
 ## 11. block-contract combination  — ✘ OPEN, non-JML (pre-existing KeY bug)
 
@@ -276,6 +309,27 @@ No token for `\strictly_nothing`; `\nothing`/`\everything` arrive as plain
 //@ assert LAB: e;    // KeY form — rejected
 //@ LAB: assert e;    // JML-standard prefix form — the only one JMLtk accepts
 ```
+
+## 17. `[no file]` in origin term labels  — ✘ OPEN (cosmetic only)
+
+- **Symptom:** origin labels on JML terms re-parsed from the JMLtk AST render
+  as e.g. `Precondition @ [no file]` instead of the pre-takeover
+  `Precondition @ file Foo.java @ line 42`.
+- **Mechanism:** the converter re-serializes clause text from the typed JMLtk
+  AST and re-parses it with `JmlFacade.createLexer(String)`, whose
+  `CharStreams.fromString` carries **no URI** (the `createLexer(PositionedString)`
+  overload does carry URI + line/column, but the re-parse sites —
+  `JP2KeYConverter.visit(JmlExpressionStmt)`, `toProofScript`, the
+  `JmlDocStmt` fallback, `JMLTransformer`'s fallback re-parse — use the
+  no-URI variant). `LabeledParserRuleContext.constructTermLabel` then reads
+  `SourceNames.getURIFromTokenSource(...)` → null and builds
+  `OriginTermLabel.FileOrigin(specType, null, line)`; `OriginTermLabel` renders
+  the null-URI case as `specType + " @ [no file]"`.
+- **Impact:** cosmetic only. `OriginTermLabel.isProofRelevant()` is `false` and
+  replay compares via `EqualityModuloProofIrrelevancy`, so this causes no red
+  job (recorded or otherwise). Fixable by re-parsing from the JMLtk node's
+  position (URI via `CompilationUnit.getStorage().getPath()`), documented but
+  not fixed at `53dcefd914`.
 
 ---
 
