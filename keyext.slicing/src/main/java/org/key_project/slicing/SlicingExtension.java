@@ -81,7 +81,7 @@ public class SlicingExtension implements KeYGuiExtension,
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
         public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
-                T object) {
+                @Nullable T object) {
             if (kind != ContextMenuKind.SEQUENT_VIEW) {
                 return Collections.emptyList();
             }

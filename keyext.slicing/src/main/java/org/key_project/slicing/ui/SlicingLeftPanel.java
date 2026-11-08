@@ -189,12 +189,13 @@ public class SlicingLeftPanel extends JPanel implements TabPanel, KeYSelectionLi
      * callees), which runs before any of the registered listeners or the label-update timer can
      * fire; the checker cannot see through those helper-method assignments (reported as
      * {@code initialization.fields.uninitialized}) and rejects listener registration on the
-     * under-initialized receiver, so these are suppressed with scoped keys.
+     * under-initialized receiver, so these are suppressed with scoped keys. NullAway performs the
+     * same field-initialization check and is suppressed the same way.
      *
      * @param mediator the KeY mediator
      * @param extension instance of the extension
      */
-    @SuppressWarnings({ "nullness:method.invocation.invalid",
+    @SuppressWarnings({ "NullAway", "nullness:method.invocation.invalid",
         "nullness:argument.type.incompatible", "nullness:initialization.fields.uninitialized" })
     public SlicingLeftPanel(KeYMediator mediator, SlicingExtension extension) {
         super();

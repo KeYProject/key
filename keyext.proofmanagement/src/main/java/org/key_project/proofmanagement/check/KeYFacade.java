@@ -363,7 +363,8 @@ public final class KeYFacade {
      * {@code replay}'s {@code listener}/{@code progressMonitor} parameters explicitly accept
      * {@code null} ("may be null" per their javadoc, guarded with {@code listener != null}
      * checks inside). The legacy unannotated parameter types cannot express this, suppressed
-     * with scoped keys.
+     * with scoped keys; NullAway performs the same argument check and is suppressed the same
+     * way.
      *
      * @param line the proof entry holding the proof and the intermediate parse result
      * @param envInput the environment the proof was loaded with
@@ -371,7 +372,7 @@ public final class KeYFacade {
      * @return the replay result
      * @throws ProofInputException if replaying the proof fails
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private static ReplayResult replayProof(CheckerData.ProofEntry line,
             @Nullable EnvInput envInput, Logger logger) throws ProofInputException {
         Proof proof = line.proof;
@@ -486,12 +487,12 @@ public final class KeYFacade {
      * declares no classpath files, "no classpath" is expressed as {@code null}; {@link SLEnvInput}
      * forwards it to {@code JavaModel}, which explicitly treats a {@code null} classpath as an
      * empty one. The unannotated (non-null) parameter type cannot express this, suppressed with a
-     * scoped key.
+     * scoped key; NullAway performs the same argument check and is suppressed the same way.
      *
      * @param data the CheckerData object to store the results
      * @throws ProofManagementException
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public static void ensureSourceLoaded(CheckerData data) throws ProofManagementException {
         data.print(LogLevel.DEBUG, "Loading Java sources ...");
         try {

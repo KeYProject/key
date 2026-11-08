@@ -148,7 +148,8 @@ public final class SlicingProofReplayer extends AbstractProofReplayer {
      * @param control the problem loader control
      * @return a problem loader for the provided parameters
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    // the problem loader accepts null classpath / profile entries (see the EISOP suppression)
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private static AbstractProblemLoader createProblemLoader(Path tmpFile,
             ProofEnvironment environment, ProblemLoaderControl control) {
         return new SingleThreadProblemLoader(

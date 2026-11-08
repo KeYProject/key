@@ -7,6 +7,7 @@ package de.uka.ilkd.key.gui.testgen;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Objects;
 import javax.swing.*;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.testgen.smt.counterexample.AbstractSideProofCounterExampl
 
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,15 +75,21 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
 
         final KeYSelectionListener selListener = new KeYSelectionListener() {
             @Override
-            public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
+            public void selectedNodeChanged(@Nullable KeYSelectionEvent<Node> e) {
                 final Proof proof = getMediator().getSelectedProof();
                 if (proof == null) {
                     // no proof loaded
                     setEnabled(false);
                 } else {
                     final Node selNode = getMediator().getSelectedNode();
-                    // Can be applied only to root nodes
-                    setEnabled(haveZ3CE && selNode.childrenCount() == 0 && !selNode.isClosed());
+                    // Can be applied only to root nodes; the guard fires exactly when the
+                    // legacy code would NPE (Z3 CE enabled and no node selected yet)
+                    setEnabled(
+                        haveZ3CE
+                                && Objects
+                                        .requireNonNull(selNode, "a node is selected")
+                                        .childrenCount() == 0
+                                && !selNode.isClosed());
                 }
             }
 

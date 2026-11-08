@@ -166,7 +166,7 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
         return x -> {
             AnalysisResults results = null;
             try {
-                results = analyzeCallback.apply(null);
+                results = applyVoid(analyzeCallback);
             } catch (Exception e) {
                 LOGGER.error("failed to analyze proof", e);
             }
@@ -221,6 +221,13 @@ public class SliceToFixedPointDialog extends JDialog implements KeYSelectionList
             }
             return results;
         };
+    }
+
+    // a Void-arg function ignores its argument, so null is the only admissible value
+    @SuppressWarnings("NullAway")
+    private static @Nullable AnalysisResults applyVoid(
+            Function<Void, @Nullable AnalysisResults> f) {
+        return f.apply(null);
     }
 
     private void updateTable() {

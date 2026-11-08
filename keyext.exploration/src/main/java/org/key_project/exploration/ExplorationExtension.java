@@ -61,8 +61,11 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
 
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
+        // the sequent view menu is only opened on a selected position, so the object is
+        // non-null whenever this branch is reached
+        @SuppressWarnings("NullAway")
         public <T> List<Action> getContextActions(KeYMediator mediator, ContextMenuKind<T> kind,
-                T object) {
+                @Nullable T object) {
             if (!model.isExplorationModeSelected() ||
                     kind != ContextMenuKind.SEQUENT_VIEW) {
                 return Collections.emptyList();
@@ -78,6 +81,8 @@ public class ExplorationExtension implements KeYGuiExtension, KeYGuiExtension.Co
     private final ProofTreeListener proofTreeListener = new ProofTreeAdapter() {
 
         @Override
+        // a pruned node without exploration data just yields a no-op deregistration
+        @SuppressWarnings("NullAway")
         public void proofPruned(de.uka.ilkd.key.proof.ProofTreeEvent e) {
             e.getNode().deregister(e.getNode().lookup(ExplorationNodeData.class),
                 ExplorationNodeData.class);

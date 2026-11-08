@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.event.MouseInputAdapter;
 
@@ -121,7 +122,9 @@ class CheckConfigDialog extends JDialog {
                             containerPoint.x,
                             containerPoint.y);
                     if (component == runButton) {
-                        checkWorker.cancel(true);
+                        Objects
+                                .requireNonNull(checkWorker, "the check worker is running")
+                                .cancel(true);
                     } else {
                         e.consume();
                     }

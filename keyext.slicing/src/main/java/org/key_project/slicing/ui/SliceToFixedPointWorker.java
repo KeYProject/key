@@ -78,7 +78,7 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
             doneCallback.run();
             return null;
         }
-        AnalysisResults results = analyzeButton.apply(null);
+        AnalysisResults results = applyVoid(analyzeButton);
         if (results == null) {
             throw new NullPointerException(
                 "No analysis results for proof " + proof.name() + ".");
@@ -107,5 +107,12 @@ final class SliceToFixedPointWorker extends SwingWorker<Void, Void> {
      */
     public Proof getSlicedProof() {
         return proof;
+    }
+
+    // a Void-arg function ignores its argument, so null is the only admissible value
+    @SuppressWarnings("NullAway")
+    private static @Nullable AnalysisResults applyVoid(
+            Function<Void, @Nullable AnalysisResults> f) {
+        return f.apply(null);
     }
 }

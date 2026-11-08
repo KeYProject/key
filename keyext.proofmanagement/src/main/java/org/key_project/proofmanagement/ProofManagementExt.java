@@ -98,11 +98,11 @@ public class ProofManagementExt implements
      * dialog has no owner frame, which the Swing {@code JDialog} constructor accepts (a
      * {@code null} owner simply omits the parent relation and {@code setLocationRelativeTo(null)}
      * centers the dialog on the screen). The legacy unannotated parameter type cannot express
-     * this, suppressed with a scoped key.
+     * this, suppressed with scoped keys (NullAway performs the same argument check).
      *
      * @param args ignored command line arguments
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public static void main(String[] args) {
         JDialog checkConfigDialog = new CheckConfigDialog(null, "Check configuration", true);
         checkConfigDialog.setVisible(true);
