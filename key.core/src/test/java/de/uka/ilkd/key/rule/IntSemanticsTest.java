@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -24,7 +25,9 @@ import org.junit.jupiter.params.provider.ValueSource;
  * @author Wolfram Pfeifer
  */
 class IntSemanticsTest {
-    private static final Path TEST_DIR = FindResources.getTestResourcesDirectory()
+    private static final Path TEST_DIR = Objects
+            .requireNonNull(FindResources.getTestResourcesDirectory(),
+                "the test resources directory must be available")
             .resolve("de/uka/ilkd/key/rule/intSemantics/");
 
     /**
@@ -41,7 +44,7 @@ class IntSemanticsTest {
     void testSemanticsProvable(String filename) throws ProblemLoaderException {
         Path proofFile = TEST_DIR.resolve(filename);
         KeYEnvironment<?> pmapi = KeYEnvironment.load(proofFile);
-        Proof proof = pmapi.getLoadedProof();
+        Proof proof = Objects.requireNonNull(pmapi.getLoadedProof(), "the proof must be loaded");
         // Proof should be reloaded completely now. If not, the int semantics are probably broken.
         Assertions.assertTrue(proof.closed());
     }
@@ -60,8 +63,10 @@ class IntSemanticsTest {
     void testSemanticsUnprovable(String filename) throws ProblemLoaderException {
         Path keyFile = TEST_DIR.resolve(filename);
         KeYEnvironment<?> pmapi = KeYEnvironment.load(keyFile);
-        Proof proof = pmapi.getLoadedProof();
-        pmapi.getProofControl().startAndWaitForAutoMode(proof);
+        Proof proof = Objects.requireNonNull(pmapi.getLoadedProof(), "the proof must be loaded");
+        var control = Objects.requireNonNull(pmapi.getProofControl(),
+            "the proof control must be available");
+        control.startAndWaitForAutoMode(proof);
         // we expect that exactly one branch (the overflow check) is open now:
         Assertions.assertEquals(1, proof.openGoals().size());
     }
