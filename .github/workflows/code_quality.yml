@@ -29,9 +29,6 @@ jobs:
         run: ./gradlew -DENABLE_NULLNESS=true compileTestJava
 
   nullaway:
-    # Informational until key.core is NullAway-clean (~3.3k findings predate the rebase);
-    # flip to a blocking gate once the campaign in docs/plan-jspecify-nullness.md is done.
-    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
