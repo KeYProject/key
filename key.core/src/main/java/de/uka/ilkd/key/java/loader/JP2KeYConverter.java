@@ -1071,6 +1071,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Throws thr = t.isEmpty() ? null : new Throws(null, null, t);
         boolean isInInterface = parentIsInterface(n);
         TypeReference returnType = requireTypeReference(n.getType());
+        final Node jmlWrapper = jmlWrapperOf(n);
+        // A model/ghost method unwrapped from a JmlMethodDeclaration: its body is a JML
+        // definition (specification text, e.g. containing \old), not executable Java. The
+        // pre-JMLtk front-end produced signature-only KeY methods for it; the definition
+        // itself is translated via the JML grammar (JmlToTextual.toMethodDecl, AXIOMS).
+        final Optional<BlockStmt> body = jmlWrapper == null ? n.getBody() : Optional.empty();
 
         de.uka.ilkd.key.java.ast.declaration.MethodDeclaration md =
             new de.uka.ilkd.key.java.ast.declaration.MethodDeclaration(
@@ -1080,14 +1086,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 createProgramElementName(n.getName()),
                 map(n.getParameters()),
                 thr,
-                accepto(n.getBody()),
+                accepto(body),
                 isInInterface);
         // Model method contracts and the method definition live on the JmlMethodDeclaration
         // wrapper; for regular methods the MethodDeclaration node itself carries the contracts
         // (CallableDeclaration is a NodeWithContracts). The pipeline (JMLTransformer) unwraps
         // the wrapper into a regular member and remembers it on the inner declaration, so the
         // wrapper is looked up from there first.
-        Node contractCarrier = jmlWrapperOf(n);
+        Node contractCarrier = jmlWrapper;
         if (contractCarrier == null) {
             Node parent = n.getParentNode().orElse(null);
             contractCarrier = parent instanceof JmlMethodDeclaration ? parent : n;

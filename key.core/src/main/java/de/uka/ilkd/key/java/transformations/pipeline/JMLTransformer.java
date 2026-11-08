@@ -205,6 +205,12 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                     } else {
                         var decl = fieldDecl.getDecl();
                         decl.setData(KEY_JML_WRAPPER, fieldDecl);
+                        // The pre-JMLtk front-end materialized class level JML field
+                        // declarations without their initializers, so they never reached the
+                        // constructors. JMLtk keeps the initializer on the wrapped
+                        // FieldDeclaration; remove it to keep the program (and recorded
+                        // proofs) unchanged.
+                        decl.getVariables().forEach(variable -> variable.removeInitializer());
                         replaceMember(td, fieldDecl, decl);
                     }
                 }
