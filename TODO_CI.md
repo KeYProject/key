@@ -59,10 +59,30 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
   `maintaining`/`decreasing` loop + `\strictly_nothing`; no model methods / JML
   fields / `\by` scripts).
 
-## 4. Integration jobs (ubuntu) — red
+## 4. Integration jobs (ubuntu) — red — triaged at `4b62b1d6fa` (CI run 2026-11-08)
 
-- [ ] `testMt2w` / `testMt4w` / `testMtStress` — expect the `prover.mt` gaps from §1 (ScDeterminism / RealProofMtEquivalence / ParallelProverDeterminism). Verify.
-- [ ] `testRunAllFunProofs` / `testRunAllInfProofs` / `testRunAllWdProofs` — identify which example proofs fail; expect overlap with recorded gaps (break/continue, relax, store-ref).
+- [x] `testRunAllWdProofs` — **now PASSING** (red at 2026-11-02) — resolved by the
+  program/spec-shape fixes (`6a07c20e63` + `233ec1d9b0`).
+- [x] `testMt2w` / `testMt4w` — **ACCOUNTED**: the curated small-MT collections
+  (`ProofCollections.smallMultiThreaded{,Splitting}`) contain exactly the
+  recorded failing proofs — `selection_sort`, `dependency_contracts`,
+  `ArrayList_get_dep`, `ArrayList_add` (JMLTK_GAPS §4 store-ref load fails) and
+  `sum1` (§5). The `multithreaded_smoke`/`multithreaded_splitting` group
+  failures are those recorded gaps surfacing through the MT runner; the
+  `ScDeterminismTest` ×5 in the same job is the identical set. No new MT
+  prover failure.
+- [x] `testMtStress` — `MtScriptStressTest` ×2 = **newly identified,
+  pre-existing, previously unrecorded gap** (JMLTK_GAPS §18):
+  `heap/quicksort/sort.key` fails to **load** — JMLtk (1.1.0 **and** 1.2.1)
+  parses the `//@ ghost \seq x = \dl_array2seq(array);` ghost locals as
+  class-level `JmlFieldDeclaration` → hard parse problem. Same failure in the
+  2026-11-02 CI (1.1.0) — not caused by the 1.2.1 bump.
+- [ ] `testRunAllFunProofs` (21 groups) / `testRunAllInfProofs` (11 groups) —
+  per-proof triage in progress (local corpus run at `4b62b1d6fa`).
+  `quicksort` group = §18 (confirmed by local repro); the others
+  (newBook, blockContracts, javaCard, observer, SmansEtAl, VACID0, VSTTE10,
+  FM2024Tutorial, javadl, simpleTests, redux, the InfFlow examples) pending
+  classification against the recorded families.
 
 ## 5. jmltk bump 1.1.0 → 1.2.1-SNAPSHOT (user request)
 
@@ -93,4 +113,4 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
 | `keyext.slicing` | **17/17 green** (was 5 red) |
 | `keyext.caching` | 1 failure — `TestReferenceSearcher`, the recorded `relax.proof` gap (JMLTK_GAPS §10); `ProofCachingSingleRunTest` green |
 | `key.core` | 11 failures, **all recorded** (JMLTK_GAPS §4 store-ref ×4, §5 `\sum` ×2, §10 relax replays ×2, §11 MT ×1, + the 2 known `JMLParserExceptionTest` cases); 3 recorded reds resolved by `6a07c20e63` |
-| integration (`testMt*`, `testRunAll*`) | CI-only (not runnable locally); expect overlap with the recorded MT / store-ref / relax gaps |
+| integration | triaged at `4b62b1d6fa` (CI 2026-11-08): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = recorded §4/§5 gaps via the curated small-MT collections; `testMtStress` = new pre-existing quicksort load gap (JMLTK_GAPS §18); `testRunAllFunProofs`/`testRunAllInfProofs` per-proof triage in progress |
