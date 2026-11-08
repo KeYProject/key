@@ -62,6 +62,7 @@ import com.github.javaparser.ast.jml.body.JmlClassExprDeclaration;
 import com.github.javaparser.ast.jml.body.JmlRepresentsDeclaration;
 import com.github.javaparser.ast.jml.clauses.ContractType;
 import com.github.javaparser.ast.jml.clauses.JmlContract;
+import com.github.javaparser.ast.jml.stmt.JmlMergePointStmt;
 import com.github.javaparser.ast.key.KeyMergePointStmt;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -1596,6 +1597,41 @@ public class JMLSpecFactory {
         final JmlParser.Merge_point_statementContext ctx =
             JmlFacade.createParser(JmlFacade.createLexer(text)).merge_point_statement();
         return createJMLMergeContracts(method, mps, ctx, Location.UNDEFINED);
+    }
+
+    /**
+     * Creates the merge contracts for a JMLtk 1.2.1 typed merge point statement (the comment
+     * form {@code //@ merge_point ...}). The node's optional merge procedure, lattice and
+     * predicate metadata are re-serialized to the textual merge point statement and re-parsed
+     * with KeY's own JML grammar, reusing the shared translation below.
+     */
+    public ImmutableSet<MergeContract> createJMLMergeContracts(final IProgramMethod method,
+            final MergePointStatement mps, final JmlMergePointStmt mergePointStmt)
+            throws SLTranslationException {
+        final JmlParser.Merge_point_statementContext ctx =
+            JmlFacade.createParser(JmlFacade.createLexer(mergePointText(mergePointStmt)))
+                    .merge_point_statement();
+        return createJMLMergeContracts(method, mps, ctx, Location.UNDEFINED);
+    }
+
+    /**
+     * Re-serializes the given JMLtk typed merge point to the textual form understood by KeY's JML
+     * grammar ({@code merge_point [merge_proc "X"] [merge_params {L: (T v) -> {p1, p2}}];}).
+     */
+    private static String mergePointText(JmlMergePointStmt jms) {
+        StringBuilder sb = new StringBuilder("merge_point");
+        jms.getBy().ifPresent(by -> sb.append(" merge_proc ").append(by));
+        if (jms.getLattice().isPresent() && jms.getPredicateVariable().isPresent()
+                && jms.getPredicates().isPresent()) {
+            String lattice = jms.getLattice().get().toString().replaceAll("\"", "");
+            sb.append(" merge_params {").append(lattice).append(": (")
+                    .append(jms.getPredicateVariable().get()).append(") -> {")
+                    .append(String.join(", ", jms.getPredicates().get().stream()
+                            .map(Object::toString).toList()))
+                    .append("}}");
+        }
+        sb.append(";");
+        return sb.toString();
     }
 
     /**

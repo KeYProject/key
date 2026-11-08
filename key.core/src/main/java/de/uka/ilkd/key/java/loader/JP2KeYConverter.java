@@ -69,6 +69,7 @@ import com.github.javaparser.ast.jml.doc.JmlDocStmt;
 import com.github.javaparser.ast.jml.proof.JmlProofStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
+import com.github.javaparser.ast.jml.stmt.JmlMergePointStmt;
 import com.github.javaparser.ast.key.*;
 import com.github.javaparser.ast.key.sv.*;
 import com.github.javaparser.ast.modules.*;
@@ -1959,6 +1960,25 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             IProgramVariable expr = accept(n.getExpr());
             return new MergePointStatement(pi, c, expr);
         }
+    }
+
+    /**
+     * Translates the JMLtk 1.2.1 typed merge point statement, which the front-end produces for
+     * the comment form ({@code //@ merge_point ...}). Unlike the raw {@code KeyMergePointStmt}
+     * it carries no executable expression (only optional merge procedure / lattice / predicate
+     * metadata plus JML key tags), so it is translated exactly like the re-parsed fallback form:
+     * a {@link MergePointStatement} holding a temporary boolean location variable. The concrete
+     * merge procedure and parameters are re-derived by the {@code JMLSpecExtractor} from the node
+     * (see {@code JMLSpecFactory#createJMLMergeContracts}).
+     */
+    @Override
+    public Object visit(JmlMergePointStmt n, Void arg) {
+        var pi = createPositionInfo(n);
+        List<Comment> c = createComments(n);
+        var loc = new LocationVariable(
+            services.getVariableNamer().getTemporaryNameProposal("x"),
+            services.getNamespaces().sorts().lookup("boolean"));
+        return addToMapping(n, new MergePointStatement(pi, c, loc));
     }
 
     @Override
