@@ -77,12 +77,62 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
   parses the `//@ ghost \seq x = \dl_array2seq(array);` ghost locals as
   class-level `JmlFieldDeclaration` → hard parse problem. Same failure in the
   2026-11-02 CI (1.1.0) — not caused by the 1.2.1 bump.
-- [ ] `testRunAllFunProofs` (21 groups) / `testRunAllInfProofs` (11 groups) —
-  per-proof triage in progress (local corpus run at `4b62b1d6fa`).
-  `quicksort` group = §18 (confirmed by local repro); the others
-  (newBook, blockContracts, javaCard, observer, SmansEtAl, VACID0, VSTTE10,
-  FM2024Tutorial, javadl, simpleTests, redux, the InfFlow examples) pending
-  classification against the recorded families.
+- [x] `testRunAllFunProofs` (22 red groups) / `testRunAllInfProofs`
+  (10 red groups local, 11 in CI) — **per-proof triage complete** (local
+  corpus run at `4b62b1d6fa`; XML in `build/test-results`). **All PR-induced**:
+  `origin/main`'s Tests workflow is fully green, including both RunAll jobs.
+  The Fun set shrank 33 → 22 between the 2026-11-02 (1.1.0) and 2026-11-08
+  (1.2.1) runs — the 11 groups fixed by the program/spec-shape commits:
+  `arithmetic`, `list_recursive`, `modelMethods`, `permissionHeap1..7`,
+  `StipuLa`, `switch`.
+  Fun classification (22):
+  - **§4 comma `represents` → LOAD failure (5)**: `list`, `javaCard`,
+    `funOfIF`, `simple_info_flow`, `simpleTests` (ANTLR hard problem on the
+    locset comma; files: `heap/list/src/ArrayList.java:13`,
+    `javacard/framework/CardRuntimeException.java:18`,
+    `heap/information_flow/src/ArrayList.java:13`,
+    `heap/simple/src/MySubclass.java:4`).
+  - **§18 ghost locals → LOAD failure (1)**: `quicksort`.
+  - **§17 `[no file]` origin save→reload round-trip → RELOAD failure (2)**:
+    `other` (`verifyThis26_01_hIndex/update.key.proof`), `list_seq`
+    (`SimplifiedLinkedList.remove.key.proof`) — saved proof carries
+    `requires @ [no file]`, `OriginTermLabelFactory.parse` rejects it.
+    Upgraded JMLTK_GAPS §17 from cosmetic to **reload blocker**.
+  - **§19 `ensures_redundantly` → LOAD failure (1)**: `SmansEtAl`
+    (`heap/SmansEtAl/src/Iterator.java:11`; "Unsupported clause kind:
+    ENSURES_REDUNDANTLY" at `JmlToTextual.java:348/382`).
+  - **§20 `assignable_free` → LOAD failure (1)**: `javadl`
+    (`standard_key/java_dl/jml-free/AssignableLoopFree.java:14,22`;
+    `UnsolvedSymbolException{name='assignable_free'}` in
+    `JP2KeYConverter`'s `ClassOrInterfaceType` handling).
+  - **§21 committed-proof replay drift (1)**: `reload_examples`
+    (`heap/permutedSum/perm.proof`, tracked; loads but 6 replay errors:
+    stored rule position no longer fits + `One Step Simplification`
+    reconstruction).
+  - **proofs that no longer close — spec/sequent-shape drift (11)**:
+    `newBook` (ArrayList.add/remFirst), `comprehensions` (sum0–3, segsum —
+    §5 family), `blockContracts` (Simple__addAbsoluteValues), `list_ghost`
+    (ArrayList_enlarge), `observer` (ExampleSubject_addObserver),
+    `example-algos` (arrayPart/contains/removeDup/BM.bm), `VACID0`
+    (MemoryAllocator_alloc + _unsigned), `VSTTE10` (Queens_isConsistent),
+    `FM2024Tutorial` (ArrayList_sort/LinkedList_find/get), `WeideEtAl`
+    (AddAndMultiply_add), `redux` (Arrays.copyOf/copyOfRange/equals,
+    ArrayCopy). These need per-proof debugging (which shape difference
+    feeds the open goals) — not a single root cause.
+  Inf classification (10 local / 11 CI):
+  - **§4 comma `represents` → LOAD failure (1)**: `NewObjects`
+    (`InformationFlow/PasswordFile/.../SecurePasswordFile.java:13`
+    `represents footprint = \locset(names, passwords), …`).
+  - **non-interference proofs that no longer close (9)**: `ToyVoting`,
+    `ConditionalConfidential`, `SumExample`, `SumExample_nomacro`,
+    `SumExample_fullmacro`, `ToyBanking`, `ToyBanking_fullmacro`,
+    `SimpleEvoting`, `ToyVoting_fullmacro`; plus `SimpleEvoting_fullmacro`
+    red **in CI only** (green in the local run — flaky/environmental,
+    watch on the next run).
+  - Note: the Fun/Inf red groups are a **superset-stable** set across the
+    2026-11-02 (1.1.0) and 2026-11-08 (1.2.1) CI runs — the jmltk bump
+    added no new red groups (Fun 33→22 is only the shape fixes removing
+    groups).
 
 ## 5. jmltk bump 1.1.0 → 1.2.1-SNAPSHOT (user request)
 
@@ -113,4 +163,4 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
 | `keyext.slicing` | **17/17 green** (was 5 red) |
 | `keyext.caching` | 1 failure — `TestReferenceSearcher`, the recorded `relax.proof` gap (JMLTK_GAPS §10); `ProofCachingSingleRunTest` green |
 | `key.core` | 11 failures, **all recorded** (JMLTK_GAPS §4 store-ref ×4, §5 `\sum` ×2, §10 relax replays ×2, §11 MT ×1, + the 2 known `JMLParserExceptionTest` cases); 3 recorded reds resolved by `6a07c20e63` |
-| integration | triaged at `4b62b1d6fa` (CI 2026-11-08): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = recorded §4/§5 gaps via the curated small-MT collections; `testMtStress` = new pre-existing quicksort load gap (JMLTK_GAPS §18); `testRunAllFunProofs`/`testRunAllInfProofs` per-proof triage in progress |
+| integration | triaged at `4b62b1d6fa` (CI 2026-11-08 + local corpus run): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = recorded §4/§5 gaps via the curated small-MT collections; `testMtStress` = quicksort load gap (JMLTK_GAPS §18); `testRunAllFunProofs` = 22 red groups, all classified (§4 ×5, §18 ×1, §17-reload ×2, §19 ×1, §20 ×1, §21 ×1, doesn't-close ×11); `testRunAllInfProofs` = 10–11 red groups (§4 ×1, doesn't-close ×9–10) — **all PR-induced** (main is green) |

@@ -16,9 +16,26 @@ JMLtk front-end shipped in PR #3997.
   (`arrayMax.key`, `polishFlagSort.key`, both loop proofs — mis-attributed to
   `\sum` fidelity). key.core red count is now **11** (was 14). See the
   per-section status for the re-measured state.
-- 2026-11-08 CI-integration triage (branch tip `4b62b1d6fa`): one **new,
-  pre-existing** gap identified in the `testMt*`/`testRunAll*` jobs — §18
-  (quicksort ghost locals, load failure, present at 1.1.0 and 1.2.1).
+- 2026-11-08 CI-integration + RunAll-corpus triage (branch tip `4b62b1d6fa`;
+  `testRunAll*` jobs are CI-only, so the per-proof triage was done with a
+  **local** corpus run at the branch tip):
+  - `testMt*` / `testRunAllWdProofs` — §18 (quicksort ghost locals, load
+    failure, present at 1.1.0 **and** 1.2.1); Wd is now green.
+  - `testRunAllFunProofs` (22 red groups) / `testRunAllInfProofs` (10–11 red
+    groups) — **all PR-induced** (`origin/main`'s Tests workflow is fully
+    green, incl. both RunAll jobs). New gaps recorded here: §17 upgraded to a
+    **save→reload blocker** (RunAll `other`, `list_seq`), §19
+    (`ensures_redundantly`, group `SmansEtAl`), §20 (`assignable_free`,
+    group `javadl`), §21 (committed `perm.proof` replay drift, group
+    `reload_examples`); the rest are §4 (comma `represents` → load failure:
+    Fun `list`, `javaCard`, `funOfIF`, `simple_info_flow`, `simpleTests`; Inf
+    `NewObjects`), §18 (Fun `quicksort`), §5 (`\sum` fidelity: Fun
+    `comprehensions`), or proofs that simply no longer close under the new
+    front-end (spec/sequent-shape drift — Fun `newBook`, `blockContracts`,
+    `list_ghost`, `observer`, `example-algos`, `VACID0`, `VSTTE10`,
+    `FM2024Tutorial`, `WeideEtAl`, `redux`; Inf `ToyVoting{,_fullmacro}`,
+    `ConditionalConfidential`, `SumExample{,_nomacro,_fullmacro}`,
+    `ToyBanking{,_fullmacro}`, `SimpleEvoting{,_fullmacro}`).
 - Every entry has a fixture path so it can be re-verified.
 
 ## Status legend
@@ -52,8 +69,11 @@ JMLtk front-end shipped in PR #3997.
 | 14 | datagroup / monitor clauses | `monitors_for`, `readable_if`, `writable_if`, `in_group`, `maps_into` | `exceptional/{Datagroup,MonitorsFor,ReadableIf,WritableIf,InGroup,MapsInto}.java` | ✔ RESOLVED (loud guard, no spurious fields) |
 | 15 | `\strictly_nothing`, `\nothing`, `\everything` | — | — | ✘ OPEN (plain `NameExpr`; locset meaning must be re-added) |
 | 16 | assert label *after* `assert` | `//@ assert LAB: e;` | — | ✘ OPEN (only JML-standard `LAB: assert e;`) |
-| 17 | origin-label file info for re-parsed JML | `Precondition @ [no file]` | any JMLtk-converted spec (assert/assume/set, fallback clauses) | ✘ OPEN (cosmetic only — labels are proof-irrelevant) |
+| 17 | origin-label file info for re-parsed JML | `Precondition @ [no file]` | any JMLtk-converted spec (assert/assume/set, contract clauses, fallback) | ✘ OPEN (**save→reload blocker** — `[no file]` origins are not re-parseable; RunAll `other`, `list_seq`) |
 | 18 | DL-typed ghost locals with initializer | `//@ ghost \seq x = \dl_array2seq(a);` | `key.ui/examples/heap/quicksort/{sort,split}{,-jmlscript}.key` | ✘ OPEN (load failure — JMLtk reads `ghost` as field-level; pre-existing at 1.1.0 **and** 1.2.1) |
+| 19 | `ensures_redundantly` clause kind | `@ ensures_redundantly e;` | `key.ui/examples/heap/SmansEtAl/src/Iterator.java:11` | ✘ OPEN (load failure — JMLtk accepts it, KeY `JmlParser.g4` has no production) |
+| 20 | `assignable_free` clause body | `@ assignable_free \nothing;` / `@ assignable_free field;` | `key.ui/examples/standard_key/java_dl/jml-free/{AssignableFree,AssignableLoopFree}.java` | ✘ OPEN (load failure — `UnsolvedSymbolException` on the clause keyword) |
+| 21 | committed `.proof` replay drift | `heap/permutedSum/perm.proof` | the tracked proof (155 tracked `.proof` files total; this one fails) | ✘ OPEN (replay errors: rule position no longer fits, built-in reconstruction fails) |
 
 ---
 
@@ -135,10 +155,23 @@ JMLtk front-end shipped in PR #3997.
   `key.ui/examples/heap/list/src/ArrayList.java:6`.
 - **Before:** KeY's grammar accepted comma-separated locset expressions in
   `represents`.
-- **After (JMLtk):** no comma-storage-ref `represents` form.
+- **After (JMLtk):** no comma-storage-ref `represents` form. JMLtk's JML
+  grammar hits a hard ANTLR problem (`Encountered unexpected token: ","`)
+  on the first comma of the locset list, so the whole Java source fails to
+  load.
 - **Status:** OPEN. Measured: `ScDeterminismTest` load failures →
   `heap/list/ArrayList_add.key`, `heap/list/ArrayList_get_dep.key`,
   `heap/simple/dependency_contracts.key`, `heap/simple/selection_sort.key` (4).
+  RunAll corpus (2026-11-08 local run, branch tip): the same parse failure
+  breaks whole groups — Fun `list` (`heap/list/src/ArrayList.java:13`
+  `represents footprint = array, array[*], size;`), `javaCard`
+  (`javacard/framework/CardRuntimeException.java:18`
+  `represents footprint = _reason, _reason[0], _reason.\transient;`),
+  `funOfIF` + `simple_info_flow` (`heap/information_flow/src/ArrayList.java:13`),
+  `simpleTests` (`heap/simple/src/MySubclass.java:4`
+  `represents footprint = this.*, o.*;`), and Inf `NewObjects`
+  (`InformationFlow/PasswordFile/.../SecurePasswordFile.java:13`
+  `represents footprint = \locset(names, passwords), names[*], passwords[*];`).
 
 ## 5. `\sum` comprehension fidelity  — ✘ OPEN (sum0/sum1 don't close)
 
@@ -314,11 +347,20 @@ No token for `\strictly_nothing`; `\nothing`/`\everything` arrive as plain
 //@ LAB: assert e;    // JML-standard prefix form — the only one JMLtk accepts
 ```
 
-## 17. `[no file]` in origin term labels  — ✘ OPEN (cosmetic only)
+## 17. `[no file]` in origin term labels  — ✘ OPEN (save→reload blocker, display otherwise cosmetic)
 
-- **Symptom:** origin labels on JML terms re-parsed from the JMLtk AST render
+- **Symptom (display):** origin labels on JML terms re-parsed from the JMLtk AST render
   as e.g. `Precondition @ [no file]` instead of the pre-takeover
   `Precondition @ file Foo.java @ line 42`.
+- **Symptom (reload — found 2026-11-08 in the RunAll triage):** a proof
+  **saved** under the JMLtk front-end contains origin strings like
+  `requires @ [no file]`; reloading that proof **fails**, because
+  `OriginTermLabelFactory.parseOrigin` accepts only `(implicit)`,
+  `@ file <name> @ line <n>` and `@ node <n> (<rule>)` — it throws
+  `TermLabelException("Malformed origin string: \"requires @ [no file]\"")`
+  on the `[no file]` form that `FileOrigin.toString()` itself renders for
+  null-URI origins (`OriginTermLabel.java:743`). The renderer and the parser
+  are asymmetric.
 - **Mechanism:** the converter re-serializes clause text from the typed JMLtk
   AST and re-parses it with `JmlFacade.createLexer(String)`, whose
   `CharStreams.fromString` carries **no URI** (the `createLexer(PositionedString)`
@@ -329,11 +371,27 @@ No token for `\strictly_nothing`; `\nothing`/`\everything` arrive as plain
   `SourceNames.getURIFromTokenSource(...)` → null and builds
   `OriginTermLabel.FileOrigin(specType, null, line)`; `OriginTermLabel` renders
   the null-URI case as `specType + " @ [no file]"`.
-- **Impact:** cosmetic only. `OriginTermLabel.isProofRelevant()` is `false` and
-  replay compares via `EqualityModuloProofIrrelevancy`, so this causes no red
-  job (recorded or otherwise). Fixable by re-parsing from the JMLtk node's
-  position (URI via `CompilationUnit.getStorage().getPath()`), documented but
-  not fixed at `53dcefd914`.
+- **Impact:**
+  - *Display:* cosmetic — `OriginTermLabel.isProofRelevant()` is `false` and
+    replay compares via `EqualityModuloProofIrrelevancy`.
+  - *Save→reload (NEW, 2026-11-08):* **blocker**. The RunAll corpus saves
+    proofs and reloads them in the same run (reload-enabled groups); the
+    saved file carries `requires @ [no file]` origins and the reload aborts
+    with the `Malformed origin string` above. Measured (local run at branch
+    tip, Fun corpus): group `other`
+    (`heap/verifyThis26_01_hIndex/update.key.proof`, saved proof line 4806)
+    and group `list_seq`
+    (`heap/list_seq/SimplifiedLinkedList.remove.key.proof`, line 1575).
+    Any saved proof that contains a JMLtk-converted spec (contract clauses
+    included — the failing origins are `requires` clauses of operation
+    contracts) fails to reload; this is a branch-side round-trip bug, not a
+    defect of the recorded recordings.
+- **Fix options:** (a) propagate the JMLtk node's position to the re-parse
+  (URI via `CompilationUnit.getStorage().getPath()` + line/column) so origins
+  carry a real file — fixes display *and* round-trip; (b) make
+  `parseOrigin` accept the `[no file]` rendering (map it to a null-URI
+  `FileOrigin`); (c) render null-URI origins as `(implicit)`.
+  Documented but not fixed at `53dcefd914`.
 
 ## 18. DL-typed ghost locals with initializer (quicksort)  — ✘ OPEN (load failure, pre-existing)
 
@@ -371,6 +429,85 @@ No token for `\strictly_nothing`; `\nothing`/`\everything` arrive as plain
   local — conflicts with the loud-failure policy and needs care.
 
 ---
+
+## 19. `ensures_redundantly` clause kind  — ✘ OPEN (load failure, JMLtk accepts, KeY grammar lacks it)
+
+```java
+@ ensures_redundantly l.footprint == \old(l.footprint);
+```
+- Fixture: `key.ui/examples/heap/SmansEtAl/src/Iterator.java:11`.
+- **Symptom:** loading any `.key` file in the `SmansEtAl` group fails —
+  whole-group load failure in `testRunAllFunProofs` (group `SmansEtAl`).
+- **Root cause:** `ensures_redundantly` is a standard-JML clause; JMLtk
+  parses it into a typed clause of kind `ENSURES_REDUNDANTLY`. KeY's
+  `JmlParser.g4` (the grammar `JmlToTextual` re-serializes against) has
+  **no production** for this clause kind (0 occurrences), so
+  `JmlToTextual`'s kind dispatch falls through to
+  `throw new …("Unsupported clause kind: ENSURES_REDUNDANTLY " + clause)`
+  (`JmlToTextual.java:348/382`). Before the takeover the same source parsed
+  with KeY's old JML front-end (which tolerated/ignored the clause); the
+  re-serialization design exposes the missing production as a hard error.
+- **CI impact:** `testRunAllFunProofs` group `SmansEtAl` (Fun corpus red on
+  the branch, green on `main` — PR-induced).
+- **Fix options:** add an `ensures_redundantly` production to `JmlParser.g4`
+  and translate it like `ensures` (the "redundantly" modifier is a
+  soundness hint, not extra semantics — verify against the JML reference
+  before dropping the qualifier); or reject the clause kind explicitly with
+  a targeted message.
+
+## 20. `assignable_free` clause body  — ✘ OPEN (load failure, symbol resolution)
+
+```java
+@ assignable_free \nothing;
+@ assignable_free field;
+```
+- Fixtures: `key.ui/examples/standard_key/java_dl/jml-free/AssignableLoopFree.java:14,22`
+  (and `AssignableFree.java` in the same directory); group = the 13 `.key`
+  files of `key.ui/examples/standard_key/java_dl/jml-free/`.
+- **Symptom:** load fails with
+  `UnsolvedSymbolException{context='null', name='assignable_free'}` thrown
+  from `JP2KeYConverter`'s `ClassOrInterfaceType` handling
+  (`getKeYJavaType` → `type.resolve()`, `JP2KeYConverter.java:1268`, via
+  `visit(ClassOrInterfaceType)` at `:449`).
+- **Root cause:** JMLtk parses the KeY-specific `assignable_free <expr>`
+  clause and exposes the clause keyword position as a Java type node in the
+  AST; the converter runs the javaparser symbol resolver on it, which
+  cannot resolve `assignable_free` (it is a clause keyword, not a type).
+  KeY's own re-parse path for `assignable_free` exists (`JMLSpecFactory`
+  re-parses `assignable_free \nothing;` with `JmlFacade.parseClause`), so
+  the clause is expressible in `JmlParser.g4` — the crash happens before
+  that path, during Java-AST conversion.
+- **CI impact:** `testRunAllFunProofs` group `javadl` (whole group).
+- **Fix options:** in the converter, do not symbol-resolve clause-keyword
+  positions (skip resolution for JML clause nodes), or convert the
+  `assignable_free` clause via its typed JML node before the generic
+  type-visitor reaches it.
+
+## 21. committed `perm.proof` no longer replays  — ✘ OPEN (replay drift)
+
+- Fixture: `key.ui/examples/heap/permutedSum/perm.proof` (tracked; 1 of the
+  155 tracked `.proof` files under `key.ui/examples`), group
+  `reload_examples` (`TestProperty.LOADABLE`).
+- **Symptom:** the proof **loads** (environment-level load succeeds) but the
+  recorded replay reports **6 errors** → `replayResult.hasErrors()` → group
+  fails. Error mix (reproduced locally at branch tip):
+  - `IntermediateProofReplayer$TacletAppConstructionException: Could not
+    reconstruct the rule application: the stored position does not fit the
+    current sequent` (a `Perm::#pIdx`-heavy goal), and
+  - `BuiltInConstructionException: One Step Simplification is missing …`
+    (the replayer finds no reconstructable application for the stored
+    built-in step — the generic "missing binary" wording of
+    `IntermediateProofReplayer.java:735` for a not-reconstructable app).
+- **Interpretation:** the proof was recorded with the pre-takeover front-end;
+  under the JMLtk front-end the spec/sequent shape at some goals differs
+  enough that recorded rule applications no longer reconstruct. Same family
+  as the `relax.proof` replay gap (§10) — a committed proof whose recording
+  is stale against the new front-end. Not a save/reload format bug: a plain
+  `KeYEnvironment.load` of the file succeeds.
+- **CI impact:** `testRunAllFunProofs` group `reload_examples`.
+- **Fix options:** regenerate the recording under the JMLtk front-end
+  (re-prove `perm.key` and re-record), or repair the drift at its source
+  (whichever of the §4/§5/§17/§18-style shape differences feeds these goals).
 
 ## Appendix A — how to re-measure
 
