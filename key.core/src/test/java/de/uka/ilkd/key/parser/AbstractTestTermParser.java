@@ -23,6 +23,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.Nullable;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -32,6 +34,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class AbstractTestTermParser {
 
+    // vestigial: kept for API compatibility with subclasses, never assigned
+    @Nullable
     private static Services SERVICES = null;
 
     protected final TermFactory tf;
@@ -49,11 +53,11 @@ public class AbstractTestTermParser {
         io = new KeyIO(services, nss);
     }
 
-    protected Sort lookup_sort(String name) {
+    protected @Nullable Sort lookup_sort(String name) {
         return nss.sorts().lookup(new Name(name));
     }
 
-    protected Function lookup_func(String name) {
+    protected @Nullable Function lookup_func(String name) {
         return nss.functions().lookup(new Name(name));
     }
 
@@ -67,7 +71,7 @@ public class AbstractTestTermParser {
         io.load(content).parseFile().loadDeclarations().loadSndDegreeDeclarations();
     }
 
-    public JTerm parseProblem(String s) {
+    public @Nullable JTerm parseProblem(String s) {
         try {
             TacletForTests.services().getJavaService()
                     .parseSpecialClasses();

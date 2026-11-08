@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.parser;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -29,7 +31,9 @@ public class TestJMLParserAssociativity extends AbstractTestTermParser {
          * containerType and self variable are not relevant for the tests currently and can be
          * changed if needed.
          */
-        KeYJavaType containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
+        KeYJavaType containerType = Objects
+                .requireNonNull(services.getJavaInfo().getKeYJavaType("testTermParserHeap.A"),
+                    "the test class type must exist");
         var self = (LocationVariable) services.getJavaInfo()
                 .getCanonicalFieldProgramVariable("next", containerType);
         JmlIO io = new JmlIO(getServices()).classType(containerType)

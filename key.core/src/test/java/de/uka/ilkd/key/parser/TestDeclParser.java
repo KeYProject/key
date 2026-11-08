@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.parser;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -19,11 +21,13 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Namespace;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -35,10 +39,12 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test cases for validating the correct handling of declarations inside KeY files.
  */
 public class TestDeclParser {
-    private static Services SERVICES = null;
+    // lazily created in setUp(); null until then
+    private static @Nullable Services SERVICES = null;
     private NamespaceSet nss;
     private Services serv;
-    private Namespace<SchemaVariable> parsedSchemaVars;
+    // set by evaluateDeclarations(); null until then
+    private @Nullable Namespace<SchemaVariable> parsedSchemaVars;
     private KeyIO io;
 
     @BeforeEach
@@ -73,13 +79,15 @@ public class TestDeclParser {
     @Test
     public void testSortDecl() {
         evaluateDeclarations("\\sorts { elem; list; }");
-        assertEquals(new Name("elem"), nss.sorts().lookup(new Name("elem")).name(),
-            "find sort elem");
-        assertEquals(new Name("list"), nss.sorts().lookup(new Name("list")).name(),
-            "find sort list");
+        Sort elem = Objects
+                .requireNonNull(nss.sorts().lookup(new Name("elem")), "sort elem must exist");
+        Sort list = Objects
+                .requireNonNull(nss.sorts().lookup(new Name("list")), "sort list must exist");
+        assertEquals(new Name("elem"), elem.name(), "find sort elem");
+        assertEquals(new Name("list"), list.name(), "find sort list");
     }
 
-    private GenericSort checkGenericSort(Named name, ImmutableSet<Sort> pExt,
+    private GenericSort checkGenericSort(@Nullable Named name, ImmutableSet<Sort> pExt,
             ImmutableSet<Sort> pOneOf) {
         assertNotNull(name, "Generic sort does not exist");
         assertTrue(name instanceof GenericSort,
@@ -93,7 +101,7 @@ public class TestDeclParser {
         return gs;
     }
 
-    private Sort checkSort(Named name) {
+    private Sort checkSort(@Nullable Named name) {
         assertNotNull(name, "Sort does not exist");
         assertTrue(name instanceof Sort, "Sort does not have type Sort, but " + name.getClass());
         return (Sort) name;
@@ -110,14 +118,14 @@ public class TestDeclParser {
         assertEquals("P", P.name().toString());
         assertEquals(DefaultImmutableSet.nil().add(JavaDLTheory.ANY), P.extendsSorts());
 
-        Sort A = nss.sorts().lookup(new Name("A"));
-        Sort B = nss.sorts().lookup(new Name("B"));
+        Sort A = Objects.requireNonNull(nss.sorts().lookup(new Name("A")), "sort A must exist");
+        Sort B = Objects.requireNonNull(nss.sorts().lookup(new Name("B")), "sort B must exist");
         Sort Q = nss.sorts().lookup(new Name("Q"));
         assertTrue(Q instanceof ProxySort);
         assertEquals("Q", Q.name().toString());
         assertEquals(DefaultImmutableSet.nil().add(A).add(B), Q.extendsSorts());
 
-        Sort R = nss.sorts().lookup(new Name("R"));
+        Sort R = Objects.requireNonNull(nss.sorts().lookup(new Name("R")), "sort R must exist");
         assertTrue(P instanceof ProxySort);
         assertEquals("R", R.name().toString());
         assertEquals(DefaultImmutableSet.nil().add(Q), R.extendsSorts());
@@ -202,7 +210,8 @@ public class TestDeclParser {
             fail("Expected an GenericSortException");
         } catch (Exception e) {
             System.out.println(e);
-            assertTrue(e.getMessage().contains("generic"), "Expected a GenericSortException");
+            String message = Objects.requireNonNull(e.getMessage(), "the exception has a message");
+            assertTrue(message.contains("generic"), "Expected a GenericSortException");
         }
     }
 
@@ -250,7 +259,8 @@ public class TestDeclParser {
                       aSort[][] f(aSort);
                     }
                     """);
-        Sort aSort = nss.sorts().lookup(new Name("aSort"));
+        Sort aSort = Objects
+                .requireNonNull(nss.sorts().lookup(new Name("aSort")), "sort aSort must exist");
         Sort objectSort = serv.getJavaInfo().objectSort();
         Sort cloneableSort = serv.getJavaInfo().cloneableSort();
         Sort serializableSort = serv.getJavaInfo().serializableSort();
@@ -285,40 +295,52 @@ public class TestDeclParser {
                 }
                 """);
 
-        Sort elem = nss.sorts().lookup(new Name("elem"));
+        Sort elem = Objects
+                .requireNonNull(nss.sorts().lookup(new Name("elem")), "sort elem must exist");
         Sort list = nss.sorts().lookup(new Name("list"));
 
         Sort objectSort = serv.getJavaInfo().objectSort();
         Sort cloneableSort = serv.getJavaInfo().cloneableSort();
         Sort serializableSort = serv.getJavaInfo().serializableSort();
 
-        assertEquals(new Name("head"), nss.functions().lookup(new Name("head")).name(),
-            "find head function");
-        assertEquals(1, nss.functions().lookup(new Name("head")).arity(), "head arity");
-        assertEquals(list, nss.functions().lookup(new Name("head")).argSort(0), "head arg sort 0");
-        assertEquals(elem, nss.functions().lookup(new Name("head")).sort(), "head return sort");
+        Function head = Objects
+                .requireNonNull(nss.functions().lookup(new Name("head")),
+                    "function head must exist");
+        assertEquals(new Name("head"), head.name(), "find head function");
+        assertEquals(1, head.arity(), "head arity");
+        assertEquals(list, head.argSort(0), "head arg sort 0");
+        assertEquals(elem, head.sort(), "head return sort");
 
-        assertEquals(new Name("tail"), nss.functions().lookup(new Name("tail")).name(),
-            "find tail function");
-        assertEquals(1, nss.functions().lookup(new Name("tail")).arity(), "tail arity");
-        assertEquals(list, nss.functions().lookup(new Name("tail")).argSort(0), "tail arg sort 0");
-        assertEquals(list, nss.functions().lookup(new Name("tail")).sort(), "tail return sort");
+        Function tail = Objects
+                .requireNonNull(nss.functions().lookup(new Name("tail")),
+                    "function tail must exist");
+        assertEquals(new Name("tail"), tail.name(), "find tail function");
+        assertEquals(1, tail.arity(), "tail arity");
+        assertEquals(list, tail.argSort(0), "tail arg sort 0");
+        assertEquals(list, tail.sort(), "tail return sort");
+        Function tailarray = Objects
+                .requireNonNull(nss.functions().lookup(new Name("tailarray")),
+                    "function tailarray must exist");
         assertEquals(ArraySort.getArraySort(elem, objectSort, cloneableSort, serializableSort),
-            nss.functions().lookup(new Name("tailarray")).argSort(0), "tailarray arg sort 0");
+            tailarray.argSort(0), "tailarray arg sort 0");
         assertEquals(ArraySort.getArraySort(elem, objectSort, cloneableSort, serializableSort),
-            nss.functions().lookup(new Name("tailarray")).sort(), "tailarray return sort");
+            tailarray.sort(), "tailarray return sort");
 
-        assertEquals(new Name("nil"), nss.functions().lookup(new Name("nil")).name(),
-            "find nil function");
-        assertEquals(0, nss.functions().lookup(new Name("nil")).arity(), "nil arity");
-        assertEquals(list, nss.functions().lookup(new Name("nil")).sort(), "nil return sort");
+        Function nil = Objects
+                .requireNonNull(nss.functions().lookup(new Name("nil")),
+                    "function nil must exist");
+        assertEquals(new Name("nil"), nil.name(), "find nil function");
+        assertEquals(0, nil.arity(), "nil arity");
+        assertEquals(list, nil.sort(), "nil return sort");
 
-        assertEquals(new Name("cons"), nss.functions().lookup(new Name("cons")).name(),
-            "find cons function");
-        assertEquals(2, nss.functions().lookup(new Name("cons")).arity(), "cons arity");
-        assertEquals(elem, nss.functions().lookup(new Name("cons")).argSort(0), "cons arg sort 0");
-        assertEquals(list, nss.functions().lookup(new Name("cons")).argSort(1), "cons arg sort 1");
-        assertEquals(list, nss.functions().lookup(new Name("cons")).sort(), "cons return sort");
+        Function cons = Objects
+                .requireNonNull(nss.functions().lookup(new Name("cons")),
+                    "function cons must exist");
+        assertEquals(new Name("cons"), cons.name(), "find cons function");
+        assertEquals(2, cons.arity(), "cons arity");
+        assertEquals(elem, cons.argSort(0), "cons arg sort 0");
+        assertEquals(list, cons.argSort(1), "cons arg sort 1");
+        assertEquals(list, cons.sort(), "cons return sort");
     }
 
     @Test
@@ -336,29 +358,29 @@ public class TestDeclParser {
         Sort list = nss.sorts().lookup(new Name("list"));
 
 
-        assertEquals(new Name("isEmpty"), nss.functions().lookup(new Name("isEmpty")).name(),
-            "find isEmpty predicate");
-        assertEquals(1, nss.functions().lookup(new Name("isEmpty")).arity(), "isEmpty arity");
-        assertEquals(list, nss.functions().lookup(new Name("isEmpty")).argSort(0),
-            "isEmpty arg sort 0");
-        assertEquals(JavaDLTheory.FORMULA, nss.functions().lookup(new Name("isEmpty")).sort(),
-            "isEmpty return sort");
+        Function isEmpty = Objects
+                .requireNonNull(nss.functions().lookup(new Name("isEmpty")),
+                    "predicate isEmpty must exist");
+        assertEquals(new Name("isEmpty"), isEmpty.name(), "find isEmpty predicate");
+        assertEquals(1, isEmpty.arity(), "isEmpty arity");
+        assertEquals(list, isEmpty.argSort(0), "isEmpty arg sort 0");
+        assertEquals(JavaDLTheory.FORMULA, isEmpty.sort(), "isEmpty return sort");
 
-        assertEquals(new Name("contains"), nss.functions().lookup(new Name("contains")).name(),
-            "find contains predicate");
-        assertEquals(2, nss.functions().lookup(new Name("contains")).arity(), "contains arity");
-        assertEquals(list, nss.functions().lookup(new Name("contains")).argSort(0),
-            "contains arg sort 0");
-        assertEquals(elem, nss.functions().lookup(new Name("contains")).argSort(1),
-            "contains arg sort 1");
-        assertEquals(JavaDLTheory.FORMULA, nss.functions().lookup(new Name("contains")).sort(),
-            "contains return sort");
+        Function contains = Objects
+                .requireNonNull(nss.functions().lookup(new Name("contains")),
+                    "predicate contains must exist");
+        assertEquals(new Name("contains"), contains.name(), "find contains predicate");
+        assertEquals(2, contains.arity(), "contains arity");
+        assertEquals(list, contains.argSort(0), "contains arg sort 0");
+        assertEquals(elem, contains.argSort(1), "contains arg sort 1");
+        assertEquals(JavaDLTheory.FORMULA, contains.sort(), "contains return sort");
 
-        assertEquals(new Name("maybe"), nss.functions().lookup(new Name("maybe")).name(),
-            "find maybe predicate");
-        assertEquals(0, nss.functions().lookup(new Name("maybe")).arity(), "maybe arity");
-        assertEquals(JavaDLTheory.FORMULA, nss.functions().lookup(new Name("maybe")).sort(),
-            "maybe return sort");
+        Function maybe = Objects
+                .requireNonNull(nss.functions().lookup(new Name("maybe")),
+                    "predicate maybe must exist");
+        assertEquals(new Name("maybe"), maybe.name(), "find maybe predicate");
+        assertEquals(0, maybe.arity(), "maybe arity");
+        assertEquals(JavaDLTheory.FORMULA, maybe.sort(), "maybe return sort");
     }
 
     @Test
@@ -371,24 +393,32 @@ public class TestDeclParser {
         Sort elem = nss.sorts().lookup(new Name("elem"));
         Sort list = nss.sorts().lookup(new Name("list"));
 
-        Namespace<SchemaVariable> variables = parsedSchemaVars;
+        Namespace<SchemaVariable> variables = Objects
+                .requireNonNull(parsedSchemaVars, "the schema variables must have been parsed");
 
-        assertEquals(new Name("x"), variables.lookup(new Name("x")).name(), "find SV x");
-        assertTermSV("SV x type", variables.lookup(new Name("x")));
-        assertEquals(elem, ((TermSV) variables.lookup(new Name("x"))).sort(), "SV x sort");
+        SchemaVariable x =
+            Objects.requireNonNull(variables.lookup(new Name("x")), "SV x must exist");
+        assertEquals(new Name("x"), x.name(), "find SV x");
+        assertTermSV("SV x type", x);
+        assertEquals(elem, ((TermSV) x).sort(), "SV x sort");
 
-        assertEquals(new Name("y"), variables.lookup(new Name("y")).name(), "find SV ");
-        assertTermSV("SV y type", variables.lookup(new Name("y")));
-        assertEquals(elem, ((TermSV) variables.lookup(new Name("y"))).sort(), "SV y sort");
+        SchemaVariable y =
+            Objects.requireNonNull(variables.lookup(new Name("y")), "SV y must exist");
+        assertEquals(new Name("y"), y.name(), "find SV ");
+        assertTermSV("SV y type", y);
+        assertEquals(elem, ((TermSV) y).sort(), "SV y sort");
 
-        assertEquals(new Name("lv"), variables.lookup(new Name("lv")).name(), "find SV ");
-        assertVariableSV("SV lv type", variables.lookup(new Name("lv")));
-        assertEquals(list, ((VariableSV) variables.lookup(new Name("lv"))).sort(), "SV lv sort");
+        SchemaVariable lv =
+            Objects.requireNonNull(variables.lookup(new Name("lv")), "SV lv must exist");
+        assertEquals(new Name("lv"), lv.name(), "find SV ");
+        assertVariableSV("SV lv type", lv);
+        assertEquals(list, ((VariableSV) lv).sort(), "SV lv sort");
 
-        assertEquals(new Name("b"), variables.lookup(new Name("b")).name(), "find SV ");
-        assertFormulaSV("SV b type", variables.lookup(new Name("b")));
-        assertEquals(JavaDLTheory.FORMULA, ((FormulaSV) variables.lookup(new Name("b"))).sort(),
-            "SV b sort");
+        SchemaVariable b =
+            Objects.requireNonNull(variables.lookup(new Name("b")), "SV b must exist");
+        assertEquals(new Name("b"), b.name(), "find SV ");
+        assertFormulaSV("SV b type", b);
+        assertEquals(JavaDLTheory.FORMULA, ((FormulaSV) b).sort(), "SV b sort");
     }
 
 
@@ -416,9 +446,13 @@ public class TestDeclParser {
     @Test
     public void testHeurDecl() {
         evaluateDeclarations("\\heuristicsDecl { bool; shoot_foot; }");
-        assertEquals(new Name("bool"), nss.ruleSets().lookup(new Name("bool")).name(),
-            "find heuristic bool");
-        assertEquals(new Name("shoot_foot"), nss.ruleSets().lookup(new Name("shoot_foot")).name(),
-            "find heuristic shoot_foot");
+        var bool = Objects
+                .requireNonNull(nss.ruleSets().lookup(new Name("bool")),
+                    "rule set bool must exist");
+        assertEquals(new Name("bool"), bool.name(), "find heuristic bool");
+        var shootFoot = Objects
+                .requireNonNull(nss.ruleSets().lookup(new Name("shoot_foot")),
+                    "rule set shoot_foot must exist");
+        assertEquals(new Name("shoot_foot"), shootFoot.name(), "find heuristic shoot_foot");
     }
 }

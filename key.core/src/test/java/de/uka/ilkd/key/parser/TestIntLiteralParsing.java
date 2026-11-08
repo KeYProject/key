@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.parser;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -149,13 +150,19 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
 
 
     private final JmlIO jio;
-    private static KeYJavaType containerType;
-    private static LocationVariable self;
+    // created per instance in the constructor and only used there
+    private KeYJavaType containerType;
+    private LocationVariable self;
 
     public TestIntLiteralParsing() {
-        containerType = services.getJavaInfo().getKeYJavaType("testTermParserHeap.A");
-        self = (LocationVariable) services.getJavaInfo().getCanonicalFieldProgramVariable("next",
-            containerType);
+        containerType = Objects
+                .requireNonNull(services.getJavaInfo().getKeYJavaType("testTermParserHeap.A"),
+                    "the test class type must exist");
+        self = Objects
+                .requireNonNull(
+                    (LocationVariable) services.getJavaInfo()
+                            .getCanonicalFieldProgramVariable("next", containerType),
+                    "the self field program variable must exist");
         jio = new JmlIO(getServices()).classType(containerType)
                 .specMathMode(SpecMathMode.BIGINT).selfVar(self);
     }
@@ -206,7 +213,11 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     public Stream<DynamicTest> testIntRange() {
         return Arrays.stream(INTRANGESTRINGS).map(it -> DynamicTest.dynamicTest(it, () -> {
             RuntimeException ex = assertThrows(RuntimeException.class, () -> parseTerm(it));
-            assertTrue(ex.getCause().getMessage().startsWith("Number constant out of bounds"));
+            Throwable cause =
+                Objects.requireNonNull(ex.getCause(), "the exception has a cause");
+            String message =
+                Objects.requireNonNull(cause.getMessage(), "the cause has a message");
+            assertTrue(message.startsWith("Number constant out of bounds"));
         }));
     }
 
@@ -218,7 +229,11 @@ public class TestIntLiteralParsing extends AbstractTestTermParser {
     public Stream<DynamicTest> testLongRange() {
         return Arrays.stream(LONGRANGESTRINGS).map(it -> DynamicTest.dynamicTest(it, () -> {
             RuntimeException ex = assertThrows(RuntimeException.class, () -> parseTerm(it));
-            assertTrue(ex.getCause().getMessage().startsWith("Number constant out of bounds"));
+            Throwable cause =
+                Objects.requireNonNull(ex.getCause(), "the exception has a cause");
+            String message =
+                Objects.requireNonNull(cause.getMessage(), "the cause has a message");
+            assertTrue(message.startsWith("Number constant out of bounds"));
         }));
     }
 }
