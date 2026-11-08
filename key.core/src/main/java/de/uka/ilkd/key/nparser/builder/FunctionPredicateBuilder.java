@@ -53,7 +53,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitFile(JavaKeYParser.FileContext ctx) {
         return accept(ctx.decls());
@@ -63,7 +63,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapMapOf(ctx.pred_decls(), ctx.func_decls(), ctx.transform_decls(), ctx.datatype_decls());
@@ -73,10 +73,11 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
     /**
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key. The
-     * parametric sort of a declared polymorphic datatype is guaranteed to be registered (asserted
-     * on access); the dereference is suppressed with a scoped key.
+     * parametric sort of a declared polymorphic datatype is guaranteed to be registered and is
+     * enforced non-null with an explicit check below.
      */
-    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable",
+        "NullAway" })
     @Override
     public @Nullable Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
         // weigl: all datatypes are free ==> functions are unique!
@@ -87,8 +88,9 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
         ImmutableList<GenericParameter> genericParams;
         if (sorts().lookup(ctx.name.getText()) == null) {
             // Is polymorphic
-            var psd = namespaces().parametricSorts().lookup(ctx.name.getText());
-            assert psd != null;
+            var psd = Objects.requireNonNull(
+                namespaces().parametricSorts().lookup(ctx.name.getText()),
+                "a polymorphic datatype sort must be registered");
             genericParams = psd.getParameters();
             ImmutableList<GenericArgument> args = ImmutableList.of();
             for (int i = psd.getParameters().size() - 1; i >= 0; i--) {
@@ -172,9 +174,10 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key. The sort
      * of a declared predicate parameter is guaranteed to be resolvable (asserted on access); the
-     * dereference is suppressed with a scoped key.
+     * dereference is suppressed with scoped keys.
      */
-    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable",
+        "NullAway" })
     @Override
     public @Nullable Object visitPred_decl(JavaKeYParser.Pred_declContext ctx) {
         String pred_name = accept(ctx.funcpred_name());
@@ -234,9 +237,10 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key. The return
      * sort of a declared function is guaranteed to be resolvable (asserted on access); the
-     * dereference is suppressed with a scoped key.
+     * dereference is suppressed with scoped keys.
      */
-    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable",
+        "NullAway" })
     @Override
     public @Nullable Object visitFunc_decl(JavaKeYParser.Func_declContext ctx) {
         boolean unique = ctx.UNIQUE() != null;
@@ -303,7 +307,7 @@ public class FunctionPredicateBuilder extends DefaultBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitTransform_decl(JavaKeYParser.Transform_declContext ctx) {
         Sort retSort = Objects.requireNonNull(

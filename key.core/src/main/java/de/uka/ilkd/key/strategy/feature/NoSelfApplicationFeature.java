@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -44,7 +46,7 @@ public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
                 : "NoSelfApplicationFeature: Need to know the equation the taclet is used with";
 
         boolean noSelfApplication = true;
-        for (var assumesInstantiation : assumesInstantiations) {
+        for (var assumesInstantiation : Objects.requireNonNull(assumesInstantiations)) {
             noSelfApplication =
                 noSelfApplication
                         && assumesInstantiation.getSequentFormula() != pos.sequentFormula();

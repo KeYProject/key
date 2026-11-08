@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NullMarked;
@@ -32,9 +34,10 @@ class UninstantiatedNoPosTacletApp extends NoPosTacletApp {
      * PosInOccurrence, de.uka.ilkd.key.java.Services, de.uka.ilkd.key.logic.Constraint)
      */
     @Override
-    protected @Nullable MatchConditions setupMatchConditions(PosInOccurrence pos) {
+    protected @Nullable MatchConditions setupMatchConditions(@Nullable PosInOccurrence pos) {
         if (taclet() instanceof RewriteTaclet) {
-            return ((RewriteTaclet) taclet()).checkPrefix(pos,
+            return ((RewriteTaclet) taclet()).checkPrefix(
+                Objects.requireNonNull(pos, "rewrite taclet requires the position"),
                 MatchConditions.EMPTY_MATCHCONDITIONS);
         }
 

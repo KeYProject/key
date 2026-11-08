@@ -144,7 +144,7 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
          *         implementation may legitimately return {@code null}; the difference is suppressed
          *         with a scoped key.
          */
-        @SuppressWarnings("nullness:override.return.invalid")
+        @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
         @Override
         public @Nullable SequentFormula get(int idx) {
             return null;
@@ -156,7 +156,7 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
          *         implementation may legitimately return {@code null}; the difference is suppressed
          *         with a scoped key.
          */
-        @SuppressWarnings("nullness:override.return.invalid")
+        @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
         @Override
         public @Nullable SequentFormula getFirst() {
             return null;

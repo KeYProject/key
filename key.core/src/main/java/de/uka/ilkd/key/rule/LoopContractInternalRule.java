@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -96,8 +97,8 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
      * @param services services.
      * @return the preconditions.
      */
-    private static JTerm[] createPreconditions(final JTerm selfTerm, final LoopContract contract,
-            final List<LocationVariable> heaps,
+    private static JTerm[] createPreconditions(final @Nullable JTerm selfTerm,
+            final LoopContract contract, final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
@@ -146,7 +147,7 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
      *        * @return the postconditions for the next loop iteration.
      */
     private static JTerm[] createPostconditionsNext(
-            final JTerm selfTerm,
+            final @Nullable JTerm selfTerm,
             final LoopContract contract,
             final List<LocationVariable> heaps,
             final LoopContract.Variables nextVariables,
@@ -226,8 +227,8 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
      * @param contract the contract being applied.
      * @return the variables for both the current and the next loop iteration.
      */
-    private static AuxiliaryContract.Variables[] createVars(final Goal goal, final JTerm selfTerm,
-            final LoopContract contract) {
+    private static AuxiliaryContract.Variables[] createVars(final Goal goal,
+            final @Nullable JTerm selfTerm, final LoopContract contract) {
         final LoopContract.Variables variables =
             new VariablesCreatorAndRegistrar(goal, contract.getPlaceholderVariables())
                     .createAndRegister(selfTerm, true);
@@ -264,11 +265,16 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public LoopContractInternalBuiltInRuleApp createApp(final PosInOccurrence occurrence,
+    public LoopContractInternalBuiltInRuleApp createApp(final @Nullable PosInOccurrence occurrence,
             TermServices services) {
-        return new LoopContractInternalBuiltInRuleApp(this, occurrence);
+        return new LoopContractInternalBuiltInRuleApp(this,
+            Objects.requireNonNull(occurrence, "rule application needs a position"));
     }
 
+    // The self term is absent for static methods: {@code setInstantiationSelf} (in the
+    // out-of-scope speclang package) stores it as-is (the conditions builders null-check it), and
+    // {@code termify} keeps it as the @Nullable AuxiliaryContract.Terms.self.
+    @SuppressWarnings("NullAway")
     @Override
     public ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
@@ -276,9 +282,12 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
         LoopContractInternalBuiltInRuleApp application =
             (LoopContractInternalBuiltInRuleApp) ruleApp;
 
-        final Instantiation instantiation =
-            instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
-        LoopContract contract = application.getContract();
+        final PosInOccurrence pio = Objects.requireNonNull(application.posInOccurrence(),
+            "loop contract app requires an occurrence");
+        final Instantiation instantiation = Objects.requireNonNull(
+            instantiate((JTerm) pio.subTerm(), goal), "no loop instantiation");
+        LoopContract contract = Objects.requireNonNull(application.getContract(),
+            "no loop contract set for rule application");
 
         assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement())
                 || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement());
@@ -287,7 +296,8 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
         contract = contract.replaceEnhancedForVariables(contract.getBlock(), services);
         contract.setInstantiationSelf(instantiation.self());
 
-        final List<LocationVariable> heaps = application.getHeapContext();
+        final List<LocationVariable> heaps = Objects.requireNonNull(application.getHeapContext(),
+            "no heap context for rule application");
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
@@ -331,8 +341,12 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
         configurator.setUpPreconditionGoal(result.tail().head(), updates[0], assumptions);
         configurator.setUpUsageGoal(result.head(), updates,
             ArrayUtil.add(usageAssumptions, freePostcondition));
-        final LocationVariable exceptionParameter =
-            createLocalVariable("e", vars[0].exception.getTypeReference(), services);
+        final LocationVariable exceptionParameter = createLocalVariable("e",
+            Objects.requireNonNull(vars[0].exception.getTypeReference(),
+                "no type reference for exception variable"),
+            services);
+        // termify stores the (possibly absent) self term into AuxiliaryContract.Terms.self, which
+        // is @Nullable; see the method-level suppression above.
         configurator.setUpLoopValidityGoal(goal, contract, context, updates[1],
             nextRemembranceUpdate, anonOutHeaps, modifiableClauses,
             freeModifiableClauses,

@@ -16,6 +16,7 @@ import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -40,7 +41,8 @@ public final class IsThisReference extends VariableConditionAdapter {
 
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            SVInstantiations instMap,
             Services services) {
         if (var != this.var) {
             return true;

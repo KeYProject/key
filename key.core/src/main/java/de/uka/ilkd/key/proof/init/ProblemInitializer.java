@@ -236,7 +236,7 @@ public final class ProblemInitializer {
      * {@code null}; the dereference of the (nullable) file-name path is suppressed with a scoped
      * key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private Collection<Path> getClasses(Path javaRoot) throws ProofInputException {
         if (Files.isDirectory(javaRoot)) {
             try (var walker = Files.walk(javaRoot)) {
@@ -259,7 +259,7 @@ public final class ProblemInitializer {
      * The included files are regular files whose file name is never {@code null}; the dereference
      * of the (nullable) file-name path is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void readJava(EnvInput envInput, InitConfig initConfig) throws ProofInputException {
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
@@ -409,7 +409,7 @@ public final class ProblemInitializer {
      * Every opened proof has a root node; the dereference of the (nullable) root node is
      * suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void populateNamespaces(Proof proof) {
         final NamespaceSet namespaces = proof.getNamespaces();
         final Goal rootGoal = proof.openGoals().head();
@@ -440,7 +440,7 @@ public final class ProblemInitializer {
      *         (nullable)
      *         init configs and the profile are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void setUpProofHelper(ProofOblInput problem, @Nullable ProofAggregate pl)
             throws ProofInputException {
         if (pl == null) {
@@ -531,7 +531,7 @@ public final class ProblemInitializer {
      * The profile of the created init config is always set; the dereference of the (nullable)
      * profile is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
         progressStarted(this);
         alreadyParsed.clear();
@@ -676,7 +676,7 @@ public final class ProblemInitializer {
      *         retrieval is
      *         an internal check); the dereference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
             throws ProofInputException {
         // create initConfig
@@ -742,7 +742,7 @@ public final class ProblemInitializer {
      *         dereference of
      *         the (nullable) aggregate is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
             throws ProofInputException {
         progressStarted(this);

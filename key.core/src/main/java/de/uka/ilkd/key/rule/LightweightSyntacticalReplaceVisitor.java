@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
 import java.util.Stack;
 
 import de.uka.ilkd.key.java.*;
@@ -99,13 +100,16 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
                 new StatementBlock(csb.getBody()), // TODO
                 services, svInst);
             trans.start();
-            result = addContext((StatementBlock) trans.result());
+            result = addContext(Objects.requireNonNull((StatementBlock) trans.result(),
+                "program replacement produced no result"));
         } else {
             trans = new ProgramReplaceVisitor(jb.program(), services, svInst);
             trans.start();
             result = trans.result();
         }
-        return (result == jb.program()) ? jb : JavaBlock.createJavaBlock((StatementBlock) result);
+        return (result == jb.program()) ? jb
+                : JavaBlock.createJavaBlock(Objects.requireNonNull((StatementBlock) result,
+                    "program replacement produced no result"));
     }
 
     private JTerm[] neededSubs(int n) {
@@ -154,7 +158,9 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
     private Operator instantiateModality(JModality op, JavaBlock jb) {
         JModality.JavaModalityKind kind = op.kind();
         if (op.kind() instanceof ModalOperatorSV) {
-            kind = (JModality.JavaModalityKind) svInst.getInstantiation(op.kind());
+            kind = Objects.requireNonNull(
+                (JModality.JavaModalityKind) svInst.getInstantiation(op.kind()),
+                "no modality kind instantiated for modal operator");
         }
         if (jb != op.programBlock() || kind != op.kind()) {
             return JModality.getModality(kind, jb);
@@ -175,7 +181,8 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
         }
         assert instantiatedOp != null;
 
-        return instantiatedOp;
+        return Objects.requireNonNull(instantiatedOp,
+            "schema variable was not (properly) instantiated");
     }
 
     private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(JTerm visited) {
@@ -217,7 +224,8 @@ public final class LightweightSyntacticalReplaceVisitor implements DefaultVisito
                 && svInst.isInstantiated(visitedSV)
                 && (!(visitedOp instanceof ProgramSV visitedPSV && visitedPSV.isListSV()))) {
             final JTerm newTerm = svInst.getTermInstantiation(visitedSV, services);
-            pushNew(newTerm);
+            pushNew(Objects.requireNonNull(newTerm,
+                "schema variable is instantiated but has no term instantiation"));
         } else {
             // instantiation of java block
             boolean jblockChanged = false;

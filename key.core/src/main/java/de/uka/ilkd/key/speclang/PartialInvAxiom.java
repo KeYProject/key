@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
@@ -119,7 +120,7 @@ public final class PartialInvAxiom extends ClassAxiom {
 
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return inv.getVisibility();
     }
 
@@ -136,18 +137,23 @@ public final class PartialInvAxiom extends ClassAxiom {
                 + (target.isStatic() ? "static " : "") + inv.getName() + (i == 0 ? "" : " EQ"));
 
             // create schema variables
-            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+            final HeapLDT heapLDT =
+                Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
             final List<TermSV> heapSVs = new LinkedList<>();
             for (int j = 0; j < HeapContext.getModifiableHeaps(services, false).size(); j++) {
                 heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + j),
                     heapLDT.targetSort(), false, false));
             }
             final var selfSV = target.isStatic() ? null
-                    : SchemaVariableFactory.createTermSV(new Name("self"), inv.getKJT().getSort());
+                    : SchemaVariableFactory.createTermSV(new Name("self"),
+                        Objects.requireNonNull(inv.getKJT().getSort(), "no sort"));
             final var eqSV = target.isStatic() ? null
                     : SchemaVariableFactory.createTermSV(new Name("EQ"),
                         services.getJavaInfo().objectSort());
 
+            @SuppressWarnings("NullAway") // static invariants legitimately pass null schema vars;
+                                          // the callees (TacletGenerator.generatePartialInvTaclet,
+                                          // ClassInvariant.getInv) accept null there
             ImmutableSet<Taclet> taclets = TG.generatePartialInvTaclet(name, heapSVs, selfSV, eqSV,
                 inv.getInv(selfSV, services), inv.getKJT(), toLimit, target.isStatic(),
                 inv.isFree(), i == 1, services);

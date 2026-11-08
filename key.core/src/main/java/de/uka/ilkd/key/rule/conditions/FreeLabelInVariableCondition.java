@@ -15,6 +15,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 @NullMarked
@@ -34,7 +35,8 @@ public final class FreeLabelInVariableCondition extends VariableConditionAdapter
 
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            SVInstantiations instMap,
             Services services) {
         Label prgLabel = null;
         ProgramElement program = null;

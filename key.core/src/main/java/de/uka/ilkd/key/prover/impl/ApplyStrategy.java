@@ -140,8 +140,9 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
 
         ProofTreeListener treeListener = prepareStrategy(proof, goals, maxSteps, timeout);
         ApplyStrategyInfo<Proof, Goal> result;
-        try (var ignored =
-            proof.setRuleAppIndexMode(proof.getActiveStrategy().getRuleAppIndexMode())) {
+        try (var ignored = proof.setRuleAppIndexMode(
+            Objects.requireNonNull(proof.getActiveStrategy(), "active strategy")
+                    .getRuleAppIndexMode())) {
             result = executeStrategy(treeListener);
         } catch (Exception e) { // should never be reached
             throw new RuntimeException(e);
@@ -179,16 +180,17 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
     @SuppressWarnings("nullness:dereference.of.nullable")
     private ApplyStrategyInfo<Proof, Goal> executeStrategy(ProofTreeListener treeListener) {
         assert proof != null;
+        final Proof proofNonNull = Objects.requireNonNull(proof, "proof");
 
         ProofListener pl = new ProofListener();
-        proof.addRuleAppListener(pl);
+        proofNonNull.addRuleAppListener(pl);
         ApplyStrategyInfo<Proof, Goal> result;
         try {
             result = doWork(Objects.requireNonNull(goalChooser),
                 Objects.requireNonNull(stopCondition));
         } finally {
-            proof.removeProofTreeListener(treeListener);
-            proof.removeRuleAppListener(pl);
+            proofNonNull.removeProofTreeListener(treeListener);
+            proofNonNull.removeRuleAppListener(pl);
             setAutoModeActive(false);
         }
         return result;
@@ -204,8 +206,9 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
     @SuppressWarnings("nullness:dereference.of.nullable")
     private void finishStrategy(ApplyStrategyInfo<Proof, Goal> result) {
         assert result != null; // CS
-        proof.addAutoModeTime(result.getTime());
-        fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
+        final Proof proofNonNull = Objects.requireNonNull(proof, "proof");
+        proofNonNull.addAutoModeTime(result.getTime());
+        fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proofNonNull, result.getTime(),
             result.getNumberOfAppliedRuleApps(), result.getNumberOfClosedGoals()));
     }
 
@@ -239,7 +242,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
         // Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
         if (app == null) {
             goal.ruleAppIndex().scanBuiltInRules(goal);
-            app = goal.getRuleAppManager().next();
+            app = Objects.requireNonNull(goal.getRuleAppManager(), "rule app manager").next();
         }
         // <-------
         return app;
@@ -263,7 +266,8 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
                 getGoalChooserForProof(rai.getOriginalNode().proof());
             synchronized (goalChooser) {
                 // reverse just to keep old order
-                goalChooser.updateGoalList(rai.getOriginalNode(), e.getNewGoals().reverse());
+                goalChooser.updateGoalList(rai.getOriginalNode(),
+                    Objects.requireNonNull(e.getNewGoals(), "new goals").reverse());
             }
         }
     }
@@ -285,7 +289,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
      * Resetting it is the canonical monotonic release pattern and is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "nullness:assignment.type.incompatible", "NullAway" })
     public void clear() {
         final GoalChooser<Proof, Goal> goalChooser = getGoalChooserForProof(proof);
         proof = null;

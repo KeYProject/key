@@ -78,7 +78,7 @@ public final class InnerNodeView extends SequentView implements ProofDisposedLis
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
         "nullness:method.invocation.invalid", "nullness:argument.type.incompatible",
-        "nullness:assignment.type.incompatible" })
+        "nullness:assignment.type.incompatible", "NullAway" })
     public InnerNodeView(Proof proof, Node node, @Nullable RuleApp ruleApp,
             Sequent sequent,
             MainWindow mainWindow) {

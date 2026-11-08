@@ -19,6 +19,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.NullMarked;
 
 
@@ -52,7 +53,7 @@ public class NoFindTaclet extends Taclet {
      *        callee; the call is therefore suppressed.
      *        </p>
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public NoFindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
@@ -70,6 +71,7 @@ public class NoFindTaclet extends Taclet {
      */
     @SuppressWarnings("nullness:override.receiver.invalid")
     @Override
+    @EnsuresNonNull("executor")
     protected void createAndInitializeExecutor() {
         executor = new NoFindTacletExecutor(this);
     }

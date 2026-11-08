@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
@@ -66,10 +67,13 @@ public abstract class AbstractBlockContractBuiltInRuleApp<T extends BuiltInRule>
             return this;
         }
         final Services services = goal.proof().getServices();
-        final AbstractBlockContractRule.Instantiation instantiation =
-            rule.instantiate((JTerm) posInOccurrence().subTerm(), goal);
-        final ImmutableSet<BlockContract> contracts =
-            AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services);
+        final JTerm posTerm = (JTerm) Objects.requireNonNull(posInOccurrence(),
+            "block contract app requires an occurrence").subTerm();
+        final AbstractBlockContractRule.Instantiation instantiation = Objects.requireNonNull(
+            rule.instantiate(posTerm, goal), "no instantiation for block contract");
+        final ImmutableSet<BlockContract> contracts = Objects.requireNonNull(
+            AbstractBlockContractRule.getApplicableContracts(instantiation, goal, services),
+            "no applicable contracts for block contract");
         setStatement(instantiation.statement());
         ImmutableSet<BlockContract> cons = DefaultImmutableSet.nil();
         for (BlockContract cont : contracts) {

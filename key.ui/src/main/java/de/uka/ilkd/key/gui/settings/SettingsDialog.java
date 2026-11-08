@@ -45,7 +45,7 @@ public class SettingsDialog extends JDialog {
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
         "nullness:method.invocation.invalid", "nullness:assignment.type.incompatible",
-        "nullness:argument.type.incompatible" })
+        "nullness:argument.type.incompatible", "NullAway" })
     public SettingsDialog(MainWindow owner) {
         super(owner, Dialog.ModalityType.TOOLKIT_MODAL);
         setTitle("Settings");

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -58,7 +59,8 @@ public abstract class SMTBeautifier {
             if (head != null) {
                 return head;
             } else {
-                return children.toString();
+                // an element without a head always carries children (see parseParen)
+                return Objects.requireNonNull(children, "children").toString();
             }
         }
 
@@ -187,7 +189,9 @@ public abstract class SMTBeautifier {
             StringBuilder sb = new StringBuilder("(");
             boolean oneLine = (element.length() < lineLength) && !element.hasComments();
             boolean first = true;
-            for (Element child : element.children) {
+            // an element without a head always carries children (see parseParen)
+            List<Element> children = Objects.requireNonNull(element.children, "children");
+            for (Element child : children) {
                 if (first) {
                     first = false;
                 } else {

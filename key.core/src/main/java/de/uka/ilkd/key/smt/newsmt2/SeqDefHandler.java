@@ -60,14 +60,16 @@ public class SeqDefHandler implements SMTHandler {
     @Override
     public void init(MasterHandler masterHandler, Services services,
             @Nullable Properties handlerSnippets, String[] handlerOptions) {
-        enabled = !HandlerUtil.PROPERTY_NOBINDERS.get(masterHandler.getTranslationState());
+        enabled = !Objects.requireNonNull(
+            HandlerUtil.PROPERTY_NOBINDERS.get(masterHandler.getTranslationState()),
+            "nobinders property");
         seqLDT = services.getTypeConverter().getSeqLDT();
         termFactory = services.getTermFactory();
     }
 
     @Override
     public boolean canHandle(Operator op) {
-        return enabled && op == seqLDT.getSeqDef();
+        return enabled && op == Objects.requireNonNull(seqLDT, "seq LDT").getSeqDef();
     }
 
     @Override
@@ -200,7 +202,8 @@ public class SeqDefHandler implements SMTHandler {
 
     private SExpr makeTyping(String name, Set<ParsableVariable> vars, MasterHandler master)
             throws SMTTranslationException {
-        return HandlerUtil.funTypeAxiom(name, vars.size(), seqLDT.targetSort(), master);
+        return HandlerUtil.funTypeAxiom(name, vars.size(),
+            Objects.requireNonNull(seqLDT, "seq LDT").targetSort(), master);
     }
 
     private SExpr makeFunctionDeclaration(String name, Set<ParsableVariable> vars) {
@@ -224,8 +227,8 @@ public class SeqDefHandler implements SMTHandler {
             throws SMTTranslationException {
         List<SExpr> args = new ArrayList<>();
         for (ParsableVariable var : vars) {
-            SExpr ref =
-                trans.translate(termFactory.createTerm((Operator) var));
+            SExpr ref = trans.translate(
+                Objects.requireNonNull(termFactory, "term factory").createTerm((Operator) var));
             args.add(SExprs.coerce(ref, Type.UNIVERSE));
         }
         return new SExpr(name, Type.UNIVERSE, args);

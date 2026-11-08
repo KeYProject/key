@@ -164,7 +164,7 @@ public class DelayedCutProcessor implements Runnable {
      *         dereference of the (nullable) goal returned by the lookup is suppressed with a scoped
      *         key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private ImmutableList<Goal> cut(DelayedCut cut) {
         Goal goal = find(cut.getProof(), cut.getNode());
 
@@ -236,7 +236,7 @@ public class DelayedCutProcessor implements Runnable {
      * The branch label of a cut goal's node is always present; the dereference of the (nullable)
      * node annotation is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private int getGoalForHiding(ImmutableList<Goal> goals, DelayedCut cut) {
         assert goals.size() == 2;
         Goal[] goal = { goals.head(), goals.tail().head() };
@@ -313,7 +313,7 @@ public class DelayedCutProcessor implements Runnable {
      *         present;
      *         the dereference of the (nullable) instantiation is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private LinkedList<Goal> apply(Goal goal, @Nullable RuleApp app, TermServices services) {
         if (app instanceof TacletApp tapp) {
             final SVInstantiations insts = tapp.instantiations();
@@ -475,7 +475,7 @@ public class DelayedCutProcessor implements Runnable {
      * The application of the hide rule on an uncovered goal always yields a goal; the dereference
      * of the (nullable) application result is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void uncoverDecisionPredicate(DelayedCut cut, List<NodeGoalPair> openLeaves) {
         ImmutableList<NodeGoalPair> list = ImmutableList.nil();
         for (NodeGoalPair pair : openLeaves) {

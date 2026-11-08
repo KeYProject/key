@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JModality;
@@ -79,7 +81,7 @@ class TwoSidedMatching {
 
     private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
-        Substitution sub = match(triggerWithMVs, target, services);
+        Substitution sub = match(Objects.requireNonNull(triggerWithMVs), target, services);
         if (sub != null
                 && (trigger.isElementOfMultitrigger() || sub.isTotalOn(trigger.getUniVariables())
                 // sub.containFreevar(trigger.ts.allTerm.
@@ -106,7 +108,8 @@ class TwoSidedMatching {
             for (QuantifiableVariable quantifiableVariable : trigger.getUniVariables()) {
                 QuantifiableVariable q = quantifiableVariable;
                 Term mv = triggerSubstWithMVs.getSubstitutedTerm(q);
-                Term t = c.getInstantiation((Metavariable) (mv.op()), services);
+                Term t = c.getInstantiation((Metavariable) (Objects.requireNonNull(mv).op()),
+                    services);
                 if (t == null || t.op() instanceof Metavariable) {
                     return null;
                 }

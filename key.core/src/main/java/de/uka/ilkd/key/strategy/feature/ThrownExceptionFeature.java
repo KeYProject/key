@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -75,14 +76,18 @@ public class ThrownExceptionFeature extends BinaryFeature {
             PosInOccurrence pos, Goal goal, MutableState mState) {
         return app instanceof TacletApp tacletApp
                 && filter((JTerm) pos.subTerm(), (Services) goal.proof().getServices(),
-                    tacletApp.instantiations().getExecutionContext());
+                    Objects.requireNonNull(tacletApp.instantiations().getExecutionContext()));
     }
 
     protected boolean filter(JTerm term, Services services, ExecutionContext ec) {
         if (term.op() instanceof JModality) {
             final ProgramElement fstActive = getFirstExecutableStatement(term);
             return fstActive instanceof Throw fstThrow && blockedExceptions(
-                fstThrow.getExpressionAt(0).getKeYJavaType(services, ec).getSort());
+                Objects.requireNonNull(
+                    Objects.requireNonNull(
+                        fstThrow.getExpressionAt(0).getKeYJavaType(services, ec))
+                            .getSort(),
+                    "no sort for thrown type"));
         }
         return false;
     }

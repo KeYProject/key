@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.TermLabelSV;
@@ -16,6 +18,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This variable condition checks if an instantiation for term labels contains a specific term
@@ -37,10 +40,13 @@ public class TermLabelCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            SVInstantiations instMap,
             Services services) {
         assert instMap.getInstantiation(l) instanceof ImmutableArray<?>;
-        ImmutableArray<?> tInsts = (ImmutableArray<?>) instMap.getInstantiation(l);
+        ImmutableArray<?> tInsts =
+            Objects.requireNonNull((ImmutableArray<?>) instMap.getInstantiation(l),
+                "no label instantiation of " + l);
         boolean hasLabel = hasLabel(tInsts, ln);
         return negated != hasLabel;
     }

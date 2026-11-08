@@ -41,7 +41,7 @@ public abstract class SequentialOnLastGoalProofMacro extends SequentialProofMacr
      *
      * @throws InterruptedException if one of the wrapped macros is interrupted.
      */
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,

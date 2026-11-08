@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termfeature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.LogicServices;
@@ -39,6 +41,7 @@ public class EqTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term term, MutableState mState, LogicServices services) {
-        return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, pattern.getContent(mState));
+        return RENAMING_TERM_PROPERTY.equalsModThisProperty(term,
+            Objects.requireNonNull(pattern.getContent(mState)));
     }
 }

@@ -268,7 +268,7 @@ public class KeYMediator {
      * {@code @NonNull} is only a caller-side contract this mediator historically violates on the
      * unload path, suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "nullness:argument.type.incompatible", "NullAway" })
     private static void setAutoSaverProof(AutoSaver saver, @Nullable Proof newProof) {
         saver.setProof(newProof);
     }

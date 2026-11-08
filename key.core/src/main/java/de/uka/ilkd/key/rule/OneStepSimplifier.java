@@ -417,6 +417,8 @@ public final class OneStepSimplifier implements BuiltInRule {
                 pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
             // TODO: pos.subTerm() == in should be true which is currently not the case (labels are
             // missing)
+            // The hint is intentionally null: instantiateLabels documents an "optional hint".
+            @SuppressWarnings("NullAway")
             ImmutableArray<TermLabel> labels =
                 TermLabelManager.instantiateLabels(new TermLabelState(), services, in, pos, this,
                     Objects.requireNonNull(ruleApp,

@@ -213,7 +213,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * type carries a KeY Java type; the dereference of the (nullable) array type's base type is
      * suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private ArrayInitializer visitArrayInitializerExpr(ArrayInitializerExpr n, KeYJavaType type) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
@@ -628,7 +628,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * (nullable) containing class is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public Object visit(ConstructorDeclaration n, Void arg) {
         boolean isInInterface = parentIsInterface(n);
         PositionInfo pi = createPositionInfo(n);
@@ -692,7 +692,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * non-null for the callers; the {@link #nameToLabel(Name)} delegate is nullable, hence the
      * difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     private Label nameToLabel(Optional<Name> label) {
         return nameToLabel(label.orElse(null));
     }
@@ -888,7 +888,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * The {@link KeYTypeConverter} may return {@code null} for unresolved types; the callers only
      * invoke this for resolved types, so the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     private KeYJavaType getCachedKeYJavaType(ResolvedType rtype) {
         return typeConverter.getKeYJavaType(rtype, true);
     }
@@ -897,7 +897,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * The {@link KeYTypeConverter} may return {@code null} for unresolved types; the callers only
      * invoke this for resolved types, so the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     private KeYJavaType getKeYJavaType(ResolvedType rtype) {
         return typeConverter.getKeYJavaType(rtype, false);
     }
@@ -1024,7 +1024,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * deliberately carries the null expression, so the check is suppressed with a scoped key.
      */
     private static Guard toForGuard(PositionInfo pi, @Nullable Object guard) {
-        @SuppressWarnings("nullness:argument.type.incompatible")
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
         Guard result = new Guard(pi, null, (Expression) guard);
         return result;
     }
@@ -1152,7 +1152,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * (nullable) containing class is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public Object visit(MethodDeclaration n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
@@ -1286,7 +1286,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * An anonymous class declaration has neither a name nor a fully qualified name; the null
      * arguments are deliberate (TypeDeclaration no-arg ctor precedent) and suppressed scoped.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private static ClassDeclaration anonymousClassDeclaration(PositionInfo pi, List<Comment> c,
             ImmutableArray<MemberDeclaration> bodies) {
         return new ClassDeclaration(pi, c, new ImmutableArray<>(), null, null, bodies, true, false,
@@ -1352,7 +1352,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * {@code catch (#t #v0)}) carry no concrete {@link KeYJavaType} at parse time; main stores
      * null in the specification and resolves the type at taclet instantiation.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private ParameterDeclaration visitNoMap(Parameter n) {
         ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> modifiers =
             map(n.getModifiers());
@@ -1399,7 +1399,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * TODO below) is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public Object visit(Name n, Void arg) {
         if (n.getIdentifier().startsWith("#")) {
             return lookupSchemaVariable(n.getIdentifier(), n);
@@ -1427,8 +1427,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    @SuppressWarnings("nullness:return.type.incompatible") // javaparser GenericVisitor contract:
-                                                           // may return null for missing dimensions
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" }) // javaparser
+                                                                           // GenericVisitor
+                                                                           // contract:
+    // may return null for missing dimensions
     public Object visit(ArrayCreationLevel n, Void arg) {
         return this.<Expression>accepto(n.getDimension());
     }
@@ -1620,7 +1622,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         // Schema variable declarations (e.g. "#typeof(#nse) #v0 = #nse;") carry no concrete
         // KeYJavaType at parse time; main stores null here and the type is resolved when the
         // taclet schema is instantiated. A requireNonNull here breaks all schematic taclets.
-        @SuppressWarnings("nullness:argument.type.incompatible")
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
         VariableSpecification specification =
             addToMapping(v, new VariableSpecification(pi, c, init, pv, 0, type.getKeYJavaType()));
         return specification;
@@ -1793,8 +1795,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    @SuppressWarnings("nullness:return.type.incompatible") // javaparser GenericVisitor contract:
-                                                           // unsupported modifiers yield null
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" }) // javaparser
+                                                                           // GenericVisitor
+                                                                           // contract:
+    // unsupported modifiers yield null
     public Object visit(Modifier n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
@@ -2114,7 +2118,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * the AST-guaranteed default. Scoped suppression of the deliberate null argument.
      */
     @Override
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public Object visit(KeyContextStatementBlock n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
@@ -2166,7 +2170,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * Scoped suppression of the deliberate null arguments.
      */
     @Override
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public Object visit(KeyMetaConstruct n, Void arg) {
         final String kind = n.getKind();
         final Class<? extends ProgramTransformer> transformer =

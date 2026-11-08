@@ -138,7 +138,7 @@ public final class PSeqLDT extends ParametricLDT {
     }
 
     @Override
-    public JTerm translateLiteral(Literal lit, Services services) {
+    public @Nullable JTerm translateLiteral(Literal lit, Services services) {
         return null;
     }
 
@@ -153,7 +153,7 @@ public final class PSeqLDT extends ParametricLDT {
     }
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         return null;
     }
 }

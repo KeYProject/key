@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.Dialog.ModalityType;
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import javax.swing.*;
@@ -147,10 +148,12 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
                 if (exec.command().startsWith("'echo ")) {
                     continue;
                 }
-                if (exec.location().getFileURI().isPresent()) {
-                    message.append(exec.location().getFileURI().get()).append(":");
+                var location =
+                    Objects.requireNonNull(exec.location(), "a script command has a location");
+                if (location.getFileURI().isPresent()) {
+                    message.append(location.getFileURI().get()).append(":");
                 }
-                message.append(exec.location().getPosition().line())
+                message.append(location.getPosition().line())
                         .append(": Executing on goal ").append(exec.nodeSerial()).append('\n')
                         .append(exec.command());
             }

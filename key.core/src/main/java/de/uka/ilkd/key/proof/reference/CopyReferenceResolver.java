@@ -33,7 +33,7 @@ public class CopyReferenceResolver {
      *        the
      *        (nullable) proof of the cache entry is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static void copyCachedGoals(
             Proof toComplete,
             @Nullable Proof referencedFrom,

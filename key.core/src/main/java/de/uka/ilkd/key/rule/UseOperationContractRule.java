@@ -270,7 +270,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         }
 
         // there must be applicable contracts for the operation
-        return getApplicableContracts(services, inst.pm, inst.staticType.getKeYJavaType(),
+        return getApplicableContracts(services, inst.pm,
+            Objects.requireNonNull(inst.staticType.getKeYJavaType(),
+                "no KeYJavaType for static type " + inst.staticType),
             inst.modality.kind());
     }
 
@@ -494,8 +496,10 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         // collect further information
         final TypeReference staticType = getStaticPrefixType(mr, services, ec);
         assert staticType != null;
+        final KeYJavaType staticKjt = Objects.requireNonNull(staticType.getKeYJavaType(),
+            "no KeYJavaType for static type " + staticType);
         final IProgramMethod pm = Objects.requireNonNull(
-            getProgramMethod(mr, staticType.getKeYJavaType(), ec, services),
+            getProgramMethod(mr, staticKjt, ec, services),
             "Getting program method failed.\nReference: " + mr + ", static type: " + staticType
                 + ", execution context: " + ec);
         final JTerm actualSelf = getActualSelf(mr, pm, ec, services);
@@ -534,7 +538,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
         // there must be applicable contracts for the operation
         final ImmutableSet<FunctionalOperationContract> contracts =
             getApplicableContracts(goal.proof().getServices(), inst.pm,
-                inst.staticType.getKeYJavaType(), inst.modality.kind());
+                Objects.requireNonNull(inst.staticType.getKeYJavaType(),
+                    "no KeYJavaType for static type " + inst.staticType),
+                inst.modality.kind());
         if (contracts.isEmpty()) {
             return false;
         }
@@ -906,7 +912,9 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
             excNull = tb.equals(tb.var(excVar), tb.NULL());
             excCreated = tb.created(tb.var(excVar));
-            freePost = getFreePost(heapContext, inst.pm, inst.staticType.getKeYJavaType(),
+            freePost = getFreePost(heapContext, inst.pm,
+                Objects.requireNonNull(inst.staticType.getKeYJavaType(),
+                    "no KeYJavaType for static type " + inst.staticType),
                 contractResult, contractSelf, atPres, freeSpecPost, services);
             freeExcPost = inst.pm.isConstructor() ? freePost : tb.tt();
             final JTerm anonAssumptionNonNull = Objects.requireNonNull(anonAssumption,

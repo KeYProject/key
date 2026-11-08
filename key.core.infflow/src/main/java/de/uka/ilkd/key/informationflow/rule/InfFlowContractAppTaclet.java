@@ -23,6 +23,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -83,6 +84,7 @@ public class InfFlowContractAppTaclet extends RewriteTaclet {
      */
     @SuppressWarnings("nullness:override.receiver.invalid")
     @Override
+    @EnsuresNonNull("executor")
     protected void createAndInitializeExecutor() {
         executor = new InfFlowContractAppTacletExecutor(this);
     }

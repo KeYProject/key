@@ -81,8 +81,10 @@ public class TermLabelMenu extends JMenu {
              */
             @Override
             public void selectedNodeChanged(KeYSelectionEvent<Node> e) {
-                Set<Name> labelNames =
-                    getOccuringTermLabels(mainWindow.getMediator().getSelectedNode().sequent());
+                Node selectedNode =
+                    Objects.requireNonNull(mainWindow.getMediator().getSelectedNode(),
+                        "a node is selected when the term label menu is updated");
+                Set<Name> labelNames = getOccuringTermLabels(selectedNode.sequent());
                 for (Entry<Name, TermLabelCheckBox> entry : checkBoxMap.entrySet()) {
                     TermLabelCheckBox checkBox = entry.getValue();
                     /*

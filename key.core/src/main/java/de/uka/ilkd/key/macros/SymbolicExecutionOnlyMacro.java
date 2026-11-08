@@ -144,7 +144,7 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
      * the special-cased rules; the dereferences of the (nullable) position are suppressed with a
      * scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static boolean isAdmittedRule(RuleApp ruleApp) {
         Rule rule = ruleApp.rule();
         String name = rule.name().toString();

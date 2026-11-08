@@ -14,6 +14,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -31,15 +32,16 @@ public final class DifferentFields extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            SVInstantiations instMap,
             Services services) {
 
         if (var == var1) {
             final Object inst2 = instMap.getInstantiation(var2);
-            return inst2 == null || checkHelp(instCandidate, inst2);
+            return inst2 == null || (instCandidate != null && checkHelp(instCandidate, inst2));
         } else if (var == var2) {
             final Object inst1 = instMap.getInstantiation(var1);
-            return inst1 == null || checkHelp(inst1, instCandidate);
+            return inst1 == null || (instCandidate != null && checkHelp(inst1, instCandidate));
         } else {
             return true;
         }

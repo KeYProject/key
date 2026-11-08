@@ -62,7 +62,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
      * {@link #init}); the dereference of the (nullable) proof field is suppressed with a scoped
      * key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
     protected ImmutableList<Goal> insertNewGoals(ImmutableList<Goal> newGoals,
             ImmutableList<Goal> prevGoalList) {
 

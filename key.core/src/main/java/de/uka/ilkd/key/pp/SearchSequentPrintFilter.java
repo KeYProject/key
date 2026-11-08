@@ -113,7 +113,7 @@ public abstract class SearchSequentPrintFilter extends SequentPrintFilter {
      *
      * @return a brand new shiny pattern
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     protected @Nullable Pattern createPattern() {
         try {
             return createPattern(this.searchString, this.regex);

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -45,7 +47,7 @@ public record SLParameters(ImmutableList<SLExpression> parameters) {
                     }
                 }
             }
-            result = result.append(type);
+            result = result.append(Objects.requireNonNull(type, "no parameter type"));
         }
         return result;
     }

@@ -913,7 +913,7 @@ public abstract class Notation {
          * The sub-terms of a well-formed string term are always present; the dereferences of the
          * (nullable) sub-terms are suppressed with a scoped key.
          */
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
         private String printStringTerm(JTerm t) {
             StringBuilder result = new StringBuilder("\"");
             JTerm term = t;

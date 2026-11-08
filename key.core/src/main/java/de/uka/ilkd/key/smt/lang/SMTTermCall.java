@@ -159,7 +159,7 @@ public class SMTTermCall extends SMTTerm {
      * of the (nullable) function id is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public boolean occurs(String id) {
         if (func.getId().equals(id)) {
             return true;
@@ -325,7 +325,7 @@ public class SMTTermCall extends SMTTerm {
      * of the (nullable) function id is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public int hashCode() {
         int ret = func.getId().hashCode();
         int base = 10;

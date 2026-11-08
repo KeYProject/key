@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.speclang.translation;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -42,7 +43,8 @@ public final class SLAttributeResolver extends SLExpressionResolver {
             KeYJavaType containingType) {
         assert containingType.getJavaType() instanceof TypeDeclaration
                 : "type %s is primitive, lookup for %s".formatted(containingType, name);
-        final TypeDeclaration td = (TypeDeclaration) containingType.getJavaType();
+        final TypeDeclaration td =
+            (TypeDeclaration) Objects.requireNonNull(containingType.getJavaType(), "no java type");
         // lookup locally
         for (MemberDeclaration md : td.getMembers()) {
             if (md instanceof FieldDeclaration && isVisible(md, containingType)) {
@@ -84,17 +86,21 @@ public final class SLAttributeResolver extends SLExpressionResolver {
             return null;
         }
 
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
 
-        JTerm recTerm = receiver.getTerm();
+        SLExpression recv = Objects.requireNonNull(receiver, "no receiver");
+        JTerm recTerm = recv.getTerm();
 
         // $inv and <inv_free> are special cases
         // (because they're predicates, not boolean attributes)
-        if (name.equals(PipelineConstants.IMPLICIT_OBJECT_INVARIANT) && receiver.isTerm()) {
-            return new SLExpression(services.getTermBuilder().inv(receiver.getTerm()));
+        if (name.equals(PipelineConstants.IMPLICIT_OBJECT_INVARIANT) && recv.isTerm()) {
+            return new SLExpression(services.getTermBuilder()
+                    .inv(Objects.requireNonNull(recTerm, "no receiver term")));
         }
-        if (name.equals(PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT) && receiver.isTerm()) {
-            return new SLExpression(services.getTermBuilder().invFree(receiver.getTerm()));
+        if (name.equals(PipelineConstants.IMPLICIT_OBJECT_FREE_INVARIANT) && recv.isTerm()) {
+            return new SLExpression(services.getTermBuilder()
+                    .invFree(Objects.requireNonNull(recTerm, "no receiver term")));
         }
 
 
@@ -104,7 +110,8 @@ public final class SLAttributeResolver extends SLExpressionResolver {
             attribute = javaInfo.getAttribute(name);
         } catch (IllegalArgumentException e) {
             // try as short name and in enclosing classes
-            KeYJavaType containingType = receiver.getType();
+            KeYJavaType containingType =
+                Objects.requireNonNull(recv.getType(), "no receiver type");
             while (attribute == null) {
                 attribute = lookupVisibleAttribute(name, containingType);
                 if (attribute == null) {
@@ -114,7 +121,8 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                 final LocationVariable et = (LocationVariable) javaInfo
                         .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
                 if (et != null && attribute == null) {
-                    containingType = et.getKeYJavaType();
+                    containingType =
+                        Objects.requireNonNull(et.getKeYJavaType(), "no enclosing-class type");
                     if (recTerm != null) {
                         final Function thisFieldSymbol =
                             heapLDT.getFieldSymbolForPV(et, services);
@@ -133,10 +141,12 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                     "Reference to non-static field without receiver: " + attribute.name());
             } else if (attribute instanceof ProgramConstant) {
                 return new SLExpression(services.getTermBuilder().var(attribute),
-                    attribute.getKeYJavaType());
+                    Objects.requireNonNull(attribute.getKeYJavaType(), "no attribute type"));
             } else if (attribute == javaInfo.getArrayLength()) {
-                return new SLExpression(services.getTermBuilder().dotLength(recTerm),
-                    attribute.getKeYJavaType());
+                return new SLExpression(
+                    services.getTermBuilder().dotLength(Objects.requireNonNull(recTerm,
+                        "no receiver term")),
+                    Objects.requireNonNull(attribute.getKeYJavaType(), "no attribute type"));
             } else {
                 try {
                     final Function fieldSymbol =
@@ -150,7 +160,8 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                             subs[j] = services.getTermBuilder().var(heaps.get(j));
                         }
                         if (!attribute.isStatic()) {
-                            subs[heaps.size()] = recTerm;
+                            subs[heaps.size()] =
+                                Objects.requireNonNull(recTerm, "no receiver term");
                         }
                         attributeTerm = services.getTermBuilder().func(fieldSymbol, subs);
                     } else if (attribute.isStatic()) {
@@ -163,12 +174,13 @@ public final class SLAttributeResolver extends SLExpressionResolver {
                         }
                     } else if (attribute.isFinal() && FinalHeapResolution.recallIsFinalEnabled()) {
                         attributeTerm = services.getTermBuilder().finalDot(attribute.sort(),
-                            recTerm, fieldSymbol);
+                            Objects.requireNonNull(recTerm, "no receiver term"), fieldSymbol);
                     } else {
-                        attributeTerm =
-                            services.getTermBuilder().dot(attribute.sort(), recTerm, fieldSymbol);
+                        attributeTerm = services.getTermBuilder().dot(attribute.sort(),
+                            Objects.requireNonNull(recTerm, "no receiver term"), fieldSymbol);
                     }
-                    return new SLExpression(attributeTerm, attribute.getKeYJavaType());
+                    return new SLExpression(attributeTerm,
+                        Objects.requireNonNull(attribute.getKeYJavaType(), "no attribute type"));
                 } catch (TermCreationException e) {
                     throw manager.excManager.createException(
                         "Wrong attribute reference \"" + name + "\": " + e.getMessage());

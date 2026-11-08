@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt;
 
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 import de.uka.ilkd.key.util.Debug;
 
@@ -41,7 +42,8 @@ public final class NumberTranslation {
             char ch = name.charAt(0);
             if (ch >= '0' && ch <= '9') {
                 Debug.assertTrue(term.arity() == 1);
-                return translate(term.sub(0)).multiply(smallInts[10]).add(smallInts[ch - '0']);
+                return Objects.requireNonNull(translate(term.sub(0)), "number")
+                        .multiply(smallInts[10]).add(smallInts[ch - '0']);
             } else if (ch == '#') {
                 Debug.assertTrue(term.arity() == 0);
                 return BigInteger.ZERO;
@@ -54,7 +56,7 @@ public final class NumberTranslation {
             /*
              * Hint: translate operator "neg" at all places correctly, e.g. neg(1(neg(1(#)))).
              */
-            return translate(term.sub(0)).negate();
+            return Objects.requireNonNull(translate(term.sub(0)), "number").negate();
         } else {
             Debug.fail("unknown number literal");
             return null; // not reached

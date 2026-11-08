@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
@@ -63,7 +64,8 @@ public class SVInstantiationCP implements Feature {
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos,
             Goal goal, MutableState mState) {
-        final BackTrackingManager manager = mState.getBacktrackingManager();
+        final BackTrackingManager manager =
+            Objects.requireNonNull(mState.getBacktrackingManager());
         manager.passChoicePoint(new CP(app, pos, (de.uka.ilkd.key.proof.Goal) goal, mState), this);
         return NumberRuleAppCost.getZeroCost();
     }
@@ -71,7 +73,7 @@ public class SVInstantiationCP implements Feature {
     private @Nullable SchemaVariable findSVWithName(TacletApp app) {
 
         if (svToInstantiate == null) {
-            return app.taclet().getTrigger().triggerVar();
+            return Objects.requireNonNull(app.taclet().getTrigger()).triggerVar();
         }
 
         final ImmutableSet<SchemaVariable> vars = app.uninstantiatedVars();
@@ -113,12 +115,11 @@ public class SVInstantiationCP implements Feature {
                     "Rule application must be a taclet application, but is " + oldApp);
             }
 
-            final SchemaVariable sv = findSVWithName(tapp);
+            final SchemaVariable sv = Objects.requireNonNull(findSVWithName(tapp));
             final Term instTerm = value.toTerm(app, pos, goal, mState);
-
-            final RuleApp newApp =
-                tapp.addCheckedInstantiation(sv, (JTerm) instTerm,
-                    goal.proof().getServices(), true);
+            final RuleApp newApp = Objects.requireNonNull(
+                tapp.addCheckedInstantiation(sv, (JTerm) Objects.requireNonNull(instTerm),
+                    goal.proof().getServices(), true));
 
             final CPBranch branch = new CPBranch() {
                 @Override

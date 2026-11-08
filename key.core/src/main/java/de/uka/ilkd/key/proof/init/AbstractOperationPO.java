@@ -310,7 +310,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * the environment configuration, sharing its LDT instances), so the dereference is suppressed
      * with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private static JTerm createPermsFor(final IProgramMethod pm, final List<LocationVariable> heaps,
             final Services proofServices, final TermBuilder tb) {
         JTerm permsFor = tb.tt();
@@ -346,7 +346,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * The accumulator is {@code @Nullable} during the build; the invariants of the method guarantee
      * a non-null result, so the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     private static JTerm saveBeforeHeaps(final Map<JTerm, JTerm> heapToBefore,
             final TermBuilder tb) {
         JTerm saveBeforeHeaps = null;
@@ -436,6 +436,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      */
     @Override
     @SuppressWarnings({
+        "NullAway",
         "nullness:dereference.of.nullable",
         "nullness:argument.type.incompatible" })
     public void readProblem() throws ProofInputException {
@@ -668,7 +669,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param services The services instance.
      * @return The {@link JTerm} containing the general assumptions.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected JTerm buildFreePre(LocationVariable selfVar, KeYJavaType selfKJT,
             ImmutableList<LocationVariable> paramVars, List<LocationVariable> heaps,
             Services services) {
@@ -715,7 +716,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * @param paramVars The parameters {@link ProgramVariable}s.
      * @return The term representing the general assumption.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected JTerm generateParamsOK(ImmutableList<LocationVariable> paramVars) {
         JTerm paramsOK = tb.tt();
         for (LocationVariable paramVar : paramVars) {
@@ -735,7 +736,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * is set up by {@code postInit()} before this method is invoked (see the invariant
      * documented in the superclass), so the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected JTerm generateParamsOK2(ImmutableList<JTerm> paramVars) {
         JTerm paramsOK = tb.tt();
         for (JTerm paramVar : paramVars) {
@@ -783,6 +784,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
             LocationVariable resultVar, LocationVariable exceptionVar,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
+    /**
+     * @return the term for the global update, or {@code null} if this proof obligation has no
+     *         global definitions
+     */
+    @Nullable
     protected abstract JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
             @Nullable JTerm selfTerm, ImmutableList<JTerm> paramTerms, Services services);
 
@@ -810,7 +816,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * is set up by {@code postInit()} before this method is invoked (see the invariant
      * documented in the superclass), so the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected JTerm ensureUninterpretedPredicateExists(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars, LocationVariable exceptionVar,
             String name, Services services) {
@@ -856,7 +862,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * is set up by {@code postInit()} before this method is invoked (see the invariant
      * documented in the superclass), so the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected JTerm createUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
             JTerm exceptionVar, String name, Services services) {
         // Create parameters for predicate
@@ -915,7 +921,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * is set up by {@code postInit()} before this method is invoked (see the invariant
      * documented in the superclass), so the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected JTerm buildProgramTerm(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars, LocationVariable selfVar,
             LocationVariable resultVar, LocationVariable exceptionVar,
@@ -953,7 +959,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * is set up by {@code postInit()} before this method is invoked (see the invariant
      * documented in the superclass), so the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected LocationVariable getBaseHeap(Services services) {
         return services.getTypeConverter().getHeapLDT().getHeap();
     }
@@ -969,7 +975,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * is set up by {@code postInit()} before this method is invoked (see the invariant
      * documented in the superclass), so the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected LocationVariable getSavedHeap(Services services) {
         return services.getTypeConverter().getHeapLDT().getSavedHeap();
     }
@@ -1073,6 +1079,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * {@link AbstractPO}); its dereferences are suppressed with a scoped key too.
      */
     @SuppressWarnings({
+        "NullAway",
         "nullness:return.type.incompatible",
         "nullness:dereference.of.nullable",
         "nullness:argument.type.incompatible" })
@@ -1196,7 +1203,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * is set up by {@code postInit()} before this method is invoked (see the invariant
      * documented in the superclass), so the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private JTerm createApplyGlobalUpdateTerm(final @Nullable LocationVariable selfVar,
             final ImmutableList<LocationVariable> paramVars, final JTerm preImpliesProgPost,
             final Services proofServices) {
@@ -1214,7 +1221,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * is set up by {@code postInit()} before this method is invoked (see the invariant
      * documented in the superclass), so the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private JTerm createPost(final LocationVariable selfVar,
             final ImmutableList<LocationVariable> paramVars,
             final ImmutableList<LocationVariable> formalParamVars, final LocationVariable resultVar,
@@ -1247,6 +1254,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * helpers below are suppressed with scoped keys.
      */
     @SuppressWarnings({
+        "NullAway",
         "nullness:dereference.of.nullable",
         "nullness:argument.type.incompatible" })
     private JTerm createNonModelPOTerm(final IProgramMethod pm, final LocationVariable selfVar,
@@ -1295,6 +1303,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
      * because model methods cannot throw. All three differences are suppressed with scoped keys.
      */
     @SuppressWarnings({
+        "NullAway",
         "nullness:dereference.of.nullable",
         "nullness:argument.type.incompatible" })
     private JTerm createModelPOTerm(final IProgramMethod pm, final LocationVariable selfVar,

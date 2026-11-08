@@ -39,6 +39,7 @@ public class IncludeFinder extends AbstractBuilder<Void> {
         this.base = base;
     }
 
+    @SuppressWarnings("NullAway")
     @Override
     public @Nullable Void visitOne_include_statement(
             JavaKeYParser.One_include_statementContext ctx) {
@@ -47,6 +48,7 @@ public class IncludeFinder extends AbstractBuilder<Void> {
         return null;
     }
 
+    @SuppressWarnings("NullAway")
     @Override
     public @Nullable Void visitOne_include(JavaKeYParser.One_includeContext ctx) {
         String value = StringUtil.trim(ctx.getText(), "\"'");

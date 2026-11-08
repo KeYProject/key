@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -34,7 +35,9 @@ public class CastHandler implements SMTHandler {
     public void init(MasterHandler masterHandler, Services services,
             @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         this.anyCast = services.getJavaDLTheory().getCastSymbol(services);
-        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+        // the master always loads the snippets for every handler
+        masterHandler.addDeclarationsAndAxioms(
+            Objects.requireNonNull(handlerSnippets, "handler snippets"));
     }
 
     @Override

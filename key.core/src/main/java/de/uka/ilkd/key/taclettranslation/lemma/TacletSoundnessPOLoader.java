@@ -254,7 +254,8 @@ public class TacletSoundnessPOLoader {
         if (!isUsedOnlyForProvingTaclets()) {
             assert tacletLoader instanceof TacletLoader.TacletFromFileLoader;
             TacletLoader loader = new TacletLoader.TacletFromFileLoader(
-                (TacletLoader.TacletFromFileLoader) tacletLoader, originalConfig.copy());
+                (TacletLoader.TacletFromFileLoader) tacletLoader,
+                Objects.requireNonNull(originalConfig).copy());
             ImmutableList<Taclet> unfilteredResult = loader.loadTaclets();
             resultingTacletsForOriginalProof =
                 computeCommonTaclets(unfilteredResult, resultingTaclets);
@@ -286,7 +287,7 @@ public class TacletSoundnessPOLoader {
 
         InitConfig[] proofConfigs = new InitConfig[tacletsToProve.size()];
         for (int i = 0; i < proofConfigs.length; i++) {
-            proofConfigs[i] = originalConfig.deepCopy();
+            proofConfigs[i] = Objects.requireNonNull(originalConfig).deepCopy();
             proofConfigs[i].registerRules(tacletsToProve, AxiomJustification.INSTANCE);
 
             tacletLoader.manageAvailableTaclets(proofConfigs[i], tacletsToProveList.get(i));
@@ -315,7 +316,7 @@ public class TacletSoundnessPOLoader {
             }
         } else {
             assert aggregate instanceof SingleProof;
-            Proof proof = aggregate.getFirstProof();
+            Proof proof = Objects.requireNonNull(aggregate.getFirstProof());
             ProofOblInput keyFile = tacletLoader.getTacletFile(proof);
             proofEnv.registerProof(keyFile, aggregate);
         }

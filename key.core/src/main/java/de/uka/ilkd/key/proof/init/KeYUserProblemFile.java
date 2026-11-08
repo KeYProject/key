@@ -59,7 +59,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param monitor the possibly <tt>null</tt> monitor for progress
      * @param profile the KeY profile under which to load
      */
-    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
+    public KeYUserProblemFile(String name, Path file, @Nullable ProgressMonitor monitor,
+            Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
@@ -72,8 +73,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile,
-            boolean compressed) {
+    public KeYUserProblemFile(String name, Path file, @Nullable ProgressMonitor monitor,
+            Profile profile, boolean compressed) {
         super(name, file, monitor, profile, compressed);
     }
 
@@ -88,8 +89,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      *        declared in the file (see {@link #getProfile()})
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
-            @Nullable Profile profile, boolean compressed) {
+    public KeYUserProblemFile(String name, Path file, FileRepo fileRepo,
+            @Nullable ProgressMonitor monitor, @Nullable Profile profile, boolean compressed) {
         super(name, file, fileRepo, monitor, profile, compressed);
     }
 
@@ -189,7 +190,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public ProofAggregate getPO() {
         assert problem != null;
         String name = name();

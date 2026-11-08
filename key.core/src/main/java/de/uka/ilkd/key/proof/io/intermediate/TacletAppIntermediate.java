@@ -80,7 +80,7 @@ public class TacletAppIntermediate extends AppIntermediate {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
     @Override
     public @Nullable ImmutableList<Name> getNewNames() {
         return newNames;

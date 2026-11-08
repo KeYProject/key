@@ -8,6 +8,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -130,7 +131,7 @@ public abstract class TacletLoader {
                 @Nullable ProblemInitializerListener listener,
                 ProblemInitializer problemInitializer, Path fileForTaclets,
                 Collection<Path> filesForAxioms, InitConfig initConfig) {
-            super(pm, listener, initConfig.getProfile());
+            super(pm, listener, Objects.requireNonNull(initConfig.getProfile()));
             this.fileForTaclets = fileForTaclets;
             this.filesForAxioms = filesForAxioms;
             this.problemInitializer = problemInitializer;
@@ -148,7 +149,8 @@ public abstract class TacletLoader {
         }
 
         public TacletFromFileLoader(TacletFromFileLoader loader, @Nullable InitConfig initConfig) {
-            this(loader.monitor, loader.listener, makeProblemInitializer(loader, initConfig),
+            this(loader.monitor, loader.listener,
+                makeProblemInitializer(loader, Objects.requireNonNull(initConfig)),
                 loader.profile, loader.fileForTaclets, loader.filesForAxioms);
             assert initConfig == null || loader.profile == initConfig.getProfile();
             this.initConfig = initConfig;

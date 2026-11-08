@@ -44,7 +44,7 @@ public class ProblemFinder extends ExpressionBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitFile(JavaKeYParser.FileContext ctx) {
         each(ctx.problem());
@@ -55,7 +55,7 @@ public class ProblemFinder extends ExpressionBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable KeYJavaType visitArrayopid(JavaKeYParser.ArrayopidContext ctx) {
         return accept(ctx.typemapping());
@@ -83,7 +83,7 @@ public class ProblemFinder extends ExpressionBuilder {
      *         suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:override.return.invalid",
-        "nullness:type.invalid.annotations.on.location" })
+        "nullness:type.invalid.annotations.on.location", "NullAway" })
     @Override
     public @Nullable JTerm visitProblem(JavaKeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {

@@ -69,7 +69,8 @@ public class DefaultAutoMacro extends AbstractProofMacro {
      * carries an init config; the dereferences of the (nullable) init config are suppressed with a
      * scoped key.
      */
-    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible",
+        "nullness:dereference.of.nullable" })
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,

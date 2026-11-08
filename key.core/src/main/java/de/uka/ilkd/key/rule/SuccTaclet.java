@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.executor.javadl.SuccTacletExecutor;
 
@@ -20,6 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.NullMarked;
 
 
@@ -57,10 +60,12 @@ public class SuccTaclet extends FindTaclet {
 
     @Override
     public JTerm find() {
-        return (JTerm) ((Sequent) find).succedent().getFirst().formula();
+        return (JTerm) ((Sequent) Objects.requireNonNull(find, "succ taclet has no find part"))
+                .succedent().getFirst().formula();
     }
 
     @Override
+    @EnsuresNonNull("executor")
     protected void createAndInitializeExecutor() {
         executor = new SuccTacletExecutor(this);
     }
@@ -73,12 +78,14 @@ public class SuccTaclet extends FindTaclet {
     @Override
     public SuccTaclet setName(String s) {
         final TacletApplPart applPart =
-            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
-                varsNotFreeIn(),
+            new TacletApplPart(assumesSequent(),
+                Objects.requireNonNull(applicationRestriction(),
+                    "succ taclets require an application restriction"),
+                varsNew(), varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
         return new SuccTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
-            (Sequent) find,
+            Objects.requireNonNull((Sequent) find, "succ taclet has no find part"),
             prefixMap, choices, tacletAnnotations);
     }
 }

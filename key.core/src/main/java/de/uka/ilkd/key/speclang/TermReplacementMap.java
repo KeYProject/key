@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
@@ -40,7 +42,8 @@ public class TermReplacementMap extends ReplacementMap<JTerm> {
         if (newHeap == null) {
             throw new IllegalArgumentException("newHeap can't be null");
         }
-        if (!newHeap.sort().equals(services.getTypeConverter().getHeapLDT().targetSort())) {
+        if (!newHeap.sort().equals(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT").targetSort())) {
             throw new IllegalArgumentException("newHeap has to be a heap");
         }
         put(services.getTermBuilder().getBaseHeap(), newHeap);

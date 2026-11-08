@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.join;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -81,8 +82,11 @@ public class JoinMenuItem extends JMenuItem {
                     // This method delegates the request only to the UserInterfaceControl which
                     // implements the functionality.
                     // No functionality is allowed in this method body!
-                    mediator.getUI().getProofControl()
-                            .startAutoMode(mediator.getSelectedProof(), goals);
+                    // Auto mode requires a selected proof; without one the auto-mode
+                    // implementations crashed with an NPE, kept crash-equivalent here.
+                    Proof selectedProof =
+                        Objects.requireNonNull(mediator.getSelectedProof());
+                    mediator.getUI().getProofControl().startAutoMode(selectedProof, goals);
                 });
 
             }

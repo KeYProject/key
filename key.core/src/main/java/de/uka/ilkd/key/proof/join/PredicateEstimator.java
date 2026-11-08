@@ -67,7 +67,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      * dereference of the (nullable) node is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public Result estimate(ProspectivePartner partner, final Proof proof) {
         final Node node = getFirstDifferentNode(partner);
         String branchLabel = node.getNodeInfo().getBranchLabel();
@@ -132,7 +132,7 @@ class StdPredicateEstimator implements PredicateEstimator {
      *         nodes
      *         assigned from the (nullable) partner accessor are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private @Nullable Node getFirstDifferentNode(ProspectivePartner partner) {
         TreeSet<Node> set = new TreeSet<>(Comparator.comparingInt(Node::serialNr));
 

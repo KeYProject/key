@@ -92,7 +92,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
             }
 
             return services.getTermFactory().createTerm(phi.op(), updatedSubs, phi.boundVars(),
-                null);
+                new ImmutableArray<>());
         }
 
         // Here we have to check for name collisions as there are free variables in u
@@ -150,7 +150,7 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
         }
 
         return services.getTermFactory().createTerm(phi.op(), updatedSubs,
-            new ImmutableArray<>(boundVarsInPhi), null);
+            new ImmutableArray<>(boundVarsInPhi), new ImmutableArray<>());
     }
 
     /**
@@ -207,7 +207,8 @@ public final class ApplyUpdateOnRigidCondition implements VariableCondition {
     }
 
     @Override
-    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo mc,
             LogicServices services) {
         var svInst = mc.getInstantiations();

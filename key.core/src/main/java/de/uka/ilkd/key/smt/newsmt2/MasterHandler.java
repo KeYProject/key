@@ -358,8 +358,9 @@ public class MasterHandler {
         }
 
         if (translationState.containsKey(functionName + ".intro")) {
-            SymbolIntroducer introducer =
-                (SymbolIntroducer) translationState.get(functionName + ".intro");
+            SymbolIntroducer introducer = Objects.requireNonNull(
+                (SymbolIntroducer) translationState.get(functionName + ".intro"),
+                "no introducer registered for " + functionName);
             introducer.introduce(this, functionName);
         }
 
@@ -370,19 +371,25 @@ public class MasterHandler {
         }
 
         if (translationState.containsKey(functionName + ".decls")) {
-            String decls = (String) translationState.get(functionName + ".decls");
+            String decls = Objects.requireNonNull(
+                (String) translationState.get(functionName + ".decls"),
+                "no decls registered for " + functionName);
             VerbatimSMT decl = new VerbatimSMT(decls);
             addDeclaration(decl);
         }
 
         if (translationState.containsKey(functionName + ".axioms")) {
-            String axioms = (String) translationState.get(functionName + ".axioms");
+            String axioms = Objects.requireNonNull(
+                (String) translationState.get(functionName + ".axioms"),
+                "no axioms registered for " + functionName);
             VerbatimSMT ax = new VerbatimSMT(axioms);
             addAxiom(ax);
         }
 
         if (translationState.containsKey(functionName + ".deps")) {
-            String entry = (String) translationState.get(functionName + ".deps");
+            String entry = Objects.requireNonNull(
+                (String) translationState.get(functionName + ".deps"),
+                "no deps registered for " + functionName);
             String[] deps = entry.trim().split(", *");
             for (String dep : deps) {
                 introduceSymbol(dep);

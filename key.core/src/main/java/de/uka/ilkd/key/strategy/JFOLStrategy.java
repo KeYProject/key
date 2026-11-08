@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -58,7 +60,7 @@ public class JFOLStrategy extends FOLStrategy {
     @Override
     protected void setupSplitting(RuleSetDispatchFeature d) {
         super.setupSplitting(d);
-        var heapLDT = getServices().getTypeConverter().getHeapLDT();
+        var heapLDT = Objects.requireNonNull(getServices().getTypeConverter().getHeapLDT());
         var vf = new ValueTermFeature(op(heapLDT.getNull()));
         ProjectionToTerm<Goal> cutFormula = instOf("cutFormula");
         bindRuleSet(d, "cut_direct",

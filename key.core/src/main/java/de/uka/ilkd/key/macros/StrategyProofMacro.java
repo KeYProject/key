@@ -101,7 +101,8 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
      * it is used; the dereferences of the (nullable) init config and (nullable) rule-app manager
      * are suppressed with a scoped key.
      */
-    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible",
+        "nullness:dereference.of.nullable" })
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,

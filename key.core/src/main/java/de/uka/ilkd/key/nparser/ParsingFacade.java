@@ -145,7 +145,9 @@ public final class ParsingFacade {
 
     public static @NonNull JavaKeYLexer createLexer(@NonNull PositionedString ps) {
         var position = ps.getLocation().getPosition();
-        var uri = ps.getLocation().fileUri().toString();
+        // A location may lack a named file (e.g. standard input); the previous code crashed
+        // with an NPE on such input, kept crash-equivalent here.
+        var uri = Objects.requireNonNull(ps.getLocation().fileUri()).toString();
 
         CharStream result = CharStreams.fromString(ps.text, uri);
         var lexer = createLexer(result);

@@ -793,9 +793,13 @@ public final class SourceView extends JComponent {
                     @Override
                     public void subtreeEntered(JTerm subtreeRoot) {
                         if (subtreeRoot.javaBlock() != null) {
+                            // The mediator's services are fully initialized before any source
+                            // view is shown; the guard makes the (crash-equivalent) NPE explicit
+                            // for the theoretical uninitialized case.
                             JavaASTVisitor visitor =
                                 new JavaASTVisitor(subtreeRoot.javaBlock().program(),
-                                    mainWindow.getMediator().getServices()) {
+                                    Objects.requireNonNull(
+                                        mainWindow.getMediator().getServices())) {
 
                                     @Override
                                     protected void doDefaultAction(SourceElement el) {
@@ -818,14 +822,23 @@ public final class SourceView extends JComponent {
                                                 // sometimes the useful file info is only stored in
                                                 // parentClassURI for some reason ...
                                                 if (posInf.getURI().isPresent()) {
-                                                    node.proof()
-                                                            .lookup(ProofJavaSourceCollection.class)
-                                                            .addRelevantFile(posInf.getURI().get());
+                                                    ProofJavaSourceCollection sources =
+                                                        Objects.requireNonNull(
+                                                            node.proof()
+                                                                    .lookup(
+                                                                        ProofJavaSourceCollection.class),
+                                                            "no source collection registered");
+                                                    sources.addRelevantFile(
+                                                        posInf.getURI().get());
                                                 } else if (posInf.getParentClassURI() != null) {
-                                                    node.proof()
-                                                            .lookup(ProofJavaSourceCollection.class)
-                                                            .addRelevantFile(
-                                                                posInf.getParentClassURI());
+                                                    ProofJavaSourceCollection sources =
+                                                        Objects.requireNonNull(
+                                                            node.proof()
+                                                                    .lookup(
+                                                                        ProofJavaSourceCollection.class),
+                                                            "no source collection registered");
+                                                    sources.addRelevantFile(
+                                                        posInf.getParentClassURI());
                                                 }
                                             }
                                         }
@@ -949,7 +962,7 @@ public final class SourceView extends JComponent {
          */
         private final JTextPane textPane = new JTextPane() {
             @Override
-            public String getToolTipText(MouseEvent mouseEvent) {
+            public @Nullable String getToolTipText(MouseEvent mouseEvent) {
                 if (!ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                         .isShowSourceViewTooltips()) {
                     return null;
@@ -995,7 +1008,7 @@ public final class SourceView extends JComponent {
          * scoped keys.
          */
         @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-            "nullness:method.invocation.invalid" })
+            "nullness:method.invocation.invalid", "NullAway" })
         private Tab(URI fileURI, InputStream stream) {
             this.absoluteFileName = fileURI;
             this.simpleFileName = extractFileName(fileURI);

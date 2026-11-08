@@ -356,7 +356,7 @@ public class VMTacletMatcher implements TacletMatcher {
      * @param var the SchemaVariable to look for
      * @return true iff declared not free
      */
-    private boolean varDeclaredNotFree(SchemaVariable var) {
+    private boolean varDeclaredNotFree(@Nullable SchemaVariable var) {
         for (final NotFreeIn nfi : varsNotFreeIn) {
             if (nfi.first() == var) {
                 return true;
@@ -372,7 +372,7 @@ public class VMTacletMatcher implements TacletMatcher {
      *
      * @param v the bound variable to be searched
      */
-    private boolean varIsBound(SchemaVariable v) {
+    private boolean varIsBound(@Nullable SchemaVariable v) {
         return (v instanceof QuantifiableVariable) && boundVars.contains(v);
     }
 

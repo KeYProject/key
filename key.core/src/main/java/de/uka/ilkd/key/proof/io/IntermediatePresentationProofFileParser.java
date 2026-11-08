@@ -94,7 +94,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * key. The {@code unchecked} suppression covers the parser-overloaded generic containers.
      */
     @Override
-    @SuppressWarnings({ "unchecked", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "unchecked", "NullAway", "nullness:dereference.of.nullable" })
     public void beginExpr(ProofElementID eid, String str) {
         switch (eid) {
             case BRANCH -> {
@@ -247,7 +247,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void endExpr(ProofElementID eid, int lineNr) {
         switch (eid) {
             case BRANCH -> currNode = stack.pop();
@@ -313,7 +313,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      *
      * @return An intermediate taclet application generated from previously parsed information.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private TacletAppIntermediate constructTacletApp() {
         TacletInformation tacletInfo = (TacletInformation) ruleInfo;
         return new TacletAppIntermediate(tacletInfo.currRuleName,
@@ -330,7 +330,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * @return An intermediate built-in rule application generated from previously parsed
      *         information.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private BuiltInAppIntermediate constructBuiltInApp() {
         BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
         return switch (builtinInfo.currRuleName) {
@@ -371,7 +371,7 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
      * @return True iff we are currently parsing a built-in rule and are inside an if-insts sub
      *         expression.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private boolean insideBuiltinIfInsts() {
         return ruleInfo.isBuiltinInfo()
                 && ((BuiltinRuleInformation) ruleInfo).builtinIfInsts != null;

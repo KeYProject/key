@@ -108,14 +108,33 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this.useSpecification = false;
     }
 
-    public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification) {
+    public MethodBodyStatement(IProgramMethod method, @Nullable ReferencePrefix newContext,
+            @Nullable IProgramVariable res, ImmutableArray<Expression> args,
+            boolean useSpecification) {
         this(method, newContext, res, args, useSpecification, null);
     }
 
-    public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification,
-            @Nullable ProgramElement scope) {
+    /**
+     * Constructs a method body statement.
+     *
+     * @param method
+     *        the invoked program method
+     * @param newContext
+     *        the reference the method is invoked on; may be {@code null} only for static methods,
+     *        in which case the container type is used
+     * @param res
+     *        the variable the result is assigned to; may be {@code null} if the method is void or
+     *        the result is not assigned
+     * @param args
+     *        the actual arguments, all program variables
+     * @param useSpecification
+     *        whether to use the specification rather than the concrete body
+     * @param scope
+     *        the enclosing scope, or {@code null}
+     */
+    public MethodBodyStatement(IProgramMethod method, @Nullable ReferencePrefix newContext,
+            @Nullable IProgramVariable res, ImmutableArray<Expression> args,
+            boolean useSpecification, @Nullable ProgramElement scope) {
         this.method = method;
         this.bodySource = new TypeRef(Objects.requireNonNull(method.getContainerType(),
             "a program method must have a container type"));
@@ -163,13 +182,14 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         }
     }
 
-    public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args) {
+    public MethodBodyStatement(IProgramMethod method, @Nullable ReferencePrefix newContext,
+            @Nullable IProgramVariable res, ImmutableArray<Expression> args) {
         this(method, newContext, res, args, false);
     }
 
-    public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args, ProgramElement scope) {
+    public MethodBodyStatement(IProgramMethod method, @Nullable ReferencePrefix newContext,
+            @Nullable IProgramVariable res, ImmutableArray<Expression> args,
+            ProgramElement scope) {
         this(method, newContext, res, args, false, scope);
     }
 

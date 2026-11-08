@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Node;
 
 import org.jspecify.annotations.NullMarked;
@@ -66,18 +68,21 @@ public class SearchNodePreorderIterator {
      * Computes the next element and updates {@link #next()}.
      */
     protected void updateNext() {
-        if (!next.leaf()) {
-            next = next.child(0);
+        // the iteration protocol guarantees a current node when stepping (hasNext checked next)
+        Node current = Objects.requireNonNull(next, "current node");
+        if (!current.leaf()) {
+            next = current.child(0);
         } else {
-            Node parent = next.parent();
+            Node parent = current.parent();
             while (parent != null) {
-                int childIndex = parent.getChildNr(next);
+                int childIndex = parent.getChildNr(current);
                 int parentChildCount = parent.childrenCount();
                 if (childIndex + 1 < parentChildCount) {
                     next = parent.child(childIndex + 1);
                     return; // done
                 } else {
                     next = parent; // continue at parent
+                    current = parent;
                     parent = parent.parent();
                 }
             }

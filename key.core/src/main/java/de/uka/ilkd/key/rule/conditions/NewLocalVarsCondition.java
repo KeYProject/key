@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule.conditions;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -30,6 +31,7 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * For the loop scope rule, if a local program variable that may be altered by the loop body appears
@@ -72,7 +74,8 @@ public class NewLocalVarsCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices lServices) {
         var services = (Services) lServices;
         var svInst = matchCond.getInstantiations();
@@ -101,7 +104,8 @@ public class NewLocalVarsCondition implements VariableCondition {
             // mismatch (e.g. k_before#0 vs. k_before#1) breaks the slicing mechanism, which
             // relies on formula equivalence across reloads. See issue #3834.
             final var newName = uniqueBeforeName(v.name() + "_before", services, reserved);
-            TypeReference typeRef = v.getTypeReference();
+            TypeReference typeRef = Objects.requireNonNull(v.getTypeReference(),
+                "no type reference for " + v);
             var locVar = new LocationVariable(newName, typeRef);
             var spec = new VariableSpecification(locVar);
             decls.add(new LocalVariableDeclaration(typeRef, spec));

@@ -7,7 +7,6 @@ package de.uka.ilkd.key.scripts.meta;
 import java.lang.reflect.Field;
 import java.util.Objects;
 
-import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.Nullable;
 
 /// This class captures the meta data about parameters of [ProofScriptCommand]s.
@@ -79,19 +78,16 @@ public class ProofScriptArgument {
     }
 
     /// True if this argument captures positional variable arguments.
-    @EnsuresNonNull("positionalVarargs")
     public boolean isPositionalVarArgs() {
         return positionalVarargs != null;
     }
 
     /// True if this argument captures positional key-value arguments.
-    @EnsuresNonNull("optionalVarargs")
     public boolean isOptionalVarArgs() {
         return optionalVarargs != null;
     }
 
     /// True if this argument is a positional argument (w/o a keyword).
-    @EnsuresNonNull("argument")
     public boolean isPositional() {
         return argument != null;
     }

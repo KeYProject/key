@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 
@@ -598,8 +599,10 @@ public class SmtLib2Translator extends AbstractSMTTranslator {
         for (int j = 0; j < fw.length; j++) {
             for (int i = 0; i < fw[j].getFunction().arity(); i++) {
                 Sort sort = fw[j].getFunction().argSorts().get(i);
-                rightSide =
-                    translateLogicalAll(temp.get(j).get(i), usedDisplaySort.get(sort), rightSide);
+                rightSide = translateLogicalAll(temp.get(j).get(i),
+                    // every sort used by an argument is in the display map by construction
+                    Objects.requireNonNull(usedDisplaySort.get(sort), "display sort"),
+                    rightSide);
 
             }
         }

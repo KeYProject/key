@@ -182,7 +182,7 @@ class FinalFieldCodeValidator {
      * The type reference of a {@code new} expression always carries a KeY Java type; the
      * dereference of the (nullable) KeY Java type is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void validateNew(New _new) {
 
         TypeReference typeRef = _new.getTypeReference();
@@ -215,7 +215,7 @@ class FinalFieldCodeValidator {
      * The enclosing class of an effectively-final 'this' receiver always carries a Java type; the
      * dereference of the (nullable) Java type is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void validateMethodReference(MethodReference methodReference) {
         ReferencePrefix referencePrefix = methodReference.getReferencePrefix();
         var calledOnThis = referencePrefix == null || referencePrefix instanceof ThisReference;
@@ -320,7 +320,7 @@ class FinalFieldCodeValidator {
          * source" state for synthetic program elements without file attribution; {@link Location}
          * documents and supports a null fileUri (see also {@link Location#UNDEFINED}).
          */
-        @SuppressWarnings("nullness:argument.type.incompatible")
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
         private static Location computeLocation(@Nullable SyntaxElement syntaxElement) {
             if (syntaxElement instanceof SourceElement sourceElement) {
                 PositionInfo posInfo = sourceElement.getPositionInfo();

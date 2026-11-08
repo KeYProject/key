@@ -128,7 +128,13 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
      * @param contract a loop contract.
      * @param goal the current goal.
      * @return {@code true} if the contract has already been applied.
+     *         <p>
+     *         {@code previousNode} is {@code null} on the first loop iteration;
+     *         {@link Node#getChildNr} only tests identity and yields {@code -1} for any non-child
+     *         (hence for {@code null}) argument, so the null pass reproduces the pre-existing
+     *         behavior; the pass is suppressed with a scoped key.
      */
+    @SuppressWarnings("NullAway")
     protected boolean contractApplied(final LoopContract contract, final Goal goal) {
         Node selfOrParentNode = goal.node();
         Node previousNode = null;
@@ -154,7 +160,13 @@ public abstract class AbstractLoopContractRule extends AbstractAuxiliaryContract
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public boolean isApplicable(final Goal goal, final @Nullable PosInOccurrence occurrence) {
+        // a {@code null} occurrence is not an occurrence at the top level of the succedent, i.e.
+        // the same outcome {@code occursNotAtTopLevelInSuccedent} computes below; making it
+        // explicit lets the flow analysis refine the occurrence for the subsequent lookups
+        if (occurrence == null) {
+            return false;
+        }
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }

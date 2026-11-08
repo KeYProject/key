@@ -99,7 +99,7 @@ public class ProgressDialog extends JDialog {
      * fields stay unset until their getters run.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid" })
+        "nullness:method.invocation.invalid", "NullAway" })
     public ProgressDialog(ProgressModel model, ProgressDialogListener listener,
             boolean counterexample, int resolution, int progressBarMax, String[] labelTitles,
             String... titles) {
@@ -341,7 +341,8 @@ class ProgressTable extends JTable {
          * construction completes, suppressed with scoped keys.
          */
         @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-            "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })
+            "nullness:method.invocation.invalid", "nullness:argument.type.incompatible",
+            "NullAway" })
         ProgressPanel() {
 
             this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -434,7 +435,8 @@ class ProgressTable extends JTable {
      * completes, suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })
+        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible",
+        "NullAway" })
     public ProgressTable(int resolution, ProgressTableListener listener, String... titles) {
         this.setDefaultRenderer(ProgressModel.ProcessColumn.class, renderer);
         this.setDefaultEditor(ProgressModel.ProcessColumn.class, editor);

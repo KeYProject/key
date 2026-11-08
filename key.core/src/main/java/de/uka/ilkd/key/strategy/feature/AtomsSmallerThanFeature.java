@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -56,8 +58,9 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
-        return lessThan(collectAtoms(left.toTerm(app, pos, goal, mState)),
-            collectAtoms(right.toTerm(app, pos, goal, mState)), pos, goal);
+        return lessThan(
+            collectAtoms(Objects.requireNonNull(left.toTerm(app, pos, goal, mState))),
+            collectAtoms(Objects.requireNonNull(right.toTerm(app, pos, goal, mState))), pos, goal);
     }
 
     /**

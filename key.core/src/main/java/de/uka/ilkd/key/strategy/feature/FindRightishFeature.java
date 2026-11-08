@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 
@@ -50,7 +52,7 @@ public class FindRightishFeature implements Feature {
         final PIOPathIterator it = pos.iterator();
 
         while (it.next() != -1) {
-            final var op = it.getSubTerm().op();
+            final var op = Objects.requireNonNull(it.getSubTerm()).op();
             final int index = it.getChild();
             if (index == 0 && op == add || index == 1 && op == Equality.EQUALS) {
                 res = res.add(one);

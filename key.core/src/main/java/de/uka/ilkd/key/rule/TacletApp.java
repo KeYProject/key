@@ -570,14 +570,15 @@ public abstract class TacletApp implements RuleApp {
      * @param previousProposals the names already proposed in this context
      * @return the proposed name, or null if the proposer cannot propose one
      */
-    @SuppressWarnings("nullness:argument.type.incompatible") // the undo anchor is intentionally
-                                                             // null: no undo action is recorded
-                                                             // here, and VariableNameProposer
-                                                             // never dereferences the anchor
-                                                             // (widening the parameter to
-                                                             // @Nullable is out of scope; cf.
-                                                             // VariableNamer#getProposal which
-                                                             // already widens it)
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" }) // the undo anchor is
+                                                                             // intentionally
+    // null: no undo action is recorded
+    // here, and VariableNameProposer
+    // never dereferences the anchor
+    // (widening the parameter to
+    // @Nullable is out of scope; cf.
+    // VariableNamer#getProposal which
+    // already widens it)
     private static @Nullable String defaultNameProposal(TacletApp app, SchemaVariable sv,
             Services services, ImmutableList<String> previousProposals) {
         return VariableNameProposer.DEFAULT.getProposal(app, sv, services, null, previousProposals);
@@ -1318,7 +1319,9 @@ public abstract class TacletApp implements RuleApp {
                                 "no context instantiation").activeStatementContext()));
                     }
                 } else {
-                    typeRef = new TypeRef((KeYJavaType) o);
+                    typeRef = new TypeRef(
+                        Objects.requireNonNull((KeYJavaType) o,
+                            "no type defining object for " + sv));
                 }
                 assert typeRef != null : "could not find TypeReference for: " + o;
                 return new LocationVariable(VariableNamer.parseName(instantiation),

@@ -55,7 +55,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
      *        {@code setExecutionContext(...)} after construction; the difference is suppressed with
      *        a scoped key.
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     protected AbstractAuxiliaryContractBuiltInRuleApp(T rule, PosInOccurrence occurrence,
             @Nullable ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
@@ -78,7 +78,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
      * the instantiating code, so the difference from the non-null result is suppressed with a
      * scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     public JavaStatement getStatement() {
         return statement;
     }
@@ -87,7 +87,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
      *
      * @return the contract being applied.
      */
-    public abstract AuxiliaryContract getContract();
+    public abstract @Nullable AuxiliaryContract getContract();
 
 
     /**

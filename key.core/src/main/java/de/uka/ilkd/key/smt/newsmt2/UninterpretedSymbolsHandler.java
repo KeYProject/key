@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -40,7 +41,8 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     @Override
     public void init(MasterHandler masterHandler, Services services,
             @Nullable Properties handlerSnippets, String[] handlerOptions) {
-        enableQuantifiers = !HandlerUtil.NO_QUANTIFIERS.get(services);
+        enableQuantifiers = !Objects.requireNonNull(HandlerUtil.NO_QUANTIFIERS.get(services),
+            "no 'no quantifiers' property");
     }
 
     @Override

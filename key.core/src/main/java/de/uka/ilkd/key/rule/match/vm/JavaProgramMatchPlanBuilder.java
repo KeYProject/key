@@ -539,8 +539,12 @@ public final class JavaProgramMatchPlanBuilder {
                     return null;
                 }
             }
-            return matchCond.setInstantiations(
+            // The prefix-end and suffix-start positions are not known at this point; they are
+            // filled in by makeContextInfoComplete after the active statements have been matched.
+            @SuppressWarnings("NullAway")
+            MatchConditions matchResult = matchCond.setInstantiations(
                 matchCond.getInstantiations().add(null, null, innerContext, src, services));
+            return matchResult;
         }
 
         /**

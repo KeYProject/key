@@ -33,6 +33,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -101,6 +102,7 @@ public class RewriteTaclet extends FindTaclet {
      */
     @SuppressWarnings("nullness:override.receiver.invalid")
     @Override
+    @EnsuresNonNull("executor")
     protected void createAndInitializeExecutor() {
         this.executor = new RewriteTacletExecutor(this);
     }
@@ -128,7 +130,7 @@ public class RewriteTaclet extends FindTaclet {
      *         sub-term
      *         of the position iterator exists; the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public @Nullable MatchConditions checkPrefix(
             PosInOccurrence p_pos,
             MatchConditions p_mc) {
@@ -146,7 +148,8 @@ public class RewriteTaclet extends FindTaclet {
 
         PIOPathIterator it = p_pos.iterator();
         while (it.next() != -1) {
-            final JTerm t = (JTerm) it.getSubTerm();
+            final JTerm t = (JTerm) Objects.requireNonNull(it.getSubTerm(),
+                "path iterator produced no subterm");
             var op = t.op();
             if (op instanceof Transformer) {
                 return null;
@@ -214,7 +217,7 @@ public class RewriteTaclet extends FindTaclet {
      * suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected StringBuffer toStringFind(StringBuffer sb) {
         StringBuffer res = super.toStringFind(sb);
         return res.append(applicationRestriction().toString(needsSameUpdateLevel()));

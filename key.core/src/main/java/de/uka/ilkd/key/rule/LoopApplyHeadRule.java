@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
@@ -71,15 +73,18 @@ public class LoopApplyHeadRule implements BuiltInRule {
         assert application instanceof LoopApplyHeadBuiltInRuleApp;
         LoopApplyHeadBuiltInRuleApp ruleApp = (LoopApplyHeadBuiltInRuleApp) application;
 
-        ImmutableSet<LoopContract> contracts = ruleApp.contracts;
+        ImmutableSet<LoopContract> contracts =
+            Objects.requireNonNull(ruleApp.contracts, "no loop contracts to apply");
         LoopContract someContract = contracts.iterator().next();
 
         StatementBlock block = new StatementBlock(
             new While(someContract.getGuard(), someContract.getBody()), someContract.getTail());
-        StatementBlock headAndBlock = new StatementBlock(someContract.getHead(), block);
+        StatementBlock headAndBlock = new StatementBlock(
+            Objects.requireNonNull(someContract.getHead(), "loop contract has no head"), block);
         var services = goal.getOverlayServices();
         TermBuilder tb = services.getTermBuilder();
-        AbstractLoopContractRule.Instantiation instantiation = ruleApp.instantiation;
+        AbstractLoopContractRule.Instantiation instantiation = Objects.requireNonNull(
+            ruleApp.instantiation, "no loop apply head instantiation");
         Modality modality = instantiation.modality();
         JTerm update = instantiation.update();
         JTerm target = instantiation.formula();
@@ -102,7 +107,7 @@ public class LoopApplyHeadRule implements BuiltInRule {
         result.changeFormula(
             new SequentFormula(
                 tb.apply(update, tb.prog(modality.kind(), newJavaBlock, target.sub(0)))),
-            ruleApp.pio);
+            Objects.requireNonNull(ruleApp.pio, "no position for rule application"));
         return ImmutableList.<Goal>nil().append(goal);
     }
 

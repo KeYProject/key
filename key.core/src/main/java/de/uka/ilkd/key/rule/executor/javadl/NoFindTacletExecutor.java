@@ -40,6 +40,9 @@ public class NoFindTacletExecutor extends TacletExecutor {
         final TacletApp tacletApp = (TacletApp) ruleApp;
         final MatchConditions mc = tacletApp.matchConditions();
 
+        // checkAssumesGoals itself null-checks its list of assumes instantiations; a taclet
+        // without an assumes sequent contributes no instantiations.
+        @SuppressWarnings("NullAway")
         final ImmutableList<SequentChangeInfo> newSequentsForGoals = checkAssumesGoals(goal,
             tacletApp.assumesFormulaInstantiations(), mc, taclet.goalTemplates().size());
 
@@ -66,10 +69,15 @@ public class NoFindTacletExecutor extends TacletExecutor {
      *        taclet
      * @param matchCond the MatchConditions with all required instantiations
      */
+    // The position and the find position are null deliberately: the base addToAntec/addToSucc
+    // document a "null for head" position and tolerate an absent application position.
+    @SuppressWarnings("NullAway")
     protected void applyAdd(TermLabelState termLabelState, Sequent add,
             SequentChangeInfo currentSequent,
             MatchConditions matchCond,
             Goal goal, TacletApp ruleApp) {
+        // The position and the find position are null deliberately: the base addToAntec/addToSucc
+        // document a "null for head" position and tolerate an absent application position.
         addToAntec(add.antecedent(), currentSequent, null, null, matchCond, goal, ruleApp,
             goal.getOverlayServices(), termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));
@@ -84,6 +92,10 @@ public class NoFindTacletExecutor extends TacletExecutor {
      * @param goal the goal that the rule application should refer to.
      * @param ruleApp the taclet application that is executed
      */
+    // The added-program-variable position, the optional branch label and the label-refactoring
+    // hint/tacletTerm arguments are absent in the no-find case; the receivers tolerate the absent
+    // values although their parameters are declared @NonNull.
+    @SuppressWarnings("NullAway")
     public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
 
@@ -93,6 +105,9 @@ public class NoFindTacletExecutor extends TacletExecutor {
         final TacletApp tacletApp = (TacletApp) ruleApp;
         MatchConditions mc = tacletApp.matchConditions();
 
+        // checkAssumesGoals itself null-checks its list of assumes instantiations; a taclet
+        // without an assumes sequent contributes no instantiations.
+        @SuppressWarnings("NullAway")
         ImmutableList<SequentChangeInfo> newSequentsForGoals =
             checkAssumesGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
@@ -115,6 +130,8 @@ public class NoFindTacletExecutor extends TacletExecutor {
 
             applyAddrule(gt.rules(), currentGoal, services, mc);
 
+            // A no-find application may carry no position ({@link TacletApp#complete()} allows
+            // it); VariableNamer tolerates an absent position (see getProgramFromPIO).
             applyAddProgVars(gt.addedProgVars(), currentSequent, currentGoal,
                 tacletApp.posInOccurrence(), services, mc);
             PerfScope.stop(PERF_APPLY, timeApply);
@@ -127,8 +144,12 @@ public class NoFindTacletExecutor extends TacletExecutor {
             currentGoal.setSequent(currentSequent);
             PerfScope.stop(PERF_SET_SEQUENT, timeSetSequent);
 
+            // Goal templates without an explicit name keep a null branch label, which
+            // NodeInfo.setBranchLabel accepts.
             currentGoal.setBranchLabel(gt.name());
             final long timeRefactorLabels = PerfScope.start();
+            // refactorSequent consults the position only if non-null and treats the trailing
+            // hint/tacletTerm arguments as optional; all are absent in the no-find case.
             TermLabelManager.refactorSequent(termLabelState, services,
                 ruleApp.posInOccurrence(),
                 ruleApp.rule(), currentGoal, null, null);

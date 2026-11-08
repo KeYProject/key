@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaAstUtils;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -36,6 +37,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * TODO
@@ -65,10 +67,11 @@ public class EvaluateArgs extends ProgramTransformer {
      * @return TODO
      */
     public static ProgramVariable evaluate(Expression e, List<? super LocalVariableDeclaration> l,
-            Services services, ExecutionContext ec) {
+            Services services, @Nullable ExecutionContext ec) {
 
         final VariableNamer varNamer = services.getVariableNamer();
-        final TypeReference t = new TypeRef(e.getKeYJavaType(services, ec));
+        final TypeReference t = new TypeRef(Objects.requireNonNull(
+            e.getKeYJavaType(services, ec), "no KeYJavaType for expression " + e));
         final ProgramElementName name =
             VariableNamer.parseName(varNamer.getSuggestiveNameProposalForSchemaVariable(e));
         final ProgramVariable pv = KeYJavaASTFactory.localVariable(name, t);
@@ -113,22 +116,23 @@ public class EvaluateArgs extends ProgramTransformer {
 
         final MethodOrConstructorReference resMR;
         if (mr instanceof MethodReference) {
-            resMR = KeYJavaASTFactory.methodCall(newCalled, ((MethodReference) mr).getMethodName(),
-                newArgs);
+            resMR = new MethodReference(new ImmutableArray<>(newArgs),
+                ((MethodReference) mr).getMethodName(), newCalled);
         } else if (mr instanceof New) {
             resMR = KeYJavaASTFactory.newOperator(mr.getReferencePrefix(),
                 ((New) mr).getTypeReference(), newArgs);
         } else if (mr instanceof SuperConstructorReference) {
-            resMR = KeYJavaASTFactory.superConstructor(mr.getReferencePrefix(), newArgs);
+            resMR = new SuperConstructorReference(newArgs);
         } else if (mr instanceof ThisConstructorReference) {
             resMR = KeYJavaASTFactory.thisConstructor(newArgs);
         } else {
-            assert false : "unexpected subclass of MethodOrConstructorReference";
-            resMR = null;
+            throw new AssertionError("unexpected subclass of MethodOrConstructorReference");
         }
 
         if (pe instanceof Assignment a && JavaAstUtils.isCopyAssignment(a)) {
-            res[res.length - 1] = KeYJavaASTFactory.assign(a.getExpressionAt(0),
+            res[res.length - 1] = KeYJavaASTFactory.assign(
+                Objects.requireNonNull(a.getExpressionAt(0),
+                    "no left-hand side in copy assignment " + a),
                 (Expression) resMR);
         } else {
             res[res.length - 1] = resMR;

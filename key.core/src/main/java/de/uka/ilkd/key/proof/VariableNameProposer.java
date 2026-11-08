@@ -161,7 +161,8 @@ public class VariableNameProposer implements InstantiationProposer {
     }
 
 
-    public String getNameProposal(String basename, Services services, Node undoAnchor) {
+    /// The {@code undoAnchor} is not used by this proposal; all callers pass {@code null}.
+    public String getNameProposal(String basename, Services services, @Nullable Node undoAnchor) {
         final NamespaceSet nss = services.getNamespaces();
         final String base = basename.length() > 0 ? basename : "gen";
         // Pick the smallest free index against the current namespace rather than drawing from a

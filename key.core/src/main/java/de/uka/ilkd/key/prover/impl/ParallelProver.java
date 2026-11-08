@@ -6,6 +6,7 @@ package de.uka.ilkd.key.prover.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -26,6 +27,7 @@ import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.engine.GoalChooser;
+import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.engine.impl.DefaultProver;
@@ -256,7 +258,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         // BuiltInRuleAppIndex noticing.
         if (app == null) {
             goal.ruleAppIndex().scanBuiltInRules(goal);
-            app = goal.getRuleAppManager().next();
+            app = Objects.requireNonNull(goal.getRuleAppManager(), "rule app manager").next();
         }
         return app;
     }
@@ -316,8 +318,9 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             PROCESSING_STRATEGY, -1));
 
         final ApplyStrategyInfo<Proof, Goal> result;
-        try (var ignored =
-            proof.setRuleAppIndexMode(proof.getActiveStrategy().getRuleAppIndexMode())) {
+        try (var ignored = proof.setRuleAppIndexMode(
+            Objects.requireNonNull(proof.getActiveStrategy(), "active strategy")
+                    .getRuleAppIndexMode())) {
             result = runParallel(goals, perTaskSteps);
         } catch (Exception e) { // should never be reached
             throw new RuntimeException(e);
@@ -399,7 +402,8 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
                 t.setDaemon(true);
                 return t;
             });
-            try (var ignored = proof.suspendNonEssentialListeners()) {
+            try (var ignored = Objects.requireNonNull(proof, "proof")
+                    .suspendNonEssentialListeners()) {
                 List<Future<?>> futures = new ArrayList<>(workerCount);
                 try {
                     for (int w = 0; w < workerCount; w++) {
@@ -474,9 +478,10 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             return () -> {
             };
         }
-        final RunScope marker = enterMultiThreadedRun(proof);
+        final Proof proofNonNull = Objects.requireNonNull(proof, "proof");
+        final RunScope marker = enterMultiThreadedRun(proofNonNull);
         try {
-            final JavaInfo javaInfo = proof.getServices().getJavaInfo();
+            final JavaInfo javaInfo = proofNonNull.getServices().getJavaInfo();
             // Materialise the default execution context on this proof's (fresh) JavaInfo before
             // sealing, so the matcher reads it instead of registering it during the run.
             javaInfo.getDefaultExecutionContext();
@@ -547,7 +552,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         try {
             Goal goal;
             while (!stopRequested.get() && (goal = scheduler.claimOrAwait()) != null) {
-                if (proof.isErroneous()) {
+                if (Objects.requireNonNull(proof, "proof").isErroneous()) {
                     // An essential proof listener failed on some worker: wind all workers down
                     // through the regular stop path (the claimed goal is returned below by the
                     // loop exit; parked workers wake through the scheduler as with any stop).
@@ -601,6 +606,8 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         // rule aborted -- the finally below drops it from the in-flight set. Exactly one of these
         // happens per goal, which is what keeps the scheduler's accounting (and termination) sound.
         boolean handled = false;
+        final StopCondition<Goal> stopConditionNonNull =
+            Objects.requireNonNull(stopCondition, "stop condition");
         try {
             if (stopRequested.get()) {
                 return;
@@ -608,14 +615,15 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             // --- selection: concurrent across workers, no commit lock held ---
             // countApplied is read without the lock; a slightly stale value only affects the
             // step-limit heuristic (at worst a tiny overshoot), never soundness.
-            if (!stopCondition.isGoalAllowed(goal, maxApplications, timeout, startTime,
+            if (!stopConditionNonNull.isGoalAllowed(goal, maxApplications, timeout, startTime,
                 appliedSteps.get())) {
-                requestStop(stopCondition.getGoalNotAllowedMessage(goal, maxApplications,
+                requestStop(stopConditionNonNull.getGoalNotAllowedMessage(goal, maxApplications,
                     timeout, startTime, appliedSteps.get()), null);
                 return;
             }
 
-            RuleApp app = goal.getRuleAppManager().next();
+            RuleApp app =
+                Objects.requireNonNull(goal.getRuleAppManager(), "rule app manager").next();
             app = updateBuiltInRuleIndex(goal, app);
 
             if (app == null) {
@@ -690,8 +698,9 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
                 closedCount.addAndGet(closedNow);
             }
 
-            if (stopCondition.shouldStop(maxApplications, timeout, startTime, applied, null)) {
-                requestStop(stopCondition.getStopMessage(maxApplications, timeout, startTime,
+            if (stopConditionNonNull.shouldStop(maxApplications, timeout, startTime, applied,
+                null)) {
+                requestStop(stopConditionNonNull.getStopMessage(maxApplications, timeout, startTime,
                     applied, null), null);
             }
         } finally {
@@ -720,7 +729,13 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         }
     }
 
+    /**
+     * Frees the proof of the last strategy run: the {@code @MonotonicNonNull} proof field is
+     * deliberately reset to {@code null} to release the proof reference once a run has ended (the
+     * field stays non-null throughout any active run); the reset is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("NullAway") // proof is reset to null to release the reference after a run
     public synchronized void clear() {
         proof = null;
         if (goalChooser != null) {

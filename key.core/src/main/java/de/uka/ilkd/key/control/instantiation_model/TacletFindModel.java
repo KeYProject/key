@@ -42,6 +42,7 @@ import org.key_project.util.parsing.Position;
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 @NullMarked
 public class TacletFindModel extends AbstractTableModel {
@@ -51,7 +52,11 @@ public class TacletFindModel extends AbstractTableModel {
      */
     private static final long serialVersionUID = 5285420522875326156L;
     /** the instantiations entries */
-    private final ArrayList<Pair<SchemaVariable, String>> entries;
+    // NullAway: the value is the printable instantiation or proposal, which may legitimately be
+    // absent for an uninstantiated row; a @Nullable second type argument cannot be expressed on
+    // Pair (its type variable has no @Nullable upper bound)
+    @SuppressWarnings("NullAway")
+    private final ArrayList<Pair<SchemaVariable, @Nullable String>> entries;
     /** the related rule application */
     private final TacletApp originalApp;
     /** the integer defines the row until which no editing is possible */
@@ -118,8 +123,8 @@ public class TacletFindModel extends AbstractTableModel {
      * suggestion, in which case the row holds a null string that callers treat as "no input".
      */
     @SuppressWarnings({ "nullness:type.arguments.not.inferred",
-        "nullness:argument.type.incompatible" })
-    private ArrayList<Pair<SchemaVariable, String>> createEntryArray(
+        "nullness:argument.type.incompatible", "NullAway" })
+    private ArrayList<Pair<SchemaVariable, @Nullable String>> createEntryArray(
             TacletApp tacletApp) {
         ArrayList<Pair<SchemaVariable, String>> rowVec =
             new ArrayList<>();
@@ -142,8 +147,8 @@ public class TacletFindModel extends AbstractTableModel {
                 String proposal = instantiationProposers.getProposal(tacletApp, var, services,
                     goal.node(), proposals);
 
-                Pair<SchemaVariable, String> pair =
-                    new Pair<SchemaVariable, String>(var, proposal);
+                Pair<SchemaVariable, @Nullable String> pair =
+                    new Pair<SchemaVariable, @Nullable String>(var, proposal);
 
                 if (proposal != null) {
                     // A proposal is available ...
@@ -199,7 +204,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private JTerm parseTerm(String s, Namespace<@NonNull QuantifiableVariable> varNS,
             Namespace<@NonNull Function> functNS) throws ParserException {
         NamespaceSet copy = nss.copy();
@@ -376,7 +381,8 @@ public class TacletFindModel extends AbstractTableModel {
      *         the model is built; by construction it is non-null here, so the difference and the
      *         dereferences of the accumulator are suppressed with scoped keys.
      */
-    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible",
+        "nullness:dereference.of.nullable" })
     public TacletApp createTacletAppFromVarInsts() throws SVInstantiationException {
 
         final TermBuilder tb = services.getTermBuilder();

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -178,7 +179,8 @@ final class EqualityTheorySupport implements QuantifierTheorySupport {
                     // make useful triggers
                     continue;
                 }
-                final JTerm solvedEquation = mv2qv.replace(tb.equals(tb.var(mv), solution));
+                final JTerm solvedEquation =
+                    Objects.requireNonNull(mv2qv.replace(tb.equals(tb.var(mv), solution)));
                 solvedEquations.add(solvedEquation);
                 solvedEquations.add(tb.equals(solvedEquation.sub(1), solvedEquation.sub(0)));
             }

@@ -64,7 +64,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     // at runtime by every accessor of this class. The delegate below may not be widened to accept
     // them as @Nullable (the fields are final and their getters must stay @NonNull for the
     // interfaces), so the two intentional null arguments are suppressed here.
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public VariableSpecification() {
         this(null, 0, null, null, null);
     }
@@ -72,7 +72,7 @@ public class VariableSpecification extends JavaNonTerminalProgramElement
     // The {@code programVariable}'s KeYJavaType is null for schema program variables (see
     // ProgramSV.getKeYJavaType()); the resulting null {@code type} is stored by the delegate while
     // the delegated constructor's Type parameter stays @NonNull for the regular callers.
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public VariableSpecification(IProgramVariable programVariable) {
         this(programVariable, programVariable.getKeYJavaType());
     }

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -77,13 +78,17 @@ public final class GoalBackAction extends MainWindowAction {
                     setEnabled(false);
                 } else {
                     final Node selNode = getMediator().getSelectedNode();
-                    // enable/disable the action (see JavaDoc of class)
-                    setEnabled(selNode != null && !proof.root().leaf()
+                    // enable/disable the action (see JavaDoc of class); the guard stays inside
+                    // the expression, where proof.root() was already evaluated
+                    setEnabled(selNode != null && !Objects.requireNonNull(proof.root(),
+                        "a loaded proof always has a root node").leaf()
                             && !(GeneralSettings.noPruningClosed && selNode.isClosed()));
                 }
             }
 
             @Override
+            @SuppressWarnings("NullAway") // deliberate null event: the listener re-queries the
+                                          // selection model and ignores the event itself
             public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 selectedNodeChanged(null);
             }
@@ -103,6 +108,8 @@ public final class GoalBackAction extends MainWindowAction {
             }
 
             @Override
+            @SuppressWarnings("NullAway") // deliberate null event: the listener re-queries the
+                                          // selection model and ignores the event itself
             public void autoModeStopped(ProofEvent e) {
                 getMediator().addKeYSelectionListener(selListener);
                 selListener.selectedNodeChanged(null);

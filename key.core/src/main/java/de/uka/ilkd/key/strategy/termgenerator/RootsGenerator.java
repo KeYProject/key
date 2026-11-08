@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.math.BigInteger;
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -62,7 +63,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
         final Services services = goal.proof().getServices();
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
-        final Term powerRel = powerRelation.toTerm(app, pos, goal, mState);
+        final Term powerRel = Objects.requireNonNull(powerRelation.toTerm(app, pos, goal, mState));
 
         final var op = powerRel.op();
 
@@ -129,7 +130,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
                         yield tb.ff();
                     }
                 }
-                default -> null;
+                default -> throw new IllegalStateException("Unexpected value: " + lit.signum());
             };
         } else {
             // the odd case

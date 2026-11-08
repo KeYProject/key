@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.util;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -32,7 +33,7 @@ public final class LexicographicComparator<U> implements Comparator<Comparable<U
         }
         for (int i = 0; i < o1.length && i < o2.length; i++) {
             @SuppressWarnings("unchecked")
-            int c = o2[i].compareTo((U) o1[i]);
+            int c = Objects.requireNonNull(o2[i], "second element").compareTo((U) o1[i]);
             if (c != 0) {
                 return c;
             }

@@ -247,7 +247,10 @@ public class PosTacletApp extends TacletApp {
         if (!super.equals(o)) {
             return false;
         }
-        return ((PosTacletApp) o).posInOccurrence().equals(posInOccurrence());
+        // super.equals(o) implies o is non-null and of the same class (see TacletApp.equals)
+        final PosTacletApp other =
+            (PosTacletApp) Objects.requireNonNull(o, "equals argument non-null");
+        return other.posInOccurrence().equals(posInOccurrence());
     }
 
     /**

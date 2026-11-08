@@ -50,7 +50,7 @@ public abstract class GUIAbstractTreeNode implements TreeNode {
      * swing tree tolerates as the end of the path; both cases are deliberate and suppressed
      * with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     @Override
     public TreeNode getParent() {
         Node node = getNode();

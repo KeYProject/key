@@ -91,7 +91,7 @@ public final class CurrentGoalViewMenu extends SequentViewMenu<CurrentGoalView> 
      * still under initialization (EISOP initialization check), suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid" })
+        "nullness:method.invocation.invalid", "NullAway" })
     CurrentGoalViewMenu() {
         initClutterRules();
     }

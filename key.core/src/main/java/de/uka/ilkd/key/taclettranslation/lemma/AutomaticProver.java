@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -108,7 +109,7 @@ public class AutomaticProver {
                     if (app == null) {
                         openGoals.removeFirst();
                     } else {
-                        ImmutableList<Goal> goals = goal.apply(app);
+                        ImmutableList<Goal> goals = Objects.requireNonNull(goal.apply(app));
                         for (Goal res : goals) {
                             if (!res.equals(goal)) {
                                 openGoals.add(res);
@@ -134,10 +135,11 @@ public class AutomaticProver {
         }
 
         private @Nullable RuleApp getNextApp(Goal goal) {
-            RuleApp app = goal.getRuleAppManager().next();
+            var ruleAppManager = Objects.requireNonNull(goal.getRuleAppManager());
+            RuleApp app = ruleAppManager.next();
             if (app == null) {
                 goal.ruleAppIndex().scanBuiltInRules(goal);
-                app = goal.getRuleAppManager().next();
+                app = ruleAppManager.next();
             }
             return app;
         }

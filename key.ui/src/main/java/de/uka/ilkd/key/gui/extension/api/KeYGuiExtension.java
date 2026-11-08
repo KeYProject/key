@@ -241,9 +241,15 @@ public interface KeYGuiExtension {
         String SOURCE_VIEW = SourceView.class.getName();
 
         /**
-         * @return non-null settings provider
+         * Returns the keyboard shortcut actions for the given component.
+         *
+         * @param mediator the mediator, or {@code null} when the requesting component was
+         *        constructed before a mediator was available
+         * @param componentId the id of the component requesting the shortcuts
+         * @param component the component requesting the shortcuts
+         * @return the shortcut actions for the component
          */
-        Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
+        Collection<Action> getShortcuts(@Nullable KeYMediator mediator, String componentId,
                 JComponent component);
     }
 

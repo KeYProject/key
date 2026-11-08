@@ -82,7 +82,7 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      *         {@code Pair} only admits non-null type arguments, so the type inference difference
      *         is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:type.arguments.not.inferred")
+    @SuppressWarnings({ "NullAway", "nullness:type.arguments.not.inferred" })
     public Pair<LocationVariable, JTerm> getPredicateFormWithPlaceholder() {
         return new Pair<>(placeholderVariable, predicateFormWithPlaceholder);
     }
@@ -200,7 +200,7 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      * constructed, which the parseable-string consumers rely on; the dereferences of the
      * (nullable) form and placeholder values are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public String toParseableString(final Services services) {
         StringBuilder sb = new StringBuilder();
         Pair<LocationVariable, JTerm> predicateFormWithPlaceholder =
@@ -285,7 +285,7 @@ public abstract class AbstractionPredicate implements Function<JTerm, JTerm>, Na
      * predicate are suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public boolean equals(@Nullable Object obj) {
         if (!(obj instanceof AbstractionPredicate otherPred)) {
             return false;

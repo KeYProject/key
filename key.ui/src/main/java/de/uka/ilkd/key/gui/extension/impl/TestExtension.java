@@ -96,7 +96,7 @@ public class TestExtension implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     }
 
     @Override
-    public Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
+    public Collection<Action> getShortcuts(@Nullable KeYMediator mediator, String componentId,
             JComponent component) {
         return Collections.singleton(actionTest);
     }

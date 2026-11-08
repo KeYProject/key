@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.speclang.translation.*;
 
 import org.jspecify.annotations.NullMarked;
@@ -32,23 +35,28 @@ public final class JMLBuiltInPropertyResolver extends SLExpressionResolver {
 
 
     @Override
-    protected boolean canHandleReceiver(SLExpression receiver) {
+    protected boolean canHandleReceiver(@Nullable SLExpression receiver) {
         return receiver != null;
     }
 
 
     @Override
-    protected @Nullable SLExpression doResolving(SLExpression receiver, String name,
+    protected @Nullable SLExpression doResolving(@Nullable SLExpression receiver, String name,
             @Nullable SLParameters parameters)
             throws SLTranslationException {
         if (parameters != null) {
             return null;
         }
 
-        if (name.equals("length") && receiver.isTerm()
-                && receiver.getTerm().sort().equals(seqLDT.targetSort())) {
-            return new SLExpression(services.getTermBuilder().seqLen(receiver.getTerm()),
-                javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+        if (name.equals("length")) {
+            SLExpression recv = Objects.requireNonNull(receiver, "no receiver");
+            if (recv.isTerm()) {
+                JTerm term = Objects.requireNonNull(recv.getTerm(), "no receiver term");
+                if (term.sort().equals(seqLDT.targetSort())) {
+                    return new SLExpression(services.getTermBuilder().seqLen(term),
+                        javaInfo.getPrimitiveKeYJavaType(PrimitiveType.JAVA_INT));
+                }
+            }
         }
 
         return null;

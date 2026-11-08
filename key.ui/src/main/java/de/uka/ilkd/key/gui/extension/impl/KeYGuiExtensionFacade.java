@@ -399,15 +399,25 @@ public final class KeYGuiExtensionFacade {
         return getExtensionInstances(KeYGuiExtension.KeyboardShortcuts.class);
     }
 
-    public static Stream<Action> getKeyboardShortcuts(KeYMediator mediator, String componentId,
-            JComponent component) {
+    /**
+     * Returns the keyboard shortcut actions contributed for the given component.
+     *
+     * @param mediator the mediator, or {@code null} when the requesting component was constructed
+     *        before a mediator was available
+     * @param componentId the id of the component requesting the shortcuts
+     * @param component the component requesting the shortcuts
+     * @return the shortcut actions sorted by priority
+     */
+    public static Stream<Action> getKeyboardShortcuts(@Nullable KeYMediator mediator,
+            String componentId, JComponent component) {
         return getKeyboardShortcutsExtensions().stream()
                 .flatMap(it -> it.getShortcuts(mediator, componentId, component).stream())
                 .sorted(new ActionPriorityComparator());
     }
 
     /**
-     * @param mediator
+     * @param mediator the mediator, or {@code null} when the requesting component was constructed
+     *        before a mediator was available
      * @param component
      * @param componentId
      *
@@ -418,8 +428,8 @@ public final class KeYGuiExtensionFacade {
      *        with the values read from the table, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:argument.type.incompatible")
-    public static void installKeyboardShortcuts(KeYMediator mediator, JComponent component,
-            String componentId) {
+    public static void installKeyboardShortcuts(@Nullable KeYMediator mediator,
+            JComponent component, String componentId) {
         Stream<Action> provider = getKeyboardShortcuts(mediator, componentId, component);
         provider.forEach(it -> {
             int condition = it.getValue(KeyAction.SHORTCUT_FOCUSED_CONDITION) != null

@@ -72,7 +72,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * dereferences of the (nullable) specification and its (nullable) name are suppressed with a
      * scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private IProgramVariable findAttr(String fieldName) {
         String completeName = getFullName() + JavaDLFieldNames.SEPARATOR + fieldName;
         for (int i = 0; i < members.size(); i++) {
@@ -134,7 +134,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      *         A program variable of an enum-typed attribute always carries a KeY Java type; the
      *         dereference of the (nullable) KeY Java type is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static boolean isEnumConstant(IProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
         Type type = kjt.getJavaType();
@@ -155,7 +155,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
      *         A program variable of an enum-typed attribute always carries a KeY Java type; the
      *         dereference of the (nullable) KeY Java type is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static int indexOf(ProgramVariable attribute) {
         KeYJavaType kjt = attribute.getKeYJavaType();
         Type type = kjt.getJavaType();

@@ -330,7 +330,7 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
      *        of
      *        the (nullable) budget map field is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
     public synchronized void completeAndOffer(T goal, @Nullable Iterable<? extends T> successors) {
         inFlight.remove(goal);
         final Budget budget = getBudgetFor(goal);

@@ -724,13 +724,13 @@ public abstract class SequentView extends JEditorPane {
     }
 
     /**
-     * @param point a point.
+     * @param point a point, or {@code null} to ask whether no highlight is active.
      * @return {@code true} if and only if the argument points to the user selection.
      * @see #setUserSelectionHighlight(PosInSequent)
      * @see #setUserSelectionHighlight(Point)
      * @see #removeUserSelectionHighlight()
      */
-    protected boolean isInUserSelectionHighlight(Point point) {
+    protected boolean isInUserSelectionHighlight(@Nullable Point point) {
         return point == null && userSelectionHighlightRange == null
                 || point != null && userSelectionHighlightRange != null
                         && Objects.equals(userSelectionHighlightRange, getHighlightRange(point));

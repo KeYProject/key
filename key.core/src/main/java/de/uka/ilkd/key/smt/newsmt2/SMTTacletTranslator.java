@@ -70,7 +70,8 @@ public class SMTTacletTranslator {
 
         JTerm[] subs = { smt };
         ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(variables.values());
-        return services.getTermFactory().createTerm(Quantifier.ALL, subs, bvars, null);
+        return services.getTermFactory().createTerm(Quantifier.ALL, new ImmutableArray<>(subs),
+            bvars, null);
     }
 
     private JTerm variablify(JTerm term, Map<JOperatorSV, LogicVariable> variables)

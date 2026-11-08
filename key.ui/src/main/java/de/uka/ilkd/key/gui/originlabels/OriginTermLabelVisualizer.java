@@ -120,7 +120,9 @@ public final class OriginTermLabelVisualizer extends NodeInfoVisualizer {
             }
             KeYMediator mediator = MainWindow.getInstance().getMediator();
 
-            if (!mediator.getSelectedProof().equals(node.proof())) {
+            Proof selectedProof =
+                Objects.requireNonNull(mediator.getSelectedProof(), "no proof is selected");
+            if (!selectedProof.equals(node.proof())) {
                 int choice = JOptionPane.showOptionDialog(OriginTermLabelVisualizer.this,
                     "The proof containing this node is not currently selected."
                         + " Do you want to select it?",

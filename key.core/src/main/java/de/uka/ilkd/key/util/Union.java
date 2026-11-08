@@ -131,6 +131,7 @@ public record Union<A, B>(@Nullable Object value, boolean isFirst) {
      * @param <C> the result type of function
      * @return a fresh union object
      */
+    @SuppressWarnings("NullAway") // the stored value may legitimately be null (see class javadoc)
     public <C> Union<C, B> mapFirst(Function<A, C> function) {
         if (isFirst()) {
             return fromFirst(function.apply(getFirst()));
@@ -147,6 +148,7 @@ public record Union<A, B>(@Nullable Object value, boolean isFirst) {
      * @param <C> the result type of function
      * @return a fresh union object
      */
+    @SuppressWarnings("NullAway") // the stored value may legitimately be null (see class javadoc)
     public <C> Union<A, C> mapSecond(Function<B, C> function) {
         if (isSecond()) {
             return fromSecond(function.apply(getSecond()));

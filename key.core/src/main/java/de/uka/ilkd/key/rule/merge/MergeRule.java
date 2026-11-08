@@ -691,7 +691,7 @@ public class MergeRule implements BuiltInRule {
      *         proof
      *         of the services is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static ImmutableList<MergePartner> findPotentialMergePartners(Goal goal,
             PosInOccurrence pio) {
 

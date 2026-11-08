@@ -15,6 +15,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -28,10 +29,15 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplace
     @Deprecated
     private final Constraint metavariableInst;
 
+    @SuppressWarnings("NullAway")
     public ConstraintAwareSyntacticalReplaceVisitor(TermLabelState termLabelState,
             Services services, Constraint metavariableInst,
-            PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
-            TacletLabelHint labelHint) {
+            @Nullable PosInOccurrence applicationPosInOccurrence, @Nullable Rule rule,
+            @Nullable RuleApp ruleApp, @Nullable TacletLabelHint labelHint) {
+        // The constraint machinery runs without a rule/application context. The superclass stores
+        // these arguments in nullable fields and only consults them conditionally, so the
+        // historical contract of this constructor is that they may all be null. The super
+        // constructor's parameters are not nullable; suppressed with a scoped key.
         super(termLabelState, labelHint, applicationPosInOccurrence, services, rule, ruleApp,
             false);
         this.metavariableInst = metavariableInst;

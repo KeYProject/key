@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 
@@ -169,7 +170,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final Map<LocationVariable, JTerm> freePostconditions,
             final Map<LocationVariable, JTerm> modifiableClauses,
             final Map<LocationVariable, JTerm> freeModifiableClauses,
-            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
+            final @Nullable ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasModifiable,
             final Map<LocationVariable, Boolean> hasFreeModifiable,
             final @Nullable JTerm decreases,
@@ -206,8 +207,12 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         } else if (first instanceof EnhancedFor) {
             this.loop = (LoopStatement) first;
 
-            ExecutionContext ec =
-                KeYJavaASTFactory.executionContext(method.getContainerType(), method, null);
+            KeYJavaType containerType =
+                Objects.requireNonNull(method.getContainerType(), "container type");
+            @SuppressWarnings("NullAway") // direct call: no reference prefix is legitimate, but
+                                          // the factory's param is @NonNull (KeYJavaASTFactory)
+            final ExecutionContext ec =
+                KeYJavaASTFactory.executionContext(containerType, method, null);
             ProgramSV execContextSV =
                 SchemaVariableFactory.createProgramSV(new ProgramElementName("execContextSV"),
                     ProgramSVSort.EXECUTIONCONTEXT, false);
@@ -232,7 +237,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
         this.loopLabels = new ArrayList<>(loopLabels);
         head = getHeadStatement(loop, block, transformationData);
-        guard = loop.getGuardExpression();
+        guard = Objects.requireNonNull(loop.getGuardExpression(), "guard expression");
         body = getBodyStatement(loop, block, outerLabel, innerLabel, this.loopLabels, services);
         tail = getTailStatement(loop, block);
 
@@ -271,7 +276,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final Map<LocationVariable, JTerm> freePostconditions,
             final Map<LocationVariable, JTerm> modifiableClauses,
             final Map<LocationVariable, JTerm> freeModifiableClauses,
-            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
+            final @Nullable ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable,
             final Map<LocationVariable, Boolean> hasModifiable,
             final Map<LocationVariable, Boolean> hasFreeModifiable,
@@ -298,9 +303,17 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         EnhancedForElimination.TransformationData transformationData = null;
         LoopStatement nonEnhancedLoop = loop;
         if (loop instanceof EnhancedFor) {
-            ExecutionContext ec =
-                KeYJavaASTFactory.executionContext(method.getContainerType(), method, null);
-            enhancedForElim = new EnhancedForElimination(null, (EnhancedFor) loop);
+            KeYJavaType containerType =
+                Objects.requireNonNull(method.getContainerType(), "container type");
+            @SuppressWarnings("NullAway") // direct call: no reference prefix is legitimate, but
+                                          // the factory's param is @NonNull (KeYJavaASTFactory)
+            final ExecutionContext ec =
+                KeYJavaASTFactory.executionContext(containerType, method, null);
+            @SuppressWarnings("NullAway") // a null exec context SV selects the active statement
+                                          // context in doTransform, but the ctor requires @NonNull
+            final EnhancedForElimination newElimination =
+                new EnhancedForElimination(null, (EnhancedFor) loop);
+            enhancedForElim = newElimination;
             transformationData = enhancedForElim.doTransform(loop, services,
                 SVInstantiations.EMPTY_SVINSTANTIATIONS.add(PosInProgram.TOP,
                     PosInProgram.TOP, ec, loop, services));
@@ -317,7 +330,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
         this.loopLabels = new ArrayList<>(loopLabels);
         head = getHeadStatement(nonEnhancedLoop, block, transformationData);
-        guard = nonEnhancedLoop.getGuardExpression();
+        guard = Objects.requireNonNull(nonEnhancedLoop.getGuardExpression(), "guard expression");
         body = getBodyStatement(nonEnhancedLoop, block, outerLabel, innerLabel, this.loopLabels,
             services);
         tail = new StatementBlock();
@@ -373,7 +386,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             LocationVariable rem = new LocationVariable(
                 services.getVariableNamer().getTemporaryNameProposal(
                     variable.name() + VariablesCreator.REMEMBRANCE_SUFFIX),
-                variable.getTypeReference());
+                Objects.requireNonNull(variable.getTypeReference(),
+                    "type reference of " + variable));
             vars.variables.remembranceLocalVariables.put((LocationVariable) variable, rem);
         }
         return vars;
@@ -398,7 +412,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 headStatements.add(data.head());
             }
 
-            for (Statement statement : loop.getInitializers()) {
+            for (Statement statement : Objects.requireNonNull(loop.getInitializers(),
+                "initializers")) {
                 headStatements.add(statement);
             }
 
@@ -447,7 +462,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                     outerLabel, innerLabel, services).replace();
 
             ExtList updateStatements = new ExtList();
-            for (Expression statement : loop.getUpdates()) {
+            for (Expression statement : Objects.requireNonNull(loop.getUpdates(), "updates")) {
                 updateStatements.add(statement);
             }
 
@@ -572,7 +587,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         TermBuilder tb = services.getTermBuilder();
 
         preReplacementMap.put(tb.var(var), tb.var(init));
-        postReplacementMap.put(tb.var(r.variables.remembranceLocalVariables.get(var)),
+        postReplacementMap.put(tb.var(Objects.requireNonNull(
+            r.variables.remembranceLocalVariables.get(var), "remembrance variable")),
             tb.var(init));
     }
 
@@ -583,7 +599,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
         preReplacementMap.put(tb.var(var),
             services.getTypeConverter().getIntegerLDT().translateLiteral(init, services));
-        postReplacementMap.put(tb.var(r.variables.remembranceLocalVariables.get(var)),
+        postReplacementMap.put(tb.var(Objects.requireNonNull(
+            r.variables.remembranceLocalVariables.get(var), "remembrance variable")),
             services.getTypeConverter().getIntegerLDT().translateLiteral(init, services));
     }
 
@@ -594,7 +611,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
 
         preReplacementMap.put(tb.var(var),
             services.getTypeConverter().getSeqLDT().translateLiteral(init, services));
-        postReplacementMap.put(tb.var(r.variables.remembranceLocalVariables.get(var)),
+        postReplacementMap.put(tb.var(Objects.requireNonNull(
+            r.variables.remembranceLocalVariables.get(var), "remembrance variable")),
             services.getTypeConverter().getSeqLDT().translateLiteral(init, services));
     }
 
@@ -640,7 +658,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                 if (stmt instanceof LocalVariableDeclaration decl) {
                     ProgramVariable var =
                         (ProgramVariable) decl.getVariables().get(0).getProgramVariable();
-                    Expression init = decl.getVariables().get(0).getInitializer();
+                    Expression init = Objects.requireNonNull(
+                        decl.getVariables().get(0).getInitializer(), "initializer");
                     replaceVariable(var, init, preReplacementMap, postReplacementMap, r, services);
                 }
             }
@@ -703,6 +722,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     @Override
+    // NullAway: the decreases clause carries no flag or remembrance maps; their absence is encoded
+    // as null in the Terms data model (see AbstractAuxiliaryContractImpl)
+    @SuppressWarnings("NullAway")
     public @Nullable JTerm getDecreases(JTerm heap, @Nullable JTerm self, Services services) {
         final Map<JTerm, JTerm> replacementMap = createReplacementMap(heap,
             new Terms(self, null, null, null, null, null, null, null, null, null), services);
@@ -760,12 +782,13 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         Map<LocationVariable, JTerm> newFreeModifiableClauses =
             freeModifiableClauses.entrySet().stream().collect(
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        JTerm newMeasuredBy = op.apply(measuredBy);
-        JTerm newDecreases = op.apply(decreases);
+        JTerm newMeasuredBy = measuredBy == null ? null : op.apply(measuredBy);
+        JTerm newDecreases = decreases == null ? null : op.apply(decreases);
 
         return update(block, newPreconditions, newFreePreconditions, newPostconditions,
             newFreePostconditions, newModifiableClauses, newFreeModifiableClauses,
-            infFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
+            Objects.requireNonNull(infFlowSpecs, "info flow specs").stream()
+                    .map(spec -> spec.map(op)).collect(ImmutableList.collector()),
             variables, newMeasuredBy, newDecreases);
     }
 
@@ -811,6 +834,9 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
     }
 
     @Override
+    @SuppressWarnings("NullAway") // a contract may have no info flow specs (null field), but
+                                  // LoopContract.update declares its newinfFlowSpecs param @NonNull
+                                  // (should be @Nullable like LoopContractImpl's constructors)
     public LoopContract replaceEnhancedForVariables(StatementBlock newBlock, Services services) {
         if (replacedEnhancedForVars != null) {
             return replacedEnhancedForVars;
@@ -840,7 +866,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             final JTerm newMeasuredBy = replacer.replace(measuredBy);
             final JTerm newDecreases = replacer.replace(decreases);
 
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for (LocationVariable heap : Objects.requireNonNull(
+                services.getTypeConverter().getHeapLDT(), "heap LDT").getAllHeaps()) {
                 if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
                     continue;
                 }
@@ -978,7 +1005,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         public Creator(String baseName, StatementBlock block, List<Label> labels,
                 IProgramMethod method, Behavior behavior, Variables variables,
                 Map<LocationVariable, JTerm> requires, Map<LocationVariable, JTerm> requiresFree,
-                JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
+                @Nullable JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
                 Map<LocationVariable, JTerm> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
                 Map<Label, JTerm> breaks, Map<Label, JTerm> continues, JTerm returns, JTerm signals,
                 JTerm signalsOnly, JTerm diverges, Map<LocationVariable, JTerm> modifiables,
@@ -1027,7 +1054,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         public Creator(String baseName, LoopStatement loop, List<Label> labels,
                 IProgramMethod method, Behavior behavior, Variables variables,
                 Map<LocationVariable, JTerm> requires, Map<LocationVariable, JTerm> requiresFree,
-                JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
+                @Nullable JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
                 Map<LocationVariable, JTerm> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
                 Map<Label, JTerm> breaks, Map<Label, JTerm> continues, JTerm returns, JTerm signals,
                 JTerm signalsOnly, JTerm diverges, Map<LocationVariable, JTerm> modifiables,
@@ -1044,10 +1071,11 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
         }
 
         @Override
-        protected LoopContract build(String baseName, StatementBlock block, List<Label> labels,
+        protected LoopContract build(String baseName, @Nullable StatementBlock block,
+                List<Label> labels,
                 IProgramMethod method, JModality.JavaModalityKind modalityKind,
                 Map<LocationVariable, JTerm> preconditions,
-                Map<LocationVariable, JTerm> freePreconditions, JTerm measuredBy,
+                Map<LocationVariable, JTerm> freePreconditions, @Nullable JTerm measuredBy,
                 Map<LocationVariable, JTerm> postconditions,
                 Map<LocationVariable, JTerm> freePostconditions,
                 Map<LocationVariable, JTerm> modifiableClauses,
@@ -1061,17 +1089,17 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
                     preconditions, freePreconditions, measuredBy,
                     postconditions, freePostconditions,
                     modifiableClauses, freeModifiableClauses, infFlowSpecs, variables,
-                    transactionApplicable, hasModifiable, hasFreeModifiable, decreases, null,
-                    services);
+                    transactionApplicable, hasModifiable, hasFreeModifiable, decreases,
+                    DefaultImmutableSet.nil(), services);
             } else {
                 assert loop != null;
                 return new LoopContractImpl(
-                    baseName, loop, labels, method, modalityKind,
+                    baseName, Objects.requireNonNull(loop, "loop"), labels, method, modalityKind,
                     preconditions, freePreconditions,
                     measuredBy, postconditions, freePostconditions,
                     modifiableClauses, freeModifiableClauses, infFlowSpecs, variables,
-                    transactionApplicable, hasModifiable, hasFreeModifiable, decreases, null,
-                    services);
+                    transactionApplicable, hasModifiable, hasFreeModifiable, decreases,
+                    DefaultImmutableSet.nil(), services);
             }
         }
 
@@ -1134,7 +1162,8 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             Map<LocationVariable, Boolean> hasModifiable = new LinkedHashMap<>();
             Map<LocationVariable, Boolean> hasFreeModifiable =
                 new LinkedHashMap<LocationVariable, Boolean>();
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for (LocationVariable heap : Objects.requireNonNull(
+                services.getTypeConverter().getHeapLDT(), "heap LDT").getAllHeaps()) {
                 boolean hm = false;
                 boolean hfm = false;
 

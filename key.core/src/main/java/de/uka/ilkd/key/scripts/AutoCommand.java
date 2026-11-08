@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.java.Services;
@@ -90,7 +91,7 @@ public class AutoCommand extends AbstractCommand {
             OriginalValue ov = orgValues.get(entry.getKey());
             if (ov != null) {
                 ov.oldValue = activeStrategyProperties.getProperty(ov.settingName);
-                String key = state.getValueInjector().convert(entry.getValue(), String.class);
+                String key = state().getValueInjector().convert(entry.getValue(), String.class);
                 String value = ov.stringMap.get(key);
                 if (value == null) {
                     throw new ScriptException("Invalid value for " + entry.getKey() + ": " + key);
@@ -101,18 +102,21 @@ public class AutoCommand extends AbstractCommand {
 
         SetCommand.updateStrategySettings(state(), activeStrategyProperties);
 
-        final Strategy originalStrategy = state.getProof().getActiveStrategy();
+        final Strategy originalStrategy =
+            Objects.requireNonNull(state().getProof().getActiveStrategy(),
+                "no active strategy configured");
         if (arguments.additionalRules != null) {
-            state.getProof().setActiveStrategy(
+            state().getProof().setActiveStrategy(
                 new AdditionalRulesStrategy(originalStrategy, arguments.additionalRules, false));
         }
         if (arguments.onlyRules != null) {
-            state.getProof().setActiveStrategy(
+            state().getProof().setActiveStrategy(
                 new AdditionalRulesStrategy(originalStrategy, arguments.onlyRules, true));
         }
 
         // Give some feedback
-        applyStrategy.addProverTaskObserver(uiControl);
+        applyStrategy.addProverTaskObserver(
+            Objects.requireNonNull(uiControl, "user interface control is not set"));
 
         // start actual autoprove
         try {
@@ -127,7 +131,8 @@ public class AutoCommand extends AbstractCommand {
             }
             if (result.isError()) {
                 throw new ScriptException("Proof search failed: " + result.getException(),
-                    result.getException());
+                    Objects.requireNonNull(result.getException(),
+                        "proof search exception is missing"));
             }
             if (applyStrategy.hasBeenInterrupted()) {
                 throw new InterruptedException();
@@ -139,7 +144,7 @@ public class AutoCommand extends AbstractCommand {
                     activeStrategyProperties.setProperty(ov.settingName, ov.oldValue);
                 }
             }
-            state.getProof().setActiveStrategy(originalStrategy);
+            state().getProof().setActiveStrategy(originalStrategy);
             SetCommand.updateStrategySettings(state(), activeStrategyProperties);
         }
     }
@@ -165,9 +170,10 @@ public class AutoCommand extends AbstractCommand {
 
     /**
      * Sets up a focused automatic strategy. Focus is on the sequent formula matching the
-     * matchesRegEx (may not be null).
+     * matchesRegEx (may be null if only a breakpoint is given).
      *
-     * @param maybeMatchesRegEx The RegEx which should match on the sequent formula to focus.
+     * @param maybeMatchesRegEx The RegEx which should match on the sequent formula to focus, or
+     *        null if only a breakpoint is given.
      * @param breakpointArg An optional breakpoint argument.
      * @param goal The {@link Goal} to apply the strategy on, needed for the rule* application
      *        manager.
@@ -175,14 +181,15 @@ public class AutoCommand extends AbstractCommand {
      * @param services The {@link Services} object.
      * @throws ScriptException
      */
-    private void setupFocussedBreakpointStrategy(final String maybeMatchesRegEx,
-            final String breakpointArg, final Goal goal, final ProverCore proverCore,
+    private void setupFocussedBreakpointStrategy(final @Nullable String maybeMatchesRegEx,
+            final @Nullable String breakpointArg, final Goal goal, final ProverCore proverCore,
             final Services services) throws ScriptException {
         final var focus =
             MacroCommand.extractMatchingPio(goal.node().sequent(), maybeMatchesRegEx, services);
 
         final RuleApplicationManager<Goal> realManager = //
-            goal.getRuleAppManager();
+            Objects.requireNonNull(goal.getRuleAppManager(),
+                "goal rule application manager is not set");
         goal.setRuleAppManager(null);
 
         final RuleApplicationManager<Goal> focusManager = //
@@ -190,7 +197,9 @@ public class AutoCommand extends AbstractCommand {
         goal.setRuleAppManager(focusManager);
 
         proverCore.addProverTaskObserver(
-            new AbstractProofControl.FocussedAutoModeTaskListener(services.getProof()));
+            new AbstractProofControl.FocussedAutoModeTaskListener(
+                Objects.requireNonNull(services.getProof(),
+                    "proof is not available from the services")));
     }
 
     @Documentation(category = "Fundamental", value = """
@@ -210,7 +219,7 @@ public class AutoCommand extends AbstractCommand {
 
         @Option(value = "steps")
         @Documentation("The maximum number of proof steps to be performed.")
-        public @Nullable int maxSteps = -1;
+        public int maxSteps = -1;
 
         /**
          * Run on formula matching the given regex

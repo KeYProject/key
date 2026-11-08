@@ -33,7 +33,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
      * used; the EISOP initialization check cannot see those external assignments, so the
      * uninitialized fields are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized", "NullAway" })
     public DefaultSettingsProvider() {}
 
     /**
@@ -46,7 +46,7 @@ public class DefaultSettingsProvider implements SettingsProvider {
      * suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid" })
+        "nullness:method.invocation.invalid", "NullAway" })
     public DefaultSettingsProvider(String desc, JPanel pane) {
         setDescription(desc);
         setPanel(pane);

@@ -61,7 +61,7 @@ public class TacletOptionsSettings extends SimpleSettingsPanel implements Settin
      * displayed, suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
-        "nullness:initialization.fields.uninitialized" })
+        "nullness:initialization.fields.uninitialized", "NullAway" })
     public TacletOptionsSettings() {
         setHeaderText(getDescription());
         pCenter.setLayout(new MigLayout(new LC().fillX(), new AC().fill().grow().gap("3mm")));

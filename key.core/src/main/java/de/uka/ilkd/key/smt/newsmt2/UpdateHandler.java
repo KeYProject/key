@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -64,7 +65,9 @@ public class UpdateHandler implements SMTHandler {
         } else if (update.op() == UpdateJunctor.SKIP) {
             // Do precisely that: skip
         } else if (update.op() instanceof ElementaryUpdate elemUpd) {
-            Term target = services.getTermFactory().createTerm(elemUpd.lhs());
+            Term target =
+                Objects.requireNonNull(services, "services").getTermFactory()
+                        .createTerm(elemUpd.lhs());
             SExpr smtTarget = trans.translate(target);
             SExpr smtValue = trans.translate(update.sub(0), Type.UNIVERSE);
             individualUpdates.add(new SExpr(smtTarget, smtValue));

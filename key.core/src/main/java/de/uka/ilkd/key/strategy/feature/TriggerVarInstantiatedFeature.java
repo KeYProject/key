@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
@@ -26,8 +28,8 @@ public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert app.taclet().hasTrigger();
 
-        SVInstantiationProjection instProj = SVInstantiationProjection
-                .create(app.taclet().getTrigger().triggerVar().name(), false);
+        SVInstantiationProjection instProj = SVInstantiationProjection.create(
+            Objects.requireNonNull(app.taclet().getTrigger()).triggerVar().name(), false);
 
         return instProj.toTerm(app, pos, goal, mState) != null;
     }

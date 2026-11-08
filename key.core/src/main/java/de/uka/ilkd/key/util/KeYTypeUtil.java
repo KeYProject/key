@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.util;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.ArrayType;
@@ -152,21 +153,25 @@ public final class KeYTypeUtil {
     public static @Nullable IProgramMethod findExplicitConstructor(@Nullable Services services,
             @Nullable final IProgramMethod implicitConstructor) {
         if (services != null && implicitConstructor != null) {
-            Iterable<IProgramMethod> pms =
-                services.getJavaInfo().getConstructors(implicitConstructor.getContainerType());
+            Iterable<IProgramMethod> pms = services.getJavaInfo().getConstructors(
+                Objects.requireNonNull(implicitConstructor.getContainerType(),
+                    "container type of " + implicitConstructor));
             return CollectionUtil.search(pms, element -> {
                 if (implicitConstructor.getParameterDeclarationCount() == element
                         .getParameterDeclarationCount()) {
-                    Iterator<ParameterDeclaration> implicitIter =
-                        implicitConstructor.getParameters().iterator();
-                    Iterator<ParameterDeclaration> elementIter =
-                        element.getParameters().iterator();
+                    Iterator<ParameterDeclaration> implicitIter = Objects.requireNonNull(
+                        implicitConstructor.getParameters(), "parameters of " + implicitConstructor)
+                            .iterator();
+                    Iterator<ParameterDeclaration> elementIter = Objects.requireNonNull(
+                        element.getParameters(), "parameters of " + element).iterator();
                     boolean sameTypes = true;
                     while (sameTypes && implicitIter.hasNext() && elementIter.hasNext()) {
                         ParameterDeclaration implicitNext = implicitIter.next();
                         ParameterDeclaration elementNext = elementIter.next();
-                        sameTypes = implicitNext.getTypeReference()
-                                .equals(elementNext.getTypeReference());
+                        sameTypes = Objects.requireNonNull(implicitNext.getTypeReference(),
+                            "type reference of " + implicitNext)
+                                .equals(Objects.requireNonNull(elementNext.getTypeReference(),
+                                    "type reference of " + elementNext));
                     }
                     return sameTypes;
                 } else {

@@ -34,7 +34,7 @@ public class BlockContractValidityTermLabelFactory
      * non-null; the null case is suppressed here and widening the record component is tracked
      * as follow-up work.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Override
     public BlockContractValidityTermLabel parseInstance(@Nullable List<String> parameters,
             TermServices services) throws TermLabelException {

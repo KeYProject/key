@@ -16,10 +16,10 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
@@ -39,12 +39,13 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
     }
 
     @Override
-    public @Nullable JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         final JTerm target = term.sub(0);
 
         // the target term should have a Java block
         if (target.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) {
-            return null;
+            // an empty body writes no local variables, so the anonymizing update is empty
+            return createLocalAnonUpdate(DefaultImmutableSet.nil(), services);
         }
 
         assert target.op() instanceof JModality;

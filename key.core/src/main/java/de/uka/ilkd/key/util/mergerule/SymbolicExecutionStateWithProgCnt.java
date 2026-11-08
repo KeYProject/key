@@ -61,7 +61,7 @@ public record SymbolicExecutionStateWithProgCnt(JTerm symbolicState, JTerm pathC
      * key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public String toString() {
         final Services services = getCorrespondingNode().proof().getServices();
 

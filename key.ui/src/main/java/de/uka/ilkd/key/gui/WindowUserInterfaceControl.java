@@ -297,6 +297,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         }
     }
 
+    // STOPMODE_OPTIONS_KEY is registered in StrategyProperties' DEFAULT_MAP and copied into every
+    // instance, so getProperty can never return null here
+    @SuppressWarnings("NullAway")
     protected boolean inStopAtFirstUncloseableGoalMode(Proof proof) {
         return proof.getSettings().getStrategySettings().getActiveStrategyProperties()
                 .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)

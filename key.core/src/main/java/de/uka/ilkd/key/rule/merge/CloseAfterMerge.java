@@ -125,8 +125,11 @@ public class CloseAfterMerge implements BuiltInRule {
         ImmutableList<Goal> jpNewGoals = goal.split(generateIsWeakeningGoal ? 2 : 1);
 
         final Goal linkedGoal = jpNewGoals.head();
-        linkedGoal.setBranchLabel(
-            "Merged with node " + closeApp.getCorrespondingMergeNode().parent().serialNr());
+        final Node mergeNode = Objects.requireNonNull(closeApp.getCorrespondingMergeNode(),
+            "complete close-after-merge app carries the merge node");
+        linkedGoal.setBranchLabel("Merged with node "
+            + Objects.requireNonNull(mergeNode.parent(), "merge node is not the proof root")
+                    .serialNr());
         linkedGoal.setLinkedGoal(goal);
 
         // Add a listener to close this node if the associated merge
@@ -189,10 +192,9 @@ public class CloseAfterMerge implements BuiltInRule {
      *         {@link CloseAfterMergeRuleBuiltInRuleApp}.
      *         <p>
      *         The proof of the weakening goal's services is present, and the open goal for the
-     *         merge
-     *         state's node always exists when the weakening goal is generated; the dereferences of
-     *         the
-     *         (nullable) proof and (nullable) merged goal are suppressed with a scoped key.
+     *         merge state's node always exists when the weakening goal is generated; the
+     *         (nullable) proof, merge node and open goal are guarded with
+     *         {@link Objects#requireNonNull}.
      */
     @SuppressWarnings("nullness:dereference.of.nullable")
     private JTerm getSyntacticWeakeningFormula(CloseAfterMergeRuleBuiltInRuleApp closeApp,
@@ -229,9 +231,12 @@ public class CloseAfterMerge implements BuiltInRule {
 
         // The weakening goal is only generated for complete close-after-merge apps, whose merge
         // state always carries a corresponding node with an open goal (see the javadoc above).
-        final Goal mergedGoal = services.getProof().getOpenGoal(
-            Objects.requireNonNull(closeApp.getMergeState().getCorrespondingNode(),
-                "merge state must have a corresponding node"));
+        final Goal mergedGoal = Objects.requireNonNull(
+            Objects.requireNonNull(services.getProof(),
+                "close-after-merge requires an active proof").getOpenGoal(
+                    Objects.requireNonNull(closeApp.getMergeState().getCorrespondingNode(),
+                        "merge state must have a corresponding node")),
+            "the merge node must have an open goal");
 
         isWeakeningGoal.getLocalNamespaces().functions().add(predicateSymb);
         isWeakeningGoal.getLocalNamespaces().add(mergedGoal.getLocalNamespaces());

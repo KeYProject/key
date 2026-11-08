@@ -81,7 +81,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable MergeRuleBuiltInRuleApp replacePos(PosInOccurrence newPos) {
         return null;
@@ -144,7 +144,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
      * fields holding them are suppressed with a scoped key. The partner states are always derived
      * together with the (non-null-checked) merge partners, hence also present here.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
     private boolean distinguishablePathConditionsRequirement() {
         final Services services = mergeNode.proof().getServices();
 
@@ -186,7 +186,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public ImmutableList<MergePartner> getMergePartners() {
         return mergePartners;
     }
@@ -200,7 +200,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public MergeProcedure getConcreteRule() {
         return concreteRule;
     }
@@ -213,7 +213,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public Node getMergeNode() {
         return mergeNode;
     }
@@ -238,7 +238,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public JTerm getDistinguishingFormula() {
         return distForm;
     }
@@ -247,7 +247,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public SymbolicExecutionStateWithProgCnt getMergeSEState() {
         return thisSEState;
     }
@@ -256,7 +256,7 @@ public class MergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<MergeRule> {
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public ImmutableList<SymbolicExecutionState> getMergePartnerStates() {
         return mergePartnerStates;
     }

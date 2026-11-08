@@ -21,7 +21,7 @@ public class CountingBufferedReader extends BufferedReader {
 
     private long chars;
     private int step = 0;
-    private ProgressMonitor monitor = ProgressMonitor.Empty.getInstance();
+    private @Nullable ProgressMonitor monitor = ProgressMonitor.Empty.getInstance();
 
     public CountingBufferedReader(InputStream in) {
         super(new InputStreamReader(in, IOUtil.DEFAULT_CHARSET));
@@ -29,7 +29,8 @@ public class CountingBufferedReader extends BufferedReader {
         step = 1;
     }
 
-    public CountingBufferedReader(InputStream in, ProgressMonitor monitor, int step) {
+    /// A {@code null} monitor disables progress reporting (see {@link #read()}).
+    public CountingBufferedReader(InputStream in, @Nullable ProgressMonitor monitor, int step) {
         this(in);
         this.step = (step == 0 ? 1 : step);
         this.monitor = monitor;

@@ -121,7 +121,7 @@ public class InfoView extends JSplitPane implements TabPanel {
      * bound via {@link #setMediator(KeYMediator)}.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })
+        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible", "NullAway" })
     public InfoView(KeYMediator mediator) {
         super(VERTICAL_SPLIT);
 
@@ -636,7 +636,7 @@ public class InfoView extends JSplitPane implements TabPanel {
              * tolerated by the swing tree as the end of the path; the JDK declares a non-null
              * return, suppressed with a scoped key.
              */
-            @SuppressWarnings("nullness:return.type.incompatible")
+            @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
             @Override
             public TreeNode getParent() {
                 return parent == null ? (TreeNode) null : parent;

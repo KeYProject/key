@@ -38,7 +38,7 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends 
      * initialization check), suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid" })
+        "nullness:method.invocation.invalid", "NullAway" })
     public AuxiliaryContractConfigurator(final String name,
             final AuxiliaryContractSelectionPanel<T> contractPanel, final JDialog owner,
             final Services services, final T[] contracts, final String title) {
@@ -48,7 +48,7 @@ public class AuxiliaryContractConfigurator<T extends AuxiliaryContract> extends 
 
     /** See the {@code AuxiliaryContractConfigurator(String, ...)} constructor. */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid" })
+        "nullness:method.invocation.invalid", "NullAway" })
     public AuxiliaryContractConfigurator(final String name,
             final AuxiliaryContractSelectionPanel<T> contractPanel, final Frame owner,
             final Services services, final T[] contracts, final String title) {

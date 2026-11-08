@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.key_project.util.parsing.Location;
@@ -24,6 +26,7 @@ public class SLWarningException extends SLTranslationException {
     }
 
     public PositionedString getWarning() {
-        return new PositionedString(getMessage(), location);
+        return new PositionedString(Objects.requireNonNull(getMessage(), "no warning message"),
+            location);
     }
 }

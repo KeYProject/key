@@ -46,13 +46,11 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
      * referenced proof without navigating to it again (thereby clearing this list).
      *
      * <p>
-     * {@link ArrayDeque} requires a non-null element type (as does the entry-point
-     * {@link KeYSelectionModel} API), while this deque stores possibly {@code null} selections
-     * for stale references; the invariant mismatch at the initializer is suppressed with a
-     * scoped key.
+     * This deque stores possibly {@code null} selections (a weakly referenced node may have
+     * been collected), hence the {@code @Nullable} element type.
      */
-    @SuppressWarnings("nullness:assignment.type.incompatible")
-    private final Deque<@Nullable Node> selectionHistoryForward = new ArrayDeque<Node>();
+    private final Deque<@Nullable Node> selectionHistoryForward =
+        new ArrayDeque<@Nullable Node>();
 
     /**
      * Listeners watching this object for changes.
@@ -115,6 +113,9 @@ public class SelectionHistory implements KeYSelectionListener, ProofDisposedList
     /**
      * Show the previously selected node.
      */
+    // NullAway models Deque (an unannotated JDK class) as addLast(@NonNull), although the
+    // forward history intentionally stores possibly-null selections (collected nodes)
+    @SuppressWarnings("NullAway")
     public void navigateBack() {
         // navigate to previous selection
         Node previous = previousNode();

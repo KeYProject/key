@@ -383,8 +383,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
         }
 
         Debug.fail("Unexpected kind of rule.");
-
-        return null;
+        throw new IllegalArgumentException("Unexpected kind of rule.");
     }
 
     /**

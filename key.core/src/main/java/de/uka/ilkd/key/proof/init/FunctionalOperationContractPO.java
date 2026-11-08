@@ -179,7 +179,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected JTerm generateMbyAtPreDef(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services) {
         final JTerm mbyAtPreDef;
@@ -211,6 +211,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * so that argument mismatch is suppressed with a scoped key too.
      */
     @SuppressWarnings({
+        "NullAway",
         "nullness:return.type.incompatible",
         "nullness:argument.type.incompatible" })
     @Override
@@ -228,7 +229,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * The contract may yield {@code null} post terms for trivial cases, but the overridden
      * declaration requires a non-null term; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     @Override
     protected JTerm getPost(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
@@ -239,15 +240,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             services);
     }
 
-    /**
-     * {@inheritDoc}
-     * The contract may yield {@code null} global definitions, but the overridden declaration
-     * requires a non-null term; the difference is suppressed with a scoped key.
-     */
-    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
-    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
-            ImmutableList<JTerm> paramTerms, Services services) {
+    protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> paramTerms, Services services) {
         return contract.getGlobalDefs(heap, heapTerm, selfTerm, paramTerms, services);
     }
 
@@ -259,7 +254,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * the field declaration in {@link AbstractPO}); its dereferences are suppressed with a scoped
      * key too.
      */
-    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "NullAway", "nullness:override.return.invalid",
+        "nullness:dereference.of.nullable" })
     @Override
     protected @Nullable JTerm buildFrameClause(List<LocationVariable> modifiableHeaps,
             Map<JTerm, JTerm> heapToAtPre, LocationVariable selfVar,
@@ -324,6 +320,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * suppressed with a scoped key too.
      */
     @SuppressWarnings({
+        "NullAway",
         "nullness:return.type.incompatible",
         "nullness:dereference.of.nullable",
         "nullness:argument.type.incompatible" })
@@ -367,12 +364,6 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         return contract;
     }
 
-    /**
-     * {@inheritDoc}
-     * The overridden declaration requires a non-null return type, but this implementation may
-     * legitimately return {@code null}; the difference is suppressed with a scoped key.
-     */
-    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable JTerm getMbyAtPre() {
         return mbyAtPre;

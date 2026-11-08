@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -68,15 +69,17 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }
 
 
-    private static JTerm dropEffectlessStores(JTerm t, Services services) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+    private static @Nullable JTerm dropEffectlessStores(JTerm t, Services services) {
+        HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap theory not registered");
         assert t.sort() == heapLDT.targetSort();
         return dropEffectlessStoresHelper(t, services, new LinkedHashSet<>(), heapLDT.getStore());
     }
 
 
     @Override
-    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo mc,
             LogicServices p_services) {
         final Services services = (Services) p_services;

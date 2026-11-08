@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -190,7 +191,9 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
 
         final Polynomial solution = divideExactly(
             Polynomial.create(instance, services).sub(rest), linear.getCoefficient());
-        return solution == null ? null : varMap.put(variable, solution.toTerm(services));
+        return solution == null ? null
+                : varMap.put(Objects.requireNonNull(variable),
+                    solution.toTerm(services));
     }
 
     /** Divides every coefficient by the divisor, or returns null when a division is not exact. */

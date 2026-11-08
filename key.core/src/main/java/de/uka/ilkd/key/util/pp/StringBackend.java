@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.util.pp;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A {@link Backend} which appends all output to a StringBuffer. The {@link #mark(Object o)} method
@@ -36,7 +37,7 @@ public class StringBackend<M> {
     }
 
     /** Gets called to record a <code>mark()</code> call in the input. */
-    public void mark(M o) {}
+    public void mark(@Nullable M o) {}
 
     /** Returns the number of characters written through this backend. */
     public int count() {

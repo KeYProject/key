@@ -53,6 +53,13 @@ public class NewVarcond implements org.key_project.prover.rules.conditions.NewVa
     }
 
 
+    /**
+     * The peer schema variable is {@code null} whenever the type-based constructor was used; the
+     * interface {@link org.key_project.prover.rules.conditions.NewVarcond} declares a non-null
+     * result, so the difference is suppressed with a scoped key. Callers (e.g.
+     * {@code VariableNamer}, {@code LogicPrinter}) handle the nullable result.
+     */
+    @SuppressWarnings("NullAway")
     public @Nullable SchemaVariable getPeerSchemaVariable() {
         return peerSV;
     }
@@ -63,7 +70,7 @@ public class NewVarcond implements org.key_project.prover.rules.conditions.NewVa
     }
 
 
-    public Object getTypeDefiningObject() {
+    public @Nullable Object getTypeDefiningObject() {
         return type != null ? type : peerSV;
     }
 

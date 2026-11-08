@@ -132,7 +132,7 @@ public final class ShortUniqueFileNames {
          *        both the field and the delegated call are suppressed with scoped keys.
          */
         @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-            "nullness:method.invocation.invalid" })
+            "nullness:method.invocation.invalid", "NullAway" })
         public Name(String path) {
             this.path = path;
             this.nameStart = path.length();

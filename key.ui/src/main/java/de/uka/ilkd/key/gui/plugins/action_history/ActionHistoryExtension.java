@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.*;
@@ -55,7 +56,7 @@ public class ActionHistoryExtension implements UserActionListener,
      * is deliberate; every read happens after construction, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:assignment.type.incompatible")
-    private UndoHistoryButton undoButton = null;
+    private @Nullable UndoHistoryButton undoButton = null;
     /**
      * The selection button of {@link #undoButton}.
      *
@@ -64,7 +65,7 @@ public class ActionHistoryExtension implements UserActionListener,
      * is deliberate, suppressed with a scoped key.
      */
     @SuppressWarnings("nullness:assignment.type.incompatible")
-    private JButton undoUptoButton = null;
+    private @Nullable JButton undoUptoButton = null;
     /**
      * Proofs this extension is monitoring for changes.
      */
@@ -139,13 +140,15 @@ public class ActionHistoryExtension implements UserActionListener,
         mediator.addUserActionListener(this);
         mediator.addKeYSelectionListener(this);
         new StateChangeListener(mediator);
-        undoButton =
+        UndoHistoryButton button =
             new UndoHistoryButton(window, MainWindow.TOOLBAR_ICON_SIZE, UNDO, "Undo ",
                 this::undoOneAction, this::undoUptoAction, this::getActions);
-        undoUptoButton = undoButton.getSelectionButton();
-        undoUptoButton.setToolTipText(
+        undoButton = button;
+        JButton uptoButton = button.getSelectionButton();
+        undoUptoButton = uptoButton;
+        uptoButton.setToolTipText(
             "Select an action to undo, including all actions performed afterwards");
-        undoButton.refreshState();
+        button.refreshState();
     }
 
     @Override
@@ -154,7 +157,8 @@ public class ActionHistoryExtension implements UserActionListener,
             userActions.computeIfAbsent(action.getProof(), x -> new ArrayList<>());
         userActionList.add(action);
         currentProof = action.getProof();
-        undoButton.refreshState();
+        Objects.requireNonNull(undoButton, "the undo button is created in the constructor")
+                .refreshState();
     }
 
     @Override
@@ -169,7 +173,8 @@ public class ActionHistoryExtension implements UserActionListener,
 
     @Override
     public void proofDisposed(ProofDisposedEvent e) {
-        undoButton.refreshState();
+        Objects.requireNonNull(undoButton, "the undo button is created in the constructor")
+                .refreshState();
     }
 
     @Override
@@ -189,10 +194,10 @@ public class ActionHistoryExtension implements UserActionListener,
     }
 
     public JButton getUndoUptoButton() {
-        return undoUptoButton;
+        return Objects.requireNonNull(undoUptoButton, "the button is created in the constructor");
     }
 
     public UndoHistoryButton getUndoButton() {
-        return undoButton;
+        return Objects.requireNonNull(undoButton, "the button is created in the constructor");
     }
 }

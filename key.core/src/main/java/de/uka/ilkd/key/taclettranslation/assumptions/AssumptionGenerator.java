@@ -44,7 +44,7 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
     protected final Collection<TranslationListener> listener = new LinkedList<>();
 
-    protected TacletConditions conditions;
+    protected @Nullable TacletConditions conditions;
     private final Services services;
 
     private final GenericTranslator genericTranslator = new GenericTranslator(this);
@@ -84,8 +84,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
         // step: translate the generics sorts.
         result = new LinkedList<>();
         for (JTerm te : result2) {
-            result.addAll(
-                genericTranslator.translate(te, sorts, t, conditions, services, maxGeneric));
+            result.addAll(genericTranslator.translate(te, sorts, t,
+                Objects.requireNonNull(conditions), services, maxGeneric));
         }
 
         return new AssumptionFormula(t, result, "", conditions);
@@ -113,7 +113,8 @@ public class AssumptionGenerator implements TacletTranslator, VariablePool {
 
         }
 
-        term = services.getTermFactory().createTerm(term.op(), subTerms, variables, null);
+        term = services.getTermFactory().createTerm(term.op(), subTerms, variables,
+            new ImmutableArray<>());
 
         term = changeTerm(term);
 

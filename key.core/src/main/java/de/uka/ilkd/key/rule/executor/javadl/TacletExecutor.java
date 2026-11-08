@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -207,8 +208,10 @@ public abstract class TacletExecutor
             // descend into addrules
             for (SchemaVariable sv : collector.vars()) {
                 if (matchCond.getInstantiations().isInstantiated(sv)) {
-                    neededInstances = neededInstances.add(sv,
-                        matchCond.getInstantiations().getInstantiationEntry(sv), services);
+                    final var entry = Objects.requireNonNull(
+                        matchCond.getInstantiations().getInstantiationEntry(sv),
+                        "no instantiation entry for schema variable " + sv);
+                    neededInstances = neededInstances.add(sv, entry, services);
                 }
             }
 
@@ -233,8 +236,9 @@ public abstract class TacletExecutor
         final Services services = (Services) p_services;
         ImmutableList<RenamingTable> renamings = ImmutableList.nil();
         for (final SchemaVariable sv : pvs) {
-            final LocationVariable inst =
-                (LocationVariable) matchCond.getInstantiations().getInstantiation(sv);
+            final LocationVariable inst = (LocationVariable) Objects.requireNonNull(
+                matchCond.getInstantiations().getInstantiation(sv),
+                "no instantiation for added program variable " + sv);
             // if the goal already contains the variable to be added
             // (not just a variable with the same name), then there is nothing to do
             Collection<IProgramVariable> progVars =
@@ -267,7 +271,9 @@ public abstract class TacletExecutor
                 // sequent
                 currentSequent.combine(pvr.replace(currentSequent.sequent()));
 
-                final RenamingTable rt = RenamingTable.getRenamingTable(vn.getRenamingMap());
+                final RenamingTable rt = Objects.requireNonNull(
+                    RenamingTable.getRenamingTable(vn.getRenamingMap()),
+                    "non-empty renaming map must yield a renaming table");
 
                 renamings = renamings.append(rt);
             }

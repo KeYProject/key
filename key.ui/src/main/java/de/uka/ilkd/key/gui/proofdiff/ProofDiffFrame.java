@@ -380,7 +380,7 @@ public class ProofDiffFrame extends JFrame {
      * The test frame is opened without a main window; the deliberate {@code null} for the
      * non-null constructor parameter is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "nullness:argument.type.incompatible", "NullAway" })
     public static void main(String[] args) {
         ProofDiffFrame pdf = new ProofDiffFrame(null);
         pdf.setDefaultCloseOperation(EXIT_ON_CLOSE);

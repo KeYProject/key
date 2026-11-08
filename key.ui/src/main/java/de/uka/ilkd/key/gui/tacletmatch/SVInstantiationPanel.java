@@ -15,6 +15,7 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -239,7 +240,9 @@ public class SVInstantiationPanel extends JPanel {
                         event.acceptDrop(DnDConstants.ACTION_MOVE);
                         PosInSequent pis = (PosInSequent) t.getTransferData(
                             PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
-                        JTerm term = (JTerm) pis.getPosInOccurrence().subTerm();
+                        var pio = Objects.requireNonNull(pis.getPosInOccurrence(),
+                            "the dropped term has a position in the sequent");
+                        JTerm term = (JTerm) pio.subTerm();
                         insertAtCaret(field.area, printTerm(term));
                         event.getDropTargetContext().dropComplete(true);
                     } else if (t.isDataFlavorSupported(DataFlavor.stringFlavor)) {

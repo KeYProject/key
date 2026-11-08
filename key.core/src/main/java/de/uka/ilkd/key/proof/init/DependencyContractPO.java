@@ -60,7 +60,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
      * {@link #postInit()} before this helper is invoked (see the field declaration); the
      * dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private JTerm buildFreePre(List<LocationVariable> heaps, @Nullable LocationVariable selfVar,
             KeYJavaType selfKJT, ImmutableList<LocationVariable> paramVars, JTerm wellFormedHeaps,
             Services services) throws ProofInputException {
@@ -136,6 +136,7 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
      */
     @Override
     @SuppressWarnings({
+        "NullAway",
         "nullness:dereference.of.nullable",
         "nullness:argument.type.incompatible" })
     public void readProblem() throws ProofInputException {
@@ -309,11 +310,6 @@ public final class DependencyContractPO extends AbstractPO implements ContractPO
     }
 
 
-    /**
-     * The overridden declaration requires a non-null return type, but this implementation may
-     * legitimately return {@code null}; the difference is suppressed with a scoped key.
-     */
-    @SuppressWarnings("nullness:override.return.invalid")
     @Override
     public @Nullable JTerm getMbyAtPre() {
         return mbyAtPre;

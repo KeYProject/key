@@ -174,7 +174,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * {@code null}, but the checker cannot see that invariant, hence the scoped suppression for
      * the recursive sub-term stores.
      */
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     private @Nullable JTerm replaceVariablesInTerm(@Nullable JTerm t) {
         if (t == null) {
             return null;
@@ -212,7 +212,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * is never replaced by {@code null}, hence the scoped suppressions for the local and the
      * append.
      */
-    @SuppressWarnings({ "nullness:assignment.type.incompatible",
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible",
         "nullness:argument.type.incompatible" })
     private ImmutableList<JTerm> replaceVariablesInTerms(ImmutableList<JTerm> terms) {
         ImmutableList<JTerm> res = ImmutableList.nil();
@@ -327,7 +327,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * through as in the pre-nullness code (see {@link #replaceVariablesInTerm}), hence the scoped
      * suppressions.
      */
-    @SuppressWarnings({ "nullness:assignment.type.incompatible",
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible",
         "nullness:argument.type.incompatible" })
     private MergeContract createNewMergeContract(final MergeContract oldContract,
             final MergePointStatement newMps, final boolean changed) {
@@ -382,7 +382,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * stored into non-null-typed locals and maps as in the pre-nullness code, hence the further
      * scoped suppressions.
      */
-    @SuppressWarnings({ "nullness:dereference.of.nullable",
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
         "nullness:assignment.type.incompatible", "nullness:argument.type.incompatible" })
     private BlockContract createNewBlockContract(final BlockContract oldContract,
             final StatementBlock newBlock, final boolean blockChanged) {
@@ -452,7 +452,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * stored into non-null-typed locals and maps as in the pre-nullness code, hence the further
      * scoped suppressions.
      */
-    @SuppressWarnings({ "nullness:dereference.of.nullable",
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
         "nullness:assignment.type.incompatible", "nullness:argument.type.incompatible" })
     private LoopContract createNewLoopContract(final LoopContract oldContract,
             final JavaStatement newStatement, final boolean blockChanged) {
@@ -525,7 +525,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * variable is passed through as in the pre-nullness code (see {@link #replaceVariable}),
      * hence the scoped suppression.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private AuxiliaryContract.Variables replaceBlockContractVariables(
             final AuxiliaryContract.Variables variables) {
         return new AuxiliaryContract.Variables(replaceVariable(variables.self),
@@ -619,7 +619,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * maps as in the pre-nullness code, hence the further scoped suppressions.
      */
     @Override
-    @SuppressWarnings({ "nullness:dereference.of.nullable",
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
         "nullness:assignment.type.incompatible", "nullness:argument.type.incompatible" })
     public void performActionOnLoopInvariant(LoopStatement oldLoop, LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
@@ -703,7 +703,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * entries are passed through as in the pre-nullness code (see {@link #replaceVariablesInTerm}
      * and {@link #replaceVariable}), hence the scoped suppressions.
      */
-    @SuppressWarnings({ "nullness:assignment.type.incompatible",
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible",
         "nullness:argument.type.incompatible", "nullness:return.type.incompatible" })
     public <T extends Statement> void handleJmlStatements(T x, Function<T, T> cloner) {
         var spec = Objects.requireNonNull(

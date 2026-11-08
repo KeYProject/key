@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -66,6 +68,11 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         if (applicationPosition == null) {
             return bir.rule().isApplicable(goal, null);
         } else {
+            // the constructor guarantees a non-null position tag for every non-null application
+            // position; declaring the parameter non-null, the tag manager look-up tolerates null
+            // (it would answer "no such formula"), which main relies on only for the impossibility
+            // rejected by the constructor assertion
+            @SuppressWarnings("NullAway") // positionTag is non-null when applicationPosition is not
             final PosInOccurrence topPos =
                 goal.getFormulaTagManager().getPosForTag(positionTag);
             if (topPos == null) {
@@ -82,12 +89,13 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * Copied from FindTaclet.
      */
     private PosInOccurrence getPosInOccurrence(Goal p_goal) {
-        final PosInOccurrence topPos =
-            p_goal.getFormulaTagManager().getPosForTag(positionTag);
+        final PosInOccurrence topPos = Objects.requireNonNull(
+            p_goal.getFormulaTagManager().getPosForTag(
+                Objects.requireNonNull(positionTag, "no position tag for the formula")),
+            "the formula for the stored position does not exist any more");
 
-        assert topPos != null;
-
-        return applicationPosition.replaceSequentFormula(topPos.sequentFormula());
+        return Objects.requireNonNull(applicationPosition, "no application position")
+                .replaceSequentFormula(topPos.sequentFormula());
     }
 
 
@@ -105,6 +113,10 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     static RuleAppContainer createAppContainer(IBuiltInRuleApp bir,
             @Nullable PosInOccurrence pio,
             Goal goal) {
+        // a null position (a rule app without a find section) is legitimately handed to the
+        // strategy's cost computation, which tolerates it; the parameter is still declared @NonNull
+        // there.
+        @SuppressWarnings("NullAway")
         final RuleAppCost cost =
             withAge(goal.getGoalStrategy().computeCost(bir, pio, goal), goal);
         return new BuiltInRuleAppContainer(bir, pio, cost, goal);

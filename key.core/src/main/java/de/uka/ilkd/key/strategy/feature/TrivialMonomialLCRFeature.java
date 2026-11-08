@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -41,8 +43,10 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Monomial aMon = Monomial.create(a.toTerm(app, pos, goal, mState), services);
-        final Monomial bMon = Monomial.create(b.toTerm(app, pos, goal, mState), services);
+        final Monomial aMon = Monomial.create(
+            Objects.requireNonNull(a.toTerm(app, pos, goal, mState)), services);
+        final Monomial bMon = Monomial.create(
+            Objects.requireNonNull(b.toTerm(app, pos, goal, mState)), services);
 
         /*
          * final BigInteger ac = aMon.getCoefficient (); final BigInteger bc = bMon.getCoefficient

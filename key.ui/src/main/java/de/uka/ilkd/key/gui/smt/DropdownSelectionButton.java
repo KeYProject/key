@@ -326,8 +326,14 @@ public class DropdownSelectionButton {
                         if (width.isEmpty()) {
                             width = OptionalInt.of(0);
                         }
+                        JButton actionComp =
+                            Objects.requireNonNull(actionComponent,
+                                "the action component is created during setup");
+                        JButton selectionComp =
+                            Objects.requireNonNull(selectionComponent,
+                                "the selection component is created during setup");
                         int newWidth = Math.max(width.getAsInt(),
-                            actionComponent.getWidth() + selectionComponent.getWidth());
+                            actionComp.getWidth() + selectionComp.getWidth());
                         getMenu().setPopupSize(newWidth, Arrays.stream(getMenu().getComponents())
                                 .mapToInt(c -> c.getPreferredSize().height).sum());
                         getMenu().show(getActionButton(), 0, getActionButton().getHeight());

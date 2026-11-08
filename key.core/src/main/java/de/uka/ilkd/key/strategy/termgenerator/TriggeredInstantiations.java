@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy.termgenerator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -112,7 +113,7 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
                 if (tapp.uninstantiatedVars().size() <= 1) {
                     SVInstantiations svInst = tapp.instantiations();
 
-                    final var sv = taclet.getTrigger().triggerVar();
+                    final var sv = Objects.requireNonNull(taclet.getTrigger()).triggerVar();
                     final Sort svSort;
                     if (sv.sort() instanceof GenericSort) {
                         svSort = svInst.getGenericSortInstantiations().getRealSort(sv, services);
@@ -203,7 +204,8 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
                 final JTerm middle = c.getInstantiation(mv, services);
                 if (middle != null && !alreadyChecked.contains(middle)) {
                     alreadyChecked.add(middle);
-                    if (!checkConditions && app.taclet().getTrigger().hasAvoidConditions()) {
+                    if (!checkConditions && Objects.requireNonNull(app.taclet().getTrigger())
+                            .hasAvoidConditions()) {
                         ImmutableList<JTerm> conditions =
                             instantiateConditions(services, app, middle);
                         for (JTerm condition : conditions) {
@@ -226,7 +228,8 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
             final JTerm middle) {
         ImmutableList<JTerm> conditions;
         conditions = ImmutableList.nil();
-        for (var singleAvoidCond : app.taclet().getTrigger().avoidConditions()) {
+        final var trigger = Objects.requireNonNull(app.taclet().getTrigger());
+        for (var singleAvoidCond : trigger.avoidConditions()) {
             conditions =
                 conditions.append(
                     instantiateTerm((JTerm) singleAvoidCond, services, app.instantiations()

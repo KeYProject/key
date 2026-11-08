@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.VariableConditionAdapter;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -13,6 +15,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -38,10 +41,12 @@ public final class AbstractOrInterfaceType extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
             SVInstantiations instMap,
             Services services) {
-        final Sort sort = resolver.resolveSort(var, instCandidate, instMap, services);
+        final Sort sort = Objects.requireNonNull(
+            resolver.resolveSort(var, instCandidate, instMap, services),
+            "no sort resolved by " + resolver);
 
         final boolean isAbstractOrInterface = sort.isAbstract();
 

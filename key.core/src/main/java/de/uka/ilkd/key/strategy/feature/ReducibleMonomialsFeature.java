@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -58,8 +60,8 @@ public final class ReducibleMonomialsFeature extends BinaryTacletAppFeature {
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
 
         final Services services = goal.proof().getServices();
-        final Monomial mDividend = Monomial.create(dividendT, services);
-        final Monomial mDivisor = Monomial.create(divisorT, services);
+        final Monomial mDividend = Monomial.create(Objects.requireNonNull(dividendT), services);
+        final Monomial mDivisor = Monomial.create(Objects.requireNonNull(divisorT), services);
 
         return switch (check) {
             case REDUCIBLE -> mDivisor.reducible(mDividend);

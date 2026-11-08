@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The intermediate layer of the pretty printing library. Using the block size information provided
@@ -117,7 +118,7 @@ class Printer<M> {
         }
     }
 
-    void mark(M o) {
+    void mark(@Nullable M o) {
         back.mark(o);
     }
 

@@ -29,7 +29,7 @@ public class Sequence {
      * the initialization check cannot verify the deliberately unset {@code @Nullable} array, so the
      * difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     public Sequence(int length, String name) {
         super();
         this.name = name;

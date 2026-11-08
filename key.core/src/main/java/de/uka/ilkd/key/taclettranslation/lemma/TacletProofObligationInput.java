@@ -48,7 +48,7 @@ public class TacletProofObligationInput implements IPersistablePO {
     // The following may all possibly be null
     private @Nullable String definitionFile;
     private @Nullable String tacletFile;
-    private @Nullable String[] axiomFiles;
+    private String @Nullable [] axiomFiles;
     private @Nullable String baseDir;
 
     /**
@@ -156,14 +156,19 @@ public class TacletProofObligationInput implements IPersistablePO {
 
         if (tacletFile == null) {
             // prove a KeY taclet
-            loader = new TacletLoader.KeYsTacletsLoader(null, null, environmentConfig.getProfile());
+            loader = new TacletLoader.KeYsTacletsLoader(null, null,
+                Objects.requireNonNull(
+                    Objects.requireNonNull(environmentConfig, "no environment config").getProfile(),
+                    "no profile"));
         } else {
             final ProblemInitializer problemInitializer =
-                new ProblemInitializer(environmentConfig.getProfile());
+                new ProblemInitializer(Objects.requireNonNull(
+                    Objects.requireNonNull(environmentConfig, "no environment config").getProfile(),
+                    "no profile"));
             // bugfix: All files are loaded relative to the basedir of the loaded file
             loader = new TacletLoader.TacletFromFileLoader(null, null, problemInitializer,
                 Paths.get(baseDir, tacletFile),
-                fileCollection(axiomFiles), environmentConfig);
+                fileCollection(Objects.requireNonNull(axiomFiles)), environmentConfig);
         }
 
         ProofEnvironment proofEnv = createProofEnvironment();
@@ -180,7 +185,7 @@ public class TacletProofObligationInput implements IPersistablePO {
     }
 
     private ProofEnvironment createProofEnvironment() {
-        return new ProofEnvironment(environmentConfig);
+        return new ProofEnvironment(Objects.requireNonNull(environmentConfig));
     }
 
 
@@ -198,7 +203,7 @@ public class TacletProofObligationInput implements IPersistablePO {
     @Override
     public ProofAggregate getPO() throws ProofInputException {
         assert proofObligation != null : "readProblem should have been called first";
-        return proofObligation;
+        return Objects.requireNonNull(proofObligation);
     }
 
     @Override

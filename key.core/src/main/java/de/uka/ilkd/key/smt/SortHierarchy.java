@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 
@@ -72,7 +73,8 @@ class SortWrapper {
 
     private boolean addParent(SortWrapper parent, boolean explicitNullHierarchy,
             boolean explicitHierarchy, Services services) {
-        Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
+        Function nullOp = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT").getNull();
         if ((explicitNullHierarchy && this.getSort() == nullOp.sort()) || explicitHierarchy) {
             parentSorts.add(parent);
             return true;

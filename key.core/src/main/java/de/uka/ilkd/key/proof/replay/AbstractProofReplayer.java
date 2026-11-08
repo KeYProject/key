@@ -83,7 +83,7 @@ public abstract class AbstractProofReplayer {
      */
     protected @Nullable ImmutableList<Goal> reApplyRuleApp(Node node, Goal openGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
-        RuleApp ruleApp = node.getAppliedRuleApp();
+        RuleApp ruleApp = Objects.requireNonNull(node.getAppliedRuleApp());
         ImmutableList<Goal> nextGoals;
         if (ruleApp.rule() instanceof BuiltInRule) {
             IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(node, openGoal);
@@ -114,7 +114,7 @@ public abstract class AbstractProofReplayer {
      *         are
      *         suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private IBuiltInRuleApp constructBuiltinApp(Node originalStep, Goal currGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
         final RuleApp ruleApp = Objects.requireNonNull(originalStep.getAppliedRuleApp());
@@ -248,7 +248,7 @@ public abstract class AbstractProofReplayer {
      *         used; the dereferences of the (nullable) taclet app, init config and local app are
      *         suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private TacletApp constructTacletApp(Node originalStep, Goal currGoal) {
         TacletApp originalTacletApp = null;
         if (originalStep.getAppliedRuleApp() instanceof TacletApp tacletApp) {

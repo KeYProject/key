@@ -129,7 +129,7 @@ public class SMTSettingsProvider extends SettingsPanel implements SettingsProvid
      * suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
-        "nullness:initialization.fields.uninitialized" })
+        "nullness:initialization.fields.uninitialized", "NullAway" })
     public SMTSettingsProvider() {
         saveToFilePanel = getSaveToFilePanel();
         progressModeBox = getProgressModeBox();

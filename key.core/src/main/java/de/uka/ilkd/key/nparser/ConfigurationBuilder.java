@@ -40,7 +40,7 @@ class ConfigurationBuilder extends JavaKeYParserBaseVisitor<Object> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable String visitCsymbol(JavaKeYParser.CsymbolContext ctx) {
         if (ctx.getText().equals("null")) {

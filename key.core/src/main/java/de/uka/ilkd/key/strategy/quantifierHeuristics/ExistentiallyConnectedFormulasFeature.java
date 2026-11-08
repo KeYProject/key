@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
@@ -40,8 +42,8 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
         final ClausesGraph graph = ClausesGraph.create(pos.sequentFormula().formula(),
             goal.proof().getServices().getCaches());
 
-        return graph.connected(for0.toTerm(app, pos, goal, mState),
-            for1.toTerm(app, pos, goal, mState));
+        return graph.connected(Objects.requireNonNull(for0.toTerm(app, pos, goal, mState)),
+            Objects.requireNonNull(for1.toTerm(app, pos, goal, mState)));
     }
 
 }

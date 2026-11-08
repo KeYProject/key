@@ -12,6 +12,8 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.prover.rules.RuleApp;
+
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -98,7 +100,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
             if (nextN.size() > 1) {
                 // linearized mode: the main branch will be continued without a new BranchNode
                 if (getProofTreeModel().linearizedModeActive()
-                        && (n.getAppliedRuleApp().rule() instanceof Taclet taclet && Objects
+                        && (requireRuleApp(n).rule() instanceof Taclet taclet && Objects
                                 .equals(taclet.goalTemplates().last().tag(), "main"))) {
                     n = nextN.get(0);
                     nextN.remove(0);
@@ -138,6 +140,14 @@ class GUIBranchNode extends GUIAbstractTreeNode {
      */
     private static boolean showStep(Node n) {
         return !ProofTreeViewFilter.SEARCH.isActive() || ProofTreeViewFilter.SEARCH.matches(n);
+    }
+
+    /**
+     * @return the rule application that produced {@code n}; the original code dereferences it
+     *         directly, so a missing rule application is a null-pointer failure.
+     */
+    private static RuleApp requireRuleApp(Node n) {
+        return Objects.requireNonNull(n.getAppliedRuleApp(), "No applied rule available.");
     }
 
     @Override

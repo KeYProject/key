@@ -184,9 +184,9 @@ public interface ProofControl {
      *
      * @param node The {@link Node} to start macro at.
      * @param macro The {@link ProofMacro} to execute.
-     * @param posInOcc The exact {@link PosInOccurrence} at which the {@link ProofMacro} is started
-     *        at.
+     * @param posInOcc The exact {@link PosInOccurrence} at which the {@link ProofMacro} is
+     *        started at, or {@code null} when the macro is started globally without a position.
      */
     void runMacro(Node node, ProofMacro macro,
-            PosInOccurrence posInOcc);
+            @Nullable PosInOccurrence posInOcc);
 }

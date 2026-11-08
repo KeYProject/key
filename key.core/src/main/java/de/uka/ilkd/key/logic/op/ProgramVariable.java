@@ -64,10 +64,12 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
      * Creates a new program variable. The sanity-check asserts below call {@link #sort()} on
      * {@code this} while the receiver is still under initialization (EISOP initialization
      * check); safe here because the sort/type fields were assigned earlier in this constructor,
-     * suppressed with a scoped key.
+     * suppressed with a scoped key. A {@code null} {@code s} is tolerated and the sort is then
+     * derived from the type reference; the fallback may still resolve to {@code null} and is
+     * passed on to the super class field as in main (EISOP/NullAway suppression).
      */
-    @SuppressWarnings("nullness:method.invocation.invalid")
-    protected ProgramVariable(ProgramElementName name, Sort s, @Nullable TypeReference t,
+    @SuppressWarnings({ "NullAway", "nullness:method.invocation.invalid" })
+    protected ProgramVariable(ProgramElementName name, @Nullable Sort s, @Nullable TypeReference t,
             @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel,
             boolean isGhost,
             boolean isFinal) {
@@ -90,7 +92,7 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
         assert sort() != JavaDLTheory.UPDATE;
     }
 
-    protected ProgramVariable(ProgramElementName name, Sort s, @Nullable TypeReference t,
+    protected ProgramVariable(ProgramElementName name, @Nullable Sort s, @Nullable TypeReference t,
             @Nullable KeYJavaType containingType, boolean isStatic, boolean isModel,
             boolean isGhost) {
         this(name, s, t, containingType, isStatic, isModel, isGhost, false);
@@ -263,7 +265,7 @@ public abstract class ProgramVariable extends JAbstractSortedOperator
 
 
     @Override
-    public MatchConditions match(SourceData source, MatchConditions matchCond) {
+    public @Nullable MatchConditions match(SourceData source, MatchConditions matchCond) {
         final ProgramElement src = source.getSource();
         source.next();
         if (src == this) {

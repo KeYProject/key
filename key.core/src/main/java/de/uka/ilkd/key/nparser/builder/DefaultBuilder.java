@@ -7,6 +7,7 @@ package de.uka.ilkd.key.nparser.builder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -129,7 +130,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return mapOf(ctx.arg_sorts_or_formula_helper());
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Sort visitArg_sorts_or_formula_helper(
             JavaKeYParser.Arg_sorts_or_formula_helperContext ctx) {
@@ -300,7 +301,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
     @Override
     @SuppressWarnings("nullness:dereference.of.nullable")
     public Object visitVarIds(JavaKeYParser.VarIdsContext ctx) {
-        Collection<String> ids = accept(ctx.simple_ident_comma_list());
+        Collection<String> ids = Objects.requireNonNull(accept(ctx.simple_ident_comma_list()));
         List<ParsableVariable> list = new ArrayList<>(ids.size());
         for (String id : ids) {
             ParsableVariable v = (ParsableVariable) lookup(new Name(id));
@@ -350,7 +351,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * declaration is asserted present below; its dereference is suppressed with a scoped key.
      */
     @SuppressWarnings({ "nullness:type.arguments.not.inferred",
-        "nullness:dereference.of.nullable" })
+        "nullness:dereference.of.nullable", "NullAway" })
     @Override
     public Sort visitSortId(JavaKeYParser.SortIdContext ctx) {
         String primitiveName = ctx.id.getText();
@@ -358,7 +359,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
             // parametric sorts should be instantiated
             ParametricSortDecl sortDecl = nss.parametricSorts().lookup(primitiveName);
             if (sortDecl == null) {
-                semanticError(ctx, "Could not find polymorphic sort: %s", primitiveName);
+                return semanticError(ctx, "Could not find polymorphic sort: %s", primitiveName);
             }
             ImmutableList<GenericArgument> params =
                 getGenericArgs(ctx.formal_sort_args(), sortDecl.getParameters());
@@ -424,7 +425,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * the dereference of the (nullable) type reference is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
     public KeYJavaType visitTypemapping(JavaKeYParser.TypemappingContext ctx) {
         boolean array = false;
         StringBuilder type = new StringBuilder(visitSimple_ident_dots(ctx.simple_ident_dots()));
@@ -479,7 +480,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable List<GenericParameter> visitFormal_sort_param_decls(
             JavaKeYParser.Formal_sort_param_declsContext ctx) {
@@ -490,7 +491,7 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable GenericParameter visitFormal_sort_param_decl(
             JavaKeYParser.Formal_sort_param_declContext ctx) {

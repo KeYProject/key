@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.speclang.translation;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
@@ -81,7 +83,7 @@ public final class SLExpression {
         if (isTerm()) {
             return term + "(type: " + type + ")";
         } else {
-            return type.toString();
+            return Objects.requireNonNull(type, "no type").toString();
         }
     }
 }

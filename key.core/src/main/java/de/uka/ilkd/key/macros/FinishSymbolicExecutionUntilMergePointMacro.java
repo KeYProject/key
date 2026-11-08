@@ -120,7 +120,7 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
      * tests); the single-step macro and the prover core tolerate that, hence the scoped
      * suppression.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Override
     protected void doPostProcessing(Proof proof) {
         // This hack was introduced since in a "while loop with break"

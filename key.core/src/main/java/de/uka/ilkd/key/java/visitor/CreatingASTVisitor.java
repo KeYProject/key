@@ -159,7 +159,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     // the change list (the guard is explicitly null-tolerated above); such missing children are
     // stored as-is by LoopStatement and remain traversable via getChildCount(). The position, by
     // contrast, is never null here (refilled with PositionInfo.UNDEFINED when not preserved).
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Override
     public void performActionOnWhile(While x) {
         ExtList changeList = stack.getFirst();
@@ -190,7 +190,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     // (without fully understanding the former)
     // guard, updates and body may legitimately be absent when a sub-transformation removed them
     // from the change list; missing loop parts are stored as null children by LoopStatement.
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Override
     public void performActionOnFor(final For x) {
         ExtList changeList = stack.getFirst();
@@ -222,7 +222,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     // the change list (the guard is explicitly null-tolerated above); such missing children are
     // stored as-is by LoopStatement. The position is never null here (refilled with
     // PositionInfo.UNDEFINED when position info is not preserved).
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Override
     public void performActionOnDo(Do x) {
         ExtList changeList = stack.getFirst();
@@ -274,7 +274,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     // eee
     // A schema program variable (ProgramSV) has no KeYJavaType, so getKeYJavaType() may be null;
     // VariableSpecification deliberately stores such a null type (see its constructor javadoc).
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Override
     public void performActionOnVariableSpecification(VariableSpecification x) {
         ExtList changeList = stack.getFirst();
@@ -371,6 +371,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     @Override
     public void performActionOnTypeReference(final TypeReference x) {
         DefaultAction def = new DefaultAction(x) {
+            // A schematic type reference may carry no KeYJavaType at parse time; TypeRef stores
+            // such a null type as-is (cf. the VariableSpecification handling below).
+            @SuppressWarnings("NullAway")
             @Override
             ProgramElement createNewElement(ExtList changeList) {
                 return new TypeRef(changeList, x.getKeYJavaType(), x.getDimensions());
@@ -394,7 +397,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     // The case expression may legitimately be absent (an expression-less case, or the label
     // expression removed by a sub-transformation, see the null-tolerance above); the position is
     // never null here (refilled with PositionInfo.UNDEFINED when position info is not preserved).
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Override
     public void performActionOnCase(Case x) {
         Expression e = null;
@@ -544,7 +547,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     // The label may legitimately be absent when a sub-transformation removed it (see the
     // null-tolerance above); the position is never null here (refilled with
     // PositionInfo.UNDEFINED when position info is not preserved).
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Override
     public void performActionOnLabeledStatement(LabeledStatement x) {
         Label l = null;
@@ -712,6 +715,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         DefaultAction def = new DefaultAction(x) {
             final NewArray y = (NewArray) pe;
 
+            // An array creation may have no initializer (e.g. a multi-dimensional array of
+            // arrays); NewArray stores the absent initializer as null.
+            @SuppressWarnings("NullAway")
             @Override
             ProgramElement createNewElement(ExtList children) {
                 ArrayInitializer arrInit = children.get(ArrayInitializer.class);
@@ -726,6 +732,10 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     @Override
     public void performActionOnNew(New x) {
         DefaultAction def = new DefaultAction(x) {
+            // walk() always pushes a PositionInfo first (refilled with PositionInfo.UNDEFINED
+            // when position info is not preserved), and the access path is legitimately null when
+            // the constructor call has no explicit prefix; New stores an @Nullable access path.
+            @SuppressWarnings("NullAway")
             @Override
             ProgramElement createNewElement(ExtList children) {
                 PositionInfo pi = children.removeFirstOccurrence(PositionInfo.class);
@@ -750,6 +760,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     @Override
     public void performActionOnArrayReference(ArrayReference x) {
         DefaultAction def = new DefaultAction(x) {
+            // The access path is legitimately null when the array element is referenced without
+            // a prefix, and walk() always pushes the PositionInfo first (so pos is never null).
+            @SuppressWarnings("NullAway")
             @Override
             ProgramElement createNewElement(ExtList children) {
                 PositionInfo pos = children.removeFirstOccurrence(PositionInfo.class);
@@ -784,6 +797,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     @Override
     public void performActionOnSuperConstructorReference(SuperConstructorReference x) {
         DefaultAction def = new DefaultAction(x) {
+            // The access path is legitimately null when the super call has no prefix, and walk()
+            // always pushes the PositionInfo first (so pos is never null).
+            @SuppressWarnings("NullAway")
             @Override
             ProgramElement createNewElement(ExtList children) {
                 PositionInfo pos = children.removeFirstOccurrence(PositionInfo.class);
@@ -951,6 +967,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     @Override
     public void performActionOnForUpdates(final ForUpdates x) {
         DefaultAction def = new DefaultAction(x) {
+            // walk() always pushes a PositionInfo first (refilled with PositionInfo.UNDEFINED
+            // when position info is not preserved), so pi is never null here.
+            @SuppressWarnings("NullAway")
             @Override
             ProgramElement createNewElement(ExtList changeList) {
                 PositionInfo pi;
@@ -979,6 +998,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     @Override
     public void performActionOnLoopInit(LoopInit x) {
         DefaultAction def = new DefaultAction(x) {
+            // walk() always pushes a PositionInfo first (refilled with PositionInfo.UNDEFINED
+            // when position info is not preserved), so pi is never null here.
+            @SuppressWarnings("NullAway")
             @Override
             ProgramElement createNewElement(ExtList changeList) {
                 final PositionInfo pi;
@@ -1084,7 +1106,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
      *        A {@link ProgramElement}
      * @return pe2's position in pe1
      */
-    protected static int getPosition(NonTerminalProgramElement pe1, ProgramElement pe2) {
+    protected static int getPosition(NonTerminalProgramElement pe1, @Nullable ProgramElement pe2) {
         int n = pe1.getChildCount();
         int i = 0;
         while ((i < n) && (pe1.getChildAt(i) != pe2)) {

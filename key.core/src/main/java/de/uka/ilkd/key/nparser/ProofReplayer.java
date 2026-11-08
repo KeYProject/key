@@ -82,7 +82,7 @@ public class ProofReplayer {
      *        interface's non-null {@code str} parameter under-documents the contract; the pass of
      *        the (nullable) argument is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "nullness:argument.type.incompatible", "NullAway" })
     public static void run(CharStream input, IProofFileParser prl, final int startLine,
             URI source) {
         JavaKeYLexer lexer = ParsingFacade.createLexer(input);

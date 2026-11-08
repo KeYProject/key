@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -52,8 +53,9 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         final ProgramVariable permissionsHeapBeforePV = //
             (ProgramVariable) term.sub(3).op();
 
-        final LoopSpecification loopSpec = //
-            MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
+        final LoopSpecification loopSpec = Objects.requireNonNull(
+            MiscTools.getSpecForTermWithLoopStmt(loopFormula, services),
+            "no loop specification for frame condition");
 
         final boolean isTransaction =
             MiscTools.isTransaction(((Modality) loopFormula.op()).kind());
@@ -94,19 +96,22 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
         JTerm frameCondition = null;
         for (LocationVariable heap : heapContext) {
-            final JTerm modifiable = modifiables.get(heap);
+            final JTerm modifiable = Objects.requireNonNull(modifiables.get(heap),
+                "no modifiable clause for heap " + heap);
             final JTerm fc;
+            final Map<JTerm, JTerm> beforeLoopMap = Objects.requireNonNull(
+                heapToBeforeLoopMap.get(heap), "no before-loop map for heap " + heap);
 
             if (tb.strictlyNothing().equalsModProperty(modifiable,
                 IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                fc = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoopMap.get(heap));
+                fc = tb.frameStrictlyEmpty(tb.var(heap), beforeLoopMap);
             } else {
-                fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), modifiable);
+                fc = tb.frame(tb.var(heap), beforeLoopMap, modifiable);
             }
 
             frameCondition = frameCondition == null ? fc : tb.and(frameCondition, fc);
         }
-        return frameCondition;
+        return Objects.requireNonNull(frameCondition, "no frame condition");
     }
 
     /**
@@ -128,7 +133,8 @@ public final class CreateFrameCond extends AbstractTermTransformer {
             ProgramVariable permissionsHeapBeforePV, Services services) {
         final Map<LocationVariable, Map<JTerm, JTerm>> result = //
             new LinkedHashMap<>();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT");
         final TermBuilder tb = services.getTermBuilder();
 
         put(result, heapLDT.getHeap(), tb.var(heapLDT.getHeap()), tb.var(heapBeforePV));
@@ -139,8 +145,9 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         }
 
         if (isPermissions) {
-            put(result, heapLDT.getPermissionHeap(), tb.var(heapLDT.getPermissionHeap()),
-                tb.var(permissionsHeapBeforePV));
+            final LocationVariable permissionHeap = Objects.requireNonNull(
+                heapLDT.getPermissionHeap(), "no permission heap available");
+            put(result, permissionHeap, tb.var(permissionHeap), tb.var(permissionsHeapBeforePV));
         }
 
         return result;

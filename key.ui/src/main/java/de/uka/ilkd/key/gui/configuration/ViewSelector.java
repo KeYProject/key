@@ -45,7 +45,7 @@ public class ViewSelector extends JDialog {
      *        are suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid" })
+        "nullness:method.invocation.invalid", "NullAway" })
     public ViewSelector(JFrame parent) {
         super(parent, "Maximum line number for tooltips", true);
         layoutViewSelector();

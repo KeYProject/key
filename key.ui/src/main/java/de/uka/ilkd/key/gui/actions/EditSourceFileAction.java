@@ -12,6 +12,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Optional;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -303,7 +304,8 @@ public class EditSourceFileAction extends KeyAction {
                     "Position not available", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            final URI uri = location.getFileUri();
+            // Checked for nullness above; the guard keeps the crash-equivalent NPE explicit.
+            final URI uri = Objects.requireNonNull(location.getFileUri());
 
             // indicate edit/readonly in dialog title
             String prefix;

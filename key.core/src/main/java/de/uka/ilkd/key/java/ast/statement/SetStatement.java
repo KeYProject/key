@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.nparser.KeyAst.SetStatementContext;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * JML set statement
@@ -36,7 +37,7 @@ public class SetStatement extends JavaStatement {
     private final SetStatementContext context;
 
     /** Constructor used in recoderext */
-    public SetStatement(SetStatementContext context, PositionInfo positionInfo) {
+    public SetStatement(SetStatementContext context, @Nullable PositionInfo positionInfo) {
         super(positionInfo);
         this.context = context;
     }

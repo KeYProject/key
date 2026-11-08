@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
@@ -175,8 +176,8 @@ public final class LoopSpecImpl implements LoopSpecification {
         return result;
     }
 
-    private Map<JTerm, JTerm> getInverseReplaceMap(JTerm selfTerm,
-            Map<LocationVariable, JTerm> atPres,
+    private Map<JTerm, JTerm> getInverseReplaceMap(@Nullable JTerm selfTerm,
+            @Nullable Map<LocationVariable, JTerm> atPres,
             Services services) {
         final Map<JTerm, JTerm> result = new LinkedHashMap<>();
         final Map<JTerm, JTerm> replaceMap = getReplaceMap(selfTerm, atPres);
@@ -205,12 +206,14 @@ public final class LoopSpecImpl implements LoopSpecification {
             originalInfFlowSpecs.entrySet().stream()
                     .collect(MapUtil.collector(Map.Entry::getKey, entry -> entry.getValue().stream()
                             .map(spec -> spec.map(op)).collect(ImmutableList.collector())));
-        JTerm newVariant = op.apply(originalVariant);
-        JTerm newSelfTerm = op.apply(originalSelfTerm);
+        JTerm newVariant = originalVariant == null ? null : op.apply(originalVariant);
+        JTerm newSelfTerm = originalSelfTerm == null ? null : op.apply(originalSelfTerm);
         ImmutableList<JTerm> newLocalIns =
-            localIns.stream().map(op).collect(ImmutableList.collector());
+            Objects.requireNonNull(localIns, "local ins").stream().map(op)
+                    .collect(ImmutableList.collector());
         ImmutableList<JTerm> newLocalOuts =
-            localOuts.stream().map(op).collect(ImmutableList.collector());
+            Objects.requireNonNull(localOuts, "local outs").stream().map(op)
+                    .collect(ImmutableList.collector());
         Map<LocationVariable, JTerm> newAtPres = originalAtPres.entrySet().stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
 
@@ -225,6 +228,9 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // a loop may have no clause on a specific heap; absence is
+                                  // encoded as null, but LoopSpecification declares these getters
+                                  // @NonNull (should be widened to @Nullable)
     public JTerm getInvariant(LocationVariable heap, @Nullable JTerm selfTerm,
             @Nullable Map<LocationVariable, JTerm> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
@@ -234,11 +240,13 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // see getInvariant(LocationVariable, JTerm, Map, Services)
     public JTerm getInvariant(Services services) {
         return originalInvariants.get(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     @Override
+    @SuppressWarnings("NullAway") // see getInvariant(LocationVariable, JTerm, Map, Services)
     public JTerm getFreeInvariant(LocationVariable heap, @Nullable JTerm selfTerm,
             @Nullable Map<LocationVariable, JTerm> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
@@ -248,11 +256,13 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // see getInvariant(LocationVariable, JTerm, Map, Services)
     public JTerm getFreeInvariant(Services services) {
         return originalFreeInvariants.get(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     @Override
+    @SuppressWarnings("NullAway") // see getInvariant(LocationVariable, JTerm, Map, Services)
     public JTerm getModifiable(LocationVariable heap, @Nullable JTerm selfTerm,
             @Nullable Map<LocationVariable, JTerm> atPres, Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
@@ -262,6 +272,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // see getInvariant(LocationVariable, JTerm, Map, Services)
     public JTerm getModifiable(@Nullable JTerm selfTerm,
             @Nullable Map<LocationVariable, JTerm> atPres,
             Services services) {
@@ -280,7 +291,8 @@ public final class LoopSpecImpl implements LoopSpecification {
         OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
         final JTerm originalFreeModForHeap = originalFreeModifiable.get(heap);
         if (originalFreeModForHeap != null) {
-            return or.replace(originalFreeModForHeap);
+            return Objects.requireNonNull(or.replace(originalFreeModForHeap),
+                "free modifiable clause");
         } else {
             return services.getTermBuilder().strictlyNothing();
         }
@@ -297,17 +309,22 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // a loop may have no info flow specs on a heap (no entry in the
+                                  // map, hence null), but the interface declares @NonNull
     public ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap) {
         return originalInfFlowSpecs.get(heap);
     }
 
     @Override
     public ImmutableList<InfFlowSpec> getInfFlowSpecs(Services services) {
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        LocationVariable baseHeap =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT").getHeap();
         return getInfFlowSpecs(baseHeap);
     }
 
     @Override
+    @SuppressWarnings("NullAway") // the variant may be absent (no decreases clause, hence null),
+                                  // but LoopSpecification.getVariant declares @NonNull
     public JTerm getVariant(@Nullable JTerm selfTerm, @Nullable Map<LocationVariable, JTerm> atPres,
             Services services) {
         assert (selfTerm == null) == (originalSelfTerm == null);
@@ -327,6 +344,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // see getVariant(JTerm, Map, Services)
     public JTerm getInternalVariant() {
         return originalVariant;
     }
@@ -347,6 +365,8 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // static loops have no self term (null), but the interface
+                                  // declares JTerm getInternalSelfTerm() as @NonNull
     public JTerm getInternalSelfTerm() {
         return originalSelfTerm;
     }
@@ -378,6 +398,9 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // the method context (pm) is @Nullable here but the delegating
+                                  // create(loop, pm, ...) declares its pm parameter @NonNull (the
+                                  // interface should be widened like the constructor's)
     public LoopSpecification create(LoopStatement loop, Map<LocationVariable, JTerm> invariants,
             Map<LocationVariable, JTerm> freeInvariants, Map<LocationVariable, JTerm> modifiable,
             Map<LocationVariable, JTerm> freeModifiable,
@@ -396,10 +419,13 @@ public final class LoopSpecImpl implements LoopSpecification {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // localIns/localOuts are null when absent, but create's
+                                  // parameters are @NonNull in the interface (should be @Nullable)
     public LoopSpecification configurate(Map<LocationVariable, JTerm> invariants,
             Map<LocationVariable, JTerm> freeInvariants, Map<LocationVariable, JTerm> modifiable,
             Map<LocationVariable, JTerm> freeModifiable,
-            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, JTerm variant) {
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs,
+            @Nullable JTerm variant) {
         return create(loop, invariants, freeInvariants, modifiable, freeModifiable, infFlowSpecs,
             variant, originalSelfTerm, localIns, localOuts, originalAtPres);
     }
@@ -465,7 +491,8 @@ public final class LoopSpecImpl implements LoopSpecification {
      */
     public String getPlainText(Services services, boolean usePrettyPrinting,
             boolean useUnicodeSymbols, boolean hidePackagePrefix) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
         return getPlainText(services, heapLDT.getAllHeaps(), usePrettyPrinting, useUnicodeSymbols,
             hidePackagePrefix);
     }
@@ -474,7 +501,8 @@ public final class LoopSpecImpl implements LoopSpecification {
     public String getPlainText(Services services, Iterable<LocationVariable> heapContext,
             boolean usePrettyPrinting, boolean useUnicodeSymbols,
             boolean hidePackagePrefix) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
         final LocationVariable baseHeap = heapLDT.getHeap();
 
         StringBuilder mods = new StringBuilder();
@@ -527,7 +555,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     public String getUniqueName() {
         if (pm != null) {
             return "Loop Invariant " + getLoop().getStartPosition().line() + " "
-                + getTarget().getUniqueName();
+                + pm.getUniqueName();
         } else {
             return "Loop Invariant " + getLoop().getStartPosition().line() + " "
                 + Math.abs(getLoop().hashCode());

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -43,7 +44,7 @@ public class SelectCommand extends AbstractCommand {
 
         Goal g;
         if (args.number != null && args.formula == null && args.branch == null) {
-            ImmutableList<Goal> goals = state.getProof().openEnabledGoals();
+            ImmutableList<Goal> goals = state().getProof().openEnabledGoals();
 
             if (args.number >= 0) {
                 g = goals.get(args.number);
@@ -51,15 +52,15 @@ public class SelectCommand extends AbstractCommand {
                 g = goals.get(goals.size() + args.number);
             }
         } else if (args.formula != null && args.number == null && args.branch == null) {
-            g = findGoalWith(args.formula, state.getProof());
+            g = findGoalWith(args.formula, state().getProof());
         } else if (args.branch != null && args.formula == null && args.number == null) {
-            g = findGoalWith(args.branch, state.getProof());
+            g = findGoalWith(args.branch, state().getProof());
         } else {
             throw new ScriptException(
                 "Exactly one of 'formula', 'branch' or 'number' are required");
         }
 
-        state.setGoal(g);
+        state().setGoal(g);
     }
 
     private Goal findGoalWith(String branchTitle, Proof proof) throws ScriptException {
@@ -106,7 +107,8 @@ public class SelectCommand extends AbstractCommand {
             int childCount = node.childrenCount();
 
             if (filter.apply(node)) {
-                final Goal g = goalRetriever.apply(node);
+                final Goal g = Objects.requireNonNull(goalRetriever.apply(node),
+                    "No goal was found for this node");
                 if (g.isAutomatic()) {
                     return g;
                 }

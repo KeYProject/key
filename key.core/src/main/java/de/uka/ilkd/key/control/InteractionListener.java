@@ -20,6 +20,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -31,9 +32,19 @@ public interface InteractionListener {
 
     void runPrune(Node node);
 
+    /**
+     * Notifies that a macro run finished (possibly unsuccessfully).
+     *
+     * @param node the node the macro was started at
+     * @param macro the executed macro
+     * @param posInOcc the position the macro was started at, or {@code null} when no subterm was
+     *        selected
+     * @param info the macro result, or {@code null} when the macro was interrupted before
+     *        producing one
+     */
     void runMacro(Node node, ProofMacro macro,
-            PosInOccurrence posInOcc,
-            ProofMacroFinishedInfo info);
+            @Nullable PosInOccurrence posInOcc,
+            @Nullable ProofMacroFinishedInfo info);
 
     void runBuiltInRule(Node node, IBuiltInRuleApp app, BuiltInRule rule, PosInOccurrence pos,
             boolean forced);

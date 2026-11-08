@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
@@ -83,8 +85,11 @@ public class UnwindLoop extends ProgramTransformer {
         }
 
         final WhileLoopTransformation w = new WhileLoopTransformation(originalLoop,
-            (ProgramElementName) svInst.getInstantiation(outerLabel),
-            (ProgramElementName) svInst.getInstantiation(innerLabel), services);
+            (ProgramElementName) Objects.requireNonNull(svInst.getInstantiation(outerLabel),
+                "no instantiation of " + outerLabel),
+            (ProgramElementName) Objects.requireNonNull(svInst.getInstantiation(innerLabel),
+                "no instantiation of " + innerLabel),
+            services);
         w.start();
         return new ProgramElement[] { w.result() };
     }

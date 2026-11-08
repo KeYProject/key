@@ -61,7 +61,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
      *         class-path entry is a directory; the dereferences of the (nullable) roots and the
      *         (nullable) parent directory are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private @Nullable Path getJavaFilePath(Path javaFile) {
         // assumes that javaFile is an actual *.java file, path has to be absolute and normalized
         // return value: the path of the file relative to its proof bundle root
@@ -99,7 +99,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
      * The base directory of the repository is always set; the dereference of the (nullable) base
      * directory is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private Path getKeyFilePath(Path keyFile) {
         if (keyFile.isAbsolute()) {
             // compute the relative target path (top level in repo)
@@ -122,7 +122,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
      * A mapping class-path entry is a directory whose parent is always present; the dereference
      * of the (nullable) parent directory is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private @Nullable Path getClassFilePath(Path classFile) {
         // copy to classpath folder (*.class files may only occur in classpath)
 
@@ -154,7 +154,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
      * directory is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected @Nullable InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
         Path concrete;
         if (p.isAbsolute()) { // p is absolute -> directly read
@@ -218,7 +218,7 @@ public class SimpleFileRepo extends AbstractFileRepo {
      * directory is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public OutputStream createOutputStream(Path path) throws FileNotFoundException {
         if (path.isAbsolute()) {
             // programming error!

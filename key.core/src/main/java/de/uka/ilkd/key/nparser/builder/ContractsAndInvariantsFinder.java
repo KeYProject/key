@@ -41,11 +41,11 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     private final List<ClassInvariant> invariants = new ArrayList<>();
 
 
-    private LocationVariable selfVar;
+    private @Nullable LocationVariable selfVar;
 
     /**
      * The {@code self} variable is discovered while the AST is visited, after construction; the
-     * difference is suppressed with a scoped key.
+     * field is therefore honestly nullable, and the invariant construction below guards the access.
      */
     @SuppressWarnings("nullness:initialization.fields.uninitialized")
     public ContractsAndInvariantsFinder(Services services, NamespaceSet nss) {
@@ -65,7 +65,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapOf(ctx.contracts());
@@ -78,7 +78,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         return mapOf(ctx.one_contract());
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitOne_contract(JavaKeYParser.One_contractContext ctx) {
         String contractName = visitSimple_ident(ctx.contractName);
@@ -102,7 +102,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
     }
 
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitInvariants(JavaKeYParser.InvariantsContext ctx) {
         Namespace<QuantifiableVariable> orig = variables();
@@ -112,7 +112,7 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         return null;
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitOne_invariant(JavaKeYParser.One_invariantContext ctx) {
         String invName = visitSimple_ident(ctx.simple_ident());
@@ -120,7 +120,8 @@ public class ContractsAndInvariantsFinder extends ExpressionBuilder {
         String displayName = ctx.displayName != null ? ctx.displayName.getText() : null;
         DLSpecFactory dsf = new DLSpecFactory(getServices());
         try {
-            ClassInvariant inv = dsf.createDLClassInvariant(invName, displayName, selfVar, fma);
+            ClassInvariant inv = dsf.createDLClassInvariant(invName, displayName,
+                Objects.requireNonNull(selfVar), fma);
             invariants.add(inv);
         } catch (ProofInputException e) {
             semanticError(ctx, Objects.requireNonNull(e.getMessage()));

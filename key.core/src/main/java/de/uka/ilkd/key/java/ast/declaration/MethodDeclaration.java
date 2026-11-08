@@ -80,7 +80,8 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public record JMLModifiers(
             boolean pure, boolean strictlyPure, boolean helper,
-            SpecMathMode specMathMode) {
+            // no JML spec math modifier means an absent (null) mode
+            @Nullable SpecMathMode specMathMode) {
     }
 
 

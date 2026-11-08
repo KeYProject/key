@@ -155,7 +155,7 @@ public class JoinProcessor implements Runnable {
      * The rule application of a complete merge cut always yields a goal list; the dereference of
      * the (nullable) applied-goal list is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private Goal simplifyUpdate(Goal goal, DelayedCut cut) {
 
         SequentFormula sf =
@@ -208,7 +208,7 @@ public class JoinProcessor implements Runnable {
      * The hide rule application of a complete join partner always yields a goal list; the
      * dereference of the (nullable) applied-goal list is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private Goal hide(Goal goal) {
         SequentFormula formulaForHiding = partner.getFormulaForHiding();
         if (formulaForHiding == null) {

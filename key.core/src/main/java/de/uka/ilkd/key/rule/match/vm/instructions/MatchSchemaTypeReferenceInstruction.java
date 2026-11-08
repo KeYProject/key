@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.reference.SchemaTypeReference;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 
@@ -37,7 +39,8 @@ public final class MatchSchemaTypeReferenceInstruction implements MatchInstructi
     public @Nullable MatchResultInfo match(SyntaxElement actualElement,
             MatchResultInfo matchConditions, LogicServices services) {
         if (actualElement instanceof TypeReference tr
-                && pattern.getName().equals(tr.getName())
+                && Objects.requireNonNull(pattern.getName(),
+                    "schema type reference has no name").equals(tr.getName())
                 && tr.getDimensions() == pattern.getDimensions()) {
             return matchConditions;
         }

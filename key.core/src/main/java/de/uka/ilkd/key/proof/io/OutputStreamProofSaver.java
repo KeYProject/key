@@ -123,7 +123,7 @@ public class OutputStreamProofSaver {
      *         The log lists are lazily created at the entry of this method; the dereferences of the
      *         (nullable) log fields are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public StringBuffer writeLog() {
         final StringBuffer logstr = new StringBuffer();
         // Advance the Log entries
@@ -162,7 +162,7 @@ public class OutputStreamProofSaver {
      *         Every saved proof has a root node; the dereference of the (nullable) root node is
      *         suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void save(Path basePath, OutputStream out) throws IOException {
         CopyReferenceResolver.copyCachedGoals(proof, null, null, null);
         try (PrintWriter ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
@@ -473,7 +473,7 @@ public class OutputStreamProofSaver {
      * The merge node corresponding to a close-after-merge application is always present at save
      * time; the dereference of the (nullable) merge node is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void printSingleCloseAfterMergeRuleApp(CloseAfterMergeRuleBuiltInRuleApp closeApp,
             Node node, String prefix, Appendable output) throws IOException {
 
@@ -504,7 +504,7 @@ public class OutputStreamProofSaver {
      *         scoped
      *         key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void printRuleJustification(IBuiltInRuleApp appliedRuleApp, Appendable output)
             throws IOException {
         final RuleJustification ruleJusti = proof.getInitConfig().getJustifInfo()
@@ -530,7 +530,7 @@ public class OutputStreamProofSaver {
      *         A contract-rule application always carries a program term; the dereference of the
      *         (nullable) program term is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void printSingleBuiltInRuleApp(IBuiltInRuleApp appliedRuleApp, Node node, String prefix,
             Appendable output) throws IOException {
         output.append(prefix);

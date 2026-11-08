@@ -57,7 +57,7 @@ public class ResolvedLogicalType
      * dereference of the (nullable) sort is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public boolean isAssignableBy(ResolvedType type) {
         if (type instanceof ResolvedPrimitiveType primitiveType) {
             if (primitiveType.isBoolean()) {
@@ -151,7 +151,7 @@ public class ResolvedLogicalType
      * dereference of the (nullable) sort is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public boolean isAssignableToPrimitive(ResolvedPrimitiveType primitiveType) {
         if (primitiveType.isBoolean()) {
             return false;

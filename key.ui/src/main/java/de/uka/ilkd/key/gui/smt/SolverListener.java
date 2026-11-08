@@ -196,7 +196,7 @@ public class SolverListener implements SolverLauncherListener {
      * and before any further launcher event fires; the constructor cannot initialize them (EISOP
      * initialization check), suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized", "NullAway" })
     public SolverListener(DefaultSMTSettings settings, Proof smtProof) {
         this.settings = settings;
         this.smtProof = smtProof;

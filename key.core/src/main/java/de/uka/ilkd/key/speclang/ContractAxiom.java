@@ -87,8 +87,8 @@ public final class ContractAxiom extends ClassAxiom {
     public ContractAxiom map(UnaryOperator<JTerm> op, Services services) {
         return new ContractAxiom(name, displayName, target, kjt, visibility, op.apply(originalPre),
             op.apply(originalFreePre), op.apply(originalPost), op.apply(originalFreePost),
-            op.apply(originalMby), atPreVars, originalSelfVar, originalResultVar,
-            originalParamVars);
+            originalMby == null ? null : op.apply(originalMby), atPreVars, originalSelfVar,
+            originalResultVar, originalParamVars);
     }
 
     @Override
@@ -101,10 +101,14 @@ public final class ContractAxiom extends ClassAxiom {
 
         Name tacletName = MiscTools.toValidTacletName(name);
         TacletGenerator TG = TacletGenerator.getInstance();
-        return TG.generateContractAxiomTaclets(tacletName, originalPre, originalFreePre,
-            originalPost, originalFreePost, originalMby, kjt, target, heaps, self,
+        @SuppressWarnings("NullAway") // static contracts legitimately pass a null self variable
+                                      // and absent measure-by clauses; the callee
+                                      // generateContractAxiomTaclets handles both as null
+        ImmutableSet<Taclet> conds = TG.generateContractAxiomTaclets(tacletName, originalPre,
+            originalFreePre, originalPost, originalFreePost, originalMby, kjt, target, heaps, self,
             originalResultVar, atPreVars, originalParamVars, toLimit, satisfiabilityGuard,
             services);
+        return conds;
     }
 
     @Override
@@ -152,7 +156,7 @@ public final class ContractAxiom extends ClassAxiom {
     }
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return visibility;
     }
 

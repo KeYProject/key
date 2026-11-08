@@ -69,13 +69,6 @@ public class ProofMacroUserAction extends ProofModifyingUserAction {
         return "Macro: " + macro.getName();
     }
 
-    /**
-     * The macro position may legitimately be {@code null}: {@link ProofMacro#applyTo} declares a
-     * {@code @Nullable PosInOccurrence} and global macros run without a position, yet the
-     * proof-control interface parameter is annotated {@code @NonNull}, suppressed with a scoped
-     * key.
-     */
-    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     protected void apply() {
         if (mediator.isInAutoMode()) {

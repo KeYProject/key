@@ -33,7 +33,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitFile(JavaKeYParser.FileContext ctx) {
         if (ctx.profile() != null) {
@@ -50,7 +50,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         information.setBootClassPath(acceptFirst(ctx.bootClassPath()));
@@ -64,7 +64,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitProblem(JavaKeYParser.ProblemContext ctx) {
         if (ctx.CHOOSECONTRACT() != null) {
@@ -90,7 +90,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable String visitBootClassPath(JavaKeYParser.BootClassPathContext ctx) {
         String value = accept(ctx.string_value());
@@ -122,7 +122,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable String visitProgramSource(JavaKeYParser.ProgramSourceContext ctx) {
         return ctx.oneProgramSource() != null ? (String) accept(ctx.oneProgramSource()) : null;
@@ -137,7 +137,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitProfile(JavaKeYParser.ProfileContext ctx) {
         return accept(ctx.name);
@@ -147,7 +147,7 @@ public class FindProblemInformation extends AbstractBuilder<Object> {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable String visitPreferences(JavaKeYParser.PreferencesContext ctx) {
         return ctx.s != null ? (String) accept(ctx.s) : null;

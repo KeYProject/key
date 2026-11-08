@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -40,14 +41,15 @@ public class LocSetStrategy extends AbstractFeatureStrategy implements Component
     public LocSetStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
         this.lsf = new LocSetTermFeatures(
-            getServices().getTypeConverter().getLDT(de.uka.ilkd.key.ldt.SetLDT.class),
+            Objects.requireNonNull(
+                getServices().getTypeConverter().getLDT(de.uka.ilkd.key.ldt.SetLDT.class)),
             getServices().getTypeConverter().getLocSetLDT(),
-            getServices().getTypeConverter().getHeapLDT());
+            Objects.requireNonNull(getServices().getTypeConverter().getHeapLDT()));
         costComputationDispatcher = setupCostComputationF();
 
-        stopAtFirstNonCloseableGoal =
-            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                    .equals(StrategyProperties.STOPMODE_NONCLOSE);
+        stopAtFirstNonCloseableGoal = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY))
+                .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
     private RuleSetDispatchFeature setupCostComputationF() {

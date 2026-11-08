@@ -41,7 +41,7 @@ public class ColorSettingsProvider extends SimpleSettingsPanel implements Settin
      * receiver is still under initialization, both suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid" })
+        "nullness:method.invocation.invalid", "NullAway" })
     public ColorSettingsProvider() {
         super();
         setHeaderText(getDescription());

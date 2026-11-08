@@ -95,7 +95,7 @@ public class FinalFieldsPOExtension implements POExtension {
      * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereferences
      * are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private List<Function> findFinalFields(IProgramMethod iconstructor, Services services) {
         Type type = iconstructor.getContainerType().getJavaType();
         assert type instanceof ClassType

@@ -61,7 +61,7 @@ public class JFunction extends Function implements Sorted, Operator {
      * @param introductionTime the introduction time of the symbol, or a
      *        {@link Function#UNRECORDED}, if none available (e.g. existed from the beginning)
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     JFunction(Name name, Sort sort, ImmutableArray<Sort> argSorts,
             @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
             FunctionKind kind, int introductionTime) {

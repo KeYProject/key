@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -27,18 +28,16 @@ import org.jspecify.annotations.NonNull;
  * @param position The position in the file
  * @author Hubert Schmid
  */
-public record Location(URI fileUri, Position position) implements Comparable<Location> {
-    // The fileUri component may legitimately be null (e.g. standard input); see the class javadoc.
-    @SuppressWarnings("NullAway")
+public record Location(@Nullable URI fileUri, Position position) implements Comparable<Location> {
+
     public static final Location UNDEFINED = new Location(null, Position.UNDEFINED);
 
-    @SuppressWarnings("NullAway") // a token source may not name a file (e.g. standard input)
     public static Location fromToken(Token token) {
         return new Location(SourceNames.getURIFromTokenSource(token.getTokenSource()),
             Position.fromToken(token));
     }
 
-    public URI getFileUri() { return fileUri; }
+    public @Nullable URI getFileUri() { return fileUri; }
 
     /// @deprecated weigl: Usage of {@link Optional} is discourage.
     /// @see [#getFileUri()]

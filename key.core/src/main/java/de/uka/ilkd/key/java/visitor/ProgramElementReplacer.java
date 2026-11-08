@@ -24,7 +24,7 @@ public class ProgramElementReplacer extends CreatingASTVisitor {
      * ProgramElement)}; the constructor cannot assign them, so the difference is suppressed with a
      * scoped key.
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     public ProgramElementReplacer(JavaProgramElement program, Services services) {
         super(program, false, services);
     }

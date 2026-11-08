@@ -330,7 +330,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      *         below {@link #getChildCount(Object)}, so the {@code null} case is never reached on
      *         the happy path; the return type is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     @Override
     public synchronized Object getChild(Object parent, int index) {
         if (bypassNodeFilter()) {
@@ -423,7 +423,7 @@ public class GUIProofTreeModel implements TreeModel, java.io.Serializable {
      *         loaded-proof case guards the root node before passing it on, because a loaded proof
      *         always has a root.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     @Override
     public synchronized Object getRoot() {
         if (proof == null) {

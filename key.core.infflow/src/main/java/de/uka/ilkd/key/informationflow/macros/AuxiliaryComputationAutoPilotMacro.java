@@ -51,6 +51,7 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
             public String getName() { return ""; }
 
             @Override
+            @SuppressWarnings("NullAway") // uncategorized macro: null is deliberate
             public String getCategory() { return null; }
 
             @Override
@@ -72,6 +73,7 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     public String getName() { return ""; }
 
                     @Override
+                    @SuppressWarnings("NullAway") // uncategorized macro: null is deliberate
                     public String getCategory() { return null; }
 
                     @Override

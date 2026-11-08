@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.logic.JTerm;
@@ -36,7 +38,8 @@ public class LoopVariantCondition implements VariableCondition {
     }
 
     @Override
-    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices p_services) {
         final var svInst = matchCond.getInstantiations();
         final var services = (Services) p_services;
@@ -45,7 +48,9 @@ public class LoopVariantCondition implements VariableCondition {
             return matchCond;
         }
 
-        final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
+        final LoopStatement loop = Objects.requireNonNull(
+            (LoopStatement) svInst.getInstantiation(loopStmtSV),
+            "no instantiation of " + loopStmtSV);
         final LoopSpecification loopSpec = services.getSpecificationRepository().getLoopSpec(loop);
 
         if (loopSpec == null) {

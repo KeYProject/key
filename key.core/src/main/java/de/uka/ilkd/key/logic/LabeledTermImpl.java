@@ -100,7 +100,7 @@ public class LabeledTermImpl extends TermImpl {
      * Looking up a label by name may legitimately yield no result; the interface declares the
      * result non-null, so the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     @Override
     public TermLabel getLabel(final Name termLabelName) {
         return CollectionUtil.search(labels,

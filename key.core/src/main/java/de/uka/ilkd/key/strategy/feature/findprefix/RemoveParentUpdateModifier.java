@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -24,8 +26,9 @@ public class RemoveParentUpdateModifier implements Modifier {
 
     @Override
     public PosInOccurrence modifyPosition(PosInOccurrence pos) {
-        if (!pos.isTopLevel() && pos.up().subTerm().op() instanceof UpdateApplication) {
-            return modifyPosition(pos.up());
+        if (!pos.isTopLevel()
+                && Objects.requireNonNull(pos.up()).subTerm().op() instanceof UpdateApplication) {
+            return modifyPosition(Objects.requireNonNull(pos.up()));
         } else {
             return pos;
         }

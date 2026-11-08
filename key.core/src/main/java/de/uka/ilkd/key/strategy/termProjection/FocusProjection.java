@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termProjection;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -46,7 +48,7 @@ public class FocusProjection implements ProjectionToTerm<Goal> {
 
         int n = stepsUpwards;
         while (n-- > 0 && !pos.isTopLevel()) {
-            pos = pos.up();
+            pos = Objects.requireNonNull(pos.up());
         }
 
         return (JTerm) pos.subTerm();

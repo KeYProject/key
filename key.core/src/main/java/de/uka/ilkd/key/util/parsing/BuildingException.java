@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.util.parsing;
 
 import java.net.URI;
+import java.util.Objects;
 
 import org.key_project.util.parsing.HasLocation;
 import org.key_project.util.parsing.Location;
@@ -84,11 +85,12 @@ public class BuildingException extends RuntimeException implements HasLocation {
             + location.getPosition().column();
     }
 
-    public BuildingException(ParserRuleContext ctx, String message, Throwable e) {
+    public BuildingException(ParserRuleContext ctx, String message, @Nullable Throwable e) {
         this(ctx == null ? null : ctx.start, message, e);
     }
 
-    public BuildingException(@Nullable Token t, String message, Throwable e) {
+    public BuildingException(@Nullable Token t, @Nullable String message,
+            @Nullable Throwable e) {
         this(t, null, message, e);
     }
 
@@ -102,8 +104,8 @@ public class BuildingException extends RuntimeException implements HasLocation {
      * @param message the error message
      * @param e the causing throwable, may be null
      */
-    public BuildingException(@Nullable Token t, @Nullable Position overridePosition, String message,
-            @Nullable Throwable e) {
+    public BuildingException(@Nullable Token t, @Nullable Position overridePosition,
+            @Nullable String message, @Nullable Throwable e) {
         super(message + " at " + getPosition(t, overridePosition), e);
         offendingSymbol = t;
         this.overridePosition = overridePosition;
@@ -116,7 +118,8 @@ public class BuildingException extends RuntimeException implements HasLocation {
      * {@link #getLocation()} to avoid reporting the position twice.
      */
     public String getRawMessage() {
-        return rawMessage != null ? rawMessage : getMessage();
+        return rawMessage != null ? rawMessage
+                : Objects.requireNonNull(getMessage(), "no raw message");
     }
 
     private static String getPosition(@Nullable Token t) {
@@ -142,6 +145,10 @@ public class BuildingException extends RuntimeException implements HasLocation {
     }
 
     @Override
+    // NullAway: the source file of a token may legitimately be unknown (e.g. standard input), in
+    // which case Location carries a null file URI (see Location.UNDEFINED/fromToken); the record's
+    // component stays non-null typed, so this deliberate flow is suppressed with a scoped key
+    @SuppressWarnings("NullAway")
     public Location getLocation() {
         if (explicitLocation != null) {
             return explicitLocation;

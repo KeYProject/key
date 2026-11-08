@@ -42,7 +42,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         choiceInformation = new ChoiceInformation(choices);
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         ctx.option_decls().forEach(this::accept);
@@ -50,7 +50,7 @@ public class ChoiceFinder extends AbstractBuilder<Object> {
         return null;
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitChoice(JavaKeYParser.ChoiceContext ctx) {
         String category = ctx.category.getText();

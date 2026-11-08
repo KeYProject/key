@@ -127,7 +127,7 @@ public class NullType implements ClassType {
      *         The overridden declaration requires a non-null return type, but this implementation
      *         may legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
     public @Nullable ImmutableList<KeYJavaType> getSupertypes() {
         return null;
     }
@@ -161,7 +161,7 @@ public class NullType implements ClassType {
      *         The overridden declaration requires a non-null return type, but this implementation
      *         may legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
     public @Nullable ImmutableList<Field> getAllFields(Services services) {
         return null;
     }

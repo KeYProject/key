@@ -116,7 +116,7 @@ public class IntermediateProofReplayer {
     /** The proof object into which to load the replayed proof */
     /// The proof is assigned in both constructors before any use; the null placeholder
     /// initializer is suppressed with a scoped key.
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     private Proof proof = null;
 
     /** Encountered errors */
@@ -156,7 +156,7 @@ public class IntermediateProofReplayer {
      *        nullable entry is enqueued as in the pre-nullness code and the replay loop tolerates
      *        it, hence the scoped suppression.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public IntermediateProofReplayer(AbstractProblemLoader loader, Proof proof,
             IntermediatePresentationProofFileParser.Result parserResult) {
         this.proof = proof;
@@ -218,7 +218,7 @@ public class IntermediateProofReplayer {
      *         current goal and the intermediate rule applications are present whenever they are
      *         accessed; the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public Result replay(ProblemInitializer.ProblemInitializerListener listener,
             ProgressMonitor progressMonitor, boolean deleteIntermediateTree) {
         // initialize progress monitoring
@@ -429,7 +429,7 @@ public class IntermediateProofReplayer {
      *        scoped
      *        key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void addChildren(Iterator<Node> children, LinkedList<NodeIntermediate> intermChildren) {
         int i = 0;
         while (!currGoal.node().isClosed() && children.hasNext() && intermChildren.size() > 0) {
@@ -476,7 +476,7 @@ public class IntermediateProofReplayer {
      *         with a
      *         scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private TacletApp constructTacletApp(TacletAppIntermediate currInterm, Goal currGoal)
             throws TacletAppConstructionException {
 
@@ -626,7 +626,8 @@ public class IntermediateProofReplayer {
      *         goal and the nullable if-instantiation passed to the one-step simplifier (null is
      *         tolerated there and means "no restriction") are suppressed with scoped keys.
      */
-    @SuppressWarnings({ "nullness:dereference.of.nullable", "nullness:argument.type.incompatible" })
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     private IBuiltInRuleApp constructBuiltinApp(BuiltInAppIntermediate currInterm, Goal currGoal)
             throws SkipSMTRuleException, BuiltInConstructionException {
 
@@ -814,7 +815,7 @@ public class IntermediateProofReplayer {
      *         The current proof and its open goals are guaranteed to be present when a join rule
      *         application is instantiated; the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings({ "nullness:dereference.of.nullable",
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
         "nullness:argument.type.incompatible" })
     private MergeRuleBuiltInRuleApp instantiateJoinApp(final MergeAppIntermediate joinAppInterm,
             final Node currNode,
@@ -1058,7 +1059,7 @@ public class IntermediateProofReplayer {
      *         parser itself treats {@code null} sort as "no constraint". This documented use of
      *         {@code null} against the {@code @NonNull} parameter is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public static JTerm parseTerm(String value, Proof proof, Namespace<QuantifiableVariable> varNS,
             Namespace<IProgramVariable> progVarNS, Namespace<Function> functNS) {
         try {
@@ -1099,7 +1100,7 @@ public class IntermediateProofReplayer {
      * so {@link TacletApp#addCheckedInstantiation} never yields {@code null}; the difference is
      * suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     public static TacletApp parseSV1(TacletApp app, VariableSV sv, String value,
             Services services) {
         var colon = value.indexOf(':');
@@ -1138,7 +1139,7 @@ public class IntermediateProofReplayer {
      *      a
      *      scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     public static TacletApp parseSV2(TacletApp app, SchemaVariable sv, String value,
             Goal targetGoal) {
         final Proof p = targetGoal.proof();

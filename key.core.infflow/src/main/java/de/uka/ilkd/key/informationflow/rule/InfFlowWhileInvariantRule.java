@@ -95,7 +95,8 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
 
         // prepare data
         LoopSpecification inv = inst.inv();
-        final JTerm guard = ruleApp.getGuard();
+        final JTerm guard =
+            Objects.requireNonNull(ruleApp.getGuard(), "guard of the rule app");
         InfFlowData infFlowData = prepareSetUpOfInfFlowValidityGoal(infFlowGoal, anonUpdateData,
             guard, inst, inv, services, ruleApp, localIns, localOuts, anonUpdate, guardJb);
 
@@ -423,7 +424,9 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
                 // set up information flow validity goal
                 InfFlowData infFlowData = setUpInfFlowValidityGoal(preserve,
                     (InfFlowLoopInvariantBuiltInRuleApp) ruleApp, inst, guardJb,
-                    localIns, localOuts, anonUpdateDatas, anonUpdate, services);
+                    localIns, localOuts, anonUpdateDatas,
+                    Objects.requireNonNull(anonUpdate, "anonymous update of the rule app"),
+                    services);
 
                 // set up information flow part of useGoal:
                 // add infFlowAssumptions, add term and taclet to post goal

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -55,12 +56,16 @@ public class FieldConstantHandler implements SMTHandler {
     public void init(MasterHandler masterHandler, Services services,
             @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.services = services;
-        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+        // the master always loads the snippets for every handler
+        masterHandler.addDeclarationsAndAxioms(
+            Objects.requireNonNull(handlerSnippets, "handler snippets"));
     }
 
     @Override
     public boolean canHandle(Operator op) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        Services services = Objects.requireNonNull(this.services, "services");
+        HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT");
         return op.arity() == 0 && op.sort(NO_ARGS) == heapLDT.getFieldSort()
                 && op instanceof Function && ((Function) op).isUnique()
                 && (JavaDLFieldNames.isField(op.name())
@@ -73,7 +78,9 @@ public class FieldConstantHandler implements SMTHandler {
         String name = term.op().name().toString();
         String smtName = "field_" + name;
 
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        Services services = Objects.requireNonNull(this.services, "services");
+        HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT");
 
         if (term.op() instanceof SortedOperator op) {
 

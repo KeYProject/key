@@ -59,7 +59,8 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
 
         final JTerm result;
         final StrategyProperties props =
-            services.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
+            Objects.requireNonNull(services.getProof(), "no proof available for query expansion")
+                    .getSettings().getStrategySettings().getActiveStrategyProperties();
         final boolean queryTreatmenIsOn =
             Objects.equals(props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY),
                 StrategyProperties.QUERY_ON);

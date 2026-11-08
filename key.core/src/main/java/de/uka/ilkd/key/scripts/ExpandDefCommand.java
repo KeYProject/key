@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.scripts;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -97,13 +99,17 @@ public class ExpandDefCommand extends AbstractCommand {
         }
 
         if (p.on != null) {
+            TermWithHoles on = p.on;
             apps = apps.filter(
                 it -> it instanceof PosTacletApp &&
-                        p.on.matches(it.posInOccurrence()));
+                        on.matches(Objects.requireNonNull(it.posInOccurrence(),
+                            "position in occurrence is missing")));
         } else if (p.formula != null) {
+            TermWithHoles formula = p.formula;
             apps = apps.filter(
                 it -> it instanceof PosTacletApp &&
-                        p.formula.matchesToplevel(it.posInOccurrence().sequentFormula()));
+                        formula.matchesToplevel(Objects.requireNonNull(it.posInOccurrence(),
+                            "position in occurrence is missing").sequentFormula()));
         } else {
             throw new ScriptException("Either 'formula' or 'on' must be specified");
         }

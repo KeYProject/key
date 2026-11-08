@@ -134,11 +134,8 @@ public class SequentViewInputListener implements MouseMotionListener, MouseListe
      *
      * <p>
      * This is what {@code isInUserSelectionHighlight(null)} means for {@link SequentView}: the
-     * view treats a {@code null} point as "anywhere" and reports whether a highlight exists. The
-     * JDK stub declares a non-null parameter, so the deliberate {@code null} is passed here and
-     * suppressed with a scoped key.
+     * view treats a {@code null} point as "anywhere" and reports the highlight state.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
     private boolean isInUserSelectionHighlightAnywhere() {
         return sequentView.isInUserSelectionHighlight(null);
     }

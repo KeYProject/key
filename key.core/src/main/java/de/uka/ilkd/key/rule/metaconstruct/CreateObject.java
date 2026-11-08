@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
@@ -41,8 +44,10 @@ public class CreateObject extends ProgramTransformer {
             SVInstantiations svInst) {
 
         TypeReference classReference = ((New) pe).getTypeReference();
+        final KeYJavaType kjt = Objects.requireNonNull(classReference.getKeYJavaType(),
+            "no KeYJavaType for type reference " + classReference);
 
-        if (!(classReference.getKeYJavaType().getJavaType() instanceof ClassDeclaration)) {
+        if (!(kjt.getJavaType() instanceof ClassDeclaration)) {
             // no implementation available
             return new ProgramElement[] { pe };
         }

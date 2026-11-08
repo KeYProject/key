@@ -107,7 +107,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      * {@code @NonNull}-typed, so the assignment is suppressed.
      */
     @Override
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public RewriteTacletBuilder<T> copy() {
         var rb = new RewriteTacletBuilder<T>().setFind((JTerm) getFind());
         rb.setSurviveSmbExec(surviveSmbExec);

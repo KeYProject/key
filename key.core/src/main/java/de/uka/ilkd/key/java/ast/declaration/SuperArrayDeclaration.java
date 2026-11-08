@@ -61,7 +61,7 @@ public class SuperArrayDeclaration extends TypeDeclaration {
     // base contract NonTerminalProgramElement.getChildAt(int) is @NonNull and cannot be widened
     // without ripple across the whole AST, so the honestly-annotated override is exempted from
     // the check.
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
     public @Nullable ProgramElement getChildAt(int i) {
         return null;
     }

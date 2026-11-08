@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.java;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.Statement;
@@ -82,7 +84,8 @@ public final class JavaTools {
                 stack.push(new ExtList());
                 walk(root());
                 ExtList el = stack.peek();
-                return el.get(ProgramElement.class);
+                return Objects.requireNonNull(el.get(ProgramElement.class),
+                    "no reconstructed element after walking the block");
             }
 
             @Override
@@ -111,7 +114,7 @@ public final class JavaTools {
     public static @Nullable MethodFrame getInnermostMethodFrame(ProgramElement pe,
             Services services) {
         final MethodFrame result = new JavaASTVisitor(pe, services) {
-            private MethodFrame res;
+            private @Nullable MethodFrame res;
 
             protected void doDefaultAction(SourceElement node) {
                 if (node instanceof MethodFrame && res == null) {

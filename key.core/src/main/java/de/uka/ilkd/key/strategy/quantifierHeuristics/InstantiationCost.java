@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -51,7 +53,7 @@ public class InstantiationCost implements Feature {
         final de.uka.ilkd.key.proof.Goal jgoal = (de.uka.ilkd.key.proof.Goal) goal;
         final var instance = varInst.toTerm(app, pos, jgoal, mState);
 
-        return Instantiation.computeCost(instance, formula, goal.sequent(),
-            (Services) goal.proof().getServices(), treatment);
+        return Instantiation.computeCost(Objects.requireNonNull(instance), formula,
+            goal.sequent(), (Services) goal.proof().getServices(), treatment);
     }
 }

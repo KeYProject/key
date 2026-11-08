@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -46,15 +47,18 @@ public class DependencyContractCommand extends AbstractCommand {
 
         Parameters arguments = state().getValueInjector().inject(new Parameters(), command);
 
-        final Goal goal = state.getFirstOpenAutomaticGoal();
+        final Goal goal = state().getFirstOpenAutomaticGoal();
 
         if (arguments.heap == null) {
             Services services = goal.proof().getServices();
-            arguments.heap = services.getTermFactory()
-                    .createTerm(services.getTypeConverter().getHeapLDT().getHeap());
+            arguments.heap = services.getTermFactory().createTerm(
+                Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                    "heap LDT not loaded").getHeap());
         }
 
-        List<PosInOccurrence> pios = find(arguments.on, goal.sequent());
+        List<PosInOccurrence> pios = find(
+            Objects.requireNonNull(arguments.on, "no term given for the dependency contract"),
+            goal.sequent());
 
         if (pios.isEmpty()) {
             throw new ScriptException("dependency contract not applicable.");
@@ -99,9 +103,10 @@ public class DependencyContractCommand extends AbstractCommand {
     }
 
     private void apply(Goal goal, UseDependencyContractApp ruleApp, Parameters arguments) {
-        JTerm on = arguments.on;
+        JTerm on = Objects.requireNonNull(arguments.on,
+            "no term given for the dependency contract");
         JTerm[] subs = on.subs().toArray(new JTerm[0]);
-        subs[0] = arguments.heap;
+        subs[0] = Objects.requireNonNull(arguments.heap, "heap term is not set");
         Services services = goal.proof().getServices();
         JTerm replaced =
             services.getTermFactory().createTerm(on.op(), subs, on.boundVars(), on.getLabels());

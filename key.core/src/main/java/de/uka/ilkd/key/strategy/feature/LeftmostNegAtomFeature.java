@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -36,7 +38,7 @@ public class LeftmostNegAtomFeature extends AbstractBetaFeature {
         boolean positive = pos.isInAntec();
 
         while (it.next() != -1) {
-            final JTerm subTerm = (JTerm) it.getSubTerm();
+            final JTerm subTerm = Objects.requireNonNull((JTerm) it.getSubTerm());
             final Operator op = subTerm.op();
 
             if (it.getChild() == 0) {

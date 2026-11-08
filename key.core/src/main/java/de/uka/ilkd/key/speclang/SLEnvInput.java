@@ -144,7 +144,7 @@ public final class SLEnvInput extends AbstractEnvInput {
      * annotations; the violation of the walker's non-null root parameter is scoped to this
      * method.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     private static StatementBlock collectorRoot(IProgramMethod pm) {
         return pm.getBody();
     }
@@ -262,7 +262,7 @@ public final class SLEnvInput extends AbstractEnvInput {
         Services services = initConfig.getServices();
         JMLSpecFactory jsf = new JMLSpecFactory(services);
         var walker = new JavaASTWalker(collectorRoot(pm)) {
-            public ProofInputException exception = null;
+            public @Nullable ProofInputException exception = null;
 
             @Override
             protected void doAction(final ProgramElement node) {
@@ -389,7 +389,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     // returned as the legacy "no input" marker for that mode (KeY's standard setup always enables
     // JML, so this branch is effectively unreachable in practice). Keep the honest @Nullable rather
     // than collapsing the explicit null with requireNonNull, which would change this contract.
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     public @Nullable ImmutableSet<PositionedString> read() throws ProofInputException {
         if (initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");

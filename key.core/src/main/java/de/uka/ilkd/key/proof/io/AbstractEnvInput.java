@@ -39,7 +39,7 @@ public abstract class AbstractEnvInput implements EnvInput {
      * The {@link InitConfig} is bound later by the loader via {@link #setInitConfig(InitConfig)}
      * once the environment is built; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     protected AbstractEnvInput(String name, @Nullable Path javaPath,
             List<Path> classPath,
             @Nullable Path bootClassPath,

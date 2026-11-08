@@ -48,7 +48,7 @@ public class InstantiationFileHandler {
     /// The current and previous key configuration directories are always set when the key
     /// settings have been loaded; the dereferences of the (nullable) configuration paths are
     /// suppressed with a scoped key.
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private static Path getStoragePath() {
         Path cur = PathConfig.currentPaths.keyConfigDir.resolve("instantiations");
         if (Files.exists(cur)) {
@@ -97,7 +97,7 @@ public class InstantiationFileHandler {
      *         (nullable)
      *         map is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static boolean hasInstantiationListsFor(Taclet taclet) {
         if (hm == null) {
             createHashMap();
@@ -115,7 +115,7 @@ public class InstantiationFileHandler {
      *         The instantiation map is lazily created on first access; the dereferences of the
      *         (nullable) map are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static @Nullable List<List<String>> getInstantiationListsFor(Taclet taclet) {
         if (hasInstantiationListsFor(taclet)) {
             if (hm.get(taclet.name().toString()) == null) {
@@ -132,7 +132,7 @@ public class InstantiationFileHandler {
      * The map and the file names of the stored instantiation files are always present here; the
      * dereferences of the (nullable) map and file-name paths are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private static void createHashMap() {
         hm = new TreeMap<>();
         try (var stream = Files.list(INSTANTIATION_DIR)) {
@@ -152,7 +152,7 @@ public class InstantiationFileHandler {
      *        the
      *        (nullable) map is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private static void createListFor(Taclet taclet) {
         List<List<String>> instList = new LinkedList<>();
         List<String> instantiations = new LinkedList<>();
@@ -204,7 +204,7 @@ public class InstantiationFileHandler {
      *        the
      *        (nullable) map is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static void saveListFor(TacletInstantiationModel model) {
         Taclet taclet = model.taclet();
         TacletFindModel tableModel = model.tableModel();

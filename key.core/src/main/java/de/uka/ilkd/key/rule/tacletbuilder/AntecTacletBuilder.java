@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.AntecTaclet;
@@ -99,7 +101,14 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
         return t;
     }
 
+    /**
+     * {@code attrs.trigger()} is {@code null} for builders without a trigger; this is a legitimate
+     * state {@link org.key_project.prover.rules.TacletAttributes} preserves and tolerates
+     * downstream. {@link TacletBuilder#setTrigger} is {@code @NonNull}-typed, so the assignment is
+     * suppressed.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public AntecTacletBuilder copy() {
         var rb = new AntecTacletBuilder().setFind((Sequent) getFind());
         rb.setAnnotations(tacletAnnotations);
@@ -119,7 +128,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet> {
         for (var vc : varsNewDependingOn) {
             rb.addVarsNewDependingOn(vc.first(), vc.second());
         }
-        rb.setFind((Sequent) find);
+        rb.setFind((Sequent) Objects.requireNonNull(find, "find sequent of " + name));
         rb.setChoices(choices);
         if (goal2Choices != null)
             rb.goal2Choices =

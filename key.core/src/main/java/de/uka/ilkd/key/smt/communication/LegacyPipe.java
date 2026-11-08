@@ -7,6 +7,7 @@ package de.uka.ilkd.key.smt.communication;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -150,9 +151,9 @@ class LegacyPipe implements Pipe {
     }
 
     public void close() {
-        stdoutReceiver.interrupt();
-        stderrReceiver.interrupt();
-        process.destroy();
+        Objects.requireNonNull(stdoutReceiver, "stdout receiver").interrupt();
+        Objects.requireNonNull(stderrReceiver, "stderr receiver").interrupt();
+        Objects.requireNonNull(process, "process").destroy();
     }
 
     @Override
@@ -161,14 +162,15 @@ class LegacyPipe implements Pipe {
     }
 
     public void join() throws InterruptedException {
-        stdoutReceiver.join();
-        stderrReceiver.join();
+        Objects.requireNonNull(stdoutReceiver, "stdout receiver").join();
+        Objects.requireNonNull(stderrReceiver, "stderr receiver").join();
     }
 
     @Override
     public synchronized void sendMessage(@NonNull String message) throws IOException {
-        outputWriter.write(message + System.lineSeparator());
-        outputWriter.flush();
+        OutputStreamWriter writer = Objects.requireNonNull(outputWriter, "output writer");
+        writer.write(message + System.lineSeparator());
+        writer.flush();
     }
 
 
@@ -195,7 +197,8 @@ class LegacyPipe implements Pipe {
     }
 
     public boolean isAlive() {
-        return stderrReceiver.alive && stdoutReceiver.alive;
+        return Objects.requireNonNull(stderrReceiver, "stderr receiver").alive
+                && Objects.requireNonNull(stdoutReceiver, "stdout receiver").alive;
     }
 
     public @NonNull SolverCommunication getSolverCommunication() {

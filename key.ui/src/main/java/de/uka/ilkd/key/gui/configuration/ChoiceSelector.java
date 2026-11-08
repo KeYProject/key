@@ -67,7 +67,7 @@ public class ChoiceSelector extends JDialog {
      *        immediately disposed due to missing options, suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })
+        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible", "NullAway" })
     public ChoiceSelector(JFrame mainWindow, ChoiceSettings settings) {
         super(mainWindow, "Taclet Base Configuration", true);
         this.settings = settings;

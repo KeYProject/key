@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import java.util.Objects;
+
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -88,7 +90,7 @@ public final class Debug {
             if (iterable == null) {
                 fail("Null pointer: " + message);
             }
-            for (Object object : iterable) {
+            for (Object object : Objects.requireNonNull(iterable, message)) {
                 if (object == null) {
                     fail("Null element in collection:" + message);
                 }

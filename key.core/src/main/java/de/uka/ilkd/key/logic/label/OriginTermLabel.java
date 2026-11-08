@@ -676,7 +676,7 @@ public class OriginTermLabel implements TermLabel {
             if (!super.equals(obj)) {
                 return false;
             }
-            if (getClass() != obj.getClass()) {
+            if (getClass() != Objects.requireNonNull(obj).getClass()) {
                 return false;
             }
             NodeOrigin other = (NodeOrigin) obj;
@@ -769,7 +769,7 @@ public class OriginTermLabel implements TermLabel {
             if (!super.equals(obj)) {
                 return false;
             }
-            if (getClass() != obj.getClass()) {
+            if (getClass() != Objects.requireNonNull(obj).getClass()) {
                 return false;
             }
             FileOrigin other = (FileOrigin) obj;

@@ -278,7 +278,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      *         (nullable)
      *         input stream are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void saveProof(Path savePath) throws IOException {
         // We overwrite an existing proof here in any case. Checks have to be done earlier.
         if (Files.exists(savePath)) {
@@ -409,7 +409,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      *         the
      *         (nullable) save name is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private String addClasspath(String keyFileContent) {
         if (classpath == null || classpath.isEmpty()) {
             return keyFileContent;
@@ -494,7 +494,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * A base path that is a file always has a containing directory; the dereference of the
      * (nullable) parent of the absolute path is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void setBaseDir(Path path) {
         /*
          * Path can be a file or a directory. In case of a file the complete containing directory is
@@ -523,7 +523,7 @@ public abstract class AbstractFileRepo implements FileRepo {
      * non-null, so that all referenced objects become garbage-collectable; a disposed repo is never
      * used again, hence the null assignments are safe and suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     protected void dispose() {
         if (disposed) {
             return;

@@ -7,6 +7,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
@@ -75,7 +76,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, JTerm> freePostconditions,
             final Map<LocationVariable, JTerm> modifiableClauses,
             final Map<LocationVariable, JTerm> freeModifiableClauses,
-            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
+            final @Nullable ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasModifiable,
             final Map<LocationVariable, Boolean> hasFreeModifiable,
             ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
@@ -166,12 +167,14 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         Map<LocationVariable, JTerm> newFreeModifiableClauses = freeModifiableClauses.entrySet()
                 .stream()
                 .collect(MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
-        JTerm newMeasuredBy = op.apply(measuredBy);
+        JTerm newMeasuredBy = measuredBy == null ? null : op.apply(measuredBy);
+        ImmutableList<InfFlowSpec> newInfFlowSpecs = Objects.requireNonNull(infFlowSpecs,
+            "info flow specs").stream().map(spec -> spec.map(op))
+                .collect(ImmutableList.collector());
 
         return update(block, newPreconditions, newFreePreconditions, newPostconditions,
             newFreePostconditions, newModifiableClauses, newFreeModifiableClauses,
-            infFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
-            variables, newMeasuredBy);
+            newInfFlowSpecs, variables, newMeasuredBy);
     }
 
     @Override
@@ -182,7 +185,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             final Map<LocationVariable, JTerm> newFreePostconditions,
             final Map<LocationVariable, JTerm> newModifiableClauses,
             final Map<LocationVariable, JTerm> newFreeModifiableClauses,
-            final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
+            final @Nullable ImmutableList<InfFlowSpec> newinfFlowSpecs,
+            final Variables newVariables,
             @Nullable JTerm newMeasuredBy) {
         BlockContractImpl result = new BlockContractImpl(baseName, newBlock, labels, method,
             modalityKind, newPreconditions, newFreePreconditions, newMeasuredBy, newPostconditions,
@@ -260,7 +264,7 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         public Creator(String baseName, StatementBlock block, List<Label> labels,
                 IProgramMethod method, Behavior behavior, Variables variables,
                 Map<LocationVariable, JTerm> requires, Map<LocationVariable, JTerm> requiresFree,
-                JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
+                @Nullable JTerm measuredBy, Map<LocationVariable, JTerm> ensures,
                 Map<LocationVariable, JTerm> ensuresFree, ImmutableList<InfFlowSpec> infFlowSpecs,
                 Map<Label, JTerm> breaks, Map<Label, JTerm> continues, JTerm returns, JTerm signals,
                 JTerm signalsOnly, JTerm diverges, Map<LocationVariable, JTerm> modifiables,
@@ -275,10 +279,11 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         }
 
         @Override
-        protected BlockContract build(String baseName, StatementBlock block, List<Label> labels,
+        protected BlockContract build(String baseName, @Nullable StatementBlock block,
+                List<Label> labels,
                 IProgramMethod method, JModality.JavaModalityKind modalityKind,
                 Map<LocationVariable, JTerm> preconditions,
-                Map<LocationVariable, JTerm> freePreconditions, JTerm measuredBy,
+                Map<LocationVariable, JTerm> freePreconditions, @Nullable JTerm measuredBy,
                 Map<LocationVariable, JTerm> postconditions,
                 Map<LocationVariable, JTerm> freePostconditions,
                 Map<LocationVariable, JTerm> modifiableClauses,
@@ -286,11 +291,12 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasModifiable,
                 Map<LocationVariable, Boolean> hasFreeModifiable) {
-            return new BlockContractImpl(baseName, block, labels, method, modalityKind,
+            return new BlockContractImpl(baseName, Objects.requireNonNull(block, "block"), labels,
+                method, modalityKind,
                 preconditions, freePreconditions, measuredBy,
                 postconditions, freePostconditions, modifiableClauses, freeModifiableClauses,
                 infFlowSpecs, variables, transactionApplicable, hasModifiable, hasFreeModifiable,
-                null);
+                DefaultImmutableSet.nil());
         }
     }
 
@@ -341,7 +347,8 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
             Map<LocationVariable, Boolean> hasModifiable = new LinkedHashMap<>();
             Map<LocationVariable, Boolean> hasFreeModifiable =
                 new LinkedHashMap<LocationVariable, Boolean>();
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            for (LocationVariable heap : Objects.requireNonNull(
+                services.getTypeConverter().getHeapLDT(), "heap LDT").getAllHeaps()) {
                 boolean hm = false;
                 boolean hfm = false;
 

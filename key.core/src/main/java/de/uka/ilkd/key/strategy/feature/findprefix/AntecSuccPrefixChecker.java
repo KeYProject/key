@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 
@@ -65,7 +67,8 @@ class AntecSuccPrefixChecker implements Checker {
         if (pio.posInTerm() != null) {
             final PIOPathIterator it = pio.iterator();
             while (pol != 0 && it.next() != -1) {
-                pol = checkOperator(it.getSubTerm().op(), it.getChild(), pol);
+                pol = checkOperator(Objects.requireNonNull(it.getSubTerm()).op(), it.getChild(),
+                    pol);
             }
         }
 

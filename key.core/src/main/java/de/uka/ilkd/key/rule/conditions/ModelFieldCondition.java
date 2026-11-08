@@ -28,6 +28,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This variable condition checks if the instantiation of a schemavariable (of
@@ -52,7 +53,7 @@ public class ModelFieldCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement subst,
             SVInstantiations instMap, Services services) {
 
         if (var == field) {

@@ -342,7 +342,7 @@ public class TermLabelManager {
      *        supported {@link TermLabel}s are requested.
      * @return The {@link Name}s of the supported {@link TermLabel}s.
      */
-    public static ImmutableList<Name> getSupportedTermLabelNames(Services services) {
+    public static ImmutableList<Name> getSupportedTermLabelNames(@Nullable Services services) {
         TermLabelManager manager = getTermLabelManager(services);
         if (manager != null) {
             return manager.getSupportedTermLabelNames();

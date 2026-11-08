@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.util;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
@@ -88,7 +89,9 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         final JTerm temp = renameFormulasWithoutPrograms(term);
         final Map<LocationVariable, LocationVariable> progVarReplaceMap =
             restrictToProgramVariables(replaceMap);
-        return applyRenamingsToPrograms(temp, progVarReplaceMap);
+        // a non-null term is always recorded in replaceMap, so the renamed term is never null
+        return Objects.requireNonNull(applyRenamingsToPrograms(temp, progVarReplaceMap),
+            "renamed term");
     }
 
 
@@ -145,14 +148,14 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         if (pv instanceof LocationVariable lv) {
             if (lv.getKeYJavaType() != null) {
                 return new LocationVariable(new ProgramElementName(newName.toString()),
-                    lv.getTypeReference(),
+                    Objects.requireNonNull(lv.getTypeReference(), "type reference of " + lv),
                     lv.getContainerType(), lv.isStatic(), lv.isModel());
             } else {
                 return new LocationVariable(new ProgramElementName(newName.toString()), lv.sort());
             }
         } else if (pv instanceof ProgramConstant pc) {
             return new ProgramConstant(new ProgramElementName(newName.toString()),
-                pc.getTypeReference(),
+                Objects.requireNonNull(pc.getTypeReference(), "type reference of " + pc),
                 pc.getContainerType(), pc.isStatic(), pc.getCompileTimeConstant());
         } else {
             throw new IllegalArgumentException("Unknown type for pv: " + pv);
@@ -176,7 +179,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private void applyRenamingsOnUpdate(JTerm term) {
         final ElementaryUpdate u = (ElementaryUpdate) term.op();
         final JTerm lhsTerm = varOfUpdateableOp(u.lhs());
-        final JTerm renamedLhs = renameFormulasWithoutPrograms(lhsTerm);
+        final JTerm renamedLhs = Objects.requireNonNull(renameFormulasWithoutPrograms(lhsTerm),
+            "renamed update lhs");
         final JTerm[] renamedSubs = renameSubs(term);
         final ElementaryUpdate renamedU =
             ElementaryUpdate.getInstance((UpdateableOperator) renamedLhs.op());
@@ -196,7 +200,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
     private JTerm[] renameSubs(JTerm term) {
         JTerm[] renamedSubs = new JTerm[term.arity()];
         for (int i = 0; i < renamedSubs.length; i++) {
-            renamedSubs[i] = renameFormulasWithoutPrograms(term.sub(i));
+            renamedSubs[i] = Objects.requireNonNull(renameFormulasWithoutPrograms(term.sub(i)),
+                "renamed subterm");
         }
         return renamedSubs;
     }
@@ -225,7 +230,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
             Map<LocationVariable, LocationVariable> progVarReplaceMap) {
         JTerm[] appliedSubs = new JTerm[term.arity()];
         for (int i = 0; i < appliedSubs.length; i++) {
-            appliedSubs[i] = applyRenamingsToPrograms(term.sub(i), progVarReplaceMap);
+            appliedSubs[i] = Objects.requireNonNull(
+                applyRenamingsToPrograms(term.sub(i), progVarReplaceMap), "renamed subterm");
         }
         return appliedSubs;
     }
@@ -236,8 +242,8 @@ public class InfFlowProgVarRenamer extends TermBuilder {
         final ProgVarReplaceVisitor paramRepl =
             new ProgVarReplaceVisitor(program, progVarReplaceMap, services);
         paramRepl.start();
-        final JavaBlock renamedJavaBlock =
-            JavaBlock.createJavaBlock((StatementBlock) paramRepl.result());
+        final JavaBlock renamedJavaBlock = JavaBlock.createJavaBlock(
+            Objects.requireNonNull((StatementBlock) paramRepl.result(), "replaced program"));
         return renamedJavaBlock;
     }
 

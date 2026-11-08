@@ -71,7 +71,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
      * of the (nullable) proof of the wrapped info to the non-null parameter is suppressed with a
      * scoped key.
      */
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,

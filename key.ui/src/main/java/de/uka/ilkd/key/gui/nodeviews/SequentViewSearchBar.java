@@ -71,7 +71,7 @@ public class SequentViewSearchBar extends SearchBar {
      * from the {@link SearchBar} superclass constructor before {@code this} is fully initialized
      * (EISOP initialization check on the uninitialized fields), suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized", "NullAway" })
     public SequentViewSearchBar(SequentView sequentView) {
         this.sequentView = sequentView;
         searchResults = new ArrayList<>();

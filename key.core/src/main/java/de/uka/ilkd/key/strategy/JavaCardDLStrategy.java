@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -75,7 +76,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     protected JavaCardDLStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
-        heapLDT = getServices().getTypeConverter().getHeapLDT();
+        heapLDT = Objects.requireNonNull(getServices().getTypeConverter().getHeapLDT(),
+            "no heap LDT registered");
 
         this.strategyProperties = strategyProperties.clone();
 
@@ -119,8 +121,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     }
 
     protected Feature setupGlobalF(Feature dispatcher) {
-        final String queryProp =
-            strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);
+        final String queryProp = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY),
+            "no query strategy property");
         final Feature queryF;
         switch (queryProp) {
             case StrategyProperties.QUERY_ON -> queryF =
@@ -137,7 +140,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         }
 
         final Feature depSpecF;
-        final String depProp = strategyProperties.getProperty(StrategyProperties.DEP_OPTIONS_KEY);
+        final String depProp = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.DEP_OPTIONS_KEY),
+            "no dependency strategy property");
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
@@ -153,7 +158,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             // splitF,
             // strengthenConstraints,
             // smtF,
-            queryF, depSpecF, dispatcher);
+            Objects.requireNonNull(queryF, "no query feature"), depSpecF, dispatcher);
     }
 
     // //////////////////////////////////////////////////////////////////////////
@@ -231,8 +236,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
          * StrategyProperties.BLOCK_OPTIONS_KEY). equals(StrategyProperties.BLOCK_EXPAND);
          */
 
-        final String queryAxProp =
-            strategyProperties.getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY);
+        final String queryAxProp = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.QUERYAXIOM_OPTIONS_KEY),
+            "no query-axiom strategy property");
         switch (queryAxProp) {
             case StrategyProperties.QUERYAXIOM_ON ->
                 bindRuleSet(d, "query_axiom", CostBand.SOLVE.cost());
@@ -462,8 +468,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     }
 
     private boolean autoInductionLemmaEnabled() { // chrisg
-        final String prop =
-            strategyProperties.getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY);
+        final String prop = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY),
+            "no auto-induction strategy property");
         return prop.equals(StrategyProperties.AUTO_INDUCTION_LEMMA_ON)
                 || prop.equals(StrategyProperties.AUTO_INDUCTION_RESTRICTED);
         /*
@@ -482,7 +489,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     protected Feature setupApprovalF() {
         final Feature depSpecF;
-        final String depProp = strategyProperties.getProperty(StrategyProperties.DEP_OPTIONS_KEY);
+        final String depProp = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.DEP_OPTIONS_KEY),
+            "no dependency strategy property");
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
@@ -686,8 +695,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     @Override
     public boolean isStopAtFirstNonCloseableGoal() {
-        return strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                .equals(StrategyProperties.STOPMODE_NONCLOSE);
+        return Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY),
+            "no stop mode strategy property").equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
     @Override

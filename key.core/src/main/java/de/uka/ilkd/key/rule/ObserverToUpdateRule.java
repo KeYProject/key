@@ -4,15 +4,19 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -31,6 +35,7 @@ import de.uka.ilkd.key.rule.UseOperationContractRule.Instantiation;
 import de.uka.ilkd.key.util.Union;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
@@ -113,7 +118,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos,
+            @Nullable TermServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 
@@ -123,7 +129,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         // focus must be top level succedent
         if (pio == null || !pio.isTopLevel() || pio.isInAntec()) {
             return false;
@@ -144,11 +150,13 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         if (inst.isFirst()) {
             // additional checks for method calls.
             // currently only applicable to strictly pure methods
-            if (!inst.getFirst().pm().isModel() || inst.getFirst().pm().getStateCount() > 1) {
+            Instantiation methodInst = Objects.requireNonNull(inst.getFirst(),
+                "model method instantiation expected");
+            if (!methodInst.pm().isModel() || methodInst.pm().getStateCount() > 1) {
                 return false;
             }
 
-            return inst.getFirst().actualResult() instanceof ProgramVariable;
+            return methodInst.actualResult() instanceof ProgramVariable;
         }
 
         return true;
@@ -158,13 +166,19 @@ public final class ObserverToUpdateRule implements BuiltInRule {
     public ImmutableList<Goal> apply(Goal goal,
             RuleApp ruleApp) {
         final var services = goal.getOverlayServices();
-        Union<Instantiation, ModelFieldInstantiation> inst =
-            instantiate((JTerm) ruleApp.posInOccurrence().subTerm(), services);
-        assert inst != null : "If isApplicable has been checked, this must not be null";
+        final PosInOccurrence posInOccurrence = Objects.requireNonNull(ruleApp.posInOccurrence(),
+            "rule application needs a position");
+        final Union<Instantiation, ModelFieldInstantiation> inst = Objects.requireNonNull(
+            instantiate((JTerm) posInOccurrence.subTerm(), services),
+            "rule application needs an instantiation");
         if (inst.isFirst()) {
-            return applyForMethods(goal, inst.getFirst(), ruleApp);
+            return applyForMethods(goal,
+                Objects.requireNonNull(inst.getFirst(), "model method instantiation expected"),
+                ruleApp);
         } else {
-            return applyForModelFields(goal, inst.getSecond(), services, ruleApp);
+            return applyForModelFields(goal,
+                Objects.requireNonNull(inst.getSecond(), "model field instantiation expected"),
+                services, ruleApp);
         }
     }
 
@@ -178,18 +192,20 @@ public final class ObserverToUpdateRule implements BuiltInRule {
      */
     private ImmutableList<Goal> applyForModelFields(Goal goal, ModelFieldInstantiation inst,
             Services services, RuleApp ruleApp) {
+        final PosInOccurrence posInOccurrence = Objects.requireNonNull(ruleApp.posInOccurrence(),
+            "rule application needs a position");
         final TermBuilder tb = services.getTermBuilder();
         final TermLabelState termLabelState = new TermLabelState();
         // split goal into branches
         final ImmutableList<Goal> result;
         final Goal contGoal, nullGoal;
-        final ReferencePrefix rp = inst.fieldReference.getReferencePrefix();
+        final ReferencePrefix rp = inst.fieldReference().getReferencePrefix();
         if (rp != null && !(rp instanceof ThisReference) && !(rp instanceof SuperReference)
-                && !(rp instanceof TypeReference) && !(inst.modelField.isStatic())) {
+                && !(rp instanceof TypeReference) && !(inst.modelField().isStatic())) {
             result = goal.split(2);
             contGoal = result.tail().head();
             nullGoal = result.head();
-            final var recv = inst.receiver;
+            final var recv = inst.receiver();
             nullGoal.setBranchLabel(() -> "Null reference (" + recv + " = null)");
         } else {
             result = goal.split(1);
@@ -200,34 +216,37 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
-            final JTerm actualSelfNotNull = tb.not(tb.equals(inst.receiver, tb.NULL()));
+            final JTerm actualSelfNotNull = tb.not(tb.equals(
+                Objects.requireNonNull(inst.receiver(),
+                    "no receiver term in the null reference branch"),
+                tb.NULL()));
             nullGoal.changeFormula(
-                new SequentFormula(tb.apply(inst.update, actualSelfNotNull, null)),
-                ruleApp.posInOccurrence());
+                new SequentFormula(tb.apply(inst.update(), actualSelfNotNull, null)),
+                posInOccurrence);
         }
 
         // ---- create "CopyAssignment" cont branch
-        final JavaBlock jb = inst.modality.javaBlock();
+        final JavaBlock jb = inst.modality().javaBlock();
         StatementBlock postSB = UseOperationContractRule.replaceStatement(jb, new StatementBlock());
         JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
         JModality modality =
-            JModality.getModality(((JModality) inst.modality.op()).kind(), postJavaBlock);
+            JModality.getModality(((JModality) inst.modality().op()).kind(), postJavaBlock);
         JTerm modalityTerm =
-            tb.prog(modality.kind(), postJavaBlock, inst.modality.sub(0),
-                TermLabelManager.instantiateLabels(termLabelState, services,
-                    ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    tb.tf().createTerm(modality, inst.modality.subs(), null,
-                        inst.modality.getLabels())));
-        JTerm lhs = tb.var(inst.assignmentTarget);
+            tb.prog(modality.kind(), postJavaBlock, inst.modality().sub(0),
+                TermLabelManager.instantiateLabels(termLabelState, services, posInOccurrence,
+                    this, ruleApp, contGoal, "PostModality", null,
+                    tb.tf().createTerm(modality, inst.modality().subs(), null,
+                        inst.modality().getLabels())));
+        JTerm lhs = tb.var(inst.assignmentTarget());
 
         JTerm update = tb.elementary(lhs,
-            makeCall(services, inst.observerSymbol, inst.receiver, ImmutableList.of()));
+            makeCall(services, inst.observerSymbol(), inst.receiver(), ImmutableList.of()));
         JTerm normalPost = tb.apply(update, modalityTerm);
-        contGoal.changeFormula(new SequentFormula(tb.apply(inst.update, normalPost, null)),
-            ruleApp.posInOccurrence());
+        contGoal.changeFormula(new SequentFormula(tb.apply(inst.update(), normalPost, null)),
+            posInOccurrence);
 
-        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
-            nullGoal, null, null);
+        refactorLabelsAfterApplication(termLabelState, services, posInOccurrence, ruleApp,
+            nullGoal);
 
         return result;
 
@@ -239,6 +258,8 @@ public final class ObserverToUpdateRule implements BuiltInRule {
      */
     private ImmutableList<Goal> applyForMethods(Goal goal, Instantiation inst,
             RuleApp ruleApp) {
+        final PosInOccurrence posInOccurrence = Objects.requireNonNull(ruleApp.posInOccurrence(),
+            "rule application needs a position");
         final TermLabelState termLabelState = new TermLabelState();
         final JavaBlock jb = inst.progPost().javaBlock();
         final var services = goal.getOverlayServices();
@@ -264,9 +285,12 @@ public final class ObserverToUpdateRule implements BuiltInRule {
 
         // ---- create "Null Reference" branch
         if (nullGoal != null) {
-            final JTerm actualSelfNotNull = tb.not(tb.equals(inst.actualSelf(), tb.NULL()));
+            final JTerm actualSelfNotNull = tb.not(tb.equals(
+                Objects.requireNonNull(inst.actualSelf(),
+                    "no actual self term in the null reference branch"),
+                tb.NULL()));
             nullGoal.changeFormula(new SequentFormula(tb.apply(inst.u(), actualSelfNotNull, null)),
-                ruleApp.posInOccurrence());
+                posInOccurrence);
         }
 
         // ---- create "CopyAssignment" cont branch
@@ -275,20 +299,22 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         JModality modality = JModality.getModality(inst.modality().kind(), postJavaBlock);
         JTerm modalityTerm =
             tb.prog(inst.modality().kind(), postJavaBlock, inst.progPost().sub(0),
-                TermLabelManager.instantiateLabels(termLabelState, services,
-                    ruleApp.posInOccurrence(), this, ruleApp, contGoal, "PostModality", null,
-                    tb.tf().createTerm(modality, new ImmutableArray<>(inst.progPost().sub(0)), null,
-                        inst.progPost().getLabels())));
-        JTerm lhs = tb.var((ProgramVariable) inst.actualResult());
+                TermLabelManager.instantiateLabels(termLabelState, services, posInOccurrence,
+                    this, ruleApp, contGoal, "PostModality", null,
+                    tb.tf().createTerm(modality, new ImmutableArray<>(inst.progPost().sub(0)),
+                        null, inst.progPost().getLabels())));
+        JTerm lhs =
+            tb.var((ProgramVariable) Objects.requireNonNull(inst.actualResult(),
+                "no actual result for the model method"));
         JTerm update =
             tb.elementary(lhs,
                 makeCall(services, inst.pm(), inst.actualSelf(), inst.actualParams()));
         JTerm normalPost = tb.apply(update, modalityTerm);
         contGoal.changeFormula(new SequentFormula(tb.apply(inst.u(), normalPost, null)),
-            ruleApp.posInOccurrence());
+            posInOccurrence);
 
-        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this,
-            nullGoal, null, null);
+        refactorLabelsAfterApplication(termLabelState, services, posInOccurrence, ruleApp,
+            nullGoal);
 
         return result;
     }
@@ -299,12 +325,14 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         JTerm[] args = new JTerm[op.arity()];
         int idx = 0;
 
-        if (op.argSort(0) == services.getTypeConverter().getHeapLDT().targetSort()) {
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT for " + services);
+        if (op.argSort(0) == heapLDT.targetSort()) {
             args[idx++] = services.getTermBuilder().getBaseHeap();
         }
 
         if (!op.isStatic()) {
-            args[idx++] = receiver;
+            args[idx++] = Objects.requireNonNull(receiver, "no receiver for " + op);
         }
 
         for (int i = 0; i < methodArgs.size(); i++) {
@@ -314,23 +342,37 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         return services.getTermFactory().createTerm(op, args);
     }
 
+    /*
+     * Refactor the term labels of the created goals. The {@code nullGoal} is {@code null} when no
+     * null reference branch was created; {@link TermLabelManager#refactorGoal} documents this
+     * goal as optional.
+     */
+    @SuppressWarnings("NullAway")
+    private void refactorLabelsAfterApplication(TermLabelState termLabelState, Services services,
+            PosInOccurrence posInOccurrence, RuleApp ruleApp, @Nullable Goal nullGoal) {
+        TermLabelManager.refactorGoal(termLabelState, services, posInOccurrence, this, nullGoal,
+            null, null);
+    }
+
     // endregion
 
     // -----------------------------------
     // region model field instantiation
 
     /**
-     * Data structure to collect info when matching against a model field
-     * retrieval.
+     * Data structure to collect info when matching against a model field retrieval.
+     *
+     * @param fieldReference the field reference in the matched assignment
+     * @param update the leading update, or {@code skip} if none
+     * @param modelField the model field being read
+     * @param receiver the receiver of the field access, or {@code null} for static fields
+     * @param observerSymbol the observer function symbol of the model field
+     * @param assignmentTarget the variable the field value is assigned to
+     * @param modality the modality in which the field is read
      */
-    private static class ModelFieldInstantiation {
-        public FieldReference fieldReference;
-        public JTerm update;
-        public ProgramVariable modelField;
-        public @Nullable JTerm receiver;
-        public ObserverFunction observerSymbol;
-        LocationVariable assignmentTarget;
-        JTerm modality;
+    private record ModelFieldInstantiation(FieldReference fieldReference, JTerm update,
+            ProgramVariable modelField, @Nullable JTerm receiver, ObserverFunction observerSymbol,
+            LocationVariable assignmentTarget, JTerm modality) {
     }
 
     /*
@@ -340,16 +382,17 @@ public final class ObserverToUpdateRule implements BuiltInRule {
             Services services) {
 
         // see UseOperationContractRule.doInstantiation
-        ModelFieldInstantiation result = new ModelFieldInstantiation();
+        final TermBuilder tb = services.getTermBuilder();
+        final TypeConverter tc = services.getTypeConverter();
 
         // leading update?
         final JTerm mainFml;
-        final TermBuilder tb = services.getTermBuilder();
+        final JTerm update;
         if (focusTerm.op() instanceof UpdateApplication) {
-            result.update = UpdateApplication.getUpdate(focusTerm);
+            update = UpdateApplication.getUpdate(focusTerm);
             mainFml = UpdateApplication.getTarget(focusTerm);
         } else {
-            result.update = tb.skip();
+            update = tb.skip();
             mainFml = focusTerm;
         }
 
@@ -357,7 +400,7 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         if (!(mainFml.op() instanceof JModality)) {
             return null;
         }
-        result.modality = mainFml;
+        final JTerm modality = mainFml;
 
         // active statement must be reading model field
         final SourceElement activeStatement = JavaTools.getActiveStatement(mainFml.javaBlock());
@@ -372,44 +415,54 @@ public final class ObserverToUpdateRule implements BuiltInRule {
         if (!(lhs instanceof LocationVariable)) {
             return null;
         }
-        result.assignmentTarget = (LocationVariable) lhs;
+        final LocationVariable assignmentTarget = (LocationVariable) lhs;
 
         if (!(rhs instanceof FieldReference)) {
             return null;
         }
-        result.fieldReference = (FieldReference) rhs;
-        result.modelField = result.fieldReference.getProgramVariable();
+        final FieldReference fieldReference = (FieldReference) rhs;
+        final ProgramVariable modelField = fieldReference.getProgramVariable();
 
-        if (!result.modelField.isModel()) {
+        if (!modelField.isModel()) {
             return null;
         }
 
         // find receiver term
         final ExecutionContext ec =
             JavaTools.getInnermostExecutionContext(mainFml.javaBlock(), services);
-        final TypeConverter tc = services.getTypeConverter();
-        final ReferencePrefix rp = result.fieldReference.getReferencePrefix();
-        if (!result.modelField.isStatic()) {
+        final ReferencePrefix rp = fieldReference.getReferencePrefix();
+        final @Nullable JTerm receiver;
+        if (!modelField.isStatic()) {
             if (rp == null || rp instanceof ThisReference || rp instanceof SuperReference) {
-                result.receiver =
-                    tc.findThisForSort(result.modelField.getContainerType().getSort(), ec);
+                final KeYJavaType containerType = Objects.requireNonNull(
+                    modelField.getContainerType(), "no container type for " + modelField);
+                final Sort containerSort = Objects.requireNonNull(containerType.getSort(),
+                    "no sort for the container type");
+                receiver = tc.findThisForSort(containerSort, ec);
             } else if (rp instanceof FieldReference
                     && ((FieldReference) rp).referencesOwnInstanceField()) {
-                final ReferencePrefix rp2 =
-                    ((FieldReference) rp).setReferencePrefix(ec.getRuntimeInstance());
-                result.receiver = tc.convertToLogicElement(rp2);
+                // an own instance field only occurs in an instance context, so an
+                // execution context with a runtime instance is available here
+                final ExecutionContext sigEc = Objects.requireNonNull(ec,
+                    "no execution context for an own instance field");
+                final ReferencePrefix rp2 = ((FieldReference) rp).setReferencePrefix(
+                    Objects.requireNonNull(sigEc.getRuntimeInstance(),
+                        "no runtime instance in the execution context"));
+                receiver = tc.convertToLogicElement(rp2);
             } else {
-                result.receiver = tc.convertToLogicElement(rp, ec);
+                receiver = tc.convertToLogicElement(rp, ec);
             }
+        } else {
+            receiver = null;
         }
 
         // find the observer symbol
-        result.observerSymbol =
-            (ObserverFunction) services.getTypeConverter().getHeapLDT()
-                    .getFieldSymbolForPV((LocationVariable) result.modelField, services);
+        final ObserverFunction observerSymbol = (ObserverFunction) Objects.requireNonNull(
+            services.getTypeConverter().getHeapLDT(), "no heap LDT for " + services)
+                .getFieldSymbolForPV((LocationVariable) modelField, services);
 
-        return result;
-
+        return new ModelFieldInstantiation(fieldReference, update, modelField, receiver,
+            observerSymbol, assignmentTarget, modality);
     }
 
     private static @Nullable Union<Instantiation, ModelFieldInstantiation> instantiate(

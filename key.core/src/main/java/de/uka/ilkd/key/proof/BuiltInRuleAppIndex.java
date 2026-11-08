@@ -85,7 +85,7 @@ public class BuiltInRuleAppIndex {
      * registration is a deliberate value, suppressed with a scoped key (cf. the null-marker
      * precedent).
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private void scanSimplificationRule(Goal goal, NewRuleListener listener) {
         ImmutableList<BuiltInRule> rules = index.rules();
         if (!rules.isEmpty()) {

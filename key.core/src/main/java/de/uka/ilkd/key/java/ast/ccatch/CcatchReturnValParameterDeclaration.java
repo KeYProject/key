@@ -33,7 +33,7 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
     // this clause (getDelegate/getVariableSpecification/getVariables dereference it; the
     // pretty-printer visits it unconditionally). The ExtList lookup can only produce null for a
     // malformed clause, so the required field assignment is exempted from the check here.
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     public CcatchReturnValParameterDeclaration(ExtList children) {
         delegate = children.get(ParameterDeclaration.class);
     }

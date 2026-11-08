@@ -71,7 +71,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
      *        after construction; no meaningful initial value exists, so the difference is
      *        suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     public InnerBreakAndContinueReplacer(final StatementBlock block,
             final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,
             final Services services) {

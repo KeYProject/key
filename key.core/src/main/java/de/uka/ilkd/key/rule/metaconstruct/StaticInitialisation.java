@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -32,6 +34,14 @@ public class StaticInitialisation extends ProgramTransformer {
 
     }
 
+    /*
+     * A null result signals that no static initialisation is necessary (the program replace
+     * visitor ProgramReplaceVisitor#performActionOnProgramMetaConstruct handles this by
+     * dropping the meta construct), which the ProgramTransformer API cannot express; likewise
+     * the null execution context passed to MethodReference#getMethodSignature above the
+     * diamond is deliberate. So the @Nullable contract violations here are intentional.
+     */
+    @SuppressWarnings("NullAway")
     @Override
     public ProgramElement @Nullable [] transform(ProgramElement pe, Services services,
             SVInstantiations insts) {
@@ -50,7 +60,9 @@ public class StaticInitialisation extends ProgramTransformer {
                 return null; // no static initialisation necessary
             }
         } else if (pe instanceof MethodReference mr) {
-            final ExecutionContext ec = insts.getContextInstantiation().activeStatementContext();
+            final ExecutionContext ec = Objects.requireNonNull(
+                insts.getContextInstantiation(), "no context instantiation")
+                    .activeStatementContext();
             final IProgramMethod m;
             final KeYJavaType mrPrefixType = mr.determineStaticPrefixType(services, ec);
             if (ec == null) {

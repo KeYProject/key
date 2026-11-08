@@ -59,7 +59,7 @@ public class GUIOneStepChildTreeNode extends GUIAbstractTreeNode {
      * for every index; the swing tree never queries children of a leaf, so the {@code null} is
      * never observed, suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     @Override
     public TreeNode getChildAt(int childIndex) {
         // this node is a leaf, so the swing model never queries a child of it

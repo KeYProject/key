@@ -7,6 +7,7 @@ package de.uka.ilkd.key.gui.actions;
 import java.awt.event.ActionEvent;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.IssueDialog;
@@ -335,9 +336,12 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                     if (p != null || addAxioms) {
                         // add only the taclets to the goals if
                         // the proof obligations were added successfully.
-                        ImmutableList<Taclet> base = proof.getInitConfig().getTaclets();
+                        InitConfig initConfig =
+                            Objects.requireNonNull(proof.getInitConfig(),
+                                "No initial configuration for proof.");
+                        ImmutableList<Taclet> base = initConfig.getTaclets();
                         base = base.prependReverse(taclets);
-                        proof.getInitConfig().setTaclets(base);
+                        initConfig.setTaclets(base);
                         for (Taclet taclet : taclets) {
                             for (Goal goal : proof.openGoals()) {
                                 goal.addTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,

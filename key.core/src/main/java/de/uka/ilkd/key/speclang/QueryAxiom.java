@@ -6,11 +6,13 @@ package de.uka.ilkd.key.speclang;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -124,15 +126,19 @@ public final class QueryAxiom extends ClassAxiom {
         // create schema variables
         final List<TermSV> heapSVs = new ArrayList<>();
         for (int i = 0; i < target.getHeapCount(services); i++) {
-            heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + i), heapLDT.targetSort(),
-                false, false));
+            heapSVs.add(SchemaVariableFactory.createTermSV(new Name("h" + i),
+                Objects.requireNonNull(heapLDT, "heap LDT").targetSort(), false, false));
         }
         final var selfSV = target.isStatic() ? null
-                : SchemaVariableFactory.createTermSV(new Name("self"), kjt.getSort(), false, false);
+                : SchemaVariableFactory.createTermSV(new Name("self"),
+                    Objects.requireNonNull(kjt.getSort(), "kjt sort"), false, false);
         final TermSV[] paramSVs = new TermSV[target.getNumParams()];
         for (int i = 0; i < paramSVs.length; i++) {
             paramSVs[i] = SchemaVariableFactory.createTermSV(new Name("p" + i),
-                target.getParamType(i).getSort(), false, false);
+                Objects.requireNonNull(
+                    Objects.requireNonNull(target.getParamType(i), "param type").getSort(),
+                    "param type sort"),
+                false, false);
         }
         final var skolemSV = SchemaVariableFactory
                 .createSkolemTermSV(new Name(target.getName() + "_sk"), target.sort());
@@ -164,27 +170,38 @@ public final class QueryAxiom extends ClassAxiom {
                 update = tb.parallel(update, u);
             }
         }
-        update = target.isStatic() ? update
-                : tb.parallel(update, tb.elementary(selfProgSV, tb.var(selfSV)));
-        for (int i = 0; i < paramSVs.length; i++) {
-            update = tb.parallel(update, tb.elementary(paramProgSVs[i], tb.var(paramSVs[i])));
+        if (!target.isStatic()) {
+            update = tb.parallel(Objects.requireNonNull(update, "update"),
+                tb.elementary(Objects.requireNonNull(selfProgSV, "self program variable"),
+                    tb.var(Objects.requireNonNull(selfSV, "self schema variable"))));
         }
-        final JTerm post = tb.imp(tb.reachableValue(tb.var(resultProgSV), target.getReturnType()),
+        for (int i = 0; i < paramSVs.length; i++) {
+            update = tb.parallel(Objects.requireNonNull(update, "update"),
+                tb.elementary(paramProgSVs[i], tb.var(paramSVs[i])));
+        }
+        final JTerm post = tb.imp(
+            tb.reachableValue(tb.var(resultProgSV),
+                Objects.requireNonNull(target.getReturnType(), "return type")),
             tb.equals(tb.var(skolemSV), tb.var(resultProgSV)));
 
         // create java block
-        final ImmutableList<KeYJavaType> sig = ImmutableList.<KeYJavaType>nil()
-                .append(target.getParamTypes().toArray(new KeYJavaType[target.getNumParams()]));
+        final ImmutableList<KeYJavaType> sig = ImmutableList.<KeYJavaType>nil().append(Objects
+                .requireNonNull(target.getParamTypes(), "param types")
+                .toArray(new KeYJavaType[target.getNumParams()]));
         // get real implementation of program method
-        final IProgramMethod targetImpl =
-            services.getJavaInfo().getProgramMethod(kjt, target.getName(), sig, kjt);
+        final IProgramMethod targetImpl = Objects.requireNonNull(
+            services.getJavaInfo().getProgramMethod(kjt, target.getName(), sig, kjt),
+            "target program method");
+        final MethodDeclaration methodDeclaration =
+            Objects.requireNonNull(targetImpl.getMethodDeclaration(), "method declaration");
 
-        if (targetImpl.getMethodDeclaration().getBody() == null) {
+        if (methodDeclaration.getBody() == null) {
             // no method implementation available so using a query axiom
             // that requires inlining of the body is not sensible.
             return DefaultImmutableSet.nil();
         }
 
+        @SuppressWarnings("NullAway") // static queries legitimately pass null as self program var
         final MethodBodyStatement mbs = new MethodBodyStatement(targetImpl, selfProgSV,
             resultProgSV, new ImmutableArray<>(paramProgSVs));
         final StatementBlock sb = new StatementBlock(mbs);
@@ -195,7 +212,9 @@ public final class QueryAxiom extends ClassAxiom {
         if (target.isStatic()) {
             ifSeq = null;
         } else {
-            final JTerm ifFormula = tb.exactInstance(kjt.getSort(), tb.var(selfSV));
+            final JTerm ifFormula = tb.exactInstance(
+                Objects.requireNonNull(kjt.getSort(), "kjt sort"),
+                tb.var(Objects.requireNonNull(selfSV, "self schema variable")));
             final SequentFormula ifCf = new SequentFormula(ifFormula);
             final ImmutableList<SequentFormula> antecedent =
                 ImmutableList.singleton(ifCf);
@@ -210,7 +229,7 @@ public final class QueryAxiom extends ClassAxiom {
             offset++;
         }
         if (!target.isStatic()) {
-            subs[offset] = tb.var(selfSV);
+            subs[offset] = tb.var(Objects.requireNonNull(selfSV, "self schema variable"));
             offset++;
         }
         for (var paramSV : paramSVs) {
@@ -224,7 +243,8 @@ public final class QueryAxiom extends ClassAxiom {
 
         // create added sequent
         final JTerm addedFormula =
-            tb.apply(update, tb.prog(JModality.JavaModalityKind.BOX, jb, post), null);
+            tb.apply(Objects.requireNonNull(update, "update"),
+                tb.prog(JModality.JavaModalityKind.BOX, jb, post), null);
         final SequentFormula addedCf = new SequentFormula(addedFormula);
         final Sequent addedSeq =
             JavaDLSequentKit.createAnteSequent(ImmutableList.singleton(addedCf));
@@ -237,15 +257,19 @@ public final class QueryAxiom extends ClassAxiom {
             tacletBuilder.addVarsNewDependingOn(skolemSV, heapSV);
         }
         if (!target.isStatic()) {
-            tacletBuilder.addVarsNewDependingOn(skolemSV, selfSV);
-            tacletBuilder.setAssumesSequent(ifSeq);
-            tacletBuilder.addVarsNew(selfProgSV, kjt);
+            tacletBuilder.addVarsNewDependingOn(skolemSV,
+                Objects.requireNonNull(selfSV, "self schema variable"));
+            tacletBuilder.setAssumesSequent(Objects.requireNonNull(ifSeq, "if sequent"));
+            tacletBuilder.addVarsNew(Objects.requireNonNull(selfProgSV, "self program variable"),
+                kjt);
         }
         for (int i = 0; i < paramSVs.length; i++) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, paramSVs[i]);
-            tacletBuilder.addVarsNew(paramProgSVs[i], target.getParamType(i));
+            tacletBuilder.addVarsNew(paramProgSVs[i],
+                Objects.requireNonNull(target.getParamType(i), "param type"));
         }
-        tacletBuilder.addVarsNew(resultProgSV, target.getReturnType());
+        tacletBuilder.addVarsNew(resultProgSV,
+            Objects.requireNonNull(target.getReturnType(), "return type"));
         tacletBuilder.setApplicationRestriction(
             new ApplicationRestriction(ApplicationRestriction.SAME_UPDATE_LEVEL));
         tacletBuilder.addTacletGoalTemplate(

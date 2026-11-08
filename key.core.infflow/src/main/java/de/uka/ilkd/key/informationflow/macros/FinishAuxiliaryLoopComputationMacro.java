@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.informationflow.macros;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
@@ -77,6 +79,7 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
         final var loopInvRuleApp = (InfFlowLoopInvariantBuiltInRuleApp) app;
         LoopSpecification loopInv = loopInvRuleApp.retrieveLoopInvariantFromSpecification(services);
         loopInv = loopInv != null ? loopInv : loopInvRuleApp.getSpec();
+        loopInv = Objects.requireNonNull(loopInv, "loop invariant of the rule app");
         IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
             throw new NullPointerException("No information flow proof obligation variables for "
@@ -91,7 +94,9 @@ public class FinishAuxiliaryLoopComputationMacro extends AbstractFinishAuxiliary
         final LoopInfFlowUnfoldTacletBuilder tacletBuilder =
             new LoopInfFlowUnfoldTacletBuilder(services);
         tacletBuilder.setLoopInv(loopInv);
-        tacletBuilder.setExecutionContext(loopInvRuleApp.getExecutionContext());
+        tacletBuilder.setExecutionContext(
+            Objects.requireNonNull(loopInvRuleApp.getExecutionContext(),
+                "execution context of the rule app"));
         tacletBuilder.setInfFlowVars(ifVars);
         tacletBuilder.setReplacewith(result);
         tacletBuilder.setGuard(loopInvExecPO.getGuard());

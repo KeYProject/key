@@ -53,7 +53,7 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
      * construction; no meaningful initial value exists, so the difference is suppressed with a
      * scoped key.
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     public OuterBreakContinueAndReturnReplacer(final StatementBlock block,
             final Iterable<Label> alwaysInnerLabels, final Label breakOutLabel,
             final Map<Label, LocationVariable> breakFlags,
@@ -466,7 +466,8 @@ public class OuterBreakContinueAndReturnReplacer extends JavaASTVisitor {
      * and the derived default values are suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings({ "nullness:dereference.of.nullable", "nullness:argument.type.incompatible" })
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     public void performActionOnFinally(final Finally x) {
         final ExtList statements;
         final ExtList changeList = stack.getFirst();

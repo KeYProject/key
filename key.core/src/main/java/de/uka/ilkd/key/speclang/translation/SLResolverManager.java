@@ -7,6 +7,7 @@ package de.uka.ilkd.key.speclang.translation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.MemberDeclaration;
@@ -91,14 +92,16 @@ public abstract class SLResolverManager {
             var logicVar = ns.lookup(n);
             if (logicVar != null) {
                 JTerm varTerm = tb.var(logicVar);
-                return new SLExpression(varTerm, kjts.get(logicVar));
+                return new SLExpression(varTerm,
+                    Objects.requireNonNull(kjts.get(logicVar), "no type for logic variable"));
             }
         }
         for (Namespace<LocationVariable> ns : localVariablesNamespaces) {
             var localVar = ns.lookup(n);
             if (localVar != null) {
                 JTerm varTerm = tb.var(localVar);
-                return new SLExpression(varTerm, kjts.get(localVar));
+                return new SLExpression(varTerm,
+                    Objects.requireNonNull(kjts.get(localVar), "no type for local variable"));
             }
         }
 
@@ -112,7 +115,8 @@ public abstract class SLResolverManager {
     private @Nullable SLExpression resolveImplicit(String name, @Nullable SLParameters parameters)
             throws SLTranslationException {
         if (selfVar != null) {
-            SLExpression receiver = new SLExpression(tb.var(selfVar), specInClass);
+            SLExpression receiver = new SLExpression(tb.var(selfVar),
+                Objects.requireNonNull(specInClass, "no specification class"));
             SLExpression result = resolveExplicit(receiver, name, parameters);
             if (result != null) {
                 return result;
@@ -134,7 +138,7 @@ public abstract class SLResolverManager {
      * Tries to resolve a name as a property call on an explicitly given receiver, by calling the
      * registered resolvers.
      */
-    private @Nullable SLExpression resolveExplicit(SLExpression receiver, String name,
+    private @Nullable SLExpression resolveExplicit(@Nullable SLExpression receiver, String name,
             @Nullable SLParameters params)
             throws SLTranslationException {
         for (SLExpressionResolver resolver : resolvers) {
@@ -230,7 +234,8 @@ public abstract class SLResolverManager {
      * Puts a local variable into the topmost namespace on the stack
      */
     public void putIntoTopLocalVariablesNamespace(LocationVariable pv) {
-        putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
+        putIntoTopLocalVariablesNamespace(pv,
+            Objects.requireNonNull(pv.getKeYJavaType(), "no type for local variable"));
     }
 
     /**
@@ -249,7 +254,8 @@ public abstract class SLResolverManager {
      */
     public void putIntoTopLocalVariablesNamespace(ImmutableList<? extends LocationVariable> pvs) {
         for (var pv : pvs) {
-            putIntoTopLocalVariablesNamespace(pv, pv.getKeYJavaType());
+            putIntoTopLocalVariablesNamespace(pv,
+                Objects.requireNonNull(pv.getKeYJavaType(), "no type for local variable"));
         }
     }
 

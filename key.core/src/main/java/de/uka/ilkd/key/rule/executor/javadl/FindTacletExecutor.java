@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.executor.javadl;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.java.Services;
@@ -90,6 +91,10 @@ public abstract class FindTacletExecutor extends TacletExecutor {
      * @param goal the goal that the rule application should refer to.
      * @param ruleApp the taclet application that is executed.
      */
+    // The label refactoring and branch-label calls take optional hint/tacletTerm/name arguments
+    // that are deliberately absent at the call sites below, though their parameters are declared
+    // @NonNull; the receivers tolerate the absent values.
+    @SuppressWarnings("NullAway")
     @Override
     public final ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         final TermLabelState termLabelState = new TermLabelState();
@@ -100,6 +105,9 @@ public abstract class FindTacletExecutor extends TacletExecutor {
         final TacletApp tacletApp = (TacletApp) ruleApp;
         final MatchResultInfo mc = tacletApp.matchConditions();
 
+        // checkAssumesGoals itself null-checks its list of assumes instantiations; a taclet
+        // without an assumes sequent contributes no instantiations.
+        @SuppressWarnings("NullAway")
         final ImmutableList<SequentChangeInfo> newSequentsForGoals =
             checkAssumesGoals(goal, tacletApp.assumesFormulaInstantiations(), mc, numberOfNewGoals);
 
@@ -108,13 +116,17 @@ public abstract class FindTacletExecutor extends TacletExecutor {
         final Iterator<Goal> goalIt = newGoals.iterator();
         final Iterator<SequentChangeInfo> newSequentsIt =
             newSequentsForGoals.iterator();
+        // A complete find-taclet application always has a position
+        // (see {@link TacletApp#complete()}).
+        final PosInOccurrence pio = Objects.requireNonNull(tacletApp.posInOccurrence(),
+            "taclet application has no position to apply to");
 
         for (var gt : taclet.goalTemplates()) {
             final Goal currentGoal = goalIt.next();
             final SequentChangeInfo currentSequent = newSequentsIt.next();
 
             final long timeApply = PerfScope.start();
-            applyReplacewith(gt, termLabelState, currentSequent, tacletApp.posInOccurrence(), mc,
+            applyReplacewith(gt, termLabelState, currentSequent, pio, mc,
                 currentGoal, tacletApp, services);
 
             /*
@@ -124,8 +136,8 @@ public abstract class FindTacletExecutor extends TacletExecutor {
             final PosInOccurrence posWhereToAdd =
                 updatePositionInformation(tacletApp, gt, currentSequent);
 
-            applyAdd(gt.sequent(), termLabelState, currentSequent, posWhereToAdd,
-                tacletApp.posInOccurrence(), mc, goal, tacletApp, services);
+            applyAdd(gt.sequent(), termLabelState, currentSequent, posWhereToAdd, pio,
+                mc, goal, tacletApp, services);
 
             applyAddrule(gt.rules(), currentGoal, services, mc);
 
@@ -133,7 +145,7 @@ public abstract class FindTacletExecutor extends TacletExecutor {
             // found; this is taken directly from the posinoccurrence and not searched for
             // in the new sequent
             applyAddProgVars(gt.addedProgVars(), currentSequent, currentGoal,
-                tacletApp.posInOccurrence(), services, mc);
+                pio, services, mc);
             PerfScope.stop(PERF_APPLY, timeApply);
 
             final long timeMergeLabels = PerfScope.start();
@@ -144,10 +156,14 @@ public abstract class FindTacletExecutor extends TacletExecutor {
             currentGoal.setSequent(currentSequent);
             PerfScope.stop(PERF_SET_SEQUENT, timeSetSequent);
 
+            // Goal templates without an explicit name keep a null branch label, which
+            // NodeInfo.setBranchLabel accepts.
             currentGoal.setBranchLabel(gt.name());
 
             final long timeRefactorLabels = PerfScope.start();
-            TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(),
+            // The trailing hint/tacletTerm arguments are optional for this refactoring and are
+            // deliberately not provided here.
+            TermLabelManager.refactorSequent(termLabelState, services, pio,
                 tacletApp.rule(), currentGoal, null, null);
             PerfScope.stop(PERF_TERM_LABELS, timeRefactorLabels);
         }
@@ -159,7 +175,9 @@ public abstract class FindTacletExecutor extends TacletExecutor {
         while (newSequentsIt.hasNext()) {
             final Goal nextGoal = goalIt.next();
             nextGoal.setSequent(newSequentsIt.next());
-            TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(),
+            // The trailing hint/tacletTerm arguments are optional for this refactoring and are
+            // deliberately not provided here.
+            TermLabelManager.refactorGoal(termLabelState, services, pio,
                 tacletApp.rule(), nextGoal, null, null);
         }
 
@@ -185,19 +203,26 @@ public abstract class FindTacletExecutor extends TacletExecutor {
         final TacletApp tacletApp = (TacletApp) ruleApp;
         final MatchResultInfo mc = tacletApp.matchConditions();
 
+        // checkAssumesGoals itself null-checks its list of assumes instantiations; a taclet
+        // without an assumes sequent contributes no instantiations.
+        @SuppressWarnings("NullAway")
         final ImmutableList<SequentChangeInfo> newSequentsForGoals = checkAssumesGoals(goal,
             tacletApp.assumesFormulaInstantiations(), mc, taclet.goalTemplates().size());
 
         ImmutableList<SequentChangeInfo> result = ImmutableList.nil();
         final Iterator<SequentChangeInfo> it = newSequentsForGoals.iterator();
+        // A complete find-taclet application always has a position
+        // (see {@link TacletApp#complete()}).
+        final PosInOccurrence pio = Objects.requireNonNull(tacletApp.posInOccurrence(),
+            "taclet application has no position to apply to");
         for (var gt : taclet.goalTemplates()) {
             final SequentChangeInfo currentSequent = it.next();
-            applyReplacewith(gt, termLabelState, currentSequent, tacletApp.posInOccurrence(), mc,
+            applyReplacewith(gt, termLabelState, currentSequent, pio, mc,
                 goal, tacletApp, services);
             final PosInOccurrence posWhereToAdd =
                 updatePositionInformation(tacletApp, gt, currentSequent);
-            applyAdd(gt.sequent(), termLabelState, currentSequent, posWhereToAdd,
-                tacletApp.posInOccurrence(), mc, goal, tacletApp, services);
+            applyAdd(gt.sequent(), termLabelState, currentSequent, posWhereToAdd, pio,
+                mc, goal, tacletApp, services);
             TermLabelManager.mergeLabels(currentSequent, services);
             result = result.append(currentSequent);
         }

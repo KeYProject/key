@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.*;
@@ -334,7 +335,9 @@ public class SendFeedbackAction extends AbstractAction {
             }
             Location url = ExceptionTools.getLocation(t);
             if (url != null) {
-                String content = IOUtil.readFrom(url.fileUri());
+                var fileUri =
+                    Objects.requireNonNull(url.fileUri(), "the exception has a source file URI");
+                String content = IOUtil.readFrom(fileUri);
                 if (content == null) {
                     // {@code readFrom} fails to read the resource; the previous code crashed in
                     // {@code getBytes} on such input, keep that behavior.

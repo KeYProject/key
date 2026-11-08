@@ -78,7 +78,7 @@ public final class DockingLayout implements KeYGuiExtension, KeYGuiExtension.Sta
      * {@link #init(MainWindow, KeYMediator)}; the EISOP initialization check cannot see the
      * assignment inside the framework callback, suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized", "NullAway" })
     public DockingLayout() {
     }
 

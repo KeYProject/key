@@ -152,13 +152,18 @@ public class MergeRuleUtils {
     /**
      * Translates a String into a formula or to null if not applicable.
      *
-     * @param services The services object.
+     * @param services The services object, or {@code null} (in which case {@code null} is
+     *        returned).
      * @param toTranslate The formula to be translated.
      * @return The formula represented by the input or null if not applicable.
      */
-    public static @Nullable JTerm translateToFormula(final Services services,
+    public static @Nullable JTerm translateToFormula(final @Nullable Services services,
             final String toTranslate) {
         try {
+            // The KeyIO constructor declares a non-null services parameter, although a null
+            // services here only surfaces as an NPE during parsing, caught below, yielding the
+            // documented null result.
+            @SuppressWarnings("NullAway")
             @NonNull
             JTerm result = new KeyIO(services).parseExpression(toTranslate);
             return result.sort() == JavaDLTheory.FORMULA ? result : null;
@@ -861,8 +866,11 @@ public class MergeRuleUtils {
         replVisitor1.start();
         replVisitor2.start();
 
-        return replVisitor1.result().equalsModProperty(replVisitor2.result(),
-            RENAMING_SOURCE_ELEMENT_PROPERTY,
+        ProgramElement replaced1 =
+            Objects.requireNonNull(replVisitor1.result(), "replaced program");
+        ProgramElement replaced2 =
+            Objects.requireNonNull(replVisitor2.result(), "replaced program");
+        return replaced1.equalsModProperty(replaced2, RENAMING_SOURCE_ELEMENT_PROPERTY,
             new NameAbstractionTable());
     }
 
@@ -1023,7 +1031,7 @@ public class MergeRuleUtils {
      *        the
      *        dereference of the (nullable) init config is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static void closeMergePartnerGoal(Node mergeNodeParent, Goal mergePartner,
             PosInOccurrence pio, SymbolicExecutionState mergeState,
             SymbolicExecutionState mergePartnerState, JTerm pc, Set<Name> newNames) {
@@ -1090,7 +1098,7 @@ public class MergeRuleUtils {
      *         an update application (the program-counter form produced by symbolic execution); the
      *         possibly-null locals passed to the constructor are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(Node node,
             PosInOccurrence pio, Services services) {
 
@@ -1167,7 +1175,8 @@ public class MergeRuleUtils {
      *         the (nullable) corresponding nodes passed to them as arguments are suppressed with a
      *         scoped key.
      */
-    @SuppressWarnings({ "nullness:dereference.of.nullable", "nullness:argument.type.incompatible" })
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     public static Pair<SymbolicExecutionState, SymbolicExecutionState> handleNameClashes(
             SymbolicExecutionState mergeState, SymbolicExecutionState mergePartnerState,
             Services services) {
@@ -1343,7 +1352,7 @@ public class MergeRuleUtils {
      *         with a
      *         scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static AbstractionPredicate parsePredicate(String input,
             ArrayList<Pair<Sort, Name>> registeredPlaceholders, NamespaceSet localNamespaces,
             Services services) throws ParserException {

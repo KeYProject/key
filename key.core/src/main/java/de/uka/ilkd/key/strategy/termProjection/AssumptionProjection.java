@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termProjection;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -46,6 +48,7 @@ public class AssumptionProjection implements ProjectionToTerm<Goal> {
                     + " but got "
                     + app;
 
-        return tapp.assumesFormulaInstantiations().get(no).getSequentFormula().formula();
+        return Objects.requireNonNull(tapp.assumesFormulaInstantiations()).get(no)
+                .getSequentFormula().formula();
     }
 }

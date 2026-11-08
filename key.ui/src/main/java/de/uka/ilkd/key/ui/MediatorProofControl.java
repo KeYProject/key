@@ -166,7 +166,7 @@ public class MediatorProofControl extends AbstractProofControl {
      * {@inheritDoc}
      */
     @Override
-    public void runMacro(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
+    public void runMacro(Node node, ProofMacro macro, @Nullable PosInOccurrence posInOcc) {
         if (!autoModeActive.compareAndSet(false, true)) {
             return; // a run is still active or winding down; do not overlap it
         }
@@ -281,6 +281,9 @@ public class MediatorProofControl extends AbstractProofControl {
         protected ProofSearchInformation<Proof, Goal> doInBackground() {
             backgroundStarted = true;
             try {
+                // STOPMODE_OPTIONS_KEY is registered in StrategyProperties' DEFAULT_MAP and copied
+                // into every instance, so getProperty can never return null here
+                @SuppressWarnings("NullAway")
                 boolean stopMode =
                     proof.getSettings().getStrategySettings().getActiveStrategyProperties()
                             .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)

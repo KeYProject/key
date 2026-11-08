@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termProjection;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.Goal;
@@ -47,9 +49,9 @@ public class TermConstructionProjection implements ProjectionToTerm<Goal> {
     public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final JTerm[] subs = new JTerm[subTerms.length];
         for (int i = 0; i != subTerms.length; ++i) {
-            subs[i] = (JTerm) subTerms[i].toTerm(app, pos, goal, mState);
+            subs[i] = (JTerm) Objects.requireNonNull(subTerms[i].toTerm(app, pos, goal, mState));
         }
-        return goal.proof().getServices().getTermFactory().createTerm(op, subs, null, null);
+        return goal.proof().getServices().getTermFactory().createTerm(op, subs);
     }
 
 }

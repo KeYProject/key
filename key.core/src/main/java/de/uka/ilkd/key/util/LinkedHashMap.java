@@ -144,7 +144,7 @@ public class LinkedHashMap<K, V> extends java.util.LinkedHashMap<K, V>
          * suppressed because a {@code null} value is part of the map's documented contract
          * (the key argument is a freshly read, provably non-null local).
          */
-        @SuppressWarnings("nullness:argument.type.incompatible")
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
         @Override
         public Pair<K, V> next() {
             K nextKey = keyIt.next();

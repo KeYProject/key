@@ -294,7 +294,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
          * fatal error).
          */
         @Override
-        @SuppressWarnings("nullness:argument.type.incompatible")
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
         public T fromObject(@Nullable Object o) {
             return fromObject.apply(o);
         }

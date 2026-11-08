@@ -194,7 +194,9 @@ public final class StrategySelectionView extends JPanel implements TabPanel {
         setVisible(true);
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentShown(java.awt.event.ComponentEvent e) {
-                components.getMaxRuleAppSlider().refresh();
+                MaxRuleAppSlider slider = Objects.requireNonNull(components.getMaxRuleAppSlider(),
+                    "max rule applications slider not created");
+                slider.refresh();
             }
         });
         KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,

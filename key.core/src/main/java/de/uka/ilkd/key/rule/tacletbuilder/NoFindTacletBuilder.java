@@ -85,7 +85,14 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
         return getNoFindTaclet();
     }
 
+    /**
+     * {@code attrs.trigger()} is {@code null} for builders without a trigger; this is a legitimate
+     * state {@link org.key_project.prover.rules.TacletAttributes} preserves and tolerates
+     * downstream. {@link TacletBuilder#setTrigger} is {@code @NonNull}-typed, so the assignment is
+     * suppressed.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public NoFindTacletBuilder copy() {
         var rb = new NoFindTacletBuilder();
         rb.setAnnotations(tacletAnnotations);

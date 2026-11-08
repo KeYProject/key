@@ -31,7 +31,7 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     // Ccatch(ParameterDeclaration,
     // ...) and Ccatch(CcatchNonstandardParameterDeclaration, ...) also legitimately pass null, so
     // these params stay @Nullable and the check is scoped to this ctor.
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public Ccatch(@Nullable PositionInfo pi, @Nullable List<Comment> comments,
             @Nullable ParameterDeclaration parameter,
             @Nullable CcatchNonstandardParameterDeclaration nonStdParameter, StatementBlock body) {
@@ -127,7 +127,7 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     // the parameter and the non-standard parameter may legitimately be absent (a ccatch declares
     // exactly one of them); the base contract NonTerminalProgramElement.getChildAt(int) is
     // over-narrow; honest @Nullable override per SuperArrayDeclaration precedent (wave 7).
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
     @Override
     public @Nullable ProgramElement getChildAt(int index) {
         if (hasParameterDeclaration()) {
@@ -201,7 +201,7 @@ public final class Ccatch extends BranchImp implements ParameterContainer, Varia
     // the parameter may be absent (see hasParameterDeclaration()); the base contract
     // ParameterContainer.getParameterDeclarationAt(int) is over-narrow, so the honest @Nullable
     // override is exempted from the check.
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
     @Override
     public @Nullable ParameterDeclaration getParameterDeclarationAt(int index) {
         if (hasParameterDeclaration() && index == 0) {

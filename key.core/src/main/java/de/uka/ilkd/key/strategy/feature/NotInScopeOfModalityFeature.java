@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
@@ -43,7 +45,7 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
         final PIOPathIterator it = pos.iterator();
 
         while (it.next() != -1) {
-            final var op = it.getSubTerm().op();
+            final var op = Objects.requireNonNull(it.getSubTerm()).op();
 
             if (op instanceof JModality) {
                 return true;

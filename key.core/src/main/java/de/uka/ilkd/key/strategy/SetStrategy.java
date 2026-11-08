@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.ldt.SetLDT;
@@ -46,12 +47,13 @@ public class SetStrategy extends AbstractFeatureStrategy implements ComponentStr
 
     public SetStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
-        stf = new SetTermFeatures(getServices().getTypeConverter().getLDT(SetLDT.class));
+        stf = new SetTermFeatures(
+            Objects.requireNonNull(getServices().getTypeConverter().getLDT(SetLDT.class)));
         costComputationDispatcher = setupCostComputationF();
 
-        stopAtFirstNonCloseableGoal =
-            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                    .equals(StrategyProperties.STOPMODE_NONCLOSE);
+        stopAtFirstNonCloseableGoal = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY))
+                .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
     private RuleSetDispatchFeature setupCostComputationF() {

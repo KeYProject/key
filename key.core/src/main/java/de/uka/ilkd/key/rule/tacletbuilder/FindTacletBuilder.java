@@ -60,7 +60,7 @@ public abstract class FindTacletBuilder<T extends FindTaclet> extends TacletBuil
      * The field is {@code @Nullable} only because builders set it incrementally; a finished builder
      * always has a find term (the class docs require one), so the difference is suppressed.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     public SyntaxElement getFind() {
         return find;
     }

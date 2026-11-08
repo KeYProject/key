@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.speclang.Contract;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An obligation for some kind of contract.
@@ -17,5 +18,10 @@ public interface ContractPO extends ProofOblInput {
 
     Contract getContract();
 
+    /**
+     * @return the measured-by term at the precondition, or {@code null} if the contract has no
+     *         measured-by clause
+     */
+    @Nullable
     JTerm getMbyAtPre();
 }

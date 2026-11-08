@@ -232,7 +232,7 @@ public abstract class AbstractUserInterfaceControl
      * suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings({ "nullness:argument.type.incompatible",
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible",
         "nullness:dereference.of.nullable" })
     public AbstractProblemLoader load(@Nullable Profile profile, Path file,
             @Nullable List<Path> classPath,
@@ -291,7 +291,7 @@ public abstract class AbstractUserInterfaceControl
      * suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void loadingFinished(AbstractProblemLoader loader,
             @Nullable LoadedPOContainer poContainer,
             @Nullable ProofAggregate proofList, @Nullable ReplayResult result)

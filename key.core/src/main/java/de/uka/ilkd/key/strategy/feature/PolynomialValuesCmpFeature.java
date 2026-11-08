@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -123,8 +124,8 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
             @Nullable ProjectionToTerm<Goal> coeffProj,
             TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Polynomial poly =
-            Polynomial.create(polyProj.toTerm(app, pos, goal, mState), services);
+        final Polynomial poly = Polynomial
+                .create(Objects.requireNonNull(polyProj.toTerm(app, pos, goal, mState)), services);
 
         if (coeffProj == null) {
             return poly;

@@ -83,7 +83,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
             }
 
             @Override
-            public String visit(Taclet taclet, boolean visitAddrules) {
+            public @Nullable String visit(Taclet taclet, boolean visitAddrules) {
                 if (taclet instanceof RewriteTaclet rwTaclet) {
                     Sequent assumptions = rwTaclet.assumesSequent();
                     var appRestr = rwTaclet.applicationRestriction();
@@ -221,7 +221,8 @@ class DefaultLemmaGenerator implements LemmaGenerator {
      * schema variables.
      */
     private JTerm createSimpleInstantiation(Taclet owner, JOperatorSV sv, TermServices services) {
-        ImmutableSet<SchemaVariable> prefix = ((TacletPrefix) owner.getPrefix(sv)).prefix();
+        ImmutableSet<SchemaVariable> prefix =
+            ((TacletPrefix) Objects.requireNonNull(owner.getPrefix(sv))).prefix();
 
         Sort[] argSorts = computeArgSorts(prefix, services);
         JTerm[] args = computeArgs(owner, prefix, services);
@@ -287,7 +288,7 @@ class DefaultLemmaGenerator implements LemmaGenerator {
         Operator newOp = replaceOp(term.op(), services);
 
         return services.getTermFactory().createTerm(newOp, newSubs,
-            new ImmutableArray<>(qvars), null);
+            new ImmutableArray<>(qvars), new ImmutableArray<>());
     }
 
     /**

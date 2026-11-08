@@ -153,7 +153,7 @@ public class TacletAppIndex {
      * {@code seq} field documentation). The (nullable-typed) access is suppressed scoped on this
      * method.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private void createAllFromGoal() {
         final long time = PerfScope.start();
         try {
@@ -192,7 +192,7 @@ public class TacletAppIndex {
      * run, but the holding fields are {@code @Nullable}; the difference is suppressed with a scoped
      * key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     private SemisequentTacletAppIndex getIndex(PosInOccurrence pos) {
         ensureIndicesExist();
         return pos.isInAntec() ? antecIndex : succIndex;
@@ -345,7 +345,7 @@ public class TacletAppIndex {
      *        of
      *        the (nullable) index fields are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void updateIndices(SequentChangeInfo sci) {
         seq = sci.sequent();
 
@@ -365,7 +365,7 @@ public class TacletAppIndex {
      *        of
      *        the (nullable) index fields are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void updateIndices(final SetRuleFilter newTaclets) {
         antecIndex =
             antecIndex.addTaclets(newTaclets, getServices(), tacletIndex, newRuleListener);
@@ -385,7 +385,7 @@ public class TacletAppIndex {
      * The indices are lazily created before any change reaches this method; the dereferences of
      * the (nullable) index fields are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void updateIndices(final TacletIndex newTacletsIndex) {
         antecIndex = antecIndex.addTaclets(TacletFilter.TRUE, getServices(), newTacletsIndex,
             newRuleListener);
@@ -404,7 +404,7 @@ public class TacletAppIndex {
      *
      * @param tacletApp the partially instantiated Taclet to add
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public void addedNoPosTacletApp(NoPosTacletApp tacletApp) {
         if (indexCaches.isRelevantTaclet(tacletApp.taclet())) {
             // we must flush the index cache, and we must no longer use a cache
@@ -450,7 +450,7 @@ public class TacletAppIndex {
      *
      * @param tacletApps set of partially instantiated {@code Taclet}s to add
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public void addedNoPosTacletApps(Iterable<NoPosTacletApp> tacletApps) {
         for (TacletApp tacletApp : tacletApps) {
             if (indexCaches.isRelevantTaclet(tacletApp.taclet())) {
@@ -554,7 +554,7 @@ public class TacletAppIndex {
      * position (the {@link NewRuleListener} interface declares the position non-null, but
      * {@code createAppContainer} tolerates {@code null}, suppressed with a scoped key).
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public void reportRuleApps(NewRuleListener l, Services services) {
         if (antecIndex != null) {
             antecIndex.reportRuleApps(l);

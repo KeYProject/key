@@ -20,6 +20,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Rule that merges two sequents based on the if-then-else construction: If two locations are
@@ -36,7 +37,7 @@ import org.jspecify.annotations.NullMarked;
 public class MergeIfThenElseAntecedent extends MergeProcedure
         implements UnparametricMergeProcedure {
 
-    private static MergeIfThenElseAntecedent INSTANCE = null;
+    private static @Nullable MergeIfThenElseAntecedent INSTANCE = null;
 
     public static MergeIfThenElseAntecedent instance() {
         if (INSTANCE == null) {

@@ -99,7 +99,7 @@ class FinalPrinter extends FieldPrinter {
      * The attribute of the field term is always registered in the Java info of the services; the
      * dereference of the (nullable) program variable is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private Sort getFieldSort(JTerm fieldTerm) {
         String lookup = fieldTerm.op().toString().replace("$", "");
         ProgramVariable progVar = services.getJavaInfo().getAttribute(lookup);
@@ -112,7 +112,7 @@ class FinalPrinter extends FieldPrinter {
      * The printer's services are set whenever it prints; the dereference of the (nullable)
      * services is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void printStaticJavaFieldConstant(
             LogicPrinter lp, final JTerm fieldTerm) {
         lp.layouter.startTerm(2);

@@ -45,8 +45,8 @@ public class DoBreak extends ProgramTransformer {
      * @param block the NonTerminalProgramElement to go through and look for the label
      * @param breakLabel the Label the break statement marked
      */
-    private @Nullable ProgramElement doBreak(NonTerminalProgramElement block, Label breakLabel,
-            Break b) {
+    private @Nullable ProgramElement doBreak(NonTerminalProgramElement block,
+            @Nullable Label breakLabel, Break b) {
 
         if (block instanceof LabeledStatement) {
             // we enter a labeled block so we have to check the label

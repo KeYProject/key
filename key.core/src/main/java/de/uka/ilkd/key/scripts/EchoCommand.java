@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.scripts;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.scripts.meta.Argument;
 import de.uka.ilkd.key.scripts.meta.Documentation;
 
@@ -30,7 +32,8 @@ public class EchoCommand extends AbstractCommand {
 
         var obs = state().getObserver();
         if (obs != null) {
-            obs.accept(new ProofScriptEngine.EchoMessage(params.message));
+            obs.accept(new ProofScriptEngine.EchoMessage(
+                Objects.requireNonNull(params.message, "message must be given")));
         }
     }
 

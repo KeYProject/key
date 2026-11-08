@@ -157,15 +157,23 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
             @Override
             public void visualizerUnregistered(NodeInfoVisualizer vis) {
-                if (vis.getNode().proof() != null && !vis.getNode().proof().isDisposed()
-                        && vis.getNode().proof() == proof) {
-                    delegateModel.updateTree(vis.getNode());
+                Node node = Objects.requireNonNull(vis.getNode(), "No proof node available.");
+                if (node.proof() != null && !node.proof().isDisposed() && node.proof() == proof) {
+                    // {@code delegateModel} is a field whose refinement is lost across the
+                    // method calls below; work on a local copy.
+                    GUIProofTreeModel model =
+                        Objects.requireNonNull(delegateModel, "No delegate model available.");
+                    model.updateTree(node);
                 }
             }
 
             @Override
             public void visualizerRegistered(NodeInfoVisualizer vis) {
-                delegateModel.updateTree(vis.getNode());
+                // {@code delegateModel} is a field whose refinement is lost across the
+                // method calls below; work on a local copy.
+                GUIProofTreeModel model =
+                    Objects.requireNonNull(delegateModel, "No delegate model available.");
+                model.updateTree(vis.getNode());
             }
         };
 
@@ -240,8 +248,9 @@ public class ProofTreeView extends JPanel implements TabPanel {
 
                     Style style = renderer.initStyleForNode(node);
                     if (style.tooltip != null) {
-                        return renderTooltip(style.tooltip,
-                            node.getNode().proof().getServices());
+                        Node proofNode = Objects.requireNonNull(node.getNode(),
+                            "No proof node available.");
+                        return renderTooltip(style.tooltip, proofNode.proof().getServices());
                     }
                 }
 
@@ -289,7 +298,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
                 }
                 var last = path.getLastPathComponent();
                 var isValidNode = last instanceof GUIBranchNode &&
-                        ((GUIBranchNode) last).getNode().parent() != null;
+                        Objects.requireNonNull(((GUIBranchNode) last).getNode(), "No proof node")
+                                .parent() != null;
                 return isValidNode && super.isCellEditable(event);
             }
         });

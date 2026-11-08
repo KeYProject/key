@@ -204,7 +204,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return updateOrigin(a, ctx, services);
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable JTerm visitTermEOF(JavaKeYParser.TermEOFContext ctx) {
         return accept(ctx.term());
@@ -221,7 +221,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return updateOrigin(a, ctx, services);
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable JTerm visitEquivalence_term(JavaKeYParser.Equivalence_termContext ctx) {
         JTerm a = accept(ctx.a);
@@ -267,7 +267,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return binaryTerm(ctx, Junctor.IMP, termL, termR);
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable JTerm visitDisjunction_term(JavaKeYParser.Disjunction_termContext ctx) {
         JTerm t = accept(ctx.a);
@@ -277,7 +277,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return t;
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable JTerm visitConjunction_term(JavaKeYParser.Conjunction_termContext ctx) {
         JTerm t = accept(ctx.a);
@@ -294,7 +294,8 @@ public class ExpressionBuilder extends DefaultBuilder {
      * runs; the {@code override.return.invalid} and dereference warnings are suppressed with
      * scoped keys.
      */
-    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable",
+        "NullAway" })
     @Override
     public @Nullable Object visitUnary_minus_term(JavaKeYParser.Unary_minus_termContext ctx) {
         JTerm result = accept(ctx.sub);
@@ -337,7 +338,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return result;
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable JTerm visitNegation_term(JavaKeYParser.Negation_termContext ctx) {
         JTerm termL = Objects.requireNonNull(accept(ctx.sub), "a negation needs a subterm");
@@ -432,7 +433,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitStrong_arith_term_1(JavaKeYParser.Strong_arith_term_1Context ctx) {
         JTerm termL = Objects.requireNonNull(accept(ctx.a),
@@ -460,7 +461,8 @@ public class ExpressionBuilder extends DefaultBuilder {
      * runs and that the checked location sets exist; the {@code override.return.invalid} and
      * dereference warnings are suppressed with scoped keys.
      */
-    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable",
+        "NullAway" })
     @Override
     public @Nullable Object visitStrong_arith_term_2(JavaKeYParser.Strong_arith_term_2Context ctx) {
         if (ctx.b.isEmpty()) { // fast path
@@ -524,7 +526,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitBracket_term(JavaKeYParser.Bracket_termContext ctx) {
         JTerm t = Objects.requireNonNull(accept(ctx.primitive_labeled_term()),
@@ -638,7 +640,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return JavaDLSequentKit.createSequent(ant, suc);
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Sequent visitSeqEOF(JavaKeYParser.SeqEOFContext ctx) {
         return accept(ctx.seq());
@@ -648,7 +650,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitTermorseq(JavaKeYParser.TermorseqContext ctx) {
         JTerm head = accept(ctx.head);
@@ -917,10 +919,11 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     /**
-     * The heap LDT is always registered in the services of a fully initialized KeY environment
-     * (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference is suppressed
-     * with a scoped key. The prefix may be {@code null} for the leading attribute of an access
-     * term (e.g. a static field access); the terms builder is null-tolerant for that case.
+     * The prefix may be {@code null} for the leading attribute of an access term (e.g. a static
+     * field access); the terms builder is null-tolerant for that case. The heap LDT is always
+     * registered in the services of a fully initialized KeY environment (see
+     * {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}), enforced non-null with an explicit
+     * check below.
      */
     @SuppressWarnings("nullness:dereference.of.nullable")
     public JTerm createAttributeTerm(@Nullable JTerm prefix, Operator attribute,
@@ -956,8 +959,11 @@ public class ExpressionBuilder extends DefaultBuilder {
                     capsulateTf(ctx, () -> getServices().getTermBuilder().dotLength(finalResult));
             } else {
                 ProgramVariable pv = (ProgramVariable) attribute;
-                Function fieldSymbol = getServices().getTypeConverter().getHeapLDT()
-                        .getFieldSymbolForPV((LocationVariable) pv, getServices());
+                HeapLDT heapLDT = Objects.requireNonNull(
+                    getServices().getTypeConverter().getHeapLDT(),
+                    "the heap LDT must be registered");
+                Function fieldSymbol =
+                    heapLDT.getFieldSymbolForPV((LocationVariable) pv, getServices());
                 if (pv.isStatic()) {
                     result = getServices().getTermBuilder().staticDot(pv.sort(), fieldSymbol);
                 } else {
@@ -1054,7 +1060,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return getServices().getTypeConverter().convertToLogicElement(new StringLiteral(s));
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitCast_term(JavaKeYParser.Cast_termContext ctx) {
         JTerm result = accept(ctx.sub);
@@ -1101,14 +1107,15 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     /**
      * The parser guarantees that the heap-update target and value are present when this visitor
-     * runs; the dereferences are suppressed with a scoped key.
+     * runs; both are enforced non-null with explicit checks below.
      */
     @SuppressWarnings("nullness:dereference.of.nullable")
     @Override
     public Object visitBracket_access_heap_update(
             JavaKeYParser.Bracket_access_heap_updateContext ctx) {
         JTerm heap = pop();
-        JTerm target = accept(ctx.target);
+        JTerm target = Objects.requireNonNull(accept(ctx.target),
+            "a heap update needs a target");
         JTerm val = Objects.requireNonNull(accept(ctx.val),
             "a heap update needs a value");
         JTerm objectTerm = target.sub(1);
@@ -1119,8 +1126,8 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     /**
      * The parser guarantees that the argument list of a heap term and a well-formed heap
-     * constructor are present when this visitor runs; the dereferences are suppressed with a
-     * scoped key.
+     * constructor are present when this visitor runs; the argument list is enforced non-null with
+     * an explicit check below.
      */
     @SuppressWarnings("nullness:dereference.of.nullable")
     @Override
@@ -1128,7 +1135,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         JTerm heap = pop();
 
         String id = accept(ctx.simple_ident());
-        List<JTerm> args = accept(ctx.args);
+        List<JTerm> args = Objects.requireNonNull(accept(ctx.args),
+            "a heap constructor needs arguments");
         Function f = functions().lookup(new Name(id));
         if (f == null) {
             semanticError(ctx, "Unknown heap constructor " + id);
@@ -1148,7 +1156,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitBracket_access_star(JavaKeYParser.Bracket_access_starContext ctx) {
         JTerm reference = pop();
@@ -1228,7 +1236,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     /**
      * The parser guarantees that the labels and the primitive term of a labeled term are present
-     * when this visitor runs; the dereferences are suppressed with a scoped key.
+     * when this visitor runs; the labels are enforced non-null with an explicit check below.
      */
     @SuppressWarnings("nullness:dereference.of.nullable")
     @Override
@@ -1236,7 +1244,8 @@ public class ExpressionBuilder extends DefaultBuilder {
         JTerm t = Objects.requireNonNull(accept(ctx.primitive_term()),
             "a labeled term needs a primitive term");
         if (ctx.LGUILLEMETS() != null) {
-            ImmutableArray<TermLabel> labels = accept(ctx.label());
+            ImmutableArray<TermLabel> labels = Objects.requireNonNull(accept(ctx.label()),
+                "a labeled term needs labels");
             if (!labels.isEmpty()) {
                 t = getServices().getTermBuilder().addLabel(t, labels);
             }
@@ -1282,14 +1291,16 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     /**
      * The abbreviation map is installed (see {@link #setAbbrevMap(AbbrevMap)}) before any
-     * abbreviation is parsed; the dereference is suppressed with a scoped key.
+     * abbreviation is parsed; it is enforced non-null with an explicit check below.
      */
     @SuppressWarnings("nullness:dereference.of.nullable")
     @Override
     public Object visitAbbreviation(JavaKeYParser.AbbreviationContext ctx) {
         String sc = Objects.requireNonNull(accept(ctx.name),
             "an abbreviation needs a name");
-        JTerm a = abbrevMap.getTerm(sc);
+        AbbrevMap map = Objects.requireNonNull(abbrevMap,
+            "an abbreviation map must be installed");
+        JTerm a = map.getTerm(sc);
         if (a == null) {
             return throwEx(new NotDeclException("abbreviation", sc));
         }
@@ -1464,7 +1475,7 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitModality_term(JavaKeYParser.Modality_termContext ctx) {
         JTerm a1 = accept(ctx.sub);
@@ -1607,7 +1618,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * access term are present and that the resolved class/attribute exists; the dereferences are
      * suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
     private @Nullable JTerm visitAccesstermAsJava(JavaKeYParser.AccesstermContext ctx) {
         String firstName = Objects.requireNonNull(accept(ctx.firstName),
             "a Java access term needs a first name");
@@ -1722,7 +1733,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return null;
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitTermParen(JavaKeYParser.TermParenContext ctx) {
         JTerm base = Objects.requireNonNull(accept(ctx.term()),
@@ -1738,7 +1749,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * the referenced class names and sorts exist; the dereferences are suppressed with a scoped
      * key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
     private JTerm handleAttributes(JTerm current, List<JavaKeYParser.AttributeContext> attribute) {
         for (int i = 0; i < attribute.size(); i++) {
             JavaKeYParser.AttributeContext ctxSuffix = attribute.get(i);
@@ -1843,7 +1854,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         return current;
     }
 
-    public <T> T defaultOnException(T defaultValue, Supplier<T> supplier) {
+    public <T> @Nullable T defaultOnException(@Nullable T defaultValue, Supplier<T> supplier) {
         try {
             return supplier.get();
         } catch (Exception e) {
@@ -1853,7 +1864,8 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     /**
      * The parser guarantees that an access term is well-formed, so its first name and argument
-     * lists are present; the dereferences are suppressed with a scoped key.
+     * lists are present; the first name and the call arguments are enforced non-null with
+     * explicit checks below.
      */
     @SuppressWarnings("nullness:dereference.of.nullable")
     @Override
@@ -1868,8 +1880,10 @@ public class ExpressionBuilder extends DefaultBuilder {
         // sortId is dereferenced below (pre-existing), so the type inference difference for the
         // generic defaultOnException call is suppressed with a scoped key.
         @SuppressWarnings("nullness:type.arguments.not.inferred")
+        @Nullable
         Sort sortId = defaultOnException(null, () -> accept(ctx.sortId()));
-        String firstName = accept(ctx.simple_ident());
+        String firstName = Objects.requireNonNull(accept(ctx.simple_ident()),
+            "an access term needs a first name");
 
         ImmutableArray<QuantifiableVariable> boundVars = null;
         Namespace<QuantifiableVariable> orig = null;
@@ -1896,8 +1910,9 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = UpdateJunctor.SKIP;
         } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
-            op = lookupVarfuncId(ctx, sortId.name().toString() + "::" + firstName,
-                null);
+            Sort limitedSort = Objects.requireNonNull(sortId,
+                "a limited attribute needs a sort");
+            op = lookupVarfuncId(ctx, limitedSort.name().toString() + "::" + firstName, null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1931,23 +1946,23 @@ public class ExpressionBuilder extends DefaultBuilder {
             } else {
                 // sanity check
                 assert op instanceof Function;
-                for (int i = 0; i < args.length; i++) {
+                JTerm[] callArgs = Objects.requireNonNull(args, "a call needs argument terms");
+                for (int i = 0; i < callArgs.length; i++) {
                     if (i < op.arity() && !op.bindVarsAt(i)) {
-                        for (QuantifiableVariable qv : args[i].freeVars()) {
+                        for (QuantifiableVariable qv : callArgs[i].freeVars()) {
                             if (boundVars.contains(qv)) {
                                 semanticError(ctx,
                                     "Building function term " + op
                                         + " with bound variables failed: " + "Variable " + qv
-                                        + " must not occur free in subterm " + args[i]);
+                                        + " must not occur free in subterm " + callArgs[i]);
                             }
                         }
                     }
                 }
                 ImmutableArray<QuantifiableVariable> finalBoundVars = boundVars;
                 // create term
-                JTerm[] finalArgs1 = Objects.requireNonNull(args, "a call needs argument terms");
                 current = capsulateTf(ctx,
-                    () -> getTermFactory().createTerm(finalOp, finalArgs1, finalBoundVars,
+                    () -> getTermFactory().createTerm(finalOp, callArgs, finalBoundVars,
                         new ImmutableArray<TermLabel>()));
             }
         }
@@ -2091,14 +2106,16 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     /**
      * The variables passed to an instantiation with schema variables are guaranteed to have a
-     * container type; the dereference is suppressed with a scoped key.
+     * container type, enforced non-null with an explicit check below.
      */
     @SuppressWarnings("nullness:dereference.of.nullable")
     private String getTypeList(ImmutableList<ProgramVariable> vars) {
         StringBuilder result = new StringBuilder();
         final Iterator<ProgramVariable> it = vars.iterator();
         while (it.hasNext()) {
-            result.append(it.next().getContainerType().getFullName());
+            ProgramVariable v = it.next();
+            result.append(Objects.requireNonNull(v.getContainerType(),
+                "a program variable must have a container type").getFullName());
             if (it.hasNext()) {
                 result.append(", ");
             }
@@ -2129,13 +2146,14 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     /**
      * The heap LDT is always registered in the services of a fully initialized KeY environment
-     * (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference is suppressed
-     * with a scoped key.
+     * (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}), enforced non-null with an
+     * explicit check below.
      */
     @SuppressWarnings("nullness:dereference.of.nullable")
     protected boolean isHeapTerm(JTerm term) {
-        return term != null
-                && term.sort() == getServices().getTypeConverter().getHeapLDT().targetSort();
+        return term != null && term.sort() == Objects.requireNonNull(
+            getServices().getTypeConverter().getHeapLDT(),
+            "the heap LDT must be registered").targetSort();
     }
 
     private boolean isSequenceTerm(JTerm reference) {
@@ -2271,7 +2289,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitProofScript(JavaKeYParser.ProofScriptContext ctx) {
         return null;// Do not traverse into proof scripts.
@@ -2290,7 +2308,7 @@ public class ExpressionBuilder extends DefaultBuilder {
      * {@link #getJavaBlock(Token)}; the default constructor cannot assign the fields, so the
      * difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:initialization.field.uninitialized")
+    @SuppressWarnings({ "nullness:initialization.field.uninitialized", "NullAway" })
     public static class PairOfStringAndJavaBlock {
         String opName;
         JavaBlock javaBlock;

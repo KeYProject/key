@@ -44,7 +44,6 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.java.StringUtil;
 
 import com.squareup.javapoet.*;
-import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -454,7 +453,7 @@ public class TestCaseGenerator {
     public TypeName inferSort(Map<String, Sort> typeInfMap, String progVar) {
         Sort sort = typeInfMap.get(progVar);
         if (sort != null) {
-            return getSafeType(sort);
+            return Objects.requireNonNull(getSafeType(sort), "type for " + sort);
         }
         LOGGER.warn("Warning: inferSort did not find:  {}", progVar);
         return ClassName.get("", "NOTYPE");
@@ -610,7 +609,7 @@ public class TestCaseGenerator {
                     type = TypeName.OBJECT;
                     right = "null";
                 } else {
-                    type = getSafeType(sort);
+                    type = Objects.requireNonNull(getSafeType(sort), "type for " + sort);
                     if (type instanceof ArrayTypeName arrayTypeName) {
                         right = "new " + arrayTypeName.componentType + "[" + o.getLength() + "]";
                     } else if (settings.isUseRFL()) {
@@ -723,7 +722,8 @@ public class TestCaseGenerator {
 
                 }
                 if (objSort != null && objSort instanceof ArraySort) {
-                    var safeType = (ArrayTypeName) getSafeType(objSort);
+                    var safeType = (ArrayTypeName) Objects
+                            .requireNonNull(getSafeType(objSort), "type for " + objSort);
                     var elementType = safeType.componentType;
                     rflCreator.addSort(safeType);
                     LOGGER.debug("Added sort (init array fields): {}", safeType);
@@ -830,7 +830,7 @@ public class TestCaseGenerator {
         }
     }
 
-    public @PolyNull TypeName getSafeType(@PolyNull Sort sort) {
+    public @Nullable TypeName getSafeType(@Nullable Sort sort) {
         if (sort == null) {
             return null;
         }

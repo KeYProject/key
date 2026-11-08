@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
@@ -52,9 +54,9 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
         final ClauseCollector m1 = new ClauseCollector();
-        m1.collect(leftTerm);
+        m1.collect(Objects.requireNonNull(leftTerm));
         final ClauseCollector m2 = new ClauseCollector();
-        m2.collect(rightTerm);
+        m2.collect(Objects.requireNonNull(rightTerm));
 
         return lessThan(m1.getResult(), m2.getResult(), pos, goal);
     }

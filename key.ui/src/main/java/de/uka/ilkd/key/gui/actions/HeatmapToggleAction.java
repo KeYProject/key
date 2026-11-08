@@ -62,6 +62,8 @@ public class HeatmapToggleAction extends MainWindowAction {
             }
 
             @Override
+            @SuppressWarnings("NullAway") // deliberate null event: the listener re-queries the
+                                          // selection model and ignores the event itself
             public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 selectedNodeChanged(null);
             }

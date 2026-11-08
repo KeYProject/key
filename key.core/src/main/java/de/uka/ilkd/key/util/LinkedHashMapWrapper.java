@@ -371,7 +371,7 @@ public class LinkedHashMapWrapper<K extends EqualsModProperty<K>, V> {
          * {@code null} value is part of this wrapper's documented contract (the key argument
          * is a freshly read, provably non-null local).
          */
-        @SuppressWarnings("nullness:argument.type.incompatible")
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
         @Override
         public Pair<K, V> next() {
             last = keyIt.next();

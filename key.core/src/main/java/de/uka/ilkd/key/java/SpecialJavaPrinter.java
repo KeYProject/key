@@ -113,7 +113,7 @@ public class SpecialJavaPrinter extends DefaultPrettyPrinterVisitor {
      * The dependencies of a JML construct are present whenever the modifiers are printed; the
      * dereference of the (nullable) dependency pair component is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void print(ImmutableList<JMLModifier> modifiers,
             ImmutableList<LabeledParserRuleContext> depends) {
         printer.print("\n/*@ ");

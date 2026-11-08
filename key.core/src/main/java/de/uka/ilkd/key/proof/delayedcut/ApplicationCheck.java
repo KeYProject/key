@@ -81,7 +81,7 @@ public interface ApplicationCheck {
          * {@link #check(Node, JTerm)} installs the cut node before this method is invoked; the
          * dereference of the (nullable) node field is suppressed with a scoped key.
          */
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
         private void clearCaches() {
             names.clear();
             node.clearNameCache();
@@ -94,7 +94,7 @@ public interface ApplicationCheck {
          * (nullable) polled node and of its (nullable) name recorder are suppressed with a scoped
          * key.
          */
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
         private void buildCaches(Node cutNode) {
             LinkedList<Node> queue = new LinkedList<>();
             queue.add(cutNode);
@@ -123,7 +123,7 @@ public interface ApplicationCheck {
          *         the
          *         dereferences of the (nullable) node field are suppressed with a scoped key.
          */
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
         private @Nullable String checkFormula(JTerm formula) {
             final List<String> newSymbols = new LinkedList<>();
             formula.execPreOrder((DefaultVisitor) visited -> {
@@ -160,7 +160,7 @@ public interface ApplicationCheck {
          * node field is suppressed with a scoped key.
          */
         @Override
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
         public String toString() {
             return "NoNewSymbolsCheck [node=" + node.serialNr() + ", names=" + names + "]";
         }

@@ -69,6 +69,7 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
             public String getName() { return ""; }
 
             @Override
+            @SuppressWarnings("NullAway") // uncategorized macro: null is deliberate
             public String getCategory() { return null; }
 
             @Override
@@ -86,6 +87,7 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
             public String getName() { return ""; }
 
             @Override
+            @SuppressWarnings("NullAway") // uncategorized macro: null is deliberate
             public String getCategory() { return null; }
 
             @Override
@@ -97,6 +99,7 @@ public class FullInformationFlowAutoPilotMacro extends DoWhileFinallyMacro {
             public String getName() { return ""; }
 
             @Override
+            @SuppressWarnings("NullAway") // uncategorized macro: null is deliberate
             public String getCategory() { return null; }
 
             @Override

@@ -54,7 +54,8 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * @param specMathMode spec math mode
      */
     public record JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
-            SpecMathMode specMathMode) {
+            // no JML spec math modifier means an absent (null) mode
+            @Nullable SpecMathMode specMathMode) {
     }
 
     protected final JMLModifiers jmlModifiers;
@@ -189,7 +190,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     // deprecated no-arg constructor's stub declarations (see the constructor above);
     // returning null here collides with the @NonNull contract of
     // NamedModelElement.getName(), which cannot be widened without ripple.
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     public final String getName() {
         return (name == null) ? ((fullName == null) ? null : fullName.toString())
                 : name.toString();

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 
@@ -115,7 +116,7 @@ class MultiTrigger implements Trigger {
             QuantifiableVariable key = entry.key();
             Term value = entry.value();
             if (rightMap.containsKey(key)) {
-                if (!(rightMap.get(key).equals(value))) {
+                if (!(Objects.requireNonNull(rightMap.get(key)).equals(value))) {
                     return null;
                 }
             }

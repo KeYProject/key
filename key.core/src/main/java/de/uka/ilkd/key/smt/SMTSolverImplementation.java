@@ -7,14 +7,17 @@ package de.uka.ilkd.key.smt;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
+import de.uka.ilkd.key.smt.communication.Pipe;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
@@ -259,32 +262,34 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         // Secondly: Translate the given problem
         String[] commands;
         try {
-            commands = translateToCommand(problem.getSequent());
+            commands = translateToCommand(Objects.requireNonNull(problem.getSequent(),
+                "sequent"));
         } catch (Throwable e) {
             interruptionOccurred(e);
             listener.processInterrupted(this, problem, e);
             setSolverState(SolverState.Stopped);
-            solverTimeout.cancel();
+            Objects.requireNonNull(solverTimeout, "solver timeout").cancel();
             return;
         }
 
         // Thirdly: start the external process.
         try {
             processLauncher.launch(commands);
-            processLauncher.getPipe().sendMessage(type.modifyProblem(problemString));
-            // processLauncher.getPipe().sendEOF();
+            // the pipe is only accessible after the process has been launched
+            Pipe pipe = Objects.requireNonNull(processLauncher.getPipe(), "pipe");
+            pipe.sendMessage(type.modifyProblem(problemString));
 
-            String msg = processLauncher.getPipe().readMessage();
+            String msg = pipe.readMessage();
             while (msg != null) {
-                socket.messageIncoming(processLauncher.getPipe(), msg);
-                msg = processLauncher.getPipe().readMessage();
+                socket.messageIncoming(pipe, msg);
+                msg = pipe.readMessage();
             }
         } catch (IllegalStateException | IOException | InterruptedException e) {
             interruptionOccurred(e);
             Thread.currentThread().interrupt();
         } finally {
             // Close everything.
-            solverTimeout.cancel();
+            Objects.requireNonNull(solverTimeout, "solver timeout").cancel();
             setSolverState(SolverState.Stopped);
             listener.processStopped(this, problem);
             processLauncher.stop();
@@ -320,8 +325,10 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     }
 
     private String[] translateToCommand(Sequent sequent) throws IllegalFormulaException {
+        // the settings are attached by start() before the solver thread runs
+        SMTSettings settings = Objects.requireNonNull(smtSettings, "smt settings");
         if (getType() == SolverTypes.Z3_CE_SOLVER) {
-            Proof proof = problem.getGoal().proof();
+            Proof proof = Objects.requireNonNull(problem.getGoal(), "goal").proof();
             SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
 
             Proof originalProof = null;
@@ -332,12 +339,15 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
                 }
             }
 
+            ProofOblInput proofOblInput = Objects.requireNonNull(
+                specrep.getProofOblInput(Objects.requireNonNull(originalProof, "original proof")),
+                "proof obligation input");
             KeYJavaType typeOfClassUnderTest =
-                specrep.getProofOblInput(originalProof).getContainerType();
+                Objects.requireNonNull(proofOblInput.getContainerType(), "container type");
 
             SMTObjTranslator objTrans =
-                new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
-            problemString = objTrans.translateProblem(sequent, services, smtSettings).toString();
+                new SMTObjTranslator(settings, services, typeOfClassUnderTest);
+            problemString = objTrans.translateProblem(sequent, services, settings).toString();
             ModelExtractor transQuery = objTrans.getQuery();
             getSocket().setQuery(transQuery);
             tacletTranslation = null;
@@ -345,7 +355,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         } else {
             SMTTranslator trans = getType().createTranslator();
             problemString =
-                indent(trans.translateProblem(sequent, services, smtSettings).toString());
+                indent(trans.translateProblem(sequent, services, settings).toString());
             if (trans instanceof AbstractSMTTranslator) {
                 // Since taclet translation in the old form is no longer used,
                 // this will likely disappear.

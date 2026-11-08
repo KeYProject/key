@@ -62,7 +62,7 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
                 return false;
             }
             final PosInOccurrence oldPio = cmp.posInOccurrence();
-            if (!comparePio(newApp, cmp, newPio, oldPio)) {
+            if (!comparePio(newApp, cmp, newPio, Objects.requireNonNull(oldPio))) {
                 return false;
             }
         }

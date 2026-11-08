@@ -91,7 +91,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      * The accumulator is {@code @Nullable} during the build; the invariants of the method guarantee
      * a non-null result, so the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     protected static JTerm createLocalAnonUpdate(
             final ImmutableSet<LocationVariable> localOutVariables,
             final Services services, final TermBuilder tb) {
@@ -216,7 +216,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      *         explicitly permits (it only uses the goal when it is not {@code null}); the
      *         difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     protected JTerm setUpValidityTerm(final List<LocationVariable> heaps,
             Map<LocationVariable, Function> anonHeaps,
             Map<LocationVariable, Function> anonOutHeaps,
@@ -299,6 +299,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      */
     @Override
     @SuppressWarnings({
+        "NullAway",
         "nullness:dereference.of.nullable",
         "nullness:argument.type.incompatible" })
     public void readProblem() {
@@ -432,7 +433,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
      *         {@code null} goal that never consults them; the differences are suppressed with a
      *         scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private GoalsConfigurator setUpGoalConfigurator(final StatementBlock block,
             final ProgramVariable selfVar, final JTerm selfTerm,
             final BlockContract.Variables variables, final Services services,

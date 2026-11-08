@@ -55,7 +55,7 @@ public class ScriptException extends Exception implements HasLocation {
      * other paths set {@link Location#UNDEFINED}, so the difference is suppressed with a scoped
      * key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     @Override
     public Location getLocation() {
         return location;

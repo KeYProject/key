@@ -154,7 +154,7 @@ public class TryCloseMacro extends AbstractProofMacro {
      * may legitimately be <code>null</code> (no progress reports desired); the progress-bar
      * listeners accept that too, so passing it on is suppressed with a scoped key.
      */
-    @SuppressWarnings({ "nullness:return.type.incompatible",
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible",
         "nullness:argument.type.incompatible" })
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,

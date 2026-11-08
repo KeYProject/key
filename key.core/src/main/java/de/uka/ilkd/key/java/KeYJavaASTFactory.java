@@ -121,7 +121,8 @@ public abstract class KeYJavaASTFactory {
             TypeReference typeRef) {
         return new LocalVariableDeclaration(typeRef,
             new VariableSpecification(new LocationVariable(name, typeRef), init,
-                typeRef.getKeYJavaType()));
+                Objects.requireNonNull(typeRef.getKeYJavaType(),
+                    "no KeYJavaType for type reference " + typeRef)));
     }
 
     /**

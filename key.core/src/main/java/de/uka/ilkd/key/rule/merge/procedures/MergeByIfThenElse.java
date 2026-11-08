@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
@@ -19,6 +20,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.countAtoms;
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getDistinguishingFormula;
@@ -39,7 +41,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.trySimplify;
  */
 @NullMarked
 public class MergeByIfThenElse extends MergeProcedure implements UnparametricMergeProcedure {
-    private static MergeByIfThenElse INSTANCE = null;
+    private static @Nullable MergeByIfThenElse INSTANCE = null;
 
     /**
      * Time in milliseconds after which a simplification attempt of a distinguishing formula times
@@ -246,9 +248,13 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
             }
         }
 
-        // Try an automatic simplification
-        distinguishingFormula = trySimplify(services.getProof(), distinguishingFormula, true,
-            SIMPLIFICATION_TIMEOUT_MS);
+        // Try an automatic simplification; the distinguishing formula is guaranteed to be present
+        // here (see the assertions above) and simplification requires an active proof.
+        distinguishingFormula = trySimplify(Objects.requireNonNull(services.getProof(),
+            "simplification requires an active proof"),
+            Objects.requireNonNull(distinguishingFormula,
+                "a distinguishing formula has been computed above"),
+            true, SIMPLIFICATION_TIMEOUT_MS);
 
         return new DistanceFormRightSide(distinguishingFormula,
             commuteSides ? elseTerm : ifTerm, commuteSides ? ifTerm : elseTerm, commuteSides);

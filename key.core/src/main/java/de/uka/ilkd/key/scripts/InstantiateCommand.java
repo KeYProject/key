@@ -66,19 +66,22 @@ public class InstantiateCommand extends AbstractCommand {
 
         assert params.formula != null;
 
-        TacletApp theApp = findTacletApp(params, state);
+        TacletApp theApp = findTacletApp(params, state());
         if (theApp == null) {
             throw new ScriptException("No taclet application found");
         }
 
         SchemaVariable sv = theApp.uninstantiatedVars().iterator().next();
 
-        theApp = theApp.addInstantiation(sv, params.with, true /* ??? */,
-            state.getProof().getServices());
+        theApp = Objects.requireNonNull(theApp.addInstantiation(sv,
+            Objects.requireNonNull(params.with, "no term to instantiate with"),
+            true /* ??? */, state().getProof().getServices()),
+            "could not add the instantiation");
 
-        theApp = theApp.tryToInstantiate(state.getProof().getServices());
+        theApp = Objects.requireNonNull(theApp.tryToInstantiate(state().getProof().getServices()),
+            "could not instantiate the taclet application");
 
-        Goal g = state.getFirstOpenAutomaticGoal();
+        Goal g = state().getFirstOpenAutomaticGoal();
         g.apply(theApp);
     }
 
@@ -100,7 +103,7 @@ public class InstantiateCommand extends AbstractCommand {
 
 
         String rulename;
-        if (p.formula.op() == Quantifier.ALL) {
+        if (Objects.requireNonNull(p.formula, "formula must be given").op() == Quantifier.ALL) {
             rulename = "allLeft" + (hide ? "Hide" : "");
         } else {
             rulename = "exRight" + (hide ? "Hide" : "");
@@ -141,7 +144,8 @@ public class InstantiateCommand extends AbstractCommand {
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp pta) {
                 JTerm term = (JTerm) pta.posInOccurrence().subTerm();
-                if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term, p.formula)) {
+                if (RENAMING_TERM_PROPERTY.equalsModThisProperty(term,
+                    Objects.requireNonNull(p.formula, "formula must be given"))) {
                     return pta;
                 }
             }

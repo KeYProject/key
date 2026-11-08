@@ -24,13 +24,12 @@ import org.jspecify.annotations.Nullable;
  * Helper class for managing a list of goals on which rules are applied. The class provides methods
  * for removing a goal, and for updating the internal data structures after a rule has been applied.
  * <p>
- * The {@code GoalChooser} interface binds its proof and goal type parameters to non-null
- * {@code ProofObject}/{@code ProofGoal} bounds, but this chooser may be initialised without a
- * proof or goals (see {@link #init}); the generic-bound artifact is suppressed with a scoped key.
+ * The chooser may be initialised without a proof or goals (see {@link #init}); the {@code proof}
+ * field is therefore {@code @Nullable} and its dereferences are guarded wherever the prover run is
+ * active.
  */
 @NullMarked
-@SuppressWarnings("nullness:type.argument.type.incompatible")
-public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullable Goal> {
+public class DefaultGoalChooser implements GoalChooser<Proof, Goal> {
 
     /** the proof that is worked with */
     protected @Nullable Proof proof;
@@ -58,13 +57,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
 
     /**
      * {@inheritDoc}
-     *
-     * The {@code GoalChooser} interface binds its goal type parameter to
-     * {@code @Nullable ProofGoal} (generic-bound artifact), so it requires a
-     * {@code @Nullable Goal} list element here; the implementation only ever
-     * handles non-null goals, suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.param.invalid")
     public void init(@Nullable Proof p_proof, @Nullable ImmutableList<Goal> p_goals) {
         if (p_proof == null && !(p_goals == null || p_goals.isEmpty())) {
             throw new RuntimeException("A not existing proof has goals. This makes no sense.");
@@ -95,7 +88,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      *        proof.root()} to {@link #findMinimalSubtreeBelow(Node)} is suppressed with a scoped
      *        key.
      */
-    @SuppressWarnings({ "nullness:dereference.of.nullable",
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway",
         "nullness:argument.type.incompatible" })
     protected void setupGoals(ImmutableList<Goal> p_goals) {
         goalList = ImmutableList.nil();
@@ -136,7 +129,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
          * {@code getSubtreeGoals} is suppressed with a scoped key.
          */
         @Override
-        @SuppressWarnings({ "nullness:dereference.of.nullable",
+        @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway",
             "nullness:argument.type.incompatible" })
         public void proofPruned(ProofTreeEvent e) {
             currentSubtreeRoot = e.getNode();
@@ -182,13 +175,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      * (non-Javadoc)
      *
      * @see de.uka.ilkd.key.proof.IGoalChooser#removeGoal(de.uka.ilkd.key.proof.Goal)
-     *
-     * The {@code GoalChooser} interface binds its goal type parameter to
-     * {@code @Nullable ProofGoal} (generic-bound artifact), so it requires a
-     * {@code @Nullable Goal} parameter here; the implementation only ever
-     * receives non-null goals, suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.param.invalid")
     public void removeGoal(Goal goal) {
         selectedList = selectedList.removeAll(goal);
         nextGoals = ImmutableList.nil();
@@ -205,13 +192,10 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      * @see de.uka.ilkd.key.proof.IGoalChooser#updateGoalList(de.uka.ilkd.key.proof.Node,
      * de.uka.ilkd.key.proof.IList<Goal>)
      *
-     * The {@code GoalChooser} interface binds its goal type parameter to
-     * {@code @Nullable ProofGoal} (generic-bound artifact), so it requires a
-     * {@code @Nullable Goal} element here; the implementation only ever handles
-     * non-null goals, suppressed with a scoped key. The proof is initialized while the goal
-     * chooser is active; its dereference is suppressed with a scoped key.
+     * The proof is initialized while the goal chooser is active; its dereference is suppressed
+     * with a scoped key.
      */
-    @SuppressWarnings({ "nullness:override.param.invalid", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
     public void updateGoalList(@Nullable Object node, @NonNull ImmutableList<Goal> newGoals) {
         if (newGoals.isEmpty() || (newGoals.tail().isEmpty() && newGoals.head().node() == node)) {
             // Goals (may) have been closed, remove them from the goal lists
@@ -272,7 +256,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      *         The proof is initialized while the goal chooser is active; the dereference of the
      *         (nullable) proof field is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
     protected ImmutableList<Goal> insertNewGoals(ImmutableList<Goal> newGoals,
             ImmutableList<Goal> prevGoalList) {
 
@@ -303,7 +287,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      * The proof is initialized while the goal chooser is active; the dereferences of the
      * (nullable) proof field are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
     protected void removeClosedGoals() {
         boolean changed = false;
         Iterator<Goal> it = goalList.iterator();
@@ -360,7 +344,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      *         The proof is initialized while the goal chooser is active; the dereference of the
      *         (nullable) proof field is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
     protected boolean findMinimalSubtreeBelow(@NonNull Node p_startNode) {
         Node node = p_startNode;
 
@@ -413,7 +397,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      *        the root of the active proof always exists; both differences are suppressed with
      *        scoped keys.
      */
-    @SuppressWarnings({ "nullness:dereference.of.nullable",
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway",
         "nullness:assignment.type.incompatible", "nullness:argument.type.incompatible" })
     protected void findMinimalSubtree(@NonNull Node p_startNode) {
         while (!isSatisfiableSubtree(p_startNode)) {

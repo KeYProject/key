@@ -33,6 +33,7 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -93,6 +94,10 @@ public final class ProofManagementDialog extends JDialog {
         targetIcons = icons;
         classTree = tree;
         tree.addMouseListener(new MouseAdapter() {
+            @SuppressWarnings("NullAway") // the fields are set in the constructor before this
+            // listener is attached and only nulled in dispose(), which removes the components
+            // from the window so no event can fire after the nulling; entry is non-null because
+            // the double-clicked row (row != -1) is selected
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Check that it is a double click on an item, not a folder or the background
@@ -130,7 +135,10 @@ public final class ProofManagementDialog extends JDialog {
                     isSelected, cellHasFocus);
 
                 if (result instanceof JLabel label) {
-                    ProofStatus ps = ((ProofWrapper) value).proof.mgt().getStatus();
+                    ProofWrapper wrapper = (ProofWrapper) value;
+                    ProofCorrectnessMgt mgt = Objects.requireNonNull(wrapper.proof.mgt(),
+                        "proof has no correctness management");
+                    ProofStatus ps = mgt.getStatus();
                     if (ps.getProofClosed()) {
                         label.setIcon(KEY_CLOSED);
                     } else if (ps.getProofClosedButLemmasLeft()) {
@@ -172,6 +180,9 @@ public final class ProofManagementDialog extends JDialog {
         // create contract panel by method
         contractPanelByMethod = new ContractSelectionPanel(initConfig.getServices(), false);
         contractPanelByMethod.addMouseListener(new MouseAdapter() {
+            @SuppressWarnings("NullAway") // startButton is set in the constructor before this
+            // listener is attached and only nulled in dispose(), which removes the components
+            // from the window so no event can fire after the nulling
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -185,6 +196,9 @@ public final class ProofManagementDialog extends JDialog {
         // create contract panel by proof
         contractPanelByProof = new ContractSelectionPanel(initConfig.getServices(), false);
         contractPanelByProof.addMouseListener(new MouseAdapter() {
+            @SuppressWarnings("NullAway") // startButton is set in the constructor before this
+            // listener is attached and only nulled in dispose(), which removes the components
+            // from the window so no event can fire after the nulling
             @Override
             public void mouseClicked(MouseEvent e) {
                 updateStartButton();

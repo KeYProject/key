@@ -36,7 +36,7 @@ public class FieldSpecification extends VariableSpecification implements Field {
 
     // May be created for a schema program variable whose KeYJavaType is null (see
     // ProgramSV.getKeYJavaType()); the delegated constructor's Type parameter stays @NonNull.
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public FieldSpecification(IProgramVariable var) {
         this(var, var.getKeYJavaType());
     }

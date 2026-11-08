@@ -124,7 +124,7 @@ public class KeYFile implements EnvInput {
      * @param profile the KeY profile under which the file is to be load
      * @param compressed <code>true</code> iff the file has compressed content
      */
-    public KeYFile(String name, Path file, ProgressMonitor monitor, Profile profile,
+    public KeYFile(String name, Path file, @Nullable ProgressMonitor monitor, Profile profile,
             boolean compressed) {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
     }
@@ -142,7 +142,7 @@ public class KeYFile implements EnvInput {
      *        respect the profile declared in the file
      * @param compressed <code>true</code> iff the file has compressed content
      */
-    public KeYFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
+    public KeYFile(String name, Path file, FileRepo fileRepo, @Nullable ProgressMonitor monitor,
             @Nullable Profile profile, boolean compressed) {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
         this.fileRepo = fileRepo;
@@ -193,7 +193,8 @@ public class KeYFile implements EnvInput {
      *         as-is, so
      *         the {@code setSettings} argument type mismatch is suppressed as well.
      */
-    @SuppressWarnings({ "nullness:dereference.of.nullable", "nullness:argument.type.incompatible" })
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     protected @Nullable ProofSettings getPreferences() {
         if (initConfig.getSettings() == null) {
             var settings = readPreferences();
@@ -267,7 +268,7 @@ public class KeYFile implements EnvInput {
      * with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public @Nullable Path readBootClassPath() {
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
@@ -316,7 +317,8 @@ public class KeYFile implements EnvInput {
      * to that case.
      */
     @Override
-    @SuppressWarnings({ "nullness:dereference.of.nullable", "nullness:argument.type.incompatible" })
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     public @NonNull List<Path> readClassPath() {
         ProblemInformation pi = getProblemInformation();
         Path parentDirectory = file.file().getParent();
@@ -389,7 +391,7 @@ public class KeYFile implements EnvInput {
      *         scoped
      *         key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public ImmutableSet<PositionedString> readExtendedSignature() {
         if (initConfig == null) {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
@@ -413,7 +415,7 @@ public class KeYFile implements EnvInput {
      *         The init config is set before contracts are read; the dereferences of the (nullable)
      *         init-config field are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public ImmutableSet<PositionedString> readContracts() {
         SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
         ContractsAndInvariantsFinder cinvs =
@@ -433,7 +435,7 @@ public class KeYFile implements EnvInput {
      *         The init config is set before the problem finder is created; the dereferences of the
      *         (nullable) init-config field are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected @NonNull ProblemFinder getProblemFinder() {
         if (problemFinder == null) {
             ProblemFinder finder =
@@ -452,7 +454,7 @@ public class KeYFile implements EnvInput {
      * The init config is set before sorts are read; the dereferences of the (nullable)
      * init-config field are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public Collection<PositionedString> readSorts() {
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
@@ -475,7 +477,7 @@ public class KeYFile implements EnvInput {
      *         the
      *         (nullable) init-config field are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public List<PositionedString> readFuncAndPred() {
         if (file == null) {
             return Collections.emptyList();
@@ -496,7 +498,7 @@ public class KeYFile implements EnvInput {
      *         The init config is set before rules are read; the dereferences of the (nullable)
      *         init-config field are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public List<BuildingIssue> readRules() {
         KeyAst.File ctx = getParseContext();
         TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(),

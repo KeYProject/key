@@ -50,8 +50,13 @@ public class SMTTermBinOp extends SMTTerm {
      * Storing the under-construction {@code this} as the parent back-pointer of already-constructed
      * children is inherent to the design; the checker cannot express the circular link, so it is
      * suppressed with a scoped key.
+     *
+     * <p>
+     * The constructor always throws, so no instance is ever observable; the field writes to
+     * {@code this} and the {@code upp} back-pointers of the arguments must be preserved as they
+     * are, which the initialization check cannot verify.
      */
-    @SuppressWarnings("nullness:initialization.invalid.field.write.initialized")
+    @SuppressWarnings({ "NullAway", "nullness:initialization.invalid.field.write.initialized" })
     public SMTTermBinOp(Op operator, SMTTerm left, SMTTerm right) {
 
         this.operator = operator;

@@ -47,7 +47,7 @@ public final class ProblemLoader extends AbstractProblemLoader {
      * possibly-{@code null} value, which the loader tolerates (it only consults the properties
      * when forcing is requested), suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "nullness:argument.type.incompatible", "NullAway" })
     public ProblemLoader(Path file, @Nullable List<Path> classPath, @Nullable Path bootClassPath,
             @Nullable List<Path> includes, Profile profileOfNewProofs,
             boolean forceNewProfileOfNewProofs, KeYMediator mediator,

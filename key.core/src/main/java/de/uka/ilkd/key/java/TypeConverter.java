@@ -137,7 +137,10 @@ public final class TypeConverter {
             "Boolean theory not registered");
     }
 
-    public SetLDT getSetLDT() { return getLDT(SetLDT.class); }
+    public SetLDT getSetLDT() {
+        return Objects.requireNonNull(getLDT(SetLDT.class),
+            "Set theory not registered");
+    }
 
     public LocSetLDT getLocSetLDT() {
         return Objects.requireNonNull(getLDT(LocSetLDT.class),
@@ -158,7 +161,10 @@ public final class TypeConverter {
             "Seq theory not registered");
     }
 
-    public PSeqLDT getPSeqLDT() { return getLDT(PSeqLDT.class); }
+    public PSeqLDT getPSeqLDT() {
+        return Objects.requireNonNull(getLDT(PSeqLDT.class),
+            "PSeq theory not registered");
+    }
 
     public SortLDT getSortLDT() {
         return Objects.requireNonNull(getLDT(SortLDT.class),

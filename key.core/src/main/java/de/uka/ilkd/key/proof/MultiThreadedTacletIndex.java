@@ -78,7 +78,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
      * intended; {@code matchFind} only dereferences the position for taclets with a find/rewrite
      * part, which never occur in the no-find lists matched with a null position.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Override
     protected ImmutableList<NoPosTacletApp> matchTaclets(
             @NonNull ImmutableList<NoPosTacletApp> tacletApps,

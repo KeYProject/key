@@ -7,6 +7,7 @@ package de.uka.ilkd.key.scripts;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.scripts.meta.Argument;
 import de.uka.ilkd.key.scripts.meta.Documentation;
@@ -41,14 +42,16 @@ public class ScriptCommand extends AbstractCommand {
         if (!Files.isDirectory(root)) {
             root = root.getParent();
         }
-        Path file = root.resolve(args.filename);
+        Path file =
+            Objects.requireNonNull(root, "base script path has no parent").resolve(args.filename);
 
         LOGGER.info("Included script {}", file);
 
         try {
-            ProofScriptEngine pse = new ProofScriptEngine(proof);
+            ProofScriptEngine pse =
+                new ProofScriptEngine(Objects.requireNonNull(proof, "proof is not set"));
             pse.setCommandMonitor(state().getObserver());
-            pse.execute(uiControl, file);
+            pse.execute(Objects.requireNonNull(uiControl, "ui control is not set"), file);
         } catch (NoSuchFileException e) {
             // The message is very cryptic otherwise.
             throw new ScriptException("Script file '" + file + "' not found", e);

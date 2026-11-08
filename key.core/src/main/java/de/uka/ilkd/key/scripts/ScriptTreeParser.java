@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayDeque;
+import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
@@ -37,8 +38,11 @@ class ScriptTreeParser {
                 return root;
             }
 
-            switch (command.args().get(ScriptLineParser.COMMAND_KEY)) {
-                case "branches" -> branchStack.push(last);
+            String commandName = Objects.requireNonNull(
+                command.args().get(ScriptLineParser.COMMAND_KEY), "No command was given");
+            switch (commandName) {
+                case "branches" -> branchStack.push(Objects.requireNonNull(last,
+                    "No last node"));
                 case "next" -> last = branchStack.peek();
                 case "end" -> {
                     last = null;
@@ -65,7 +69,7 @@ class ScriptTreeParser {
         ScriptNode root =
             parse(new InputStreamReader(System.in, StandardCharsets.UTF_8));
 
-        root.dump(0);
+        Objects.requireNonNull(root, "No root node").dump(0);
 
     }
 

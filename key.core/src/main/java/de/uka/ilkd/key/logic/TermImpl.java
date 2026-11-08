@@ -129,7 +129,8 @@ class TermImpl implements JTerm {
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
     public TermImpl(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars) {
+            // null denotes no bounded variables
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars) {
         assert op != null;
         assert subs != null;
         this.op = op;

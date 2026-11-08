@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.ldt.BooleanLDT;
@@ -59,9 +60,9 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
 
         costComputationDispatcher = setupCostComputationF();
 
-        stopAtFirstNonCloseableGoal =
-            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                    .equals(StrategyProperties.STOPMODE_NONCLOSE);
+        stopAtFirstNonCloseableGoal = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY))
+                .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
     @Override

@@ -133,14 +133,16 @@ public final class MiscTools {
             Services services) {
         final List<LocationVariable> result = new ArrayList<>();
 
-        result.add(services.getTypeConverter().getHeapLDT().getHeap());
+        final HeapLDT heapLdt =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+        result.add(heapLdt.getHeap());
 
         if (isTransaction(modalityKind)) {
-            result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
+            result.add(heapLdt.getSavedHeap());
         }
 
         if (isPermissions(services)) {
-            result.add(services.getTypeConverter().getHeapLDT().getPermissionHeap());
+            result.add(heapLdt.getPermissionHeap());
         }
         return result;
     }
@@ -242,8 +244,15 @@ public final class MiscTools {
     public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(JTerm t) {
         ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet.nil();
         if (t.op() instanceof IObserverFunction obs) {
-            final Sort s = obs.isStatic() ? obs.getContainerType().getSort() : t.sub(1).sort();
-            result = result.add(new Pair<>(s, obs));
+            @Nullable
+            Sort s;
+            if (obs.isStatic()) {
+                s = Objects.requireNonNull(obs.getContainerType(), "container type of " + obs)
+                        .getSort();
+            } else {
+                s = t.sub(1).sort();
+            }
+            result = result.add(new Pair<>(Objects.requireNonNull(s, "sort of " + obs), obs));
         }
         for (JTerm sub : t.subs()) {
             result = result.union(collectObservers(sub));
@@ -521,7 +530,7 @@ public final class MiscTools {
      * @param profile The {@link Profile} to get its used {@link OneStepSimplifier}.
      * @return The used {@link OneStepSimplifier} or {@code null} if not available.
      */
-    public static @Nullable OneStepSimplifier findOneStepSimplifier(Profile profile) {
+    public static @Nullable OneStepSimplifier findOneStepSimplifier(@Nullable Profile profile) {
         if (profile instanceof JavaProfile) {
             return ((JavaProfile) profile).getOneStepSimpilifier();
         } else {

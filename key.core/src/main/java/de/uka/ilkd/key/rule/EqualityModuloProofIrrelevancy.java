@@ -33,6 +33,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.ProofIrrelevancyProperty.PROOF_IRRELEVANCY_PROPERTY;
 
@@ -120,7 +121,8 @@ public class EqualityModuloProofIrrelevancy {
      * @return {@code true} if the two {@code KeYJavaType} objects are considered equal;
      *         {@code false} otherwise.
      */
-    public static boolean equalsModProofIrrelevancy(KeYJavaType thisKJT, KeYJavaType thatKJT) {
+    public static boolean equalsModProofIrrelevancy(@Nullable KeYJavaType thisKJT,
+            @Nullable KeYJavaType thatKJT) {
         if (thisKJT == thatKJT)
             return true;
         if (thisKJT != null && thatKJT != null) {
@@ -235,7 +237,8 @@ public class EqualityModuloProofIrrelevancy {
         return equalsModProofIrrelevancy(_this.program(), that.program());
     }
 
-    public static boolean equalsModProofIrrelevancy(ProgramElement _this, ProgramElement that) {
+    public static boolean equalsModProofIrrelevancy(@Nullable ProgramElement _this,
+            @Nullable ProgramElement that) {
         if (_this == that)
             return true;
         if (that == null || _this == null)
@@ -393,8 +396,8 @@ public class EqualityModuloProofIrrelevancy {
      * @param that the second RuleApp
      * @return true if both arguments are equal modulo proof irrelevancy
      */
-    public static boolean equalsModProofIrrelevancy(RuleApp _this,
-            RuleApp that) {
+    public static boolean equalsModProofIrrelevancy(@Nullable RuleApp _this,
+            @Nullable RuleApp that) {
         if (_this == that) {
             return true;
         } else if (_this == null || that == null) {
@@ -460,7 +463,12 @@ public class EqualityModuloProofIrrelevancy {
             ifInsts1 = ifInsts1.tail();
             ifInsts2 = ifInsts2.tail();
         }
-        return _this.posInOccurrence().eqEquals(that.posInOccurrence());
+        // Applied built-in rule apps carry a position; {@link PosInOccurrence#eqEquals} also
+        // returns {@code false} for a {@code null} argument, i.e. proceeding with the comparison
+        // reproduces the pre-existing {@code null}-tolerant behaviour.
+        @SuppressWarnings("NullAway")
+        final boolean posEquals = _this.posInOccurrence().eqEquals(that.posInOccurrence());
+        return posEquals;
     }
 
     /**
@@ -470,10 +478,11 @@ public class EqualityModuloProofIrrelevancy {
      * @return the hash code modulo proof irrelevancy for the given argument
      */
     public static int hashCodeModProofIrrelevancy(IBuiltInRuleApp ruleApp) {
-        var sf = ruleApp.posInOccurrence().sequentFormula();
+        final PosInOccurrence pio = Objects.requireNonNull(ruleApp.posInOccurrence(),
+            "built-in rule application needs a position");
+        var sf = pio.sequentFormula();
         return Objects.hash(ruleApp.rule(), ruleApp.getHeapContext(),
-            hashCodeModProofIrrelevancy(sf),
-            ruleApp.posInOccurrence().posInTerm());
+            hashCodeModProofIrrelevancy(sf), pio.posInTerm());
     }
 
 
@@ -563,10 +572,14 @@ public class EqualityModuloProofIrrelevancy {
             return false;
         }
 
-        if (!EqualsModProofIrrelevancyUtil.compareImmutableLists(
+        // The assumes instantiations may be {@code null} for taclets without an assumes sequent;
+        // the comparison utility treats a {@code null} list as equal to the empty list.
+        @SuppressWarnings("NullAway")
+        final boolean assumesListsEqual = EqualsModProofIrrelevancyUtil.compareImmutableLists(
             _this.assumesFormulaInstantiations(),
             that.assumesFormulaInstantiations(),
-            EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy)) {
+            EqualityModuloProofIrrelevancy::equalsModProofIrrelevancy);
+        if (!assumesListsEqual) {
             return false;
         }
         if (!equalsModProofIrrelevancy(_this.instantiations(), that.instantiations())) {
@@ -589,13 +602,17 @@ public class EqualityModuloProofIrrelevancy {
      * @return the hash code modulo proof irrelevancy for the given argument
      */
     public static int hashCodeModProofIrrelevancy(TacletApp app) {
-        return Objects.hash(
+        // The assumes instantiations may be {@code null} for taclets without an assumes sequent;
+        // the hash utility returns {@code 0} for a {@code null} list (empty-list convention).
+        @SuppressWarnings("NullAway")
+        final int hash = Objects.hash(
             EqualsModProofIrrelevancyUtil.hashCodeImmutableList(app.assumesFormulaInstantiations(),
                 EqualityModuloProofIrrelevancy::hashCodeModProofIrrelevancy),
             app.instantiations(),
             app.uninstantiatedVars(),
             app.isUpdateContextFixed(),
             app.rule());
+        return hash;
     }
 
     // TacletGoalTemplate
@@ -746,8 +763,12 @@ public class EqualityModuloProofIrrelevancy {
         for (final var e : _this.getInstantiationMap()) {
             final Object inst = e.value().getInstantiation();
             if (inst instanceof JTerm instAsTerm) {
-                if (!instAsTerm.equalsModProperty(
-                    that.getInstantiation(e.key()), PROOF_IRRELEVANCY_PROPERTY)) {
+                // A missing instantiation on the other side makes the instantiations differ;
+                // {@code equalsModProperty} returns {@code false} for a {@code null} argument.
+                @SuppressWarnings("NullAway")
+                final boolean equalsModProperty = instAsTerm.equalsModProperty(
+                    that.getInstantiation(e.key()), PROOF_IRRELEVANCY_PROPERTY);
+                if (!equalsModProperty) {
                     return false;
                 }
             } else if (inst instanceof ProgramElement instAsProgramElement) {

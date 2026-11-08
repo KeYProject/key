@@ -23,6 +23,7 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Listener object to record various user actions (currently only rule applications)
@@ -65,8 +66,8 @@ public class StateChangeListener implements InteractionListener {
 
     @Override
     public void runMacro(Node node, ProofMacro macro,
-            PosInOccurrence posInOcc,
-            ProofMacroFinishedInfo info) {
+            @Nullable PosInOccurrence posInOcc,
+            @Nullable ProofMacroFinishedInfo info) {
 
     }
 

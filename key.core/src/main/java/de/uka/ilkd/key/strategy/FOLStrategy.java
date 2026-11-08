@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.Equality;
@@ -94,7 +95,13 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
 
     private Feature oneStepSimplificationFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(MiscTools.findOneStepSimplifier(getProof()));
+        // proofs without a one-step simplifier (e.g. pure FOL proofs) silently leave the filter
+        // empty, i.e. the feature never applies; adding null to the filter set would be the same
+        // no-op, so the null value is skipped instead of passed to addRuleToSet
+        final OneStepSimplifier oneStepSimplifier = MiscTools.findOneStepSimplifier(getProof());
+        if (oneStepSimplifier != null) {
+            filter.addRuleToSet(oneStepSimplifier);
+        }
         return ConditionalFeature.createConditional(filter, cost);
     }
 
@@ -621,7 +628,9 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
 
     /** the value of the trigger option, fixed when this strategy was constructed */
     private String triggersOption() {
-        return strategyProperties.getProperty(StrategyProperties.TRIGGERS_OPTIONS_KEY);
+        return Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.TRIGGERS_OPTIONS_KEY),
+            "no trigger option strategy property");
     }
 
     /** how much the quantifier heuristic is told about the theories in this strategy */

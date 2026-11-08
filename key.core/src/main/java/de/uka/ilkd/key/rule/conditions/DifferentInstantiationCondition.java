@@ -13,6 +13,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 @NullMarked
@@ -27,7 +28,8 @@ public final class DifferentInstantiationCondition extends VariableConditionAdap
 
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement candidate, SVInstantiations svInst,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement candidate,
+            SVInstantiations svInst,
             Services services) {
         if (var == var1) {
             final Object inst2 = svInst.getInstantiation(var2);

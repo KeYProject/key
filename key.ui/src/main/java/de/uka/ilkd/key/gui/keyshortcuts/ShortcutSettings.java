@@ -45,7 +45,7 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
      * receiver is still under initialization, both suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid" })
+        "nullness:method.invocation.invalid", "NullAway" })
     public ShortcutSettings() {
         super();
         setHeaderText("Keyboard Shortcuts");
@@ -77,8 +77,11 @@ public class ShortcutSettings extends SimpleSettingsPanel implements SettingsPro
             return s.replace("pressed ", "");
         }).collect(Collectors.toList());
 
-        List<@Nullable Action> actions =
-            actionNames.stream().map(KeyStrokeManager::findAction).collect(Collectors.toList());
+        // findAction may return null (unregistered action); the table model tolerates it
+        List<@Nullable Action> actions = new ArrayList<>(actionNames.size());
+        for (String actionName : actionNames) {
+            actions.add(KeyStrokeManager.findAction(actionName));
+        }
 
         modelShortcuts = new ShortcutsTableModel(actionNames, shortcuts, actions);
         tblShortcuts.setModel(modelShortcuts);

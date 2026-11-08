@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
@@ -18,6 +20,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -62,7 +65,8 @@ public class ContainsAssignmentCondition extends VariableConditionAdapter {
      * {@inheritDoc}
      */
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            SVInstantiations instMap,
             Services services) {
         if (var != expression) {
             return true;
@@ -74,7 +78,10 @@ public class ContainsAssignmentCondition extends VariableConditionAdapter {
         if (instCandidate instanceof JTerm) {
             return true;
         } else {
-            pe = (ProgramElement) instCandidate;
+            // the schema variable must be instantiated with a program element here; a {@code null}
+            // instantiation would NPE in the visitor below, so fail fast with the same outcome
+            pe = Objects.requireNonNull((ProgramElement) instCandidate,
+                "no program element instantiation for " + var);
         }
 
         final ContainsAssignment visitor = new ContainsAssignment(pe, services);

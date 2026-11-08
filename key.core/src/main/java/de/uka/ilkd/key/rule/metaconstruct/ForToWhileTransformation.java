@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -82,8 +84,9 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             body = (Statement) changeList.removeFirst();
 
             if (innerLabelNeeded() && breakInnerLabel != null) {
-                body = KeYJavaASTFactory.labeledStatement(breakInnerLabel.getLabel(), body,
-                    PositionInfo.UNDEFINED);
+                body = KeYJavaASTFactory.labeledStatement(
+                    Objects.requireNonNull(breakInnerLabel.getLabel(), "break has no label"),
+                    body, PositionInfo.UNDEFINED);
             }
 
             final int updateSize = (updates == null ? 0 : updates.size());
@@ -102,7 +105,9 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
 
             if (inits != null) {
                 for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {
-                    outerBlockStatements[copyStatements] = inits.getInits().get(copyStatements);
+                    outerBlockStatements[copyStatements] =
+                        Objects.requireNonNull(inits.getInits(), "for-loop inits are mandatory")
+                                .get(copyStatements);
                 }
             }
 
@@ -112,7 +117,8 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             Statement outerBlock = KeYJavaASTFactory.block(outerBlockStatements);
 
             if (outerLabelNeeded() && breakOuterLabel != null) {
-                outerBlock = KeYJavaASTFactory.labeledStatement(breakOuterLabel.getLabel(),
+                outerBlock = KeYJavaASTFactory.labeledStatement(
+                    Objects.requireNonNull(breakOuterLabel.getLabel(), "break has no label"),
                     outerBlock, PositionInfo.UNDEFINED);
             }
 

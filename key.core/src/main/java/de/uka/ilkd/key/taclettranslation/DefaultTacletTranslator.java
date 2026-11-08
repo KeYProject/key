@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.taclettranslation;
 
-
+import java.util.Objects;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
@@ -212,7 +212,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     }
 
     private int getPolarity(RewriteTaclet rwTaclet) {
-        var restr = rwTaclet.applicationRestriction();
+        ApplicationRestriction restr = Objects.requireNonNull(rwTaclet.applicationRestriction());
         if (restr.matches(ApplicationRestriction.ANTECEDENT_POLARITY)) {
             return -1;
         } else if (restr.matches(ApplicationRestriction.SUCCEDENT_POLARITY)) {

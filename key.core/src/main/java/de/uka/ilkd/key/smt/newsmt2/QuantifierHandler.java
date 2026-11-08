@@ -50,6 +50,8 @@ public class QuantifierHandler implements SMTHandler {
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         term = collectQuantifications(term);
 
+        Services services = Objects.requireNonNull(this.services, "services");
+
         Set<Term> triggerTerms = new HashSet<>();
         collectTriggers(term, triggerTerms);
 
@@ -117,7 +119,8 @@ public class QuantifierHandler implements SMTHandler {
 
         ImmutableArray<JTerm> subs = new ImmutableArray<>(current);
         ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(boundVars);
-        return services.getTermFactory().createTerm(type, subs, bvars, null);
+        return Objects.requireNonNull(services, "services").getTermFactory()
+                .createTerm(type, subs, bvars, null);
     }
 
 }

@@ -45,7 +45,7 @@ public abstract class JavaStatement extends JavaNonTerminalProgramElement implem
         super(children, pos);
     }
 
-    public JavaStatement(PositionInfo pos) {
+    public JavaStatement(@Nullable PositionInfo pos) {
         super(pos);
     }
 

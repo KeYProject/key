@@ -14,6 +14,9 @@ import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.scripts.meta.Argument;
 import de.uka.ilkd.key.scripts.meta.Documentation;
@@ -89,26 +92,32 @@ public class RuleCommand extends AbstractCommand {
         }
         assert theApp != null;
 
-        g.apply(theApp);
+        g.apply(Objects.requireNonNull(theApp, "No rule application could be created"));
     }
 
     private @Nullable RuleApp makeRuleApp(Parameters p, EngineState state)
             throws ScriptException {
 
         final Proof proof = state.getProof();
+        final String rulename = Objects.requireNonNull(p.rulename, "No rule name was given");
+        final InitConfig initConfig =
+            Objects.requireNonNull(proof.getInitConfig(), "No initial configuration");
+        final Profile profile = Objects.requireNonNull(initConfig.getProfile(), "No profile");
         final Optional<BuiltInRule> maybeBuiltInRule =
-            proof.getInitConfig().getProfile().getStandardRules().standardBuiltInRules().stream()
-                    .filter(r -> r.name().toString().equals(p.rulename)).findAny();
+            profile.getStandardRules().standardBuiltInRules().stream()
+                    .filter(r -> r.name().toString().equals(rulename)).findAny();
 
+        final ProofEnvironment env =
+            Objects.requireNonNull(proof.getEnv(), "No proof environment");
         final Optional<Taclet> maybeTaclet = Optional.ofNullable(
-            proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(p.rulename)));
+            env.getInitConfigForEnvironment().lookupActiveTaclet(new Name(rulename)));
 
         if (maybeBuiltInRule.isEmpty() && maybeTaclet.isEmpty()) {
             /*
              * (DS, 2019-01-31): Might be a locally introduced taclet, e.g., by hide_left etc.
              */
             final Optional<TacletApp> maybeApp = Optional.ofNullable(
-                state.getFirstOpenAutomaticGoal().indexOfTaclets().lookup(p.rulename));
+                state.getFirstOpenAutomaticGoal().indexOfTaclets().lookup(rulename));
 
             TacletApp app = maybeApp.orElseThrow(
                 () -> new ScriptException("Taclet '" + p.rulename + "' not known."));
@@ -155,7 +164,8 @@ public class RuleCommand extends AbstractCommand {
             throw new ScriptException("Not a unique \\assumes instantiation");
         }
 
-        result = assumesCandidates.head();
+        result = Objects.requireNonNull(assumesCandidates.head(),
+            "No \\assumes instantiation candidate");
 
         /*
          * NOTE (DS, 2019-02-22): If we change something by instantiating the app as much as
@@ -191,7 +201,9 @@ public class RuleCommand extends AbstractCommand {
                     throw new ScriptException("missing instantiation for " + sv);
                 }
 
-                result = result.addInstantiation(sv, inst, true, services);
+                result = Objects.requireNonNull(
+                    result.addInstantiation(sv, inst, true, services),
+                    "could not instantiate " + sv);
             }
         }
 
@@ -205,7 +217,9 @@ public class RuleCommand extends AbstractCommand {
 
         if (recheckMatchConditions) {
             final var appMC =
-                result.taclet().getMatcher().checkConditions(result.matchConditions(), services);
+                Objects.requireNonNull(result.taclet().getMatcher(),
+                    "taclet has no initialized matcher")
+                        .checkConditions(result.matchConditions(), services);
             if (appMC == null) {
                 return null;
             } else {
@@ -255,12 +269,16 @@ public class RuleCommand extends AbstractCommand {
             throw new ScriptException("No matching applications.");
         }
 
-        if (p.occ < 0) {
+        if (Objects.requireNonNull(p.occ, "No occurrence number was given") < 0) {
             if (matchingApps.size() > 1) {
                 // todo make a nice string here!
                 throw new ScriptException("More than one applicable occurrence:\n" +
                     matchingApps.stream().map(
-                        ap -> ap.posInOccurrence().subTerm() + " " + ap.matchConditions())
+                        ap -> Objects
+                                .requireNonNull(ap.posInOccurrence(),
+                                    "No position in occurrence was given")
+                                .subTerm()
+                            + " " + ap.matchConditions())
                             .collect(Collectors.joining("\n")));
             }
             return matchingApps.get(0);
@@ -307,7 +325,8 @@ public class RuleCommand extends AbstractCommand {
             throws ScriptException {
         Services services = state.getProof().getServices();
         assert services != null;
-        TacletFilter filter = new TacletNameFilter(p.rulename);
+        final String rulename = Objects.requireNonNull(p.rulename, "No rule name was given");
+        TacletFilter filter = new TacletNameFilter(rulename);
         Goal g = state.getFirstOpenAutomaticGoal();
         RuleAppIndex index = g.ruleAppIndex();
 
@@ -383,8 +402,10 @@ public class RuleCommand extends AbstractCommand {
                 for (var entry : pta.instantiations().getInstantiationMap()) {
                     final SchemaVariable sv = entry.key();
                     JTerm userInst = p.instantiations.get(sv.name().toString());
-                    Object ptaInst =
-                        pta.instantiations().getInstantiationEntry(sv).getInstantiation();
+                    Object ptaInst = Objects.requireNonNull(
+                        pta.instantiations().getInstantiationEntry(sv),
+                        "No instantiation entry for " + sv.name())
+                            .getInstantiation();
 
                     add &= userInst == null
                             || userInst.equalsModProperty(ptaInst, IRRELEVANT_TERM_LABELS_PROPERTY);

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
@@ -42,16 +44,20 @@ public final class SLTypeResolver extends SLExpressionResolver {
         } catch (RuntimeException e) {
             try {
                 if (receiver != null) {
-                    KeYJavaType containingType = receiver.getType();
+                    KeYJavaType containingType =
+                        Objects.requireNonNull(receiver.getType(), "no receiver type");
                     while (true) {
-                        String typeName = containingType.getSort().name().toString();
+                        String typeName = Objects
+                                .requireNonNull(containingType.getSort(), "no containing type sort")
+                                .name().toString();
                         if (typeName.substring(typeName.lastIndexOf('.') + 1).equals(name)) {
                             return new SLExpression(containingType);
                         }
                         ProgramVariable et = javaInfo.getAttribute(
                             PipelineConstants.IMPLICIT_ENCLOSING_THIS, containingType);
                         if (et != null) {
-                            containingType = et.getKeYJavaType();
+                            containingType =
+                                Objects.requireNonNull(et.getKeYJavaType(), "no enclosing type");
                         } else {
                             break;
                         }

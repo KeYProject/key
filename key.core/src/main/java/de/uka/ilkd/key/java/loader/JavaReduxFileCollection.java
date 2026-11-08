@@ -133,7 +133,7 @@ public class JavaReduxFileCollection implements FileCollection {
      * The resource file of a redux Java class is always resolvable through the resource manager;
      * the dereference of the (nullable) resource file is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public Stream<URI> getResources() {
         return resources.stream()
                 .map(it -> {
@@ -210,7 +210,7 @@ public class JavaReduxFileCollection implements FileCollection {
          * dereference of the (nullable) URL is suppressed with a scoped key.
          */
         @Override
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
         public Path getCurrentLocation() {
             try {
                 return Path.of(currentURL.toURI());
@@ -241,7 +241,7 @@ public class JavaReduxFileCollection implements FileCollection {
          * The overridden declaration requires a non-null return type, but this implementation may
          * legitimately return {@code null}; the difference is suppressed with a scoped key.
          */
-        @SuppressWarnings("nullness:override.return.invalid")
+        @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
         @Override
         public @Nullable String getRelativeLocation() {
             return null;

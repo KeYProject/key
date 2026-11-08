@@ -9,6 +9,7 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Stack;
 
@@ -70,7 +71,10 @@ public class BranchesCommand extends AbstractCommand {
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
         var args = state().getValueInjector().inject(new BranchesCommand.Parameters(), arguments);
 
-        Stack<Integer> stack = state.getUserData().putIfAbsent(USER_DATA_BRANCH_STACK, Stack::new);
+        Stack<Integer> stack = Objects.requireNonNull(
+            state().getUserData().putIfAbsent(USER_DATA_BRANCH_STACK, Stack::new),
+            "branch stack not available");
+        Proof proof = Objects.requireNonNull(this.proof, "proof is not set");
 
         if (args.mode == null) {
             throw new ScriptException("For 'branches', a mode must be specified");
@@ -79,7 +83,7 @@ public class BranchesCommand extends AbstractCommand {
         switch (args.mode) {
             case "push":
                 ensureSingleGoal();
-                Node node = state.getFirstOpenAutomaticGoal().node();
+                Node node = state().getFirstOpenAutomaticGoal().node();
                 // this is the first goal. The parent is the decision point
                 stack.push(node.serialNr());
                 break;
@@ -90,15 +94,18 @@ public class BranchesCommand extends AbstractCommand {
                 Node root = findNodeByNumber(proof, stack.peek());
                 Goal goal;
                 if (args.branch == null) {
-                    goal = findGoalByNode(state.getProof(), root.child(args.child));
+                    goal = findGoalByNode(state().getProof(),
+                        root.child(Objects.requireNonNull(args.child,
+                            "child index must be given")));
                 } else {
                     goal = findGoalByName(root, args.branch);
                 }
-                state.setGoal(goal);
+                state().setGoal(goal);
                 break;
             case "single":
                 root = findNodeByNumber(proof, stack.peek());
-                TacletApp ta = (TacletApp) root.getAppliedRuleApp();
+                TacletApp ta = Objects.requireNonNull((TacletApp) root.getAppliedRuleApp(),
+                    "applied rule app is not available");
                 ImmutableList<TacletGoalTemplate> templates = ta.taclet().goalTemplates();
 
                 int no = 0;
@@ -119,7 +126,7 @@ public class BranchesCommand extends AbstractCommand {
                 // For some reason, the child index is reversed between the node and the templates
                 found = templates.size() - 1 - found;
                 goal = findGoalByNode(proof, root.child(found));
-                state.setGoal(goal);
+                state().setGoal(goal);
                 break;
             default:
                 throw new ScriptException(
@@ -162,7 +169,7 @@ public class BranchesCommand extends AbstractCommand {
 
     private Node findNodeByNumber(Proof proof, int serial) throws ScriptException {
         Deque<Node> todo = new LinkedList<>();
-        todo.add(proof.root());
+        todo.add(Objects.requireNonNull(proof.root(), "proof root node is missing"));
         while (!todo.isEmpty()) {
             Node n = todo.remove();
             if (n.serialNr() == serial) {
@@ -179,7 +186,7 @@ public class BranchesCommand extends AbstractCommand {
     public static class Parameters {
         @Argument
         @Documentation("The operation mode: 'push', 'pop', 'select', or 'single'")
-        public String mode;
+        public @Nullable String mode;
 
         @Option(value = "branch")
         @Documentation("The name of the branch to select (used with mode='select')")

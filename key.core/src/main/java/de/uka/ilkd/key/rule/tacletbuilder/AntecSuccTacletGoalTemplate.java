@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.Taclet;
@@ -82,7 +84,8 @@ public class AntecSuccTacletGoalTemplate extends TacletGoalTemplate {
         if (!super.equals(o)) {
             return false;
         }
-        final AntecSuccTacletGoalTemplate other = (AntecSuccTacletGoalTemplate) o;
+        final AntecSuccTacletGoalTemplate other = (AntecSuccTacletGoalTemplate) Objects
+                .requireNonNull(o, "super.equals guarantees a non-null argument");
         return replacewith.equals(other.replacewith);
     }
 

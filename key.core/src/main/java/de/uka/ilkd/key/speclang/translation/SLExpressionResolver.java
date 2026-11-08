@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.translation;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -101,7 +103,9 @@ public abstract class SLExpressionResolver {
         if (mod == ModifierKind.PUBLIC) {
             return true;
         } else if (mod == ModifierKind.PROTECTED) {
-            return inType.getSort().extendsTrans(containingType.getSort())
+            return Objects.requireNonNull(inType.getSort(), "no in-type sort")
+                    .extendsTrans(Objects.requireNonNull(containingType.getSort(),
+                        "no containing-type sort"))
                     || areInSamePackage(inType, containingType);
         } else if (mod == ModifierKind.PRIVATE) {
             return inType.equals(containingType);
@@ -125,7 +129,8 @@ public abstract class SLExpressionResolver {
             if (p == null || javaInfo.isPackage(p.toString())) {
                 break;
             }
-            inType = javaInfo.getTypeByClassName(p.toString());
+            inType = Objects.requireNonNull(javaInfo.getTypeByClassName(p.toString()),
+                "no enclosing-class type");
             assert inType != null;
             result = isVisibleHelper(md, containingType, inType);
         }

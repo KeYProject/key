@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
@@ -32,7 +34,7 @@ public class FocussedRuleApplicationManager
     private final RuleApplicationManager<Goal> delegate;
     public final QueueRuleApplicationManager rootManager;
 
-    private final FormulaTag focussedFormula;
+    private final @Nullable FormulaTag focussedFormula;
     private final PosInOccurrence focussedSubterm;
 
     private @Nullable Goal goal;
@@ -47,7 +49,7 @@ public class FocussedRuleApplicationManager
 
     private FocussedRuleApplicationManager(RuleApplicationManager<Goal> delegate,
             @Nullable Goal goal,
-            FormulaTag focussedFormula,
+            @Nullable FormulaTag focussedFormula,
             PosInOccurrence focussedSubterm,
             boolean onlyModifyFocussedFormula) {
         this.delegate = delegate;
@@ -125,7 +127,8 @@ public class FocussedRuleApplicationManager
                  * rule app within the focussed formula, but not within the focussed subterm
                  */
                 return isBelow(focFormula, pos) && !NonDuplicateAppModPositionFeature.INSTANCE
-                        .computeCost(rule, pos, goal, new MutableState())
+                        .computeCost(rule, pos, Objects.requireNonNull(goal, "no goal set"),
+                            new MutableState())
                         .equals(BinaryFeature.TOP_COST);
             } else {
                 return !onlyModifyFocussedFormula;
@@ -155,8 +158,13 @@ public class FocussedRuleApplicationManager
     }
 
     private @Nullable PosInOccurrence getPIOForFocussedSubterm() {
+        // getPosForTag tolerates a null tag (it answers "no such formula"); the tag is only absent
+        // when no formula was found for the focused position at construction, in which case the
+        // filter silently disables. The parameter is still declared @NonNull there.
+        @SuppressWarnings("NullAway")
         final PosInOccurrence formula =
-            goal.getFormulaTagManager().getPosForTag(focussedFormula);
+            Objects.requireNonNull(goal, "no goal set").getFormulaTagManager()
+                    .getPosForTag(focussedFormula);
 
         if (formula == null) {
             return null;

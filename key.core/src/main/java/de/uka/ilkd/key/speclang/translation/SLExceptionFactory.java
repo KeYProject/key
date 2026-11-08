@@ -81,7 +81,11 @@ public class SLExceptionFactory {
     private Location createAbsolutePosition(int relativeLine, int relativeColumn) {
         int absoluteLine = offsetLine + relativeLine - 1;
         int absoluteColumn = (relativeLine == 1 ? offsetColumn : 1) + relativeColumn;
-        return new Location(fileName, Position.fromOneZeroBased(absoluteLine, absoluteColumn));
+        @SuppressWarnings("NullAway") // the file URI may be unknown for in-memory parses;
+                                      // Location permits a null fileUri (see Location.UNDEFINED)
+        Location result =
+            new Location(fileName, Position.fromOneZeroBased(absoluteLine, absoluteColumn));
+        return result;
     }
 
     // -------------------------------------------------------------------------

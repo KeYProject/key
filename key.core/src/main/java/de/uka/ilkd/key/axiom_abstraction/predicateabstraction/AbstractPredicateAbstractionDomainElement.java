@@ -63,7 +63,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * {@link #setPredicates(ImmutableSet)}; callers construct elements to always have predicates,
      * so the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     public ImmutableSet<AbstractionPredicate> getPredicates() {
         return predicates;
     }
@@ -82,7 +82,7 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * of the (nullable) predicate set are suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public Name name() {
         if (topElem) {
             return new Name("TOP");
@@ -123,7 +123,8 @@ public abstract class AbstractPredicateAbstractionDomainElement extends Abstract
      * constructed domain element is never {@code null} either; that dereference is suppressed with
      * a scoped key.
      */
-    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible",
+        "nullness:dereference.of.nullable" })
     @Override
     public JTerm getDefiningAxiom(JTerm varOrConst, Services services) {
         TermBuilder tb = services.getTermBuilder();

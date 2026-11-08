@@ -75,7 +75,7 @@ public class SMTRule implements ExternalSolverRule {
      *         init config are suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
         if (goal.proof().getInitConfig().getJustifInfo().getJustification(INSTANCE) == null) {
             goal.proof().getInitConfig().registerRule(INSTANCE, () -> false);

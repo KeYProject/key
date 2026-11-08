@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
@@ -28,7 +29,7 @@ public class SingleProof extends ProofAggregate {
      * dereference of the (nullable) proof is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public ProofStatus getStatus() {
         return proof.mgt().getStatus();
     }
@@ -43,7 +44,8 @@ public class SingleProof extends ProofAggregate {
         if (!super.equals(o)) {
             return false;
         }
-        final SingleProof other = (SingleProof) o;
+        final SingleProof other =
+            Objects.requireNonNull((SingleProof) o, "equality target not null");
 
         return proof == other.proof;
     }

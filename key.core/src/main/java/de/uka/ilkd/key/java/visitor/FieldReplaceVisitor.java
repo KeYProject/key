@@ -60,7 +60,7 @@ public class FieldReplaceVisitor extends CreatingASTVisitor {
      * The program variable of a generalized field reference is always present; the dereferences
      * of the (nullable) program variable are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void performActionOnFieldReference(final FieldReference x) {
         final ExtList changeList = stack.getFirst();
         if (changeList.getFirst() == CHANGED) {

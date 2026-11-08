@@ -126,12 +126,12 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
      * argument is deliberately the {@code proofConfig} field, which is
      * {@code null} in {@code readProblem()} (see the assertion at its
      * start): the information-flow proof obligation performs no proof
-     * configuration at this stage and the base axiom registration path
-     * tolerates an absent configuration. The base {@code AbstractPO}
-     * parameter is not nullness-annotated and cannot be widened from this
-     * module.
+     * configuration at this stage and no class axioms are registered on
+     * this path, so the base method never consults the absent
+     * configuration. The base {@code AbstractPO} parameter is not
+     * nullness-annotated and cannot be widened from this module.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private void collectAxioms(KeYJavaType kjt, @Nullable InitConfig proofConfig) {
         collectClassAxioms(kjt, proofConfig);
     }
@@ -149,15 +149,9 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
     /**
      * {@inheritDoc}
      *
-     * Deliberately nullable: {@code null} is returned when the contract has
-     * no measured-by clause. {@link ContractPO#getMbyAtPre()} is not
-     * nullness-annotated in key.core although all realizations (including
-     * {@code DependencyContractPO}) return {@code null} for absent clauses,
-     * and none of the callers in key.core dereferences the result (all such
-     * call sites are commented out).
+     * {@code null} is returned when the contract has no measured-by clause.
      */
     @Override
-    @SuppressWarnings("nullness:override.return.invalid")
     public @Nullable JTerm getMbyAtPre() {
         if (contract.hasMby()) {
             return symbExecVars.pre.mbyAtPre;
@@ -272,14 +266,9 @@ public class InfFlowContractPO extends AbstractInfFlowPO implements ContractPO, 
     }
 
     /**
-     * Deliberately returns {@code null}: information flow contracts do not
-     * have global defs. {@link AbstractOperationPO} declares a non-null
-     * return type although its only caller,
-     * {@code createApplyGlobalUpdateTerm}, explicitly null-tolerates the
-     * result; the base signature cannot be widened from this module.
+     * Deliberately returns {@code null}: information flow contracts do not have global defs.
      */
     @Override
-    @SuppressWarnings("nullness:override.return.invalid")
     protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
             @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {

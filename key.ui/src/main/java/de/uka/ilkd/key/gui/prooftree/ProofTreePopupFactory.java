@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import javax.swing.*;
 import javax.swing.tree.TreeNode;
@@ -66,7 +67,8 @@ public final class ProofTreePopupFactory {
         // (take care to not filter out any GUIBranchNodes accidentally!)
         Object o = tp.getLastPathComponent();
         if (o instanceof GUIProofTreeNode n) {
-            return !(n.getNode().getAppliedRuleApp() instanceof OneStepSimplifierRuleApp);
+            Node node = Objects.requireNonNull(n.getNode(), "No proof node available.");
+            return !(node.getAppliedRuleApp() instanceof OneStepSimplifierRuleApp);
         }
         return true;
     }
@@ -198,7 +200,7 @@ public final class ProofTreePopupFactory {
         TreePath path, branch;
         JTree delegateView;
 
-        @SuppressWarnings("nullness:initialization.fields.uninitialized")
+        @SuppressWarnings({ "nullness:initialization.fields.uninitialized", "NullAway" })
         public ProofTreeContext() {
         }
     }

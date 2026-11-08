@@ -7,6 +7,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -151,7 +152,8 @@ class TypeManager {
         }
 
         // and have a type hierarchy.
-        if (!HandlerUtil.PROPERTY_NO_TYPE_HIERARCHY.get(services)) {
+        if (!Objects.requireNonNull(HandlerUtil.PROPERTY_NO_TYPE_HIERARCHY.get(services),
+            "no 'no type hierarchy' property")) {
             createSortTypeHierarchy(master, services);
         }
     }

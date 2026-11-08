@@ -125,7 +125,9 @@ public class ContractSelectionPanel extends JPanel {
                     Proof p = getClosedProof(c);
 
                     if (p != null) {
-                        for (Contract used : p.mgt().getUsedContracts()) {
+                        ProofCorrectnessMgt mgt =
+                            Objects.requireNonNull(p.mgt(), "no proof management");
+                        for (Contract used : mgt.getUsedContracts()) {
                             appliedContracts.add(used);
                         }
                     }
@@ -142,7 +144,9 @@ public class ContractSelectionPanel extends JPanel {
                         Proof p = getClosedProof(c);
 
                         if (p != null) {
-                            for (Contract used : p.mgt().getUsedContracts()) {
+                            ProofCorrectnessMgt mgt =
+                                Objects.requireNonNull(p.mgt(), "no proof management");
+                            for (Contract used : mgt.getUsedContracts()) {
                                 appliedContracts.add(used);
                             }
                         }

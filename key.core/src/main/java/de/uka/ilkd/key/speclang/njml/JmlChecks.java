@@ -48,7 +48,11 @@ public final class JmlChecks {
 
 
 @NullMarked
-class AbstractCheck extends JmlParserBaseVisitor<Void> implements JmlCheck {
+// NullAway: the parser visitor must be able to return {@code null} for checks that do not apply,
+// but a @Nullable type argument cannot be expressed because the (generated) JmlParserBaseVisitor's
+// type variable has no @Nullable upper bound
+@SuppressWarnings("NullAway")
+class AbstractCheck extends JmlParserBaseVisitor<@Nullable Void> implements JmlCheck {
     private final List<PositionedString> warnings = new LinkedList<>();
 
     @Override

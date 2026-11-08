@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -104,9 +105,15 @@ public final class JMLSpecExtractor implements SpecExtractor {
         b.append(ERROR).append(", ").append(RUNTIME_EXCEPTION);
 
         for (int i = 0; i < exceptions.size(); i++) {
-            if (services.getJavaInfo().isSubtype(exceptions.get(i).getKeYJavaType(),
-                services.getJavaInfo().getKeYJavaType(THROWABLE))) {
-                b.append(", ").append(exceptions.get(i).getKeYJavaType().getFullName());
+            // both lookups are evaluated per iteration and must not be hoisted: hoisting would
+            // evaluate them even for empty exception lists, where they were never evaluated before
+            KeYJavaType exceptionType = Objects.requireNonNull(Objects.requireNonNull(
+                exceptions.get(i), "exception type reference").getKeYJavaType(),
+                "exception type");
+            if (services.getJavaInfo().isSubtype(exceptionType,
+                Objects.requireNonNull(services.getJavaInfo().getKeYJavaType(THROWABLE),
+                    "Throwable type"))) {
+                b.append(", ").append(exceptionType.getFullName());
             }
         }
 
@@ -129,7 +136,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * @return set of formulas specifying non-nullity for field/variables
      */
     public static ImmutableSet<LabeledParserRuleContext> createNonNullPositionedString(
-            String varName, KeYJavaType kjt, boolean isImplicitVar, Location location,
+            @Nullable String varName, KeYJavaType kjt, boolean isImplicitVar, Location location,
             Services services) {
         ImmutableSet<LabeledParserRuleContext> result = DefaultImmutableSet.nil();
         final Type varType = kjt.getJavaType();
@@ -155,13 +162,15 @@ public final class JMLSpecExtractor implements SpecExtractor {
      * Get the depth for the nonNull predicate. The depth is 0 for non array types, its dimension
      * for reference array types, and its dimension -1 for array types with primitive base type.
      */
-    public static int arrayDepth(Type type, Services services) {
+    public static int arrayDepth(@Nullable Type type, Services services) {
         assert services != null;
         final TypeConverter tc = services.getTypeConverter();
         if (type instanceof ArrayType) {
             final int d = ((ArrayType) type).getDimension();
             while (type instanceof ArrayType) {
-                type = ((ArrayType) type).getBaseType().getKeYJavaType().getJavaType();
+                type = Objects.requireNonNull(
+                    ((ArrayType) type).getBaseType().getKeYJavaType(), "base type")
+                        .getJavaType();
             }
             return tc.isReferenceType(type) ? d : d - 1;
         } else {
@@ -190,7 +199,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         for (MemberDeclaration member : td.getMembers()) {
             if (member instanceof FieldDeclaration) {
                 ModifierKind visibility = null;
-                for (Modifier mod : member.getModifiers()) {
+                for (Modifier mod : Objects.requireNonNull(member.getModifiers(), "modifiers")) {
                     final ModifierKind modKind = mod.getKind();
                     if (modKind.isVisibility()) {
                         visibility = modKind;
@@ -214,11 +223,18 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     // add invariant only for fields of reference types
                     // and not for implicit fields.
                     if (!JMLInfoExtractor.isNullable((FieldDeclaration) member, td)) {
+                        // The file URI may be genuinely absent (see Location.fileUri); the record
+                        // tolerates null but the constructor does not, so a requireNonNull would
+                        // change behavior.
+                        @SuppressWarnings("NullAway")
+                        Location location = new Location(fileName, member.getEndPosition());
                         ImmutableSet<LabeledParserRuleContext> nonNullInvs =
                             createNonNullPositionedString(field.getProgramName(),
-                                field.getProgramVariable().getKeYJavaType(),
-                                field.isImplicit(),
-                                new Location(fileName, member.getEndPosition()), services);
+                                Objects.requireNonNull(Objects.requireNonNull(
+                                    field.getProgramVariable(), "program variable")
+                                        .getKeYJavaType(),
+                                    "field type"),
+                                field.isImplicit(), location, services);
                         for (LabeledParserRuleContext classInv : nonNullInvs) {
                             final ClassInvariant jmlClassInvariant =
                                 jsf.createJMLClassInvariant(kjt, visibility, isStatic, classInv);
@@ -286,7 +302,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
         List<SpecificationElement> result = new ArrayList<>();
 
         // get type declaration, file name
-        TypeDeclaration td = (TypeDeclaration) pm.getContainerType().getJavaType();
+        TypeDeclaration td = (TypeDeclaration) Objects.requireNonNull(
+            pm.getContainerType(), "container type").getJavaType();
         URI fileName = td != null ? td.getPositionInfo().getURI().orElse(null) : null;
 
         // determine purity
@@ -295,12 +312,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
         final boolean isHelper = JMLInfoExtractor.isHelper(pm);
 
         // get textual JML constructs
-        ImmutableList<TextualJMLConstruct> constructs = pm.getMethodDeclaration().getAttachedJml();
+        MethodDeclaration methodDeclaration =
+            Objects.requireNonNull(pm.getMethodDeclaration(), "method declaration");
+        ImmutableList<TextualJMLConstruct> constructs = methodDeclaration.getAttachedJml();
 
         ParserRuleContext modelMethodDefinition = null;
         for (var c : constructs) {
             if (c instanceof TextualJMLMethodDecl m) {
-                if (pm.getMethodDeclaration().containsModifier(ModifierKind.JML_MODEL)) {
+                if (methodDeclaration.containsModifier(ModifierKind.JML_MODEL)) {
                     modelMethodDefinition = m.getMethodDefinition();
                     break;
                 }
@@ -389,17 +408,24 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
                 // add non-null preconditions
                 for (int j = 0, n = pm.getParameterDeclarationCount(); j < n; j++) {
-                    final VariableSpecification paramDecl =
-                        pm.getParameterDeclarationAt(j).getVariableSpecification();
+                    final VariableSpecification paramDecl = Objects.requireNonNull(
+                        pm.getParameterDeclarationAt(j), "parameter declaration")
+                            .getVariableSpecification();
                     if (!JMLInfoExtractor.parameterIsNullable(pm, j)) {
                         // no additional precondition for primitive types!
                         // createNonNullPos... takes care of that
+                        // The file URI may be genuinely absent (see Location.fileUri); the record
+                        // tolerates null but the constructor does not, so a requireNonNull would
+                        // change behavior.
+                        @SuppressWarnings("NullAway")
+                        Location location = new Location(fileName, pm.getStartPosition());
                         final ImmutableSet<LabeledParserRuleContext> nonNullParams =
                             createNonNullPositionedString(paramDecl.getName(),
-                                paramDecl.getProgramVariable().getKeYJavaType(), false,
-                                new Location(fileName,
-                                    pm.getStartPosition()),
-                                services);
+                                Objects.requireNonNull(Objects.requireNonNull(
+                                    paramDecl.getProgramVariable(), "program variable")
+                                        .getKeYJavaType(),
+                                    "parameter type"),
+                                false, location, services);
                         for (LabeledParserRuleContext nonNull : nonNullParams) {
                             specCase.addClause(REQUIRES, nonNull);
                         }
@@ -407,14 +433,17 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 }
 
                 // add non-null postcondition
-                KeYJavaType resultType = pm.getReturnType();
+                KeYJavaType resultType = Objects.requireNonNull(pm.getReturnType(), "return type");
 
                 if (!pm.isVoid() && !pm.isConstructor() && !JMLInfoExtractor.resultIsNullable(pm)
                         && specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
+                    // The file URI may be genuinely absent (see Location.fileUri); the record
+                    // tolerates null but the constructor does not, so a requireNonNull would
+                    // change behavior.
+                    @SuppressWarnings("NullAway")
+                    Location location = new Location(fileName, pm.getStartPosition());
                     final ImmutableSet<LabeledParserRuleContext> resultNonNull =
-                        createNonNullPositionedString("\\result", resultType, false,
-                            new Location(fileName,
-                                pm.getStartPosition()),
+                        createNonNullPositionedString("\\result", resultType, false, location,
                             services);
                     for (LabeledParserRuleContext nonNull : resultNonNull) {
                         specCase.addClause(ENSURES, nonNull);
@@ -591,11 +620,17 @@ public final class JMLSpecExtractor implements SpecExtractor {
             // Check that a decreases clause exists
             if (result.getInternalVariant() == null) {
                 PositionInfo info = loop.getPositionInfo();
+                // The file URI may be genuinely absent (see Location.fileUri); the record
+                // tolerates null but the constructor does not, so a requireNonNull would
+                // change behavior.
+                @SuppressWarnings("NullAway")
+                Location location =
+                    new Location(info.getURI().orElse(null), info.getStartPosition());
                 warnings = warnings.append(
                     new PositionedString(
                         "Missing \"decreases\" for loop invariant. " +
                             "Termination of this loop will not be provable.",
-                        new Location(info.getURI().orElse(null), info.getStartPosition())));
+                        location));
             }
         }
         return result;

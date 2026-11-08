@@ -39,6 +39,10 @@ public class AntecTacletExecutor extends FindTacletExecutor {
     /**
      * {@inheritDoc}
      */
+    // The base addToAntec/addToSucc document a "null for head" position; the calls below pass
+    // {@code null} or the (possibly absent) whereToAdd position deliberately, although the base
+    // parameters are declared @NonNull.
+    @SuppressWarnings("NullAway")
     @Override
     protected void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
@@ -50,6 +54,8 @@ public class AntecTacletExecutor extends FindTacletExecutor {
                 services, termLabelState,
                 new TacletLabelHint(TacletOperation.REPLACE_AT_ANTECEDENT, replWith));
             if (!replWith.succedent().isEmpty()) {
+                // The base addToSucc documents a "null for head" position; adding the replaced
+                // formulas at the head of the succedent is intended here.
                 addToSucc(replWith.succedent(), currentSequent, null, posOfFind, matchCond, goal,
                     ruleApp, services, termLabelState,
                     new TacletLabelHint(TacletOperation.REPLACE_TO_SUCCEDENT, replWith));
@@ -79,12 +85,15 @@ public class AntecTacletExecutor extends FindTacletExecutor {
      *        application
      * @param services the {@link Services} encapsulating all Java model information
      */
+    @SuppressWarnings("NullAway")
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
             @Nullable PosInOccurrence whereToAdd,
             PosInOccurrence posOfFind,
             MatchResultInfo matchCond, Goal goal, TacletApp ruleApp, Services services) {
+        // The base addToAntec/addToSucc document a "null for head" position; whereToAdd (possibly
+        // null) and null are the intended positions for the added semisequents.
         addToAntec(add.antecedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal,
             ruleApp, services, termLabelState,
             new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));

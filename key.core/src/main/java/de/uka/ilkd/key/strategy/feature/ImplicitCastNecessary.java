@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.util.TermHelper;
 
 import org.key_project.logic.sort.Sort;
@@ -34,8 +36,10 @@ public class ImplicitCastNecessary<Goal extends ProofGoal<@NonNull Goal>> extend
 
         int subPos = pos.getIndex();
 
-        final Sort maxSort = TermHelper.getMaxSort(pos.up().subTerm(), subPos);
-        return projection.toTerm(app, pos, (Goal) goal, mState).sort().extendsTrans(maxSort);
+        final Sort maxSort =
+            TermHelper.getMaxSort(Objects.requireNonNull(pos.up()).subTerm(), subPos);
+        return Objects.requireNonNull(projection.toTerm(app, pos, (Goal) goal, mState))
+                .sort().extendsTrans(maxSort);
     }
 
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(

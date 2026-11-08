@@ -78,7 +78,7 @@ public class PosInSequentTransferable implements Transferable {
      * @param pis the PosInSequent to be transfered (string flavor only supported if pis denotes a
      *        term or formula, not the complete sequent)
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized", "NullAway" })
     public PosInSequentTransferable(PosInSequent pis, Services serv) {
         this.pis = pis;
         if (!pis.isSequent()) {

@@ -179,7 +179,7 @@ public class AssumesSelectionPanel extends JPanel {
         }
         JList<AssumesFormulaInstantiation> list = new JList<>(lm) {
             @Override
-            public String getToolTipText(MouseEvent e) {
+            public @Nullable String getToolTipText(MouseEvent e) {
                 int idx = locationToIndex(e.getPoint());
                 return idx >= 0 ? TmText.htmlTooltip(text(getModel().getElementAt(idx))) : null;
             }

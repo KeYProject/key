@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Goal;
 
@@ -64,7 +65,8 @@ public class ForEachCP implements Feature {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);
 
-        final BackTrackingManager manager = mState.getBacktrackingManager();
+        final BackTrackingManager manager =
+            Objects.requireNonNull(mState.getBacktrackingManager());
         manager.passChoicePoint(new CP(app, pos, (Goal) goal, mState), this);
 
         final RuleAppCost res;

@@ -431,7 +431,7 @@ public class InitConfig {
     }
 
 
-    public void setSettings(ProofSettings newSettings) {
+    public void setSettings(@Nullable ProofSettings newSettings) {
         this.settings = newSettings;
     }
 

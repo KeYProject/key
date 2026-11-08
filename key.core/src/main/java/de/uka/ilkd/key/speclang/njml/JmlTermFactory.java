@@ -117,12 +117,13 @@ public final class JmlTermFactory {
                 : null;
         final JTerm h = tb.getBaseHeap();
         final JTerm s = getFields(t);
-        final JTerm o = e1.getTerm();
-        final JTerm o2 = e2.getTerm();
-        final JTerm n = e3 == null ? tb.var(stepsLV) : e3.getTerm();
+        final JTerm o = Objects.requireNonNull(e1.getTerm(), "operand is no term");
+        final JTerm o2 = Objects.requireNonNull(e2.getTerm(), "operand is no term");
+        final JTerm n = e3 == null ? tb.var(Objects.requireNonNull(stepsLV))
+                : Objects.requireNonNull(e3.getTerm(), "operand is no term");
         JTerm reach = tb.reach(h, s, o, o2, n);
         if (e3 == null) {
-            reach = tb.ex(stepsLV, reach);
+            reach = tb.ex(Objects.requireNonNull(stepsLV), reach);
         }
         return new SLExpression(reach);
     }
@@ -137,16 +138,18 @@ public final class JmlTermFactory {
                 : null;
         final JTerm h = tb.getBaseHeap();
         final JTerm s = getFields(t);
-        final JTerm o = e1.getTerm();
+        final JTerm o = Objects.requireNonNull(e1.getTerm(), "operand is no term");
         final JTerm o2 = tb.var(objLV);
-        final JTerm n = e3 == null ? tb.var(stepsLV) : e3.getTerm();
+        final JTerm n = e3 == null ? tb.var(Objects.requireNonNull(stepsLV))
+                : Objects.requireNonNull(e3.getTerm(), "operand is no term");
         JTerm reach = tb.reach(h, s, o, o2, n);
         if (e3 == null) {
-            reach = tb.ex(stepsLV, reach);
+            reach = tb.ex(Objects.requireNonNull(stepsLV), reach);
         }
 
         final LogicVariable fieldLV = new LogicVariable(new Name("f"),
-            services.getTypeConverter().getHeapLDT().getFieldSort());
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                "heap LDT not registered").getFieldSort());
         final JTerm locSet =
             tb.setComprehension(new LogicVariable[] { objLV, fieldLV }, reach, o2, tb.var(fieldLV));
 
@@ -179,7 +182,7 @@ public final class JmlTermFactory {
     // region quantification
     private JTerm typerestrictMinAndMax(KeYJavaType kjt, final boolean nullable,
             Iterable<LogicVariable> qvs) {
-        final Type type = kjt.getJavaType();
+        final Type type = Objects.requireNonNull(kjt.getJavaType(), "no operand java type");
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         JTerm res = tb.tt();
         for (var qv : qvs) {
@@ -303,7 +306,7 @@ public final class JmlTermFactory {
             @Nullable KeYJavaType resultType,
             BiFunction<QuantifiableVariable, JTerm, JTerm> combine,
             BiFunction<JTerm, JTerm, JTerm> combineQuantifiedTerms) {
-        final Type type = declsType.getJavaType();
+        final Type type = Objects.requireNonNull(declsType.getJavaType(), "no operand java type");
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
 
         if (resultType == null) {
@@ -384,16 +387,19 @@ public final class JmlTermFactory {
         Iterator<LogicVariable> it = qvs.iterator();
         LogicVariable lv = it.next();
         JTerm t;
-        if (it.hasNext() || !isBoundedNumerical(t1, lv)) {
+        if (it.hasNext() || !isBoundedNumerical(Objects.requireNonNull(t1, "no range"), lv)) {
             // not interval range, create unbounded comprehension term
             ImmutableList<LogicVariable> _qvs =
                 ImmutableList.<LogicVariable>singleton(lv);
             while (it.hasNext()) {
                 _qvs = _qvs.prepend(it.next());
             }
-            t = unbounded.apply(declsType, nullable, _qvs, t1, t2);
+            t = unbounded.apply(declsType, nullable, _qvs,
+                Objects.requireNonNull(t1, "no range"), t2);
         } else {
-            t = bounded.apply(lv, lowerBound(t1, lv), upperBound(t1, lv), t2);
+            final JTerm range = Objects.requireNonNull(t1, "no range");
+            t = bounded.apply(lv, Objects.requireNonNull(lowerBound(range, lv), "no lower bound"),
+                Objects.requireNonNull(upperBound(range, lv), "no upper bound"), t2);
         }
 
         if (resultType == null) {
@@ -485,8 +491,8 @@ public final class JmlTermFactory {
     // endregion
 
 
-    public @NonNull SLExpression arrayRef(SLExpression receiver, String fullyQualifiedName,
-            SLExpression rangeFrom, SLExpression rangeTo) {
+    public @NonNull SLExpression arrayRef(@Nullable SLExpression receiver,
+            String fullyQualifiedName, SLExpression rangeFrom, SLExpression rangeTo) {
         SLExpression result;
         try {
             if (receiver == null) {
@@ -494,8 +500,12 @@ public final class JmlTermFactory {
             } else if (receiver.isType()) {
                 throw exc.createException0(
                     format("Error in array expression: \"{0}\" is a type.", fullyQualifiedName));
-            } else if (!(receiver.getType().getJavaType() instanceof ArrayType
-                    || receiver.getType().getJavaType().equals(PrimitiveType.JAVA_SEQ))) {
+            } else if (!(Objects.requireNonNull(receiver.getType(), "no operand type")
+                    .getJavaType() instanceof ArrayType
+                    || Objects.requireNonNull(
+                        Objects.requireNonNull(receiver.getType(), "no operand type")
+                                .getJavaType(),
+                        "no operand java type").equals(PrimitiveType.JAVA_SEQ))) {
                 throw exc.createException0(
                     format("Cannot access {0} as an array.", receiver.getTerm()));
             }
@@ -510,7 +520,7 @@ public final class JmlTermFactory {
             }
             return result;
         } catch (TermCreationException tce) {
-            throw exc.createException0(tce.getMessage());
+            throw exc.createException0(Objects.requireNonNull(tce.getMessage(), "no message"));
         }
     }
 
@@ -521,17 +531,25 @@ public final class JmlTermFactory {
         if (rangeFrom == null) {
             // We have a star. A star includes all components of an array even
             // those out of bounds. This makes proving easier.
-            JTerm t = tb.allFields(receiver.getTerm());
+            JTerm t = tb.allFields(
+                Objects.requireNonNull(receiver.getTerm(), "operand is no term"));
             result = new SLExpression(t);
         } else if (rangeTo != null) {
             // We have "rangeFrom .. rangeTo"
-            JTerm t = tb.arrayRange(receiver.getTerm(), rangeFrom.getTerm(), rangeTo.getTerm());
+            JTerm t = tb.arrayRange(
+                Objects.requireNonNull(receiver.getTerm(), "operand is no term"),
+                Objects.requireNonNull(rangeFrom.getTerm(), "operand is no term"),
+                Objects.requireNonNull(rangeTo.getTerm(), "operand is no term"));
             result = new SLExpression(t);
         } else {
             // We have a regular array access
-            JTerm t = tb.dotArr(receiver.getTerm(), rangeFrom.getTerm());
-            ArrayType arrayType = (ArrayType) receiver.getType().getJavaType();
-            KeYJavaType elementType = arrayType.getBaseType().getKeYJavaType();
+            JTerm t = tb.dotArr(Objects.requireNonNull(receiver.getTerm(), "operand is no term"),
+                Objects.requireNonNull(rangeFrom.getTerm(), "operand is no term"));
+            ArrayType arrayType = (ArrayType) Objects.requireNonNull(
+                Objects.requireNonNull(receiver.getType(), "no operand type").getJavaType(),
+                "no operand java type");
+            KeYJavaType elementType = Objects.requireNonNull(
+                arrayType.getBaseType().getKeYJavaType(), "no element type");
             result = new SLExpression(t, elementType);
         }
         return result;
@@ -543,12 +561,16 @@ public final class JmlTermFactory {
             @Nullable SLExpression rangeTo) {
         if (rangeFrom == null) {
             // a star
-            return new SLExpression(tb.allFields(receiver.getTerm()));
+            return new SLExpression(tb.allFields(
+                Objects.requireNonNull(receiver.getTerm(), "operand is no term")));
         } else if (rangeTo != null) {
-            JTerm t = tb.seqSub(receiver.getTerm(), rangeFrom.getTerm(), rangeTo.getTerm());
+            JTerm t = tb.seqSub(Objects.requireNonNull(receiver.getTerm(), "operand is no term"),
+                Objects.requireNonNull(rangeFrom.getTerm(), "operand is no term"),
+                Objects.requireNonNull(rangeTo.getTerm(), "operand is no term"));
             return new SLExpression(t);
         } else {
-            return seqGet(receiver.getTerm(), rangeFrom.getTerm());
+            return seqGet(Objects.requireNonNull(receiver.getTerm(), "operand is no term"),
+                Objects.requireNonNull(rangeFrom.getTerm(), "operand is no term"));
         }
     }
 
@@ -604,7 +626,10 @@ public final class JmlTermFactory {
         JTerm aTerm = a.getType() == bool ? tb.convertToFormula(a.getTerm()) : a.getTerm();
         JTerm bTerm = b.getType() == bool ? tb.convertToFormula(b.getTerm()) : b.getTerm();
 
-        JTerm ife = tb.ife(tb.convertToFormula(result.getTerm()), aTerm, bTerm);
+        JTerm ife = tb.ife(
+            tb.convertToFormula(Objects.requireNonNull(result.getTerm(), "condition is no term")),
+            Objects.requireNonNull(aTerm, "operand is no term"),
+            Objects.requireNonNull(bTerm, "operand is no term"));
         if (a.getType() != null && b.getType() != null) {
             if (a.getType().equals(b.getType())) {
                 // same type: obvious case
@@ -615,7 +640,10 @@ public final class JmlTermFactory {
                 if (promotedType != null) {
                     // different, put compatible types: add a cast to make sure that
                     // an int is cast to a float e.g.
-                    result = new SLExpression(tb.cast(promotedType.getSort(), ife), promotedType);
+                    result = new SLExpression(
+                        tb.cast(Objects.requireNonNull(promotedType.getSort(), "no sort of type"),
+                            ife),
+                        promotedType);
                 } else {
                     // TODO this is an NPE in the making
                     result = new SLExpression(ife);
@@ -634,7 +662,8 @@ public final class JmlTermFactory {
                 throw exc.createException0("Casting of type variables not (yet) supported.");
             }
             assert result.isTerm();
-            Sort origSort = result.getTerm().sort();
+            Sort origSort =
+                Objects.requireNonNull(result.getTerm(), "operand is no term").sort();
             Sort targetSort = type.getSort();
 
             if (origSort == JavaDLTheory.FORMULA) {
@@ -652,7 +681,10 @@ public final class JmlTermFactory {
                 }
                 return buildIntCastExpression(type, target);
             } else {
-                return new SLExpression(tb.cast(type.getSort(), result.getTerm()), type);
+                return new SLExpression(
+                    tb.cast(Objects.requireNonNull(type.getSort(), "no sort of type"),
+                        Objects.requireNonNull(result.getTerm(), "operand is no term")),
+                    type);
             }
         } else {
             throw exc.createException0("Please provide a type to cast to.");
@@ -669,7 +701,8 @@ public final class JmlTermFactory {
     public SLExpression antivalence(SLExpression left, SLExpression right) {
         checkSLExpressions(left, right, "<=!=>");
         SLExpression eq = buildEqualityTerm(left, right);
-        return new SLExpression(tb.not(eq.getTerm()));
+        return new SLExpression(
+            tb.not(Objects.requireNonNull(eq.getTerm(), "operand is no term")));
     }
 
     public SLExpression eq(SLExpression left, SLExpression right) {
@@ -678,11 +711,15 @@ public final class JmlTermFactory {
     }
 
     public SLExpression fpEq(SLExpression left, SLExpression right) {
-        return new SLExpression(tb.fpEq(left.getTerm(), right.getTerm()));
+        return new SLExpression(
+            tb.fpEq(Objects.requireNonNull(left.getTerm(), "operand is no term"),
+                Objects.requireNonNull(right.getTerm(), "operand is no term")));
     }
 
     public SLExpression fpNeq(SLExpression left, SLExpression right) {
-        return new SLExpression(tb.not(tb.fpEq(left.getTerm(), right.getTerm())));
+        return new SLExpression(
+            tb.not(tb.fpEq(Objects.requireNonNull(left.getTerm(), "operand is no term"),
+                Objects.requireNonNull(right.getTerm(), "operand is no term"))));
     }
 
 
@@ -690,9 +727,11 @@ public final class JmlTermFactory {
         checkSLExpressions(left, right, "!=");
         SLExpression eq = buildEqualityTerm(left, right);
         if (eq.getType() != null) {
-            return new SLExpression(tb.not(eq.getTerm()), eq.getType());
+            return new SLExpression(
+                tb.not(Objects.requireNonNull(eq.getTerm(), "operand is no term")), eq.getType());
         } else {
-            return new SLExpression(tb.not(eq.getTerm()));
+            return new SLExpression(
+                tb.not(Objects.requireNonNull(eq.getTerm(), "operand is no term")));
         }
     }
 
@@ -705,7 +744,9 @@ public final class JmlTermFactory {
 
     private SLExpression buildEqualityTerm(SLExpression a, SLExpression b) {
         if (a.isTerm() && b.isTerm()) {
-            return new SLExpression(buildEqualityTerm(a.getTerm(), b.getTerm()));
+            return new SLExpression(buildEqualityTerm(
+                Objects.requireNonNull(a.getTerm(), "operand is no term"),
+                Objects.requireNonNull(b.getTerm(), "operand is no term")));
         }
         if (a.isType() && b.isType()) {
             SLExpression typeofExpr;
@@ -722,16 +763,26 @@ public final class JmlTermFactory {
                 typeExpr = a;
             }
 
-            Sort os = typeExpr.getType().getSort();
+            Sort os = Objects.requireNonNull(
+                Objects.requireNonNull(typeExpr.getType(), "no operand type").getSort(),
+                "no sort for operand type");
 
             Function ioFunc =
                 services.getJavaDLTheory().getExactInstanceofSymbol(os, services);
-            JTerm instanceOf = tb.equals(tb.func(ioFunc, typeofExpr.getTerm()), tb.TRUE());
+            JTerm instanceOf = tb.equals(
+                tb.func(ioFunc,
+                    Objects.requireNonNull(typeofExpr.getTerm(), "operand is no term")),
+                tb.TRUE());
             IntegerLDT ldt = services.getTypeConverter().getIntegerLDT();
             if (os == ldt.targetSort()) {
-                JTerm casted = tb.cast(ldt.targetSort(), typeofExpr.getTerm());
-                JTerm inType =
-                    tb.func(ldt.getSpecInBounds(typeExpr.getType().getJavaType()), casted);
+                JTerm casted = tb.cast(ldt.targetSort(),
+                    Objects.requireNonNull(typeofExpr.getTerm(), "operand is no term"));
+                JTerm inType = tb.func(Objects.requireNonNull(
+                    ldt.getSpecInBounds(Objects.requireNonNull(
+                        Objects.requireNonNull(typeExpr.getType(),
+                            "no operand type").getJavaType(),
+                        "no operand java type")),
+                    "no spec in bounds function"), casted);
                 return new SLExpression(tb.and(instanceOf, inType));
             } else {
                 return new SLExpression(instanceOf);
@@ -766,17 +817,22 @@ public final class JmlTermFactory {
 
     public SLExpression bsum(SLExpression a, SLExpression b, SLExpression t, KeYJavaType declsType,
             ImmutableList<LogicVariable> declVars) {
-        KeYJavaType promo = t.getType();
+        KeYJavaType promo = Objects.requireNonNull(t.getType(), "no operand type");
         // services.getTypeConverter().getPromotedType(declsType, t.getType());
 
-        if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
-                || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
+        if (!(Objects.requireNonNull(declsType.getJavaType(), "no operand java type")
+                .equals(PrimitiveType.JAVA_INT)
+                || Objects.requireNonNull(declsType.getJavaType(), "no operand java type")
+                        .equals(PrimitiveType.JAVA_BIGINT))) {
             throw exc.createException0("bounded sum variable must be of type int or \\bigint");
         } else if (declVars.size() != 1) {
             throw exc.createException0("bounded sum must declare exactly one variable");
         }
         LogicVariable qv = declVars.head();
-        JTerm resultTerm = tb.bsum(qv, a.getTerm(), b.getTerm(), t.getTerm());
+        JTerm resultTerm = tb.bsum(qv,
+            Objects.requireNonNull(a.getTerm(), "operand is no term"),
+            Objects.requireNonNull(b.getTerm(), "operand is no term"),
+            Objects.requireNonNull(t.getTerm(), "operand is no term"));
         warnings.add(new PositionedString(
             "The keyword \\bsum is deprecated and will be removed in the future.\n"
                 + "Please use the standard \\sum syntax."));
@@ -798,7 +854,9 @@ public final class JmlTermFactory {
         if (mode == SpecMathMode.JAVA) {
             return buildIntCastExpression(resultType, term);
         } else {
-            KeYJavaType bigint = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+            KeYJavaType bigint = Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT),
+                "\\bigint not registered");
             return new SLExpression(term, bigint);
         }
     }
@@ -806,7 +864,8 @@ public final class JmlTermFactory {
     private SLExpression buildIntCastExpression(KeYJavaType resultType, JTerm term) {
         IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
         try {
-            Function cast = integerLDT.getSpecCast(resultType.getJavaType());
+            Function cast = integerLDT.getSpecCast(
+                Objects.requireNonNull(resultType.getJavaType(), "no operand java type"));
             if (cast != null) {
                 return new SLExpression(tb.func(cast, term), resultType);
             } else {
@@ -821,7 +880,9 @@ public final class JmlTermFactory {
 
     public SLExpression fresh(ImmutableList<SLExpression> list,
             @Nullable Map<LocationVariable, JTerm> atPres) {
-        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        final HeapLDT heapLDT = Objects.requireNonNull(
+            services.getTypeConverter().getHeapLDT(), "heap LDT not registered");
+        final LocationVariable baseHeap = heapLDT.getHeap();
         if (atPres == null || atPres.get(baseHeap) == null) {
             throw exc.createException0("\\fresh not allowed in this context");
         }
@@ -832,14 +893,23 @@ public final class JmlTermFactory {
         for (SLExpression expr : list) {
             if (!expr.isTerm()) {
                 throw exc.createException0("Expected a term, but found: " + expr);
-            } else if (expr.getTerm().sort().extendsTrans(objectSort)) {
+            } else if (Objects.requireNonNull(expr.getTerm(), "operand is no term").sort()
+                    .extendsTrans(objectSort)) {
                 t = tb.and(t,
-                    tb.equals(tb.select(tc.getBooleanLDT().targetSort(), atPres.get(baseHeap),
-                        expr.getTerm(), tb.func(tc.getHeapLDT().getCreated())), tb.FALSE()));
+                    tb.equals(tb.select(tc.getBooleanLDT().targetSort(),
+                        Objects.requireNonNull(atPres.get(baseHeap), "no heap in \\fresh"),
+                        Objects.requireNonNull(expr.getTerm(), "operand is no term"),
+                        tb.func(heapLDT.getCreated())), tb.FALSE()));
                 // add non-nullness (bug #1364)
-                t = tb.and(t, tb.not(tb.equals(expr.getTerm(), tb.NULL())));
-            } else if (expr.getTerm().sort().extendsTrans(tc.getLocSetLDT().targetSort())) {
-                t = tb.and(t, tb.subset(expr.getTerm(), tb.freshLocs(atPres.get(baseHeap))));
+                t = tb.and(t,
+                    tb.not(tb.equals(Objects.requireNonNull(expr.getTerm(), "operand is no term"),
+                        tb.NULL())));
+            } else if (Objects.requireNonNull(expr.getTerm(), "operand is no term").sort()
+                    .extendsTrans(tc.getLocSetLDT().targetSort())) {
+                t = tb.and(t, tb.subset(
+                    Objects.requireNonNull(expr.getTerm(), "operand is no term"),
+                    tb.freshLocs(Objects.requireNonNull(atPres.get(baseHeap),
+                        "no heap in \\fresh"))));
             } else {
                 throw exc.createException0("Wrong type: " + expr);
             }
@@ -848,7 +918,7 @@ public final class JmlTermFactory {
     }
 
     public SLExpression invFor(SLExpression param) {
-        JTerm obj = param.getTerm();
+        JTerm obj = Objects.requireNonNull(param.getTerm(), "operand is no term");
         return new SLExpression(tb.inv(obj));
     }
 
@@ -858,7 +928,7 @@ public final class JmlTermFactory {
     }
 
     public SLExpression invFreeFor(SLExpression param) {
-        JTerm obj = param.getTerm();
+        JTerm obj = Objects.requireNonNull(param.getTerm(), "operand is no term");
         return new SLExpression(tb.invFree(obj));
     }
 
@@ -873,7 +943,9 @@ public final class JmlTermFactory {
     }
 
     public SLExpression index() {
-        final KeYJavaType t = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+        final KeYJavaType t = Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT),
+            "int type not registered");
         return new SLExpression(tb.index(), t);
     }
 
@@ -888,7 +960,8 @@ public final class JmlTermFactory {
     public @NonNull SLExpression createInv(@Nullable JTerm selfVar, KeYJavaType targetType) {
         final boolean isStatic = selfVar == null;
         assert targetType != null || !isStatic;
-        final JTerm result = isStatic ? tb.staticInv(targetType) : tb.inv(selfVar);
+        final JTerm result = isStatic ? tb.staticInv(targetType)
+                : tb.inv(Objects.requireNonNull(selfVar, "no target of instance invariant"));
         return new SLExpression(result);
     }
 
@@ -899,23 +972,30 @@ public final class JmlTermFactory {
     public @NonNull SLExpression createInvFree(@Nullable JTerm selfVar, KeYJavaType targetType) {
         final boolean isStatic = selfVar == null;
         assert targetType != null || !isStatic;
-        final JTerm result = isStatic ? tb.staticInvFree(targetType) : tb.invFree(selfVar);
+        final JTerm result = isStatic ? tb.staticInvFree(targetType)
+                : tb.invFree(Objects.requireNonNull(selfVar, "no target of instance invariant"));
         return new SLExpression(result);
     }
 
     public SLExpression createSeqDef(SLExpression a, SLExpression b, SLExpression t,
             KeYJavaType declsType, ImmutableList<? extends QuantifiableVariable> declVars) {
-        if (!(declsType.getJavaType().equals(PrimitiveType.JAVA_INT)
-                || declsType.getJavaType().equals(PrimitiveType.JAVA_BIGINT))) {
+        if (!(Objects.requireNonNull(declsType.getJavaType(), "no operand java type")
+                .equals(PrimitiveType.JAVA_INT)
+                || Objects.requireNonNull(declsType.getJavaType(), "no operand java type")
+                        .equals(PrimitiveType.JAVA_BIGINT))) {
             throw exc.createException0(
                 "sequence definition variable must be of type int or \\bigint");
         } else if (declVars.size() != 1) {
             throw exc.createException0("sequence definition must declare exactly one variable");
         }
         QuantifiableVariable qv = declVars.head();
-        JTerm tt = t.getTerm();
-        JTerm resultTerm = tb.seqDef(qv, a.getTerm(), b.getTerm(), ensureTerm(tt));
-        final KeYJavaType seqtype = services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
+        JTerm tt = Objects.requireNonNull(t.getTerm(), "operand is no term");
+        JTerm resultTerm = tb.seqDef(qv,
+            Objects.requireNonNull(a.getTerm(), "operand is no term"),
+            Objects.requireNonNull(b.getTerm(), "operand is no term"), ensureTerm(tt));
+        final KeYJavaType seqtype = Objects.requireNonNull(
+            services.getJavaInfo().getPrimitiveKeYJavaType("\\seq"),
+            "sequence type not registered");
         return new SLExpression(resultTerm, seqtype);
     }
 
@@ -942,7 +1022,7 @@ public final class JmlTermFactory {
 
     public JTerm createStoreRef(SLExpression expr) {
         if (expr.isTerm()) {
-            JTerm t = expr.getTerm();
+            JTerm t = Objects.requireNonNull(expr.getTerm(), "operand is no term");
             LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
             if (t.sort().equals(locSetLDT.targetSort())
                     || t.op().equals(locSetLDT.getSingleton())) {
@@ -960,10 +1040,11 @@ public final class JmlTermFactory {
         ImmutableList<JTerm> singletons = ImmutableList.nil();
         for (SLExpression expr : exprList) {
             if (expr.isTerm()) {
-                JTerm t = expr.getTerm();
+                JTerm t = Objects.requireNonNull(expr.getTerm(), "operand is no term");
                 LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
                 if (!t.op().equals(locSetLDT.getSingleton())) {
-                    HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+                    HeapLDT heapLDT = Objects.requireNonNull(
+                        services.getTypeConverter().getHeapLDT(), "heap LDT not registered");
                     if (heapLDT.getSortOfSelect(t.op()) != null) {
                         final JTerm objTerm = t.sub(1);
                         final JTerm fieldTerm = t.sub(2);
@@ -1009,7 +1090,9 @@ public final class JmlTermFactory {
     }
 
     public SLExpression seqConcat(JTerm seq1, JTerm seq2) {
-        final KeYJavaType seqtype = services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
+        final KeYJavaType seqtype = Objects.requireNonNull(
+            services.getJavaInfo().getPrimitiveKeYJavaType("\\seq"),
+            "sequence type not registered");
         return new SLExpression(tb.seqConcat(seq1, seq2), seqtype);
     }
 
@@ -1021,13 +1104,16 @@ public final class JmlTermFactory {
         ImmutableList<JTerm> terms = ImmutableList.nil();
         for (SLExpression expr : exprList) {
             if (expr.isTerm()) {
-                JTerm t = ensureTerm(expr.getTerm());
+                JTerm t = ensureTerm(
+                    Objects.requireNonNull(expr.getTerm(), "operand is no term"));
                 terms = terms.append(t);
             } else {
                 throw exc.createException0("Not a term: " + expr);
             }
         }
-        final KeYJavaType seqtype = services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
+        final KeYJavaType seqtype = Objects.requireNonNull(
+            services.getJavaInfo().getPrimitiveKeYJavaType("\\seq"),
+            "sequence type not registered");
         return new SLExpression(tb.seq(terms), seqtype);
     }
 
@@ -1050,9 +1136,13 @@ public final class JmlTermFactory {
         return createBreaks(term, label);
     }
 
+    // NullAway: a null label denotes "no target label"; Pair cannot express a @Nullable type
+    // argument (its type variables have no @Nullable upper bound)
+    @SuppressWarnings("NullAway")
     public @NonNull Pair<Label, JTerm> createBreaks(@Nullable JTerm term, @Nullable String label) {
         JTerm formula = term == null ? tb.tt() : tb.convertToFormula(term);
-        return new Pair<>(label == null ? null : new ProgramElementName(label), formula);
+        Label labelName = label == null ? null : new ProgramElementName(label);
+        return new Pair<>(labelName, formula);
     }
 
 
@@ -1060,8 +1150,8 @@ public final class JmlTermFactory {
     public JTerm signalsOnly(ImmutableList<KeYJavaType> signalsonly, LocationVariable excVar) {
         JTerm result = tb.ff();
         for (KeYJavaType kjt : signalsonly) {
-            Function instance =
-                services.getJavaDLTheory().getInstanceofSymbol(kjt.getSort(), services);
+            Function instance = services.getJavaDLTheory().getInstanceofSymbol(
+                Objects.requireNonNull(kjt.getSort(), "no sort of exception type"), services);
             result = tb.or(result, tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()));
         }
 
@@ -1078,17 +1168,20 @@ public final class JmlTermFactory {
             replaceMap.put(eVar, excVar);
             OpReplacer excVarReplacer = new OpReplacer(replaceMap, services.getTermFactory());
 
-            Sort os = excType.getSort();
+            Sort os = Objects.requireNonNull(excType.getSort(), "no sort of exception type");
             Function instance = services.getJavaDLTheory().getInstanceofSymbol(os, services);
 
-            result = tb.imp(tb.equals(tb.func(instance, tb.var(excVar)), tb.TRUE()),
+            result = tb.imp(tb.equals(tb.func(instance,
+                tb.var(Objects.requireNonNull(excVar, "no exception variable"))), tb.TRUE()),
                 tb.convertToFormula(excVarReplacer.replace(result)));
         }
         return result;
     }
 
     public Pair<IObserverFunction, JTerm> represents(SLExpression lhs, JTerm t) {
-        return new Pair<>((IObserverFunction) lhs.getTerm().op(), t);
+        return new Pair<>(
+            (IObserverFunction) Objects.requireNonNull(lhs.getTerm(), "operand is no term").op(),
+            t);
     }
 
     /**
@@ -1102,25 +1195,27 @@ public final class JmlTermFactory {
      */
     public TranslatedDependencyContract depends(SLExpression lhs, JTerm rhs,
             @Nullable SLExpression mby) {
-        LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
+        LocationVariable heap = Objects.requireNonNull(
+            services.getTypeConverter().getHeapLDT(), "heap LDT not registered").getHeap();
 
         if (!lhs.isTerm()) {
             throw exc.createException0(
                 "Left hand side of depends clause should be a term, given:" + lhs);
         }
+        final JTerm lhsTerm = Objects.requireNonNull(lhs.getTerm(), "operand is no term");
 
-        if (!(lhs.getTerm().op() instanceof IObserverFunction)) {
+        if (!(lhsTerm.op() instanceof IObserverFunction)) {
             throw exc.createException0(
                 "Left hand side of depends clause should be of type IObserverFunction, given:"
-                    + lhs.getTerm().op().getClass());
+                    + lhsTerm.op().getClass());
         }
 
-        if (lhs.getTerm().sub(0).op() != heap) {
+        if (lhsTerm.sub(0).op() != heap) {
             throw exc.createException0("Depends clause should be heap dependent of heap " + heap
-                + ", given" + lhs.getTerm().sub(0).op());
+                + ", given" + lhsTerm.sub(0).op());
         }
 
-        return new TranslatedDependencyContract((IObserverFunction) lhs.getTerm().op(), rhs,
+        return new TranslatedDependencyContract((IObserverFunction) lhsTerm.op(), rhs,
             mby == null ? null : mby.getTerm());
     }
 
@@ -1262,7 +1357,7 @@ public final class JmlTermFactory {
             @NonNull String shortName) {
         shortName = shortName.replace("\\", "");
         final Namespace<Function> fns = services.getNamespaces().functions();
-        final Sort sort = type.getSort();
+        final Sort sort = Objects.requireNonNull(type.getSort(), "no sort of type");
         int x = -1;
         Name name;
         do {
@@ -1322,10 +1417,11 @@ public final class JmlTermFactory {
                 if (!expr.isTerm()) {
                     throw exc.createException0("Expecting a term here, not: " + expr);
                 }
-                args[i++] = expr.getTerm();
+                args[i++] = Objects.requireNonNull(expr.getTerm(), "operand is no term");
             }
 
             try {
+                @SuppressWarnings("NullAway") // intentional: no bound variables are used here
                 JTerm resultTerm = tb.func(function, args, null);
                 final KeYJavaType type =
                     services.getTypeConverter().getIntegerLDT().targetSort() == resultTerm.sort()
@@ -1386,7 +1482,7 @@ public final class JmlTermFactory {
     private @NonNull JTerm typerestrict(
             @NonNull KeYJavaType kjt, final boolean nullable,
             Iterable<LogicVariable> qvs) {
-        final Type type = kjt.getJavaType();
+        final Type type = Objects.requireNonNull(kjt.getJavaType(), "no operand java type");
         final int arrayDepth = JMLSpecExtractor.arrayDepth(type, services);
         JTerm res = tb.tt();
         for (var qv : qvs) {

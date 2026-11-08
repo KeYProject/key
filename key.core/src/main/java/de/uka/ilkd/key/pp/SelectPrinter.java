@@ -45,7 +45,7 @@ class SelectPrinter extends FieldPrinter {
      * The base type of an array-typed field term is always present when its KeY Java type is
      * compared; the dereference of the (nullable) base type is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void printSelect(LogicPrinter lp, JTerm t, @Nullable JTerm tacitHeap) {
         assert t.boundVars().isEmpty();
         assert t.arity() == 3;
@@ -144,7 +144,7 @@ class SelectPrinter extends FieldPrinter {
      * The attribute of the field term is always registered in the Java info of the services; the
      * dereference of the (nullable) program variable is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private Sort getFieldSort(JTerm fieldTerm) {
         String lookup = JavaDLFieldNames.toJava(fieldTerm.op().name());
         ProgramVariable progVar = services.getJavaInfo().getAttribute(lookup);

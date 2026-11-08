@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -65,8 +66,10 @@ public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature {
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Monomial first = Monomial.create(mult1.toTerm(app, pos, goal, mState), services);
-        final Monomial second = Monomial.create(mult2.toTerm(app, pos, goal, mState), services);
+        final Monomial first = Monomial
+                .create(Objects.requireNonNull(mult1.toTerm(app, pos, goal, mState)), services);
+        final Monomial second = Monomial
+                .create(Objects.requireNonNull(mult2.toTerm(app, pos, goal, mState)), services);
         return getInEquations(goal, mState).contains(variables(first, second));
     }
 

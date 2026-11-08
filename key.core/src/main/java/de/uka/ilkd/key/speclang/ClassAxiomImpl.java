@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.speclang;
 
 
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
@@ -61,7 +62,10 @@ public final class ClassAxiomImpl extends ClassAxiom {
         this.originalSelfVar = selfVar;
         final OpCollector oc = new OpCollector();
         originalRep.execPostOrder(oc);
-        this.isStatic = !oc.contains(originalSelfVar);
+        @SuppressWarnings("NullAway") // contains() delegates to HashSet.contains(), which is
+                                      // null-tolerant: static axioms have no self variable
+        final boolean containsSelf = oc.contains(originalSelfVar);
+        this.isStatic = !containsSelf;
     }
 
 
@@ -99,8 +103,10 @@ public final class ClassAxiomImpl extends ClassAxiom {
             if (other.originalSelfVar == null) {
                 return false;
             } else {
-                return originalSelfVar.getKeYJavaType()
-                        .equals(other.originalSelfVar.getKeYJavaType());
+                return Objects.requireNonNull(originalSelfVar.getKeYJavaType(),
+                    "no self variable type")
+                        .equals(Objects.requireNonNull(other.originalSelfVar.getKeYJavaType(),
+                            "no self variable type"));
             }
         }
         return true;
@@ -125,7 +131,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return visibility;
     }
 
@@ -134,9 +140,11 @@ public final class ClassAxiomImpl extends ClassAxiom {
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
         ImmutableList<LocationVariable> replaceVars = ImmutableList.nil();
-        replaceVars = replaceVars.append(services.getTypeConverter().getHeapLDT().getHeap());
+        replaceVars = replaceVars.append(Objects.requireNonNull(
+            services.getTypeConverter().getHeapLDT(), "heap LDT").getHeap());
         if (!isStatic) {
-            replaceVars = replaceVars.append(originalSelfVar);
+            replaceVars = replaceVars.append(Objects.requireNonNull(originalSelfVar,
+                "no self variable for instance axiom"));
         }
         JTerm rep = services.getTermBuilder().convertToFormula(originalRep);
         TacletGenerator TG = TacletGenerator.getInstance();

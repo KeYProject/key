@@ -49,7 +49,7 @@ public class ProofBundleSaver extends ProofSaver {
      * init config is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected void save(Path file) throws IOException {
         // get the FileRepo from the InitConfig of the Proof
         FileRepo repo = proof.getInitConfig().getFileRepo();

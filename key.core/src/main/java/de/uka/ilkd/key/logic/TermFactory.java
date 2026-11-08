@@ -85,7 +85,7 @@ public final class TermFactory {
 
     public JTerm createTerm(Operator op, JTerm[] subs,
             @Nullable ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+            @Nullable ImmutableArray<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
 

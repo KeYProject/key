@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
@@ -76,7 +77,9 @@ public class DefaultSMTSettings implements SMTSettings {
 
     @Override
     public Path getSMTTemporaryFolder() {
-        return PathConfig.currentPaths.keyConfigDir.resolve("smt_formula");
+        return Objects.requireNonNull(PathConfig.currentPaths,
+            "key configuration paths not set; call setBaseKeyConfigDir first").keyConfigDir
+                .resolve("smt_formula");
     }
 
     @Override
@@ -87,7 +90,8 @@ public class DefaultSMTSettings implements SMTSettings {
                 return taclets;
             }
 
-            for (Taclet taclet : proof.getInitConfig().activatedTaclets()) {
+            for (Taclet taclet : Objects.requireNonNull(proof.getInitConfig(),
+                "the proof carries an init config while SMT translation runs").activatedTaclets()) {
                 if (pdSettings.getSupportedTaclets().contains(taclet.name().toString(), true)) {
                     taclets.add(taclet);
                 }

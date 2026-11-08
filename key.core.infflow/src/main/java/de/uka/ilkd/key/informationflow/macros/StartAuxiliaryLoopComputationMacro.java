@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.informationflow.macros;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
@@ -78,13 +80,17 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         if (!(app instanceof InfFlowLoopInvariantBuiltInRuleApp loopInvRuleApp)) {
             return false;
         }
-        final LoopSpecification loopInv = loopInvRuleApp.getSpec();
+        final LoopSpecification loopInv =
+            Objects.requireNonNull(loopInvRuleApp.getSpec(), "loop invariant of the rule app");
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
             return false;
         }
-        final ExecutionContext executionContext = loopInvRuleApp.getExecutionContext();
-        final JTerm guardTerm = loopInvRuleApp.getGuard();
+        final ExecutionContext executionContext =
+            Objects.requireNonNull(loopInvRuleApp.getExecutionContext(),
+                "execution context of the rule app");
+        final JTerm guardTerm =
+            Objects.requireNonNull(loopInvRuleApp.getGuard(), "guard term of the rule app");
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
             ifVars.c2, executionContext, guardTerm, services);
@@ -115,14 +121,18 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         }
         final InitConfig initConfig = env.getInitConfigForEnvironment();
 
-        final LoopSpecification loopInv = loopInvRuleApp.getSpec();
+        final LoopSpecification loopInv =
+            Objects.requireNonNull(loopInvRuleApp.getSpec(), "loop invariant of the rule app");
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
             throw new NullPointerException("No information flow proof obligation variables for "
                 + "the rule application.");
         }
-        final ExecutionContext executionContext = loopInvRuleApp.getExecutionContext();
-        final JTerm guardTerm = loopInvRuleApp.getGuard();
+        final ExecutionContext executionContext =
+            Objects.requireNonNull(loopInvRuleApp.getExecutionContext(),
+                "execution context of the rule app");
+        final JTerm guardTerm =
+            Objects.requireNonNull(loopInvRuleApp.getGuard(), "guard term of the rule app");
 
         final LoopInvExecutionPO loopInvExecPO = new LoopInvExecutionPO(initConfig, loopInv,
             ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(), goals.head(), executionContext,

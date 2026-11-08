@@ -6,6 +6,7 @@ package de.uka.ilkd.key.pp;
 
 
 import java.util.ArrayDeque;
+import java.util.Objects;
 
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
@@ -351,9 +352,10 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
          */
         @Override
         @SuppressWarnings("nullness:dereference.of.nullable")
-        public void mark(Mark pair) {
-            MarkType markType = pair.type;
-            int parameter = pair.parameter;
+        public void mark(@Nullable Mark pair) {
+            Mark mark = Objects.requireNonNull(pair, "a mark must be present");
+            MarkType markType = mark.type;
+            int parameter = mark.parameter;
 
             // IMPLEMENTATION NOTE
             //

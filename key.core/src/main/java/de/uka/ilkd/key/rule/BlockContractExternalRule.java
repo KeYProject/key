@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
@@ -190,24 +192,32 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new BlockContractExternalBuiltInRuleApp(this, pos);
+    public IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services) {
+        return new BlockContractExternalBuiltInRuleApp<>(this,
+            Objects.requireNonNull(pos, "rule application needs a position"));
     }
 
     /// Not applicable for information, but this is excluded by using the right profile.
+    // The self term is absent for static methods and {@code setInstantiationSelf} (in the
+    // out-of-scope speclang package) stores it as-is; the conditions builders null-check it.
+    @SuppressWarnings("NullAway")
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final RuleApp ruleApp)
             throws RuleAbortException {
         var application = (BlockContractExternalBuiltInRuleApp<?>) ruleApp;
 
-        final Instantiation instantiation =
-            instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
-        final BlockContract contract = application.getContract();
+        final PosInOccurrence pio = Objects.requireNonNull(application.posInOccurrence(),
+            "block contract app requires an occurrence");
+        final Instantiation instantiation = Objects.requireNonNull(
+            instantiate((JTerm) pio.subTerm(), goal), "no instantiation for block contract");
+        final BlockContract contract = Objects.requireNonNull(application.getContract(),
+            "no block contract set for rule application");
         contract.setInstantiationSelf(instantiation.self());
         assert contract.getBlock().equals(instantiation.statement());
 
         final var services = goal.getOverlayServices();
-        final List<LocationVariable> heaps = application.getHeapContext();
+        final List<LocationVariable> heaps = Objects.requireNonNull(application.getHeapContext(),
+            "no heap context for rule application");
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
@@ -237,8 +247,11 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule
         configurator.setUpUsageGoal(result.head(), updates,
             ArrayUtil.add(assumptions, freePostcondition));
 
-        final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
-                .getInitConfig().getJustifInfo().getJustification(this);
+        final InitConfig initConfig = Objects.requireNonNull(goal.proof().getInitConfig(),
+            "no initial configuration");
+        final ComplexRuleJustificationBySpec cjust = Objects.requireNonNull(
+            (ComplexRuleJustificationBySpec) initConfig.getJustifInfo().getJustification(this),
+            "no rule justification for rule application");
         for (Contract c : contract.getFunctionalContracts()) {
             cjust.add(application, new RuleJustificationBySpec(c));
         }

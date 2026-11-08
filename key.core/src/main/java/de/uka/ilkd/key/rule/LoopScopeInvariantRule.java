@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -40,6 +41,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -124,13 +126,14 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * {@inheritDoc}
      */
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         if (!super.isApplicable(goal, pio)) {
             return false;
         }
 
-        final JTerm progPost =
-            splitUpdates((JTerm) pio.subTerm(), goal.proof().getServices()).second;
+        final JTerm progPost = splitUpdates(
+            (JTerm) Objects.requireNonNull(pio, "pio").subTerm(),
+            goal.proof().getServices()).second;
         final var kind = ((JModality) progPost.op()).<JModality.JavaModalityKind>kind();
 
         return !kind.transaction();
@@ -191,9 +194,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             final TermLabelState termLabelState, Goal initiallyGoal, final Instantiation inst,
             final JTerm invTerm, JTerm reachableState) {
         initiallyGoal.setBranchLabel("Invariant Initially Valid");
+        final PosInOccurrence pio = Objects.requireNonNull(ruleApp.posInOccurrence(),
+            "rule application needs a position in occurrence");
         initiallyGoal.changeFormula(
             initFormula(termLabelState, inst, invTerm, reachableState, services, initiallyGoal),
-            ruleApp.posInOccurrence());
+            pio);
     }
 
     /**
@@ -235,7 +240,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
         presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
         presrvAndUCGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);
-        presrvAndUCGoal.changeFormula(new SequentFormula(newFormula), ruleApp.posInOccurrence());
+        final PosInOccurrence pio = Objects.requireNonNull(ruleApp.posInOccurrence(),
+            "rule application needs a position in occurrence");
+        presrvAndUCGoal.changeFormula(new SequentFormula(newFormula), pio);
     }
 
     // -------------------------------------------------------------------------
@@ -249,7 +256,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @return The variable used as a loop scope index.
      */
     private ProgramVariable loopScopeIdxVar(Services services) {
-        final KeYJavaType booleanType = services.getJavaInfo().getKeYJavaType("boolean");
+        final KeYJavaType booleanType = Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType("boolean"), "no KeYJavaType for 'boolean'");
 
         final ProgramVariable loopScopeIdxVar = //
             KeYJavaASTFactory.localVariable( //
@@ -294,7 +302,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             ifBody = KeYJavaASTFactory.labeledStatement(label, ifBody, ifBody.getPositionInfo());
         }
 
-        final Statement newIf = KeYJavaASTFactory.ifThen(loop.getGuardExpression(), ifBody);
+        final Statement newIf = KeYJavaASTFactory.ifThen(
+            Objects.requireNonNull(loop.getGuardExpression(), "loop has no guard expression"),
+            ifBody);
 
         final LoopScopeBlock loopScope =
             new LoopScopeBlock(loopScopeIdxVar, KeYJavaASTFactory.block(newIf));
@@ -412,9 +422,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         Optional<Label> loopLabel = Optional.empty();
         Statement stmtToRepl = whileLoop;
 
+        final PosInOccurrence pio = Objects.requireNonNull(ruleApp.posInOccurrence(),
+            "rule application needs a position in occurrence");
         ImmutableArray<ProgramPrefix> prefixElems =
             ((StatementBlock) TermBuilder
-                    .goBelowUpdates((JTerm) ruleApp.posInOccurrence().subTerm())
+                    .goBelowUpdates((JTerm) pio.subTerm())
                     .javaBlock().program()).getPrefixElements();
 
         if (prefixElems.size() > 0

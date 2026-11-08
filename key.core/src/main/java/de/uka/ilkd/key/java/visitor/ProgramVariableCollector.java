@@ -67,7 +67,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference
      * of the hoisted look-up is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected void collectHeapVariables() {
         HeapLDT ldt = services.getTypeConverter().getHeapLDT();
         for (LocationVariable heap : ldt.getAllHeaps()) {
@@ -127,7 +127,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * dereferences are suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void performActionOnLoopInvariant(LoopSpecification x) {
         TermProgramVariableCollector tpvc = services.getFactory().create(services);
         JTerm selfTerm = x.getInternalSelfTerm();
@@ -201,7 +201,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * dereferences are suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void performActionOnBlockContract(BlockContract x) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -253,7 +253,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * dereferences are suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void performActionOnLoopContract(LoopContract x) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {

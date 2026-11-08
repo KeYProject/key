@@ -76,7 +76,7 @@ public class InformationWindow extends JDialog {
      * with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid" })
+        "nullness:method.invocation.invalid", "NullAway" })
     public InformationWindow(Dialog parent, SMTSolver solver, Collection<Information> information,
             String title) {
         super(parent);

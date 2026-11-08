@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -11,6 +13,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -51,11 +54,13 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
                 if (ta.taclet().getRuleSets().contains(new RuleSet(ruleSetName))) {
                     final Object svInstValue = ta.instantiations().lookupValue(schemaVar);
                     if (svInstValue instanceof JTerm svInstAsTerm) {
-                        return term.toTerm(app, pos, goal, mState).op() == svInstAsTerm.op();
+                        final Term introducedTerm =
+                            Objects.requireNonNull(term.toTerm(app, pos, goal, mState));
+                        return introducedTerm.op() == svInstAsTerm.op();
                     }
                 }
             }
-            n = n.parent();
+            n = Objects.requireNonNull(n.parent());
         }
         return false;
     }

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -44,9 +46,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
         final var findFormula = pos.sequentFormula();
         final boolean findIsInAntec = pos.isInAntec();
 
-        assert list != null;
-
-        for (final AssumesFormulaInstantiation aList : list) {
+        for (final AssumesFormulaInstantiation aList : Objects.requireNonNull(list)) {
             final AssumesFormulaInstSeq instantiationOfAssumesFormula =
                 (AssumesFormulaInstSeq) aList;
             assert instantiationOfAssumesFormula != null;

@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -24,7 +25,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Modality;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
@@ -44,12 +44,11 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     }
 
     @Override
-    public @Nullable JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
+    public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         final JTerm loopTerm = term.sub(0);
-        final LoopSpecification loopSpec = MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
-        if (loopSpec == null) {
-            return null;
-        }
+        final LoopSpecification loopSpec = Objects.requireNonNull(
+            MiscTools.getSpecForTermWithLoopStmt(loopTerm, services),
+            "no loop specification for heap anonymizing update");
 
         final JTerm anonHeapTerm = term.sub(1);
         final JTerm anonSavedHeapTerm = term.sub(2);
@@ -93,22 +92,33 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         heapContext.forEach(heap -> mods.put(heap,
             loopSpec.getModifiable(heap, loopSpec.getInternalSelfTerm(), atPres, services)));
 
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT");
 
         JTerm anonUpdate = tb.skip();
 
-        anonUpdate = tb.parallel(anonUpdate, createElementaryAnonUpdate(heapLDT.getHeap(),
-            anonHeapTerm, mods.get(heapLDT.getHeap()), services));
+        final LocationVariable heap = heapLDT.getHeap();
+        anonUpdate = tb.parallel(anonUpdate, createElementaryAnonUpdate(heap, anonHeapTerm,
+            Objects.requireNonNull(mods.get(heap), "no modifiable clause for heap " + heap),
+            services));
 
         if (isTransaction) {
-            anonUpdate = tb.parallel(anonUpdate, createElementaryAnonUpdate(heapLDT.getSavedHeap(),
-                anonHeapTerm, mods.get(heapLDT.getSavedHeap()), services));
+            final LocationVariable savedHeap = heapLDT.getSavedHeap();
+            anonUpdate = tb.parallel(anonUpdate,
+                createElementaryAnonUpdate(savedHeap, anonHeapTerm,
+                    Objects.requireNonNull(mods.get(savedHeap),
+                        "no modifiable clause for heap " + savedHeap),
+                    services));
         }
 
         if (isPermissions) {
-            anonUpdate =
-                tb.parallel(anonUpdate, createElementaryAnonUpdate(heapLDT.getPermissionHeap(),
-                    anonPermissionsHeapTerm, mods.get(heapLDT.getPermissionHeap()), services));
+            final LocationVariable permissionHeap = Objects.requireNonNull(
+                heapLDT.getPermissionHeap(), "no permission heap available");
+            anonUpdate = tb.parallel(anonUpdate,
+                createElementaryAnonUpdate(permissionHeap, anonPermissionsHeapTerm,
+                    Objects.requireNonNull(mods.get(permissionHeap),
+                        "no modifiable clause for heap " + permissionHeap),
+                    services));
         }
 
         return anonUpdate;

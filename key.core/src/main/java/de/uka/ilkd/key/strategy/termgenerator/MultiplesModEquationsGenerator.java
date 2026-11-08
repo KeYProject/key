@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -63,8 +64,10 @@ public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
             MutableState mState) {
         final Services services = goal.proof().getServices();
 
-        final Monomial sourceM = Monomial.create(source.toTerm(app, pos, goal, mState), services);
-        final Monomial targetM = Monomial.create(target.toTerm(app, pos, goal, mState), services);
+        final Monomial sourceM = Monomial.create(
+            Objects.requireNonNull(source.toTerm(app, pos, goal, mState)), services);
+        final Monomial targetM = Monomial.create(
+            Objects.requireNonNull(target.toTerm(app, pos, goal, mState)), services);
 
         if (targetM.divides(sourceM)) {
             return toIterator(targetM.reduce(sourceM).toTerm(services));

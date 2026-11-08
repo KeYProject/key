@@ -188,7 +188,8 @@ public class EngineState {
             /*
              * The first subtree of the previous goal is closed. Try with other subtrees.
              */
-            rootNodeForSearch = goUpUntilOpen(lastSetGoalNode);
+            rootNodeForSearch = goUpUntilOpen(
+                Objects.requireNonNull(lastSetGoalNode, "no previous goal node is set"));
             newGoal = null;
         }
 
@@ -222,16 +223,19 @@ public class EngineState {
              * There should always be a non-closed parent since we check whether the proof is closed
              * at the beginning.
              */
-            currNode = currNode.parent();
+            currNode = Objects.requireNonNull(currNode.parent(),
+                "proof tree inconsistent: no non-closed parent found");
         }
 
         return currNode;
     }
 
-    private @Nullable Goal findGoalFromRoot(final Node rootNode, boolean checkAutomatic) {
+    private @Nullable Goal findGoalFromRoot(final @Nullable Node rootNode,
+            boolean checkAutomatic) {
         final Deque<Node> choices = new LinkedList<>();
 
         Goal result = null;
+        @Nullable
         Node node = rootNode;
 
         loop: while (node != null) {
@@ -292,8 +296,11 @@ public class EngineState {
     }
 
     public Sort toSort(String sortName) throws ScriptException {
-        return (getFirstOpenAutomaticGoal() == null ? getProof().getServices().getNamespaces()
-                : getFirstOpenAutomaticGoal().getLocalNamespaces()).lookupSortOrAlias(sortName);
+        return Objects.requireNonNull((getFirstOpenAutomaticGoal() == null
+                ? getProof().getServices().getNamespaces()
+                : getFirstOpenAutomaticGoal().getLocalNamespaces())
+                .lookupSortOrAlias(sortName),
+            "sort '" + sortName + "' not found");
     }
 
     public Sequent toSequent(String sequent) throws ParserException, ScriptException {
@@ -319,7 +326,7 @@ public class EngineState {
         return observer;
     }
 
-    public void setObserver(Consumer<ProofScriptEngine.Message> observer) {
+    public void setObserver(@Nullable Consumer<ProofScriptEngine.Message> observer) {
         this.observer = observer;
     }
 

@@ -281,7 +281,7 @@ class SettingsTreeNode implements TreeNode {
      * renders it under the "KeY Settings" caption, while the constructor declares a non-null
      * provider, suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "nullness:argument.type.incompatible", "NullAway" })
     public SettingsTreeNode(List<SettingsProvider> providers) {
         this(null, providers);
     }

@@ -98,10 +98,11 @@ public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCo
      * A loop without an enclosing method has no method context, so {@code pm}, {@code kjt} and
      * {@code selfTerm} are passed as {@code null}; {@link LoopSpecImpl} tolerates a missing
      * method context for a freshly created skeleton invariant (the interactive editor only
-     * fills it in once a method is chosen), while the constructor declares non-null parameters,
-     * suppressed with a scoped key.
+     * fills it in once a method is chosen), while the 5-argument constructor still declares
+     * non-null parameters (widening {@code kjt} would ripple into the non-null
+     * {@code getKJT()} interface contract), suppressed with scoped keys.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "nullness:argument.type.incompatible", "NullAway" })
     private static LoopSpecification newDefaultSpec(While loop, @Nullable MethodFrame mf,
             Services services) {
         IProgramMethod pm = mf == null ? null : mf.getProgramMethod();

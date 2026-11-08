@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class pretty-prints information using line breaks and indentation. For instance, it can be
@@ -380,7 +381,7 @@ public class Layouter<M> {
      * @return this
      *
      */
-    public Layouter<M> mark(M o) {
+    public Layouter<M> mark(@Nullable M o) {
         if (delimStack.isEmpty()) {
             out.mark(o);
         } else {
@@ -804,9 +805,9 @@ public class Layouter<M> {
 
     /** A token corresponding to a <code>mark</code> call. */
     private static class MarkToken<M> extends StreamToken<M> {
-        protected final M o;
+        protected final @Nullable M o;
 
-        MarkToken(M o) {
+        MarkToken(@Nullable M o) {
             this.o = o;
         }
 

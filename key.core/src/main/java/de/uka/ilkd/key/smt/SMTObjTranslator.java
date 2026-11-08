@@ -254,25 +254,28 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates the arr function.
      */
     private void createArrFunction() {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         String id = ARR_FUNCTION_NAME;
         List<SMTSort> domain = new LinkedList<>();
-        domain.add(sorts.get(BINT_SORT));
-        SMTSort image = sorts.get(FIELD_SORT);
+        domain.add(Objects.requireNonNull(sorts.get(BINT_SORT), "BINT_SORT sort"));
+        SMTSort image = Objects.requireNonNull(sorts.get(FIELD_SORT), "FIELD_SORT sort");
         SMTFunction f = new SMTFunction(id, domain, image);
         functions.put(id, f);
     }
 
     private SMTFunction createSelfObject() {
-        SMTFunction f = new SMTFunction(SELF, new LinkedList<>(), sorts.get(OBJECT_SORT));
-        SMTTerm zero = new SMTTermNumber(1, settings.getObjectBound(), sorts.get(OBJECT_SORT));
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
+        SMTSort object = Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort");
+        SMTFunction f = new SMTFunction(SELF, new LinkedList<>(), object);
+        SMTTerm zero = new SMTTermNumber(1, settings.getObjectBound(), object);
         SMTFunctionDef def = new SMTFunctionDef(f, new LinkedList<>(), zero);
         functions.put(SELF, def);
         functionDefinitionOrder.add(SELF);
-        types.putConstantType(Util.processName(SELF), sorts.get(OBJECT_SORT));
+        types.putConstantType(Util.processName(SELF), object);
         def.setComment("The self object");
 
         if (typeOfClassUnderTest != null) {
-            Sort sort = typeOfClassUnderTest.getSort();
+            Sort sort = Objects.requireNonNull(typeOfClassUnderTest.getSort(), "self sort");
             forceAddTypePredicate(sort);
             SMTFunction tp = getTypePredicate(sort.name().toString());
             if (tp != null) {
@@ -293,11 +296,12 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates the select function.
      */
     private SMTFunction createSelectFunction() {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         List<SMTSort> domainSorts = new LinkedList<>();
-        domainSorts.add(sorts.get(HEAP_SORT));
-        domainSorts.add(sorts.get(OBJECT_SORT));
-        domainSorts.add(sorts.get(FIELD_SORT));
-        SMTSort imageSort = sorts.get(ANY_SORT);
+        domainSorts.add(Objects.requireNonNull(sorts.get(HEAP_SORT), "HEAP_SORT sort"));
+        domainSorts.add(Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"));
+        domainSorts.add(Objects.requireNonNull(sorts.get(FIELD_SORT), "FIELD_SORT sort"));
+        SMTSort imageSort = Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort");
         SMTFunction f = new SMTFunction(SELECT, domainSorts, imageSort);
         functions.put(SELECT, f);
         return f;
@@ -307,10 +311,11 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates the elementOf function.
      */
     private SMTFunction createElementOfFunction() {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         List<SMTSort> domainSorts = new LinkedList<>();
-        domainSorts.add(sorts.get(OBJECT_SORT));
-        domainSorts.add(sorts.get(FIELD_SORT));
-        domainSorts.add(sorts.get(LOCSET_SORT));
+        domainSorts.add(Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"));
+        domainSorts.add(Objects.requireNonNull(sorts.get(FIELD_SORT), "FIELD_SORT sort"));
+        domainSorts.add(Objects.requireNonNull(sorts.get(LOCSET_SORT), "LOCSET_SORT sort"));
         SMTSort imageSort = SMTSort.BOOL;
         SMTFunction f = new SMTFunction(ELEMENTOF, domainSorts, imageSort);
         functions.put(ELEMENTOF, f);
@@ -321,9 +326,10 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates the length function.
      */
     private SMTFunction createLengthFunction() {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         List<SMTSort> domainSorts = new LinkedList<>();
-        domainSorts.add(sorts.get(OBJECT_SORT));
-        SMTSort imageSort = sorts.get(BINT_SORT);
+        domainSorts.add(Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"));
+        SMTSort imageSort = Objects.requireNonNull(sorts.get(BINT_SORT), "BINT_SORT sort");
         SMTFunction f = new SMTFunction(LENGTH, domainSorts, imageSort);
         functions.put(LENGTH, f);
         return f;
@@ -333,8 +339,9 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates the wellformed function.
      */
     private SMTFunction createWellFormedFunction() {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         List<SMTSort> domainSorts = new LinkedList<>();
-        domainSorts.add(sorts.get(HEAP_SORT));
+        domainSorts.add(Objects.requireNonNull(sorts.get(HEAP_SORT), "HEAP_SORT sort"));
         SMTSort imageSort = SMTSort.BOOL;
         SMTFunction f = new SMTFunction(WELL_FORMED_NAME, domainSorts, imageSort);
         functions.put(WELL_FORMED_NAME, f);
@@ -372,11 +379,14 @@ public class SMTObjTranslator implements SMTTranslator {
         // KeY Sorts
         seqSort = services.getTypeConverter().getSeqLDT().targetSort();
         integerSort = services.getTypeConverter().getIntegerLDT().targetSort();
-        heapSort = services.getTypeConverter().getHeapLDT().targetSort();
-        fieldSort = services.getTypeConverter().getHeapLDT().getFieldSort();
+        heapSort =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT()).targetSort();
+        fieldSort =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT()).getFieldSort();
         locsetSort = services.getTypeConverter().getLocSetLDT().targetSort();
         boolSort = services.getTypeConverter().getBooleanLDT().targetSort();
-        objectSort = services.getJavaInfo().getJavaLangObject().getSort();
+        objectSort =
+            Objects.requireNonNull(services.getJavaInfo().getJavaLangObject().getSort());
         cc = new ConstantCounter();
     }
 
@@ -453,8 +463,8 @@ public class SMTObjTranslator implements SMTTranslator {
         types.setServices(services);
         types.setJavaSorts(extendedJavaSorts);
         types.setSettings(settings);
-        types.setSortNumbers(sortNumbers);
-        types.setSorts(sorts);
+        types.setSortNumbers(Objects.requireNonNull(sortNumbers, "sortNumbers"));
+        types.setSorts(Objects.requireNonNull(sorts, "sorts"));
         query.setIntBound((int) settings.getIntBound());
         query.setTypes(types);
         return query;
@@ -464,15 +474,17 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates the null constant.
      */
     private SMTTerm createNullConstant() {
-        SMTFunction f = new SMTFunction(NULL_CONSTANT, new LinkedList<>(), sorts.get(OBJECT_SORT));
-        SMTTerm zero = new SMTTermNumber(0, settings.getObjectBound(), sorts.get(OBJECT_SORT));
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
+        SMTSort object = Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort");
+        SMTFunction f = new SMTFunction(NULL_CONSTANT, new LinkedList<>(), object);
+        SMTTerm zero = new SMTTermNumber(0, settings.getObjectBound(), object);
         SMTFunctionDef def = new SMTFunctionDef(f, new LinkedList<>(), zero);
         def.setComment(
             "This function is dedicated to Mattias, who has insisted for a long time that the "
                 + "null object should always be object 0.");
         functions.put(NULL_CONSTANT, def);
         functionDefinitionOrder.add(NULL_CONSTANT);
-        types.putConstantType(Util.processName(NULL_CONSTANT), sorts.get(OBJECT_SORT));
+        types.putConstantType(Util.processName(NULL_CONSTANT), object);
         return SMTTerm.call(def);
     }
 
@@ -480,38 +492,45 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates the necessary sequence functions and assertions.
      */
     private void createSeqConstantsAndAssertions() {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
+        SMTSort seqSort = Objects.requireNonNull(sorts.get(SEQ_SORT), "SEQ_SORT sort");
+        SMTSort anySort = Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort");
+        SMTSort bintSort = Objects.requireNonNull(sorts.get(BINT_SORT), "BINT_SORT sort");
         // seq empty
-        SMTFunction seqEmpty = new SMTFunction(SEQ_EMPTY, new LinkedList<>(), sorts.get(SEQ_SORT));
+        SMTFunction seqEmpty = new SMTFunction(SEQ_EMPTY, new LinkedList<>(), seqSort);
         functions.put(SEQ_EMPTY, seqEmpty);
-        types.putConstantType(SEQ_EMPTY, sorts.get(SEQ_SORT));
+        types.putConstantType(SEQ_EMPTY, seqSort);
         // seq outside
-        SMTFunction outside = new SMTFunction(SEQ_OUTSIDE, new LinkedList<>(), sorts.get(ANY_SORT));
+        SMTFunction outside = new SMTFunction(SEQ_OUTSIDE, new LinkedList<>(), anySort);
         functions.put(SEQ_OUTSIDE, outside);
-        types.putConstantType(SEQ_OUTSIDE, sorts.get(ANY_SORT));
+        types.putConstantType(SEQ_OUTSIDE, anySort);
         List<SMTSort> getDomain = new LinkedList<>();
-        getDomain.add(sorts.get(SEQ_SORT));
-        getDomain.add(sorts.get(BINT_SORT));
+        getDomain.add(seqSort);
+        getDomain.add(bintSort);
         // seqget
-        SMTFunction seqGet = new SMTFunction(SEQ_GET, getDomain, sorts.get(ANY_SORT));
+        SMTFunction seqGet = new SMTFunction(SEQ_GET, getDomain, anySort);
         functions.put(SEQ_GET, seqGet);
         List<SMTSort> lenDomain = new LinkedList<>();
-        lenDomain.add(sorts.get(SEQ_SORT));
+        lenDomain.add(seqSort);
         // seqlen
-        SMTFunction seqLen = new SMTFunction(SEQ_LEN, lenDomain, sorts.get(BINT_SORT));
+        SMTFunction seqLen = new SMTFunction(SEQ_LEN, lenDomain, bintSort);
         functions.put(SEQ_LEN, seqLen);
         // Assertion 1: length >= 0
-        SMTTermVariable i = new SMTTermVariable("i", sorts.get(BINT_SORT));
-        SMTTermVariable s = new SMTTermVariable("s", sorts.get(SEQ_SORT));
-        SMTTerm lenS = SMTTerm.call(functions.get(SEQ_LEN), s);
-        SMTTerm zero = new SMTTermNumber(0, settings.getIntBound(), sorts.get(BINT_SORT));
+        SMTTermVariable i = new SMTTermVariable("i", bintSort);
+        SMTTermVariable s = new SMTTermVariable("s", seqSort);
+        SMTTerm lenS = SMTTerm.call(Objects.requireNonNull(functions.get(SEQ_LEN), SEQ_LEN), s);
+        SMTTerm zero = new SMTTermNumber(0, settings.getIntBound(), bintSort);
         SMTTerm axiom1 = lenS.gte(zero);
         axiom1 = axiom1.forall(s);
         axiom1.setComment("All sequents have length >= 0");
         functionTypeAssertions.add(axiom1);
         // Assertion 2: out of bounds -> outside
-        SMTTerm getS = SMTTerm.call(functions.get(SEQ_GET), s, i);
+        SMTTerm getS =
+            SMTTerm.call(Objects.requireNonNull(functions.get(SEQ_GET), SEQ_GET), s, i);
         SMTTerm left = i.lt(zero).or(lenS.lte(i));
-        SMTTerm right = getS.equal(SMTTerm.call(functions.get(SEQ_OUTSIDE)));
+        SMTTerm right =
+            getS.equal(SMTTerm.call(
+                Objects.requireNonNull(functions.get(SEQ_OUTSIDE), SEQ_OUTSIDE)));
         SMTTerm axiom2 = left.implies(right);
         List<SMTTermVariable> a2vars = new LinkedList<>();
         a2vars.add(s);
@@ -521,8 +540,8 @@ public class SMTObjTranslator implements SMTTranslator {
         functionTypeAssertions.add(axiom2);
 
         // Axiom 4: length of empty is 0
-        SMTTerm lenEmpty =
-            SMTTerm.call(functions.get(SEQ_LEN), SMTTerm.call(functions.get(SEQ_EMPTY)));
+        SMTTerm lenEmpty = SMTTerm.call(Objects.requireNonNull(functions.get(SEQ_LEN), SEQ_LEN),
+            SMTTerm.call(Objects.requireNonNull(functions.get(SEQ_EMPTY), SEQ_EMPTY)));
         SMTTerm axiom4 = lenEmpty.equal(zero);
         axiom4.setComment("Length of seqEmpty is 0");
         functionTypeAssertions.add(axiom4);
@@ -532,19 +551,25 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates the empty constant.
      */
     private SMTTerm createEmptyConstant() {
-        SMTFunction f = new SMTFunction(EMPTY_CONSTANT, new LinkedList<>(), sorts.get(LOCSET_SORT));
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
+        SMTSort locsetSort = Objects.requireNonNull(sorts.get(LOCSET_SORT), "LOCSET_SORT sort");
+        SMTSort objectSort = Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort");
+        SMTSort fieldSort = Objects.requireNonNull(sorts.get(FIELD_SORT), "FIELD_SORT sort");
+        SMTFunction elementOf =
+            Objects.requireNonNull(elementOfFunction, "elementOfFunction");
+        SMTFunction f = new SMTFunction(EMPTY_CONSTANT, new LinkedList<>(), locsetSort);
         functions.put(EMPTY_CONSTANT, f);
         SMTTerm empty = SMTTerm.call(f);
-        SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
-        SMTTermVariable v = new SMTTermVariable("f", sorts.get(FIELD_SORT));
-        SMTTerm elementOfEmpty = SMTTerm.call(elementOfFunction, o, v, empty);
+        SMTTermVariable o = new SMTTermVariable("o", objectSort);
+        SMTTermVariable v = new SMTTermVariable("f", fieldSort);
+        SMTTerm elementOfEmpty = SMTTerm.call(elementOf, o, v, empty);
         SMTTerm sub = elementOfEmpty.not();
         List<SMTTermVariable> vars = new LinkedList<>();
         vars.add(o);
         vars.add(v);
-        SMTTerm assertion = SMTTerm.forall(vars, sub, null);
+        SMTTerm assertion = forallWithoutPatterns(vars, sub);
         functionTypeAssertions.add(assertion);
-        types.putConstantType(Util.processName(EMPTY_CONSTANT), sorts.get(LOCSET_SORT));
+        types.putConstantType(Util.processName(EMPTY_CONSTANT), locsetSort);
         return empty;
     }
 
@@ -552,12 +577,15 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates assertion which states that the length of each object is greater than or equal to 0.
      */
     private void generateLengthAssertions() {
-        SMTFunction length = functions.get(LENGTH);
-        SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
+        SMTSort objectSort = Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort");
+        SMTSort bintSort = Objects.requireNonNull(sorts.get(BINT_SORT), "BINT_SORT sort");
+        SMTFunction length = Objects.requireNonNull(functions.get(LENGTH), LENGTH);
+        SMTTermVariable o = new SMTTermVariable("o", objectSort);
         SMTTerm call = SMTTerm.call(length, o);
-        SMTTermNumber zero = new SMTTermNumber(0, settings.getIntBound(), sorts.get(BINT_SORT));
+        SMTTermNumber zero = new SMTTermNumber(0, settings.getIntBound(), bintSort);
         SMTTerm gtzero = call.gte(zero);
-        SMTTerm assertion1 = SMTTerm.forall(o, gtzero, null);
+        SMTTerm assertion1 = forallWithoutPatterns(o, gtzero);
         assertion1.setComment("Assert that all lengths are positive");
         functionTypeAssertions.add(assertion1);
     }
@@ -567,16 +595,19 @@ public class SMTObjTranslator implements SMTTranslator {
      * function.
      */
     private void generateFieldFunctionDefinitions() {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         List<SMTFunction> fieldConstants = new LinkedList<>();
         // also dynamically calculate bound for field
         int bound = 0;
         for (var f : functions.values()) {
-            if (f.getDomainSorts().size() == 0 && f.getImageSort().getId().equals(FIELD_SORT)) {
+            if (Objects.requireNonNull(f.getDomainSorts(), "domain sorts").size() == 0
+                    && Objects.requireNonNull(f.getImageSort(), "image sort").getId()
+                            .equals(FIELD_SORT)) {
                 fieldConstants.add(f);
                 ++bound;
             }
         }
-        SMTSort field = sorts.get(FIELD_SORT);
+        SMTSort field = Objects.requireNonNull(sorts.get(FIELD_SORT), "FIELD_SORT sort");
         long intSize = settings.getIntBound();
         long fieldSize;
         // compute bitsize for sort field
@@ -588,7 +619,7 @@ public class SMTObjTranslator implements SMTTranslator {
         for (SMTFunction f : fieldConstants) {
             SMTTermNumber fieldarg = new SMTTermNumber(i++, fieldSize, sorts.get(BINT_SORT));
             SMTFunctionDef fieldConstant = new SMTFunctionDef(f, new LinkedList<>(), fieldarg);
-            String id = f.getId();
+            String id = Objects.requireNonNull(f.getId(), "function id");
             if (!functions.containsKey(id)) {
                 id = id.replace("|", "");
             }
@@ -596,7 +627,8 @@ public class SMTObjTranslator implements SMTTranslator {
             functionDefinitionOrder.add(id);
         }
         // create arr function def
-        SMTTermVariable intarg = new SMTTermVariable(varName('i'), sorts.get(BINT_SORT));
+        SMTTermVariable intarg = new SMTTermVariable(varName('i'),
+            Objects.requireNonNull(sorts.get(BINT_SORT), "BINT_SORT sort"));
         long diff = fieldSize - intSize;
         SMTTermNumber bitDiff = new SMTTermNumber(0, diff, sorts.get(BINT_SORT));
         SMTTerm sub = bitDiff.concat(intarg);
@@ -609,46 +641,57 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates the wellformed function definition.
      */
     private void generateWellFormedAssertions() throws IllegalFormulaException {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
+        SMTFunction selectFun = Objects.requireNonNull(selectFunction, "selectFunction");
+        SMTTerm nullConst = Objects.requireNonNull(nullConstant, "nullConstant");
+        SMTFunction elementOf = Objects.requireNonNull(elementOfFunction, "elementOfFunction");
+        SMTSort heapSort = Objects.requireNonNull(sorts.get(HEAP_SORT), "HEAP_SORT sort");
+        SMTSort objectSort = Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort");
+        SMTSort fieldSort = Objects.requireNonNull(sorts.get(FIELD_SORT), "FIELD_SORT sort");
+        SMTSort bintSort = Objects.requireNonNull(sorts.get(BINT_SORT), "BINT_SORT sort");
+        SMTSort locsetSort = Objects.requireNonNull(sorts.get(LOCSET_SORT), "LOCSET_SORT sort");
         // Assertion 1:
-        SMTTermVariable h = new SMTTermVariable("h", sorts.get(HEAP_SORT));
-        SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
-        SMTTermVariable f = new SMTTermVariable("f", sorts.get(FIELD_SORT));
-        SMTTermVariable o1 = new SMTTermVariable("o1", sorts.get(OBJECT_SORT));
-        SMTTermVariable f1 = new SMTTermVariable("f1", sorts.get(FIELD_SORT));
-        SMTTermVariable bi = new SMTTermVariable(varName('i'), sorts.get(BINT_SORT));
+        SMTTermVariable h = new SMTTermVariable("h", heapSort);
+        SMTTermVariable o = new SMTTermVariable("o", objectSort);
+        SMTTermVariable f = new SMTTermVariable("f", fieldSort);
+        SMTTermVariable o1 = new SMTTermVariable("o1", objectSort);
+        SMTTermVariable f1 = new SMTTermVariable("f1", fieldSort);
+        SMTTermVariable bi = new SMTTermVariable(varName('i'), bintSort);
         List<SMTTerm> vars = new LinkedList<>();
         vars.add(h);
         vars.add(o);
         vars.add(f);
         // wellformed(h)
         // select(h,o,f)
-        SMTTerm select = SMTTerm.call(selectFunction, vars);
+        SMTTerm select = SMTTerm.call(selectFun, vars);
 
         // any2obj(select(h,o,f))
-        SMTTerm selectObj = castTermIfNecessary(select, sorts.get(OBJECT_SORT));
+        SMTTerm selectObj = castTermIfNecessary(select, objectSort);
 
         // any2obj(select(h,o,f)) == null
-        SMTTerm right = selectObj.equal(nullConstant);
+        SMTTerm right = selectObj.equal(nullConst);
         // created
-        SMTTerm created = SMTTerm.call(functions.get(CREATED_FIELD_NAME));
+        SMTTerm created =
+            SMTTerm.call(
+                Objects.requireNonNull(functions.get(CREATED_FIELD_NAME), CREATED_FIELD_NAME));
         List<SMTTerm> args = new LinkedList<>();
         args.add(h);
         args.add(selectObj);
         args.add(created);
         // select(h,any2obj(select(h,o,f)),created)
-        SMTTerm selectCreated = SMTTerm.call(selectFunction, args);
+        SMTTerm selectCreated = SMTTerm.call(selectFun, args);
         SMTTerm selectCreatedBool = castTermIfNecessary(selectCreated, SMTSort.BOOL);
         right = right.or(selectCreatedBool);
         SMTTerm assertion1 = right;
         List<SMTTermVariable> assertion1Vars = new LinkedList<>();
         assertion1Vars.add(o);
         assertion1Vars.add(f);
-        assertion1 = SMTTerm.forall(assertion1Vars, assertion1, null);
+        assertion1 = forallWithoutPatterns(assertion1Vars, assertion1);
         // Assertion 2 - locset
-        SMTFunction isLocSetFun = getIsFunction(sorts.get(LOCSET_SORT));
-        SMTTerm selectLocSet = castTermIfNecessary(select, sorts.get(LOCSET_SORT));
-        SMTTerm right2 = o1.equal(nullConstant);
-        SMTTerm selectCreated2 = SMTTerm.call(selectFunction, h, o1, created);
+        SMTFunction isLocSetFun = getIsFunction(locsetSort);
+        SMTTerm selectLocSet = castTermIfNecessary(select, locsetSort);
+        SMTTerm right2 = o1.equal(nullConst);
+        SMTTerm selectCreated2 = SMTTerm.call(selectFun, h, o1, created);
         SMTTerm selectCreatedBool2 = castTermIfNecessary(selectCreated2, SMTSort.BOOL);
         right2 = right2.or(selectCreatedBool2);
         List<SMTTermVariable> forallVariables = new LinkedList<>();
@@ -656,14 +699,14 @@ public class SMTObjTranslator implements SMTTranslator {
         forallVariables.add(f);
         forallVariables.add(o1);
         forallVariables.add(f1);
-        SMTTerm assertion2 = SMTTerm.call(elementOfFunction, o1, f1, selectLocSet).implies(right2);
-        assertion2 = SMTTerm.forall(forallVariables, assertion2, null);
+        SMTTerm assertion2 = SMTTerm.call(elementOf, o1, f1, selectLocSet).implies(right2);
+        assertion2 = forallWithoutPatterns(forallVariables, assertion2);
         // Assertion(s) 3 - normal field types
         SMTTerm assertion3 = SMTTerm.TRUE;
         for (String field : fieldSorts.keySet()) {
             assertion3 = assertion3.and(addAssertionForField(field));
         }
-        assertion3 = SMTTerm.forall(o, assertion3, null);
+        assertion3 = forallWithoutPatterns(o, assertion3);
         // Assertion(s) 4 - array field types
         SMTTerm assertion4 = new SMTTerm.True();
         for (Sort s : thierarchy.getArraySortList()) {
@@ -675,23 +718,29 @@ public class SMTObjTranslator implements SMTTranslator {
                 continue;
             }
             SMTTerm tpo = SMTTerm.call(tp, o);
-            SMTTerm oNotNull = o.equal(nullConstant).not();
+            SMTTerm oNotNull = o.equal(nullConst).not();
             SMTTerm premise = tpo.and(oNotNull);
-            SMTTerm arr = SMTTerm.call(functions.get(ARR_FUNCTION_NAME), bi);
-            SMTTerm selectArr = SMTTerm.call(selectFunction, h, o, arr);
+            SMTTerm arr = SMTTerm.call(
+                Objects.requireNonNull(functions.get(ARR_FUNCTION_NAME), ARR_FUNCTION_NAME), bi);
+            SMTTerm selectArr = SMTTerm.call(selectFun, h, o, arr);
             SMTTerm typeReq;
             switch (single) {
                 case "int", "char", "byte" -> typeReq =
-                    SMTTerm.call(getIsFunction(sorts.get(BINT_SORT)), selectArr);
+                    SMTTerm.call(getIsFunction(bintSort), selectArr);
                 case "java.lang.Object" -> typeReq =
-                    SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
+                    SMTTerm.call(getIsFunction(objectSort), selectArr);
                 case "boolean" -> typeReq = SMTTerm.call(getIsFunction(SMTSort.BOOL), selectArr);
                 default -> {
-                    typeReq = SMTTerm.call(getIsFunction(sorts.get(OBJECT_SORT)), selectArr);
-                    Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
+                    typeReq = SMTTerm.call(getIsFunction(objectSort), selectArr);
+                    Sort singleSort = Objects.requireNonNull(
+                        Objects.requireNonNull(services.getJavaInfo().getKeYJavaType(single),
+                            "KJT of " + single).getSort(),
+                        "sort of " + single);
                     addTypePredicate(singleSort);
-                    SMTFunction tps = getTypePredicate(singleSort.name().toString());
-                    SMTTerm selectObjArr = castTermIfNecessary(selectArr, sorts.get(OBJECT_SORT));
+                    SMTFunction tps = Objects.requireNonNull(
+                        getTypePredicate(singleSort.name().toString()),
+                        "type predicate of " + singleSort.name());
+                    SMTTerm selectObjArr = castTermIfNecessary(selectArr, objectSort);
                     typeReq = typeReq.and(SMTTerm.call(tps, selectObjArr));
                 }
             }
@@ -700,10 +749,11 @@ public class SMTObjTranslator implements SMTTranslator {
         List<SMTTermVariable> a4vars = new LinkedList<>();
         a4vars.add(o);
         a4vars.add(bi);
-        assertion4 = SMTTerm.forall(a4vars, assertion4, null);
+        assertion4 = forallWithoutPatterns(a4vars, assertion4);
         // Combined Assertion
         SMTTerm finalAssertion = assertion1.and(assertion2).and(assertion3).and(assertion4);
-        wellformedFunction = new SMTFunctionDef(wellformedFunction, h, finalAssertion);
+        wellformedFunction = new SMTFunctionDef(
+            Objects.requireNonNull(wellformedFunction, "wellformedFunction"), h, finalAssertion);
         functions.put(WELL_FORMED_NAME, wellformedFunction);
         functionDefinitionOrder.add(WELL_FORMED_NAME);
     }
@@ -712,8 +762,9 @@ public class SMTObjTranslator implements SMTTranslator {
      * Create the created field constant.
      */
     private void createCreatedConstant() {
-        SMTFunction c =
-            new SMTFunction(CREATED_FIELD_NAME, new LinkedList<>(), sorts.get(FIELD_SORT));
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
+        SMTFunction c = new SMTFunction(CREATED_FIELD_NAME, new LinkedList<>(),
+            Objects.requireNonNull(sorts.get(FIELD_SORT), "FIELD_SORT sort"));
         functions.put(CREATED_FIELD_NAME, c);
     }
 
@@ -721,17 +772,22 @@ public class SMTObjTranslator implements SMTTranslator {
      * Create assertion which states that a field is of the correct type.
      */
     private SMTTerm addAssertionForField(String fieldName) throws IllegalFormulaException {
-        SMTTerm f = SMTTerm.call(functions.get(fieldName));
-        Sort type = fieldSorts.get(fieldName);
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
+        SMTTerm f =
+            SMTTerm.call(Objects.requireNonNull(functions.get(fieldName), "field function"));
+        Sort type = Objects.requireNonNull(fieldSorts.get(fieldName), "field sort");
         SMTSort target = translateSort(type);
-        SMTTermVariable h = new SMTTermVariable("h", sorts.get(HEAP_SORT));
-        SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
+        SMTTermVariable h = new SMTTermVariable("h",
+            Objects.requireNonNull(sorts.get(HEAP_SORT), "HEAP_SORT sort"));
+        SMTTermVariable o = new SMTTermVariable("o",
+            Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"));
         List<SMTTerm> selectArgs = new LinkedList<>();
         selectArgs.add(h);
         selectArgs.add(o);
         selectArgs.add(f);
         // select(h,o,f)
-        SMTTerm select = SMTTerm.call(selectFunction, selectArgs);
+        SMTTerm select =
+            SMTTerm.call(Objects.requireNonNull(selectFunction, "selectFunction"), selectArgs);
         // wellformed(h)
         SMTFunction isFunction = getIsFunction(target);
         // isTargetSort(select(h,o,f)) , TargetSort is bInt, object, bool, ...
@@ -743,7 +799,8 @@ public class SMTObjTranslator implements SMTTranslator {
             if (typeOf == null) {
                 LOGGER.error(typeOfName);
             }
-            SMTTerm typeOfTerm = SMTTerm.call(typeOf, selectObj);
+            SMTTerm typeOfTerm = SMTTerm.call(
+                Objects.requireNonNull(typeOf, "type predicate of " + typeOfName), selectObj);
             right = right.and(typeOfTerm);
         }
         return right;
@@ -801,30 +858,35 @@ public class SMTObjTranslator implements SMTTranslator {
      * @param id key where the cast function can be found in the function table
      */
     private void addCastAssertions(SMTSort source, SMTSort target, String id) {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
+        List<SMTTerm> castAssertions =
+            Objects.requireNonNull(this.castAssertions, "castAssertions");
         SMTTermVariable v = new SMTTermVariable("v", source);
         SMTFunction fun = getCastFunction(source, target);
         SMTTerm call = SMTTerm.call(fun, v);
-        long anySize = sorts.get(ANY_SORT).getBitSize();
+        long anySize = Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort").getBitSize();
         SMTTerm sub;
         if (target.getId().equals(sorts.get(ANY_SORT).getId())) {
             if (source.equals(SMTSort.BOOL)) {
                 sub = SMTTerm.ite(v, new SMTTermNumber(1, anySize, sorts.get(BINT_SORT)),
                     new SMTTermNumber(0, anySize, sorts.get(BINT_SORT)));
             } else {
-                SMTTermNumber n = sortNumbers.get(source);
+                SMTTermNumber n = Objects.requireNonNull(sortNumbers, "sortNumbers").get(source);
                 if (n == null) {
                     LOGGER.error("{} has no number", source.getId());
                 }
                 long bitDiff = anySize - source.getBitSize() - 3;
                 if (bitDiff == 0) {
-                    sub = n.concat(v);
+                    sub = Objects.requireNonNull(n, "number of " + source).concat(v);
                 } else {
                     SMTTermNumber diff = new SMTTermNumber(0, bitDiff, sorts.get(BINT_SORT));
-                    sub = n.concat(diff.concat(v));
+                    sub = Objects.requireNonNull(n, "number of " + source)
+                            .concat(diff.concat(v));
                 }
             }
             SMTFunction is = functions.get(id);
-            SMTFunctionDef def = new SMTFunctionDef(is, v, sub);
+            SMTFunctionDef def =
+                new SMTFunctionDef(Objects.requireNonNull(is, "cast function"), v, sub);
             functions.put(id, def);
             functionDefinitionOrder.add(id);
             return;
@@ -854,20 +916,22 @@ public class SMTObjTranslator implements SMTTranslator {
                 if (target.getId().equals(OBJECT_SORT)) {
                     SMTTerm condition = SMTTerm.call(isFunction, v);
                     SMTTerm trueCase = extractValue;
-                    SMTTerm falseCase = nullConstant;
+                    SMTTerm falseCase = Objects.requireNonNull(nullConstant, "nullConstant");
                     sub = new SMTTermITE(condition, trueCase, falseCase);
                     SMTFunction is = functions.get(id);
-                    SMTFunctionDef def = new SMTFunctionDef(is, v, sub);
+                    SMTFunctionDef def =
+                        new SMTFunctionDef(Objects.requireNonNull(is, "cast function"), v, sub);
                     functions.put(id, def);
                     functionDefinitionOrder.add(id);
                     return;
                 } else if (target.getId().equals(LOCSET_SORT)) {
                     SMTTerm condition = SMTTerm.call(isFunction, v);
                     SMTTerm trueCase = extractValue;
-                    SMTTerm falseCase = emptyConstant;
+                    SMTTerm falseCase = Objects.requireNonNull(emptyConstant, "emptyConstant");
                     sub = new SMTTermITE(condition, trueCase, falseCase);
                     SMTFunction is = functions.get(id);
-                    SMTFunctionDef def = new SMTFunctionDef(is, v, sub);
+                    SMTFunctionDef def =
+                        new SMTFunctionDef(Objects.requireNonNull(is, "cast function"), v, sub);
                     functions.put(id, def);
                     functionDefinitionOrder.add(id);
                     return;
@@ -876,7 +940,7 @@ public class SMTObjTranslator implements SMTTranslator {
                 }
             }
         } else {
-            SMTSort any = sorts.get(ANY_SORT);
+            SMTSort any = Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort");
             String sourceName = source.getId();
             String targetName = target.getId();
             if (sourceName.equals(FIELD_SORT) || sourceName.equals(HEAP_SORT)
@@ -889,13 +953,15 @@ public class SMTObjTranslator implements SMTTranslator {
             SMTFunction any2t = getCastFunction(any, target);
             SMTTerm body = SMTTerm.call(s2any, v);
             body = SMTTerm.call(any2t, body);
-            SMTFunctionDef def = new SMTFunctionDef(functions.get(id), v, body);
+            SMTFunctionDef def =
+                new SMTFunctionDef(Objects.requireNonNull(functions.get(id), "cast function"), v,
+                    body);
             functions.put(id, def);
             functionDefinitionOrder.add(id);
             return;
         }
         if (sub != null) {
-            SMTTerm assertion = SMTTerm.forall(v, sub, null);
+            SMTTerm assertion = forallWithoutPatterns(v, sub);
             assertion.setComment("Assertion for " + fun.getId());
             castAssertions.add(assertion);
         }
@@ -922,8 +988,9 @@ public class SMTObjTranslator implements SMTTranslator {
     private void addSingleSort(Set<Sort> sorts, Sort s) {
         String name = s.name().toString();
         JavaInfo javaInfo = services.getJavaInfo();
-        Sort object = javaInfo.getJavaLangObject().getSort();
-        Sort nullSort = services.getTypeConverter().getHeapLDT().getNull().sort();
+        Sort object = Objects.requireNonNull(javaInfo.getJavaLangObject().getSort(), "object sort");
+        Sort nullSort = Objects.requireNonNull(services.getTypeConverter().getHeapLDT())
+                .getNull().sort();
         // if java reference type
         if (s.extendsTrans(object) && !s.equals(nullSort)) {
             sorts.add(s);
@@ -931,7 +998,10 @@ public class SMTObjTranslator implements SMTTranslator {
         // if array type- add element type
         if (name.endsWith("[]")) {
             String single = name.substring(0, name.length() - 2);
-            Sort singleSort = services.getJavaInfo().getKeYJavaType(single).getSort();
+            Sort singleSort = Objects.requireNonNull(
+                Objects.requireNonNull(services.getJavaInfo().getKeYJavaType(single),
+                    "KJT of " + single).getSort(),
+                "sort of " + single);
             addSingleSort(sorts, singleSort);
         }
     }
@@ -942,6 +1012,7 @@ public class SMTObjTranslator implements SMTTranslator {
      * @param problem The KeY proof obligation.
      */
     private SMTFile translateProblem(Term problem) throws IllegalFormulaException {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         SMTFile file = new SMTFile();
         // initialize smt sorts
         cc.countConstants(problem);
@@ -958,7 +1029,8 @@ public class SMTObjTranslator implements SMTTranslator {
         generateWellFormedAssertions();
         generateLengthAssertions();
         if (GUARD_OVERFLOW) {
-            OverflowChecker oc = new OverflowChecker(sorts.get(BINT_SORT));
+            OverflowChecker oc =
+                new OverflowChecker(Objects.requireNonNull(sorts.get(BINT_SORT), "BINT_SORT sort"));
             Set<SMTTerm> groundTerms = new HashSet<>();
             oc.searchArithGroundTerms(groundTerms, po);
             overflowGuards.addAll(oc.createGuards(groundTerms));
@@ -982,7 +1054,7 @@ public class SMTObjTranslator implements SMTTranslator {
         }
         // Add function definitions to file.
         for (String s : functionDefinitionOrder) {
-            file.addFunction(functions.get(s));
+            file.addFunction(Objects.requireNonNull(functions.get(s), "function " + s));
         }
         // Add assertions for type hierarchy to file.
         for (String s : typeAssertions.keySet()) {
@@ -991,7 +1063,7 @@ public class SMTObjTranslator implements SMTTranslator {
         // Add function return type assertions to file.
         file.addFormulas(functionTypeAssertions);
         // Add cast assertions to file.
-        file.addFormulas(castAssertions);
+        file.addFormulas(Objects.requireNonNull(castAssertions, "castAssertions"));
         // Add wellformedness assertions to file.
         file.addFormulas(wellFormedAssertions);
         // Add overflow formulas to file
@@ -1001,12 +1073,15 @@ public class SMTObjTranslator implements SMTTranslator {
         }
         // should all objects satisfy their invariant?
         if (settings.invarianForall()) {
-            SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
-            SMTTermVariable h = new SMTTermVariable("h", sorts.get(HEAP_SORT));
+            SMTTermVariable o = new SMTTermVariable("o",
+                Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"));
+            SMTTermVariable h = new SMTTermVariable("h",
+                Objects.requireNonNull(sorts.get(HEAP_SORT), "HEAP_SORT sort"));
             List<SMTTermVariable> vars = new LinkedList<>();
             vars.add(h);
             vars.add(o);
-            SMTTerm inv = SMTTerm.call(functions.get(CLASS_INVARIANT), h, o);
+            SMTTerm inv = SMTTerm.call(
+                Objects.requireNonNull(functions.get(CLASS_INVARIANT), CLASS_INVARIANT), h, o);
             SMTTerm forall = inv.forall(vars);
             file.addFormula(forall);
         }
@@ -1023,6 +1098,7 @@ public class SMTObjTranslator implements SMTTranslator {
      * @return the SMT term.
      */
     private SMTTerm translateTerm(Term term) throws IllegalFormulaException {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         Operator op = term.op();
         if (opTable.containsKey(op)) {
             SMTTerm left = translateTerm(term.sub(0));
@@ -1031,23 +1107,29 @@ public class SMTObjTranslator implements SMTTranslator {
             if (!left.sort().getId().equals(right.sort().getId())) {
                 if (left.sort().getId().equals(ANY_SORT)) {
                     if (right instanceof SMTTermCall tc) {
-                        if (tc.getFunc().getId().startsWith(ANY_SORT + "2")) {
+                        if (Objects.requireNonNull(tc.getFunc().getId(), "function id")
+                                .startsWith(ANY_SORT + "2")) {
                             right = tc.getArgs().get(0);
                         } else {
-                            right = castTermIfNecessary(right, sorts.get(ANY_SORT));
+                            right = castTermIfNecessary(right,
+                                Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort"));
                         }
                     } else {
-                        right = castTermIfNecessary(right, sorts.get(ANY_SORT));
+                        right = castTermIfNecessary(right,
+                            Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort"));
                     }
                 } else if (right.sort().getId().equals(ANY_SORT)) {
                     if (left instanceof SMTTermCall tc) {
-                        if (tc.getFunc().getId().startsWith(ANY_SORT + "2")) {
+                        if (Objects.requireNonNull(tc.getFunc().getId(), "function id")
+                                .startsWith(ANY_SORT + "2")) {
                             left = tc.getArgs().get(0);
                         } else {
-                            left = castTermIfNecessary(left, sorts.get(ANY_SORT));
+                            left = castTermIfNecessary(left,
+                                Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort"));
                         }
                     } else {
-                        left = castTermIfNecessary(left, sorts.get(ANY_SORT));
+                        left = castTermIfNecessary(left,
+                            Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort"));
                     }
                 }
             }
@@ -1060,8 +1142,10 @@ public class SMTObjTranslator implements SMTTranslator {
             SMTTerm trueCase = translateTerm(term.sub(1));
             SMTTerm falseCase = translateTerm(term.sub(2));
             if (!trueCase.sort().getId().equals(falseCase.sort().getId())) {
-                trueCase = castTermIfNecessary(trueCase, sorts.get(ANY_SORT));
-                falseCase = castTermIfNecessary(falseCase, sorts.get(ANY_SORT));
+                trueCase = castTermIfNecessary(trueCase,
+                    Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort"));
+                falseCase = castTermIfNecessary(falseCase,
+                    Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort"));
             }
             return SMTTerm.ite(condition, trueCase, falseCase);
         } else if (op == Quantifier.ALL || op == Quantifier.EX) {
@@ -1079,16 +1163,17 @@ public class SMTObjTranslator implements SMTTranslator {
                 SMTTerm call = SMTTerm.call(typePredicates.get(id), var);
                 sub = call.implies(sub);
             }
-            SMTTerm result = op == Quantifier.ALL ? SMTTerm.forall(variables, sub, null)
-                    : SMTTerm.exists(variables, sub, null);
+            SMTTerm result = op == Quantifier.ALL ? forallWithoutPatterns(variables, sub)
+                    : existsWithoutPatterns(variables, sub);
             quantifiedVariables.remove(quantifiedVariables.size() - 1);
             return result;
         } else if (op == Junctor.TRUE) {
             return SMTTerm.TRUE;
         } else if (op == Junctor.FALSE) {
             return SMTTerm.FALSE;
-        } else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
-            return nullConstant;
+        } else if (op == Objects.requireNonNull(services.getTypeConverter().getHeapLDT())
+                .getNull()) {
+            return Objects.requireNonNull(nullConstant, "nullConstant");
         } else if (op instanceof QuantifiableVariable qop) {
             // translate as variable or constant
             SMTTermVariable var = translateVariable(qop);
@@ -1104,8 +1189,9 @@ public class SMTObjTranslator implements SMTTranslator {
         } else if (op == services.getTypeConverter().getIntegerLDT().getNumberSymbol()) {
             Debug.assertTrue(term.arity() == 1);
 
-            long num = NumberTranslation.translate(term.sub(0)).longValue();
-            long size = sorts.get(BINT_SORT).getBitSize();
+            long num = Objects.requireNonNull(NumberTranslation.translate(term.sub(0)),
+                "translated number").longValue();
+            long size = Objects.requireNonNull(sorts.get(BINT_SORT), "BINT_SORT sort").getBitSize();
             // modulo max int
             SMTTerm n;
             if (num < 0) {
@@ -1121,7 +1207,8 @@ public class SMTObjTranslator implements SMTTranslator {
             } else if (isFalseConstant(fun, services)) {
                 return SMTTerm.FALSE;
             } else if (fun == services.getTypeConverter().getIntegerLDT().getNeg()) {
-                SMTTerm left = new SMTTermNumber(0, settings.getIntBound(), sorts.get(BINT_SORT));
+                SMTTerm left =
+                    new SMTTermNumber(0, settings.getIntBound(), sorts.get(BINT_SORT));
                 SMTTerm right = translateTerm(term.sub(0));
                 return left.minus(right);
             } else {
@@ -1146,22 +1233,23 @@ public class SMTObjTranslator implements SMTTranslator {
      * Translates a KeY sort to an SMT sort.
      */
     private SMTSort translateSort(Sort s) throws IllegalFormulaException {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         if (s.equals(boolSort)) {
             return SMTSort.BOOL;
         } else if (s.equals(JavaDLTheory.FORMULA)) {
             return SMTSort.BOOL;
         } else if (s.equals(integerSort)) {
-            return sorts.get(BINT_SORT);
+            return Objects.requireNonNull(sorts.get(BINT_SORT), "BINT_SORT sort");
         } else if (s.equals(heapSort)) {
-            return sorts.get(HEAP_SORT);
+            return Objects.requireNonNull(sorts.get(HEAP_SORT), "HEAP_SORT sort");
         } else if (s.equals(fieldSort)) {
-            return sorts.get(FIELD_SORT);
+            return Objects.requireNonNull(sorts.get(FIELD_SORT), "FIELD_SORT sort");
         } else if (s.equals(locsetSort)) {
-            return sorts.get(LOCSET_SORT);
+            return Objects.requireNonNull(sorts.get(LOCSET_SORT), "LOCSET_SORT sort");
         } else if (s.equals(JavaDLTheory.ANY)) {
-            return sorts.get(ANY_SORT);
+            return Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort");
         } else if (s.equals(seqSort)) {
-            return sorts.get(SEQ_SORT);
+            return Objects.requireNonNull(sorts.get(SEQ_SORT), "SEQ_SORT sort");
         } else {
 
             if (!(s.equals(objectSort) || s.extendsTrans(objectSort))) {
@@ -1171,7 +1259,7 @@ public class SMTObjTranslator implements SMTTranslator {
             LOGGER.debug("Found sort in PO: {}", s);
             javaSorts.add(s);
             addTypePredicate(s);
-            return sorts.get(OBJECT_SORT);
+            return Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort");
         }
     }
 
@@ -1188,7 +1276,7 @@ public class SMTObjTranslator implements SMTTranslator {
         List<SMTTerm> typeCalls = new LinkedList<>();
         for (String s : typePredicates.keySet()) {
             SMTFunction f = typePredicates.get(s);
-            typeCalls.add(SMTTerm.call(f, nullConstant));
+            typeCalls.add(SMTTerm.call(f, Objects.requireNonNull(nullConstant, "nullConstant")));
         }
         SMTTerm nullTypeAssertion = SMTTerm.and(typeCalls);
         nullTypeAssertion.setComment("Assert that null is all types");
@@ -1205,6 +1293,7 @@ public class SMTObjTranslator implements SMTTranslator {
      * Generates the type assertions for the java reference type s.
      */
     private void addTypeConstarints(Sort s) throws IllegalFormulaException {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         // Did we already specify the constraints?
         if (typeAssertions.containsKey(s.toString())) {
             return;
@@ -1219,7 +1308,8 @@ public class SMTObjTranslator implements SMTTranslator {
          * parents as well.
          */
         // create a variable x of type object
-        SMTTermVariable var = new SMTTermVariable("x", sorts.get(OBJECT_SORT));
+        SMTTermVariable var = new SMTTermVariable("x",
+            Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"));
         // generate the type predicate for sort s
         addTypePredicate(s);
         // get the parent of sort s
@@ -1248,11 +1338,12 @@ public class SMTObjTranslator implements SMTTranslator {
             LOGGER.error("Error: could not find type predicate: {}",
                 getTypePredicateName(s.toString()));
         }
-        SMTTerm left = SMTTerm.call(tf, var);
+        SMTTerm left = SMTTerm.call(Objects.requireNonNull(tf, "type predicate of " + s), var);
         SMTTerm right = null;
         // x == null
         List<SMTTerm> eqnullArgs = var.toList();
-        eqnullArgs.add(SMTTerm.call(functions.get(NULL_CONSTANT)));
+        eqnullArgs.add(
+            SMTTerm.call(Objects.requireNonNull(functions.get(NULL_CONSTANT), NULL_CONSTANT)));
         SMTTerm eqnull = SMTTerm.equal(eqnullArgs);
         SMTTerm eiCall = null;
         if (s.isAbstract() || isFinal(s)) {
@@ -1274,7 +1365,7 @@ public class SMTObjTranslator implements SMTTranslator {
             if (concreteParent == null) {
                 LOGGER.debug("{} has no concrete Parent", s);
             }
-            Set<SortNode> siblings = concreteHierarchy.getChildren(concreteParent);
+            Set<SortNode> siblings = getChildrenOf(concreteParent);
             SMTTerm sibFormulae = SMTTerm.FALSE;
             LOGGER.debug("Processing siblings");
             for (SortNode sibling : siblings) {
@@ -1293,17 +1384,20 @@ public class SMTObjTranslator implements SMTTranslator {
             }
             if (!s.isAbstract()) {
                 if (isFinal(s)) {
-                    right = eqnull.or(eiCall.and(parentsFormulae.and(sibFormulae.not())));
+                    SMTTerm exact = Objects.requireNonNull(eiCall, "exact instance call");
+                    right = eqnull.or(exact.and(parentsFormulae.and(sibFormulae.not())));
                 } else {
                     right = eqnull.or(parentsFormulae.and(sibFormulae.not()));
                 }
 
             } else {
-                right = eqnull.or(parentsFormulae.and(eiCall.not().and(sibFormulae.not())));
+                SMTTerm exact = Objects.requireNonNull(eiCall, "exact instance call");
+                right = eqnull.or(parentsFormulae.and(exact.not().and(sibFormulae.not())));
             }
 
         }
-        SMTTerm forall = SMTTerm.forall(var, left.implies(right), null);
+        SMTTerm forall = forallWithoutPatterns(var,
+            left.implies(Objects.requireNonNull(right, "type assertion")));
         forall.setComment("Assertions for type " + s.name());
         typeAssertions.put(s.name().toString(), forall);
     }
@@ -1326,14 +1420,14 @@ public class SMTObjTranslator implements SMTTranslator {
     private void addTypeAssertion(SMTFunction f, SMTFunction tp) {
         List<SMTTermVariable> vars = new LinkedList<>();
         List<SMTTerm> args = new LinkedList<>();
-        for (SMTSort s : f.getDomainSorts()) {
+        for (SMTSort s : Objects.requireNonNull(f.getDomainSorts(), "domain sorts")) {
             SMTTermVariable v = new SMTTermVariable(varName('x'), s);
             vars.add(v);
             args.add(v);
         }
         SMTTerm fcall = SMTTerm.call(f, args);
         SMTTerm tpcall = SMTTerm.call(tp, fcall);
-        SMTTerm asrt = SMTTerm.forall(vars, tpcall, null);
+        SMTTerm asrt = forallWithoutPatterns(vars, tpcall);
         if (!functionTypeAssertions.contains(asrt)) {
             asrt.setComment("Assertion regarding the type of " + f.getId());
             functionTypeAssertions.add(asrt);
@@ -1374,16 +1468,19 @@ public class SMTObjTranslator implements SMTTranslator {
     }
 
     private void forceAddTypePredicate(Sort s) {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         String id = s.name().toString();
         String name = getTypePredicateName(id);
         if (!typePredicates.containsKey(name)) {
             SMTSort imageSort = SMTSort.BOOL;
-            SMTSort domainSort = sorts.get(OBJECT_SORT);
+            SMTSort domainSort = Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort");
             List<SMTSort> domainSorts = new LinkedList<>();
             domainSorts.add(domainSort);
             SMTFunction fun = new SMTFunction(name, domainSorts, imageSort);
             if (s.equals(objectSort)) {
-                fun = new SMTFunctionDef(fun, new SMTTermVariable("o", sorts.get(OBJECT_SORT)),
+                fun = new SMTFunctionDef(fun,
+                    new SMTTermVariable("o",
+                        Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort")),
                     SMTTerm.TRUE);
             } else {
                 extendedJavaSorts.add(s);
@@ -1417,22 +1514,30 @@ public class SMTObjTranslator implements SMTTranslator {
      */
     private SMTTerm translateCall(Function fun, ImmutableArray<? extends Term> subs)
             throws IllegalFormulaException {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         String name = fun.name().toString();
         // handle sort constants
         if (fun.sort().equals(fieldSort) && subs.isEmpty()) {
             name = JavaDLFieldNames.toJava(name);
             JavaInfo info = services.getJavaInfo();
-            Sort sort = info.getAttribute(name).getKeYJavaType().getSort();
+            Sort sort = Objects.requireNonNull(
+                Objects.requireNonNull(
+                    Objects.requireNonNull(info.getAttribute(name), "attribute " + name)
+                            .getKeYJavaType(),
+                    "KJT of attribute " + name).getSort(),
+                "sort of attribute " + name);
             fieldSorts.put(name, sort);
             types.putFieldType(Util.processName(name), translateSort(sort));
-            types.putConstantType(Util.processName(name), sorts.get(FIELD_SORT));
+            types.putConstantType(Util.processName(name),
+                Objects.requireNonNull(sorts.get(FIELD_SORT), "FIELD_SORT sort"));
         } else if (subs.isEmpty()) {
             types.putConstantType(Util.processName(name), translateSort(fun.sort()));
         }
         // handle select functions
         if (name.endsWith(SELECT)) {
             SMTSort target = translateSort(fun.sort());
-            SMTTerm selectCall = call(selectFunction, subs);
+            SMTTerm selectCall =
+                call(Objects.requireNonNull(selectFunction, "selectFunction"), subs);
             SMTTerm result = castTermIfNecessary(selectCall, target);
             if (target.getId().equals(OBJECT_SORT) && !fun.sort().equals(objectSort)) {
                 Sort castTarget = fun.sort();
@@ -1444,7 +1549,8 @@ public class SMTObjTranslator implements SMTTranslator {
         // handle seqGet functions
         if (name.endsWith(SEQ_GET)) {
             SMTSort target = translateSort(fun.sort());
-            SMTTerm seqGetCall = call(functions.get(SEQ_GET), subs);
+            SMTTerm seqGetCall = call(
+                Objects.requireNonNull(functions.get(SEQ_GET), SEQ_GET), subs);
             SMTTerm result = castTermIfNecessary(seqGetCall, target);
             if (target.getId().equals(OBJECT_SORT) && !fun.sort().equals(objectSort)) {
                 Sort castTarget = fun.sort();
@@ -1513,17 +1619,18 @@ public class SMTObjTranslator implements SMTTranslator {
         if (function == null) {
             LOGGER.error("Null function {}", name);
         }
-        return call(function, subs);
+        return call(Objects.requireNonNull(function, "function"), subs);
     }
 
     /**
      * Creates the class invariant function.
      */
     private SMTFunction createClassInvariantFunction() {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         SMTFunction function;
         List<SMTSort> domain = new LinkedList<>();
-        domain.add(sorts.get(HEAP_SORT));
-        domain.add(sorts.get(OBJECT_SORT));
+        domain.add(Objects.requireNonNull(sorts.get(HEAP_SORT), "HEAP_SORT sort"));
+        domain.add(Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"));
         function = new SMTFunction(CLASS_INVARIANT, domain, SMTSort.BOOL);
         functions.put(CLASS_INVARIANT, function);
         return function;
@@ -1533,6 +1640,7 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates a reference type cast function for the castTarget type.
      */
     private SMTFunction getCastFunction(Sort castTarget) throws IllegalFormulaException {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         SMTSort sort = translateSort(castTarget);
         if (sort.getId().equals(OBJECT_SORT)) {
             SMTFunction f;
@@ -1541,15 +1649,16 @@ public class SMTObjTranslator implements SMTTranslator {
                 f = functions.get(castFunctionName);
             } else {
                 List<SMTSort> domain = new LinkedList<>();
-                domain.add(sorts.get(OBJECT_SORT));
-                SMTSort image = sorts.get(OBJECT_SORT);
+                domain.add(Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"));
+                SMTSort image = Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort");
                 f = new SMTFunction(castFunctionName, domain, image);
                 functions.put(castFunctionName, f);
                 addCastFunctionAssertions(castTarget);
             }
             return f;
         } else {
-            return getCastFunction(sorts.get(OBJECT_SORT), sort);
+            return getCastFunction(
+                Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"), sort);
         }
     }
 
@@ -1557,21 +1666,24 @@ public class SMTObjTranslator implements SMTTranslator {
      * Adds the necessary assertions for the cast function for the castTarget sort.
      */
     private void addCastFunctionAssertions(Sort castTarget) {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         addTypePredicate(castTarget);
-        SMTFunction f = functions.get(getCastFunctionName(castTarget));
+        SMTFunction f =
+            Objects.requireNonNull(functions.get(getCastFunctionName(castTarget)), "cast function");
         SMTFunction t = getTypePredicate(castTarget.name().toString());
         if (t == null) {
             LOGGER.error("No tp for {}", castTarget.name());
         }
-        SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
+        SMTTermVariable o = new SMTTermVariable("o",
+            Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"));
         // cast(o)
         SMTTerm fo = SMTTerm.call(f, o);
-        SMTTerm.call(t, fo);
+        SMTTerm.call(Objects.requireNonNull(t, "type predicate of " + castTarget), fo);
         // typeof(o)
-        SMTTerm to = SMTTerm.call(t, o);
-        SMTTerm body = SMTTerm.ite(to, o, nullConstant);
+        SMTTerm to = SMTTerm.call(Objects.requireNonNull(t, "type predicate of " + castTarget), o);
+        SMTTerm body = SMTTerm.ite(to, o, Objects.requireNonNull(nullConstant, "nullConstant"));
         SMTTerm assertion = fo.equal(body);
-        assertion = SMTTerm.forall(o, assertion, null);
+        assertion = forallWithoutPatterns(o, assertion);
         assertion.setComment("Assertion for " + castTarget + " cast function.");
         typeAssertions.put(f.getId(), assertion);
     }
@@ -1589,7 +1701,9 @@ public class SMTObjTranslator implements SMTTranslator {
             LOGGER.error("{} is not an object", s.name());
             return getIsFunction(smtSort);
         } else if (functions.containsKey(getExactInstanceName(s.name().toString()))) {
-            return functions.get(getExactInstanceName(s.name().toString()));
+            return Objects.requireNonNull(
+                functions.get(getExactInstanceName(s.name().toString())),
+                "exact instance of " + s.name());
         } else {
             SMTFunction f = createExactInstanceDefinition(s);
             functions.put(getExactInstanceName(s.name().toString()), f);
@@ -1619,9 +1733,11 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates the exactInstance function assertion(definition for final classes) for sort s.
      */
     private SMTFunction createExactInstanceDefinition(Sort sort) {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         String id = getExactInstanceName(sort.name().toString());
         SMTSort image = SMTSort.BOOL;
-        SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
+        SMTTermVariable o = new SMTTermVariable("o",
+            Objects.requireNonNull(sorts.get(OBJECT_SORT), "OBJECT_SORT sort"));
         addTypePredicate(sort);
         SMTFunction typeofFun = getTypePredicate(sort.name().toString());
         SMTTerm typeof;
@@ -1630,7 +1746,7 @@ public class SMTObjTranslator implements SMTTranslator {
         } else {
             typeof = SMTTerm.TRUE;
         }
-        SMTTerm children = o.equal(nullConstant);
+        SMTTerm children = o.equal(Objects.requireNonNull(nullConstant, "nullConstant"));
         for (SortNode node : thierarchy.getChildren(sort)) {
             Sort child = node.getSort();
             addTypePredicate(child);
@@ -1679,19 +1795,21 @@ public class SMTObjTranslator implements SMTTranslator {
      * Creates a function for checking if the given sort is the actual sort of an Any value.
      */
     private SMTFunction getIsFunction(SMTSort sort) {
+        Map<String, SMTSort> sorts = Objects.requireNonNull(this.sorts, "sorts");
         String id = "is" + sort.getId();
         if (functions.containsKey(id)) {
             return functions.get(id);
         }
         List<SMTSort> domain = new LinkedList<>();
-        domain.add(sorts.get(ANY_SORT));
+        domain.add(Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort"));
         SMTSort image = SMTSort.BOOL;
         SMTFunction isFunction = new SMTFunction(id, domain, image);
         SMTFunctionDef def;
-        SMTTermVariable v = new SMTTermVariable("x", sorts.get(ANY_SORT));
+        SMTTermVariable v = new SMTTermVariable("x",
+            Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort"));
         List<SMTTermVariable> vars = new LinkedList<>();
         vars.add(v);
-        long anySize = sorts.get(ANY_SORT).getBitSize();
+        long anySize = Objects.requireNonNull(sorts.get(ANY_SORT), "ANY_SORT sort").getBitSize();
         // special case for boolean
         if (sort.equals(SMTSort.BOOL)) {
             SMTTermNumber zero = new SMTTermNumber(0, anySize, sorts.get(BINT_SORT));
@@ -1703,7 +1821,8 @@ public class SMTObjTranslator implements SMTTranslator {
             functionDefinitionOrder.add(id);
             return def;
         }
-        SMTTermNumber targetNumber = sortNumbers.get(sort);
+        SMTTermNumber targetNumber =
+            Objects.requireNonNull(sortNumbers, "sortNumbers").get(sort);
         long firstBit = anySize - 1;
         long lastBit = anySize - 3;
         String extractTypeID = "(_ extract " + firstBit + " " + lastBit + ")";
@@ -1711,11 +1830,57 @@ public class SMTObjTranslator implements SMTTranslator {
         extrIDDomain.add(sorts.get(ANY_SORT));
         SMTFunction extractId = new SMTFunction(extractTypeID, extrIDDomain, SMTSort.mkBV(3));
         SMTTerm extract = SMTTerm.call(extractId, v);
-        SMTTerm isAssertion = extract.equal(targetNumber);
+        SMTTerm isAssertion =
+            extract.equal(Objects.requireNonNull(targetNumber, "number of " + sort));
         def = new SMTFunctionDef(isFunction, vars, isAssertion);
         functions.put(id, def);
         functionDefinitionOrder.add(id);
         return def;
+    }
+
+    /**
+     * Creates a universally quantified term without patterns.
+     * <p>
+     * The static {@link SMTTerm#forall} is used instead of the instance method to avoid flattening
+     * nested quantifiers.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    private static SMTTerm forallWithoutPatterns(SMTTermVariable bindVar, SMTTerm subForm) {
+        return SMTTerm.forall(bindVar, subForm, null);
+    }
+
+    /**
+     * Creates a universally quantified term without patterns.
+     * <p>
+     * The static {@link SMTTerm#forall} is used instead of the instance method to avoid flattening
+     * nested quantifiers.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    private static SMTTerm forallWithoutPatterns(List<SMTTermVariable> bindVars,
+            SMTTerm subForm) {
+        return SMTTerm.forall(bindVars, subForm, null);
+    }
+
+    /**
+     * Creates an existentially quantified term without patterns.
+     * <p>
+     * The static {@link SMTTerm#exists} is used instead of the instance method to avoid flattening
+     * nested quantifiers.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    private static SMTTerm existsWithoutPatterns(List<SMTTermVariable> bindVars,
+            SMTTerm subForm) {
+        return SMTTerm.exists(bindVars, subForm, null);
+    }
+
+    /**
+     * Returns the children of the given sort in the concrete type hierarchy.
+     * <p>
+     * The hierarchy treats a {@code null} sort as the root and returns an empty set in that case.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    private Set<SortNode> getChildrenOf(@Nullable Sort sort) {
+        return concreteHierarchy.getChildren(sort);
     }
 
     /**
@@ -1727,7 +1892,8 @@ public class SMTObjTranslator implements SMTTranslator {
         int i = 0;
         for (Term t : subs) {
             SMTTerm sub = translateTerm(t);
-            SMTSort target = function.getDomainSorts().get(i);
+            SMTSort target =
+                Objects.requireNonNull(function.getDomainSorts(), "domain sorts").get(i);
             sub = castTermIfNecessary(sub, target);
             subTerms.add(sub);
             i++;

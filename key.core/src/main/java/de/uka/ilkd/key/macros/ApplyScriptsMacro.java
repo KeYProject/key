@@ -190,7 +190,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
      * always present; the dereferences of the (nullable) parent node, rule application and
      * position are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private static @Nullable OpReplacer getUpdateReplacer(Goal goal) {
         RuleApp ruleApp = goal.node().parent().getAppliedRuleApp();
         Term appliedOn = ruleApp.posInOccurrence().subTerm();
@@ -226,7 +226,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
      * always present; the dereferences of the (nullable) parent node, rule application and
      * position are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private static JavaBlock getJavaBlock(Goal goal) {
         RuleApp ruleApp = goal.node().parent().getAppliedRuleApp();
         JTerm appliedOn = (JTerm) ruleApp.posInOccurrence().subTerm();
@@ -243,7 +243,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
      * scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
             ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
             @Nullable ProverTaskListener listener)
@@ -275,7 +275,7 @@ public class ApplyScriptsMacro extends AbstractProofMacro {
             // command binds them (see makeObtainVarMap), and no JmlIO is available while a macro
             // runs, so collectVariablesInProof(null) is the intended invocation; null JFunction
             // values are unbound-obtain sentinels that OpReplacer leaves untouched.
-            @SuppressWarnings({ "nullness:assignment.type.incompatible",
+            @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible",
                 "nullness:argument.type.incompatible" })
             Map<LocationVariable, JFunction> obtainMap =
                 makeObtainVarMap(jmlAssert.collectVariablesInProof(null));

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
@@ -43,7 +45,7 @@ public class AllowedCutPositionFeature extends BinaryFeature {
 
         while (it.next() != -1) {
             final int child = it.getChild();
-            final var op = it.getSubTerm().op();
+            final var op = Objects.requireNonNull(it.getSubTerm()).op();
 
             if (op == Junctor.NOT) {
                 negated = !negated;

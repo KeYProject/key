@@ -60,7 +60,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable CloseAfterMergeRuleBuiltInRuleApp replacePos(PosInOccurrence newPos) {
         return null;
@@ -90,7 +90,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public Node getThePartnerNode() {
         return partnerNode;
     }
@@ -103,7 +103,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public Node getCorrespondingMergeNode() {
         return correspondingMergeNode;
     }
@@ -116,7 +116,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public SymbolicExecutionState getMergeState() {
         return mergeNodeState;
     }
@@ -129,7 +129,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public SymbolicExecutionState getPartnerSEState() {
         return partnerState;
     }
@@ -142,7 +142,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public JTerm getPc() {
         return pc;
     }
@@ -155,7 +155,7 @@ public class CloseAfterMergeRuleBuiltInRuleApp extends AbstractBuiltInRuleApp<Cl
      * The backing field is intentionally {@code @Nullable} (it is only guaranteed non-null after
      * {@link #complete()} returns true); the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
     public Set<Name> getNewNames() {
         return newNames;
     }

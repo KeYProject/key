@@ -103,7 +103,7 @@ public class UndoHistoryButton {
      * @param pressedSelection callback if a dropdown entry is selected
      * @param actionSupplier callback that provides the list of actions to display
      */
-    @SuppressWarnings("nullness:initialization.fields.uninitialized")
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized", "NullAway" })
     public UndoHistoryButton(MainWindow mainWindow, int iconSize, IconFontProvider actionIcon,
             String prefix,
             Consumer<UserAction> pressedAction, Consumer<UserAction> pressedSelection,

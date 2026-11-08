@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
@@ -36,7 +38,7 @@ public final class TextualJMLInitially extends TextualJMLConstruct {
 
     @Override
     public String toString() {
-        return inv.first.getText();
+        return Objects.requireNonNull(inv.first, "no parser rule context").getText();
     }
 
 

@@ -689,7 +689,7 @@ public class ModelExtractor {
      * which the domain and image sorts are always present; the dereferences are suppressed with a
      * scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void addFunction(SMTFunction f) {
         if (f.getDomainSorts().isEmpty()) {
             switch (f.getImageSort().getId()) {
@@ -728,7 +728,7 @@ public class ModelExtractor {
      * {@code types} is set via {@link #setTypes(ProblemTypeInformation)} prior to any query
      * generation; the dereference of this nullable field is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void generateTypeQueries() {
         queries = new LinkedList<>();
         currentQuery = 0;
@@ -746,7 +746,7 @@ public class ModelExtractor {
      * {@code types} is set via {@link #setTypes(ProblemTypeInformation)} prior to any query
      * generation; the dereference of this nullable field is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void generateBasicQueries() {
         queries = new LinkedList<>();
         currentQuery = 0;
@@ -901,7 +901,7 @@ public class ModelExtractor {
      * {@code types} is set via {@link #setTypes(ProblemTypeInformation)} prior to any query
      * generation; the dereference of this nullable field is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void generateSeqQueries() {
         queries = new LinkedList<>();
         currentQuery = 0;
@@ -1015,7 +1015,7 @@ public class ModelExtractor {
      * to be present at the time this method runs (see {@link #setTypes(ProblemTypeInformation)}
      * and the query-answer protocol); the dereferences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void processBasicQueries() {
         model.setTypes(Objects.requireNonNull(types));
 
@@ -1282,7 +1282,7 @@ public class ModelExtractor {
      * runs (see the query-answer protocol); the dereference of the possibly-null query result is
      * suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void processTypesQueries() {
         for (Query q : queries) {
             if (q instanceof ObjectTypeQuery oq) {

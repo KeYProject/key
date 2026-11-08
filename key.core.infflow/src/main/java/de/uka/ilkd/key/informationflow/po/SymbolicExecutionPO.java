@@ -134,15 +134,9 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
     /**
      * {@inheritDoc}
      *
-     * Deliberately nullable: {@code null} is returned when the contract has
-     * no measured-by clause. {@link ContractPO#getMbyAtPre()} is not
-     * nullness-annotated in key.core although all realizations (including
-     * {@code DependencyContractPO}) return {@code null} for absent clauses,
-     * and none of the callers in key.core dereferences the result (all such
-     * call sites are commented out).
+     * {@code null} is returned when the contract has no measured-by clause.
      */
     @Override
-    @SuppressWarnings("nullness:override.return.invalid")
     public @Nullable JTerm getMbyAtPre() {
         if (contract.hasMby()) {
             return symbExecVars.pre.mbyAtPre;
@@ -257,14 +251,9 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
     }
 
     /**
-     * Deliberately returns {@code null}: information flow contracts do not
-     * have global defs. {@link AbstractOperationPO} declares a non-null
-     * return type although its only caller,
-     * {@code createApplyGlobalUpdateTerm}, explicitly null-tolerates the
-     * result; the base signature cannot be widened from this module.
+     * Deliberately returns {@code null}: information flow contracts do not have global defs.
      */
     @Override
-    @SuppressWarnings("nullness:override.return.invalid")
     protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
             @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {

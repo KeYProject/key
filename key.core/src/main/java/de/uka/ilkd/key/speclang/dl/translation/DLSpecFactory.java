@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang.dl.translation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.SourceElement;
@@ -197,7 +198,8 @@ public final class DLSpecFactory {
         assert selfVar != null;
         assert inv != null;
 
-        final KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(selfVar.sort());
+        final KeYJavaType kjt = Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType(selfVar.sort()), "no KeYJavaType for self");
         assert kjt != null;
 
         return new ClassInvariantImpl(name, displayName, kjt, ModifierKind.PRIVATE, inv,
@@ -245,7 +247,8 @@ public final class DLSpecFactory {
             }
         }
 
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
         // heapAtPre variable may be omitted
         TermBuilder tb = services.getTermBuilder();
         if (heapAtPreVar == null) {
@@ -292,9 +295,15 @@ public final class DLSpecFactory {
             }
         }
 
-        final boolean isLibraryClass =
-            ((TypeDeclaration) pm.getContainerType().getJavaType()).isLibraryClass();
-        return cf.func(name, pm.getContainerType(), pm, modalityKind, pres,
+        final boolean isLibraryClass = ((TypeDeclaration) Objects.requireNonNull(
+            Objects.requireNonNull(pm.getContainerType(), "no container type").getJavaType(),
+            "no java type")).isLibraryClass();
+        @SuppressWarnings("NullAway") // DL contracts support neither measured_by/axioms clauses nor
+                                      // a self or result variable for static/constructor contracts;
+                                      // the params of ContractFactory.func are @NonNull but should
+                                      // be @Nullable (like the JML path)
+        FunctionalOperationContract contract = cf.func(name, pm.getContainerType(), pm,
+            modalityKind, pres,
             new LinkedHashMap<>(), null, // TODO measured_by in DL contracts
                                          // not supported yet
             posts, new LinkedHashMap<>(), null, // TODO no model methods in DL
@@ -304,5 +313,6 @@ public final class DLSpecFactory {
             hasModifiable, new LinkedHashMap<>(), // TODO strictly pure in DL
             // contracts not supported yet
             selfVar, paramVars, resultVar, excVar, atPreVars, !isLibraryClass);
+        return contract;
     }
 }

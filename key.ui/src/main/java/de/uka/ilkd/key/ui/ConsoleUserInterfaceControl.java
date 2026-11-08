@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -170,7 +171,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             }
             System.exit(1);
         }
-        final int openGoals = proof.openGoals().size();
+        // proof is non-null here: the null branch above terminates the program with
+        // System.exit(1), which NullAway does not model as terminating.
+        final Proof loadedProof =
+            Objects.requireNonNull(proof, "no proof when the task finished");
+        final int openGoals = loadedProof.openGoals().size();
         if (info.getSource() instanceof ProverCore
                 || info.getSource() instanceof KeyAst.ProofScript) {
             printResults(openGoals, info, result);
@@ -197,14 +202,14 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                     var script = problemLoader.getProofScript();
                     if (script != null) {
                         ProofScriptEngine pse =
-                            new ProofScriptEngine(proof);
+                            new ProofScriptEngine(loadedProof);
                         this.taskStarted(
                             new DefaultTaskStartedInfo(TaskKind.Macro, "Script started", 0));
                         pse.execute(this, script);
                         // The start and end messages are fake to persuade the system ...
                         // All this here should refactored anyway ...
                         this.taskFinished(
-                            new DefaultTaskFinishedInfo(script, null, proof, 0, 0, 0));
+                            new DefaultTaskFinishedInfo(script, null, loadedProof, 0, 0, 0));
                     }
                 } catch (Exception e) {
                     LOGGER.debug("", e);
@@ -213,7 +218,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
             } else if (macroChosen()) {
                 applyMacro();
             } else {
-                finish(proof);
+                finish(loadedProof);
             }
         }
     }

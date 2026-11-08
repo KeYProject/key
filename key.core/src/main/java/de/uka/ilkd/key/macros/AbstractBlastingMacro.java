@@ -76,7 +76,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
      * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference is
      * suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected void addInvariantFormula(Goal goal) {
         Sort nullSort = goal.proof().getServices().getTypeConverter().getHeapLDT().getNull().sort();
 
@@ -119,7 +119,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
      * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference is
      * suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private List<SequentFormula> createFormulae(Services services,
             Set<Sort> sorts) {
         List<SequentFormula> result = new LinkedList<>();

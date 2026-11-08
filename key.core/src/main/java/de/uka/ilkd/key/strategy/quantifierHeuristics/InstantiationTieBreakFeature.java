@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -23,6 +25,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Orders quantifier instantiation candidates whose predicted cost is equal, so the choice within a
@@ -40,10 +43,10 @@ public class InstantiationTieBreakFeature implements Feature {
 
     private final ProjectionToTerm<Goal> varInst;
     /** the resolved tie-break, or {@code null} for the classic option */
-    private final QuantifierInstantiationTieBreak strategy;
+    private final @Nullable QuantifierInstantiationTieBreak strategy;
 
     private InstantiationTieBreakFeature(ProjectionToTerm<Goal> var,
-            QuantifierInstantiationTieBreak strategy) {
+            @Nullable QuantifierInstantiationTieBreak strategy) {
         varInst = var;
         this.strategy = strategy;
     }
@@ -78,7 +81,8 @@ public class InstantiationTieBreakFeature implements Feature {
 
         final Term formula = pos.sequentFormula().formula();
         final Term instance = varInst.toTerm(app, pos, jgoal, mState);
-        return Instantiation.computeTieBreak(instance, formula, goal.sequent(), jgoal,
-            (Services) goal.proof().getServices(), TriggerTreatment.BEST, strategy);
+        return Instantiation.computeTieBreak(Objects.requireNonNull(instance), formula,
+            goal.sequent(), jgoal, (Services) goal.proof().getServices(),
+            TriggerTreatment.BEST, strategy);
     }
 }

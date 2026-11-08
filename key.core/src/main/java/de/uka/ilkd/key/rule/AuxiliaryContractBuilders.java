@@ -218,7 +218,7 @@ public final class AuxiliaryContractBuilders {
          * the contract body; the dereferences of the (nullable) result variable and (nullable)
          * result type are suppressed with a scoped key.
          */
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
         private void declareResultDefault() {
             if (occursReturnAndIsReturnTypeNotVoid()) {
                 if (alreadyDeclared != null && alreadyDeclared.result != null) {
@@ -295,7 +295,7 @@ public final class AuxiliaryContractBuilders {
             // returnFlag is null exactly when the block contains no return statement (see
             // AuxiliaryContract.VariablesCreator); the replacer only consults it when processing a
             // return, which cannot occur in that case, so the flag is deliberately passed as-is.
-            @SuppressWarnings("nullness:argument.type.incompatible")
+            @SuppressWarnings({ "nullness:argument.type.incompatible", "NullAway" })
             OuterBreakContinueAndReturnReplacer replacer =
                 new OuterBreakContinueAndReturnReplacer(block, labels, breakOutLabel,
                     variables.breakFlags, variables.continueFlags, variables.returnFlag,
@@ -377,8 +377,8 @@ public final class AuxiliaryContractBuilders {
          * (existingPO == false); the rule-application callers of this overload always build in an
          * existing PO, so the null program element is never dereferenced.
          */
-        @SuppressWarnings("nullness:argument.type.incompatible")
-        public Variables createAndRegister(JTerm self, boolean existingPO) {
+        @SuppressWarnings({ "nullness:argument.type.incompatible", "NullAway" })
+        public Variables createAndRegister(@Nullable JTerm self, boolean existingPO) {
             return createAndRegister(self, existingPO, null);
         }
 
@@ -391,7 +391,8 @@ public final class AuxiliaryContractBuilders {
          *        will have their remembrance variables replaced by the one created here.
          * @return the registered variables.
          */
-        public Variables createAndRegister(JTerm self, boolean existingPO, ProgramElement pe) {
+        public Variables createAndRegister(@Nullable JTerm self, boolean existingPO,
+                ProgramElement pe) {
             if (existingPO) {
                 // In an existing PO, the outer remembrance vars already exist and refer to the
                 // current method's prestate.
@@ -702,7 +703,7 @@ public final class AuxiliaryContractBuilders {
          *         with a
          *         scoped key.
          */
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
         public JTerm buildAnonOutUpdate(final Set<? extends LocationVariable> vars,
                 final Map<LocationVariable, Function> anonymisationHeaps,
                 final Map<LocationVariable, JTerm> modifiableClauses, final String prefix) {
@@ -803,12 +804,16 @@ public final class AuxiliaryContractBuilders {
          * @param contract the contract being applied.
          * @param heaps the heaps.
          * @param variables the variables.
-         * @param self the self term.
+         * @param self the self term (absent for static methods).
          * @param services services.
          */
+        // termify stores the (possibly absent) self term into AuxiliaryContract.Terms.self, which
+        // is @Nullable (de.uka.ilkd.key.speclang is out of scope of the rule fixes); the pass is
+        // suppressed with a scoped key.
+        @SuppressWarnings("NullAway")
         public ConditionsAndClausesBuilder(final AuxiliaryContract contract,
                 final List<LocationVariable> heaps, final BlockContract.Variables variables,
-                final JTerm self, final Services services) {
+                final @Nullable JTerm self, final Services services) {
             super(services.getTermFactory(), services);
             this.contract = contract;
             this.heaps = heaps;
@@ -1033,7 +1038,7 @@ public final class AuxiliaryContractBuilders {
          *         scoped
          *         key.
          */
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
         private Map<LocationVariable, Map<JTerm, JTerm>> constructRemembranceVariables() {
             Map<LocationVariable, Map<JTerm, JTerm>> result =
                 new LinkedHashMap<>();
@@ -1058,7 +1063,7 @@ public final class AuxiliaryContractBuilders {
          *
          * @return the base heap.
          */
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
         private LocationVariable getBaseHeapFunction() {
             return services.getTypeConverter().getHeapLDT().getHeap();
         }
@@ -1120,13 +1125,13 @@ public final class AuxiliaryContractBuilders {
          * @param heaps the heaps.
          * @param pm the method containg the block.
          * @param selfKJT the self variable's type.
-         * @param self the self variable.
+         * @param self the self variable (absent for static methods).
          * @param services services.
          * @return the assumptions for the {@code self} variable.
          */
-        @SuppressWarnings("nullness:dereference.of.nullable")
+        @SuppressWarnings({ "nullness:dereference.of.nullable", "NullAway" })
         public JTerm buildSelfConditions(List<LocationVariable> heaps, IProgramMethod pm,
-                KeYJavaType selfKJT, JTerm self, Services services) {
+                KeYJavaType selfKJT, @Nullable JTerm self, Services services) {
             if (self != null && !pm.isConstructor()) {
                 JTerm notNull = not(equals(self, NULL()));
 

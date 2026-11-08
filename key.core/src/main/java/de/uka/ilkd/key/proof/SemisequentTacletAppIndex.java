@@ -99,7 +99,7 @@ public class SemisequentTacletAppIndex {
      * The formula is asserted to have a term index in the map below (the method is a destructive
      * update); the dereference of the (nullable) term index is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void addTaclets(RuleFilter filter, SequentFormula cfma,
             Services services,
             TacletIndex tacletIndex, NewRuleListener listener) {
@@ -242,7 +242,7 @@ public class SemisequentTacletAppIndex {
      * state during index rebuilds); callers invoke this only after populating the map, so the
      * difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     private TermTacletAppIndex getTermIndex(PosInOccurrence pos) {
         return termIndices.get(pos.sequentFormula());
     }

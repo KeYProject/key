@@ -255,13 +255,14 @@ public interface LoopSpecification extends SpecificationElement {
      * @param modifiable the new modifiable clauses.
      * @param freeModifiable the new free modifiable clauses.
      * @param infFlowSpecs the new information flow specification elements.
-     * @param variant the new loop variant.
+     * @param variant the new loop variant (may be null, e.g. if the loop has no variant).
      * @return The configured loop specification.
      */
     LoopSpecification configurate(
             Map<LocationVariable, JTerm> invariants, Map<LocationVariable, JTerm> freeInvariants,
             Map<LocationVariable, JTerm> modifiable, Map<LocationVariable, JTerm> freeModifiable,
-            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, JTerm variant);
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs,
+            @Nullable JTerm variant);
 
     /**
      * Returns a new loop invariant where the loop reference has been replaced with the passed one.

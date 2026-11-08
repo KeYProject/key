@@ -116,7 +116,7 @@ public class LogicPrinter {
      *        (nullable) services are therefore passed on deliberately and the argument errors are
      *        suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public LogicPrinter(NotationInfo notationInfo, @Nullable Services services,
             PosTableLayouter layouter) {
         this.notationInfo = notationInfo;
@@ -159,7 +159,7 @@ public class LogicPrinter {
      *        are forwarded to the {@link SequentViewLogicPrinter} factory, whose argument error is
      *        suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public static SequentViewLogicPrinter quickPrinter(@Nullable Services services,
             boolean usePrettyPrinting, boolean useUnicodeSymbols,
             boolean hidePackagePrefix) {
@@ -178,10 +178,10 @@ public class LogicPrinter {
      * Converts a term to a string.
      *
      * @param t a term.
-     * @param services services.
+     * @param services services (may be null for degraded printing).
      * @return the printed term.
      */
-    public static String quickPrintTerm(JTerm t, Services services) {
+    public static String quickPrintTerm(JTerm t, @Nullable Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
             NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
     }
@@ -221,14 +221,14 @@ public class LogicPrinter {
      * Converts a term to a string.
      *
      * @param t a term.
-     * @param services services.
+     * @param services services (may be null for degraded printing).
      * @param usePrettyPrinting whether to use pretty-printing.
      * @param useUnicodeSymbols whether to use unicode symbols.
      * @param hidePackagePrefix
      * @return the printed term.
      */
-    public static String quickPrintTerm(JTerm t, Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols, boolean hidePackagePrefix) {
+    public static String quickPrintTerm(JTerm t, @Nullable Services services,
+            boolean usePrettyPrinting, boolean useUnicodeSymbols, boolean hidePackagePrefix) {
         var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
         p.layouter().beginC();
         p.printTerm(t);
@@ -329,7 +329,7 @@ public class LogicPrinter {
      *        schema variable type; the dereference of the (nullable) notation is suppressed with a
      *        scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void printTaclet(org.key_project.prover.rules.Taclet taclet, SVInstantiations sv,
             boolean showWholeTaclet,
             boolean declareSchemaVars) {
@@ -420,7 +420,7 @@ public class LogicPrinter {
      *        The application restriction of a rewrite taclet is always set; the dereference of the
      *        (nullable) restriction is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected void printRewriteAttributes(RewriteTaclet taclet) {
         final var applicationRestriction = taclet.applicationRestriction();
         layouter.nl().print(applicationRestriction.toString());
@@ -499,7 +499,7 @@ public class LogicPrinter {
      *        A schema variable that is defined by type has a type attached; the dereference of the
      *        (nullable) type is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected void printNewVarcond(NewVarcond p_sv) {
         de.uka.ilkd.key.rule.NewVarcond sv = (de.uka.ilkd.key.rule.NewVarcond) p_sv;
         layouter.beginC();
@@ -560,7 +560,7 @@ public class LogicPrinter {
      *        {@code hasTrigger()} guarantees that the trigger is present; the dereference of the
      *        (nullable) trigger is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected void printTriggers(Taclet taclet) {
         if (!taclet.hasTrigger()) {
             return;
@@ -772,7 +772,7 @@ public class LogicPrinter {
      *        the
      *        dereferences of the (nullable) filtrate lists are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void printFilteredSequent(SequentPrintFilter filter) {
         try {
             ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
@@ -957,7 +957,7 @@ public class LogicPrinter {
      *        The notation table is fully populated when printing; the dereference of the (nullable)
      *        notation is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void printLabels(JTerm t) {
         notationInfo.getNotation(TermLabel.class).print(t, this);
     }
@@ -972,7 +972,7 @@ public class LogicPrinter {
      *        The number of term-label children of a label matches its declared child count; the
      *        dereference of a (nullable) label child is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     void printLabels(JTerm t, String left, String right) {
 
         ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
@@ -1319,7 +1319,7 @@ public class LogicPrinter {
      *        the
      *        dereferences inside the fancy branch are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void printObserver(JTerm t, @Nullable JTerm tacitHeap) {
         assert t.op() instanceof IObserverFunction;
         assert t.boundVars().isEmpty();
@@ -1882,7 +1882,7 @@ public class LogicPrinter {
      * The services are present whenever a term is printed; the dereference of the (nullable)
      * services field is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void printModalityTerm(String left, JavaBlock jb, String right, JTerm phi, int ass) {
         assert jb != null;
         assert jb.program() != null;

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
@@ -37,8 +38,10 @@ public class AssumesInstantiator {
     private final Goal goal;
     private final AssumesInstantiationCache ifInstCache;
 
-    private ImmutableArray<AssumesFormulaInstantiation> allAntecFormulas;
-    private ImmutableArray<AssumesFormulaInstantiation> allSuccFormulas;
+    private ImmutableArray<AssumesFormulaInstantiation> allAntecFormulas =
+        new ImmutableArray<>();
+    private ImmutableArray<AssumesFormulaInstantiation> allSuccFormulas =
+        new ImmutableArray<>();
 
     private ImmutableList<NoPosTacletApp> results = ImmutableList.nil();
 
@@ -230,8 +233,9 @@ public class AssumesInstantiator {
             p_ifSeqTail.size() == 1 && (p_ifSeqTail2nd == null || p_ifSeqTail2nd.isEmpty());
         final ImmutableArray<AssumesFormulaInstantiation> formulas =
             getSequentFormulas(antec, !lastIfFormula || p_alreadyMatchedNewFor);
-        final AssumesMatchResult mr = getTaclet().getMatcher().matchAssumes(formulas,
-            p_ifSeqTail.head().formula(), p_matchCond, getServices());
+        final AssumesMatchResult mr = Objects.requireNonNull(getTaclet().getMatcher(),
+            "taclet has no matcher").matchAssumes(formulas, p_ifSeqTail.head().formula(),
+                p_matchCond, getServices());
 
         // For each matching formula call the method again to match
         // the remaining terms
@@ -253,8 +257,10 @@ public class AssumesInstantiator {
 
     private NoPosTacletApp setAllInstantiations(MatchConditions p_matchCond,
             ImmutableList<AssumesFormulaInstantiation> p_alreadyMatched) {
-        return NoPosTacletApp.createNoPosTacletApp(getTaclet(), p_matchCond.getInstantiations(),
-            p_alreadyMatched, getServices());
+        return Objects.requireNonNull(
+            NoPosTacletApp.createNoPosTacletApp(getTaclet(), p_matchCond.getInstantiations(),
+                p_alreadyMatched, getServices()),
+            "no taclet app for all assumed formula instantiations");
     }
 
     /**

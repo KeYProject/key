@@ -199,7 +199,7 @@ public abstract class AbstractProblemLoader {
      *        still under initialization, but is safe because the field it writes is only read
      *        after construction, also suppressed.
      */
-    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized",
         "nullness:method.invocation.invalid" })
     protected AbstractProblemLoader(Path file, List<Path> classPath, Path bootClassPath,
             List<Path> includes, @Nullable Profile profileOfNewProofs,
@@ -230,7 +230,7 @@ public abstract class AbstractProblemLoader {
      * forwarded as-is when the environment input is constructed. The field keeps its non-null type
      * so the assignment is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     public void setClassPath(@Nullable List<Path> classPath) {
         this.classPath = classPath;
     }
@@ -242,7 +242,7 @@ public abstract class AbstractProblemLoader {
      * forwarded as-is when the environment input is constructed. The field keeps its non-null type
      * so the assignment is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     public void setBootClassPath(@Nullable Path bootClassPath) {
         this.bootClassPath = bootClassPath;
     }
@@ -254,7 +254,7 @@ public abstract class AbstractProblemLoader {
      * only forwarded as-is when the environment input is constructed. The field keeps its non-null
      * type so the assignment is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     public void setIncludes(@Nullable List<Path> includes) {
         this.includes = includes;
     }
@@ -375,7 +375,7 @@ public abstract class AbstractProblemLoader {
      *      init config and only then inspects their warnings; the dereferences of the corresponding
      *      (nullable) fields are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected void loadEnvironment() throws ProofInputException, IOException {
         FileRepo fileRepo = createFileRepo();
 
@@ -462,7 +462,7 @@ public abstract class AbstractProblemLoader {
      *         the
      *         dereference of the (nullable) file-name path is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected EnvInput createEnvInput(FileRepo fileRepo) throws IOException {
 
         final String filename = file.getFileName().toString();
@@ -589,7 +589,7 @@ public abstract class AbstractProblemLoader {
      *         dereference of the (nullable) environment-input field is suppressed with a scoped
      *         key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected ProblemInitializer createProblemInitializer(FileRepo fileRepo) {
         @Nullable
         Profile profile = enforcedProfile();
@@ -612,7 +612,7 @@ public abstract class AbstractProblemLoader {
      *         dereference of
      *         the (nullable) problem-initializer field is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected InitConfig createInitConfig() throws ProofInputException {
         return problemInitializer.prepare(Objects.requireNonNull(envInput));
     }
@@ -684,7 +684,7 @@ public abstract class AbstractProblemLoader {
      *         The init config is always set before a contract is looked up; the dereference of the
      *         (nullable) init-config field is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private LoadedPOContainer loadByChosenContract(String chooseContract) {
         int proofNum = 0;
         String baseContractName;
@@ -726,7 +726,7 @@ public abstract class AbstractProblemLoader {
      *         with a
      *         scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected ProofAggregate createProof(LoadedPOContainer poContainer) throws ProofInputException {
 
         ProofAggregate proofList =
@@ -762,7 +762,7 @@ public abstract class AbstractProblemLoader {
      * {@code KeYUserProblemFile} and thus non-null; the dereference of the (nullable)
      * environment-input field is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public @Nullable ProofScript getProofScript() {
         if (!hasProofScript()) {
             return null;
@@ -790,7 +790,7 @@ public abstract class AbstractProblemLoader {
      *         nullable-typed values into {@code setProperty}/{@code ReplayResult} is the deliberate
      *         fail-fast idiom; those argument errors are suppressed scoped as well.
      */
-    @SuppressWarnings({ "nullness:dereference.of.nullable",
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
         "nullness:argument.type.incompatible" })
     private ReplayResult replayProof(Proof proof) {
         String status = "";

@@ -196,13 +196,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void>
      *        selected
      * @param info the macro result, or {@code null} when the macro was interrupted before
      *        producing one
-     *
-     *        <p>
-     *        The listeners ignore the position and result of an interrupted macro, so the
-     *        deliberate {@code null}s are passed on although the interface declares non-null
-     *        parameters, suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
     protected void emitProofMacroFinished(Node node, ProofMacro macro,
             @Nullable PosInOccurrence posInOcc,
             @Nullable ProofMacroFinishedInfo info) {

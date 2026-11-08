@@ -177,7 +177,7 @@ public class JmlAssert extends JavaStatement {
             return false;
         }
         // super.equals() check classes
-        final JmlAssert jmlAssert = (JmlAssert) o;
+        final JmlAssert jmlAssert = Objects.requireNonNull((JmlAssert) o);
         return kind == jmlAssert.kind && Objects.equals(condition, jmlAssert.condition);
     }
 

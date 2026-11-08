@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
@@ -39,7 +40,8 @@ public class IsLabeledCondition implements VariableCondition {
     }
 
     @Override
-    public @Nullable MatchResultInfo check(SchemaVariable sv, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable sv,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices services) {
         final var svInst =
             (SVInstantiations) matchCond.getInstantiations();
@@ -48,7 +50,8 @@ public class IsLabeledCondition implements VariableCondition {
 
         final ArrayList<ProgramElement> labels = new ArrayList<>();
         ProgramPrefix prefix = //
-            (ProgramPrefix) svInst.getContextInstantiation().program();
+            (ProgramPrefix) Objects.requireNonNull(svInst.getContextInstantiation(),
+                "no context instantiation").program();
         do {
             if (prefix instanceof LabeledStatement
                     && ((LabeledStatement) prefix).getBody().equals(stmt)) {

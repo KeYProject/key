@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
@@ -98,9 +99,13 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     protected static TacletAppContainer createContainer(NoPosTacletApp p_app,
             @Nullable PosInOccurrence p_pio,
             Goal p_goal, boolean p_initial) {
+        // a null position (a no-find taclet) is legitimately handed to the strategy's cost
+        // computation, which tolerates it; the parameter is still declared @NonNull there.
+        @SuppressWarnings("NullAway")
+        final RuleAppCost p_ageFreeCost =
+            p_goal.getGoalStrategy().computeCost(p_app, p_pio, p_goal);
         // the cost is the regular strategy cost, so it may be reused
-        return createContainer(p_app, p_pio, p_goal,
-            p_goal.getGoalStrategy().computeCost(p_app, p_pio, p_goal), true, p_initial);
+        return createContainer(p_app, p_pio, p_goal, p_ageFreeCost, true, p_initial);
     }
 
     private static TacletAppContainer createContainer(NoPosTacletApp p_app,
@@ -171,7 +176,12 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     /**
      * Use the method <code>instantiateApp</code> of the strategy for choosing the values of schema
      * variables that have not been instantiated so far
+     * <p>
+     * No-find taclets have no position, which is legitimately handed to the strategy's
+     * {@code instantiateApp}; the parameter is still declared non-null there, so the call is
+     * suppressed with a scoped key.
      */
+    @SuppressWarnings("NullAway")
     private ImmutableList<RuleAppContainer> instantiateApp(NoPosTacletApp app,
             ImmutableList<RuleAppContainer> targetList, final Goal p_goal) {
         // just for being able to modify the result-list in an
@@ -241,7 +251,12 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * the
      * full cost would be {@link TopRuleAppCost}, so {@code null} is returned (drop the app).
      * Otherwise, and whenever reuse is disabled/inapplicable, falls back to the normal recompute.
+     * <p>
+     * No-find taclets have no position, which is legitimately handed to the cost features and to
+     * {@code computeCost}; the parameters are still declared non-null there, so the calls are
+     * suppressed with a scoped key.
      */
+    @SuppressWarnings("NullAway")
     private @Nullable TacletAppContainer costLocalReusedContainerOr(Goal p_goal) {
         // only a regular (computeCost) base may be carried forward; an instantiation-supplied base
         // would re-cost differently, so such containers always fall through to a normal recompute
@@ -300,7 +315,11 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         List<RuleAppCost> costs = new LinkedList<>();
 
         for (NoPosTacletApp app : p_app) {
-            costs.add(p_goal.getGoalStrategy().computeCost(app, p_pio, p_goal));
+            // a null position (a no-find taclet) is legitimately handed to the strategy's cost
+            // computation, which tolerates it; the parameter is still declared @NonNull there.
+            @SuppressWarnings("NullAway")
+            final RuleAppCost cost = p_goal.getGoalStrategy().computeCost(app, p_pio, p_goal);
+            costs.add(cost);
         }
 
         ImmutableList<RuleAppContainer> result = ImmutableList.nil();
@@ -350,7 +369,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         }
 
         final Iterator<AssumesFormulaInstantiation> it =
-            getTacletApp().assumesFormulaInstantiations().iterator();
+            Objects.requireNonNull(getTacletApp().assumesFormulaInstantiations(),
+                "assumes-instantiation is expected for a completed app").iterator();
         final FormulaTagManager tags = p_goal.getFormulaTagManager();
 
         while (it.hasNext()) {
@@ -385,7 +405,12 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
     /**
      * Create a <code>RuleApp</code> that is suitable to be applied or <code>null</code>.
+     * <p>
+     * No-find taclets have no position, which is legitimately handed to the strategy's
+     * {@code isApprovedApp}; the parameter is still declared non-null there, so the call is
+     * suppressed with a scoped key.
      */
+    @SuppressWarnings("NullAway")
     @Override
     public @Nullable TacletApp completeRuleApp(Goal p_goal) {
         if (!(isStillApplicable(p_goal) && assumesFormulasStillValid(p_goal))) {

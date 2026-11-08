@@ -7,6 +7,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -51,8 +52,10 @@ public class BooleanConnectiveHandler implements SMTHandler {
         var logicTrue = ldt.getTrueConst();
         supportedOperators.put(logicTrue, "true");
 
-        masterHandler.addDeclaration(new VerbatimSMT(handlerSnippets.getProperty("bool.decls")));
-        masterHandler.addAxiom(new VerbatimSMT(handlerSnippets.getProperty("bool.axioms")));
+        // the master always loads the snippets for every handler
+        Properties snippets = Objects.requireNonNull(handlerSnippets, "handler snippets");
+        masterHandler.addDeclaration(new VerbatimSMT(snippets.getProperty("bool.decls")));
+        masterHandler.addAxiom(new VerbatimSMT(snippets.getProperty("bool.axioms")));
         masterHandler.addKnownSymbol("sort_boolean");
         masterHandler.addSort(ldt.targetSort());
     }
@@ -68,7 +71,9 @@ public class BooleanConnectiveHandler implements SMTHandler {
         Operator op = term.op();
         String smtOp = supportedOperators.get(op);
         assert smtOp != null;
-        return new SExpr(smtOp, Type.BOOL, children);
+        // canHandle guarantees that op is a supported operator
+        return new SExpr(Objects.requireNonNull(smtOp, "operator not supported"), Type.BOOL,
+            children);
     }
 
 }

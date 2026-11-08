@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
@@ -156,15 +157,16 @@ public class DirectoryFileCollection implements FileCollection {
         @Override
         public InputStream openCurrent(FileRepo fileRepo) throws IOException {
             if (fileRepo != null) {
-                return fileRepo.getInputStream(currentFile);
+                return Objects.requireNonNull(fileRepo.getInputStream(
+                    Objects.requireNonNull(currentFile, "current file")), "input stream");
             } else {
                 return openCurrent(); // fallback without FileRepo
             }
         }
 
         @Override
-        public @Nullable Path getCurrentLocation() {
-            return currentFile;
+        public Path getCurrentLocation() {
+            return Objects.requireNonNull(currentFile, "current file");
         }
 
         @Override

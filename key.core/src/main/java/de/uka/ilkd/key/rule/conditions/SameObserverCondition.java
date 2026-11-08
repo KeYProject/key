@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -76,7 +77,8 @@ public final class SameObserverCondition implements VariableCondition {
 
     // explanation see class javadoc.
     @Override
-    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo mc,
             LogicServices p_services) {
         final Services services = (Services) p_services;
@@ -105,8 +107,9 @@ public final class SameObserverCondition implements VariableCondition {
             return null;
         }
 
-        KeYJavaType kjt = obs1.isStatic() ? obs1.getContainerType()
-                : services.getTypeConverter().getKeYJavaType(term1.sub(1));
+        KeYJavaType kjt = Objects.requireNonNull(obs1.isStatic() ? obs1.getContainerType()
+                : services.getTypeConverter().getKeYJavaType(term1.sub(1)),
+            "no KeYJavaType for observer " + obs1);
 
         ImmutableSet<Contract> contracts =
             UseDependencyContractRule.getApplicableContracts(services, kjt, obs1);

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -42,9 +43,11 @@ public class CastingFunctionsHandler implements SMTHandler {
     public void init(MasterHandler masterHandler, Services services,
             @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet();
-        this.select =
-            services.getTypeConverter().getHeapLDT().getSelect();
-        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+        this.select = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT").getSelect();
+        // the master always loads the snippets for every handler
+        masterHandler.addDeclarationsAndAxioms(
+            Objects.requireNonNull(handlerSnippets, "handler snippets"));
     }
 
     @Override

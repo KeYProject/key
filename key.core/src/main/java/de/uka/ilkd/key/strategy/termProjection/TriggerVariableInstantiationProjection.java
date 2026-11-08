@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termProjection;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet;
 
@@ -25,9 +27,9 @@ public class TriggerVariableInstantiationProjection implements ProjectionToTerm<
         assert app.rule() instanceof Taclet;
         final Taclet t = (Taclet) app.rule();
 
-        final SVInstantiationProjection instProj =
-            SVInstantiationProjection.create(t.getTrigger().triggerVar().name(), true);
-        return instProj.toTerm(app, pos, goal, mState);
+        final SVInstantiationProjection instProj = SVInstantiationProjection
+                .create(Objects.requireNonNull(t.getTrigger()).triggerVar().name(), true);
+        return Objects.requireNonNull(instProj.toTerm(app, pos, goal, mState));
     }
 
 

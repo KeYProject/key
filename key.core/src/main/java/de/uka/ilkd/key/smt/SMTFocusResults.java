@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -65,16 +66,20 @@ public final class SMTFocusResults {
             return false;
         }
 
-        Goal goal = smtProblem.getGoal();
+        Goal goal = Objects.requireNonNull(smtProblem.getGoal(), "goal");
         // cache the goal node, because we will apply rules on the goal
         // (changing the result of goal.node())
-        Node goalNode = smtProblem.getNode();
+        Node goalNode = Objects.requireNonNull(smtProblem.getNode(), "goal node");
 
-        FindTaclet hideLeft = (FindTaclet) goalNode.proof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(new Name("hide_left"));
+        FindTaclet hideLeft = Objects.requireNonNull((FindTaclet) Objects
+                .requireNonNull(goalNode.proof().getEnv(), "proof environment")
+                .getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_left")),
+            "hide_left taclet");
 
-        FindTaclet hideRight = (FindTaclet) goalNode.proof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(new Name("hide_right"));
+        FindTaclet hideRight = Objects.requireNonNull((FindTaclet) Objects
+                .requireNonNull(goalNode.proof().getEnv(), "proof environment")
+                .getInitConfigForEnvironment().lookupActiveTaclet(new Name("hide_right")),
+            "hide_right taclet");
 
         Semisequent antecedent = goalNode.sequent().antecedent();
         Semisequent succedent = goalNode.sequent().succedent();
@@ -87,11 +92,15 @@ public final class SMTFocusResults {
             if (!unsatCore.contains(pio)) {
                 // TODO: ugly way of acessing. Can be done better?!
                 SchemaVariable schema = hideLeft.collectSchemaVars().iterator().next();
-                TacletApp app = PosTacletApp.createPosTacletApp(hideLeft, new MatchConditions(),
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
-                    services);
-                app = app.addCheckedInstantiation(schema, (JTerm) sf.formula(), services, true);
-                goal = goal.apply(app).iterator().next();
+                TacletApp app = Objects.requireNonNull(
+                    PosTacletApp.createPosTacletApp(hideLeft, new MatchConditions(),
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                        services),
+                    "pos taclet app for hide_left");
+                app = Objects.requireNonNull(
+                    app.addCheckedInstantiation(schema, (JTerm) sf.formula(), services, true),
+                    "checked hide_left app");
+                goal = Objects.requireNonNull(goal.apply(app), "applied goal").iterator().next();
             }
             i++;
         }
@@ -103,12 +112,15 @@ public final class SMTFocusResults {
             if (!unsatCore.contains(pio)) {
                 // TODO: ugly way of acessing. Can be done better?!
                 SchemaVariable schema = hideRight.collectSchemaVars().iterator().next();
-                TacletApp app =
+                TacletApp app = Objects.requireNonNull(
                     PosTacletApp.createPosTacletApp(hideRight, new MatchConditions(),
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
-                        services);
-                app = app.addCheckedInstantiation(schema, (JTerm) sf.formula(), services, true);
-                goal = goal.apply(app).iterator().next();
+                        services),
+                    "pos taclet app for hide_right");
+                app = Objects.requireNonNull(
+                    app.addCheckedInstantiation(schema, (JTerm) sf.formula(), services, true),
+                    "checked hide_right app");
+                goal = Objects.requireNonNull(goal.apply(app), "applied goal").iterator().next();
             }
             i++;
         }
@@ -128,9 +140,12 @@ public final class SMTFocusResults {
     public static @Nullable ImmutableList<PosInOccurrence> getUnsatCore(
             SMTProblem problem) {
 
-        SMTSolver solver = problem.getSuccessfulSolver();
+        // a problem with an unsat core always has a successful solver attached
+        SMTSolver solver =
+            Objects.requireNonNull(problem.getSuccessfulSolver(), "successful solver");
 
-        if (solver.getFinalResult().isValid() != ThreeValuedTruth.VALID) {
+        if (Objects.requireNonNull(solver.getFinalResult(), "final solver result")
+                .isValid() != ThreeValuedTruth.VALID) {
             return null;
         }
 
@@ -151,7 +166,7 @@ public final class SMTFocusResults {
             return null;
         }
 
-        Node goalNode = problem.getNode();
+        Node goalNode = Objects.requireNonNull(problem.getNode(), "goal node");
 
         Set<Integer> unsatCore = new TreeSet<>();
         Arrays.stream(numbers).forEach(unsatCore::add);

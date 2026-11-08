@@ -7,6 +7,7 @@ package de.uka.ilkd.key.ui;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.RuleCompletionHandler;
@@ -199,21 +200,24 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
     }
 
     protected void macroSideProofDisposing(final ProofMacroFinishedInfo initiatingInfo,
-            final Proof initiatingProof, final Proof sideProof) {
+            @Nullable final Proof initiatingProof, final Proof sideProof) {
         ThreadUtilities.invokeAndWait(() -> {
             saveSideProof(sideProof);
             // make everyone listen to the proof remove
             getMediator().startInterface(true);
-            if (initiatingProof.closed()) {
-                Node root = initiatingProof.root();
+            // a missing original proof is an inconsistent state in which the previous code
+            // crashed with an NPE
+            final Proof originalProof = Objects.requireNonNull(initiatingProof,
+                "original proof of the side-proof macro");
+            if (originalProof.closed()) {
+                Node root = originalProof.root();
                 if (root != null) {
                     // a closed proof always has a root; a missing root is an inconsistent state
                     // in which the previous code crashed with an NPE
                     getMediator().getSelectionModel().setSelectedNode(root);
                 }
             } else {
-                getMediator().getSelectionModel()
-                        .setSelectedGoal(initiatingProof.openGoals().head());
+                getMediator().getSelectionModel().setSelectedGoal(originalProof.openGoals().head());
             }
             // go into automode again
             getMediator().stopInterface(true);
@@ -257,7 +261,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
      * implementations only pass it on to logging and tolerate a {@code null}, suppressed with a
      * scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "nullness:argument.type.incompatible", "NullAway" })
     private void reportSideProofSaveFailure(Exception e) {
         reportException(this, null, e);
     }

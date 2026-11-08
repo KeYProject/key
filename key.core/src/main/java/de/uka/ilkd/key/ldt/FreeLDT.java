@@ -18,6 +18,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Generic data type, which has no predefined theory. It is meant as a basis to implement an
@@ -65,12 +66,11 @@ public final class FreeLDT extends LDT {
     }
 
     /**
-     * Stub that is never reached: {@code assert false} aborts when this LDT would be used; the
-     * unreachable null return is suppressed with a scoped key.
+     * Stub that is never reached: {@code assert false} aborts when this LDT would be used. The
+     * return is declared {@code @Nullable} like the base contract.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
-    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public @Nullable Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         assert false;
         return null;
     }
@@ -81,12 +81,11 @@ public final class FreeLDT extends LDT {
     }
 
     /**
-     * Stub that is never reached: {@code assert false} aborts when this LDT would be used; the
-     * unreachable null return is suppressed with a scoped key.
+     * Stub that is never reached: {@code assert false} aborts when this LDT would be used. The
+     * return is declared {@code @Nullable} like the base contract.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op() instanceof Function && hasLiteralFunction((Function) t.op())) {
             return FreeLiteral.INSTANCE;
         }
@@ -95,12 +94,11 @@ public final class FreeLDT extends LDT {
     }
 
     /**
-     * Stub that is never reached: {@code assert false} aborts when this LDT would be used; the
-     * unreachable null return is suppressed with a scoped key.
+     * Stub that is never reached: {@code assert false} aborts when this LDT would be used. The
+     * return is declared {@code @Nullable} like the base contract.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false;
         return null;
     }

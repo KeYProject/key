@@ -70,7 +70,7 @@ public abstract class AbstractProfile implements Profile {
      * while the receiver is still under initialization (EISOP initialization check); safe here
      * because each result is only assigned to its final field, suppressed with a scoped key.
      */
-    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized",
         "nullness:method.invocation.invalid" })
     protected AbstractProfile(String standardRuleFilename) {
         final var ruleSource = RuleSourceFactory.fromDefaultLocation(standardRuleFilename);

@@ -236,9 +236,11 @@ public class InvariantConfigurator {
 
                 loopInvTexts[INV_IDX] = new LinkedHashMap<>();
                 final Map<LocationVariable, JTerm> atPres = loopInv.getInternalAtPres();
+                final HeapLDT heapLdt = Objects.requireNonNull(services.getTypeConverter()
+                        .getHeapLDT(),
+                    "heap LDT of the java services");
 
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                        .getAllHeaps()) {
+                for (LocationVariable heap : heapLdt.getAllHeaps()) {
                     final JTerm invariant =
                         loopInv.getInvariant(heap, loopInv.getInternalSelfTerm(), atPres, services);
 
@@ -252,8 +254,7 @@ public class InvariantConfigurator {
 
                 loopInvTexts[MOD_IDX] = new LinkedHashMap<>();
 
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                        .getAllHeaps()) {
+                for (LocationVariable heap : heapLdt.getAllHeaps()) {
                     final JTerm modifiable =
                         loopInv.getModifiable(heap, loopInv.getInternalSelfTerm(), atPres,
                             services);
@@ -278,8 +279,7 @@ public class InvariantConfigurator {
 
                 loopInvTexts[IF_PRE_IDX] = new LinkedHashMap<>();
 
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                        .getAllHeaps()) {
+                for (LocationVariable heap : heapLdt.getAllHeaps()) {
                     final ImmutableList<InfFlowSpec> infFlowSpecs = loopInv.getInfFlowSpecs(heap,
                         loopInv.getInternalSelfTerm(), atPres, services);
 
@@ -296,8 +296,7 @@ public class InvariantConfigurator {
 
                 loopInvTexts[IF_POST_IDX] = new LinkedHashMap<>();
 
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                        .getAllHeaps()) {
+                for (LocationVariable heap : heapLdt.getAllHeaps()) {
                     final ImmutableList<InfFlowSpec> infFlowSpecs = loopInv.getInfFlowSpecs(heap,
                         loopInv.getInternalSelfTerm(), atPres, services);
 
@@ -314,8 +313,7 @@ public class InvariantConfigurator {
 
                 loopInvTexts[IF_OO_IDX] = new LinkedHashMap<>();
 
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                        .getAllHeaps()) {
+                for (LocationVariable heap : heapLdt.getAllHeaps()) {
                     final ImmutableList<InfFlowSpec> infFlowSpecs = loopInv.getInfFlowSpecs(heap,
                         loopInv.getInternalSelfTerm(), atPres, services);
 
@@ -441,7 +439,7 @@ public class InvariantConfigurator {
 
             }
 
-            public JTextArea createInputTextArea(String title, String text) {
+            public JTextArea createInputTextArea(String title, @Nullable String text) {
                 JTextArea inputTextArea = new JTextArea(text);
                 inputTextArea.setBorder(BorderFactory.createTitledBorder(
                     BorderFactory.createLineBorder(Color.DARK_GRAY), title));
@@ -571,20 +569,21 @@ public class InvariantConfigurator {
                 return loopRep;
             }
 
-            private JPanel createErrorPanel(Map<String, String> invMsgs,
-                    Map<String, Color> invColors, Map<String, String> modMsgs,
-                    Map<String, Color> modColors, Map<String, String> varMsgs,
-                    Map<String, Color> varColors) {
+            private JPanel createErrorPanel(@Nullable Map<String, String> invMsgs,
+                    @Nullable Map<String, Color> invColors,
+                    @Nullable Map<String, String> modMsgs, @Nullable Map<String, Color> modColors,
+                    @Nullable Map<String, String> varMsgs, @Nullable Map<String, Color> varColors) {
                 JPanel panel = new JPanel();
                 panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
 
                 JTabbedPane invPane = new JTabbedPane(JTabbedPane.BOTTOM);
                 JTabbedPane modPane = new JTabbedPane(JTabbedPane.BOTTOM);
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                        .getAllHeaps()) {
+                final HeapLDT heapLdt = Objects.requireNonNull(services.getTypeConverter()
+                        .getHeapLDT(),
+                    "heap LDT of the java services");
+                for (LocationVariable heap : heapLdt.getAllHeaps()) {
 
-                    final LocationVariable baseHeap =
-                        services.getTypeConverter().getHeapLDT().getHeap();
+                    final LocationVariable baseHeap = heapLdt.getHeap();
                     final String k = heap.name().toString();
                     String title =
                         format("Invariant%s - Status: ", heap == baseHeap ? "" : "[" + k + "]");
@@ -604,7 +603,8 @@ public class InvariantConfigurator {
                 heapPanes.add(invPane);
                 heapPanes.add(modPane);
                 JTextArea varErrorArea = createErrorTextField("Variant - Status",
-                    varMsgs.get(DEFAULT), varColors.get(DEFAULT));
+                    Objects.requireNonNull(varMsgs, "variant error messages").get(DEFAULT),
+                    Objects.requireNonNull(varColors, "variant error colors").get(DEFAULT));
                 panel.add(varErrorArea);
 
                 final int charXWidth =
@@ -627,9 +627,11 @@ public class InvariantConfigurator {
                 Map<String, Color> modColors = new LinkedHashMap<>();
                 Map<String, String> varMsgs = new LinkedHashMap<>();
                 Map<String, Color> varColors = new LinkedHashMap<>();
+                final HeapLDT heapLdt = Objects.requireNonNull(services.getTypeConverter()
+                        .getHeapLDT(),
+                    "heap LDT of the java services");
 
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                        .getAllHeaps()) {
+                for (LocationVariable heap : heapLdt.getAllHeaps()) {
                     final String k = heap.name().toString();
                     setOK(invMsgs, invColors, k);
                     setOK(modMsgs, modColors, k);
@@ -645,12 +647,13 @@ public class InvariantConfigurator {
             }
 
             private void setError(Map<String, String> msgMap, Map<String, Color> colors,
-                    String setOn, String errorMsg) {
+                    String setOn, @Nullable String errorMsg) {
                 msgMap.put(setOn, errorMsg);
                 colors.put(setOn, COLOR_ERROR);
             }
 
-            private JTextArea createErrorTextField(String title, String errorMessage, Color color) {
+            private JTextArea createErrorTextField(String title, @Nullable String errorMessage,
+                    @Nullable Color color) {
                 JTextArea errorTextfield = new JTextArea();
                 errorTextfield.setPreferredSize(errorTextfield.getMinimumSize());
                 errorTextfield.setBorder(BorderFactory.createTitledBorder(title));
@@ -829,8 +832,10 @@ public class InvariantConfigurator {
                 Map<String, Color> modCols = new LinkedHashMap<>();
                 Map<String, String> respErrors = new LinkedHashMap<>();
                 Map<String, Color> respCols = new LinkedHashMap<>();
-                for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                        .getAllHeaps()) {
+                final HeapLDT heapLdt = Objects.requireNonNull(services.getTypeConverter()
+                        .getHeapLDT(),
+                    "heap LDT of the java services");
+                for (LocationVariable heap : heapLdt.getAllHeaps()) {
                     try {
                         invariantTerm.put(heap, parseInvariant(heap));
                         setOK(invErrors, invCols, heap.toString());
@@ -844,7 +849,7 @@ public class InvariantConfigurator {
                         setError(modErrors, modCols, heap.toString(), e.getMessage());
                     }
                 }
-                LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+                LocationVariable baseHeap = heapLdt.getHeap();
                 // TODO: add post expressions and new objects
                 try {
                     infFlowSpecs.put(baseHeap, parseInfFlowSpec(baseHeap));
@@ -859,7 +864,8 @@ public class InvariantConfigurator {
                     int i = inputPane.getSelectedIndex();
                     // TODO Jonas: hier geht's bei der manuellen Regelanwendung vermutlich schief,
                     // wenn es nur freie Invarianten gibt
-                    if (invariants.get(i)[VAR_IDX].get(DEFAULT).isEmpty()) {
+                    if (Objects.requireNonNull(invariants.get(i)[VAR_IDX].get(DEFAULT),
+                        "variant text").isEmpty()) {
                         variantTerm = null;
                         if (requiresVariant) {
                             throw new ParserException(VARIANT_REQUIRED, null);
@@ -889,9 +895,10 @@ public class InvariantConfigurator {
                 }
             }
 
-            private void updateErrorPanel(Map<String, String> invErrors, Map<String, Color> invCols,
-                    Map<String, String> modErrors, Map<String, Color> modCols,
-                    Map<String, String> varErrors, Map<String, Color> varCols) {
+            private void updateErrorPanel(@Nullable Map<String, String> invErrors,
+                    @Nullable Map<String, Color> invCols, @Nullable Map<String, String> modErrors,
+                    @Nullable Map<String, Color> modCols, @Nullable Map<String, String> varErrors,
+                    @Nullable Map<String, Color> varCols) {
                 boolean reeinit = true;
                 boolean errorFound = false;
 
@@ -899,7 +906,8 @@ public class InvariantConfigurator {
                     for (Map.Entry<String, String> entry : invErrors.entrySet()) {
                         String k = entry.getKey();
                         String invError = entry.getValue();
-                        Color invCol = invCols.get(k);
+                        Color invCol = Objects.requireNonNull(invCols, "invariant error colors")
+                                .get(k);
                         JTabbedPane p = (JTabbedPane) errorPanel.getComponent(0);
                         JTextArea jta = (JTextArea) p.getComponent(p.indexOfTab(k));
                         jta.setForeground(invCol);
@@ -914,7 +922,8 @@ public class InvariantConfigurator {
                     for (Map.Entry<String, String> entry : modErrors.entrySet()) {
                         String k = entry.getKey();
                         String modError = entry.getValue();
-                        Color modCol = modCols.get(k);
+                        Color modCol = Objects.requireNonNull(modCols, "modifiable error colors")
+                                .get(k);
                         JTabbedPane p = (JTabbedPane) errorPanel.getComponent(1);
                         JTextArea jta = (JTextArea) p.getComponent(p.indexOfTab(k));
                         jta.setForeground(modCol);
@@ -927,7 +936,8 @@ public class InvariantConfigurator {
                 }
                 if (varErrors != null) {
                     String varError = varErrors.get(DEFAULT);
-                    Color varCol = varCols.get(DEFAULT);
+                    Color varCol =
+                        Objects.requireNonNull(varCols, "variant error colors").get(DEFAULT);
                     JTextArea jta = (JTextArea) errorPanel.getComponent(2);
                     jta.setForeground(varCol);
                     jta.setText(varError);
@@ -960,8 +970,9 @@ public class InvariantConfigurator {
              */
             protected JTerm parseInvariant(LocationVariable heap) {
                 index = inputPane.getSelectedIndex();
-                JTerm result =
-                    parser.parseExpression(invariants.get(index)[INV_IDX].get(heap.toString()));
+                JTerm result = parser.parseExpression(
+                    Objects.requireNonNull(invariants.get(index)[INV_IDX].get(heap.toString()),
+                        "invariant formula for " + heap));
                 if (result.sort() != JavaDLTheory.FORMULA) {
                     throw newUnexpectedTypeException(JavaDLTheory.FORMULA, result.sort());
                 }
@@ -975,7 +986,9 @@ public class InvariantConfigurator {
             protected JTerm parseModifiable(LocationVariable heap) {
                 index = inputPane.getSelectedIndex();
                 final Sort locSetSort = services.getTypeConverter().getLocSetLDT().targetSort();
-                String string = invariants.get(index)[MOD_IDX].get(heap.toString());
+                String string =
+                    Objects.requireNonNull(invariants.get(index)[MOD_IDX].get(heap.toString()),
+                        "modifiable text for " + heap);
                 if (string.trim().equals("\\strictly_nothing")) {
                     // FIXME
                     // This is a hack that has been introduced to be able
@@ -991,12 +1004,15 @@ public class InvariantConfigurator {
 
             protected ImmutableList<InfFlowSpec> parseInfFlowSpec(LocationVariable heap) {
                 index = inputPane.getSelectedIndex();
-                final String preExpsAsString =
-                    invariants.get(index)[IF_PRE_IDX].get(heap.toString());
-                final String postExpsAsString =
-                    invariants.get(index)[IF_POST_IDX].get(heap.toString());
-                final String newObjectsAsString =
-                    invariants.get(index)[IF_OO_IDX].get(heap.toString());
+                final String preExpsAsString = Objects
+                        .requireNonNull(invariants.get(index)[IF_PRE_IDX].get(heap.toString()),
+                            "info-flow pre expressions for " + heap);
+                final String postExpsAsString = Objects
+                        .requireNonNull(invariants.get(index)[IF_POST_IDX].get(heap.toString()),
+                            "info-flow post expressions for " + heap);
+                final String newObjectsAsString = Objects
+                        .requireNonNull(invariants.get(index)[IF_OO_IDX].get(heap.toString()),
+                            "info-flow new objects for " + heap);
                 // TODO: allow more than one term
                 JTerm preExps = parser.parseExpression(preExpsAsString);
                 // TODO: allow more than one term
@@ -1013,7 +1029,9 @@ public class InvariantConfigurator {
             protected JTerm parseVariant() {
                 index = inputPane.getSelectedIndex();
                 final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
-                JTerm result = parser.parseExpression(invariants.get(index)[VAR_IDX].get(DEFAULT));
+                JTerm result = parser.parseExpression(
+                    Objects.requireNonNull(invariants.get(index)[VAR_IDX].get(DEFAULT),
+                        "variant formula"));
                 if (result.sort() != intSort) {
                     throw newUnexpectedTypeException(intSort, result.sort());
                 }

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -39,7 +41,8 @@ public class MultipleVarDecl extends ProgramTransformer {
             SVInstantiations svInst) {
         VariableDeclaration vardecl = (VariableDeclaration) pe;
         ImmutableArray<Modifier> modifiers = vardecl.getModifiers();
-        TypeReference tref = vardecl.getTypeReference();
+        TypeReference tref =
+            Objects.requireNonNull(vardecl.getTypeReference(), "no type reference");
         ImmutableArray<? extends VariableSpecification> variables = vardecl.getVariables();
         VariableSpecification headVar = variables.get(0);
         VariableSpecification[] tailVars = new VariableSpecification[variables.size() - 1];

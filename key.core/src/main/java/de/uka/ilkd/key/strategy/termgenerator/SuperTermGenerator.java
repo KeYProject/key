@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -31,7 +32,6 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 /**
  * Generates the terms upward a given (usually the find-)position and
@@ -152,8 +152,8 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
             }
 
             @Override
-            public @Nullable ImmutableArray<Sort> argSorts() {
-                return null;
+            public ImmutableArray<Sort> argSorts() {
+                return new ImmutableArray<>(JavaDLTheory.ANY, JavaDLTheory.ANY);
             }
 
             @Override
@@ -199,7 +199,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
             int i = depth;
             while (it.next() != -1) {
                 i--;
-                ancestors[i] = it.getSubTerm();
+                ancestors[i] = Objects.requireNonNull(it.getSubTerm());
                 childIndices[i] = it.getChild();
             }
         }

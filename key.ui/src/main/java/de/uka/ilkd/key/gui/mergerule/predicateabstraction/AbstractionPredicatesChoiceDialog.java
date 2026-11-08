@@ -284,6 +284,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         txtPlaceholderInput.addKeyListener(new KeyAdapter() {
             @Override
+            @SuppressWarnings("NullAway") // the problems renderer appends the message to a
+                                          // StringBuilder, which renders a null message as "null";
+                                          // widening the list element type would ripple
             public void keyReleased(KeyEvent evt) {
                 final String currInput = txtPlaceholderInput.getText();
 
@@ -335,10 +338,20 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE && !placeholdersLstModel.isEmpty()
                         && selectedIndex >= 0) {
                     placeholdersLstModel.remove(selectedIndex);
-                    final Pair<Sort, Name> removedPlaceholder =
-                        registeredPlaceholders.remove(selectedIndex);
+                    final ArrayList<Pair<Sort, Name>> placeholders = registeredPlaceholders;
+                    if (placeholders == null) {
+                        // placeholders are cleared when the dialog is cancelled
+                        throw new NullPointerException("No registered placeholders available.");
+                    }
+                    final Pair<Sort, Name> removedPlaceholder = placeholders.remove(selectedIndex);
+                    final Goal currentGoal = goal;
+                    if (currentGoal == null) {
+                        // the goal is only absent in test runs without a proof
+                        throw new NullPointerException(
+                            "No goal available for removing a placeholder.");
+                    }
                     final Namespace<IProgramVariable> pvs =
-                        goal.proof().getServices().getNamespaces().programVariables();
+                        currentGoal.proof().getServices().getNamespaces().programVariables();
                     pvs.remove(removedPlaceholder.second);
                 }
             }
@@ -379,6 +392,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         txtAbstrPredInput.addKeyListener(new KeyAdapter() {
             @Override
+            @SuppressWarnings("NullAway") // the problems renderer appends the message to a
+                                          // StringBuilder, which renders a null message as "null";
+                                          // widening the list element type would ripple
             public void keyReleased(KeyEvent evt) {
                 final String currInput = txtAbstrPredInput.getText();
 
@@ -388,11 +404,18 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 }
 
                 try {
+                    // the guards are crash-equivalent: with a null goal (test runs without a
+                    // proof) or after cancellation, the NPE is caught and displayed as before
+                    final Goal currentGoal =
+                        Objects.requireNonNull(goal, "No goal available for parsing.");
                     final AbstractionPredicate pred =
-                        parsePredicate(currInput, goal.getLocalNamespaces());
+                        parsePredicate(currInput, currentGoal.getLocalNamespaces());
                     abstrPredProblemsListData.clear();
 
-                    if (registeredPredicates.contains(pred)) {
+                    final ArrayList<AbstractionPredicate> predicates =
+                        Objects.requireNonNull(registeredPredicates,
+                            "registered predicates are cleared when the dialog is cancelled");
+                    if (predicates.contains(pred)) {
                         abstrPredProblemsListData.add("Predicate is already registered");
                     }
                 } catch (Exception e) {
@@ -437,7 +460,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE && !abstrPredListModel.isEmpty()
                         && selectedIndex >= 0) {
                     abstrPredListModel.remove(selectedIndex);
-                    registeredPredicates.remove(selectedIndex);
+                    final ArrayList<AbstractionPredicate> predicates = registeredPredicates;
+                    if (predicates == null) {
+                        // predicates are cleared when the dialog is cancelled
+                        throw new NullPointerException("No registered predicates available.");
+                    }
+                    predicates.remove(selectedIndex);
                 }
             }
         });

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Label;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.logic.SyntaxElement;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A map from some type to the same type.
@@ -46,12 +48,15 @@ public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
      * @param newSelf the new self variable.
      * @param services services.
      */
-    public void replaceSelf(final ProgramVariable oldSelf, final S newSelf, TermServices services) {
+    public void replaceSelf(final @Nullable ProgramVariable oldSelf, final @Nullable S newSelf,
+            TermServices services) {
         if (newSelf != null) {
-            if (!newSelf.sort().extendsTrans(oldSelf.sort())) {
+            // the callers assert that oldSelf is null exactly when newSelf is null
+            final ProgramVariable old = Objects.requireNonNull(oldSelf, "self variable");
+            if (!newSelf.sort().extendsTrans(old.sort())) {
                 throw new IllegalArgumentException("new self variable has to be compatible");
             }
-            put(convert(oldSelf, services), newSelf);
+            put(convert(old, services), newSelf);
         }
     }
 
@@ -81,13 +86,15 @@ public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
      * @param newVariable new variable.
      * @param services services.
      */
-    public void replaceVariable(final ProgramVariable oldVariable, final S newVariable,
-            TermServices services) {
+    public void replaceVariable(final @Nullable ProgramVariable oldVariable,
+            final @Nullable S newVariable, TermServices services) {
         if (newVariable != null) {
-            if (!oldVariable.sort().equals(newVariable.sort())) {
+            // absent variables (e.g. no return flag or result) are passed as null
+            final ProgramVariable old = Objects.requireNonNull(oldVariable, "variable");
+            if (!old.sort().equals(newVariable.sort())) {
                 throw new IllegalArgumentException("variables have to have the same sort");
             }
-            put(convert(oldVariable, services), newVariable);
+            put(convert(old, services), newVariable);
         }
     }
 
@@ -98,11 +105,16 @@ public abstract class ReplacementMap<S extends Sorted & SyntaxElement>
      * @param newRemembranceHeaps new remembrance heaps.
      * @param services services.
      */
+    @SuppressWarnings("NullAway") // newRemembranceHeaps may lack an entry for a heap present in
+                                  // oldRemembranceHeaps; main stores a null mapping in that case
+                                  // (the wrapped LinkedHashMap accepts null values)
     public void replaceRemembranceHeaps(
             final Map<LocationVariable, LocationVariable> oldRemembranceHeaps,
             final Map<LocationVariable, ? extends S> newRemembranceHeaps, final Services services) {
         if (newRemembranceHeaps != null) {
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+            HeapLDT heapLDT =
+                Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+            for (LocationVariable heap : heapLDT.getAllHeaps()) {
                 if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
                     continue;
                 }

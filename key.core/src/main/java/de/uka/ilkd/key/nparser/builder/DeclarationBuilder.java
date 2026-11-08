@@ -64,7 +64,7 @@ public class DeclarationBuilder extends DefaultBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitDecls(JavaKeYParser.DeclsContext ctx) {
         mapMapOf(ctx.option_decls(), ctx.options_choice(), ctx.ruleset_decls(), ctx.sort_decls(),
@@ -77,7 +77,7 @@ public class DeclarationBuilder extends DefaultBuilder {
      * The overridden declaration requires a non-null return type, but this implementation may
      * legitimately return {@code null}; the difference is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitDatatype_decl(JavaKeYParser.Datatype_declContext ctx) {
         var name = ctx.name.getText();
@@ -114,7 +114,8 @@ public class DeclarationBuilder extends DefaultBuilder {
      * suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "nullness:override.return.invalid", "nullness:dereference.of.nullable",
+        "NullAway" })
     public @Nullable Object visitProg_var_decls(JavaKeYParser.Prog_var_declsContext ctx) {
         for (int i = 0; i < ctx.simple_ident_comma_list_with_docs().size(); i++) {
             var c = ctx.simple_ident_comma_list_with_docs(i);
@@ -134,7 +135,7 @@ public class DeclarationBuilder extends DefaultBuilder {
                     // throw new AmbigiousDeclException(varName, getSourceName(), getLine(),
                     // getColumn())
                     if (!(name instanceof ProgramVariable pv)
-                            || !(pv.getKeYJavaType().equals(kjt))) {
+                            || !(Objects.requireNonNull(pv.getKeYJavaType()).equals(kjt))) {
                         programVariables().add(new LocationVariable(pvName, new TypeRef(kjt)));
                     }
                 } else {
@@ -146,7 +147,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitChoice(JavaKeYParser.ChoiceContext ctx) {
         String cat = ctx.category.getText();
@@ -177,7 +178,7 @@ public class DeclarationBuilder extends DefaultBuilder {
         return null;
     }
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitSort_decls(JavaKeYParser.Sort_declsContext ctx) {
         for (JavaKeYParser.One_sort_declContext c : ctx.one_sort_decl()) {
@@ -324,7 +325,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitRuleset_decls(JavaKeYParser.Ruleset_declsContext ctx) {
         for (JavaKeYParser.Simple_ident_with_docContext iddoc : ctx.id) {
@@ -340,7 +341,7 @@ public class DeclarationBuilder extends DefaultBuilder {
     }
 
 
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
     public @Nullable Object visitOptions_choice(JavaKeYParser.Options_choiceContext ctx) {
         return null;

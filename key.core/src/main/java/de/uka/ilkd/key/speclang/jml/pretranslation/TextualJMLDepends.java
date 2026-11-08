@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
@@ -40,11 +41,12 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
     }
 
     public ImmutableList<LabeledParserRuleContext> getDepends() {
-        return depends.get(HeapLDT.BASE_HEAP_NAME);
+        return Objects.requireNonNull(depends.get(HeapLDT.BASE_HEAP_NAME),
+            "no depends clause for base heap");
     }
 
     public ImmutableList<LabeledParserRuleContext> getDepends(Name hName) {
-        return depends.get(hName);
+        return Objects.requireNonNull(depends.get(hName), "no depends clause for heap " + hName);
     }
 
     @Override

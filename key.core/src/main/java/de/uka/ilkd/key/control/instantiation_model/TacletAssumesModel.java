@@ -48,6 +48,7 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
             }
 
             @Override
+            @SuppressWarnings("NullAway") // sentinel is matched by identity, never dereferenced
             public @Nullable SequentFormula getSequentFormula() {
                 return null;
             }

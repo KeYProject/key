@@ -7,6 +7,7 @@ package de.uka.ilkd.key.taclettranslation.assumptions;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -34,7 +35,7 @@ import org.jspecify.annotations.Nullable;
 class GenericTranslator {
     private final VariablePool pool;
     private final ArrayList<TranslationListener> listener = new ArrayList<>();
-    private Services services;
+    private @Nullable Services services;
 
     GenericTranslator(VariablePool pool) {
         this.pool = pool;
@@ -64,7 +65,7 @@ class GenericTranslator {
 
         if (!list.isEmpty()) {
             for (JTerm gt : list) {
-                result.add(AssumptionGenerator.quantifyTerm(gt, services));
+                result.add(AssumptionGenerator.quantifyTerm(gt, Objects.requireNonNull(services)));
 
             }
         }
@@ -92,15 +93,15 @@ class GenericTranslator {
     private @Nullable JTerm instantiateGeneric(JTerm term, GenericSort generic, Sort instantiation,
             Taclet t)
             throws IllegalArgumentException, IllegalTacletException {
+        Services services = Objects.requireNonNull(this.services);
         JTerm[] subTerms = new JTerm[term.arity()];
         ImmutableArray<QuantifiableVariable> variables = term.boundVars();
         for (int i = 0; i < term.arity(); i++) {
-            subTerms[i] = instantiateGeneric(term.sub(i), generic, instantiation, t);
-
-            if (subTerms[i] == null) {
+            JTerm subTerm = instantiateGeneric(term.sub(i), generic, instantiation, t);
+            if (subTerm == null) {
                 return null;
             }
-
+            subTerms[i] = subTerm;
         }
 
         if (term.sort().equals(generic)) {
@@ -184,7 +185,7 @@ class GenericTranslator {
             }
         } else {
             term = services.getTermFactory().createTerm(term.op(), subTerms, variables,
-                null);
+                new ImmutableArray<>());
         }
 
         return term;
@@ -198,6 +199,7 @@ class GenericTranslator {
      *         otherwise <code>false</code>
      */
     private boolean doInstantiation(GenericSort generic, Sort inst, TacletConditions conditions) {
+        Services services = Objects.requireNonNull(this.services);
 
         return !((inst instanceof GenericSort) || (inst.equals(JavaDLTheory.ANY))
                 || (conditions.containsIsReferenceCondition(generic) > 0
@@ -224,6 +226,7 @@ class GenericTranslator {
             @Nullable ImmutableSet<Sort> instSorts, Taclet t, TacletConditions conditions,
             int maxGeneric)
             throws IllegalTacletException {
+        Services services = Objects.requireNonNull(this.services);
         ImmutableList<JTerm> instantiatedTerms = ImmutableList.nil();
         if (maxGeneric < genericSorts.size()) {
             throw new IllegalTacletException("To many different generic sorts. Found: "
@@ -234,6 +237,8 @@ class GenericTranslator {
         if (genericSorts.isEmpty()) {
             return null;
         }
+
+        Objects.requireNonNull(instSorts);
 
         GenericSort[] genericTable = new GenericSort[genericSorts.size()];
         Sort[] instTable = new Sort[instSorts.size()];

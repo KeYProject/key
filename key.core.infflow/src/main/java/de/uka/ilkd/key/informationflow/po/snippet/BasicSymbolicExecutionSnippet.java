@@ -179,11 +179,8 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod implements 
      * Creates the method body statement for a non-constructor method call. The
      * context ({@code newContext}) and result ({@code res}) are deliberately
      * {@code null} for static and void methods respectively; the
-     * {@code MethodBodyStatement} constructor tolerates this (neither is
-     * dereferenced before being assigned, matching its usage throughout
-     * key.core), but its parameters are not nullness annotated.
+     * {@code MethodBodyStatement} constructor tolerates this.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
     private static MethodBodyStatement buildMethodBodyStatement(IProgramMethod method,
             @Nullable ProgramVariable newContext, @Nullable ProgramVariable res,
             ImmutableArray<Expression> args) {

@@ -272,7 +272,9 @@ public class CETree {
         result.add("Length=" + s.getLength());
 
         for (int i = 0; i < s.getLength(); ++i) {
-            result.add("[" + i + "]=" + Model.removePipes(s.get(i)));
+            // Sequence entries may legitimately be unset; the NPE on a missing entry is
+            // kept crash-equivalent by the explicit guard.
+            result.add("[" + i + "]=" + Model.removePipes(Objects.requireNonNull(s.get(i))));
         }
         return result;
     }

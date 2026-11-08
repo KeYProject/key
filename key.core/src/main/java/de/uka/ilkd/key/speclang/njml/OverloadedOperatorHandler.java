@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
@@ -193,10 +194,13 @@ public class OverloadedOperatorHandler {
             if (right == null) {
                 return null;
             }
-            if (left.getTerm().sort() == ldtSequence.targetSort()
-                    && right.getTerm().sort() == ldtSequence.targetSort()) {
+            JTerm leftTerm = Objects.requireNonNull(left.getTerm(), "sequence operand is no term");
+            JTerm rightTerm =
+                Objects.requireNonNull(right.getTerm(), "sequence operand is no term");
+            if (leftTerm.sort() == ldtSequence.targetSort()
+                    && rightTerm.sort() == ldtSequence.targetSort()) {
                 if (op == JMLOperator.ADD) {
-                    return new SLExpression(tb.seqConcat(left.getTerm(), right.getTerm()));
+                    return new SLExpression(tb.seqConcat(leftTerm, rightTerm));
                 }
             }
             return null;
@@ -219,8 +223,8 @@ public class OverloadedOperatorHandler {
             if (right == null) {
                 return null;
             }
-            final var l = left.getTerm();
-            final var r = right.getTerm();
+            final var l = Objects.requireNonNull(left.getTerm(), "locset operand is no term");
+            final var r = Objects.requireNonNull(right.getTerm(), "locset operand is no term");
             if (l.sort() == ldt.targetSort() && r.sort() == ldt.targetSort()) {
                 return switch (op) {
                     case ADD, BITWISE_OR -> new SLExpression(tb.union(l, r));
@@ -249,12 +253,13 @@ public class OverloadedOperatorHandler {
         @Override
         public @Nullable SLExpression build(JMLOperator op, SLExpression left,
                 @Nullable SLExpression right) {
-            if ((left.getTerm().sort() == sortBoolean
-                    || left.getTerm().sort() == JavaDLTheory.FORMULA)
-                    && (right.getTerm().sort() == sortBoolean
-                            || right.getTerm().sort() == JavaDLTheory.FORMULA)) {
-                final var t1 = tb.convertToFormula(left.getTerm());
-                final var t2 = tb.convertToFormula(right.getTerm());
+            final JTerm leftTerm =
+                Objects.requireNonNull(left.getTerm(), "boolean operand is no term");
+            if ((leftTerm.sort() == sortBoolean || leftTerm.sort() == JavaDLTheory.FORMULA)
+                    && (rightTerm(right).sort() == sortBoolean
+                            || rightTerm(right).sort() == JavaDLTheory.FORMULA)) {
+                final var t1 = tb.convertToFormula(leftTerm);
+                final var t2 = tb.convertToFormula(rightTerm(right));
                 return switch (op) {
                     case BITWISE_AND -> new SLExpression(tb.and(t1, t2));
                     case BITWISE_OR -> new SLExpression(tb.or(t1, t2));
@@ -264,6 +269,17 @@ public class OverloadedOperatorHandler {
                 };
             }
             return null;
+        }
+
+        /**
+         * The term of the right operand; a missing operand (which the previous code
+         * dereferenced unconditionally) fails with an NPE here as before.
+         */
+        private static JTerm rightTerm(@Nullable SLExpression right) {
+            return Objects.requireNonNull(
+                Objects.requireNonNull(right, "binary boolean operator needs a right operand")
+                        .getTerm(),
+                "boolean operand is no term");
         }
     }
 }

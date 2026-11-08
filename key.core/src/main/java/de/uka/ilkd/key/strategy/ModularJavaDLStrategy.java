@@ -81,7 +81,9 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
             (rule) -> responsibleStrategyCache.getResponsibleStrategies(rule, strategies,
                 StrategyAspect.Cost));
 
-        reduceInstTillMaxF = new ReduceTillMaxFeature(ComponentStrategy::instantiateApp,
+        reduceInstTillMaxF = new ReduceTillMaxFeature(
+            (s, app, pos, goal, mState) -> Objects.requireNonNull(
+                s.instantiateApp(app, pos, goal, mState), "no instantiation cost for " + s.name()),
             (rule) -> responsibleStrategyCache.getResponsibleStrategies(rule, strategies,
                 StrategyAspect.Instantiation));
 
@@ -136,7 +138,9 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
         var dis = new RuleSetDispatchFeature();
         var dispatchers =
             strategies.stream()
-                    .map(s -> new StratAndDispatcher(s, s.getDispatcher(StrategyAspect.Cost)))
+                    .map(s -> new StratAndDispatcher(s,
+                        Objects.requireNonNull(s.getDispatcher(StrategyAspect.Cost),
+                            "no cost dispatcher for " + s.name())))
                     .toList();
         var map = new HashMap<RuleSet, List<Name>>();
         for (var d : dispatchers) {
@@ -162,27 +166,41 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
      * @throws IllegalArgumentException if the conflict cannot be resolved
      */
     private void resolveConflict(RuleSetDispatchFeature d, RuleSet rs) {
-        var folStrat = responsibleStrategyCache.getStrategyByName(JFOLStrategy.NAME);
-        var intStrat = responsibleStrategyCache.getStrategyByName(IntegerStrategy.NAME);
+        var folStrat = Objects.requireNonNull(
+            responsibleStrategyCache.getStrategyByName(JFOLStrategy.NAME),
+            "no JFOL strategy registered for conflict resolution");
+        var intStrat = Objects.requireNonNull(
+            responsibleStrategyCache.getStrategyByName(IntegerStrategy.NAME),
+            "no integer strategy registered for conflict resolution");
+        var folCost = Objects.requireNonNull(folStrat.getDispatcher(StrategyAspect.Cost),
+            "no cost dispatcher for the FOL strategy");
+        var intCost = Objects.requireNonNull(intStrat.getDispatcher(StrategyAspect.Cost),
+            "no cost dispatcher for the integer strategy");
         switch (rs.name().toString()) {
             case "order_terms" -> {
                 bindRuleSet(d, "order_terms",
                     ifZero(applyTF("commEqLeft", tf.intF),
-                        intStrat.getDispatcher(StrategyAspect.Cost).remove(rs),
-                        folStrat.getDispatcher(StrategyAspect.Cost).remove(rs)));
+                        Objects.requireNonNull(intCost.remove(rs),
+                            "no integer cost for " + rs),
+                        Objects.requireNonNull(folCost.remove(rs),
+                            "no FOL cost for " + rs)));
             }
             case "apply_equations" -> {
                 bindRuleSet(d, "apply_equations",
                     ifZero(applyTF(FocusProjection.create(0), tf.intF),
-                        intStrat.getDispatcher(StrategyAspect.Cost).remove(rs),
-                        folStrat.getDispatcher(StrategyAspect.Cost).remove(rs)));
+                        Objects.requireNonNull(intCost.remove(rs),
+                            "no integer cost for " + rs),
+                        Objects.requireNonNull(folCost.remove(rs),
+                            "no FOL cost for " + rs)));
             }
             case "apply_equations_andOr" -> {
                 if (quantifierInstantiatedEnabled()) {
                     bindRuleSet(d, "apply_equations_andOr",
                         ifZero(applyTF(FocusProjection.create(0), tf.intF),
-                            intStrat.getDispatcher(StrategyAspect.Cost).remove(rs),
-                            folStrat.getDispatcher(StrategyAspect.Cost).remove(rs)));
+                            Objects.requireNonNull(intCost.remove(rs),
+                                "no integer cost for " + rs),
+                            Objects.requireNonNull(folCost.remove(rs),
+                                "no FOL cost for " + rs)));
                 } else {
                     bindRuleSet(d, "apply_equations_andOr", inftyConst());
                 }
@@ -199,8 +217,9 @@ public class ModularJavaDLStrategy extends AbstractFeatureStrategy {
 
     @Override
     public boolean isStopAtFirstNonCloseableGoal() {
-        return strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                .equals(StrategyProperties.STOPMODE_NONCLOSE);
+        return Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY),
+            "no stop mode strategy property").equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
     @Override

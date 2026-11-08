@@ -13,6 +13,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -35,7 +36,8 @@ public final class AlternativeVariableCondition extends VariableConditionAdapter
      * check whether any of the two delegates apply
      */
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement subst,
+            SVInstantiations svInst,
             Services services) {
         return delegate0.check(var, subst, svInst, services)
                 || delegate1.check(var, subst, svInst, services);

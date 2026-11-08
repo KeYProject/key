@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Label;
@@ -45,8 +46,8 @@ public final class NewJumpLabelCondition implements VariableCondition {
     }
 
     @Override
-    public @Nullable MatchConditions check(SchemaVariable var,
-            SyntaxElement instCandidate,
+    public @Nullable MatchConditions check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo matchCond,
             LogicServices services) {
         SVInstantiations instantiations = (SVInstantiations) matchCond.getInstantiations();
@@ -60,7 +61,8 @@ public final class NewJumpLabelCondition implements VariableCondition {
                 return null;
             }
             final List<ProgramElement> programs = collect(instantiations);
-            programs.add(instantiations.getContextInstantiation().program());
+            programs.add(Objects.requireNonNull(instantiations.getContextInstantiation(),
+                "no context instantiation").program());
             if (!isUnique((Label) instCandidate, programs, services)) {
                 return null;
             }

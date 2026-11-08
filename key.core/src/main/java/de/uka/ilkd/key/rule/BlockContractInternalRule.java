@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -95,8 +96,8 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
      * @param services services.
      * @return the preconditions.
      */
-    private static JTerm[] createPreconditions(final BlockContract contract, final JTerm self,
-            final List<LocationVariable> heaps,
+    private static JTerm[] createPreconditions(final BlockContract contract,
+            final @Nullable JTerm self, final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
@@ -205,25 +206,33 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
 
     @Override
     public BlockContractInternalBuiltInRuleApp<? extends BlockContractInternalRule> createApp(
-            final PosInOccurrence occurrence, TermServices services) {
-        return new BlockContractInternalBuiltInRuleApp<>(this, occurrence);
+            final @Nullable PosInOccurrence occurrence, TermServices services) {
+        return new BlockContractInternalBuiltInRuleApp<>(this,
+            Objects.requireNonNull(occurrence, "rule application needs a position"));
     }
 
+    // The self term is absent for static methods and {@code setInstantiationSelf} (in the
+    // out-of-scope speclang package) stores it as-is; the conditions builders null-check it.
+    @SuppressWarnings("NullAway")
     @Override
     public ImmutableList<Goal> apply(final Goal goal, final RuleApp ruleApp)
             throws RuleAbortException {
         assert ruleApp instanceof BlockContractInternalBuiltInRuleApp<?>;
         var application = (BlockContractInternalBuiltInRuleApp<?>) ruleApp;
 
-        final Instantiation instantiation =
-            instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
-        final BlockContract contract = application.getContract();
+        final PosInOccurrence pio = Objects.requireNonNull(application.posInOccurrence(),
+            "block contract app requires an occurrence");
+        final Instantiation instantiation = Objects.requireNonNull(
+            instantiate((JTerm) pio.subTerm(), goal), "no instantiation for block contract");
+        final BlockContract contract = Objects.requireNonNull(application.getContract(),
+            "no block contract set for rule application");
         contract.setInstantiationSelf(instantiation.self());
         assert contract.getBlock().equals(instantiation.statement());
         final JTerm contextUpdate = instantiation.update();
 
         final var services = goal.getOverlayServices();
-        final List<LocationVariable> heaps = application.getHeapContext();
+        final List<LocationVariable> heaps = Objects.requireNonNull(application.getHeapContext(),
+            "no heap context for rule application");
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
@@ -272,7 +281,13 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
 
     @Override
     public boolean isApplicable(Goal goal,
-            PosInOccurrence occurrence) {
+            @Nullable PosInOccurrence occurrence) {
+        // a {@code null} occurrence is not an occurrence at the top level of the succedent, i.e.
+        // the same outcome {@code occursNotAtTopLevelInSuccedent} computes below; making it
+        // explicit lets the flow analysis refine the occurrence for the subsequent lookups
+        if (occurrence == null) {
+            return false;
+        }
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -290,7 +305,8 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
 
         // If we are using internal rules, we can apply the respective loop contract directly,
         // without first applying this block contract.
-        return !contracts.isEmpty() && contracts.stream().allMatch(c -> c.toLoopContract() == null);
+        return contracts != null && !contracts.isEmpty()
+                && contracts.stream().allMatch(c -> c.toLoopContract() == null);
     }
 
     /**
@@ -325,8 +341,10 @@ public class BlockContractInternalRule extends AbstractBlockContractRule {
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
         Goal validityGoal = result.tail().tail().head();
-        final ProgramVariable exceptionParameter =
-            createLocalVariable("e", variables.exception.getTypeReference(), services);
+        final ProgramVariable exceptionParameter = createLocalVariable("e",
+            Objects.requireNonNull(variables.exception.getTypeReference(),
+                "no type reference for exception variable"),
+            services);
         configurator.setUpValidityGoal(validityGoal, new JTerm[] { updates[0], updates[1] },
             preconditions, new JTerm[] { assumptions[0], frameCondition }, exceptionParameter,
             conditionsAndClausesBuilder.terms);

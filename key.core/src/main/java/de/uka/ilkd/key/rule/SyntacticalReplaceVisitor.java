@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
@@ -82,10 +83,11 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param ruleApp the rule application
      * @param useTermCache the TermBuilder to use (allows to use the non cached version)
      */
-    private SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence,
+    private SyntacticalReplaceVisitor(TermLabelState termLabelState,
+            @Nullable TacletLabelHint labelHint,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             SVInstantiations svInst, Goal goal,
-            Rule rule, RuleApp ruleApp, boolean useTermCache) {
+            @Nullable Rule rule, @Nullable RuleApp ruleApp, boolean useTermCache) {
         this.termLabelState = termLabelState;
         this.services = goal.getOverlayServices();
         this.tb = services.getTermBuilder(useTermCache);
@@ -146,10 +148,11 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
      * @param rule the applied rule
      * @param ruleApp the rule application
      */
-    public SyntacticalReplaceVisitor(TermLabelState termLabelState, TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence,
+    public SyntacticalReplaceVisitor(TermLabelState termLabelState,
+            @Nullable TacletLabelHint labelHint,
+            @Nullable PosInOccurrence applicationPosInOccurrence,
             SVInstantiations svInst, Goal goal,
-            Rule rule, RuleApp ruleApp) {
+            @Nullable Rule rule, @Nullable RuleApp ruleApp) {
         this(termLabelState, labelHint, applicationPosInOccurrence, svInst, goal, rule, ruleApp,
             true);
     }
@@ -203,13 +206,16 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
                 new StatementBlock(((ContextStatementBlock) jb.program()).getBody()), // TODO
                 services, svInst);
             trans.start();
-            result = addContext((StatementBlock) trans.result());
+            result = addContext(Objects.requireNonNull((StatementBlock) trans.result(),
+                "program replacement produced no result"));
         } else {
             trans = new ProgramReplaceVisitor(jb.program(), services, svInst);
             trans.start();
             result = trans.result();
         }
-        return (result == jb.program()) ? jb : JavaBlock.createJavaBlock((StatementBlock) result);
+        return (result == jb.program()) ? jb
+                : JavaBlock.createJavaBlock(Objects.requireNonNull((StatementBlock) result,
+                    "program replacement produced no result"));
     }
 
     private JTerm[] neededSubs(int n) {
@@ -274,7 +280,9 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
     private Operator instantiateModality(JModality op, JavaBlock jb) {
         JModality.JavaModalityKind kind = op.kind();
         if (op.kind() instanceof ModalOperatorSV) {
-            kind = svInst.getInstantiation(op.kind());
+            kind = Objects.requireNonNull(
+                (JModality.JavaModalityKind) svInst.getInstantiation(op.kind()),
+                "no modality kind instantiated for modal operator");
         }
         if (jb != op.programBlock() || kind != op.kind()) {
             return JModality.getModality(kind, jb);
@@ -297,7 +305,8 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         }
         assert instantiatedOp != null;
 
-        return instantiatedOp;
+        return Objects.requireNonNull(instantiatedOp,
+            "schema variable was not (properly) instantiated");
     }
 
     private ImmutableArray<QuantifiableVariable> instantiateBoundVariables(JTerm visited) {
@@ -338,8 +347,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         if (visitedOp instanceof SchemaVariable visitedSV && visitedOp.arity() == 0
                 && svInst.isInstantiated(visitedSV)
                 && (!(visitedOp instanceof ProgramSV visitedAsPSV && visitedAsPSV.isListSV()))) {
-            final JTerm newTerm = toTerm(
-                svInst.getTermInstantiation(visitedSV, services));
+            final JTerm newTerm = toTerm(Objects.requireNonNull(
+                svInst.getTermInstantiation(visitedSV, services),
+                "schema variable is instantiated but has no term instantiation"));
+            // TermLabelManager.label requires a non-null rule context although it is only an
+            // optional context at runtime (see its javadoc); the fields are declared @Nullable
+            // because of the strategy-internal constructor without rule context. Widening would
+            // cascade into TermLabelManager and belongs to a dedicated wave, hence the scoped
+            // suppression.
+            @SuppressWarnings("NullAway")
             final JTerm labeledTerm = TermLabelManager.label(services, termLabelState,
                 applicationPosInOccurrence, rule, ruleApp, goal, labelHint, visited, newTerm);
             pushNew(labeledTerm);
@@ -393,9 +409,16 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             ImmutableArray<JTerm> newTermSubs,
             ImmutableArray<QuantifiableVariable> newTermBoundVars,
             ImmutableArray<TermLabel> newTermOriginalLabels) {
-        return TermLabelManager.instantiateLabels(termLabelState, services,
-            applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
+        // Like TermLabelManager.label, instantiateLabels declares its rule-context parameters
+        // @NonNull although they are optional at runtime (see its javadoc); the fields are
+        // @Nullable because of the strategy-internal constructor without rule context. Widening
+        // would cascade into TermLabelManager and belongs to a dedicated wave, hence the scoped
+        // suppression.
+        @SuppressWarnings("NullAway")
+        ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(termLabelState,
+            services, applicationPosInOccurrence, rule, ruleApp, goal, labelHint, tacletTerm,
             tb.tf().createTerm(newTermOp, newTermSubs, newTermBoundVars, newTermOriginalLabels));
+        return labels;
     }
 
     private Operator handleParametricFunction(ParametricFunctionInstance pfi) {
@@ -413,8 +436,15 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
             JTerm resolved = ((SubstOp) t.op()).apply(t, tb);
             resolved = tb.label(resolved, t.sub(1).getLabels());
             if (t.hasLabels()) {
-                resolved = TermLabelManager.refactorTerm(termLabelState, services, null, resolved,
-                    rule, goal, SUBSTITUTION_WITH_LABELS_HINT, t);
+                // refactorTerm declares its rule and goal parameters @NonNull although they are
+                // only an optional context at runtime (see its javadoc); the fields are declared
+                // @Nullable because of the strategy-internal constructor without rule context.
+                // Widening would cascade into TermLabelManager and belongs to a dedicated wave,
+                // hence the scoped suppression.
+                @SuppressWarnings("NullAway")
+                JTerm refactoredTerm = TermLabelManager.refactorTerm(termLabelState, services, null,
+                    resolved, rule, goal, SUBSTITUTION_WITH_LABELS_HINT, t);
+                resolved = refactoredTerm;
             }
             return resolved;
         } else {
@@ -466,6 +496,10 @@ public class SyntacticalReplaceVisitor implements DefaultVisitor {
         tacletTermStack.pop();
         if (subtreeRoot.op() instanceof TermTransformer mop) {
             final JTerm newTerm = mop.transform((JTerm) subStack.pop(), svInst, services);
+            // See the analogous suppression in visit(): label requires a non-null rule context
+            // although it is optional at runtime; the fields are @Nullable because of the
+            // strategy-internal constructor without rule context.
+            @SuppressWarnings("NullAway")
             final JTerm labeledTerm = TermLabelManager.label(services, termLabelState,
                 applicationPosInOccurrence, rule, ruleApp, goal, labelHint, (JTerm) subtreeRoot,
                 newTerm);

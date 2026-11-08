@@ -52,7 +52,7 @@ class ProofPruner {
      *         set-back); as in the pre-nullness code, the possibly-null app is passed through and
      *         {@link ProofCorrectnessMgt#ruleUnApplied} tolerates it.
      */
-    @SuppressWarnings({ "nullness:dereference.of.nullable",
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
         "nullness:argument.type.incompatible" })
     public ImmutableList<Node> prune(final Node cuttingPoint) {
         // special case: prune cached goal = only need to re-open the final node
@@ -204,7 +204,7 @@ class ProofPruner {
      *        dereference
      *        of the (nullable) rule-app manager is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void refreshGoal(Goal goal, Node node) {
         goal.getRuleAppManager().clearCache();
         goal.ruleAppIndex().clearIndexes();

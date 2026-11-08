@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -83,7 +84,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
      * {@code tablePane} fields are bound by the private layout methods.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible" })
+        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible", "NullAway" })
     public TacletMatchCompletionDialog(MainWindow parent, TacletInstantiationModel[] model,
             Goal goal, KeYMediator mediator) {
         super(parent, model, mediator);
@@ -428,7 +429,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
                                     PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
 
-                                JTerm term = (JTerm) pis.getPosInOccurrence().subTerm();
+                                var pio = Objects.requireNonNull(pis.getPosInOccurrence(),
+                                    "the dropped term has a position in the sequent");
+                                JTerm term = (JTerm) pio.subTerm();
 
                                 // Reactivate this when the parser is fully capable again.
                                 // droppedString = LogicPrinter.quickPrintTerm(term,
@@ -621,7 +624,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 event.acceptDrop(DnDConstants.ACTION_MOVE);
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
                                     PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
-                                JTerm term = (JTerm) pis.getPosInOccurrence().subTerm();
+                                var pio = Objects.requireNonNull(pis.getPosInOccurrence(),
+                                    "the dropped term has a position in the sequent");
+                                JTerm term = (JTerm) pio.subTerm();
                                 // Reactivate this when the parser is fully capable again.
                                 // String droppedString = LogicPrinter.quickPrintTerm(term,
                                 // mediator.getServices(),

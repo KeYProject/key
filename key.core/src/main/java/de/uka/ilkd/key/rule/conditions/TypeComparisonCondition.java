@@ -115,7 +115,7 @@ public final class TypeComparisonCondition extends VariableConditionAdapter {
      * always supply non-null sorts, so the {@code extendsTrans} arguments are guarded with
      * {@link Objects#requireNonNull}.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private boolean checkSorts(final @Nullable Sort fstSort, final @Nullable Sort sndSort,
             final Services services) {
 

@@ -141,7 +141,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      * differences are suppressed with a scoped key too.
      */
     @Override
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public void readProblem() {
         assert proofConfig == null;
         final boolean makeNamesUnique = true;
@@ -390,7 +390,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      *         {@code null} goal that never consults them (see {@code GoalsConfigurator}); the
      *         differences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private GoalsConfigurator createGoalConfigurator(final ProgramVariable selfVar,
             final JTerm selfTerm, final BlockContract.Variables variables, final Services services,
             final TermBuilder tb) {
@@ -438,7 +438,7 @@ public class FunctionalLoopContractPO extends AbstractPO implements ContractPO {
      *         exception variable introduced by {@code VariablesCreatorAndRegistrar} always carries
      *         a declared type; the differences are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private JTerm setUpValidityGoal(final JTerm selfTerm, final List<LocationVariable> heaps,
             final Map<LocationVariable, Function> anonOutHeaps,
             final BlockContract.Variables variables, final LoopContract.Variables nextVariables,

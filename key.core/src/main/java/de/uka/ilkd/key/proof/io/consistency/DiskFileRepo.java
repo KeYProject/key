@@ -80,7 +80,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * dereference of the (nullable) copied path is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public @Nullable InputStream getInputStream(URL url) throws IOException {
         String protocol = url.getProtocol();
         // currently, we support only two protocols: file and zip/jar
@@ -209,7 +209,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * The temporary directory is always set before any repository stream is opened; the
      * dereference of the (nullable) temporary directory is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private InputStream getKeyFileInputStream(Path keyFile) throws IOException {
         // compute the absolute target path (top level in repo);
         // a *.key/*.proof file always has a file name (a root path does not match the matcher)
@@ -275,7 +275,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * The temporary directory is always set before a file is copied into the repository; the
      * dereference of the (nullable) temporary directory is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private Path resolveAndCopy(Path norm, Path containing, Path relTarget) throws IOException {
         // compute relative path from containing to norm
         Path rel = containing.relativize(norm);
@@ -306,7 +306,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * (nullable) temporary directory is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public OutputStream createOutputStream(Path path) throws FileNotFoundException {
 
         if (path.isAbsolute()) {
@@ -333,7 +333,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * the (nullable) temporary directory is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected Path getSaveName(Path path) {
         /*
          * assumption: a file with the given path has already been stored in the repo (via
@@ -363,7 +363,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * dereference of the (nullable) temporary directory is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected @Nullable InputStream getInputStreamInternal(Path p) throws FileNotFoundException {
         Path concrete;
         if (p.isAbsolute()) { // p is absolute -> lookup in map
@@ -392,7 +392,7 @@ public final class DiskFileRepo extends AbstractFileRepo {
      * the null assignment is safe and suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     protected void dispose() {
         if (isDisposed()) {
             return;

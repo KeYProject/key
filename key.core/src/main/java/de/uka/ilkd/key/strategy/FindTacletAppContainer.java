@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -73,9 +75,9 @@ public class FindTacletAppContainer extends TacletAppContainer {
         super(app, ageFreeCost, ageFreeCostIsRegular, cost, age);
         applicationPosition = pio;
 
-        final FormulaTag posTag = goal.getFormulaTagManager().getTagForPos(pio.topLevel());
-        assert posTag != null : "No formula tag found for " + pio;
-        positionTag = posTag;
+        positionTag =
+            Objects.requireNonNull(goal.getFormulaTagManager().getTagForPos(pio.topLevel()),
+                "No formula tag found for " + pio);
     }
 
     /**
@@ -164,7 +166,9 @@ public class FindTacletAppContainer extends TacletAppContainer {
             }
 
             if (changeIndex == -1) {
-                final JTerm beforeChangeTerm = (JTerm) changePIO.getSubTerm();
+                final JTerm beforeChangeTerm =
+                    Objects.requireNonNull((JTerm) changePIO.getSubTerm(),
+                        "no subterm at the change position");
                 final Operator beforeChangeOp = beforeChangeTerm.op();
 
                 // special case: a taclet application is not affected by changes
@@ -193,7 +197,8 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // in case a change within an update occurred, also (some)
                 // taclets within the update target expression have to be
                 // invalidated
-                final var modOp = changePIO.getSubTerm().op();
+                final var modOp = Objects.requireNonNull(changePIO.getSubTerm(),
+                    "no subterm at the modification position").op();
 
                 return !(modOp instanceof UpdateApplication
                         && appIndex == UpdateApplication.targetPos() && updateContextIsRecorded());
@@ -215,9 +220,9 @@ public class FindTacletAppContainer extends TacletAppContainer {
      */
     @Override
     protected PosInOccurrence getPosInOccurrence(Goal p_goal) {
-        final PosInOccurrence topPos =
-            p_goal.getFormulaTagManager().getPosForTag(positionTag);
-        assert topPos != null;
+        final PosInOccurrence topPos = Objects.requireNonNull(
+            p_goal.getFormulaTagManager().getPosForTag(positionTag),
+            "no position found for the stored formula tag");
         PosInOccurrence cached = currentPositionCache;
         if (cached == null || cached.sequentFormula() != topPos.sequentFormula()) {
             cached = applicationPosition.replaceSequentFormula(topPos.sequentFormula());

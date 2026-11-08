@@ -484,7 +484,7 @@ class KeyboardTacletModel {
      * take place after construction completes, suppressed with scoped keys.
      */
     @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
-        "nullness:method.invocation.invalid", "nullness:assignment.type.incompatible" })
+        "nullness:method.invocation.invalid", "nullness:assignment.type.incompatible", "NullAway" })
     KeyboardTacletModel(List<RuleApp> taclets) {
         reset();
         this.taclets = new HashMap<>();

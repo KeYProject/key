@@ -66,13 +66,16 @@ public class IntegerOpHandler implements SMTHandler {
         supportedOperators.put(integerLDT.getGreaterThan(), ">");
         predicateOperators.add(integerLDT.getGreaterThan());
 
-        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+        // the master always loads the snippets for every handler
+        masterHandler.addDeclarationsAndAxioms(
+            Objects.requireNonNull(handlerSnippets, "handler snippets"));
 
         // sort_int is defined here, declare it as already defined
         masterHandler.addKnownSymbol("sort_int");
         masterHandler.addSort(integerLDT.targetSort());
 
-        this.limitedToPresbuger = PROPERTY_PRESBURGER.get(masterHandler.getTranslationState());
+        this.limitedToPresbuger = Objects.requireNonNull(
+            PROPERTY_PRESBURGER.get(masterHandler.getTranslationState()), "presburger property");
     }
 
     @Override
@@ -99,7 +102,7 @@ public class IntegerOpHandler implements SMTHandler {
     }
 
     private boolean isIntLiteral(Term term) {
-        return term.op() == integerLDT.getNumberSymbol();
+        return term.op() == Objects.requireNonNull(integerLDT, "integer LDT").getNumberSymbol();
     }
 
     @Override
@@ -116,7 +119,9 @@ public class IntegerOpHandler implements SMTHandler {
             resultType = INT;
         }
 
-        return new SExpr(smtOp, resultType, children);
+        // canHandle guarantees that op is a supported operator
+        return new SExpr(Objects.requireNonNull(smtOp, "operator not supported"), resultType,
+            children);
     }
 
     /*

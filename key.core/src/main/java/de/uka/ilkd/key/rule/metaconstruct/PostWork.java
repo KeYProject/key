@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -55,11 +57,13 @@ public class PostWork extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        final ProgramVariable newObject =
-            (ProgramVariable) (schema ? svInst.getInstantiation((SchemaVariable) body()) : body());
-
-        final ProgramVariable initialized = services.getJavaInfo().getAttribute(
-            PipelineConstants.IMPLICIT_INITIALIZED, services.getJavaInfo().getJavaLangObject());
+        final ProgramVariable newObject = (ProgramVariable) Objects.requireNonNull(
+            schema ? svInst.getInstantiation((SchemaVariable) body()) : body(),
+            "no instantiation of " + body());
+        final ProgramVariable initialized = Objects.requireNonNull(services.getJavaInfo()
+                .getAttribute(PipelineConstants.IMPLICIT_INITIALIZED,
+                    services.getJavaInfo().getJavaLangObject()),
+            "no implicit-initialized attribute");
         return new ProgramElement[] { KeYJavaASTFactory.assign(
             KeYJavaASTFactory.fieldReference(newObject, initialized), BooleanLiteral.TRUE) };
     }

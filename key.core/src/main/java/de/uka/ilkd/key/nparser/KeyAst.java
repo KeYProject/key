@@ -253,6 +253,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             // unbound type parameter T (here Void). Void has no non-null value, so the generated
             // superclass cannot even be implemented for T = Void without returning null; the
             // override honestly declares its @Nullable result.
+            @SuppressWarnings("NullAway")
             @Override
             public @Nullable Void visitProofCmd(JmlParser.ProofCmdContext ctx) {
                 if (ctx.obtain != null) {
@@ -272,6 +273,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
             // Same generated-superclass constraint as visitProofCmd above: the ANTLR-generated
             // JmlParserBaseVisitor declares visitExpression to return the unbound type parameter T,
             // which has no non-null value when instantiated with Void.
+            @SuppressWarnings("NullAway")
             @Override
             public @Nullable Void visitExpression(JmlParser.ExpressionContext ctx) {
                 collectedTerms = collectedTerms.prepend(ctx);
@@ -453,10 +455,11 @@ public abstract class KeyAst<T extends ParserRuleContext> {
         // bound, so the null-returning print-only overrides below cannot be typed honestly without
         // editing the generated superclass: the visitor is instantiated with the raw upper bound
         // Object, and the @Nullable return types of the overrides (they never produce a result)
-        // necessarily conflict with the generated T = Object signatures. The check is scoped to
-        // this method.
+        // necessarily conflict with the generated T = Object signatures. Each override is
+        // suppressed individually.
         public void printDefinitions(PrintWriter out) {
             ctx.accept(new JavaKeYParserBaseVisitor<Object>() {
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitOne_include(JavaKeYParser.One_includeContext ctx) {
                     if (ctx.absfile != null) {
@@ -465,6 +468,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitOptions_choice(
                         JavaKeYParser.Options_choiceContext ctx) {
@@ -472,18 +476,21 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitOption_decls(JavaKeYParser.Option_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitSort_decls(JavaKeYParser.Sort_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitProg_var_decls(
                         JavaKeYParser.Prog_var_declsContext ctx) {
@@ -491,6 +498,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitSchema_var_decls(
                         JavaKeYParser.Schema_var_declsContext ctx) {
@@ -498,18 +506,21 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitPred_decls(JavaKeYParser.Pred_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitFunc_decls(JavaKeYParser.Func_declsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitTransform_decls(
                         JavaKeYParser.Transform_declsContext ctx) {
@@ -517,6 +528,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitDatatype_decls(
                         JavaKeYParser.Datatype_declsContext ctx) {
@@ -525,6 +537,7 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 }
 
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitRuleset_decls(JavaKeYParser.Ruleset_declsContext ctx) {
                     printAsIs(ctx);
@@ -532,18 +545,21 @@ public abstract class KeyAst<T extends ParserRuleContext> {
                 }
 
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitContracts(JavaKeYParser.ContractsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitInvariants(JavaKeYParser.InvariantsContext ctx) {
                     printAsIs(ctx);
                     return null;
                 }
 
+                @SuppressWarnings("NullAway")
                 @Override
                 public @Nullable Object visitRulesOrAxioms(JavaKeYParser.RulesOrAxiomsContext ctx) {
                     printAsIs(ctx);

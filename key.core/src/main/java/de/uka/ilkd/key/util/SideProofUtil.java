@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -50,7 +51,8 @@ public final class SideProofUtil {
             final Proof source, final Choice... enableChoices) {
         assert !source.isDisposed();
         // Get required source instances
-        final InitConfig sourceInitConfig = source.getInitConfig();
+        final InitConfig sourceInitConfig =
+            Objects.requireNonNull(source.getInitConfig(), "no init config from " + source);
         final RuleJustificationInfo sourceJustiInfo = sourceInitConfig.getJustifInfo();
         // Create new profile which has separate OneStepSimplifier instance
         JavaProfile profile = new JavaProfile();
@@ -74,7 +76,8 @@ public final class SideProofUtil {
         ProofEnvironment env = new ProofEnvironment(initConfig);
         for (Taclet taclet : initConfig.activatedTaclets()) {
             initConfig.getJustifInfo().addJustification(taclet,
-                sourceJustiInfo.getJustification(taclet));
+                Objects.requireNonNull(sourceJustiInfo.getJustification(taclet),
+                    "no justification for " + taclet));
         }
         for (BuiltInRule rule : initConfig.builtInRules()) {
             RuleJustification origJusti = sourceJustiInfo.getJustification(rule);

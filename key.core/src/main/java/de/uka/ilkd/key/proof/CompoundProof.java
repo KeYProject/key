@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
@@ -81,7 +82,8 @@ public class CompoundProof extends ProofAggregate {
             return false;
         }
 
-        final CompoundProof other = (CompoundProof) o;
+        final CompoundProof other =
+            Objects.requireNonNull((CompoundProof) o, "equality target not null");
 
         for (int i = 0; i < proofs.size(); i++) {
             if (!proofs.get(i).equals(other.proofs.get(i))) {

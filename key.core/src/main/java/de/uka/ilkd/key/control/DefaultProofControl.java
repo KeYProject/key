@@ -95,7 +95,7 @@ public class DefaultProofControl extends AbstractProofControl {
      * dereference of the (nullable) thread field is suppressed with a scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public synchronized void stopAutoMode() {
         if (isInAutoMode()) {
             autoModeThread.interrupt();
@@ -158,7 +158,7 @@ public class DefaultProofControl extends AbstractProofControl {
      */
     @Override
     public synchronized void runMacro(Node node, ProofMacro macro,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         Proof proof = node.proof();
         if (proof.isErroneous()) {
             // A previous run marked the proof erroneous (an essential proof listener failed); it
@@ -177,9 +177,9 @@ public class DefaultProofControl extends AbstractProofControl {
 
         private final ProofMacro macro;
 
-        private final PosInOccurrence posInOcc;
+        private final @Nullable PosInOccurrence posInOcc;
 
-        public MacroThread(Node node, ProofMacro macro, PosInOccurrence posInOcc) {
+        public MacroThread(Node node, ProofMacro macro, @Nullable PosInOccurrence posInOcc) {
             this.node = node;
             this.macro = macro;
             this.posInOcc = posInOcc;
@@ -196,7 +196,7 @@ public class DefaultProofControl extends AbstractProofControl {
          * is suppressed with a scoped key.
          */
         @Override
-        @SuppressWarnings("nullness:argument.type.incompatible")
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
         public void run() {
             Proof proof = node.proof();
             ProverTaskListener ptl = getDefaultProverTaskListener();

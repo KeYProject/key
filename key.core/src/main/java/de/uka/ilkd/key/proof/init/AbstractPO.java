@@ -87,7 +87,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * theory, see the assertion in {@code ProblemInitializer}); the lookups below and the resulting
      * assignments into final fields are suppressed with scoped keys.
      */
-    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized",
         "nullness:assignment.type.incompatible" })
     protected AbstractPO(InitConfig initConfig, String name) {
         this.environmentConfig = initConfig;
@@ -178,7 +178,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * (see the class level invariant documentation), so its dereference here is suppressed with a
      * scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected JTerm generateSelfNotNull(IProgramMethod pm, @Nullable ProgramVariable selfVar) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
@@ -199,7 +199,8 @@ public abstract class AbstractPO implements IPersistablePO {
      * builder and the heap LDT are guaranteed by the {@code postInit()} contract as documented at
      * the field declaration, so their dereferences are suppressed with scoped keys too.
      */
-    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible",
+        "nullness:dereference.of.nullable" })
     protected JTerm generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
             @Nullable ProgramVariable selfVar, Services services) {
         if (selfVar == null || pm.isConstructor()) {
@@ -233,7 +234,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * The {@link #tb} term builder is assigned by {@code postInit()} before this helper is invoked
      * (see the field declaration), so its dereference here is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected JTerm generateSelfExactType(IProgramMethod pm, @Nullable ProgramVariable selfVar,
             KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
@@ -254,7 +255,8 @@ public abstract class AbstractPO implements IPersistablePO {
      * to be present for the receiver type of a program method. The differences are suppressed with
      * scoped keys.
      */
-    @SuppressWarnings({ "nullness:argument.type.incompatible", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible",
+        "nullness:dereference.of.nullable" })
     protected JTerm generateSelfExactType(IProgramMethod pm, @Nullable JTerm selfVar,
             KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
@@ -347,7 +349,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param selfKJT the {@link KeYJavaType} for which to collect all accessible class axioms
      * @param proofConfig the {@link InitConfig} of the proof for this PO
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private void registerClassAxiomTaclets(KeYJavaType selfKJT, InitConfig proofConfig) {
         final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
         for (ClassAxiom axiom : axioms) {
@@ -483,7 +485,8 @@ public abstract class AbstractPO implements IPersistablePO {
      * documented at the {@link #tb} field, so their dereferences are suppressed with a scoped key
      * too.
      */
-    @SuppressWarnings({ "nullness:return.type.incompatible", "nullness:dereference.of.nullable" })
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible",
+        "nullness:dereference.of.nullable" })
     public final ProofAggregate getPO() {
         if (proofAggregate != null) {
             return proofAggregate;

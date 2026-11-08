@@ -140,7 +140,9 @@ public abstract class FindTaclet extends Taclet {
         if (!super.equals(o)) {
             return false;
         }
-        return Objects.requireNonNull(find).equals(((FindTaclet) o).find);
+        // super.equals(o) implies o is non-null and of the same class (see Taclet.equals)
+        return Objects.requireNonNull(find)
+                .equals(((FindTaclet) Objects.requireNonNull(o, "equals argument non-null")).find);
     }
 
     /** {@inheritDoc} */

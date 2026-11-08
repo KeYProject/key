@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.scripts;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
@@ -79,9 +81,11 @@ public class AssumeCommand extends AbstractCommand {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(ASSUME_TACLET);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, parameter.formula, state.getProof().getServices(),
-            true);
-        state.getFirstOpenAutomaticGoal().apply(app);
+        app = app.addCheckedInstantiation(sv,
+            Objects.requireNonNull(parameter.formula, "formula must be given"),
+            state().getProof().getServices(), true);
+        state().getFirstOpenAutomaticGoal()
+                .apply(Objects.requireNonNull(app, "taclet application is null"));
     }
 
     @Documentation(category = "Control",

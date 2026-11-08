@@ -659,11 +659,12 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
      * Deliberately returns {@code null}: information flow contracts do not
      * track the original variables of a represented functional contract.
      * The base {@link Contract#getOrigVars()} is not nullness-annotated and
-     * cannot be widened from this module; no information-flow consumer
-     * dereferences the result.
+     * cannot be widened from this module without rippling nullability checks
+     * into the key.core.wd well-definedness code, which dereferences the
+     * result.
      */
     @Override
-    @SuppressWarnings("nullness:override.return.invalid")
+    @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
     public @Nullable OriginalVariables getOrigVars() {
         // TODO Auto-generated method stub
         return null;

@@ -42,7 +42,7 @@ public final class Then extends BranchImp {
     // the @Nullable-annotated JavaNonTerminalProgramElement ctor, but BranchImp is outside this
     // wave's file set and cannot be widened here; the convenience ctor Then(Statement) also
     // legitimately passes null, so these params stay @Nullable and the check is scoped here.
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public Then(@Nullable PositionInfo pi, @Nullable List<Comment> comments, Statement body) {
         super(pi, comments);
         this.body = body;

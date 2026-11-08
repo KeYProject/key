@@ -18,6 +18,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Adapter for {@link KeYGuiExtension.KeyboardShortcuts} interface.
@@ -31,8 +32,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.KeyboardShortcuts {
     @Override
-    public final Collection<Action> getShortcuts(KeYMediator mediator, String componentId,
-            JComponent component) {
+    public final Collection<Action> getShortcuts(@Nullable KeYMediator mediator,
+            String componentId, JComponent component) {
         if (Objects.equals(SEQUENT_VIEW, componentId)) {
             return getShortcuts(mediator, (SequentView) component);
         }
@@ -66,8 +67,8 @@ public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.Keyboar
      * @param component
      * @return an empty list
      */
-    protected Collection<Action> fallbackShortcuts(KeYMediator mediator, String componentId,
-            JComponent component) {
+    protected Collection<Action> fallbackShortcuts(@Nullable KeYMediator mediator,
+            String componentId, JComponent component) {
         return Collections.emptyList();
     }
 
@@ -78,7 +79,8 @@ public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.Keyboar
      * @param component
      * @return
      */
-    protected Collection<Action> getShortcutsMainWindow(KeYMediator mediator, JPanel component) {
+    protected Collection<Action> getShortcutsMainWindow(@Nullable KeYMediator mediator,
+            JPanel component) {
         return Collections.emptyList();
     }
 
@@ -88,7 +90,8 @@ public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.Keyboar
      * @param component
      * @return
      */
-    protected Collection<Action> getShortcuts(KeYMediator mediator, SequentView component) {
+    protected Collection<Action> getShortcuts(@Nullable KeYMediator mediator,
+            SequentView component) {
         return Collections.emptyList();
     }
 
@@ -98,7 +101,8 @@ public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.Keyboar
      * @param component
      * @return
      */
-    protected Collection<Action> getShortcuts(KeYMediator mediator, ProofTreeView component) {
+    protected Collection<Action> getShortcuts(@Nullable KeYMediator mediator,
+            ProofTreeView component) {
         return Collections.emptyList();
     }
 
@@ -108,7 +112,7 @@ public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.Keyboar
      * @param component
      * @return
      */
-    protected Collection<Action> getShortcuts(KeYMediator mediator,
+    protected Collection<Action> getShortcuts(@Nullable KeYMediator mediator,
             StrategySelectionView component) {
         return Collections.emptyList();
     }
@@ -119,7 +123,8 @@ public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.Keyboar
      * @param component
      * @return
      */
-    protected Collection<Action> getShortcuts(KeYMediator mediator, InfoView component) {
+    protected Collection<Action> getShortcuts(@Nullable KeYMediator mediator,
+            InfoView component) {
         return Collections.emptyList();
     }
 
@@ -129,7 +134,8 @@ public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.Keyboar
      * @param component
      * @return
      */
-    protected Collection<Action> getShortcuts(KeYMediator mediator, SourceView component) {
+    protected Collection<Action> getShortcuts(@Nullable KeYMediator mediator,
+            SourceView component) {
         return Collections.emptyList();
     }
 
@@ -139,7 +145,8 @@ public abstract class KeyboardShortcutAdapter implements KeYGuiExtension.Keyboar
      * @param component
      * @return
      */
-    protected Collection<Action> getShortcuts(KeYMediator mediator, GoalList component) {
+    protected Collection<Action> getShortcuts(@Nullable KeYMediator mediator,
+            GoalList component) {
         return Collections.emptyList();
     }
 }

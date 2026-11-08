@@ -15,6 +15,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Ensures the given ProgramElement denotes a local variable
@@ -35,7 +36,8 @@ public final class LocalVariableCondition extends VariableConditionAdapter {
 
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement candidate, SVInstantiations svInst,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement candidate,
+            SVInstantiations svInst,
             Services services) {
 
         if (var != this.var) {

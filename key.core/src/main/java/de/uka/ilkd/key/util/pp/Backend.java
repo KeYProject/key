@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.util.pp;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The backend for a {@link Layouter}. An object satisfying this interface can act as a receiver for
@@ -36,7 +37,7 @@ public interface Backend<M> {
     void flush();
 
     /** Gets called to record a <code>mark()</code> call in the input. */
-    void mark(M o);
+    void mark(@Nullable M o);
 
     /** Returns the available space per line */
     int lineWidth();

@@ -57,7 +57,7 @@ class GUIProofTreeNode extends GUIAbstractTreeNode {
      * reports {@code null}; the swing tree only ever holds live nodes, so this is not reached on
      * the happy path, suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:return.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     @Override
     public TreeNode getParent() {
         TreeNode parentNode = parent;

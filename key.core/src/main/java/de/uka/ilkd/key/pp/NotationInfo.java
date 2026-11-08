@@ -248,7 +248,7 @@ public final class NotationInfo {
      * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereference
      * is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private HashMap<Object, Notation> createPrettyNotation(Services services) {
 
         HashMap<Object, Notation> tbl = createDefaultNotation();
@@ -375,7 +375,7 @@ public final class NotationInfo {
      *
      * @param services
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private HashMap<Object, Notation> createUnicodeNotation(Services services) {
 
         HashMap<Object, Notation> tbl = createPrettyNotation(services);

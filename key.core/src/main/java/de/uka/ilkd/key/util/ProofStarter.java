@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyAst;
@@ -62,6 +64,12 @@ public class ProofStarter {
             this(seq, env, null);
         }
 
+        /**
+         * @param seq the sequent to prove
+         * @param env the proof environment
+         * @param proofName the name of the proof (may be {@code null})
+         */
+        @SuppressWarnings("NullAway") // printAnything tolerates a missing Services (null env)
         public UserProvidedInput(Sequent seq, ProofEnvironment env, @Nullable String proofName) {
             this.seq = seq;
             this.env = env;
@@ -166,7 +174,8 @@ public class ProofStarter {
      */
     public void init(JTerm formulaToProve, ProofEnvironment env) throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(formulaToProve, env);
-        proof = input.getPO().getFirstProof();
+        proof = Objects.requireNonNull(
+            Objects.requireNonNull(input.getPO(), "proof obligation").getFirstProof(), "proof");
         proof.setEnv(env);
     }
 
@@ -178,7 +187,8 @@ public class ProofStarter {
     public void init(Sequent sequentToProve, ProofEnvironment env, @Nullable String proofName)
             throws ProofInputException {
         final ProofOblInput input = new UserProvidedInput(sequentToProve, env, proofName);
-        proof = input.getPO().getFirstProof();
+        proof = Objects.requireNonNull(
+            Objects.requireNonNull(input.getPO(), "proof obligation").getFirstProof(), "proof");
         proof.setEnv(env);
     }
 
@@ -209,7 +219,7 @@ public class ProofStarter {
         this.maxSteps = maxSteps;
     }
 
-    public void setStrategy(Strategy<@NonNull Goal> strategy) {
+    public void setStrategy(@Nullable Strategy<@NonNull Goal> strategy) {
         this.strategy = strategy;
     }
 
@@ -231,10 +241,13 @@ public class ProofStarter {
      * @throws NullPointerException if the proof object is not yet created
      */
     public void setStrategyProperties(StrategyProperties sp) {
-        final Profile profile = proof.getInitConfig().getProfile();
+        final Proof proofNonNull = Objects.requireNonNull(proof, "proof not created");
+        final InitConfig initConfig =
+            Objects.requireNonNull(proofNonNull.getInitConfig(), "init config");
+        final Profile profile = Objects.requireNonNull(initConfig.getProfile(), "profile");
         StrategyFactory factory = strategy != null ? profile.getStrategyFactory(strategy.name())
                 : profile.getDefaultStrategyFactory();
-        setStrategy(factory.create(proof, sp));
+        setStrategy(Objects.requireNonNull(factory, "strategy factory").create(proofNonNull, sp));
     }
 
     /**
@@ -245,7 +258,7 @@ public class ProofStarter {
      * @throws NullPointerException if the proof object is not yet created
      */
     public ProofSearchInformation<Proof, Goal> start() {
-        return start(proof.openGoals());
+        return start(Objects.requireNonNull(proof, "proof not created").openGoals());
     }
 
     /**
@@ -255,20 +268,25 @@ public class ProofStarter {
      * @throws NullPointerException if the proof object is not yet created
      */
     public ProofSearchInformation<Proof, Goal> start(ImmutableList<Goal> goals) {
-        final Profile profile = proof.getInitConfig().getProfile();
+        final Proof proofNonNull = Objects.requireNonNull(proof, "proof not created");
+        final InitConfig initConfig =
+            Objects.requireNonNull(proofNonNull.getInitConfig(), "init config");
+        final Profile profile = Objects.requireNonNull(initConfig.getProfile(), "profile");
 
         if (strategy == null) {
-            StrategyFactory factory = profile.getDefaultStrategyFactory();
-            StrategyProperties sp = factory.getSettingsDefinition()
-                    .getDefaultPropertiesFactory().createDefaultStrategyProperties();
-            strategy = factory.create(proof, sp);
+            StrategyFactory factory = Objects.requireNonNull(profile.getDefaultStrategyFactory(),
+                "strategy factory");
+            StrategyProperties sp = Objects.requireNonNull(factory.getSettingsDefinition(),
+                "settings definition").getDefaultPropertiesFactory()
+                    .createDefaultStrategyProperties();
+            strategy = factory.create(proofNonNull, sp);
         }
 
-        proof.setActiveStrategy(strategy);
+        proofNonNull.setActiveStrategy(strategy);
 
         // It is important that OSS is refreshed AFTER the strategy has been
         // set!
-        OneStepSimplifier.refreshOSS(proof);
+        OneStepSimplifier.refreshOSS(proofNonNull);
 
         var goalChooser = profile.<Proof, Goal>getSelectedGoalChooserBuilder().create();
         ProverCore<Proof, Goal> prover =
@@ -277,13 +295,13 @@ public class ProofStarter {
             prover.addProverTaskObserver(ptl);
         }
         if (autoSaver != null) {
-            autoSaver.setProof(proof);
+            autoSaver.setProof(proofNonNull);
             prover.addProverTaskObserver(autoSaver);
         }
 
         ProofSearchInformation<Proof, Goal> result;
 
-        result = prover.start(proof, goals, maxSteps, timeout,
+        result = prover.start(proofNonNull, goals, maxSteps, timeout,
             strategy.isStopAtFirstNonCloseableGoal());
 
         if (result.isError()) {
@@ -297,10 +315,23 @@ public class ProofStarter {
         }
         if (autoSaver != null) {
             prover.removeProverTaskObserver(autoSaver);
-            autoSaver.setProof(null);
+            releaseAutoSaver();
         }
 
         return result;
+    }
+
+    /**
+     * Releases the proof reference held by the auto saver once the run has ended.
+     * <p>
+     * {@link AutoSaver#setProof} declares its parameter non-null, but the auto saver tolerates a
+     * {@code null} proof (its {@code taskProgress} guards on it) and releasing the reference
+     * exactly this way is main's documented cleanup; the wider {@code @NonNull} contract in
+     * {@code AutoSaver} is therefore not relied upon here.
+     */
+    @SuppressWarnings("NullAway") // AutoSaver tolerates a null proof; releasing after the run
+    private void releaseAutoSaver() {
+        autoSaver.setProof(null);
     }
 
     /**

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -54,7 +55,8 @@ public class HeapGenerator implements TermGenerator<Goal> {
     }
 
     private void collectHeaps(Term term, LinkedHashSet<Term> heaps, Services services) {
-        if (term.sort().equals(services.getTypeConverter().getHeapLDT().targetSort())) {
+        if (term.sort().equals(
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT()).targetSort())) {
             heaps.add(term);
         } else {
             if (!includeUpdates && term.op() instanceof UpdateApplication) {

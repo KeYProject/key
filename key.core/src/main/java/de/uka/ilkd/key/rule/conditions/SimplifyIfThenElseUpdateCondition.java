@@ -161,7 +161,8 @@ public class SimplifyIfThenElseUpdateCondition implements VariableCondition {
 
 
     @Override
-    public @Nullable MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo mc, LogicServices p_services) {
         final Services services = (Services) p_services;
         SVInstantiations svInst = mc.getInstantiations();

@@ -30,7 +30,7 @@ public class FunctionalBlockContractPOLoader implements ProofObligationLoader {
      *         scoped key.
      */
     @Override
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) {
         String contractName = properties.getString("contract");

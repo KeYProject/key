@@ -74,6 +74,8 @@ public final class ModelMethodExecution extends ClassAxiom {
     }
 
     @Override
+    @SuppressWarnings("NullAway") // getTaclets is not implemented for model methods yet and
+                                  // deliberately returns null (superclass declares @NonNull)
     public @Nullable ImmutableSet<Taclet> getTaclets(
             ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {

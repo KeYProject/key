@@ -262,14 +262,9 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO implements InfFlowComp
     }
 
     /**
-     * Deliberately returns {@code null}: information flow contracts do not
-     * have global defs. {@link AbstractOperationPO} declares a non-null
-     * return type although its only caller,
-     * {@code createApplyGlobalUpdateTerm}, explicitly null-tolerates the
-     * result; the base signature cannot be widened from this module.
+     * Deliberately returns {@code null}: information flow contracts do not have global defs.
      */
     @Override
-    @SuppressWarnings("nullness:override.return.invalid")
     protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
             @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services) {

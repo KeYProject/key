@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -75,8 +76,9 @@ public class InitArrayCreation extends InitArray {
      * @return an if statement throwing a NegativeArraySizeException if cond is evaluated to false
      */
     private If checkNegativeDimension(Expression cond, Services services) {
-        final New exception = KeYJavaASTFactory.newOperator(
-            services.getJavaInfo().getKeYJavaType("java.lang.NegativeArraySizeException"));
+        final New exception = KeYJavaASTFactory.newOperator(Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType("java.lang.NegativeArraySizeException"),
+            "no KeYJavaType for NegativeArraySizeException"));
 
         return KeYJavaASTFactory.ifThen(cond, KeYJavaASTFactory.throwClause(exception));
     }
@@ -102,7 +104,9 @@ public class InitArrayCreation extends InitArray {
         ProgramVariable[] pvars = new ProgramVariable[dimExpr.size()];
         final NameRecorder nameRecorder = services.getNameRecorder();
         final VariableNamer varNamer = services.getVariableNamer();
-        final KeYJavaType intType = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+        final KeYJavaType intType = Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT),
+            "no KeYJavaType for int");
 
         for (int i = 0; i < pvars.length; i++) {
             // first check for previously saved name
@@ -155,8 +159,9 @@ public class InitArrayCreation extends InitArray {
             Expression[] baseDim = new Expression[dimensions.length - 1];
             System.arraycopy(dimensions, 1, baseDim, 0, dimensions.length - 1);
             final VariableNamer varNamer = services.getVariableNamer();
-            final KeYJavaType intType =
-                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
+            final KeYJavaType intType = Objects.requireNonNull(
+                services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT),
+                "no KeYJavaType for int");
             final ProgramElementName name = varNamer.getTemporaryNameProposal("i");
             final LocalVariableDeclaration forInit =
                 KeYJavaASTFactory.declare(name, KeYJavaASTFactory.zeroLiteral(),
@@ -165,11 +170,19 @@ public class InitArrayCreation extends InitArray {
             final ProgramVariable pv =
                 (ProgramVariable) forInit.getVariables().get(0).getProgramVariable();
 
-            TypeReference baseTypeRef = ((ArrayType) arrayType.getJavaType()).getBaseType();
-            final KeYJavaType baseType = baseTypeRef.getKeYJavaType();
+            if (!(arrayType.getJavaType() instanceof ArrayType arrayBaseType)) {
+                throw new AssertionError("Not an array type: " + arrayType);
+            }
+            TypeReference baseTypeRef = arrayBaseType.getBaseType();
+            final KeYJavaType baseType = Objects.requireNonNull(baseTypeRef.getKeYJavaType(),
+                "no KeYJavaType for base type " + baseTypeRef);
 
             for (int i = 0; i < dimensions.length - 1; i++) {
-                ArrayType at = (ArrayType) baseTypeRef.getKeYJavaType().getJavaType();
+                final Type refType = Objects.requireNonNull(baseTypeRef.getKeYJavaType(),
+                    "no KeYJavaType for base type " + baseTypeRef).getJavaType();
+                if (!(refType instanceof ArrayType at)) {
+                    throw new AssertionError("Not an array type: " + refType);
+                }
                 baseTypeRef = at.getBaseType();
             }
 
@@ -207,7 +220,8 @@ public class InitArrayCreation extends InitArray {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
 
-        final Expression array = svInst.getInstantiation(newObjectSV);
+        final Expression array = Objects.requireNonNull(svInst.getInstantiation(newObjectSV),
+            "no instantiation of " + newObjectSV);
 
         NewArray na;
         if (pe instanceof NewArray) {
@@ -217,31 +231,31 @@ public class InitArrayCreation extends InitArray {
                     arrayCreationWithoutInitializers(array, na, services) };
             }
         } else if (pe instanceof ArrayInitializer init) {
-            final KeYJavaType kjt = array.getKeYJavaType(services, svInst.getExecutionContext());
-            ArrayType arrayType;
-            try {
-                arrayType = (ArrayType) kjt.getJavaType();
-            } catch (ClassCastException e) {
+            final KeYJavaType kjt = Objects.requireNonNull(
+                array.getKeYJavaType(services, svInst.getExecutionContext()),
+                "no KeYJavaType for " + array);
+            if (!(kjt.getJavaType() instanceof ArrayType arrayType)) {
                 throw new RuntimeException(
-                    "Array dimension does not match its definition. This is a Java syntax error.",
-                    e);
+                    "Array dimension does not match its definition. This is a Java syntax error.");
             }
             final int dimension = arrayType.getDimension();
             Type baseType = arrayType;
             TypeReference baseTypeRef = null;
             while (baseType instanceof ArrayType) {
                 baseTypeRef = ((ArrayType) baseType).getBaseType();
-                baseType = baseTypeRef.getKeYJavaType();
+                baseType = Objects.requireNonNull(baseTypeRef.getKeYJavaType(),
+                    "no KeYJavaType for base type " + baseTypeRef);
             }
             // XXX known issue: multi-dimensional array new declarations are
             // displayed improperly
-            assert baseTypeRef != null;
-            na = KeYJavaASTFactory.newArray(baseTypeRef, dimension, init, kjt);
+            na = KeYJavaASTFactory.newArray(Objects.requireNonNull(baseTypeRef,
+                "no base type reference for " + kjt), dimension, init, kjt);
         } else {
             return new ProgramElement[] { pe };
         }
 
-        final int arrayLength = na.getArrayInitializer().getArguments().size();
+        final int arrayLength = Objects.requireNonNull(na.getArrayInitializer(),
+            "no array initializer in " + na).getArguments().size();
 
         final Statement[] body = new Statement[2 * arrayLength + 1];
         final ProgramVariable[] vars = evaluateInitializers(body, na, services);

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.wd;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -57,15 +59,17 @@ public class WdWhileInvariantRule extends WhileInvariantRule {
             goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
             final LoopWellDefinedness lwd = new LoopWellDefinedness(inst.inv(), localIns, services);
             final LocationVariable self;
-            if (inst.selfTerm().op() instanceof LocationVariable lv) {
+            if (Objects.requireNonNull(inst.selfTerm(), "self term")
+                    .op() instanceof LocationVariable lv) {
                 self = lv;
             } else {
                 self = null;
             }
             ((SpecificationRepositoryWD) services.getSpecificationRepository()).addWdStatement(lwd);
             LocationVariable heap = heapContext.getFirst();
-            final SequentFormula wdInv = lwd.generateSequent(self, heap, anonHeap, localIns,
-                inst.u(), localAnonUpdate, services);
+            final SequentFormula wdInv = lwd.generateSequent(self, heap,
+                Objects.requireNonNull(anonHeap, "anon heap"), localIns, inst.u(), localAnonUpdate,
+                services);
             final PosInOccurrence posInOcc = ruleApp.posInOccurrence();
             if (posInOcc == null) {
                 throw new NullPointerException(

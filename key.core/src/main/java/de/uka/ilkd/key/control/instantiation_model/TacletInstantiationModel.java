@@ -149,7 +149,7 @@ public class TacletInstantiationModel {
      * The matcher of the underlying taclet is present for a closed model; the dereference of the
      * (nullable) matcher is suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void initIfChoiceModels() {
         Sequent ifseq = taclet().assumesSequent();
         int asize = ifseq.antecedent().size();
@@ -266,7 +266,7 @@ public class TacletInstantiationModel {
      * the user rather than dereferencing. Assigning the (nullable-typed) resolution result to the
      * non-null field is suppressed scoped on this method, preserving the pre-analysis behavior.
      */
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     public void prepareUnmatchedInstantiation() {
         app = app.prepareUserInstantiation(services);
     }

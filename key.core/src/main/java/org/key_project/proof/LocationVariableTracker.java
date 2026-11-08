@@ -5,6 +5,7 @@
 package org.key_project.proof;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.logic.OpCollectorJavaBlock;
@@ -14,6 +15,8 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.RuleAppListener;
 
 import org.key_project.prover.rules.RuleApp;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Tracks which rule application introduced each {@link LocationVariable} in a proof.
@@ -47,13 +50,13 @@ public class LocationVariableTracker implements RuleAppListener {
      * @param locationVariable some location variable
      * @return the rule app that created it, or null
      */
-    public RuleApp getCreatedBy(LocationVariable locationVariable) {
+    public @Nullable RuleApp getCreatedBy(LocationVariable locationVariable) {
         return createdBy.get(locationVariable);
     }
 
     @Override
     public void ruleApplied(ProofEvent e) {
-        var rai = e.getRuleAppInfo();
+        var rai = Objects.requireNonNull(e.getRuleAppInfo(), "rule app info");
         if (rai.getRuleApp().rule().displayName().equals("ifElseUnfold")) {
             rai.getReplacementNodes().forEach(x -> {
                 var it = x.getNodeChanges();

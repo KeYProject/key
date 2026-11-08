@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -74,7 +76,7 @@ public final class TopLevelFindFeature extends BinaryTacletAppFeature {
         // ALLOW: accept iff everything above the focus is an update application
         final PIOPathIterator it = pos.iterator();
         while (it.next() != -1) {
-            if (!(it.getSubTerm().op() instanceof UpdateApplication)) {
+            if (!(Objects.requireNonNull(it.getSubTerm()).op() instanceof UpdateApplication)) {
                 return false;
             }
         }

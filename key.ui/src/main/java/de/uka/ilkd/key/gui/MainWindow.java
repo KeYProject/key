@@ -294,7 +294,7 @@ public final class MainWindow extends JFrame {
      */
     @SuppressWarnings({ "nullness:argument.type.incompatible",
         "nullness:return.type.incompatible" })
-    private final Function<Action[], Action> collapseChoice = a -> {
+    private final Function<Action[], @Nullable Action> collapseChoice = a -> {
         Set<SolverType> types = new HashSet<>();
         StringBuilder builder = new StringBuilder();
         for (Action action : a) {
@@ -341,7 +341,8 @@ public final class MainWindow extends JFrame {
      */
     @SuppressWarnings({ "nullness:method.invocation.invalid",
         "nullness:argument.type.incompatible", "nullness:assignment.type.incompatible",
-        "nullness:initialization.fields.uninitialized", "nullness:dereference.of.nullable" })
+        "nullness:initialization.fields.uninitialized", "nullness:dereference.of.nullable",
+        "NullAway" })
     private MainWindow() {
         InputMap inputMap =
             getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
@@ -89,9 +91,10 @@ public class LoopApplyHeadBuiltInRuleApp extends AbstractBuiltInRuleApp<LoopAppl
         // TODO: FOR REVIEW (weigl):
         // Here we plugin the static reference directly. LCIR comes now w/o InfFlow support.
         final var instance = LoopContractInternalRule.INSTANCE;
-        instantiation =
-            instance.new Instantiator((JTerm) pio.subTerm(), goal)
-                    .instantiate();
+        final JTerm posTerm = (JTerm) Objects.requireNonNull(pio, "no position to instantiate")
+                .subTerm();
+        instantiation = instance.new Instantiator(posTerm, goal)
+                .instantiate();
 
         contracts = instance.getApplicableContracts(instantiation, goal, services);
         return this;

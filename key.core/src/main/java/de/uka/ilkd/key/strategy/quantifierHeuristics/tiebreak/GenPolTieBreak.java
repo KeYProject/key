@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import org.key_project.logic.Term;
@@ -83,7 +84,8 @@ public final class GenPolTieBreak extends PolarityOccurrenceTieBreak {
         }
         final Map<Term, Integer> ranks = new LinkedHashMap<>();
         for (final var e : intro.entrySet()) {
-            ranks.put(e.getKey(), e.getValue() < 0 ? 0 : rankOf.get(e.getValue()));
+            ranks.put(e.getKey(),
+                e.getValue() < 0 ? 0 : Objects.requireNonNull(rankOf.get(e.getValue())));
         }
         return ranks;
     }

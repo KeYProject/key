@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.util;
 
 
+import java.util.Objects;
+
 import org.jspecify.annotations.NullMarked;
 
 /** This Exception is only thrown by the ExceptionHandler */
@@ -36,6 +38,8 @@ public class ExceptionHandlerException extends RuntimeException {
 
     @Override
     public String toString() {
-        return super.getMessage();
+        // All constructors guarantee a non-null message (the Throwable one stores
+        // cause.toString()).
+        return Objects.requireNonNull(super.getMessage(), "exception message");
     }
 }

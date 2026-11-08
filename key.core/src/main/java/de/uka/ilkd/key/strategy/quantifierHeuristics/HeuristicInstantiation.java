@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -57,7 +58,7 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
      * @return the generator
      */
     public static TermGenerator<Goal> forOption(TriggerTreatment treatment) {
-        return GENERATORS.get(treatment);
+        return Objects.requireNonNull(GENERATORS.get(treatment));
     }
 
     @Override
@@ -113,7 +114,8 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
 
         @Override
         public Term next() {
-            final Term res = nextInst;
+            // hasNext() is the protocol witness that nextInst is non-null.
+            final Term res = Objects.requireNonNull(nextInst);
             nextInst = null;
             findNextInst();
             return res;

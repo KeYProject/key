@@ -32,7 +32,7 @@ public record RuleJustificationByAddRules(Node node, boolean isAxiom) implements
      * A rule justification added by a rule always derives from a received rule application; the
      * dereferences of the (nullable) mother rule app are suppressed with a scoped key.
      */
-    @SuppressWarnings("nullness:dereference.of.nullable")
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public String toString() {
         String mother;
         if (motherTaclet().rule() instanceof Taclet) {

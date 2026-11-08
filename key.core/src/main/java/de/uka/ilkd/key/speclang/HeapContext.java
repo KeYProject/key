@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -26,8 +28,10 @@ public class HeapContext {
     public static List<LocationVariable> getModifiableHeaps(Services services,
             boolean transaction) {
         List<LocationVariable> result = new ArrayList<>();
-        final LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+        final LocationVariable savedHeap = heapLDT.getSavedHeap();
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
             if (savedHeap == heap && !transaction) {
                 continue;
             }
@@ -51,7 +55,9 @@ public class HeapContext {
     public static Map<LocationVariable, JTerm> getAtPres(
             Map<LocationVariable, LocationVariable> atPreVars, Services services) {
         final Map<LocationVariable, JTerm> result = new LinkedHashMap<>();
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        HeapLDT heapLDT =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT");
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
             final LocationVariable lv = atPreVars.get(heap);
             final JTerm t = lv == null ? null : services.getTermBuilder().var(lv);
             result.put(heap, t);

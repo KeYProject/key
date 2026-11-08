@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaInfo;
@@ -168,13 +169,18 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         final EnhancedFor enhancedFor = (EnhancedFor) pe;
 
-        Expression expression = enhancedFor.getGuardExpression();
+        final Expression expression = Objects.requireNonNull(enhancedFor.getGuardExpression(),
+            "no guard expression in " + enhancedFor);
 
         final ExecutionContext execContext;
         if (execContextSV == null) {
-            execContext = svInst.getContextInstantiation().activeStatementContext();
+            execContext = Objects.requireNonNull(
+                Objects.requireNonNull(svInst.getContextInstantiation(),
+                    "no context instantiation").activeStatementContext(),
+                "no active statement context");
         } else {
-            execContext = (ExecutionContext) svInst.getInstantiation(execContextSV);
+            execContext = (ExecutionContext) Objects.requireNonNull(
+                svInst.getInstantiation(execContextSV), "no instantiation of " + execContextSV);
         }
 
         TransformationData data = new TransformationData(execContext);
@@ -198,7 +204,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      */
     private boolean isArrayType(Expression expression, ExecutionContext execContext,
             Services services) {
-        return expression.getKeYJavaType(services, execContext).getSort() instanceof ArraySort;
+        return Objects.requireNonNull(expression.getKeYJavaType(services, execContext),
+            "no KeYJavaType for " + expression).getSort() instanceof ArraySort;
     }
 
     /*
@@ -207,7 +214,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      */
     private ProgramElement makeArrayForLoop(EnhancedFor enhancedFor, TransformationData data,
             Services services) {
-        Expression expression = enhancedFor.getGuardExpression();
+        final Expression expression = Objects.requireNonNull(enhancedFor.getGuardExpression(),
+            "no guard expression in " + enhancedFor);
         Statement body = enhancedFor.getBody();
 
         assert expression instanceof ReferencePrefix : expression + " is not an arrray reference.";
@@ -215,15 +223,17 @@ public class EnhancedForElimination extends ProgramTransformer {
         final JavaInfo ji = services.getJavaInfo();
 
         // T[] arr = exp;
-        final TypeReference arrayType =
-            new TypeRef(expression.getKeYJavaType(services, data.execContext()));
+        final TypeReference arrayType = new TypeRef(Objects.requireNonNull(
+            expression.getKeYJavaType(services, data.execContext()),
+            "no KeYJavaType for " + expression));
         final ProgramVariable arrayVar = KeYJavaASTFactory.localVariable(services, ARR, arrayType);
         final Statement arrAssignment = KeYJavaASTFactory.declare(arrayVar, expression);
 
         data.setHead(KeYJavaASTFactory.block(arrAssignment));
 
         // for(int i; i < arr.length; i++)
-        final TypeReference intType = new TypeRef(ji.getPrimitiveKeYJavaType("int"));
+        final TypeReference intType = new TypeRef(Objects.requireNonNull(
+            ji.getPrimitiveKeYJavaType("int"), "no KeYJavaType for int"));
         data.setIndexVariable(KeYJavaASTFactory.localVariable(services, INDEX, intType));
         final ILoopInit inits = KeYJavaASTFactory.loopInitZero(intType, data.indexVariable());
         final IGuard guard =
@@ -257,16 +267,28 @@ public class EnhancedForElimination extends ProgramTransformer {
     /*
      * "{ ; while(<itguard>) <block> } "
      */
+    // While's position parameter is declared @NonNull, but null positions are accepted by the
+    // AST and KeYJavaASTFactory is read-only; no source position is attached here.
+    @SuppressWarnings("NullAway")
     private ProgramElement makeIterableForLoop(EnhancedFor enhancedFor, TransformationData data,
             Services services) {
-        final Expression iterableExpr = enhancedFor.getGuardExpression();
-        final KeYJavaType iterableType = iterableExpr.getKeYJavaType(services, data.execContext());
-        final IProgramMethod iteratorMethod =
-            services.getJavaInfo().getProgramMethod(iterableType, ITERATOR_METHOD_NAME,
-                ImmutableList.nil(), data.execContext().getTypeReference().getKeYJavaType());
+        final Expression iterableExpr = Objects.requireNonNull(enhancedFor.getGuardExpression(),
+            "no guard expression in " + enhancedFor);
+        final KeYJavaType iterableType = Objects.requireNonNull(
+            iterableExpr.getKeYJavaType(services, data.execContext()),
+            "no KeYJavaType for " + iterableExpr);
+        final TypeReference contextRef = Objects.requireNonNull(data.execContext()
+                .getTypeReference(),
+            "no type reference in " + data.execContext());
+        final IProgramMethod iteratorMethod = Objects.requireNonNull(services.getJavaInfo()
+                .getProgramMethod(iterableType, ITERATOR_METHOD_NAME, ImmutableList.nil(),
+                    Objects.requireNonNull(contextRef.getKeYJavaType(),
+                        "no KeYJavaType for type reference " + contextRef)),
+            "no iterator method for " + iterableType);
 
         // local variable "it"
-        final TypeReference iteratorType = new TypeRef(iteratorMethod.getReturnType());
+        final TypeReference iteratorType = new TypeRef(Objects.requireNonNull(
+            iteratorMethod.getReturnType(), "no return type for " + iteratorMethod));
         ProgramVariable iteratorVariable =
             KeYJavaASTFactory.localVariable(services, IT, iteratorType);
 
@@ -282,7 +304,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // Iterator itVar = expression.iterator();
         final Statement itinit = KeYJavaASTFactory.declareMethodCall(iteratorType, iteratorVariable,
-            new ParenthesizedExpression(enhancedFor.getGuardExpression()), ITERATOR_METHOD_NAME);
+            new ParenthesizedExpression(iterableExpr), ITERATOR_METHOD_NAME);
 
         // create the method call itVar.hasNext();
         final Expression itGuard =
@@ -349,7 +371,9 @@ public class EnhancedForElimination extends ProgramTransformer {
         LoopSpecification li = services.getSpecificationRepository().getLoopSpec(original);
         if (li != null) {
             li = li.setLoop(transformed);
-            li = instantiateIndexValues(li, loopIdxVar, valuesVar, services);
+            li = Objects.requireNonNull(
+                instantiateIndexValues(li, loopIdxVar, valuesVar, services),
+                "no instantiated loop invariant for " + li);
             services.getSpecificationRepository().addLoopInvariant(li);
         }
     }
@@ -427,6 +451,9 @@ public class EnhancedForElimination extends ProgramTransformer {
         private final ExecutionContext execContext;
         private ProgramElement transformationResult;
 
+        // all other fields are set via the setters of this class before any getter is called
+        // (see makeArrayForLoop, makeIterableForLoop and doTransform)
+        @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
         public TransformationData(ExecutionContext execContext) {
             this.execContext = execContext;
         }

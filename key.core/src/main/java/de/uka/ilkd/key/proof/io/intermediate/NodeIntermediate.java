@@ -41,7 +41,7 @@ public abstract class NodeIntermediate {
      * The assignment of the (nullable) argument to the non-null field is suppressed with a scoped
      * key.
      */
-    @SuppressWarnings("nullness:assignment.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
     public void setChildren(@Nullable LinkedList<NodeIntermediate> children) {
         this.children = children;
         this.subtreeSize = -1;
