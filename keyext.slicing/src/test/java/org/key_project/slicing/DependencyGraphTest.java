@@ -24,7 +24,7 @@ class DependencyGraphTest {
      * {@code AnnotatedEdge}, so a {@code null} node is runtime-legal. The nullness checker
      * requires a non-null node argument, hence the scoped suppression.
      */
-    @SuppressWarnings("nullness:argument.type.incompatible")
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Test
     void basicTest() {
         var graph = new DependencyGraph();
