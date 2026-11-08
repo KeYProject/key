@@ -16,6 +16,9 @@ JMLtk front-end shipped in PR #3997.
   (`arrayMax.key`, `polishFlagSort.key`, both loop proofs — mis-attributed to
   `\sum` fidelity). key.core red count is now **11** (was 14). See the
   per-section status for the re-measured state.
+- 2026-11-08 CI-integration triage (branch tip `4b62b1d6fa`): one **new,
+  pre-existing** gap identified in the `testMt*`/`testRunAll*` jobs — §18
+  (quicksort ghost locals, load failure, present at 1.1.0 and 1.2.1).
 - Every entry has a fixture path so it can be re-verified.
 
 ## Status legend
@@ -50,6 +53,7 @@ JMLtk front-end shipped in PR #3997.
 | 15 | `\strictly_nothing`, `\nothing`, `\everything` | — | — | ✘ OPEN (plain `NameExpr`; locset meaning must be re-added) |
 | 16 | assert label *after* `assert` | `//@ assert LAB: e;` | — | ✘ OPEN (only JML-standard `LAB: assert e;`) |
 | 17 | origin-label file info for re-parsed JML | `Precondition @ [no file]` | any JMLtk-converted spec (assert/assume/set, fallback clauses) | ✘ OPEN (cosmetic only — labels are proof-irrelevant) |
+| 18 | DL-typed ghost locals with initializer | `//@ ghost \seq x = \dl_array2seq(a);` | `key.ui/examples/heap/quicksort/{sort,split}{,-jmlscript}.key` | ✘ OPEN (load failure — JMLtk reads `ghost` as field-level; pre-existing at 1.1.0 **and** 1.2.1) |
 
 ---
 
@@ -330,6 +334,41 @@ No token for `\strictly_nothing`; `\nothing`/`\everything` arrive as plain
   job (recorded or otherwise). Fixable by re-parsing from the JMLtk node's
   position (URI via `CompilationUnit.getStorage().getPath()`), documented but
   not fixed at `53dcefd914`.
+
+## 18. DL-typed ghost locals with initializer (quicksort)  — ✘ OPEN (load failure, pre-existing)
+
+```java
+//@ ghost \seq seq3 = \dl_array2seq(array);
+```
+- Fixtures: `key.ui/examples/heap/quicksort/{sort,sort-jmlscript,split,split-jmlscript}.key`
+  (all load `Quicksort.java`).
+- **Symptom:** the proof fails to **load** (`ProblemLoaderException` ←
+  `BuildingExceptions`) — it is never proved or replayed.
+- **Root cause (JMLtk parse dump, `53dcefd914`):** JMLtk (both
+  `1.1.0-SNAPSHOT` and `1.2.1-SNAPSHOT`) parses the KeY-specific ghost *local*
+  `//@ ghost \seq <name> = \dl_array2seq(array);` as a class-level
+  `JmlFieldDeclaration` (`ghost` is a field-level modifier in standard JML)
+  and reports the hard problem *"Class-level JML declaration
+  JmlFieldDeclaration is not allowed within methods"*. `JavaService.unwrapParseResult`
+  only tolerates the method-level "Could not handle the JML comment" gap (plus
+  the accompanying location-less ANTLR problems), so this hard problem aborts
+  the load. (A plain `//@ ghost T x = plainCall();` without the DL-escape
+  initializer does parse as `JmlGhostStmt`.)
+- **Also in the file (tolerated, not fatal):** two `\by` proof scripts with
+  KeY-specific commands (`oss;`, `rule "…";`, `case "…":`,
+  `instantiate hide:true …`) → JMLtk "Could not handle the JML comment" →
+  leftover handled by the `KEY_JML_FALLBACK` re-parse.
+- **Pre-existing, not from the bump:** CI 2026-11-02 at `ed348636cb` (jmltk
+  `1.1.0-SNAPSHOT`) failed identically (`MtScriptStressTest` ×2, same exception
+  at the same line). Unrecorded until now because the `testMt*`/`testRunAll*`
+  integration jobs were not part of the local Appendix-A baseline.
+- **CI impact:** `testMtStress` (`MtScriptStressTest` ×2) and the `quicksort`
+  group of `testRunAllFunProofs`.
+- **Fix options:** fix upstream in JMLtk (a `ghost` local with a DL
+  type/initializer must parse as a statement, not a class-level field); or
+  rewrite the example source; or (KeY-side) tolerate this specific hard problem
+  and convert the statement-position `JmlFieldDeclaration` back into a ghost
+  local — conflicts with the loud-failure policy and needs care.
 
 ---
 
