@@ -145,9 +145,17 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
         splitPane.setResizeWeight(2.0 / 3.0);
         splitPane.setDividerLocation(2.0 / 3.0);
 
-        txtInput.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER,
-            InputEvent.CTRL_DOWN_MASK), "sendPrompt");
-        txtInput.getActionMap().put("sendPrompt", new SendPromptAction());
+        // Ctrl+Enter sends the prompt. It is bound to the input (the usual case) and to the
+        // panel itself, so that it also works when the keyboard focus is on another part of
+        // the KeY-Agent panel (toolbar button, output area, ...). A panel-level
+        // WHEN_ANCESTOR_OF_FOCUSED_COMPONENT binding only matches while the focus is inside
+        // this panel, so it cannot hijack the shortcut in the rest of the main window.
+        var sendAction = new SendPromptAction();
+        var sendStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK);
+        txtInput.getInputMap().put(sendStroke, "sendPrompt");
+        txtInput.getActionMap().put("sendPrompt", sendAction);
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(sendStroke, "sendPrompt");
+        getActionMap().put("sendPrompt", sendAction);
         // Ctrl+Space expands the $token / @file / /directive at the caret in place. The hook is
         // invoked directly from the input's key listener, before any key binding processing.
         txtInput.setExpandHook(this::expandAtCaret);
