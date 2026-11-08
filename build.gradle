@@ -122,10 +122,13 @@ subprojects {
         options.encoding = "UTF-8"
         // Setting the release to Java 21
         options.release = 21
-        // Fast JSpecify-aware nullness trial (Uber NullAway). It is an Error
-        // Prone checker, so it needs the Error Prone compiler plugin; both are
-        // opt-in via -DENABLE_NULLAWAY and off by default. EISOP's
-        // NullnessChecker (-DENABLE_NULLNESS) remains the conformance gate.
+        // JSpecify-aware nullness gate (Uber NullAway). It is an Error Prone
+        // checker, so it needs the Error Prone compiler plugin; both are
+        // opt-in via -DENABLE_NULLAWAY and off by default. This is the
+        // operating CI nullness gate (blocking `nullaway` job in
+        // code_quality.yml); EISOP's NullnessChecker (-DENABLE_NULLNESS) was
+        // dropped as a CI gate because a full-checker compile hangs on
+        // GitHub Actions (per-module wiring stays opt-in for local runs).
         options.errorprone.enabled = false
         if (System.getProperty("ENABLE_NULLAWAY")) {
             options.errorprone.enabled = true
