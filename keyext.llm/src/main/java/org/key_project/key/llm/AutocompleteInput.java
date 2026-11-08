@@ -277,6 +277,11 @@ public class AutocompleteInput extends JTextPane {
         return provider == null ? List.of() : provider.apply(prefix);
     }
 
+    /** Whether the completion popup is currently shown (test support). */
+    boolean isPopupVisible() {
+        return popup.isVisible();
+    }
+
     // ---------------------------------------------------------------------------- dropping
 
     /**
