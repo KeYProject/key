@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -31,7 +32,7 @@ public class FocusCommandTest {
                 \\proofScript { macro "prop-simp"; }
                 """);
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp);
-        Proof p = env.getLoadedProof();
+        Proof p = Objects.requireNonNull(env.getLoadedProof(), "no proof loaded");
         var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus (i=1 ==> i = 4);");
         ProofScriptEngine pse = new ProofScriptEngine(p);
         pse.execute(env.getUi(), script);
@@ -52,7 +53,7 @@ public class FocusCommandTest {
                     """);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(temp);
-        Proof p = env.getLoadedProof();
+        Proof p = Objects.requireNonNull(env.getLoadedProof(), "no proof loaded");
         var script = ParsingFacade.parseScript("macro \"nosplit-prop\"; focus (i=1 ==> i = 3);");
         ProofScriptEngine pse = new ProofScriptEngine(p);
         pse.execute(env.getUi(), script);

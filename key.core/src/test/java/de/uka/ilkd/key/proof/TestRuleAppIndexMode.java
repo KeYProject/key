@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -35,7 +36,8 @@ public class TestRuleAppIndexMode {
     void indicesAreInteractiveAfterARun(@TempDir Path dir) throws Exception {
         final KeYEnvironment<DefaultUserInterfaceControl> env = load(dir);
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             run(proof);
             assertEquals(RuleAppIndexMode.INTERACTIVE, proof.getRuleAppIndexMode());
             assertTrue(reports(proof.openGoals().head(), "hide_left", true));
@@ -48,9 +50,10 @@ public class TestRuleAppIndexMode {
     void aPrunedGoalIsInteractive(@TempDir Path dir) throws Exception {
         final KeYEnvironment<DefaultUserInterfaceControl> env = load(dir);
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             run(proof);
-            proof.pruneProof(proof.root());
+            proof.pruneProof(Objects.requireNonNull(proof.root(), "the proof has a root node"));
             assertTrue(reports(proof.openGoals().head(), "hide_right", false));
         } finally {
             env.dispose();
@@ -61,7 +64,8 @@ public class TestRuleAppIndexMode {
     void scopesRestoreThePreviousMode(@TempDir Path dir) throws Exception {
         final KeYEnvironment<DefaultUserInterfaceControl> env = load(dir);
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             final Goal goal = proof.openGoals().head();
             try (var automatic = proof.setRuleAppIndexMode(RuleAppIndexMode.AUTO)) {
                 try (var interactive = proof.setRuleAppIndexMode(RuleAppIndexMode.INTERACTIVE)) {
@@ -80,7 +84,8 @@ public class TestRuleAppIndexMode {
             throws Exception {
         final KeYEnvironment<DefaultUserInterfaceControl> env = load(dir);
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             final Goal goal = proof.openGoals().head();
             final PosInOccurrence pos = new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);

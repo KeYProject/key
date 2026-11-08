@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.Collections;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Statement;
@@ -124,7 +125,8 @@ public class TestVariableNamer {
         app = (NoPosTacletApp) app.addCheckedInstantiation(sv, statement,
             goal.proof().getServices(), false);
 
-        goal.ruleAppIndex().tacletIndex().add(app);
+        goal.ruleAppIndex().tacletIndex()
+                .add(Objects.requireNonNull(app, "the checked instantiation must succeed"));
     }
 
 
@@ -212,14 +214,17 @@ public class TestVariableNamer {
         PosInOccurrence pio = constructPIO(formulaWithVar_1);
         Goal goal = constructGoal(formulaWithVar_1);
 
-        proposal = vn.getNameProposalForSchemaVariable(null, variableSV, pio, null, null, services);
+        proposal = Objects.requireNonNull(
+            vn.getNameProposalForSchemaVariable(null, variableSV, pio, null, null, services),
+            "a name proposal for the schema variable must be found");
         assertEquals("var_2", proposal.toString());
 
         proof.getNamespaces().programVariables().addSafely(var_2);
         addGlobal(goal, var_2);
 
-        proposal =
-            vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null, services);
+        proposal = Objects.requireNonNull(
+            vn.getNameProposalForSchemaVariable("var", variableSV, pio, null, null, services),
+            "a name proposal for the schema variable must be found");
         assertEquals("var_3", proposal.toString());
     }
 

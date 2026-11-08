@@ -46,6 +46,9 @@ public class TestEqualsModProperty {
 
     final private TermLabel relevantLabel1 = ParameterlessTermLabel.UNDEFINED_VALUE_LABEL;
     final private TermLabel relevantLabel2 = ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL;
+    // assigned in setIrrelevantLabel() (@BeforeAll) before any test runs; the JUnit lifecycle
+    // assignment is invisible to NullAway's field initialization analysis
+    @SuppressWarnings("NullAway")
     private static TermLabel irrelevantLabel = null;
     final private static OriginTermLabelFactory factory = new OriginTermLabelFactory();
 

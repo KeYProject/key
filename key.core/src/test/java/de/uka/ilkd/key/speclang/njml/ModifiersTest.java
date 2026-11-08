@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
@@ -13,6 +14,7 @@ import de.uka.ilkd.key.java.ast.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ModifiersTest {
-    private static JavaService java = null;
+    // lazily filled in setUp(); null until then
+    private static @Nullable JavaService java = null;
 
     @BeforeEach
     public void setUp() throws URISyntaxException, IOException {
@@ -65,7 +68,7 @@ public class ModifiersTest {
 
     @Test
     public void testClassModifiers() {
-        var cu = java.readCompilationUnit(CLASSES);
+        var cu = Objects.requireNonNull(java, "set in setUp").readCompilationUnit(CLASSES);
         var decls = cu.getDeclarations();
         var a = decls.get(0);
         var b = decls.get(1);
@@ -78,7 +81,7 @@ public class ModifiersTest {
 
     @Test
     public void testMethodModifiers() {
-        var cu = java.readCompilationUnit(METHODS);
+        var cu = Objects.requireNonNull(java, "set in setUp").readCompilationUnit(METHODS);
         var members = cu.getDeclarations().get(0).getMembers();
         var a = ((ProgramMethod) members.get(0)).getMethodDeclaration();
         var modelA = ((ProgramMethod) members.get(3)).getMethodDeclaration();

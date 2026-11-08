@@ -7,6 +7,7 @@ package de.uka.ilkd.key.prover.mt;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -86,7 +87,8 @@ public class MtStopTest {
 
         KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
         try {
-            Proof proof = env.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
 

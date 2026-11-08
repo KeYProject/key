@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.nparser;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -35,7 +37,7 @@ public class NamespaceBuilder {
         if (nss.sorts().lookup(group) == null) {
             addSort(group);
         }
-        return nss.sorts().lookup(group);
+        return Objects.requireNonNull(nss.sorts().lookup(group), "sort " + group + " expected");
     }
 
     public NamespaceBuilder addVariable(String name, String sort) {

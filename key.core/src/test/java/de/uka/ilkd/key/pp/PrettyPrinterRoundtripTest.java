@@ -9,12 +9,14 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.Choice;
@@ -48,6 +50,7 @@ public class PrettyPrinterRoundtripTest {
     }
 
     @AfterAll
+    @SuppressWarnings("NullAway") // io is released after all tests and never read again
     public static void tearDown() {
         io = null;
     }
@@ -88,7 +91,8 @@ public class PrettyPrinterRoundtripTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("getCases")
     public void roundtrip(String termString) {
-        services.getProof().getSettings().getChoiceSettings().updateWith(List.of(WITH_FINAL));
+        Proof proof = Objects.requireNonNull(services.getProof(), "no proof in services");
+        proof.getSettings().getChoiceSettings().updateWith(List.of(WITH_FINAL));
         JTerm term = io.parseExpression(termString);
         System.out.println("Original: " + term);
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
@@ -103,7 +107,8 @@ public class PrettyPrinterRoundtripTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("getHeapCases")
     void roundtripWithoutFinal(String termString) {
-        services.getProof().getSettings().getChoiceSettings().updateWith(List.of(WITHOUT_FINAL));
+        Proof proof = Objects.requireNonNull(services.getProof(), "no proof in services");
+        proof.getSettings().getChoiceSettings().updateWith(List.of(WITHOUT_FINAL));
         JTerm term = io.parseExpression(termString);
         System.out.println("Original: " + term);
         LogicPrinter lp = LogicPrinter.purePrinter(new NotationInfo(), services);
@@ -128,7 +133,8 @@ public class PrettyPrinterRoundtripTest {
     static Services getServices() {
         try {
             URL url = PrettyPrinterRoundtripTest.class.getResource("roundTripTest.key");
-            Path keyFile = Paths.get(url.toURI());
+            Path keyFile =
+                Paths.get(Objects.requireNonNull(url, "roundTripTest.key resource").toURI());
             return HelperClassForTests.createServices(keyFile);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);

@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util.parsing;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ConvertException;
 import de.uka.ilkd.key.util.ExceptionTools;
@@ -32,11 +34,12 @@ class BuildingExceptionsTest {
         var ex = new BuildingExceptions(List.of(located));
 
         // the message must contain the actual reason and not just a vague header
-        assertTrue(ex.getMessage().contains("something went wrong"),
-            "message should contain the reason, but was: " + ex.getMessage());
-        assertTrue(ex.getMessage().contains("file:///tmp/test.key"),
-            "message should mention the source, but was: " + ex.getMessage());
-        assertFalse(ex.getMessage().startsWith("Multiple errors"),
+        String message = Objects.requireNonNull(ex.getMessage(), "the exception has a message");
+        assertTrue(message.contains("something went wrong"),
+            "message should contain the reason, but was: " + message);
+        assertTrue(message.contains("file:///tmp/test.key"),
+            "message should mention the source, but was: " + message);
+        assertFalse(message.startsWith("Multiple errors"),
             "a single issue should not be reported as 'Multiple errors'");
 
         // The location used to be lost entirely (BuildingExceptions was not HasLocation).
@@ -44,8 +47,9 @@ class BuildingExceptionsTest {
         assertNotNull(loc);
         assertEquals(12, loc.getPosition().line());
         assertEquals(7, loc.getPosition().column());
-        assertTrue(loc.fileUri().toString().endsWith("/tmp/test.key"),
-            "unexpected file uri: " + loc.fileUri());
+        URI fileUri = Objects.requireNonNull(loc.fileUri(), "the location carries a file uri");
+        assertTrue(fileUri.toString().endsWith("/tmp/test.key"),
+            "unexpected file uri: " + fileUri);
 
         // ExceptionTools must also be able to extract that location now.
         assertDoesNotThrow(() -> {
@@ -60,8 +64,9 @@ class BuildingExceptionsTest {
         var i1 = new BuildingIssue("first", null, false, Position.newOneBased(1, 1), "a.key");
         var i2 = new BuildingIssue("second", null, false, Position.newOneBased(2, 2), "a.key");
         var ex = new BuildingExceptions(List.of(i1, i2));
-        assertTrue(ex.getMessage().contains("2 errors occurred"),
-            "message should count the issues, but was: " + ex.getMessage());
+        String message = Objects.requireNonNull(ex.getMessage(), "the exception has a message");
+        assertTrue(message.contains("2 errors occurred"),
+            "message should count the issues, but was: " + message);
         assertTrue(ex.getMessage().contains("first") && ex.getMessage().contains("second"));
     }
 

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.logic;
 
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TestTermBuilder {
-    private static Proof PROOF = null;
+    // lazily initialized proof aggregate, cached across tests
+    private static @Nullable Proof PROOF = null;
     private Services services;
     private TermBuilder tb;
 
@@ -33,7 +36,8 @@ public class TestTermBuilder {
             PROOF = agg.getFirstProof();
         }
 
-        services = PROOF.getServices().copy(false);
+        services = Objects.requireNonNull(PROOF, "proof must have been parsed in setUp")
+                .getServices().copy(false);
         tb = services.getTermBuilder();
     }
 
@@ -107,6 +111,8 @@ public class TestTermBuilder {
     private void testDoubleLongPatterns(String number) {
         double doubleVal = Double.parseDouble(number);
         JTerm doubleTerm = tb.dfpTerm(doubleVal);
+        // literal decoding never consults the children parameter, so null is deliberate
+        @SuppressWarnings("NullAway")
         DoubleLiteral literal =
             services.getTypeConverter().getDoubleLDT().translateTerm(doubleTerm, null, services);
         assertEquals(doubleVal, Double.parseDouble(literal.getValue()),
@@ -128,8 +134,12 @@ public class TestTermBuilder {
     private void testFloatPatterns(String number) {
         float floatval = Float.parseFloat(number);
         JTerm floatTerm = tb.fpTerm(floatval);
-        FloatLiteral literal =
-            services.getTypeConverter().getFloatLDT().translateTerm(floatTerm, null, services);
+        // literal decoding never consults the children parameter, so null is deliberate; the
+        // guard is crash-equivalent (a null result previously threw NPE at literal.getValue())
+        @SuppressWarnings("NullAway")
+        FloatLiteral literal = Objects.requireNonNull(
+            services.getTypeConverter().getFloatLDT().translateTerm(floatTerm, null, services),
+            "float literal term must decode back to a float literal");
         assertEquals(floatval, Float.parseFloat(literal.getValue()), "for double value " + number);
     }
 

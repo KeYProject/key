@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -109,7 +110,8 @@ public class TestProofBundleIO {
         assertNotNull(proof);
         assertTrue(proof.closed());
 
-        Path unzip = zip.getParent().resolve("unzip");
+        Path unzip = Objects.requireNonNull(zip.getParent(), "the bundle has a parent dir")
+                .resolve("unzip");
         IOUtil.extractZip(zip, unzip);
 
         // test: classpath/bootclasspath empty (no such subdirectories exists)
@@ -167,7 +169,8 @@ public class TestProofBundleIO {
      */
     private Proof loadBundle(Path p) throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(p);
-        AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
+        AbstractProblemLoader.ReplayResult replayResult =
+            Objects.requireNonNull(env.getReplayResult(), "the replay must have been executed");
         if (replayResult.hasErrors()) {
             LOGGER.debug("Error(s) while loading");
             for (Throwable error : replayResult.getErrorList()) {
@@ -209,7 +212,8 @@ public class TestProofBundleIO {
         assertNotNull(proof);
 
         // start auto mode (proof is closable by auto mode)
-        ProofControl control = env.getProofControl();
+        ProofControl control =
+            Objects.requireNonNull(env.getProofControl(), "the proof control must be available");
         control.startAndWaitForAutoMode(proof);
         assertTrue(proof.closed());
 

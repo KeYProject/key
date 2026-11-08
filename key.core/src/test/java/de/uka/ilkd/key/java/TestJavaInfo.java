@@ -8,9 +8,11 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
@@ -38,7 +40,9 @@ public class TestJavaInfo {
     static void setUp() {
         if (services == null || javaInfo == null) {
             final ProofAggregate agg = HelperClassForTests.parse(Paths.get(testfile));
-            services = agg.getFirstProof().getServices();
+            final Proof firstProof = Objects.requireNonNull(agg.getFirstProof(),
+                "the parsed test file must contain at least one proof");
+            services = firstProof.getServices();
             javaInfo = services.getJavaInfo();
         }
     }
@@ -105,7 +109,8 @@ public class TestJavaInfo {
 
     @Test
     public void testFindImplicitAttributesForClassTypesOnly() {
-        KeYJavaType obj = javaInfo.getKeYJavaType("java.lang.Object");
+        KeYJavaType obj = Objects.requireNonNull(javaInfo.getKeYJavaType("java.lang.Object"),
+            "type java.lang.Object must be known");
         for (String generalImplicitField : generalImplicitFields) {
             assertNotNull(javaInfo.lookupVisibleAttribute(generalImplicitField, obj),
                 "Could not find " + generalImplicitField + "attribute for arrays.");
@@ -142,13 +147,20 @@ public class TestJavaInfo {
     @Test
     public void testGetCommonSubtypes() {
 
-        final KeYJavaType ae = javaInfo.getKeYJavaType("java.lang.ArithmeticException");
-        final KeYJavaType npe = javaInfo.getKeYJavaType("java.lang.NullPointerException");
+        final KeYJavaType ae = Objects.requireNonNull(
+            javaInfo.getKeYJavaType("java.lang.ArithmeticException"),
+            "type java.lang.ArithmeticException must be known");
+        final KeYJavaType npe = Objects.requireNonNull(
+            javaInfo.getKeYJavaType("java.lang.NullPointerException"),
+            "type java.lang.NullPointerException must be known");
 
         assertEquals(0, javaInfo.getCommonSubtypes(ae, npe).size());
 
-        final KeYJavaType obj = javaInfo.getKeYJavaType("java.lang.Object");
-        final KeYJavaType rte = javaInfo.getKeYJavaType("java.lang.RuntimeException");
+        final KeYJavaType obj = Objects.requireNonNull(javaInfo.getKeYJavaType("java.lang.Object"),
+            "type java.lang.Object must be known");
+        final KeYJavaType rte = Objects.requireNonNull(
+            javaInfo.getKeYJavaType("java.lang.RuntimeException"),
+            "type java.lang.RuntimeException must be known");
 
         long start = System.currentTimeMillis();
 

@@ -9,10 +9,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,7 +167,7 @@ public class TestFile implements Serializable {
                 var pair = load(keyFile);
                 env = pair.first;
                 var script = pair.second;
-                loadedProof = env.getLoadedProof();
+                loadedProof = Objects.requireNonNull(env.getLoadedProof(), "loaded proof");
                 ReplayResult replayResult;
 
 
@@ -176,13 +178,18 @@ public class TestFile implements Serializable {
                         LOGGER.info("... success: loading failed");
                         return getRunAllProofsTestResult(catched, true);
                     }
+                    // outside the inner try so that a null result is not swallowed as a
+                    // "loading failed" success
+                    replayResult = Objects.requireNonNull(
+                        replayResult, "replay result of the loaded proof");
                     assertTrue(replayResult.hasErrors(),
                         "Loading problem file succeded but it shouldn't");
                     LOGGER.info("... success: loading failed");
                     return getRunAllProofsTestResult(catched, true);
                 }
 
-                replayResult = env.getReplayResult();
+                replayResult = Objects.requireNonNull(
+                    env.getReplayResult(), "replay result of the loaded proof");
                 if (replayResult.hasErrors() && verbose) {
                     LOGGER.warn("... error(s) while loading");
                     List<Throwable> errors = replayResult.getErrorList();
@@ -210,8 +217,9 @@ public class TestFile implements Serializable {
                     ProofSaver.saveToFile(new File(keyFile.toAbsolutePath() + ".save.proof"),
                         loadedProof);
 
-                    var path = Paths.get("proofs",
-                        loadedProof.getProofFile().getFileName() + ".proof.xml.gz");
+                    var loadedProofFile = Objects.requireNonNull(
+                        loadedProof.getProofFile(), "proof file of the loaded proof");
+                    var path = Paths.get("proofs", loadedProofFile.getFileName() + ".proof.xml.gz");
                     ProveTest.saveProofXml(loadedProof, path);
                     LOGGER.info("Stored {}", path);
                 }
@@ -271,14 +279,16 @@ public class TestFile implements Serializable {
      * want to use a different strategy.
      */
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            KeyAst.ProofScript script) throws Exception {
+            @Nullable ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
-            env.getProofControl().startAndWaitForAutoMode(loadedProof);
+            Objects.requireNonNull(env.getProofControl(), "proof control of the KeY environment")
+                    .startAndWaitForAutoMode(loadedProof);
         } else {
             // ... script
-            ProofScriptEngine pse = new ProofScriptEngine(env.getLoadedProof());
+            ProofScriptEngine pse = new ProofScriptEngine(
+                Objects.requireNonNull(env.getLoadedProof(), "loaded proof"));
             pse.execute(env.getUi(), script);
         }
     }
@@ -286,7 +296,10 @@ public class TestFile implements Serializable {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(Path keyFile)
+    // Pair's type parameters cannot be @Nullable, but getProofScript() is @Nullable (auto-mode
+    // runs have no proof script); callers null-check the second component.
+    @SuppressWarnings("NullAway")
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScript> load(Path keyFile)
             throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
@@ -308,7 +321,8 @@ public class TestFile implements Serializable {
         try {
             proofLoadEnvironment = KeYEnvironment.load(proofFile);
 
-            ReplayResult result = proofLoadEnvironment.getReplayResult();
+            ReplayResult result =
+                Objects.requireNonNull(proofLoadEnvironment.getReplayResult(), "replay result");
 
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
@@ -318,7 +332,8 @@ public class TestFile implements Serializable {
                 throw errorList.get(0);
             }
 
-            reloadedProof = proofLoadEnvironment.getLoadedProof();
+            reloadedProof =
+                Objects.requireNonNull(proofLoadEnvironment.getLoadedProof(), "loaded proof");
 
             List<Integer> goalsSerials = reloadedProof
                     .openGoals()

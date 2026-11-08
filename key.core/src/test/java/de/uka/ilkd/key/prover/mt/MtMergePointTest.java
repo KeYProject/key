@@ -7,6 +7,7 @@ package de.uka.ilkd.key.prover.mt;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
@@ -70,7 +71,8 @@ public class MtMergePointTest {
             ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
             final KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
             try {
-                final Proof proof = env.getLoadedProof();
+                final Proof proof =
+                    Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
                 final ProofStarter starter = new ProofStarter(false);
                 starter.init(proof);
                 // The scenario under guard: the user's stored preference is 'merge'.
@@ -83,7 +85,8 @@ public class MtMergePointTest {
 
                 boolean mergeRuleApplied = false;
                 boolean mergePointDeleted = false;
-                for (Iterator<Node> it = proof.root().subtreeIterator(); it.hasNext();) {
+                final Node root = Objects.requireNonNull(proof.root(), "the proof has a root node");
+                for (Iterator<Node> it = root.subtreeIterator(); it.hasNext();) {
                     final Node n = it.next();
                     final RuleApp app = n.getAppliedRuleApp();
                     if (app == null) {

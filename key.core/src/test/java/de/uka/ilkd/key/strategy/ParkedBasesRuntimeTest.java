@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -77,7 +78,8 @@ public class ParkedBasesRuntimeTest {
         final Collection<RuleAppContainer> woken = parking.getAndClearWokenApplications();
         assertEquals(1, woken.size(), "the parked base must be woken");
         assertSame(base, woken.iterator().next(), "the woken base is the parked one");
-        assertTrue(parking.parkedMapForTests().isEmpty(),
+        assertTrue(
+            Objects.requireNonNull(parking.parkedMapForTests(), "the parked map exists").isEmpty(),
             "unindexing recomputes the base's keys and releases it from the map");
 
         parking.recordWakeKeysOf(completer, key.inAntecedent());
@@ -97,7 +99,9 @@ public class ParkedBasesRuntimeTest {
             key.inAntecedent());
         assertTrue(parking.getAndClearWokenApplications().isEmpty(),
             "no recorded change matches the parked key");
-        assertEquals(1, parking.parkedMapForTests().size(), "the base stays parked");
+        assertEquals(1,
+            Objects.requireNonNull(parking.parkedMapForTests(), "the parked map exists").size(),
+            "the base stays parked");
     }
 
     @Test
@@ -148,8 +152,9 @@ public class ParkedBasesRuntimeTest {
             }
         }
         assertNotNull(sv, "schema variable " + svName + " not found in " + tacletName);
-        final NoPosTacletApp bound =
-            (NoPosTacletApp) app.addCheckedInstantiation(sv, term, services, true);
+        final NoPosTacletApp bound = (NoPosTacletApp) Objects
+                .requireNonNull(app.addCheckedInstantiation(sv, term, services, true),
+                    "the checked instantiation must succeed");
         return new NoFindTacletAppContainer(bound, NumberRuleAppCost.getZeroCost(), true,
             NumberRuleAppCost.getZeroCost(), -1);
     }

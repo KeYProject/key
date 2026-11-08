@@ -28,6 +28,8 @@ public class Z3LegacyTest extends SMTSolverTest {
     private static final String SYSTEM_PROPERTY_SOLVER_PATH = "z3SolverPath";
     private static final Logger LOGGER = LoggerFactory.getLogger(Z3LegacyTest.class);
     private static final String SOLVER_NAME = "Z3 (Legacy Translation)";
+    // orElse(null): the registry always contains this solver type
+    @SuppressWarnings("NullAway")
     private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
                     && it.getName().equals(SOLVER_NAME))

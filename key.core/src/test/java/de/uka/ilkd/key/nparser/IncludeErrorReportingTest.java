@@ -6,6 +6,7 @@ package de.uka.ilkd.key.nparser;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.util.ExceptionTools;
@@ -56,8 +57,8 @@ public class IncludeErrorReportingTest {
     public void syntaxErrorInIncludeReportsIncludedFile() throws Exception {
         // missing ';' after the declaration of f in inc.key (line 2)
         Throwable t = loadWithInclude("\\functions {\n   int f\n   int g;\n}\n");
-        assertTrue(ExceptionTools.getMessage(t).contains("expected"),
-            "expected a syntax-error message, but was: " + ExceptionTools.getMessage(t));
+        String msg = Objects.requireNonNull(ExceptionTools.getMessage(t), "error message");
+        assertTrue(msg.contains("expected"), "expected a syntax-error message, but was: " + msg);
         Location loc = locationOf(t);
         assertEquals(2, loc.getPosition().line(),
             "the missing ';' should be reported at the end of line 2 of inc.key");
@@ -67,8 +68,8 @@ public class IncludeErrorReportingTest {
     public void semanticErrorInIncludeReportsIncludedFile() throws Exception {
         // duplicate function declaration in inc.key (second one on line 3)
         Throwable t = loadWithInclude("\\functions {\n   int f;\n   int f;\n}\n");
-        assertTrue(ExceptionTools.getMessage(t).contains("Function 'f' is already defined!"),
-            "unexpected message: " + ExceptionTools.getMessage(t));
+        String msg = Objects.requireNonNull(ExceptionTools.getMessage(t), "error message");
+        assertTrue(msg.contains("Function 'f' is already defined!"), "unexpected message: " + msg);
         Location loc = locationOf(t);
         assertEquals(3, loc.getPosition().line(),
             "the duplicate should be reported on line 3 of inc.key");

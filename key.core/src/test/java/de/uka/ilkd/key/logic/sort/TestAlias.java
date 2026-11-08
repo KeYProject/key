@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.sort;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericArgument;
@@ -13,6 +15,7 @@ import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -42,7 +45,8 @@ public class TestAlias {
     private SortAlias addAlias(String name, String aliased) {
         var aliasedSort = nss.sorts().lookup(aliased);
         assert aliasedSort != null;
-        var alias = new SortAlias(new Name(name), aliasedSort);
+        var alias = new SortAlias(new Name(name),
+            Objects.requireNonNull(aliasedSort, "sort " + aliased + " must be declared"));
         nss.sortAliases().add(alias);
         return alias;
     }
@@ -60,8 +64,10 @@ public class TestAlias {
                 new GenericParameter(new GenericSort(new Name("A")),
                     GenericParameter.Variance.INVARIANT)));
         nss.parametricSorts().add(pSet);
+        Sort intSort =
+            Objects.requireNonNull(nss.lookupSortOrAlias("int"), "int must be declared");
         ParametricSortInstance intSet = ParametricSortInstance.get(pSet,
-            ImmutableList.of(new GenericArgument(nss.lookupSortOrAlias("int"))), services);
+            ImmutableList.of(new GenericArgument(intSort)), services);
         var alias = new SortAlias(new Name("IntSet"), intSet);
         nss.sortAliases().add(alias);
         assertEquals(intSet, nss.lookupSortOrAlias("IntSet"));

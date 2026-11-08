@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
@@ -108,6 +109,7 @@ public class TestApplyTaclet {
     }
 
     @AfterEach
+    @SuppressWarnings("NullAway") // null out proof after each test to release references
     public void tearDown() {
         proof = null;
     }
@@ -115,14 +117,16 @@ public class TestApplyTaclet {
 
     @Test
     public void testSuccTacletWithoutIf() {
-        JTerm fma = (JTerm) proof[0].root().sequent().succedent().getFirst().formula();
+        Node root = Objects.requireNonNull(proof[0].root(), "root of proof[0]");
+        JTerm fma = (JTerm) root.sequent().succedent().getFirst().formula();
         NoPosTacletApp impright = TacletForTests.lookupTaclet("imp_right");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(impright);
-        Goal goal = createGoal(proof[0].root(), tacletIndex);
+        Goal goal = createGoal(root, tacletIndex);
         PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
+        @SuppressWarnings("NullAway") // null Services is intentional: taclet is pure logic
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
@@ -140,15 +144,17 @@ public class TestApplyTaclet {
 
     @Test
     public void testAddingRule() {
-        JTerm fma = (JTerm) proof[0].root().sequent().succedent().getFirst().formula();
+        Node root = Objects.requireNonNull(proof[0].root(), "root of proof[0]");
+        JTerm fma = (JTerm) root.sequent().succedent().getFirst().formula();
         NoPosTacletApp imprightadd =
             TacletForTests.lookupTaclet("TestApplyTaclet_imp_right_add");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(imprightadd);
-        Goal goal = createGoal(proof[0].root(), tacletIndex);
+        Goal goal = createGoal(root, tacletIndex);
         PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
+        @SuppressWarnings("NullAway") // null Services is intentional: taclet is pure logic
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
@@ -161,13 +167,16 @@ public class TestApplyTaclet {
             "Wrong antecedent after imp_right_add");
         assertEquals(seq.succedent().getFirst().formula(), fma.sub(1),
             "Wrong succedent after imp_right_add");
+        @SuppressWarnings("NullAway") // null Services is intentional: taclet is pure logic
         ImmutableList<NoPosTacletApp> nfapp = goals.head().indexOfTaclets()
                 .getNoFindTaclet(new IHTacletFilter(true, ImmutableList.nil()), null);
         JTerm aimpb = TacletForTests.parseTerm("A -> B");
         assertEquals(1, nfapp.size(), "Cut Rule should be inserted to TacletIndex.");
+        SchemaVariable b =
+            Objects.requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name("b")),
+                "schema variable b");
         assertEquals(
-            nfapp.head().instantiations()
-                    .getInstantiation(TacletForTests.getSchemaVariables().lookup(new Name("b"))),
+            nfapp.head().instantiations().getInstantiation(b),
             aimpb, "Inserted cut rule's b should be instantiated to A -> B.");
         assertTrue(rApp.complete(), "Rule App should be complete");
         goals = nfapp.head().rule().getExecutor().apply(goals.head(), nfapp.head());
@@ -188,21 +197,26 @@ public class TestApplyTaclet {
 
     @Test
     public void testSuccTacletAllRight() {
+        Node root = Objects.requireNonNull(proof[1].root(), "root of proof[1]");
         NoPosTacletApp allright = TacletForTests.lookupTaclet("all_right");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(allright);
-        Goal goal = createGoal(proof[1].root(), tacletIndex);
+        Goal goal = createGoal(root, tacletIndex);
         PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
+        @SuppressWarnings("NullAway") // null Services is intentional: taclet is pure logic
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         TacletApp rApp = rApplist.head();
-        rApp = rApp.tryToInstantiate(TacletForTests.services());
+        rApp =
+            Objects.requireNonNull(rApp.tryToInstantiate(TacletForTests.services()),
+                "app after tryToInstantiate");
         assertTrue(rApp.completeExceptSkolemConstants(),
             "Rule App should be applicable, the skolem constants are created on application");
-        rApp = rApp.createSkolemConstants(goal);
+        rApp = Objects.requireNonNull(rApp.createSkolemConstants(goal),
+            "app after createSkolemConstants");
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(1, goals.size(), "Too many or zero goals for all-right.");
@@ -219,10 +233,12 @@ public class TestApplyTaclet {
         NoPosTacletApp close = TacletForTests.lookupTaclet("close_goal");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(close);
-        Goal goal = createGoal(proof[2].root(), tacletIndex);
+        Node root = Objects.requireNonNull(proof[2].root(), "root of proof[2]");
+        Goal goal = createGoal(root, tacletIndex);
         PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
+        @SuppressWarnings("NullAway") // null Services is intentional: taclet is pure logic
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(),
@@ -252,14 +268,16 @@ public class TestApplyTaclet {
 
     @Test
     public void testAntecTacletWithoutIf() {
-        JTerm fma = (JTerm) proof[3].root().sequent().antecedent().getFirst().formula();
+        Node root = Objects.requireNonNull(proof[3].root(), "root of proof[3]");
+        JTerm fma = (JTerm) root.sequent().antecedent().getFirst().formula();
         NoPosTacletApp impleft = TacletForTests.lookupTaclet("imp_left");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(impleft);
-        Goal goal = createGoal(proof[3].root(), tacletIndex);
+        Goal goal = createGoal(root, tacletIndex);
         PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().antecedent().getFirst(),
                 PosInTerm.getTopLevel(), true);
+        @SuppressWarnings("NullAway") // null Services is intentional: taclet is pure logic
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
@@ -293,10 +311,12 @@ public class TestApplyTaclet {
             TacletForTests.lookupTaclet("TestApplyTaclet_contradiction");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(contradiction);
-        Goal goal = createGoal(proof[0].root(), tacletIndex);
+        Node root = Objects.requireNonNull(proof[0].root(), "root of proof[0]");
+        Goal goal = createGoal(root, tacletIndex);
         PosInOccurrence pos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel().down(1).down(0).down(0), false);
+        @SuppressWarnings("NullAway") // null Services is intentional: taclet is pure logic
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pos, null);
 
@@ -317,16 +337,21 @@ public class TestApplyTaclet {
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         JTerm t_c = TacletForTests.parseTerm("D");
         tacletIndex.add(cut);
-        Goal goal = createGoal(proof[0].root(), tacletIndex);
+        Node root = Objects.requireNonNull(proof[0].root(), "root of proof[0]");
+        Goal goal = createGoal(root, tacletIndex);
         PosInOccurrence pos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
+        @SuppressWarnings("NullAway") // null Services is intentional: taclet is pure logic
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pos, null);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
-        TacletApp rApp = rApplist.head().addInstantiation(
-            TacletForTests.getSchemaVariables().lookup(new Name("b")), t_c, false,
-            proof[0].getServices());
+        SchemaVariable b =
+            Objects.requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name("b")),
+                "schema variable b");
+        TacletApp rApp = Objects.requireNonNull(
+            rApplist.head().addInstantiation(b, t_c, false, proof[0].getServices()),
+            "app after addInstantiation");
         assertTrue(rApp.complete(), "Rule App should be complete");
         ImmutableList<Goal> goals = rApp.rule().getExecutor().apply(goal, rApp);
         assertEquals(2, goals.size(), "Too many or too few goals.");
@@ -395,7 +420,9 @@ public class TestApplyTaclet {
     public void testIncompleteNoFindTacletApp() {
         NoPosTacletApp cut = TacletForTests.lookupTaclet("TestApplyTaclet_cut");
         assertFalse(cut.complete(), "TacletApp should not be complete, as b is not instantiated");
-        SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
+        SchemaVariable b =
+            Objects.requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name("b")),
+                "schema variable b");
         assertTrue(cut.uninstantiatedVars().contains(b),
             "b should be in the set of not instantiated SVs");
     }
@@ -407,19 +434,31 @@ public class TestApplyTaclet {
             "TacletApp should not be complete, as SVs are not instantiated");
 
         Services services = TacletForTests.services();
-        SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
-        SchemaVariable c = TacletForTests.getSchemaVariables().lookup(new Name("c"));
+        SchemaVariable b =
+            Objects.requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name("b")),
+                "schema variable b");
+        SchemaVariable c =
+            Objects.requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name("c")),
+                "schema variable c");
         assertEquals(orright.uninstantiatedVars(),
             DefaultImmutableSet.<SchemaVariable>nil().add(b).add(c),
             "b and c should be in the set of not instantiated SVs");
-        orright = orright.addInstantiation(b, TacletForTests.parseTerm("A"), false, services);
+        orright = Objects.requireNonNull(
+            orright.addInstantiation(b, TacletForTests.parseTerm("A"), false, services),
+            "or_right app after instantiating b");
         assertFalse(orright.complete(),
             "TacletApp should not be complete, as B is not instantiated");
-        orright = orright.addInstantiation(c, TacletForTests.parseTerm("B"), false, services);
+        orright = Objects.requireNonNull(
+            orright.addInstantiation(c, TacletForTests.parseTerm("B"), false, services),
+            "or_right app after instantiating c");
         assertFalse(orright.complete(), "TacletApp should not be complete, as Position unknown");
-        Sequent seq = proof[0].root().sequent();
-        orright = orright.setPosInOccurrence(
-            new PosInOccurrence(seq.succedent().get(0), PosInTerm.getTopLevel(), false), services);
+        Node root = Objects.requireNonNull(proof[0].root(), "root of proof[0]");
+        Sequent seq = root.sequent();
+        orright = Objects.requireNonNull(
+            orright.setPosInOccurrence(
+                new PosInOccurrence(seq.succedent().get(0), PosInTerm.getTopLevel(), false),
+                services),
+            "or_right app after setting position");
         assertTrue(orright.complete(),
             "TacletApp should now be complete with Position set and SVs " + "instantiated");
     }
@@ -428,16 +467,22 @@ public class TestApplyTaclet {
     @Test
     public void testPrgTacletApp() {
         NoPosTacletApp wh0 = TacletForTests.lookupTaclet("TestApplyTaclet_while0");
-        SchemaVariable e2 = TacletForTests.getSchemaVariables().lookup(new Name("#e2"));
-        SchemaVariable p1 = TacletForTests.getSchemaVariables().lookup(new Name("#p1"));
+        SchemaVariable e2 =
+            Objects.requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name("#e2")),
+                "schema variable #e2");
+        SchemaVariable p1 =
+            Objects.requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name("#p1")),
+                "schema variable #p1");
         // wh0=wh0.addInstantiation(e2,TacletForTests.parseExpr("boolean", "false"));
         // wh0=wh0.addInstantiation(p1,TacletForTests.parsePrg("{if (false){}}"));
-        Sequent seq = proof[4].root().sequent();
+        Node root = Objects.requireNonNull(proof[4].root(), "root of proof[4]");
+        Sequent seq = root.sequent();
         PosInOccurrence pio =
             new PosInOccurrence(seq.succedent().get(0), PosInTerm.getTopLevel(), false);
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(wh0);
-        Goal goal = createGoal(proof[4].root(), tacletIndex);
+        Goal goal = createGoal(root, tacletIndex);
+        @SuppressWarnings("NullAway") // null Services is intentional: taclet is pure logic
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pio, null);
 
@@ -461,12 +506,14 @@ public class TestApplyTaclet {
         // b==> , b==>b
         NoPosTacletApp cdr = TacletForTests.lookupTaclet("TestApplyTaclet_cut_direct_r");
 
-        Sequent seq = proof[1].root().sequent();
+        Node root = Objects.requireNonNull(proof[1].root(), "root of proof[1]");
+        Sequent seq = root.sequent();
         PosInOccurrence pio =
             new PosInOccurrence(seq.succedent().get(0), PosInTerm.getTopLevel(), false);
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(cdr);
-        Goal goal = createGoal(proof[1].root(), tacletIndex);
+        Goal goal = createGoal(root, tacletIndex);
+        @SuppressWarnings("NullAway") // null Services is intentional: taclet is pure logic
         ImmutableList<TacletApp> rApplist =
             goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pio, null);
         ImmutableList<Goal> goals =

@@ -128,6 +128,7 @@ public class ArrayUtilTest {
      * Tests {@link ArrayUtil#remove(Object[], Object)}.
      */
     @Test
+    @SuppressWarnings("NullAway") // exercises arrays containing null elements by design
     public void testRemove() {
         // Test remove on array
         var array = new String[] { "A", "B", "C", null, "D", null, null, "C", "A" };

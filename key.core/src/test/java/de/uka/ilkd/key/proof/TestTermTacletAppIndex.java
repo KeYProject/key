@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
@@ -74,6 +75,7 @@ public class TestTermTacletAppIndex {
     }
 
     @AfterEach
+    @SuppressWarnings("NullAway") // deliberate null reset after each test
     public void tearDown() {
         ruleRewriteNonH1H2 = null;
         ruleNoFindNonH1H2H3 = null;
@@ -157,7 +159,10 @@ public class TestTermTacletAppIndex {
         // add a new taclet to the index
         ruleIdx.add(remove_ff);
         SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(ruleIdx.lookup(remove_ff.taclet().name()).rule());
+        filter.addRuleToSet(Objects
+                .requireNonNull(ruleIdx.lookup(remove_ff.taclet().name()),
+                    "the taclet must be in the index")
+                .rule());
         termIdx = termIdx.addTaclets(filter, pio2, serv, ruleIdx, NullNewRuleListener.INSTANCE);
         checkTermIndex3(pio2, termIdx);
     }

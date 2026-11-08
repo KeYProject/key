@@ -65,6 +65,7 @@ public class TestSemisequent {
     }
 
     @AfterEach
+    @SuppressWarnings("NullAway") // deliberate null reset after each test
     public void tearDown() {
         con = null;
     }

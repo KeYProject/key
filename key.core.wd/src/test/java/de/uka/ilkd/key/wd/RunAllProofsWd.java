@@ -5,10 +5,10 @@
 package de.uka.ilkd.key.wd;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.StatisticsFile;
 
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DynamicTest;
@@ -27,7 +27,8 @@ public final class RunAllProofsWd {
     @TestFactory
     Stream<DynamicTest> data() throws IOException {
         var proofCollection = WdProofCollection.automaticWd();
-        StatisticsFile statisticsFile = proofCollection.getSettings().getStatisticsFile();
+        var statisticsFile = Objects.requireNonNull(
+            proofCollection.getSettings().getStatisticsFile(), "statistics file");
         statisticsFile.setUp();
         Assumptions.assumeTrue(proofCollection != null);
         return RunAllProofsTest.data(proofCollection);

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -61,9 +62,12 @@ public class TestTacletIndex {
         assertTrue(Files.exists(tacletFile), "File '" + tacletFile + "' does not exist.");
         TacletForTests.parse(tacletFile);
 
-        h1 = TacletForTests.getHeuristics().lookup(new Name("h1"));
-        h2 = TacletForTests.getHeuristics().lookup(new Name("h2"));
-        h3 = TacletForTests.getHeuristics().lookup(new Name("h3"));
+        h1 = Objects.requireNonNull(TacletForTests.getHeuristics().lookup(new Name("h1")),
+            "heuristic h1 must be declared in the parsed taclet file");
+        h2 = Objects.requireNonNull(TacletForTests.getHeuristics().lookup(new Name("h2")),
+            "heuristic h2 must be declared in the parsed taclet file");
+        h3 = Objects.requireNonNull(TacletForTests.getHeuristics().lookup(new Name("h3")),
+            "heuristic h3 must be declared in the parsed taclet file");
 
         ruleRewriteNonH1H2 =
             NoPosTacletApp.createNoPosTacletApp(taclet("rewrite_noninteractive_h1_h2"));
@@ -86,6 +90,7 @@ public class TestTacletIndex {
 
 
     @AfterEach
+    @SuppressWarnings("NullAway") // deliberate null reset of all fields between tests
     public void tearDown() {
         ruleRewriteNonH1H2 = null;
         ruleNoFindNonH1H2H3 = null;
@@ -117,6 +122,8 @@ public class TestTacletIndex {
      */
     @Test
     @Disabled
+    @SuppressWarnings("NullAway") // deliberately passes null Services; test is @Disabled and never
+                                  // runs
     public void disabled_testNonInteractiveIsShownOnlyIfHeuristicIsMissed() {
         JTerm term_p1 = TacletForTests.parseTerm("p(one, zero)");
         ImmutableList<RuleSet> listofHeuristic = ImmutableList.nil();
@@ -234,6 +241,7 @@ public class TestTacletIndex {
     }
 
     @Test
+    @SuppressWarnings("NullAway") // deliberately passes null Services; the matched rules need none
     public void testNotFreeInYConflict() {
         TacletIndex ruleIdx = TacletIndexKit.getKit().createTacletIndex();
         ruleIdx.add(notfreeconflict);

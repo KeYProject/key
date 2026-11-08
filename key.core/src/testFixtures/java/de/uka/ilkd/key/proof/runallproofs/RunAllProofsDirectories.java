@@ -8,8 +8,11 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import org.key_project.util.helper.FindResources;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Initialising directories for runallproofs is a bit tricky since doing it statically results
@@ -27,14 +30,16 @@ import org.key_project.util.helper.FindResources;
  */
 @SuppressWarnings("serial")
 public class RunAllProofsDirectories implements Serializable {
-    public static final Path EXAMPLE_DIR = FindResources.getExampleDirectory();
-    public static final Path RUNALLPROOFS_DIR = FindResources.getTestResultForRunAllProofs();
+    public static final @Nullable Path EXAMPLE_DIR = FindResources.getExampleDirectory();
+    public static final @Nullable Path RUNALLPROOFS_DIR =
+        FindResources.getTestResultForRunAllProofs();
 
     public RunAllProofsDirectories() throws IOException {
         init();
     }
 
     public static void init() throws IOException {
+        Objects.requireNonNull(RUNALLPROOFS_DIR, "runallproofs result directory");
         Files.createDirectories(RUNALLPROOFS_DIR);
     }
 }

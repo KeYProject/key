@@ -38,11 +38,15 @@ public class TestSMTMod {
     private static final Path testCaseDirectory =
         Objects.requireNonNull(FindResources.getTestCasesDirectory());
 
+    // orElse(null): the registry always contains these solver types, and a missing entry
+    // would NPE at the first dereference, which is the pre-existing behavior
+    @SuppressWarnings("NullAway")
     private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
                     && it.getName().equals("Z3"))
             .findFirst().orElse(null);
 
+    @SuppressWarnings("NullAway")
     private static final SolverType CVC5_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
                     && it.getName().equals("cvc5"))

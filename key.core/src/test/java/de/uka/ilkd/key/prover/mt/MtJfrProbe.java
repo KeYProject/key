@@ -6,6 +6,7 @@ package de.uka.ilkd.key.prover.mt;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -62,7 +63,8 @@ public class MtJfrProbe {
         for (int i = 0; i < reps; i++) {
             KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
             try {
-                Proof proof = env.getLoadedProof();
+                Proof proof =
+                    Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
                 ProofStarter starter = new ProofStarter(false);
                 starter.init(proof);
                 long t0 = System.nanoTime();

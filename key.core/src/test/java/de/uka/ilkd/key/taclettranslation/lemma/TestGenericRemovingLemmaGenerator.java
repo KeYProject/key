@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.GenericArgument;
@@ -33,7 +34,9 @@ public class TestGenericRemovingLemmaGenerator {
         TacletFormula result = g.translate(app.taclet(), TacletForTests.services());
 
         Set<Sort> sorts = new HashSet<>();
-        collectSorts(result.getFormula(TacletForTests.services()), sorts);
+        JTerm formula = Objects.requireNonNull(result.getFormula(TacletForTests.services()),
+            "the translated taclet must contain a formula");
+        collectSorts(formula, sorts);
 
         Name nameG = new Name("P_G");
         boolean found = false;

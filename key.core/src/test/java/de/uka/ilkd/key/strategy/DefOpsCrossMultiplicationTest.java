@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -28,21 +29,27 @@ import org.junit.jupiter.api.Test;
  */
 public class DefOpsCrossMultiplicationTest {
 
-    private static final Path PROBLEM = FindResources.getTestResourcesDirectory()
-            .resolve("de/uka/ilkd/key/strategy/crossMultDefOps.key");
+    private static final Path PROBLEM =
+        Objects.requireNonNull(FindResources.getTestResourcesDirectory(),
+            "test resources must be available")
+                .resolve("de/uka/ilkd/key/strategy/crossMultDefOps.key");
 
     private boolean closesWith(String nonLinArithMode) throws Exception {
         KeYEnvironment<?> env = KeYEnvironment.load(PROBLEM);
         try {
-            Proof proof = env.getLoadedProof();
+            Proof proof = Objects.requireNonNull(env.getLoadedProof(),
+                "the proof must have been loaded");
             var settings = proof.getSettings().getStrategySettings();
             var sp = settings.getActiveStrategyProperties();
             sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, nonLinArithMode);
             settings.setActiveStrategyProperties(sp);
             settings.setMaxSteps(30000);
-            proof.setActiveStrategy(
-                proof.getServices().getProfile().getDefaultStrategyFactory().create(proof, sp));
-            env.getProofControl().startAndWaitForAutoMode(proof);
+            proof.setActiveStrategy(Objects
+                    .requireNonNull(proof.getServices().getProfile().getDefaultStrategyFactory(),
+                        "the profile must provide a default strategy factory")
+                    .create(proof, sp));
+            Objects.requireNonNull(env.getProofControl(), "the proof control must be available")
+                    .startAndWaitForAutoMode(proof);
             return proof.closed();
         } finally {
             env.dispose();

@@ -66,7 +66,8 @@ public class ProveRulesTest {
                 + " but the taclet is not registered as a lemma. It can be registered as a lemma by "
                 + "adding annotation \\lemma to the declaration of the taclet.");
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(proofFile);
-        Proof proof = env.getLoadedProof();
+        Proof proof =
+            Objects.requireNonNull(env.getLoadedProof(), "the taclet proof must have been loaded");
 
         KeyAst.ProofScript script = env.getProofScript();
         if (script != null) {
@@ -143,7 +144,8 @@ public class ProveRulesTest {
         return tacletNames.stream()
                 .map(tacletName -> DynamicTest.dynamicTest(tacletName,
                     () -> loadTacletProof(tacletName,
-                        tacletObjectByTacletName.get(tacletName),
+                        Objects.requireNonNull(tacletObjectByTacletName.get(tacletName),
+                            "the taclet must have been parsed"),
                         proofFileByTacletName.get(tacletName))));
     }
 

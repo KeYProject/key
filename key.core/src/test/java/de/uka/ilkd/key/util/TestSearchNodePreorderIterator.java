@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
@@ -113,7 +114,7 @@ public class TestSearchNodePreorderIterator {
         NodePreorderIterator iter = new NodePreorderIterator(root);
         ImmutableList<Node> childList = ImmutableList.nil();
         while (iter.hasNext()) {
-            Node next = iter.next();
+            Node next = Objects.requireNonNull(iter.next(), "hasNext promised a node");
             childList = childList.append(next);
         }
         // Test each child

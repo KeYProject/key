@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -107,7 +108,7 @@ public class TestLocalSymbols {
             assertEquals("[]==>[equals(varr_0,const),equals(const,varr_1)]", actual);
         }
 
-        proof.pruneProof(proof.root());
+        proof.pruneProof(Objects.requireNonNull(proof.root(), "a proof always has a root node"));
 
         apply(proof, andRight, 0, 1);
         apply(proof, orRight, 0, 1);
@@ -124,7 +125,9 @@ public class TestLocalSymbols {
     }
 
     // there was a bug.
+    // the null user interface control in execute is deliberate: the script runs headlessly
     @Test
+    @SuppressWarnings("NullAway")
     public void testDoubleInstantiation() throws Exception {
         Path proofFile = TEST_RESOURCES_DIR_PREFIX.resolve("doubleSkolem.key");
         Assertions.assertTrue(Files.exists(proofFile), "Proof file does not exist" + proofFile);
@@ -133,8 +136,8 @@ public class TestLocalSymbols {
             JavaProfile.getDefaultInstance(), proofFile, null, null,
             null, true);
 
-        Proof proof = env.getLoadedProof();
-        var script = env.getProofScript();
+        Proof proof = Objects.requireNonNull(env.getLoadedProof(), "proof must have been loaded");
+        var script = Objects.requireNonNull(env.getProofScript(), "proof script must be loaded");
 
         ProofScriptEngine pse = new ProofScriptEngine(proof);
         pse.execute(null, script);
@@ -162,9 +165,13 @@ public class TestLocalSymbols {
             new PosInOccurrence(sequentFormulas.getFormulaByNr(formulaNo),
                 PosInTerm.getTopLevel(), false);
 
-        app = rule.matchFind(pio, services);
-        app = app.setPosInOccurrence(pio, services);
-        app = app.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces()));
+        app = Objects.requireNonNull(rule.matchFind(pio, services),
+            "the taclet must match the selected formula");
+        app = Objects.requireNonNull(app.setPosInOccurrence(pio, services),
+            "setting the occurrence position must succeed");
+        app = Objects.requireNonNull(
+            app.tryToInstantiate(services.getOverlay(goal.getLocalNamespaces())),
+            "instantiation of a matching taclet must succeed");
 
         goal.apply(app);
     }
@@ -176,6 +183,9 @@ public class TestLocalSymbols {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
+    // the catch block always calls Assertions.fail, which does not return; the trailing
+    // return null merely satisfies the compiler
+    @SuppressWarnings("NullAway")
     private KeYEnvironment<?> loadProof(String proofFileName) {
         Path proofFile = TEST_RESOURCES_DIR_PREFIX.resolve(proofFileName);
         Assertions.assertTrue(Files.exists(proofFile), "Proof file does not exist" + proofFile);

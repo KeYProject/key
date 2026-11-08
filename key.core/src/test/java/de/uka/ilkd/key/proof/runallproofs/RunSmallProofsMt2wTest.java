@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.prover.impl.ParallelProver;
@@ -69,7 +70,10 @@ public final class RunSmallProofsMt2wTest {
     @TestFactory
     Stream<DynamicTest> data() throws IOException {
         var proofCollection = ProofCollections.smallMultiThreaded();
-        proofCollection.getSettings().getStatisticsFile().setUp();
+        var statisticsFile =
+            Objects.requireNonNull(proofCollection.getSettings().getStatisticsFile(),
+                "statistics file");
+        statisticsFile.setUp();
         // append the multi-core advice block to every failure, so a developer who has never
         // worked with the multi-core prover knows what to look for
         return RunAllProofsTest.data(proofCollection)

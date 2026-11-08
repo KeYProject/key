@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -28,9 +29,11 @@ class Issue243Test {
         Services services = TacletForTests.services().copy(false);
         KeyIO io = new KeyIO(services, services.getNamespaces());
 
-        Sequent seq = io.load("""
+        KeyIO.Loader loader = io.load("""
                 \\problem { ==> true, false }
-                """).loadCompleteProblem().getProblem();
+                """);
+        Sequent seq = Objects.requireNonNull(loader.loadCompleteProblem().getProblem(),
+            "problem is present in the test source");
 
         String semi = LogicPrinter.quickPrintSemisequent(seq.succedent(), services);
         String full = LogicPrinter.quickPrintSequent(seq, services);

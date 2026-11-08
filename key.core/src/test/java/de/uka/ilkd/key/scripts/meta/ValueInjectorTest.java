@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.scripts.AbstractCommand;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
@@ -134,8 +135,9 @@ public class ValueInjectorTest {
             assertEquals("varargs", vars.getName());
             assertEquals(PP.class.getDeclaredField("varargs"), vars.getField());
             assertEquals(Map.class, vars.getType());
-            assertEquals("var_", vars.getOptionalVarArgs().prefix());
-            assertSame(String.class, vars.getOptionalVarArgs().as());
+            var varArgs = Objects.requireNonNull(vars.getOptionalVarArgs(), "varargs expected");
+            assertEquals("var_", varArgs.prefix());
+            assertSame(String.class, varArgs.as());
             assertTrue(vars.isOptionalVarArgs());
         }
 
@@ -164,10 +166,10 @@ public class ValueInjectorTest {
     public void testVarargs() throws InjectionException {
         class Varargs {
             @OptionalVarargs(prefix = "a", as = Boolean.class)
-            Map<String, Boolean> a;
+            Map<String, Boolean> a = new HashMap<>();
 
             @OptionalVarargs(prefix = "b", as = Integer.class)
-            Map<String, Integer> b;
+            Map<String, Integer> b = new HashMap<>();
         }
         var arg = new ScriptCommandAst("empty",
             Map.of("a1", "true", "b1", "1", "b2", "2", "a2", "false"),
@@ -201,7 +203,7 @@ public class ValueInjectorTest {
         String required;
 
         @OptionalVarargs(prefix = "var_")
-        Map<String, String> varargs;
+        Map<String, String> varargs = new HashMap<>();
     }
 
     @NullMarked

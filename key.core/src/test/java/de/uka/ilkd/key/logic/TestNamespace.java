@@ -55,6 +55,7 @@ public class TestNamespace {
     }
 
     @AfterEach
+    @SuppressWarnings("NullAway") // deliberate null reset of all fields between tests
     public void tearDown() {
         ns1 = null;
         ns2 = null;

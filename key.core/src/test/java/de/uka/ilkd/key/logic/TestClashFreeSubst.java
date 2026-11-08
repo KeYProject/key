@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.logic;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Stack;
 
 import de.uka.ilkd.key.java.JavaService;
@@ -133,6 +134,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
             subStack = new Stack<>();
         }
 
+        // the normalized terms deliberately carry no attributes, hence the null argument
+        @SuppressWarnings("NullAway")
         public void visit(final Term p_visited) {
             final JTerm visited = (JTerm) p_visited;
             Operator op = visited.op();
@@ -222,7 +225,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         ns.add(x1);
         nss.setVariables(ns);
         assertEquals(parseTerm("\\exists x1; q(x1,f(x))"), res, "clash resolution");
-        nss.setVariables(nss.variables().parent());
+        nss.setVariables(
+            Objects.requireNonNull(nss.variables().parent(), "extended by the test above"));
     }
 
     @Test
@@ -246,7 +250,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         nss.setVariables(ns);
         assertEquals(parseTerm("{\\subst x1; f(f(x))}g(x1,f(x))"), res,
             "clash resolution in substitution term");
-        nss.setVariables(nss.variables().parent());
+        nss.setVariables(
+            Objects.requireNonNull(nss.variables().parent(), "extended by the test above"));
     }
 
 
@@ -287,7 +292,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         assertEquals(
             toMulti(parseTerm("\\forall y; \\forall x1; \\forall z; q(g(x1,y),g(f(x),z))")), res,
             "clash resolution in multi term");
-        nss.setVariables(nss.variables().parent());
+        nss.setVariables(
+            Objects.requireNonNull(nss.variables().parent(), "extended by the test above"));
     }
 
     // disabled. multi vars at quantifier currently not supported by
@@ -305,7 +311,8 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
         nss.setVariables(ns);
         assertEquals(toMulti(parseTerm("q(g(x1,y),g(f(x),z))")), res.sub(0),
             "clash resolution in multi term");
-        nss.setVariables(nss.variables().parent());
+        nss.setVariables(
+            Objects.requireNonNull(nss.variables().parent(), "extended by the test above"));
     }
 
 
@@ -339,6 +346,7 @@ public class TestClashFreeSubst extends AbstractTestTermParser {
             + "; f(pv0)} ( q(f(pv0),x) & {pv0:=f(pv0)}q(x," + x1.name() + ") )"),
             cfs.apply(t),
             "substitution");
-        nss.setVariables(nss.variables().parent());
+        nss.setVariables(
+            Objects.requireNonNull(nss.variables().parent(), "extended by the test above"));
     }
 }

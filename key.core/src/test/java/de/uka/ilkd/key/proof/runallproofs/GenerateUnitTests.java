@@ -114,9 +114,10 @@ public class GenerateUnitTests {
         vars.put("packageName", packageName);
         vars.put("baseDirectory", settings.getBaseDirectory().getAbsolutePath()
                 .replaceAll("\\\\", "/"));
+        var statisticsFile =
+            Objects.requireNonNull(settings.getStatisticsFile(), "statistics file");
         vars.put("statisticsFile",
-            settings.getStatisticsFile().getStatisticsFile().getAbsolutePath()
-                    .replaceAll("\\\\", "/"));
+            statisticsFile.getStatisticsFile().getAbsolutePath().replaceAll("\\\\", "/"));
         vars.put("name", name);
         vars.put("reloadEnabled", String.valueOf(settings.reloadEnabled()));
         vars.put("tempDir", settings.getTempDir().getAbsolutePath()
@@ -125,10 +126,10 @@ public class GenerateUnitTests {
         vars.put("keySettings", settings.getGlobalKeYSettings()
                 .replace("\n", "\\\\n")
                 .replace("\r", "\\\\r"));
+        String localSettings = settings.getLocalKeYSettings();
+        localSettings = localSettings == null ? "" : localSettings;
         vars.put("localSettings",
-            (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
-                    .replace("\n", "\\\\n")
-                    .replace("\r", "\\\\r"));
+            localSettings.replace("\n", "\\\\n").replace("\r", "\\\\r"));
         if (unit.isResetEachTest()) {
             vars.put("killSwitch",
                 "@BeforeEach void killInitConfig() { de.uka.ilkd.key.proof.init.BaseConfigCache.reset(); }");

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.taclettranslation;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -20,6 +21,7 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +31,8 @@ public class TestTacletTranslator {
     private NamespaceSet nss;
     private Services services;
     private KeyIO io;
-    private Namespace<SchemaVariable> lastSchemaNamespace;
+    // set by parseTaclet, which every test runs before parsing terms
+    private @Nullable Namespace<SchemaVariable> lastSchemaNamespace;
 
 
     // some methods essentially "stolen" from TestTacletParser
@@ -58,7 +61,9 @@ public class TestTacletTranslator {
 
     private JTerm parseTerm(String s) {
         KeyAst.Term ctx = ParsingFacade.parseExpression(CharStreams.fromString(s));
-        return (JTerm) ctx.accept(new ExpressionBuilder(services, nss, lastSchemaNamespace));
+        return (JTerm) ctx.accept(new ExpressionBuilder(services, nss,
+            Objects.requireNonNull(lastSchemaNamespace,
+                "a taclet must have been parsed before terms are parsed")));
     }
 
     private Taclet parseTaclet(String s) {
