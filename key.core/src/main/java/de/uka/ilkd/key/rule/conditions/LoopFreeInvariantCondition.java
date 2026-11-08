@@ -58,14 +58,14 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         }
 
         final LoopStatement loop = svInst.getInstantiation(loopStmtSV);
-        final LoopSpecification loopSpec = loop.getLoopInvariant();
+        final StatementBlock program = (StatementBlock) svInst.getContextInstantiation().program();
+        final LoopSpecification loopSpec = loop.getLoopInvariant(program);
 
         if (loopSpec == null) {
             return null;
         }
 
-        final JavaBlock javaBlock = JavaBlock.createJavaBlock(
-            (StatementBlock) svInst.getContextInstantiation().program());
+        final JavaBlock javaBlock = JavaBlock.createJavaBlock(program);
 
         final MethodFrame mf = //
             JavaTools.getInnermostMethodFrame(javaBlock, services);
