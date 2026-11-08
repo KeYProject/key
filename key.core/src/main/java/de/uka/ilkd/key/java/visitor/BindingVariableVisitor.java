@@ -6,9 +6,13 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.util.*;
 
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 
 /**
@@ -34,6 +38,38 @@ public class BindingVariableVisitor {
             return "Bindings{whenTrue=" + whenTrue + ", whenFalse=" + whenFalse + "}";
         }
     }
+
+    public static boolean binds(Expression e) {
+        if (e instanceof InstanceofPattern io) {
+            // §6.3.1.5 — a instanceof p
+            // "when true" = variables declared by p. No "when false" rule:
+            // it can't be determined at compile time that the match failed
+            // in a way that still binds anything.
+            return true;
+        } else if (e instanceof BinaryOperator bo) {
+            if (bo.getKind() == BinaryOperatorKind.LOGICAL_AND) {
+                // §6.3.1.1 — a && b
+                return binds(bo.getExpressionAt(0)) || binds(bo.getExpressionAt(1));
+            } else if (bo.getKind() == BinaryOperatorKind.LOGICAL_OR) {
+                // §6.3.1.2 — a || b (mirror image of &&)
+                return binds(bo.getExpressionAt(0)) || binds(bo.getExpressionAt(1));
+            }
+        } else if (e instanceof UnaryOperator not && not.kind == UnaryOperatorKind.LOGICAL_NOT) {
+            // §6.3.1.3 — !a: true/false swap.
+            return binds(not.getExpressionAt(0));
+        } else if (e instanceof Conditional c) {
+            // §6.3.1.4 — a ? b : c
+            return binds(c.getExpressionAt(0))
+                    || binds(c.getExpressionAt(1))
+                    || binds(c.getExpressionAt(2));
+        } else if (e instanceof ParenthesizedExpression p) {
+            // §6.3.1.7 — (a): pass through unchanged.
+            return binds(p.getExpressionAt(0));
+
+        }
+        return false;
+    }
+
 
     public static Bindings analyze(Expression e) {
         if (e instanceof InstanceofPattern io) {
@@ -120,6 +156,27 @@ public class BindingVariableVisitor {
         var result = new LinkedHashMap<>(a);
         result.putAll(b);
         return result;
+    }
+
+    /**
+     * Turns a binding (a map from pattern variables to their cast expressions) into a sequence of
+     * local variable declarations of the form {@code Type var = (Type) expr;}.
+     * <p>
+     * The declarations introduce the pattern variables of an {@code instanceof} pattern so that
+     * they are usable in the branch of a conditional in which the analyzed expression is known to
+     * evaluate to the corresponding truth value, see {@link #analyze(Expression)}.
+     *
+     * @param bindings a binding according to {@link Bindings#whenTrue()} or
+     *        {@link Bindings#whenFalse()}
+     * @return one fresh {@link LocalVariableDeclaration} per bound pattern variable
+     */
+    public static Statement[] toStatements(Map<LocationVariable, Expression> bindings) {
+        return bindings.entrySet().stream()
+                .map(entry -> new LocalVariableDeclaration(
+                    new TypeRef(entry.getKey().getKeYJavaType()),
+                    new VariableSpecification(entry.getKey(), entry.getValue(),
+                        entry.getKey().getKeYJavaType())))
+                .toArray(Statement[]::new);
     }
 
     private static void requireDisjoint(Map<LocationVariable, Expression> a,
