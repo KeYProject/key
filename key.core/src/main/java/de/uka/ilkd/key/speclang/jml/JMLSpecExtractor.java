@@ -7,7 +7,9 @@ package de.uka.ilkd.key.speclang.jml;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.KeYJPMapping;
 import de.uka.ilkd.key.java.Services;
@@ -276,10 +278,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     .hasModifier(com.github.javaparser.ast.Modifier.DefaultKeyword.JML_MODEL)) {
                 modelMethodDefinition = JmlToTextual.toMethodDecl(wrapper).getMethodDefinition();
             }
-            if (wrapper.getContract().isPresent()) {
-                addOperationContracts(result, pm, wrapper.getContract().get(),
-                    modelMethodDefinition, addInvariant);
-            } else if (modelMethodDefinition != null) {
+            // JMLtk attaches the specification either to the wrapper (single optional contract)
+            // or to the inner method declaration (the usual attachment point, e.g. for model
+            // methods); both carriers have to be considered.
+            final Set<JmlContract> contracts = new LinkedHashSet<>();
+            wrapper.getContract().ifPresent(contracts::add);
+            contracts.addAll(wrapper.getMethodDeclaration().getContracts());
+            if (contracts.isEmpty() && modelMethodDefinition != null) {
                 // model method without an explicit contract: the method definition itself serves
                 // as the specification
                 try {
@@ -290,6 +295,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 } catch (SLWarningException e) {
                     warnings = warnings.append(e.getWarning());
                 }
+            }
+            for (JmlContract contract : contracts) {
+                addOperationContracts(result, pm, contract, modelMethodDefinition, addInvariant);
             }
         } else if (node instanceof NodeWithContracts<?> carrier) {
             for (JmlContract contract : carrier.getContracts()) {
