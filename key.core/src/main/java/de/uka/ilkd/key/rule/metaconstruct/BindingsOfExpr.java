@@ -13,8 +13,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
- * Expands an expression into the declarations of the pattern variables that are definitely bound if
- * the expression evaluates to {@code true}.
+ * Expands an expression into the declarations of the pattern variables that are definitely bound
+ * when the expression evaluates to the given polarity.
  * <p>
  * This is implemented by the two meta constructs {@code #posBinding} and {@code #negBinding}.
  * Given a guard expression such as {@code obj instanceof String s}, {@code #posBinding} produces

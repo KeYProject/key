@@ -169,7 +169,7 @@ public class TacletBuilderManipulators {
         "newLocalVars", NewLocalVarsCondition.class, SV, SV, SV, SV);
 
     public static final TacletBuilderCommand ABNORMALLY_TERMINATE = new ConstructorBasedBuilder(
-        "alwaysAbnormallyTerminates", BindingExpressionCond.class, SV);
+        "alwaysAbnormallyTerminates", AbnormallyTerminatesCond.class, SV);
 
     public static final TacletBuilderCommand BINDING_EXPRESSION_SIMPLE =
         new ConstructorBasedBuilder(
