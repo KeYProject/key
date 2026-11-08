@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -41,7 +42,10 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     @Override
     public JTerm transform(JTerm term, SVInstantiations svInst, Services services) {
         final JTerm loopTerm = term.sub(0);
-        final LoopSpecification loopSpec = MiscTools.getSpecForTermWithLoopStmt(loopTerm, services);
+        final StatementBlock program = svInst.getContextInstantiation() == null ? null
+                : (StatementBlock) svInst.getContextInstantiation().program();
+        final LoopSpecification loopSpec = MiscTools.getSpecForTermWithLoopStmt(loopTerm, program,
+            services);
         if (loopSpec == null) {
             return null;
         }

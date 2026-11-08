@@ -475,6 +475,45 @@ public abstract class LoopStatement extends JavaStatement
     }
 
     /**
+     * Returns the loop invariant for this loop. If this node itself carries no invariant — as is
+     * the case for loop nodes freshly created by substituting rule pattern templates (see e.g. the
+     * <code>\storeStmtIn</code> variable condition) — it searches the given program for a
+     * structurally equal loop that carries an invariant and returns that one. This reproduces the
+     * structural loop-specification lookup that the former {@code SpecificationRepository}
+     * performed.
+     *
+     * @param program the program to search, typically the program of the goal the loop occurs in;
+     *        a {@code null} value disables the search
+     * @return the loop invariant, or {@code null} if none was found
+     */
+    public @Nullable LoopSpecification getLoopInvariant(Statement program) {
+        final LoopSpecification attached = getLoopInvariant();
+        if (attached != null) {
+            return attached;
+        }
+        if (program instanceof NonTerminalProgramElement nonTerminalProgram) {
+            return findLoopInvariant(nonTerminalProgram);
+        }
+        return null;
+    }
+
+    private @Nullable LoopSpecification findLoopInvariant(NonTerminalProgramElement element) {
+        if (element instanceof LoopStatement loop && loop.getLoopInvariant() != null
+                && loop.equals(this)) {
+            return loop.getLoopInvariant();
+        }
+        for (int i = 0, childCount = element.getChildCount(); i < childCount; i++) {
+            if (element.getChildAt(i) instanceof NonTerminalProgramElement child) {
+                final LoopSpecification spec = findLoopInvariant(child);
+                if (spec != null) {
+                    return spec;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Attaches the given loop invariant to this loop, replacing any previous one.
      */
     public synchronized void setLoopInvariant(@Nullable LoopSpecification inv) {
