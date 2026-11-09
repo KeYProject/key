@@ -35,7 +35,7 @@ public class RedBlackTree implements AbstractMap {
 
     /*@ private represents contents \such_that (\forall int i; 0 <= i && i < contents.length;
       @            contents[i] == (get(i) == Node.NIL ? deefolt : get(i).value));
-      @ private represents footprint = theNodes, root, root.treeFootprint;
+      @ private represents footprint = \locset(theNodes, root, root.treeFootprint);
       @ accessible contents : \singleton(theNodes);
       @ accessible \inv : footprint;
       @ accessible footprint : footprint;

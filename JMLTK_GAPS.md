@@ -56,7 +56,7 @@ JMLtk front-end shipped in PR #3997.
 | 1 | comment-form `merge_point` — legacy `merge_proc`/`merge_params` **and** JMLtk 1.2.1 `\by`/`\lattice`/`\predicate` | `//@ merge_point \by "…" \lattice conjunctive \predicate (int x) : …;` | `testcase/merge/{A,Gcd}.java`, `testcase/merge/newsyntax/MergeNewSyntax.java` | ✔ RESOLVED (legacy → leftover fallback; 1.2.1 syntax → typed `JmlMergePointStmt`, `53dcefd914`, covered by `MergePointJmltkSyntaxTest`) |
 | 2 | `\by {…}` assertion-proof scripts / `obtain` | `/*@ assert x > 2 \by {…} */` | `scripts/jml/*.java`, `exceptional/AssertProofScript.java` | ✔ RESOLVED (fallback) |
 | 3 | `\seq(0)` inside a model-method body | `… : \seq_concat(b(n-1), \seq(0));` | `nparser/fix3452/fix/Issue3452Fixture.java` | ✔ RESOLVED — ⚠ was mis-attributed to JMLtk |
-| 4 | comma-separated store-ref `represents` | `//@ represents footprint = this.*, o.*;` | `key.ui/examples/heap/simple/src/MySubclass.java`, `heap/list/src/ArrayList.java` | ✘ OPEN (4 load fails) |
+| 4 | comma-separated store-ref `represents` | `//@ represents footprint = this.*, o.*;` → `//@ represents footprint = \locset(this.*, o.*);` | 10 example files, 11 sites (`heap/{simple,list,javacard,information_flow,vacid0_05_RedBlackTrees}`, `InformationFlow/PasswordFile`) | ✔ RESOLVED by syntax adoption (2026-11-09); load failures cleared, residual drift recorded below |
 | 5 | `\sum` comprehension fidelity | `ensures \result == (\sum int i; …)` | `comprehensions/{sum0,sum1}.key` | ✘ OPEN (sum0/sum1 don't close; `arrayMax`/`polishFlagSort` were loop-invariant, resolved by `6a07c20e63`) |
 | 6 | record-level `/*@ nullable */` + record pipeline output | `/*@ nullable */ record MyRecord(…)` | `pipelineTests/records/**` | ✔ RESOLVED — goldens regenerated for the JMLtk output; `KeyJavaPipelineTest` 142/0 |
 | 7 | `spec_*_math` class/method pragmas | `/*@ spec_java_math @*/` | `testcase/specMath/{java,bigint}/Test.java`, `testPackage/TestClass.java` | ✔ RESOLVED (JML modifiers → `SpecMathMode`; `SpecMathModeTest` 2 + `ContractLoadingTests` 6 green) |
@@ -181,33 +181,57 @@ JMLtk front-end shipped in PR #3997.
   mirroring `TermBuilder.seq` (`JP2KeYConverter.java:1854`, in the fallback
   commit `251f945131`). Measured: `Issue3452Test` 2/2 green.
 
-## 4. comma-separated store-ref `represents`  — ✘ OPEN
+## 4. comma-separated store-ref `represents`  — ✔ RESOLVED by syntax adoption (2026-11-09)
 
 ```java
-//@ represents footprint = this.*, o.*;
-//@ private represents footprint = array, array[*], size;
+//@ represents footprint = this.*, o.*;              // legacy KeY form (pre-takeover)
+//@ represents footprint = \locset(this.*, o.*);     // JMLtk grammar
 ```
 - Fixtures: `key.ui/examples/heap/simple/src/MySubclass.java:4`,
   `key.ui/examples/heap/list/src/ArrayList.java:6`.
 - **Before:** KeY's grammar accepted comma-separated locset expressions in
   `represents`.
-- **After (JMLtk):** no comma-storage-ref `represents` form. JMLtk's JML
-  grammar hits a hard ANTLR problem (`Encountered unexpected token: ","`)
-  on the first comma of the locset list, so the whole Java source fails to
-  load.
-- **Status:** OPEN. Measured: `ScDeterminismTest` load failures →
-  `heap/list/ArrayList_add.key`, `heap/list/ArrayList_get_dep.key`,
-  `heap/simple/dependency_contracts.key`, `heap/simple/selection_sort.key` (4).
-  RunAll corpus (2026-11-08 local run, branch tip): the same parse failure
-  breaks whole groups — Fun `list` (`heap/list/src/ArrayList.java:13`
-  `represents footprint = array, array[*], size;`), `javaCard`
-  (`javacard/framework/CardRuntimeException.java:18`
-  `represents footprint = _reason, _reason[0], _reason.\transient;`),
-  `funOfIF` + `simple_info_flow` (`heap/information_flow/src/ArrayList.java:13`),
-  `simpleTests` (`heap/simple/src/MySubclass.java:4`
-  `represents footprint = this.*, o.*;`), and Inf `NewObjects`
-  (`InformationFlow/PasswordFile/.../SecurePasswordFile.java:13`
-  `represents footprint = \locset(names, passwords), names[*], passwords[*];`).
+- **After (JMLtk):** no comma-separated store-ref `represents` form. JMLtk's JML
+  grammar hits a hard problem (`Encountered unexpected token: ","`) on the first
+  comma of the locset list, so the whole Java source fails to load. JMLtk's
+  grammar instead models the store-set as `\locset(…)` — lexed as an identifier
+  (the `LOCSET` token is not a JML keyword in JMLtk), i.e. a method call whose
+  arguments are the store-refs; valid in `represents` **and** `set` statements.
+- **Resolution (2026-11-09, user-directed adoption):** all affected example
+  sources rewritten to the `\locset(…)` form — 11 sites in 10 files:
+  `heap/simple/src/MySubclass.java`, `heap/list/src/{ArrayList,LinkedList,MySet}.java`,
+  `heap/javacard/src/javacard/framework/{CardRuntimeException,OwnerPIN}.java`
+  (OwnerPIN: 2 sites, incl. the multi-line `footprint` clause),
+  `heap/information_flow/src/ArrayList.java`,
+  `heap/vacid0_05_RedBlackTrees/src/vacid0/redblacktree/{Node,RedBlackTree}.java`
+  (not in any CI corpus), `InformationFlow/PasswordFile/src/passwordfile/SecurePasswordFile.java`
+  (nested `\locset(\locset(names, passwords), names[*], passwords[*])` — the
+  mechanical wrap of the legacy list, term-identical to the old form).
+  No test resources or READMEs used the legacy form.
+- **Verification (scratch parse against the 1.2.1-SNAPSHOT in use):** JMLtk
+  parses every rewritten form (incl. the exotic javacard arguments
+  `_pin[0]`, `_pin.\transient`, `\transactionUpdated(_pin)`,
+  `\reachLocs(first.next, first)`), `JmlToTextual.toRepresents` re-serializes it
+  and KeY's own `JmlParser.g4` re-parses it (`represents_clause` →
+  `primaryStoreRef` → `storeRefUnion`); the resulting term is **identical** to
+  the legacy comma form (e.g. `MySubclass::footprint ==
+  union(allFields(self), allFields(o))`), so no spec change. The old comma form
+  is confirmed rejected by the same parser (`Encountered unexpected token: ","`).
+- **Measured:** the 4 `ScDeterminismTest` load failures cleared
+  (`heap/list/ArrayList_add.key`, `heap/list/ArrayList_get_dep.key`,
+  `heap/simple/dependency_contracts.key`, `heap/simple/selection_sort.key` now
+  load); every remaining comma-separated store-ref `represents` in those
+  example directories was rewritten, so the §4 parse failure is gone from the
+  corpus (full RunAll group re-measurement pending — per-proof closure is
+  tracked in the doesn't-close classification of `TODO_CI.md` §4).
+  - **Residual (not a load failure):** `heap/simple/selection_sort.key` loads
+    but **does not close** under the JMLtk front-end (A/B: same file + same
+    strategy closes on `origin/main`; represents axioms term-identical on both
+    sides). Open goal is the outer-loop exit obligation; its loop-invariant
+    terms carry `<<origin(… ([loop_invariant @ [no file]]))>>` (cf. §17).
+    Moved to the doesn't-close drift family (see RunAll classification in
+    `TODO_CI.md` §4).
+  - `heap/comprehensions/sum1.key` remains a doesn't-close failure (gap §5).
 
 ## 5. `\sum` comprehension fidelity  — ✘ OPEN (sum0/sum1 don't close)
 
