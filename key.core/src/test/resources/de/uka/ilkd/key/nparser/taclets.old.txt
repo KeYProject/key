@@ -7418,8 +7418,8 @@ Choices: sequences:on}
 equalityToSeqGetAndSeqLenLeft {
 \find(equals(s,s2)==>)
 \varcond(\notFreeIn(iv (variable), s2 (Seq term)), \notFreeIn(iv (variable), s (Seq term)))
-\add [and(equals(seqLen(s),seqLen(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<any>(s,iv),seqGet<any>(s2,iv)))))]==>[] 
-\heuristics(inReachableStateImplication)
+\add [and(equals(seqLen(s),seqLen(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<any>(s,iv),seqGet<any>(s2,iv)))))]==>[]
+\heuristics(seqEqExpandAntec)
 Choices: sequences:on}
 -----------------------------------------------------
 == equalityToSeqGetAndSeqLenRight (equalityToSeqGetAndSeqLenRight) =========================================
@@ -9749,7 +9749,7 @@ Choices: true}
 getOfSeqConcat {
 \find(seqGet<alpha>(seqConcat(seq,seq2),idx))
 \replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<alpha>(seq,idx),seqGet<alpha>(seq2,sub(idx,seqLen(seq))))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqRead)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqConcatEQ (getOfSeqConcatEQ) =========================================
@@ -9781,7 +9781,7 @@ Choices: sequences:on}
 getOfSeqReverse {
 \find(seqGet<alpha>(seqReverse(seq),idx))
 \replacewith(seqGet<alpha>(seq,sub(sub(seqLen(seq),Z(1(#))),idx))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqRead)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqReverseEQ (getOfSeqReverseEQ) =========================================
@@ -9818,7 +9818,7 @@ Choices: sequences:on}
 getOfSeqSub {
 \find(seqGet<alpha>(seqSub(seq,from,to),idx))
 \replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),seqGet<alpha>(seq,add(idx,from)),cast<alpha>(seqGetOutside))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqRead)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSubEQ (getOfSeqSubEQ) =========================================
@@ -9833,7 +9833,7 @@ Choices: sequences:on}
 getOfSeqUpd {
 \find(seqGet<alpha>(seqUpd(seq,idx,value),jdx))
 \replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),cast<alpha>(value),seqGet<alpha>(seq,jdx))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqRead)
 Choices: sequences:on}
 -----------------------------------------------------
 == greater (greater) =========================================
@@ -16195,6 +16195,13 @@ selectOfStoreSameLoc {
 \heuristics(simplify_select_concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== seqConcatAssoc (seqConcatAssoc) =========================================
+seqConcatAssoc {
+\find(seqConcat(seqConcat(a,b),c))
+\replacewith(seqConcat(a,seqConcat(b,c))) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
 == seqConcatUnfoldLeft (seqConcatUnfold) =========================================
 seqConcatUnfoldLeft {
 \find(#allmodal ((modal operator))|{{ ..
@@ -16241,6 +16248,14 @@ seqDefOfSeq {
 \varcond(\notFreeIn(v (variable), s (Seq term)), \notFreeIn(v (variable), x (int term)), \notFreeIn(u (variable), s (Seq term)), \notFreeIn(u (variable), x (int term)))
 \replacewith(if-then-else(equals(seqLen(s),x),s,if-then-else(gt(seqLen(s),x),seqSub(s,Z(0(#)),x),seqConcat(s,seqDef{v (variable)}(seqLen(s),x,seqGetOutside))))) 
 \heuristics(simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== seqDefOfStore (seqDefOfStore) =========================================
+seqDefOfStore {
+\find(seqDef{u (variable)}(l,r,select<any>(store(h,o,arr(k),x),a,arr(u))))
+\varcond(\notFreeIn(u (variable), x (any term)), \notFreeIn(u (variable), k (int term)), \notFreeIn(u (variable), a (java.lang.Object term)), \notFreeIn(u (variable), o (java.lang.Object term)), \notFreeIn(u (variable), h (Heap term)))
+\replacewith(if-then-else(and(and(equals(o,a),leq(l,k)),lt(k,r)),seqUpd(seqDef{u (variable)}(l,r,select<any>(h,a,arr(u))),sub(k,l),x),seqDef{u (variable)}(l,r,select<any>(h,a,arr(u))))) 
+\heuristics(seqDefStore)
 Choices: sequences:on}
 -----------------------------------------------------
 == seqDef_empty (seqDef_empty) =========================================

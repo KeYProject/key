@@ -26,7 +26,7 @@ public class ModularJavaDLStrategyFactory implements StrategyFactory {
     private final List<StrategyFactory> componentFactories =
         Arrays.asList(new JFOLStrategyFactory(),
             new IntegerStrategyFactory(),
-            new SetStrategyFactory(), new LocSetStrategyFactory(),
+            new SetStrategyFactory(), new LocSetStrategyFactory(), new SeqStrategyFactory(),
             new SymExStrategyFactory(), new StringStrategyFactory(),
             new JavaCardDLStrategyFactory());
 
