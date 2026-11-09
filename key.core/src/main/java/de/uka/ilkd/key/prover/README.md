@@ -27,14 +27,15 @@ depending on what you actually need:
 
 | You need... | Use | Why this one |
 |---|---|---|
-| a cache where the value depends **only on the key** (same key ⇒ always same value, e.g. "the sort of this term") | `StripedLruCache` | Fastest under many threads. If an entry is evicted too early, the only cost is computing the same value again — the result never changes. |
+| a cache where the value depends **only on the key** and the workers **read it far more often than they insert** (e.g. the term interner, the arithmetic decision caches) | `GenerationalCache` | Reads take no lock; a hit writes the entry's generation stamp at most once per generation, a plain `int` store that no invariant depends on. An entry in use is never evicted; if an entry is evicted, the only cost is computing the same value again. |
+| a cache where the value depends **only on the key** (same key ⇒ always same value, e.g. "the sort of this term") | `StripedLruCache` | One lock per segment, exact LRU order within a segment. If an entry is evicted too early, the only cost is computing the same value again — the result never changes. |
 | a cache where the value depends on **when it was first stored** (e.g. "the goal state at the time we first saw this rule app") | `ConcurrentLruCache` | Keeps one exact least-recently-used order for all entries. Slower (one lock for the whole cache), but eviction order can change results here, so it must be exact. |
 | scratch memory that only helps the **current computation** (a "last input / last result" shortcut, a reusable buffer) | `ThreadLocal` | Every thread gets its own private copy, so nothing is shared at all. Use this for the common "remember the previous call" memo on a singleton. |
 | a lookup table that is **filled once and then only read** | `final` field + immutable content (`ImmutableList`, `Map.copyOf`, `Collections.unmodifiableMap`) | Data that nobody writes can be read by any number of threads safely. |
 
-How to decide between the two caches in one sentence: ask *"if this entry were thrown
-away and computed again later, could the new value differ?"* If no → `StripedLruCache`;
-if yes → `ConcurrentLruCache`.
+How to decide between the caches in one sentence: ask *"if this entry were thrown
+away and computed again later, could the new value differ?"* If no → `GenerationalCache` on the
+workers' hot path, `StripedLruCache` otherwise; if yes → `ConcurrentLruCache`.
 
 ## Rule 2: shared singletons must not remember anything between calls
 
