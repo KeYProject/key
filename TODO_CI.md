@@ -7,7 +7,7 @@ Main is green; the PR is `BEHIND` main (#4019, #4022, #4023 not yet included).
 
 | Test | Recorded reason (JMLTK_GAPS.md) |
 |---|---|
-| `ScDeterminismTest#singleCoreProofIsReproducible` ×7 ([6]–[10],[12],[14]) | comma-separated store-ref `represents` + `\sum`-proof fidelity |
+| `ScDeterminismTest#singleCoreProofIsReproducible` ×7 ([6]–[10],[12],[14]) | comma-separated store-ref `represents` + `\sum`-proof fidelity — **updated 2026-11-09 (`20d361fa85`): ×2** ([7] `selection_sort` = doesn't-close drift, was a §4 load fail; [10] `sum1` = §5); the §4 load failures cleared by the `\locset(…)` adoption |
 | `RealProofMtEquivalenceTest[3]` | same family (`sum0`) |
 | `LoopScopeInvRuleTests#testDoAutomaticProofOfBenchmarkWithLabeledBreaksAndContinues` | labeled `break`/`continue` proofs |
 | `ParallelProverDeterminismTest#sequentialAndOneWorkerProofsAreIdentical` | pre-existing block-contract combination bug ("flags have to have the same size") |
@@ -63,13 +63,14 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
 
 - [x] `testRunAllWdProofs` — **now PASSING** (red at 2026-11-02) — resolved by the
   program/spec-shape fixes (`6a07c20e63` + `233ec1d9b0`).
-- [x] `testMt2w` / `testMt4w` — **ACCOUNTED**: the curated small-MT collections
-  (`ProofCollections.smallMultiThreaded{,Splitting}`) contain exactly the
-  recorded failing proofs — `selection_sort`, `dependency_contracts`,
-  `ArrayList_get_dep`, `ArrayList_add` (JMLTK_GAPS §4 store-ref load fails) and
-  `sum1` (§5). The `multithreaded_smoke`/`multithreaded_splitting` group
-  failures are those recorded gaps surfacing through the MT runner; the
-  `ScDeterminismTest` ×5 in the same job is the identical set. No new MT
+- [x] `testMt2w` / `testMt4w` — **ACCOUNTED** (updated 2026-11-09,
+  `20d361fa85`): the curated small-MT collections
+  (`ProofCollections.smallMultiThreaded{,Splitting}`) contain the recorded
+  failing proofs. After the §4 `\locset(…)` adoption: `dependency_contracts`,
+  `ArrayList_get_dep`, `ArrayList_add` **close** (verified single-core in
+  `ScDeterminismTest`); remaining reds are `selection_sort` (was a §4 load
+  fail; now doesn't close under the JMLtk front-end — A/B: closes on
+  `origin/main`, cf. JMLTK_GAPS §4 residual) and `sum1` (§5). No new MT
   prover failure.
 - [x] `testMtStress` — `MtScriptStressTest` ×2 = **newly identified,
   pre-existing, previously unrecorded gap** (JMLTK_GAPS §18):
@@ -77,21 +78,22 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
   parses the `//@ ghost \seq x = \dl_array2seq(array);` ghost locals as
   class-level `JmlFieldDeclaration` → hard parse problem. Same failure in the
   2026-11-02 CI (1.1.0) — not caused by the 1.2.1 bump.
-- [x] `testRunAllFunProofs` (22 red groups) / `testRunAllInfProofs`
-  (10 red groups local, 11 in CI) — **per-proof triage complete** (local
-  corpus run at `4b62b1d6fa`; XML in `build/test-results`). **All PR-induced**:
-  `origin/main`'s Tests workflow is fully green, including both RunAll jobs.
-  The Fun set shrank 33 → 22 between the 2026-11-02 (1.1.0) and 2026-11-08
-  (1.2.1) runs — the 11 groups fixed by the program/spec-shape commits:
-  `arithmetic`, `list_recursive`, `modelMethods`, `permissionHeap1..7`,
-  `StipuLa`, `switch`.
-  Fun classification (22):
-  - **§4 comma `represents` → LOAD failure (5)**: `list`, `javaCard`,
-    `funOfIF`, `simple_info_flow`, `simpleTests` (ANTLR hard problem on the
-    locset comma; files: `heap/list/src/ArrayList.java:13`,
-    `javacard/framework/CardRuntimeException.java:18`,
-    `heap/information_flow/src/ArrayList.java:13`,
-    `heap/simple/src/MySubclass.java:4`).
+- [x] `testRunAllFunProofs` (22 red groups; **20 at `20d361fa85`**) /
+  `testRunAllInfProofs` (10 red groups local, 11 in CI; **9 local at
+  `20d361fa85`**) — **per-proof triage complete** (local corpus run at
+  `4b62b1d6fa`; re-measured after the §4 `\locset(…)` adoption, 2026-11-09;
+  XML in `build/test-results`). **All PR-induced**: `origin/main`'s Tests
+  workflow is fully green, including both RunAll jobs. The Fun set shrank
+  33 → 22 between the 2026-11-02 (1.1.0) and 2026-11-08 (1.2.1) runs — the
+  11 groups fixed by the program/spec-shape commits: `arithmetic`,
+  `list_recursive`, `modelMethods`, `permissionHeap1..7`, `StipuLa`,
+  `switch`.
+  Fun classification (20 at `20d361fa85`):
+  - **§4 comma `represents` — RESOLVED by the `\locset(…)` adoption
+    (`20d361fa85`)**: the 5 load-failing groups are fixed — `funOfIF` (8/8)
+    and `simple_info_flow` (2/2) now **pass**; `simpleTests` 27/28, `list`
+    25/29, `javaCard` 2/5 load but have doesn't-close proofs (listed under
+    the drift family below).
   - **§18 ghost locals → LOAD failure (1)**: `quicksort`.
   - **§17 `[no file]` origin save→reload round-trip → RELOAD failure (2)**:
     `other` (`verifyThis26_01_hIndex/update.key.proof`), `list_seq`
@@ -109,7 +111,7 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
     (`heap/permutedSum/perm.proof`, tracked; loads but 6 replay errors:
     stored rule position no longer fits + `One Step Simplification`
     reconstruction).
-  - **proofs that no longer close — spec/sequent-shape drift (11)**:
+  - **proofs that no longer close — spec/sequent-shape drift (14)**:
     `newBook` (ArrayList.add/remFirst), `comprehensions` (sum0–3, segsum —
     §5 family), `blockContracts` (Simple__addAbsoluteValues), `list_ghost`
     (ArrayList_enlarge), `observer` (ExampleSubject_addObserver),
@@ -117,12 +119,18 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
     (MemoryAllocator_alloc + _unsigned), `VSTTE10` (Queens_isConsistent),
     `FM2024Tutorial` (ArrayList_sort/LinkedList_find/get), `WeideEtAl`
     (AddAndMultiply_add), `redux` (Arrays.copyOf/copyOfRange/equals,
-    ArrayCopy). These need per-proof debugging (which shape difference
-    feeds the open goals) — not a single root cause.
-  Inf classification (10 local / 11 CI):
-  - **§4 comma `represents` → LOAD failure (1)**: `NewObjects`
-    (`InformationFlow/PasswordFile/.../SecurePasswordFile.java:13`
-    `represents footprint = \locset(names, passwords), …`).
+    ArrayCopy), plus — newly visible now that §4 loads work (2026-11-09):
+    `simpleTests` (selection_sort — open goal carries the §17
+    `[loop_invariant @ [no file]]` origin label), `list`
+    (ArrayList_concatenate/contains_dep/enlarge, LinkedList_get_normal),
+    `javaCard` (setArray1/setArray2, arrayFillNonAtomic). These need
+    per-proof debugging (which shape difference feeds the open goals) — not
+    a single root cause.
+  Inf classification (9 local / 11 CI at `20d361fa85`):
+  - **§4 comma `represents` — RESOLVED by the `\locset(…)` adoption
+    (`20d361fa85`)**: `NewObjects` (incl. the
+    `passwordfile.SecurePasswordFile` proofs) now **passes** — load and
+    closure.
   - **non-interference proofs that no longer close (9)**: `ToyVoting`,
     `ConditionalConfidential`, `SumExample`, `SumExample_nomacro`,
     `SumExample_fullmacro`, `ToyBanking`, `ToyBanking_fullmacro`,
@@ -162,5 +170,5 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
 |---|---|
 | `keyext.slicing` | **17/17 green** (was 5 red) |
 | `keyext.caching` | 1 failure — `TestReferenceSearcher`, the recorded `relax.proof` gap (JMLTK_GAPS §10); `ProofCachingSingleRunTest` green |
-| `key.core` | 11 failures, **all recorded** (JMLTK_GAPS §4 store-ref ×4, §5 `\sum` ×2, §10 relax replays ×2, §11 MT ×1, + the 2 known `JMLParserExceptionTest` cases); 3 recorded reds resolved by `6a07c20e63` |
-| integration | triaged at `4b62b1d6fa` (CI 2026-11-08 + local corpus run): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = recorded §4/§5 gaps via the curated small-MT collections; `testMtStress` = quicksort load gap (JMLTK_GAPS §18); `testRunAllFunProofs` = 22 red groups, all classified (§4 ×5, §18 ×1, §17-reload ×2, §19 ×1, §20 ×1, §21 ×1, doesn't-close ×11); `testRunAllInfProofs` = 10–11 red groups (§4 ×1, doesn't-close ×9–10) — **all PR-induced** (main is green) |
+| `key.core` | 11 → **8 failures at `20d361fa85`, all recorded** (JMLTK_GAPS §5 `\sum` ×2, §10 relax replays ×2, §11 MT ×1, §4-residual `selection_sort` doesn't-close drift ×1, + the 2 known `JMLParserExceptionTest` cases); the 4 §4 store-ref reds cleared by the `\locset(…)` adoption (`20d361fa85`), of which `selection_sort` resurfaces as drift |
+| integration | triaged at `4b62b1d6fa`, re-measured at `20d361fa85` (local corpus run): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = the 2 recorded remaining reds (`selection_sort` drift, `sum1` §5) via the curated small-MT collections; `testMtStress` = quicksort load gap (JMLTK_GAPS §18); `testRunAllFunProofs` = **20 red groups**, all classified (§18 ×1, §17-reload ×2, §19 ×1, §20 ×1, §21 ×1, doesn't-close ×14 — the 5 §4 load-failing groups now load: `funOfIF` + `simple_info_flow` pass, `simpleTests`/`list`/`javaCard` resurface with doesn't-close proofs); `testRunAllInfProofs` = **9 local** (11 CI) — `NewObjects` passes; doesn't-close ×9 + `SimpleEvoting_fullmacro` CI-only flake — **all PR-induced** (main is green) |

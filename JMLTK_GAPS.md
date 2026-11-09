@@ -217,20 +217,28 @@ JMLtk front-end shipped in PR #3997.
   the legacy comma form (e.g. `MySubclass::footprint ==
   union(allFields(self), allFields(o))`), so no spec change. The old comma form
   is confirmed rejected by the same parser (`Encountered unexpected token: ","`).
-- **Measured:** the 4 `ScDeterminismTest` load failures cleared
-  (`heap/list/ArrayList_add.key`, `heap/list/ArrayList_get_dep.key`,
-  `heap/simple/dependency_contracts.key`, `heap/simple/selection_sort.key` now
-  load); every remaining comma-separated store-ref `represents` in those
-  example directories was rewritten, so the §4 parse failure is gone from the
-  corpus (full RunAll group re-measurement pending — per-proof closure is
-  tracked in the doesn't-close classification of `TODO_CI.md` §4).
-  - **Residual (not a load failure):** `heap/simple/selection_sort.key` loads
-    but **does not close** under the JMLtk front-end (A/B: same file + same
-    strategy closes on `origin/main`; represents axioms term-identical on both
-    sides). Open goal is the outer-loop exit obligation; its loop-invariant
-    terms carry `<<origin(… ([loop_invariant @ [no file]]))>>` (cf. §17).
-    Moved to the doesn't-close drift family (see RunAll classification in
-    `TODO_CI.md` §4).
+- **Measured (2026-11-09 local corpus run at `20d361fa85`):** the 4
+  `ScDeterminismTest` load failures cleared (`heap/list/ArrayList_add.key`,
+  `heap/list/ArrayList_get_dep.key`, `heap/simple/dependency_contracts.key`,
+  `heap/simple/selection_sort.key` now load — the first three close and are
+  single-core reproducible). RunAll Fun **22 → 20 red groups**:
+  - `funOfIF` (8/8) and `simple_info_flow` (2/2 notprovable) now **pass** —
+    no drift in these groups.
+  - `simpleTests`: 27/28 pass; only `selection_sort.key` doesn't close.
+  - `list`: 25/29 pass; doesn't close: `ArrayList_concatenate`,
+    `ArrayList_contains_dep`, `ArrayList_enlarge`, `LinkedList_get_normal`.
+  - `javaCard`: 2/5 pass; doesn't close: `setArray1`, `setArray2`,
+    `arrayFillNonAtomic` (all load; `updateBalance0/1` close).
+  The §4 parse failure is gone from the corpus; the new doesn't-close proofs
+  above are the front-end's spec/sequent-shape drift, same family as the
+  pre-existing 11 drift groups (per-proof debugging pending — see
+  `TODO_CI.md` §4).
+  - **Residual detail for `selection_sort`:** A/B against `origin/main`
+    (same file + same strategy closes there; the `MySubclass::footprint`
+    represents axiom is term-identical on both sides, so the rewrite is not
+    the cause). Open goal is the outer-loop exit obligation; its
+    loop-invariant terms carry `<<origin(… ([loop_invariant @ [no file]]))>>`
+    (cf. §17).
   - `heap/comprehensions/sum1.key` remains a doesn't-close failure (gap §5).
 
 ## 5. `\sum` comprehension fidelity  — ✘ OPEN (sum0/sum1 don't close)
