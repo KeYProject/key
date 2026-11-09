@@ -23,6 +23,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
  *
  * @author Richard Bubel
  */
+@TransformerMeta(name = "#reattachLoopInvariant")
 public class ReattachLoopInvariant extends ProgramTransformer {
     public ReattachLoopInvariant(LoopStatement ls) {
         super("#reattachLoopInvariant", ls);

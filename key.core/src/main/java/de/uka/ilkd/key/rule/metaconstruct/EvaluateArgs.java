@@ -39,6 +39,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author N/A
  */
+@TransformerMeta(name = "#evaluateArguments")
 public class EvaluateArgs extends ProgramTransformer {
 
     /**
@@ -47,7 +48,7 @@ public class EvaluateArgs extends ProgramTransformer {
      * @param pe the instance of expression contained by the meta construct
      */
     public EvaluateArgs(ProgramElement pe) {
-        super("#evaluate-arguments", pe);
+        super("#evaluateArguments", pe);
     }
 
     /**

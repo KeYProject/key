@@ -21,13 +21,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * <code>&lt;createObject&gt;</code> which on its part calls another implicit method
  * <code>lt;prepare&gt;</code> for setting the fields values.
  */
+@TransformerMeta(name = "#createObject")
 public class CreateObject extends ProgramTransformer {
 
     /**
      * @param newExpr The {@link ProgramElement}
      */
     public CreateObject(ProgramElement newExpr) {
-        super("create-object", newExpr);
+        super("#createObject", newExpr);
     }
 
     @Override

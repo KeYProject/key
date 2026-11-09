@@ -22,6 +22,7 @@ import org.key_project.logic.Name;
  * to an implict method called <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
+@TransformerMeta(name = "#specialConstructorCall")
 public class SpecialConstructorCall extends ProgramTransformer {
 
     /**
@@ -34,7 +35,7 @@ public class SpecialConstructorCall extends ProgramTransformer {
      * @param consRef The constructor reference.
      */
     public SpecialConstructorCall(ProgramElement consRef) {
-        super(new Name("special-constructor-call"), consRef);
+        super(new Name("#specialConstructorCall"), consRef);
     }
 
     @Override

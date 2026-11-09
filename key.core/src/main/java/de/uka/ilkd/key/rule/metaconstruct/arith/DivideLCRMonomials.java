@@ -8,12 +8,14 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 
 import org.key_project.logic.Name;
 
 /**
  * Metaoperator for computing the result of dividing one monomial by another
  */
+@TransformerMeta(name = "#divideLCRMonomials")
 public final class DivideLCRMonomials extends AbstractTermTransformer {
 
     public DivideLCRMonomials() {

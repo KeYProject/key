@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *  l1:l2:{...}
  * </code>
  */
+@TransformerMeta(name = "#doBreak")
 public class DoBreak extends ProgramTransformer {
 
     /**
@@ -29,7 +30,7 @@ public class DoBreak extends ProgramTransformer {
      * @param labeledBreak the LabeledStatement contained by the meta construct
      */
     public DoBreak(LabeledStatement labeledBreak) {
-        super("do-break", labeledBreak);
+        super("#doBreak", labeledBreak);
     }
 
     /**

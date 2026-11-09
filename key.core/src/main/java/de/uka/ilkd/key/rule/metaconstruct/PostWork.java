@@ -18,9 +18,10 @@ import org.key_project.logic.op.sv.SchemaVariable;
 /**
  * creates an assignment instantiationOf(#newObjectsV).$initialized = true
  */
+@TransformerMeta(name = "#postWork")
 public class PostWork extends ProgramTransformer {
 
-    private final static String POST_WORK = "post-work";
+    private final static String POST_WORK = "#postWork";
 
     /**
      * Whether this transformer is used schematically (i.e., in taclets).

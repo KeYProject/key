@@ -33,9 +33,10 @@ import org.key_project.util.collection.ImmutableArray;
  * to an implict method called <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
+@TransformerMeta(name = "#constructorCall")
 public class ConstructorCall extends ProgramTransformer {
 
-    private static final String CONSTRUCTOR_CALL = "constructor-call";
+    private static final String CONSTRUCTOR_CALL = "#constructorCall";
 
     // @ invariant (newObjectSV == null) != (newObjectVar == null);
     private final SchemaVariable newObjectSV;

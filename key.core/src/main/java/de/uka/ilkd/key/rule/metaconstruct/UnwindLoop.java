@@ -40,6 +40,7 @@ import org.key_project.util.collection.ImmutableList;
  * </pre>
  *
  */
+@TransformerMeta(name = "#unwindLoop")
 public class UnwindLoop extends ProgramTransformer {
 
     /** the outer label that is used to leave the while loop ('l1') */
@@ -55,7 +56,7 @@ public class UnwindLoop extends ProgramTransformer {
      * @param outerLabel The outer label SV
      */
     public UnwindLoop(SchemaVariable innerLabel, SchemaVariable outerLabel, LoopStatement loop) {
-        super("#unwind-loop", loop);
+        super("#unwindLoop", loop);
         this.innerLabel = innerLabel;
         this.outerLabel = outerLabel;
     }

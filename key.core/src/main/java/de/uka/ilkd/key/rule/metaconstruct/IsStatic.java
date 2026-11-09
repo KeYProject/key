@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *
  * @author N/A
  */
+@TransformerMeta(name = "#isstatic")
 public class IsStatic extends ProgramTransformer {
 
     /**

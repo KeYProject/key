@@ -52,6 +52,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author MU
  */
 
+@TransformerMeta(name = "#forToWhile")
 public class ForToWhile extends ProgramTransformer {
 
     /**
@@ -72,7 +73,7 @@ public class ForToWhile extends ProgramTransformer {
      * @param outerLabel the label used to handle break (only needed for do-while-loops)
      */
     public ForToWhile(SchemaVariable innerLabel, SchemaVariable outerLabel, Statement loop) {
-        super("#for-to-while", loop);
+        super("#forToWhile", loop);
         this.innerLabel = innerLabel;
         this.outerLabel = outerLabel;
 

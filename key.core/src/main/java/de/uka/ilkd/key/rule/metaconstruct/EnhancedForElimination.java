@@ -54,6 +54,7 @@ import static de.uka.ilkd.key.java.ast.expression.operator.LogicFunctionalOperat
  *
  */
 
+@TransformerMeta(name = "#enhancedforElim")
 public class EnhancedForElimination extends ProgramTransformer {
 
     /**
@@ -104,7 +105,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param forStatement the enhanced for loop to eliminate.
      */
     public EnhancedForElimination(ProgramSV execContextSV, EnhancedFor forStatement) {
-        super("enhancedfor-elim", forStatement);
+        super("#enhancedforElim", forStatement);
         this.execContextSV = execContextSV;
     }
 

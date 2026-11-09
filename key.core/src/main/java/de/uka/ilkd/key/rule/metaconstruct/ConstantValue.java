@@ -17,6 +17,7 @@ import org.key_project.logic.op.Operator;
 /**
  * Replace a program variable that is a compile-time constant with the value of the initializer
  */
+@TransformerMeta(name = "#constantvalue")
 public final class ConstantValue extends AbstractTermTransformer {
 
 
