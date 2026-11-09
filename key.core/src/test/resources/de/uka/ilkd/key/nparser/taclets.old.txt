@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sat Oct 24 15:29:23 CEST 2026
+# Date: Mon Nov 09 12:53:23 CET 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -5338,66 +5338,58 @@ cut_direct_r {
 
 Choices: true}
 -----------------------------------------------------
-== defInDomainImpliesCreated (defInDomainImpliesCreated) =========================================
-defInDomainImpliesCreated {
-\find(inDomainImpliesCreated(m))
-\varcond(\notFreeIn(o (variable), m (Map term)))
-\replacewith(all{o (variable)}(imp(inDomain(m,o),equals(select<boolean>(heap,o,java.lang.Object::#$created),TRUE)))) 
-\heuristics(simplify_enlarging)
-Choices: true}
------------------------------------------------------
 == defIsFinite (defIsFinite) =========================================
 defIsFinite {
-\find(isFinite(m))
-\varcond(\notFreeIn(s (variable), m (Map term)), \notFreeIn(vx (variable), m (Map term)))
-\replacewith(exists{s (variable)}(all{vx (variable)}(equiv(inDomain(m,vx),exists{ix (variable)}(and(and(leq(Z(0(#)),ix),lt(ix,seqLen(s))),equals(seqGet<any>(s,ix),vx))))))) 
+\find(isFinite<K,V>(m))
+\varcond(\notFreeIn(s (variable), m (Map<K,V> term)), \notFreeIn(kv (variable), m (Map<K,V> term)))
+\replacewith(exists{s (variable)}(all{kv (variable)}(and(imp(inDomain<K,V>(m,kv),exists{ix (variable)}(and(and(and(leq(Z(0(#)),ix),lt(ix,pseqLen<K>(s))),equals(pseqGet<K>(s,ix),kv)),all{jx:int}(imp(and(and(leq(Z(0(#)),jx),lt(jx,pseqLen<K>(s))),not(equals(ix,jx))),not(equals(pseqGet<K>(s,jx),kv))))))),imp(exists{ix (variable)}(and(and(leq(Z(0(#)),ix),lt(ix,pseqLen<K>(s))),equals(pseqGet<K>(s,ix),kv))),inDomain<K,V>(m,kv)))))) 
 
 Choices: true}
 -----------------------------------------------------
 == defMapEmpty (defMapEmpty) =========================================
 defMapEmpty {
-\find(mapEmpty)
-\replacewith(mapForeach{vy (variable)}(FALSE,mapUndef)) 
+\find(mapEmpty<K,V>)
+\replacewith(mapForeach<K,V>{kv (variable)}(FALSE,mapUndef<V>)) 
 
 Choices: true}
 -----------------------------------------------------
 == defMapEquality (defMapEquality) =========================================
 defMapEquality {
 \find(equals(m0,m1))
-\varcond(\notFreeIn(vy (variable), m1 (Map term)), \notFreeIn(vy (variable), m0 (Map term)))
-\replacewith(all{vy (variable)}(and(equiv(inDomain(m0,vy),inDomain(m1,vy)),imp(inDomain(m0,vy),equals(mapGet(m0,vy),mapGet(m1,vy)))))) 
+\varcond(\notFreeIn(kv (variable), m1 (Map<K,V> term)), \notFreeIn(kv (variable), m0 (Map<K,V> term)))
+\replacewith(all{kv (variable)}(and(equiv(inDomain<K,V>(m0,kv),inDomain<K,V>(m1,kv)),imp(inDomain<K,V>(m0,kv),equals(mapGet<K,V>(m0,kv),mapGet<K,V>(m1,kv)))))) 
 
 Choices: true}
 -----------------------------------------------------
 == defMapOverride (defMapOverride) =========================================
 defMapOverride {
-\find(mapOverride(m0,m1))
-\varcond(\notFreeIn(vy (variable), m1 (Map term)), \notFreeIn(vy (variable), m0 (Map term)))
-\replacewith(mapForeach{vy (variable)}(if-then-else(or(inDomain(m0,vy),inDomain(m1,vy)),TRUE,FALSE),if-then-else(inDomain(m1,vy),mapGet(m1,vy),mapGet(m0,vy)))) 
+\find(mapOverride<K,V>(m0,m1))
+\varcond(\notFreeIn(kv (variable), m1 (Map<K,V> term)), \notFreeIn(kv (variable), m0 (Map<K,V> term)))
+\replacewith(mapForeach<K,V>{kv (variable)}(if-then-else(or(inDomain<K,V>(m0,kv),inDomain<K,V>(m1,kv)),TRUE,FALSE),if-then-else(inDomain<K,V>(m1,kv),mapGet<K,V>(m1,kv),mapGet<K,V>(m0,kv)))) 
 
 Choices: true}
 -----------------------------------------------------
 == defMapRemove (defMapRemove) =========================================
 defMapRemove {
-\find(mapRemove(m,key))
-\varcond(\notFreeIn(vy (variable), key (any term)), \notFreeIn(vy (variable), m (Map term)))
-\replacewith(mapForeach{vy (variable)}(if-then-else(and(inDomain(m,vy),not(equals(vy,key))),TRUE,FALSE),mapGet(m,vy))) 
+\find(mapRemove<K,V>(m,key))
+\varcond(\notFreeIn(kv (variable), key (K term)), \notFreeIn(kv (variable), m (Map<K,V> term)))
+\replacewith(mapForeach<K,V>{kv (variable)}(if-then-else(and(inDomain<K,V>(m,kv),not(equals(kv,key))),TRUE,FALSE),mapGet<K,V>(m,kv))) 
 
 Choices: true}
 -----------------------------------------------------
 == defMapSingleton (defMapSingleton) =========================================
 defMapSingleton {
-\find(mapSingleton(xa,y))
-\varcond(\notFreeIn(vy (variable), y (any term)), \notFreeIn(vy (variable), xa (alpha term)))
-\replacewith(mapForeach{vy (variable)}(if-then-else(equals(vy,cast<any>(xa)),TRUE,FALSE),y)) 
+\find(mapSingleton<K,V>(key,value))
+\varcond(\notFreeIn(kv (variable), value (V term)), \notFreeIn(kv (variable), key (K term)))
+\replacewith(mapForeach<K,V>{kv (variable)}(if-then-else(equals(kv,key),TRUE,FALSE),value)) 
 
 Choices: true}
 -----------------------------------------------------
 == defMapUpdate (defMapUpdate) =========================================
 defMapUpdate {
-\find(mapUpdate(m,key,value))
-\varcond(\notFreeIn(vy (variable), value (any term)), \notFreeIn(vy (variable), key (any term)), \notFreeIn(vy (variable), m (Map term)))
-\replacewith(mapForeach{vy (variable)}(if-then-else(or(inDomain(m,vy),equals(vy,key)),TRUE,FALSE),if-then-else(equals(vy,key),value,mapGet(m,vy)))) 
+\find(mapUpdate<K,V>(m,key,value))
+\varcond(\notFreeIn(kv (variable), value (V term)), \notFreeIn(kv (variable), key (K term)), \notFreeIn(kv (variable), m (Map<K,V> term)))
+\replacewith(mapForeach<K,V>{kv (variable)}(if-then-else(or(inDomain<K,V>(m,kv),equals(kv,key)),TRUE,FALSE),if-then-else(equals(kv,key),value,mapGet<K,V>(m,kv)))) 
 
 Choices: true}
 -----------------------------------------------------
@@ -5406,6 +5398,46 @@ defOfEmpty {
 \find(seqEmpty)
 \varcond(\notFreeIn(uSub (variable), te (any term)))
 \replacewith(seqDef{uSub (variable)}(Z(0(#)),Z(0(#)),te)) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== defOfPSeqConcat (defOfPSeqConcat) =========================================
+defOfPSeqConcat {
+\find(pseqConcat<E>(seq1,seq2))
+\varcond(\notFreeIn(uSub (variable), seq2 (PSeq<E> term)), \notFreeIn(uSub (variable), seq1 (PSeq<E> term)))
+\replacewith(pseqDef<E>{uSub (variable)}(Z(0(#)),add(pseqLen<E>(seq1),pseqLen<E>(seq2)),if-then-else(lt(uSub,pseqLen<E>(seq1)),pseqGet<E>(seq1,uSub),pseqGet<E>(seq2,sub(uSub,pseqLen<E>(seq1)))))) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== defOfPSeqReverse (defOfPSeqReverse) =========================================
+defOfPSeqReverse {
+\find(pseqReverse<E>(seq))
+\varcond(\notFreeIn(uSub (variable), seq (PSeq<E> term)))
+\replacewith(pseqDef<E>{uSub (variable)}(Z(0(#)),pseqLen<E>(seq),pseqGet<E>(seq,sub(sub(pseqLen<E>(seq),uSub),Z(1(#)))))) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== defOfPSeqSingleton (defOfPSeqSingleton) =========================================
+defOfPSeqSingleton {
+\find(pseqSingleton<E>(x))
+\varcond(\notFreeIn(uSub (variable), x (E term)))
+\replacewith(pseqDef<E>{uSub (variable)}(Z(0(#)),Z(1(#)),x)) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== defOfPSeqSub (defOfPSeqSub) =========================================
+defOfPSeqSub {
+\find(pseqSub<E>(seq,from,to))
+\varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)), \notFreeIn(uSub (variable), seq (PSeq<E> term)))
+\replacewith(pseqDef<E>{uSub (variable)}(from,to,pseqGet<E>(seq,uSub))) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== defOfPSeqUpd (defOfPSeqUpd) =========================================
+defOfPSeqUpd {
+\find(pseqUpd<E>(seq,idx,value))
+\varcond(\notFreeIn(uSub (variable), seq (PSeq<E> term)), \notFreeIn(uSub (variable), value (E term)), \notFreeIn(uSub (variable), idx (int term)))
+\replacewith(pseqDef<E>{uSub (variable)}(Z(0(#)),pseqLen<E>(seq),if-then-else(equals(uSub,idx),value,pseqGet<E>(seq,uSub)))) 
 
 Choices: sequences:on}
 -----------------------------------------------------
@@ -5449,11 +5481,11 @@ defOfSeqUpd {
 
 Choices: sequences:on}
 -----------------------------------------------------
-== defSeq2Map (defSeq2Map) =========================================
-defSeq2Map {
-\find(seq2map(s))
-\varcond(\notFreeIn(ix (variable), s (Seq term)))
-\replacewith(mapForeach{ix (variable)}(if-then-else(and(leq(Z(0(#)),ix),lt(ix,seqLen(s))),TRUE,FALSE),seqGet<any>(s,ix))) 
+== defPSeq2Map (defPSeq2Map) =========================================
+defPSeq2Map {
+\find(pseq2map<V>(s))
+\varcond(\notFreeIn(ix (variable), s (PSeq<V> term)))
+\replacewith(mapForeach<int,V>{ix (variable)}(if-then-else(and(leq(Z(0(#)),ix),lt(ix,pseqLen<V>(s))),TRUE,FALSE),pseqGet<V>(s,ix))) 
 
 Choices: true}
 -----------------------------------------------------
@@ -7397,6 +7429,30 @@ equalityToElementOfRight {
 \replacewith([]==>[all{ov (variable)}(all{fv (variable)}(equiv(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2))))]) 
 \heuristics(locSetEqualityBlastingRight)
 Choices: programRules:Java}
+-----------------------------------------------------
+== equalityToPSeqGetAndPSeqLen (equalityToPSeqGetAndPSeqLen) =========================================
+equalityToPSeqGetAndPSeqLen {
+\find(equals(left,right))
+\varcond(\notFreeIn(iv (variable), right (PSeq<E> term)), \notFreeIn(iv (variable), left (PSeq<E> term)))
+\replacewith(and(equals(pseqLen<E>(left),pseqLen<E>(right)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,pseqLen<E>(left))),equals(pseqGet<E>(left,iv),pseqGet<E>(right,iv)))))) 
+\heuristics(defOpsSeqEquality)
+Choices: sequences:on}
+-----------------------------------------------------
+== equalityToPSeqGetAndPSeqLenLeft (equalityToPSeqGetAndPSeqLenLeft) =========================================
+equalityToPSeqGetAndPSeqLenLeft {
+\find(equals(s,s2)==>)
+\varcond(\notFreeIn(iv (variable), s2 (PSeq<E> term)), \notFreeIn(iv (variable), s (PSeq<E> term)))
+\add [and(equals(pseqLen<E>(s),pseqLen<E>(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,pseqLen<E>(s))),equals(pseqGet<E>(s,iv),pseqGet<E>(s2,iv)))))]==>[] 
+\heuristics(inReachableStateImplication)
+Choices: sequences:on}
+-----------------------------------------------------
+== equalityToPSeqGetAndPSeqLenRight (equalityToPSeqGetAndPSeqLenRight) =========================================
+equalityToPSeqGetAndPSeqLenRight {
+\find(==>equals(s,s2))
+\varcond(\notFreeIn(iv (variable), s2 (PSeq<E> term)), \notFreeIn(iv (variable), s (PSeq<E> term)))
+\replacewith([]==>[and(equals(pseqLen<E>(s),pseqLen<E>(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,pseqLen<E>(s))),equals(pseqGet<E>(s,iv),pseqGet<E>(s2,iv)))))]) 
+\heuristics(simplify_enlarging)
+Choices: sequences:on}
 -----------------------------------------------------
 == equalityToSelect (equalityToSelect) =========================================
 equalityToSelect {
@@ -9698,52 +9754,191 @@ Choices: sequences:on}
 -----------------------------------------------------
 == getOfMapEmpty (getOfMapEmpty) =========================================
 getOfMapEmpty {
-\find(mapGet(mapEmpty,x))
-\replacewith(mapUndef) 
+\find(mapGet<K,V>(mapEmpty<K,V>,key))
+\replacewith(mapUndef<V>) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== getOfMapEmptyEQ (getOfMapEmptyEQ) =========================================
+getOfMapEmptyEQ {
+\assumes ([equals(mapEmpty<K,V>,EQ)]==>[]) 
+\find(mapGet<K,V>(EQ,key))
+\replacewith(mapUndef<V>) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == getOfMapForeach (getOfMapForeach) =========================================
 getOfMapForeach {
-\find(mapGet(mapForeach{v (variable)}(b,y),x))
-\replacewith(if-then-else(inDomain(mapForeach{v (variable)}(b,y),x),subst{v (variable)}(cast<alpha>(x),y),mapUndef)) 
+\find(mapGet<K,V>(mapForeach<K,V>{kv (variable)}(b,value),key))
+\replacewith(if-then-else(inDomain<K,V>(mapForeach<K,V>{kv (variable)}(b,value),key),subst{kv (variable)}(key,value),mapUndef<V>)) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == getOfMapOverride (getOfMapOverride) =========================================
 getOfMapOverride {
-\find(mapGet(mapOverride(m0,m1),x))
-\replacewith(if-then-else(inDomain(m1,x),mapGet(m1,x),mapGet(m0,x))) 
+\find(mapGet<K,V>(mapOverride<K,V>(m0,m1),key))
+\replacewith(if-then-else(inDomain<K,V>(m1,key),mapGet<K,V>(m1,key),mapGet<K,V>(m0,key))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== getOfMapOverrideEQ (getOfMapOverrideEQ) =========================================
+getOfMapOverrideEQ {
+\assumes ([equals(mapOverride<K,V>(m0,m1),EQ)]==>[]) 
+\find(mapGet<K,V>(EQ,key))
+\replacewith(if-then-else(inDomain<K,V>(m1,key),mapGet<K,V>(m1,key),mapGet<K,V>(m0,key))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == getOfMapRemove (getOfMapRemove) =========================================
 getOfMapRemove {
-\find(mapGet(mapRemove(m,key),x))
-\replacewith(if-then-else(equals(x,key),mapUndef,mapGet(m,x))) 
+\find(mapGet<K,V>(mapRemove<K,V>(m,key),key1))
+\replacewith(if-then-else(equals(key1,key),mapUndef<V>,mapGet<K,V>(m,key1))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== getOfMapRemoveEQ (getOfMapRemoveEQ) =========================================
+getOfMapRemoveEQ {
+\assumes ([equals(mapRemove<K,V>(m,key),EQ)]==>[]) 
+\find(mapGet<K,V>(EQ,key1))
+\replacewith(if-then-else(equals(key1,key),mapUndef<V>,mapGet<K,V>(m,key1))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == getOfMapSingleton (getOfMapSingleton) =========================================
 getOfMapSingleton {
-\find(mapGet(mapSingleton(x,y),z))
-\replacewith(if-then-else(equals(x,z),y,mapUndef)) 
+\find(mapGet<K,V>(mapSingleton<K,V>(key,value),key1))
+\replacewith(if-then-else(equals(key,key1),value,mapUndef<V>)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== getOfMapSingletonEQ (getOfMapSingletonEQ) =========================================
+getOfMapSingletonEQ {
+\assumes ([equals(mapSingleton<K,V>(key,value),EQ)]==>[]) 
+\find(mapGet<K,V>(EQ,key1))
+\replacewith(if-then-else(equals(key,key1),value,mapUndef<V>)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == getOfMapUpdate (getOfMapUpdate) =========================================
 getOfMapUpdate {
-\find(mapGet(mapUpdate(m,key,value),x))
-\replacewith(if-then-else(equals(x,key),value,mapGet(m,x))) 
+\find(mapGet<K,V>(mapUpdate<K,V>(m,key,value),key1))
+\replacewith(if-then-else(equals(key1,key),value,mapGet<K,V>(m,key1))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
-== getOfSeq2Map (getOfSeq2Map) =========================================
-getOfSeq2Map {
-\find(mapGet(seq2map(s),x))
-\replacewith(if-then-else(and(and(equals(instance<int>(x),TRUE),leq(Z(0(#)),cast<int>(x))),lt(cast<int>(x),seqLen(s))),seqGet<any>(s,cast<int>(x)),mapUndef)) 
+== getOfMapUpdateEQ (getOfMapUpdateEQ) =========================================
+getOfMapUpdateEQ {
+\assumes ([equals(mapUpdate<K,V>(m,key,value),EQ)]==>[]) 
+\find(mapGet<K,V>(EQ,key1))
+\replacewith(if-then-else(equals(key1,key),value,mapGet<K,V>(m,key1))) 
 \heuristics(simplify_enlarging)
 Choices: true}
+-----------------------------------------------------
+== getOfPSeq2Map (getOfPSeq2Map) =========================================
+getOfPSeq2Map {
+\find(mapGet<int,V>(pseq2map<V>(s),ki))
+\replacewith(if-then-else(and(leq(Z(0(#)),ki),lt(ki,pseqLen<V>(s))),pseqGet<V>(s,ki),mapUndef<V>)) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== getOfPSeq2MapEQ (getOfPSeq2MapEQ) =========================================
+getOfPSeq2MapEQ {
+\assumes ([equals(pseq2map<V>(s),EQ)]==>[]) 
+\find(mapGet<int,V>(EQ,ki))
+\replacewith(if-then-else(and(leq(Z(0(#)),ki),lt(ki,pseqLen<V>(s))),pseqGet<V>(s,ki),mapUndef<V>)) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== getOfPSeqConcat (getOfPSeqConcat) =========================================
+getOfPSeqConcat {
+\find(pseqGet<E>(pseqConcat<E>(seq,seq2),idx))
+\replacewith(if-then-else(lt(idx,pseqLen<E>(seq)),pseqGet<E>(seq,idx),pseqGet<E>(seq2,sub(idx,pseqLen<E>(seq))))) 
+\heuristics(simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqConcatEQ (getOfPSeqConcatEQ) =========================================
+getOfPSeqConcatEQ {
+\assumes ([equals(pseqConcat<E>(seq,seq2),EQ)]==>[]) 
+\find(pseqGet<E>(EQ,idx))
+\replacewith(if-then-else(lt(idx,pseqLen<E>(seq)),pseqGet<E>(seq,idx),pseqGet<E>(seq2,sub(idx,pseqLen<E>(seq))))) 
+\heuristics(no_self_application, simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqDef (getOfPSeqDef) =========================================
+getOfPSeqDef {
+\find(pseqGet<E>(pseqDef<E>{uSub (variable)}(from,to,t),idx))
+\varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
+\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),subst{uSub (variable)}(add(idx,from),t),pseqGetOutside<E>)) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqDefEQ (getOfSeqDef) =========================================
+getOfPSeqDefEQ {
+\assumes ([equals(pseqDef<E>{uSub (variable)}(from,to,t),EQ)]==>[]) 
+\find(pseqGet<E>(EQ,idx))
+\varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
+\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),subst{uSub (variable)}(add(idx,from),t),pseqGetOutside<E>)) 
+\heuristics(simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqReverse (getOfPSeqReverse) =========================================
+getOfPSeqReverse {
+\find(pseqGet<E>(pseqReverse<E>(seq),idx))
+\replacewith(pseqGet<E>(seq,sub(sub(pseqLen<E>(seq),Z(1(#))),idx))) 
+\heuristics(simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqReverseEQ (getOfPSeqReverseEQ) =========================================
+getOfPSeqReverseEQ {
+\assumes ([equals(pseqReverse<E>(seq),EQ)]==>[]) 
+\find(pseqGet<E>(EQ,idx))
+\replacewith(pseqGet<E>(seq,sub(sub(pseqLen<E>(seq),Z(1(#))),idx))) 
+\heuristics(no_self_application, simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqSingleton (getOfPSeqSingleton) =========================================
+getOfPSeqSingleton {
+\find(pseqGet<E>(pseqSingleton<E>(x),idx))
+\replacewith(if-then-else(equals(idx,Z(0(#))),x,pseqGetOutside<E>)) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqSingletonConcrete (getOfPSeqSingletonConcrete) =========================================
+getOfPSeqSingletonConcrete {
+\find(pseqGet<E>(pseqSingleton<E>(x),Z(0(#))))
+\replacewith(x) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqSingletonEQ (getOfPSeqSingletonEQ) =========================================
+getOfPSeqSingletonEQ {
+\assumes ([equals(pseqSingleton<E>(x),EQ)]==>[]) 
+\find(pseqGet<E>(EQ,idx))
+\replacewith(if-then-else(equals(idx,Z(0(#))),x,pseqGetOutside<E>)) 
+\heuristics(no_self_application, simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqSub (getOfPSeqSub) =========================================
+getOfPSeqSub {
+\find(pseqGet<E>(pseqSub<E>(seq,from,to),idx))
+\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),pseqGet<E>(seq,add(idx,from)),pseqGetOutside<E>)) 
+\heuristics(simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqSubEQ (getOfPSeqSubEQ) =========================================
+getOfPSeqSubEQ {
+\assumes ([equals(pseqSub<E>(seq,from,to),EQ)]==>[]) 
+\find(pseqGet<E>(EQ,idx))
+\replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),pseqGet<E>(seq,add(idx,from)),pseqGetOutside<E>)) 
+\heuristics(no_self_application, simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== getOfPSeqUpd (getOfPSeqUpd) =========================================
+getOfPSeqUpd {
+\find(pseqGet<E>(pseqUpd<E>(seq,idx,value),jdx))
+\replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,pseqLen<E>(seq))),equals(idx,jdx)),value,pseqGet<E>(seq,jdx))) 
+\heuristics(simplify_enlarging)
+Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqConcat (getOfSeqConcat) =========================================
 getOfSeqConcat {
@@ -10676,58 +10871,106 @@ Choices: true}
 -----------------------------------------------------
 == inDomainConcrete (inDomainConcrete) =========================================
 inDomainConcrete {
-\assumes ([]==>[equals(mapUndef,y)]) 
-\find(equals(mapGet(m,x),y)==>)
-\add [inDomain(m,x)]==>[] 
+\assumes ([]==>[equals(mapUndef<V>,value)]) 
+\find(equals(mapGet<K,V>(m,key),value)==>)
+\add [inDomain<K,V>(m,key)]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
 == inDomainOfMapEmpty (inDomainOfMapEmpty) =========================================
 inDomainOfMapEmpty {
-\find(inDomain(mapEmpty,x))
+\find(inDomain<K,V>(mapEmpty<K,V>,key))
+\replacewith(false) 
+\heuristics(concrete)
+Choices: true}
+-----------------------------------------------------
+== inDomainOfMapEmptyEQ (inDomainOfMapEmptyEQ) =========================================
+inDomainOfMapEmptyEQ {
+\assumes ([equals(mapEmpty<K,V>,EQ)]==>[]) 
+\find(inDomain<K,V>(EQ,key))
 \replacewith(false) 
 \heuristics(concrete)
 Choices: true}
 -----------------------------------------------------
 == inDomainOfMapForeach (inDomainOfMapForeach) =========================================
 inDomainOfMapForeach {
-\find(inDomain(mapForeach{v (variable)}(b,y),x))
-\replacewith(and(equals(subst{v (variable)}(cast<alpha>(x),b),TRUE),equals(instance<alpha>(x),TRUE))) 
+\find(inDomain<K,V>(mapForeach<K,V>{kv (variable)}(b,value),key))
+\replacewith(equals(subst{kv (variable)}(key,b),TRUE)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == inDomainOfMapOverride (inDomainOfMapOverride) =========================================
 inDomainOfMapOverride {
-\find(inDomain(mapOverride(m0,m1),x))
-\replacewith(or(inDomain(m0,x),inDomain(m1,x))) 
+\find(inDomain<K,V>(mapOverride<K,V>(m0,m1),key))
+\replacewith(or(inDomain<K,V>(m0,key),inDomain<K,V>(m1,key))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== inDomainOfMapOverrideEQ (inDomainOfMapOverrideEQ) =========================================
+inDomainOfMapOverrideEQ {
+\assumes ([equals(mapOverride<K,V>(m0,m1),EQ)]==>[]) 
+\find(inDomain<K,V>(EQ,key))
+\replacewith(or(inDomain<K,V>(m0,key),inDomain<K,V>(m1,key))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == inDomainOfMapRemove (inDomainOfMapRemove) =========================================
 inDomainOfMapRemove {
-\find(inDomain(mapRemove(m,key),x))
-\replacewith(and(inDomain(m,x),not(equals(x,key)))) 
+\find(inDomain<K,V>(mapRemove<K,V>(m,key),key1))
+\replacewith(and(inDomain<K,V>(m,key1),not(equals(key1,key)))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== inDomainOfMapRemoveEQ (inDomainOfMapRemoveEQ) =========================================
+inDomainOfMapRemoveEQ {
+\assumes ([equals(mapRemove<K,V>(m,key),EQ)]==>[]) 
+\find(inDomain<K,V>(EQ,key1))
+\replacewith(and(inDomain<K,V>(m,key1),not(equals(key1,key)))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == inDomainOfMapSingleton (inDomainOfMapSingleton) =========================================
 inDomainOfMapSingleton {
-\find(inDomain(mapSingleton(x,y),z))
-\replacewith(equals(x,z)) 
+\find(inDomain<K,V>(mapSingleton<K,V>(key,value),key1))
+\replacewith(equals(key,key1)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== inDomainOfMapSingletonEQ (inDomainOfMapSingletonEQ) =========================================
+inDomainOfMapSingletonEQ {
+\assumes ([equals(mapSingleton<K,V>(key,value),EQ)]==>[]) 
+\find(inDomain<K,V>(EQ,key1))
+\replacewith(equals(key,key1)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == inDomainOfMapUpdate (inDomainOfMapUpdate) =========================================
 inDomainOfMapUpdate {
-\find(inDomain(mapUpdate(m,key,value),x))
-\replacewith(or(inDomain(m,x),equals(x,key))) 
+\find(inDomain<K,V>(mapUpdate<K,V>(m,key,value),key1))
+\replacewith(or(inDomain<K,V>(m,key1),equals(key1,key))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
-== inDomainOfSeq2Map (inDomainOfSeq2Map) =========================================
-inDomainOfSeq2Map {
-\find(inDomain(seq2map(s),x))
-\replacewith(and(and(equals(instance<int>(x),TRUE),leq(Z(0(#)),cast<int>(x))),lt(cast<int>(x),seqLen(s)))) 
+== inDomainOfMapUpdateEQ (inDomainOfMapUpdateEQ) =========================================
+inDomainOfMapUpdateEQ {
+\assumes ([equals(mapUpdate<K,V>(m,key,value),EQ)]==>[]) 
+\find(inDomain<K,V>(EQ,key1))
+\replacewith(or(inDomain<K,V>(m,key1),equals(key1,key))) 
+\heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== inDomainOfPSeq2Map (inDomainOfPSeq2Map) =========================================
+inDomainOfPSeq2Map {
+\find(inDomain<int,V>(pseq2map<V>(s),ki))
+\replacewith(and(leq(Z(0(#)),ki),lt(ki,pseqLen<V>(s)))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== inDomainOfPSeq2MapEQ (inDomainOfPSeq2MapEQ) =========================================
+inDomainOfPSeq2MapEQ {
+\assumes ([equals(pseq2map<V>(s),EQ)]==>[]) 
+\find(inDomain<int,V>(EQ,ki))
+\replacewith(and(leq(Z(0(#)),ki),lt(ki,pseqLen<V>(s)))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -11270,6 +11513,40 @@ indexOf {
 \replacewith(ifExThenElse{iv (variable)}(and(and(and(geq(i,Z(0(#))),geq(iv,i)),lt(iv,seqLen(l))),equals(seqGet<int>(l,iv),c)),iv,Z(neglit(1(#))))) 
 \heuristics(stringsExpandDefNormalOp)
 Choices: Strings:on}
+-----------------------------------------------------
+== indexOfPSeqConcatFirst (indexOfPSeqConcatFirst) =========================================
+indexOfPSeqConcatFirst {
+\find(pseqIndexOf<E>(pseqConcat<E>(s1,s2),x))
+\varcond(\notFreeIn(idx (variable), x (E term)), \notFreeIn(idx (variable), s2 (PSeq<E> term)), \notFreeIn(idx (variable), s1 (PSeq<E> term)))
+\add []==>[exists{idx (variable)}(and(and(leq(Z(0(#)),idx),lt(idx,pseqLen<E>(s1))),equals(pseqGet<E>(s1,idx),x)))] ;
+\replacewith(pseqIndexOf<E>(s1,x)) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== indexOfPSeqConcatSecond (indexOfPSeqConcatSecond) =========================================
+indexOfPSeqConcatSecond {
+\find(pseqIndexOf<E>(pseqConcat<E>(s1,s2),x))
+\varcond(\notFreeIn(idx (variable), x (E term)), \notFreeIn(idx (variable), s2 (PSeq<E> term)), \notFreeIn(idx (variable), s1 (PSeq<E> term)))
+\add []==>[and(not(exists{idx (variable)}(and(and(leq(Z(0(#)),idx),lt(idx,pseqLen<E>(s1))),equals(pseqGet<E>(s1,idx),x)))),exists{idx (variable)}(and(and(leq(Z(0(#)),idx),lt(idx,pseqLen<E>(s2))),equals(pseqGet<E>(s2,idx),x))))] ;
+\replacewith(add(pseqIndexOf<E>(s2,x),pseqLen<E>(s1))) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== indexOfPSeqSingleton (indexOfPSeqSingleton) =========================================
+indexOfPSeqSingleton {
+\find(pseqIndexOf<E>(pseqSingleton<E>(x),x))
+\replacewith(Z(0(#))) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== indexOfPSeqSub (indexOfPSeqSub) =========================================
+indexOfPSeqSub {
+\find(pseqIndexOf<E>(pseqSub<E>(s,from,to),x))
+\varcond(\notFreeIn(nx (variable), to (int term)), \notFreeIn(nx (variable), from (int term)), \notFreeIn(nx (variable), x (E term)), \notFreeIn(nx (variable), s (PSeq<E> term)))
+\add []==>[and(and(and(leq(from,pseqIndexOf<E>(s,x)),lt(pseqIndexOf<E>(s,x),to)),leq(Z(0(#)),from)),exists{nx (variable)}(and(and(leq(Z(0(#)),nx),lt(nx,pseqLen<E>(s))),equals(pseqGet<E>(s,nx),x))))] ;
+\replacewith(sub(pseqIndexOf<E>(s,x),from)) 
+
+Choices: sequences:on}
 -----------------------------------------------------
 == indexOfSeqConcatFirst (indexOfSeqConcatFirst) =========================================
 indexOfSeqConcatFirst {
@@ -12015,35 +12292,75 @@ Choices: true}
 -----------------------------------------------------
 == isFiniteOfMapEmpty (isFiniteOfMapEmpty) =========================================
 isFiniteOfMapEmpty {
-\find(isFinite(mapEmpty))
+\find(isFinite<K,V>(mapEmpty<K,V>))
+\replacewith(true) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== isFiniteOfMapEmptyEQ (isFiniteOfMapEmptyEQ) =========================================
+isFiniteOfMapEmptyEQ {
+\assumes ([equals(mapEmpty<K,V>,EQ)]==>[]) 
+\find(isFinite<K,V>(EQ))
 \replacewith(true) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == isFiniteOfMapRemove (isFiniteOfMapRemove) =========================================
 isFiniteOfMapRemove {
-\find(isFinite(mapRemove(m,key)))
-\replacewith(isFinite(m)) 
+\find(isFinite<K,V>(mapRemove<K,V>(m,key)))
+\replacewith(isFinite<K,V>(m)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== isFiniteOfMapRemoveEQ (isFiniteOfMapRemoveEQ) =========================================
+isFiniteOfMapRemoveEQ {
+\assumes ([equals(mapRemove<K,V>(m,key),EQ)]==>[]) 
+\find(isFinite<K,V>(EQ))
+\replacewith(isFinite<K,V>(m)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == isFiniteOfMapSingleton (isFiniteOfMapSingleton) =========================================
 isFiniteOfMapSingleton {
-\find(isFinite(mapSingleton(key,value)))
+\find(isFinite<K,V>(mapSingleton<K,V>(key,value)))
+\replacewith(true) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== isFiniteOfMapSingletonEQ (isFiniteOfMapSingletonEQ) =========================================
+isFiniteOfMapSingletonEQ {
+\assumes ([equals(mapSingleton<K,V>(key,value),EQ)]==>[]) 
+\find(isFinite<K,V>(EQ))
 \replacewith(true) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == isFiniteOfMapUpdate (isFiniteOfMapUpdate) =========================================
 isFiniteOfMapUpdate {
-\find(isFinite(mapUpdate(m,key,value)))
-\replacewith(isFinite(m)) 
+\find(isFinite<K,V>(mapUpdate<K,V>(m,key,value)))
+\replacewith(isFinite<K,V>(m)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
-== isFiniteOfSeq2Map (isFiniteOfSeq2Map) =========================================
-isFiniteOfSeq2Map {
-\find(isFinite(seq2map(s)))
+== isFiniteOfMapUpdateEQ (isFiniteOfMapUpdateEQ) =========================================
+isFiniteOfMapUpdateEQ {
+\assumes ([equals(mapUpdate<K,V>(m,key,value),EQ)]==>[]) 
+\find(isFinite<K,V>(EQ))
+\replacewith(isFinite<K,V>(m)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== isFiniteOfPSeq2Map (isFiniteOfPSeq2Map) =========================================
+isFiniteOfPSeq2Map {
+\find(isFinite<int,V>(pseq2map<V>(s)))
+\replacewith(true) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== isFiniteOfPSeq2MapEQ (isFiniteOfPSeq2MapEQ) =========================================
+isFiniteOfPSeq2MapEQ {
+\assumes ([equals(pseq2map<V>(s),EQ)]==>[]) 
+\find(isFinite<int,V>(EQ))
 \replacewith(true) 
 \heuristics(simplify)
 Choices: true}
@@ -12454,6 +12771,103 @@ lenOfArray2seq {
 \find(seqLen(array2seq(h,a)))
 \replacewith(length(a)) 
 
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqConcat (lenOfPSeqConcat) =========================================
+lenOfPSeqConcat {
+\find(pseqLen<E>(pseqConcat<E>(seq,seq2)))
+\replacewith(add(pseqLen<E>(seq),pseqLen<E>(seq2))) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqConcatEQ (lenOfPSeqConcatEQ) =========================================
+lenOfPSeqConcatEQ {
+\assumes ([equals(pseqConcat<E>(seq,seq2),EQ)]==>[]) 
+\find(pseqLen<E>(EQ))
+\replacewith(add(pseqLen<E>(seq),pseqLen<E>(seq2))) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqDef (lenOfPSeqDef) =========================================
+lenOfPSeqDef {
+\find(pseqLen<E>(pseqDef<E>{uSub (variable)}(from,to,t)))
+\replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqDefEQ (lenOfSeqDef) =========================================
+lenOfPSeqDefEQ {
+\assumes ([equals(pseqDef<E>{uSub (variable)}(from,to,t),EQ)]==>[]) 
+\find(pseqLen<E>(EQ))
+\replacewith(if-then-else(leq(from,to),sub(to,from),Z(0(#)))) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqEmpty (lenOfPSeqEmpty) =========================================
+lenOfPSeqEmpty {
+\find(pseqLen<E>(pseqEmpty<E>))
+\replacewith(Z(0(#))) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqEmptyEQ (lenOfPSeqEmptyEQ) =========================================
+lenOfPSeqEmptyEQ {
+\assumes ([equals(pseqEmpty<E>,EQ)]==>[]) 
+\find(pseqLen<E>(EQ))
+\replacewith(Z(0(#))) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqReverse (lenOfPSeqReverse) =========================================
+lenOfPSeqReverse {
+\find(pseqLen<E>(pseqReverse<E>(seq)))
+\replacewith(pseqLen<E>(seq)) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqReverseEQ (lenOfPSeqReverseEQ) =========================================
+lenOfPSeqReverseEQ {
+\assumes ([equals(pseqReverse<E>(seq),EQ)]==>[]) 
+\find(pseqLen<E>(EQ))
+\replacewith(pseqLen<E>(seq)) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqSingleton (lenOfPSeqSingleton) =========================================
+lenOfPSeqSingleton {
+\find(pseqLen<E>(pseqSingleton<E>(x)))
+\replacewith(Z(1(#))) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqSingletonEQ (lenOfPSeqSingletonEQ) =========================================
+lenOfPSeqSingletonEQ {
+\assumes ([equals(pseqSingleton<E>(x),EQ)]==>[]) 
+\find(pseqLen<E>(EQ))
+\replacewith(Z(1(#))) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqSub (lenOfPSeqSub) =========================================
+lenOfPSeqSub {
+\find(pseqLen<E>(pseqSub<E>(seq,from,to)))
+\replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqSubEQ (lenOfPSeqSubEQ) =========================================
+lenOfPSeqSubEQ {
+\assumes ([equals(pseqSub<E>(seq,from,to),EQ)]==>[]) 
+\find(pseqLen<E>(EQ))
+\replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== lenOfPSeqUpd (lenOfPSeqUpd) =========================================
+lenOfPSeqUpd {
+\find(pseqLen<E>(pseqUpd<E>(seq,idx,value)))
+\replacewith(pseqLen<E>(seq)) 
+\heuristics(simplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqConcat (lenOfSeqConcat) =========================================
@@ -13246,43 +13660,51 @@ Choices: true}
 == mapEqualityRight (mapEqualityRight) =========================================
 mapEqualityRight {
 \find(==>equals(m0,m1))
-\varcond(\notFreeIn(vy (variable), m1 (Map term)), \notFreeIn(vy (variable), m0 (Map term)))
-\replacewith([]==>[all{vy (variable)}(and(equiv(inDomain(m0,vy),inDomain(m1,vy)),imp(inDomain(m0,vy),equals(mapGet(m0,vy),mapGet(m1,vy)))))]) 
+\varcond(\notFreeIn(kv (variable), m1 (Map<K,V> term)), \notFreeIn(kv (variable), m0 (Map<K,V> term)))
+\replacewith([]==>[all{kv (variable)}(and(equiv(inDomain<K,V>(m0,kv),inDomain<K,V>(m1,kv)),imp(inDomain<K,V>(m0,kv),equals(mapGet<K,V>(m0,kv),mapGet<K,V>(m1,kv)))))]) 
 \heuristics(simplify_enlarging)
+Choices: true}
+-----------------------------------------------------
+== mapGetNotInDomain (mapGetNotInDomain) =========================================
+mapGetNotInDomain {
+\assumes ([]==>[inDomain<K,V>(m,key)]) 
+\find(mapGet<K,V>(m,key))
+\replacewith(mapUndef<V>) 
+\heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == mapRemoveUnchanged (mapRemoveUnchanged) =========================================
 mapRemoveUnchanged {
-\find(equals(m,mapRemove(m,key)))
-\replacewith(not(inDomain(m,key))) 
+\find(equals(m,mapRemove<K,V>(m,key)))
+\replacewith(not(inDomain<K,V>(m,key))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == mapRemoveUnchanged2 (mapRemoveUnchanged2) =========================================
 mapRemoveUnchanged2 {
-\find(equals(mapRemove(m,key),m))
-\replacewith(not(inDomain(m,key))) 
+\find(equals(mapRemove<K,V>(m,key),m))
+\replacewith(not(inDomain<K,V>(m,key))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == mapSizeNotNegativeForFiniteMaps (mapSizeNotNegativeForFiniteMaps) =========================================
 mapSizeNotNegativeForFiniteMaps {
-\find(mapSize(m))
-\add [imp(isFinite(m),geq(mapSize(m),Z(0(#))))]==>[] 
+\find(mapSize<K,V>(m))
+\add [imp(isFinite<K,V>(m),geq(mapSize<K,V>(m),Z(0(#))))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
 == mapUpdateUnchanged (mapUpdateUnchanged) =========================================
 mapUpdateUnchanged {
-\find(equals(m,mapUpdate(m,key,value)))
-\replacewith(and(inDomain(m,key),equals(mapGet(m,key),value))) 
+\find(equals(m,mapUpdate<K,V>(m,key,value)))
+\replacewith(and(inDomain<K,V>(m,key),equals(mapGet<K,V>(m,key),value))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
 == mapUpdateUnchanged2 (mapUpdateUnchanged2) =========================================
 mapUpdateUnchanged2 {
-\find(equals(mapUpdate(m,key,value),m))
-\replacewith(and(inDomain(m,key),equals(mapGet(m,key),value))) 
+\find(equals(mapUpdate<K,V>(m,key,value),m))
+\replacewith(and(inDomain<K,V>(m,key),equals(mapGet<K,V>(m,key),value))) 
 \heuristics(simplify_enlarging)
 Choices: true}
 -----------------------------------------------------
@@ -14243,13 +14665,6 @@ nonNullZero {
 \replacewith(not(equals(o,null))) 
 \heuristics(concrete)
 Choices: programRules:Java}
------------------------------------------------------
-== notInDomain (notInDomain) =========================================
-notInDomain {
-\find(==>inDomain(m,x))
-\add [equals(mapGet(m,x),mapUndef)]==>[] 
-\heuristics(inReachableStateImplication)
-Choices: true}
 -----------------------------------------------------
 == notLeft (notLeft) =========================================
 notLeft {
@@ -15315,6 +15730,155 @@ prod_one {
 \replacewith(Z(1(#))) 
 \heuristics(concrete)
 Choices: integerSimplificationRules:full}
+-----------------------------------------------------
+== pseqConcatWithPSeqEmpty1 (seqConcatWithEmpty) =========================================
+pseqConcatWithPSeqEmpty1 {
+\find(pseqConcat<E>(seq,pseqEmpty<E>))
+\replacewith(seq) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqConcatWithPSeqEmpty2 (seqConcatWithEmpty) =========================================
+pseqConcatWithPSeqEmpty2 {
+\find(pseqConcat<E>(pseqEmpty<E>,seq))
+\replacewith(seq) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDefOfEmpty (pseqDefOfEmpty) =========================================
+pseqDefOfEmpty {
+\find(pseqEmpty<E>)
+\varcond(\notFreeIn(uSub (variable), te (E term)))
+\replacewith(pseqDef<E>{uSub (variable)}(Z(0(#)),Z(0(#)),te)) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDefOfPSeq (pseqDefOfPSeq) =========================================
+pseqDefOfPSeq {
+\find(pseqDef<E>{u (variable)}(Z(0(#)),x,pseqGet<E>(s,u)))
+\varcond(\notFreeIn(v (variable), s (PSeq<E> term)), \notFreeIn(v (variable), x (int term)), \notFreeIn(u (variable), s (PSeq<E> term)), \notFreeIn(u (variable), x (int term)))
+\replacewith(if-then-else(equals(pseqLen<E>(s),x),s,if-then-else(gt(pseqLen<E>(s),x),pseqSub<E>(s,Z(0(#)),x),pseqConcat<E>(s,pseqDef<E>{v (variable)}(pseqLen<E>(s),x,pseqGetOutside<E>))))) 
+\heuristics(simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDef_empty (pseqDef_empty) =========================================
+pseqDef_empty {
+\find(pseqDef<E>{uSub (variable)}(from,idx,t))
+\varcond(\notFreeIn(uSub (variable), idx (int term)), \notFreeIn(uSub (variable), from (int term)))
+\replacewith(pseqEmpty<E>) ;
+\add []==>[leq(idx,from)] 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDef_induction_lower (pseqDef_induction_lower) =========================================
+pseqDef_induction_lower {
+\find(pseqDef<E>{uSub (variable)}(from,to,t))
+\varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
+\replacewith(pseqConcat<E>(if-then-else(lt(from,to),pseqSingleton<E>(subst{uSub (variable)}(from,t)),pseqEmpty<E>),pseqDef<E>{uSub (variable)}(add(from,Z(1(#))),to,t))) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDef_induction_lower_concrete (pseqDef_induction_lower_concrete) =========================================
+pseqDef_induction_lower_concrete {
+\find(pseqDef<E>{uSub (variable)}(add(Z(neglit(1(#))),from),to,t))
+\varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
+\replacewith(pseqConcat<E>(if-then-else(lt(add(Z(neglit(1(#))),from),to),pseqSingleton<E>(subst{uSub (variable)}(add(Z(neglit(1(#))),from),t)),pseqEmpty<E>),pseqDef<E>{uSub (variable)}(from,to,t))) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDef_induction_upper (pseqDef_induction_upper) =========================================
+pseqDef_induction_upper {
+\find(pseqDef<E>{uSub (variable)}(from,to,t))
+\varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
+\replacewith(pseqConcat<E>(pseqDef<E>{uSub (variable)}(from,sub(to,Z(1(#))),t),if-then-else(lt(from,to),pseqSingleton<E>(subst{uSub (variable)}(sub(to,Z(1(#))),t)),pseqEmpty<E>))) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDef_induction_upper_concrete (pseqDef_induction_upper_concrete) =========================================
+pseqDef_induction_upper_concrete {
+\find(pseqDef<E>{uSub (variable)}(from,add(Z(1(#)),to),t))
+\varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
+\replacewith(pseqConcat<E>(pseqDef<E>{uSub (variable)}(from,to,t),if-then-else(leq(from,to),pseqSingleton<E>(subst{uSub (variable)}(to,t)),pseqEmpty<E>))) 
+\heuristics(simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDef_lower_equals_upper (pseqDef_lower_equals_upper) =========================================
+pseqDef_lower_equals_upper {
+\find(pseqDef<E>{uSub (variable)}(idx,idx,t))
+\varcond(\notFreeIn(uSub (variable), idx (int term)))
+\replacewith(pseqEmpty<E>) 
+\heuristics(simplify)
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDef_one_summand (pseqDef_one_summand) =========================================
+pseqDef_one_summand {
+\find(pseqDef<E>{uSub (variable)}(from,idx,t))
+\varcond(\notFreeIn(uSub (variable), idx (int term)), \notFreeIn(uSub (variable), from (int term)))
+\replacewith(if-then-else(equals(add(from,Z(1(#))),idx),pseqSingleton<E>(subst{uSub (variable)}(from,t)),pseqDef<E>{uSub (variable)}(from,idx,t))) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDef_split (pseqDef_split) =========================================
+pseqDef_split {
+\find(pseqDef<E>{uSub (variable)}(from,to,t))
+\varcond(\notFreeIn(uSub1 (variable), t (E term)), \notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), idx (int term)), \notFreeIn(uSub (variable), from (int term)), \notFreeIn(uSub1 (variable), to (int term)), \notFreeIn(uSub1 (variable), idx (int term)), \notFreeIn(uSub1 (variable), from (int term)))
+\replacewith(if-then-else(and(leq(from,idx),lt(idx,to)),pseqConcat<E>(pseqDef<E>{uSub (variable)}(from,idx,t),pseqDef<E>{uSub1 (variable)}(idx,to,subst{uSub (variable)}(uSub1,t))),pseqDef<E>{uSub (variable)}(from,to,t))) 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqDef_split_in_three (pseqDef_split_in_three) =========================================
+pseqDef_split_in_three {
+\find(pseqDef<E>{uSub (variable)}(from,to,t))
+\varcond(\notFreeIn(uSub1 (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)), \notFreeIn(uSub1 (variable), idx (int term)), \notFreeIn(uSub1 (variable), t (E term)), \notFreeIn(uSub (variable), idx (int term)))
+\replacewith(pseqConcat<E>(pseqDef<E>{uSub (variable)}(from,idx,t),pseqConcat<E>(pseqSingleton<E>(subst{uSub (variable)}(idx,t)),pseqDef<E>{uSub1 (variable)}(add(idx,Z(1(#))),to,subst{uSub (variable)}(uSub1,t))))) ;
+\add []==>[and(leq(from,idx),lt(idx,to))] 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqIndexOf (pseqIndexOf) =========================================
+pseqIndexOf {
+\find(pseqIndexOf<E>(s,t))
+\varcond(\notFreeIn(m (variable), t (E term)), \notFreeIn(m (variable), s (PSeq<E> term)), \notFreeIn(n (variable), t (E term)), \notFreeIn(n (variable), s (PSeq<E> term)))
+\add [imp(exists{n (variable)}(and(and(leq(Z(0(#)),n),lt(n,pseqLen<E>(s))),equals(pseqGet<E>(s,n),t))),and(and(and(leq(Z(0(#)),pseqIndexOf<E>(s,t)),lt(pseqIndexOf<E>(s,t),pseqLen<E>(s))),equals(pseqGet<E>(s,pseqIndexOf<E>(s,t)),t)),all{m (variable)}(imp(and(leq(Z(0(#)),m),lt(m,pseqIndexOf<E>(s,t))),not(equals(pseqGet<E>(s,m),t))))))]==>[] 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqLenNonNegative (pseqLenNonNegative) =========================================
+pseqLenNonNegative {
+\find(pseqLen<E>(seq))
+\add [leq(Z(0(#)),pseqLen<E>(seq))]==>[] 
+\heuristics(inReachableStateImplication)
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqOutsideValue (pseqOutsideValue) =========================================
+pseqOutsideValue {
+\find(pseqGetOutside<E>)
+\add [all{s (variable)}(all{iv (variable)}(imp(or(lt(iv,Z(0(#))),leq(pseqLen<E>(s),iv)),equals(pseqGet<E>(s,iv),pseqGetOutside<E>))))]==>[] 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqReverseOfPSeqEmpty (pseqReverseOfPSeqEmpty) =========================================
+pseqReverseOfPSeqEmpty {
+\find(pseqReverse<E>(pseqEmpty<E>))
+\replacewith(pseqEmpty<E>) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqSelfDefinition (pseqSelfDefinition) =========================================
+pseqSelfDefinition {
+\find(seq)
+\add [all{s (variable)}(equals(s,pseqDef<E>{u (variable)}(Z(0(#)),pseqLen<E>(s),pseqGet<E>(s,u))))]==>[] 
+
+Choices: sequences:on}
+-----------------------------------------------------
+== pseqSelfDefinitionEQ2 (seqSelfDefinition) =========================================
+pseqSelfDefinitionEQ2 {
+\assumes ([equals(pseqLen<E>(s),x)]==>[]) 
+\find(pseqDef<E>{u (variable)}(Z(0(#)),x,pseqGet<E>(s,u)))
+\varcond(\notFreeIn(u (variable), s (PSeq<E> term)), \notFreeIn(u (variable), x (int term)))
+\replacewith(s) 
+\heuristics(simplify)
+Choices: sequences:on}
 -----------------------------------------------------
 == pullOut (pullOut) =========================================
 pullOut {
@@ -16997,36 +17561,60 @@ Choices: programRules:Java}
 -----------------------------------------------------
 == sizeOfMapEmpty (sizeOfMapEmpty) =========================================
 sizeOfMapEmpty {
-\find(mapSize(mapEmpty))
+\find(mapSize<K,V>(mapEmpty<K,V>))
+\replacewith(Z(0(#))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== sizeOfMapEmptyEQ (sizeOfMapEmptyEQ) =========================================
+sizeOfMapEmptyEQ {
+\assumes ([equals(mapEmpty<K,V>,EQ)]==>[]) 
+\find(mapSize<K,V>(EQ))
 \replacewith(Z(0(#))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == sizeOfMapRemove (sizeOfMapRemove) =========================================
 sizeOfMapRemove {
-\find(mapSize(mapRemove(m,key)))
-\add [imp(isFinite(m),equals(mapSize(mapRemove(m,key)),if-then-else(inDomain(m,key),sub(mapSize(m),Z(1(#))),mapSize(m))))]==>[] 
+\find(mapSize<K,V>(mapRemove<K,V>(m,key)))
+\add [imp(isFinite<K,V>(m),equals(mapSize<K,V>(mapRemove<K,V>(m,key)),if-then-else(inDomain<K,V>(m,key),sub(mapSize<K,V>(m),Z(1(#))),mapSize<K,V>(m))))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
 == sizeOfMapSingleton (sizeOfMapSingleton) =========================================
 sizeOfMapSingleton {
-\find(mapSize(mapSingleton(key,value)))
+\find(mapSize<K,V>(mapSingleton<K,V>(key,value)))
+\replacewith(Z(1(#))) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== sizeOfMapSingletonEQ (sizeOfMapSingletonEQ) =========================================
+sizeOfMapSingletonEQ {
+\assumes ([equals(mapSingleton<K,V>(key,value),EQ)]==>[]) 
+\find(mapSize<K,V>(EQ))
 \replacewith(Z(1(#))) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
 == sizeOfMapUpdate (sizeOfMapUpdate) =========================================
 sizeOfMapUpdate {
-\find(mapSize(mapUpdate(m,key,value)))
-\add [imp(isFinite(m),equals(mapSize(mapUpdate(m,key,value)),if-then-else(inDomain(m,key),mapSize(m),add(mapSize(m),Z(1(#))))))]==>[] 
+\find(mapSize<K,V>(mapUpdate<K,V>(m,key,value)))
+\add [imp(isFinite<K,V>(m),equals(mapSize<K,V>(mapUpdate<K,V>(m,key,value)),if-then-else(inDomain<K,V>(m,key),mapSize<K,V>(m),add(mapSize<K,V>(m),Z(1(#))))))]==>[] 
 \heuristics(inReachableStateImplication)
 Choices: true}
 -----------------------------------------------------
-== sizeOfSeq2Map (sizeOfSeq2Map) =========================================
-sizeOfSeq2Map {
-\find(mapSize(seq2map(s)))
-\replacewith(seqLen(s)) 
+== sizeOfPSeq2Map (sizeOfPSeq2Map) =========================================
+sizeOfPSeq2Map {
+\find(mapSize<int,V>(pseq2map<V>(s)))
+\replacewith(pseqLen<V>(s)) 
+\heuristics(simplify)
+Choices: true}
+-----------------------------------------------------
+== sizeOfPSeq2MapEQ (sizeOfPSeq2MapEQ) =========================================
+sizeOfPSeq2MapEQ {
+\assumes ([equals(pseq2map<V>(s),EQ)]==>[]) 
+\find(mapSize<int,V>(EQ))
+\replacewith(pseqLen<V>(s)) 
 \heuristics(simplify)
 Choices: true}
 -----------------------------------------------------
@@ -17312,6 +17900,125 @@ sub {
 \replacewith(add(i,neg(i0))) 
 \heuristics(simplify_int)
 Choices: true}
+-----------------------------------------------------
+== subPSeqComplete (subPSeqComplete) =========================================
+subPSeqComplete {
+\find(pseqSub<E>(seq,Z(0(#)),pseqLen<E>(seq)))
+\replacewith(seq) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqCompletePSeqDef (subPSeqCompletePSeqDef) =========================================
+subPSeqCompletePSeqDef {
+\find(pseqSub<E>(pseqDef<E>{i (variable)}(Z(0(#)),u,a),Z(0(#)),u))
+\replacewith(pseqDef<E>{i (variable)}(Z(0(#)),u,a)) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqCompletePSeqDefEQ (subPSeqCompletePSeqDefEQ) =========================================
+subPSeqCompletePSeqDefEQ {
+\assumes ([equals(pseqDef<E>{i (variable)}(Z(0(#)),u,a),EQ)]==>[]) 
+\find(pseqSub<E>(EQ,Z(0(#)),u))
+\replacewith(pseqDef<E>{i (variable)}(Z(0(#)),u,a)) 
+\heuristics(no_self_application, concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqConcat (subPSeqConcat) =========================================
+subPSeqConcat {
+\find(pseqSub<E>(pseqConcat<E>(s1,s2),l,u))
+\replacewith(pseqConcat<E>(pseqSub<E>(s1,l,if-then-else(lt(pseqLen<E>(s1),u),pseqLen<E>(s1),u)),pseqSub<E>(s2,if-then-else(lt(l,pseqLen<E>(s1)),Z(0(#)),sub(l,pseqLen<E>(s1))),sub(u,pseqLen<E>(s1))))) 
+\heuristics(simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqConcatEQ (subPSeqConcatEQ) =========================================
+subPSeqConcatEQ {
+\assumes ([equals(pseqConcat<E>(s1,s2),EQ)]==>[]) 
+\find(pseqSub<E>(EQ,l,u))
+\replacewith(pseqConcat<E>(pseqSub<E>(s1,l,if-then-else(lt(pseqLen<E>(s1),u),pseqLen<E>(s1),u)),pseqSub<E>(s2,if-then-else(lt(l,pseqLen<E>(s1)),Z(0(#)),sub(l,pseqLen<E>(s1))),sub(u,pseqLen<E>(s1))))) 
+\heuristics(no_self_application, simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqEmpty (subPSeqEmpty) =========================================
+subPSeqEmpty {
+\find(pseqSub<E>(seq,i,i))
+\replacewith(pseqEmpty<E>) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqHeadPSeqDef (subPSeqHeadPSeqDef) =========================================
+subPSeqHeadPSeqDef {
+\find(pseqSub<E>(pseqConcat<E>(pseqDef<E>{i (variable)}(Z(0(#)),u,a),seq),Z(0(#)),u))
+\replacewith(pseqDef<E>{i (variable)}(Z(0(#)),u,a)) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqHeadPSeqDefEQ (subPSeqHeadPSeqDefEQ) =========================================
+subPSeqHeadPSeqDefEQ {
+\assumes ([equals(pseqDef<E>{i (variable)}(Z(0(#)),u,a),EQ)]==>[]) 
+\find(pseqSub<E>(pseqConcat<E>(EQ,seq),Z(0(#)),u))
+\replacewith(pseqDef<E>{i (variable)}(Z(0(#)),u,a)) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqSingleton (subPSeqSingleton) =========================================
+subPSeqSingleton {
+\find(pseqSub<E>(pseqSingleton<E>(x),Z(0(#)),Z(1(#))))
+\replacewith(pseqSingleton<E>(x)) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqSingleton2 (subPSeqSingleton2) =========================================
+subPSeqSingleton2 {
+\find(pseqSub<E>(pseqSingleton<E>(x),l,u))
+\replacewith(pseqConcat<E>(pseqSub<E>(pseqEmpty<E>,if-then-else(lt(l,Z(0(#))),l,Z(0(#))),if-then-else(lt(u,Z(0(#))),u,Z(0(#)))),pseqConcat<E>(if-then-else(and(leq(l,Z(0(#))),geq(u,Z(1(#)))),pseqSingleton<E>(x),pseqEmpty<E>),pseqSub<E>(pseqEmpty<E>,if-then-else(gt(l,Z(0(#))),l,Z(1(#))),if-then-else(gt(u,Z(0(#))),u,Z(1(#))))))) 
+\heuristics(simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqSingleton2EQ (subPSeqSingleton2EQ) =========================================
+subPSeqSingleton2EQ {
+\assumes ([equals(pseqSingleton<E>(x),EQ)]==>[]) 
+\find(pseqSub<E>(EQ,l,u))
+\replacewith(pseqConcat<E>(pseqSub<E>(pseqEmpty<E>,if-then-else(lt(l,Z(0(#))),l,Z(0(#))),if-then-else(lt(u,Z(0(#))),u,Z(0(#)))),pseqConcat<E>(if-then-else(and(leq(l,Z(0(#))),geq(u,Z(1(#)))),pseqSingleton<E>(x),pseqEmpty<E>),pseqSub<E>(pseqEmpty<E>,if-then-else(gt(l,Z(0(#))),l,Z(1(#))),if-then-else(gt(u,Z(0(#))),u,Z(1(#))))))) 
+\heuristics(no_self_application, simplify_enlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqSingletonEQ (subPSeqSingletonEQ) =========================================
+subPSeqSingletonEQ {
+\assumes ([equals(pseqSingleton<E>(x),EQ)]==>[]) 
+\find(pseqSub<E>(EQ,Z(0(#)),Z(1(#))))
+\replacewith(pseqSingleton<E>(x)) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqTailL (subSeqTail) =========================================
+subPSeqTailL {
+\find(pseqSub<E>(pseqConcat<E>(pseqSingleton<E>(x),seq),Z(1(#)),add(Z(1(#)),pseqLen<E>(seq))))
+\replacewith(seq) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqTailLEQ (subSeqTailEQ) =========================================
+subPSeqTailLEQ {
+\assumes ([equals(pseqLen<E>(seq),EQ)]==>[]) 
+\find(pseqSub<E>(pseqConcat<E>(pseqSingleton<E>(x),seq),Z(1(#)),add(Z(1(#)),EQ)))
+\replacewith(seq) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqTailR (subSeqTail) =========================================
+subPSeqTailR {
+\find(pseqSub<E>(pseqConcat<E>(pseqSingleton<E>(x),seq),Z(1(#)),add(pseqLen<E>(seq),Z(1(#)))))
+\replacewith(seq) 
+\heuristics(concrete)
+Choices: sequences:on}
+-----------------------------------------------------
+== subPSeqTailREQ (subSeqTailEQ) =========================================
+subPSeqTailREQ {
+\assumes ([equals(pseqLen<E>(seq),EQ)]==>[]) 
+\find(pseqSub<E>(pseqConcat<E>(pseqSingleton<E>(x),seq),Z(1(#)),add(EQ,Z(1(#)))))
+\replacewith(seq) 
+\heuristics(concrete)
+Choices: sequences:on}
 -----------------------------------------------------
 == subSeqComplete (subSeqComplete) =========================================
 subSeqComplete {
