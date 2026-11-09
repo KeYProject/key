@@ -1,7 +1,7 @@
 class MySubclass extends MyClass {
 
     Object o;
-    //@ represents footprint = this.*, o.*;
+    //@ represents footprint = \locset(this.*, o.*);
 
     int add27(int i) {
         return attr = 27 + i;

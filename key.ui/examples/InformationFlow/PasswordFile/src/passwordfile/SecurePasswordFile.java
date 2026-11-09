@@ -10,7 +10,7 @@ class SecurePasswordFile {
 
     /*@ public final model \locset footprint;
       @ represents footprint =
-      @     \locset(names, passwords), names[*], passwords[*];
+      @     \locset(\locset(names, passwords), names[*], passwords[*]);
       @*/
 
     /*@ model int userIndex;
