@@ -53,7 +53,7 @@ JMLtk front-end shipped in PR #3997.
 
 | # | Construct | Example | Fixtures | Status at HEAD |
 |---|---|---|---|---|
-| 1 | comment-form `merge_point` (`merge_proc`/`merge_params`) | `//@ merge_point;` | `testcase/merge/A.java`, `Gcd.java` | ✔ RESOLVED (fallback; 1.2.1 typed `JmlMergePointStmt` handled at `53dcefd914`) |
+| 1 | comment-form `merge_point` — legacy `merge_proc`/`merge_params` **and** JMLtk 1.2.1 `\by`/`\lattice`/`\predicate` | `//@ merge_point \by "…" \lattice conjunctive \predicate (int x) : …;` | `testcase/merge/{A,Gcd}.java`, `testcase/merge/newsyntax/MergeNewSyntax.java` | ✔ RESOLVED (legacy → leftover fallback; 1.2.1 syntax → typed `JmlMergePointStmt`, `53dcefd914`, covered by `MergePointJmltkSyntaxTest`) |
 | 2 | `\by {…}` assertion-proof scripts / `obtain` | `/*@ assert x > 2 \by {…} */` | `scripts/jml/*.java`, `exceptional/AssertProofScript.java` | ✔ RESOLVED (fallback) |
 | 3 | `\seq(0)` inside a model-method body | `… : \seq_concat(b(n-1), \seq(0));` | `nparser/fix3452/fix/Issue3452Fixture.java` | ✔ RESOLVED — ⚠ was mis-attributed to JMLtk |
 | 4 | comma-separated store-ref `represents` | `//@ represents footprint = this.*, o.*;` | `key.ui/examples/heap/simple/src/MySubclass.java`, `heap/list/src/ArrayList.java` | ✘ OPEN (4 load fails) |
@@ -84,27 +84,63 @@ JMLtk front-end shipped in PR #3997.
 //@ merge_proc "MergeByPredicateAbstraction"
 //@ merge_params {conjunctive: (int x) -> {x >= 0, (x == \old(b) || x == -\old(b))}};
 ```
-- Fixtures: `key.core/src/test/resources/testcase/merge/A.java:17`, `Gcd.java:38-71`.
+- Fixtures: `key.core/src/test/resources/testcase/merge/A.java:17`,
+  `Gcd.java:38-71` (legacy form); `testcase/merge/newsyntax/MergeNewSyntax.java`
+  (JMLtk 1.2.1 form).
 - **Before:** KeY's `PreParser` produced `TextualJMLMergePointDecl` → merge contracts.
-- **After (JMLtk):** the comment form does not exist in JMLtk's grammar at all —
-  only the raw Java statement `merge_point(expr);` (`KeyMergePointStmt`). See
-  `JML_MAPPING.md` §Part D.1.
-- **Status:** both forms now work. The raw `KeyMergePointStmt` is translated back
-  to KeY's `MergePointStatement` in `JP2KeYConverter`, and leftover unhandled
-  `//@` comments are re-parsed with KeY's `JmlParser` and attached via
+- **After (JMLtk 1.1.0):** the comment form does not exist in JMLtk's grammar at
+  all — only the raw Java statement `merge_point(expr);` (`KeyMergePointStmt`).
+  See `JML_MAPPING.md` §Part D.1.
+- **Status (1.1.0):** both forms work. The raw `KeyMergePointStmt` is translated
+  back to KeY's `MergePointStatement` in `JP2KeYConverter`, and leftover
+  unhandled `//@` comments are re-parsed with KeY's `JmlParser` and attached via
   `MarkerStatementHelper.KEY_JML_FALLBACK` (commit `251f945131`).
   Measured (Appendix A at `8fe1be5b6c`): `MergeRuleTests` (12) and
   `PredicateAbstractionLatticeTests` (3) green; `MtMergePointTest` (1) and
   `TestTacletEquality` (2137) were green at the original measurement.
-- **JMLtk 1.2.1 (commit `53dcefd914`):** the comment form is now parsed by
-  JMLtk into a *typed* `JmlMergePointStmt` (`com.github.javaparser.ast.jml.stmt`,
-  new in 1.2.1) instead of remaining an unparsed leftover — so the fallback path
-  no longer sees it. The converter now has a `visit(JmlMergePointStmt)` (temp
-  boolean location var, like the fallback) and the merge *contract* is re-derived
-  by re-serializing the node's `merge_proc`/`merge_params` metadata to the
-  textual `merge_point` statement (`JMLSpecFactory#createJMLMergeContracts`).
-  Measured at `53dcefd914`: `MergeRuleTests` (12) and
-  `PredicateAbstractionLatticeTests` (3) green.
+- **JMLtk 1.2.1 (commit `53dcefd914`) — typed node, *different syntax*:**
+  JMLtk now parses a comment-form merge point into a *typed*
+  `JmlMergePointStmt` (`com.github.javaparser.ast.jml.stmt`, new in 1.2.1) —
+  but the syntax is **not** the legacy KeY `merge_proc`/`merge_params` form.
+  The 1.2.1 JML grammar (javacc `JmlMergePoint()`) accepts only:
+
+  ```java
+  //@ merge_point;
+  //@ merge_point \by MergeByIfThenElse;                       // string literal or plain identifier
+  //@ merge_point \by "MergeByPredicateAbstraction" \lattice conjunctive
+  //         \predicate (int x) : x >= 0, x == \old(b) || x == -\old(b);
+  ```
+
+  i.e. `merge_point` followed by the options `\by <name>`, `\lattice <name>`
+  and `\predicate (T v) : p1, p2, …`, each optional and in exactly that order;
+  `\by`/`\lattice` values may be a string literal or a plain identifier
+  (normalized to `StringLiteralExpr`). The node exposes `by`, `lattice`,
+  `predicateVariable`, `predicates`. **The legacy multi-line
+  `//@ merge_point` + `//@ merge_proc "…"` + `//@ merge_params {…};` form is
+  *not* parsed by JMLtk** (JMLtk's own `FullExamplesTest` rewrites KeY's
+  `firstTouch/11-StateMerging/Gcd.java` from it to the new form); it remains an
+  unparsed leftover handled by the `KEY_JML_FALLBACK` re-parse. So at HEAD both
+  comment forms work through different paths:
+  - *new 1.2.1 syntax* → typed `JmlMergePointStmt` →
+    `JP2KeYConverter.visit(JmlMergePointStmt)` (temp boolean location var) +
+    `JMLSpecFactory#createJMLMergeContracts(JmlMergePointStmt)`, which
+    re-serializes the node's `by`/`lattice`/`predicateVariable`/`predicates`
+    to the **textual legacy form** `merge_point merge_proc "X" merge_params
+    {L: (T v) -> {p1, p2}};` and re-parses it with KeY's `JmlParser`
+    (`merge_point_statement`), reusing the shared translation.
+  - *legacy syntax* → leftover `JmlDocStmt` → `KEY_JML_FALLBACK` re-parse →
+    `createJMLMergeContracts(Merge_point_statementContext)`.
+  A bare `merge_point;` (no options) is parsed typed in both versions.
+- **Measured at HEAD:** `MergeRuleTests` (12) and
+  `PredicateAbstractionLatticeTests` (3) green (legacy form, via fallback);
+  `MergePointJmltkSyntaxTest` (3, new at `HEAD`) loads
+  `testcase/merge/newsyntax/merge.newsyntax.{bare,byId,param}.key` and asserts
+  the typed path end to end: bare → default `MergeByIfThenElse` contract,
+  `\by MergeByFullAnonymization` → `MergeTotalWeakening` contract, full form →
+  `PredicateAbstractionMergeContract` with lattice `conjunctive` and 2
+  abstraction predicates. Note: contract extraction runs for *every* method of
+  a loaded class, so an unknown procedure name in *any* method aborts every
+  load of that class (`Unknown merge procedure: "…"`).
 
 ## 2. `\by {…}` assertion-proof scripts  — ✔ RESOLVED (fallback)
 
