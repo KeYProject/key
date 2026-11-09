@@ -291,17 +291,32 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
 
     // ------------------------------------------------------------------ rendering helpers
 
-    private OutputBox<String> addInput(String text) {
+    /**
+     * Adds the box of a user prompt (package-private so the UI tests can render a conversation).
+     */
+    OutputBox<String> addInput(String text) {
         var o = addBox(new LlmPromptModel<>(LlmPromptModel.Kind.INPUT, text, text),
             new RepromptAction(text));
         o.setBackground(COLOR_BG_INPUT.get());
         return o;
     }
 
-    private void addOutput(String text) {
+    /**
+     * Adds the box of an agent answer (package-private so the UI tests can render a
+     * conversation).
+     */
+    void addOutput(String text) {
         var o = addBox(new LlmPromptModel<>(LlmPromptModel.Kind.OUTPUT, text,
             new LlmContext.LlmMessage("assistant", text)));
         o.setBackground(COLOR_BG_ANSWER.get());
+    }
+
+    /**
+     * Renders the tool-activity rows of a finished agent turn (package-private so the UI tests
+     * can render a conversation).
+     */
+    void addToolActivities(@NonNull List<AgentResult.ToolActivity> activities) {
+        addToolActivity(activities);
     }
 
     private void addError(String text) {
