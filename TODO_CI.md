@@ -126,7 +126,8 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
     `javaCard` (setArray1/setArray2, arrayFillNonAtomic). These need
     per-proof debugging (which shape difference feeds the open goals) — not
     a single root cause.
-  Inf classification (9 local / 11 CI at `20d361fa85`):
+  Inf classification (9 local at `20d361fa85`; CI pending, 10 expected =
+  local + the flaky `SimpleEvoting_fullmacro`):
   - **§4 comma `represents` — RESOLVED by the `\locset(…)` adoption
     (`20d361fa85`)**: `NewObjects` (incl. the
     `passwordfile.SecurePasswordFile` proofs) now **passes** — load and
@@ -171,4 +172,4 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
 | `keyext.slicing` | **17/17 green** (was 5 red) |
 | `keyext.caching` | 1 failure — `TestReferenceSearcher`, the recorded `relax.proof` gap (JMLTK_GAPS §10); `ProofCachingSingleRunTest` green |
 | `key.core` | 11 → **8 failures at `20d361fa85`, all recorded** (JMLTK_GAPS §5 `\sum` ×2, §10 relax replays ×2, §11 MT ×1, §4-residual `selection_sort` doesn't-close drift ×1, + the 2 known `JMLParserExceptionTest` cases); the 4 §4 store-ref reds cleared by the `\locset(…)` adoption (`20d361fa85`), of which `selection_sort` resurfaces as drift |
-| integration | triaged at `4b62b1d6fa`, re-measured at `20d361fa85` (local corpus run): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = the 2 recorded remaining reds (`selection_sort` drift, `sum1` §5) via the curated small-MT collections; `testMtStress` = quicksort load gap (JMLTK_GAPS §18); `testRunAllFunProofs` = **20 red groups**, all classified (§18 ×1, §17-reload ×2, §19 ×1, §20 ×1, §21 ×1, doesn't-close ×14 — the 5 §4 load-failing groups now load: `funOfIF` + `simple_info_flow` pass, `simpleTests`/`list`/`javaCard` resurface with doesn't-close proofs); `testRunAllInfProofs` = **9 local** (11 CI) — `NewObjects` passes; doesn't-close ×9 + `SimpleEvoting_fullmacro` CI-only flake — **all PR-induced** (main is green) |
+| integration | triaged at `4b62b1d6fa`, re-measured at `20d361fa85` (local corpus run): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = the 2 recorded remaining reds (`selection_sort` drift, `sum1` §5) via the curated small-MT collections; `testMtStress` = quicksort load gap (JMLTK_GAPS §18); `testRunAllFunProofs` = **20 red groups**, all classified (§18 ×1, §17-reload ×2, §19 ×1, §20 ×1, §21 ×1, doesn't-close ×14 — the 5 §4 load-failing groups now load: `funOfIF` + `simple_info_flow` pass, `simpleTests`/`list`/`javaCard` resurface with doesn't-close proofs); `testRunAllInfProofs` = **9 local** (10 expected in CI = local + the flaky `SimpleEvoting_fullmacro`) — `NewObjects` passes; doesn't-close ×9 — **all PR-induced** (main is green) |
