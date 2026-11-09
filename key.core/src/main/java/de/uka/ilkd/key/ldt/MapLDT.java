@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.ldt;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.expression.literal.EmptyMapLiteral;
@@ -14,9 +13,9 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.GenericArgument;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
+
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
@@ -75,7 +74,8 @@ public final class MapLDT extends ParametricLDT {
     @Override
     public JTerm translateLiteral(Literal lit, Services services) {
         assert lit instanceof EmptyMapLiteral;
-        return services.getTermBuilder().func(ParametricFunctionInstance.get(mapEmpty, ImmutableList.singleton(new GenericArgument(JavaDLTheory.ANY)), services));
+        return services.getTermBuilder().func(ParametricFunctionInstance.get(mapEmpty,
+            ImmutableList.singleton(new GenericArgument(JavaDLTheory.ANY)), services));
     }
 
     @Override
@@ -101,27 +101,35 @@ public final class MapLDT extends ParametricLDT {
     public ParametricFunctionDecl getMapGet() {
         return mapGet;
     }
+
     public ParametricFunctionDecl getMapUndef() {
         return mapUndef;
     }
+
     public ParametricFunctionDecl getMapEmpty() {
         return mapEmpty;
     }
+
     public ParametricFunctionDecl getMapForeach() {
         return mapForeach;
     }
+
     public ParametricFunctionDecl getMapSingleton() {
         return mapSingleton;
     }
+
     public ParametricFunctionDecl getMapOverride() {
         return mapOverride;
     }
+
     public ParametricFunctionDecl getMapRemove() {
         return mapRemove;
     }
+
     public ParametricFunctionDecl getMapUpdate() {
         return mapUpdate;
     }
+
     public ParametricFunctionDecl getPseq2map() {
         return pseq2map;
     }
