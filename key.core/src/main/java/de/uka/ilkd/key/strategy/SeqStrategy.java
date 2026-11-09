@@ -30,6 +30,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.FindDepthFeature;
+import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
@@ -61,6 +63,15 @@ public class SeqStrategy extends AbstractFeatureStrategy implements ComponentStr
     private RuleSetDispatchFeature setupCostDispatcher() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         final ProjectionToTerm<Goal> focus = FocusProjection.INSTANCE;
+
+        // === Rewriting Defaults ===
+
+        // replicated defaults from the standard rulesets of analogous name
+        bindRuleSet(d, "seqConcrete", add(CostBand.REWRITE.cost(),
+            ScaleFeature.createScaled(FindDepthFeature.getInstance(), 10.0)));
+        bindRuleSet(d, "seqSimplify", CostBand.SIMPLIFY.cost());
+        bindRuleSet(d, "seqSimplifyEnlarging", CostBand.ENLARGE.cost());
+
 
         // Equality reasoning on sequences: an equation is replaced by its elementwise definition
         // late, to allow for normalisation, simplification and equation based reasoning before
