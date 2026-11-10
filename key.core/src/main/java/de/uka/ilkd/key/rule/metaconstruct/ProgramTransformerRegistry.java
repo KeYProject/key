@@ -4,8 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
@@ -21,7 +24,10 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * The keys are read from the {@link TransformerMeta} annotation of the registered classes, which
  * is therefore the single source of truth for the names. The {@code JP2KeYConverter} uses this
- * registry to resolve the kind of a parsed meta-construct statement to its transformer.
+ * registry to resolve the kind of a parsed meta-construct statement to its transformer, and the
+ * {@code JavaParserFactory} configures the JMLtk parser (via
+ * {@code ParserConfiguration#setKeyMetaConstructNames}) with {@link #names()} so that only these
+ * names are recognized as meta-construct statements.
  *
  * <p>
  * The registry intentionally covers only statement transformers: transformers that occur in
@@ -33,32 +39,10 @@ import org.jspecify.annotations.Nullable;
  */
 public final class ProgramTransformerRegistry {
 
-    private static final ImmutableMap<String, Class<? extends ProgramTransformer>> BY_NAME =
-        buildRegistry();
+    private static final ImmutableMap<String, Class<? extends ProgramTransformer>> BY_NAME;
+    private static final Set<String> NAMES;
 
-    private ProgramTransformerRegistry() {
-    }
-
-    /**
-     * Looks up the transformer registered under the given meta-construct name.
-     *
-     * @param name the meta-construct name including the leading {@code #}, e.g. {@code #unwindLoop}
-     * @return the corresponding {@link ProgramTransformer} class, or {@code null} if the name is
-     *         not registered (unknown or reserved but not supported)
-     */
-    @Nullable
-    public static Class<? extends ProgramTransformer> byName(@NonNull String name) {
-        return BY_NAME.get(name);
-    }
-
-    /**
-     * @return the number of registered transformers
-     */
-    public static int size() {
-        return BY_NAME.size();
-    }
-
-    private static ImmutableMap<String, Class<? extends ProgramTransformer>> buildRegistry() {
+    static {
         Map<String, Class<? extends ProgramTransformer>> byName = new LinkedHashMap<>();
         register(byName, SwitchToIf.class);
         register(byName, UnwindLoop.class);
@@ -78,7 +62,37 @@ public final class ProgramTransformerRegistry {
         register(byName, ArrayPostDecl.class);
         register(byName, InitArrayCreation.class);
         register(byName, ReattachLoopInvariant.class);
-        return DefaultImmutableMap.fromMap(byName);
+        BY_NAME = DefaultImmutableMap.fromMap(byName);
+        NAMES = Collections.unmodifiableSet(new LinkedHashSet<>(byName.keySet()));
+    }
+
+    private ProgramTransformerRegistry() {
+    }
+
+    /**
+     * Looks up the transformer registered under the given meta-construct name.
+     *
+     * @param name the meta-construct name including the leading {@code #}, e.g. {@code #unwindLoop}
+     * @return the corresponding {@link ProgramTransformer} class, or {@code null} if the name is
+     *         not registered (unknown or reserved but not supported)
+     */
+    @Nullable
+    public static Class<? extends ProgramTransformer> byName(@NonNull String name) {
+        return BY_NAME.get(name);
+    }
+
+    /**
+     * @return the names (grammar kinds) of all registered transformers as an unmodifiable set
+     */
+    public static Set<String> names() {
+        return NAMES;
+    }
+
+    /**
+     * @return the number of registered transformers
+     */
+    public static int size() {
+        return BY_NAME.size();
     }
 
     private static void register(
