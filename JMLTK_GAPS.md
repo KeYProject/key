@@ -62,12 +62,12 @@ JMLtk front-end shipped in PR #3997.
 | 7 | `spec_*_math` class/method pragmas | `/*@ spec_java_math @*/` | `testcase/specMath/{java,bigint}/Test.java`, `testPackage/TestClass.java` | ✔ RESOLVED (JML modifiers → `SpecMathMode`; `SpecMathModeTest` 2 + `ContractLoadingTests` 6 green) |
 | 8 | `ensures \result = max;` (single `=`) | — | `exceptional/WrongEquals.java` | ✔ RESOLVED (guarded via `JmlSideEffectChecker`) |
 | 9 | labeled `break`/`continue` proofs | — | `LoopScopeInvRuleTests` bench | ✔ RESOLVED (loop-invariant fix `6a07c20e63`) |
-| 10 | `relax.proof` scripted-proof replay | — | `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof` | ✘ OPEN (2 key.core replays + keyext.caching `TestReferenceSearcher`) |
+| 10 | `relax.proof` scripted-proof replay | — | `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof` | ✔ RESOLVED (2026-11-10: loop invariant lost in `elim_double_block_3` rebuild; fixed via `#reattachLoopInvariant` — see §10) |
 | 11 | block-contract combination | — | `ParallelProverDeterminismTest` | ✘ OPEN — non-JML real KeY bug (pre-existing) |
 | 12 | absent clause keywords | `when`, `duration`, `working_space`, `captures`, and the legacy clause-name `name "..."` | — | ⚠ mostly OPEN — `name` replaced by the native `[behavior] <name>:` prefix (✔ RESOLVED) |
 | 13 | pragma-statements | `//@ nowarn;`, `//@ debug;` | `exceptional/NowarnDebug.java`, `exceptional/NowarnDebugInMethod.java` | ⚠ pinned: class level loud (`ProofInputException`), method level dropped (fallback) |
 | 14 | datagroup / monitor clauses | `monitors_for`, `readable_if`, `writable_if`, `in_group`, `maps_into` | `exceptional/{Datagroup,MonitorsFor,ReadableIf,WritableIf,InGroup,MapsInto}.java` | ✔ RESOLVED (loud guard, no spurious fields) |
-| 15 | `\strictly_nothing`, `\nothing`, `\everything` | — | — | ✘ OPEN (plain `NameExpr`; locset meaning must be re-added) |
+| 15 | `\strictly_nothing`, `\nothing`, `\everything` | — | `LocsetClauseTranslationTest` | ✔ RESOLVED (measured 2026-11-10: names re-lex to the special tokens; residual: method-level `accessible` is a JMLtk-upstream gap, fallback mitigates) |
 | 16 | assert label *after* `assert` | `//@ assert LAB: e;` | — | ✘ OPEN (only JML-standard `LAB: assert e;`) |
 | 17 | origin-label file info for re-parsed JML | `Precondition @ [no file]` | any JMLtk-converted spec (assert/assume/set, contract clauses, fallback) | ✘ OPEN (**save→reload blocker** — `[no file]` origins are not re-parseable; RunAll `other`, `list_seq`) |
 | 18 | DL-typed ghost locals with initializer | `//@ ghost \seq x = \dl_array2seq(a);` | `key.ui/examples/heap/quicksort/{sort,split}{,-jmlscript}.key` | ✘ OPEN (load failure — JMLtk reads `ghost` as field-level; pre-existing at 1.1.0 **and** 1.2.1) |
@@ -341,23 +341,62 @@ public class Test { … }
   invariant is null). The structural-lookup fix (`6a07c20e63`) restores it.
   Measured at `53dcefd914`: `LoopScopeInvRuleTests` green.
 
-## 10. `relax.proof` scripted-proof replay  — ✘ OPEN
+## 10. `relax.proof` scripted-proof replay  — ✔ RESOLVED (2026-11-10)
 
 - Tests: `TestCopyingReplayer.testJavaProof`,
   `TestEqualsModProofIrrelevancy.testJavaProof` (key.core), and
   `TestReferenceSearcher#testFindsReferenceInSameProof` (keyext.caching) — all
   load `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof`.
 - **Before:** replayed byte-identical.
-- **After:** the loaded proof does not match the stored (closed) proof.
-  Re-measured at `53dcefd914`: the replay reports "Proof replayed
-  successfully" but leaves **node 40 open** — the `Null Reference (_pat = null)`
-  case whose postcondition frame derives from `assignable \strictly_nothing`
-  (cf. gap #15). The source `Relaxed.java` has a `maintaining`/`decreasing` loop
-  and `assignable \strictly_nothing` (no `\by` scripts, no model methods/JML
-  fields), so the mismatch is the loop + `\strictly_nothing` frame, not the
-  `\by`-script attribution recorded at `8fe1be5b6c`. `TestReferenceSearcher`
-  fails at `assertTrue(p.closed())` (line 83) because that open goal survives
-  the prune + close-by-reference.
+- **After (pre-fix):** the load-time replay tracked the stored script
+  node-for-node, then the **"Loop Invariant" rule** (`WhileInvariantRule`) at
+  the loop-head goal aborted with `RuleAbortException("no invariant found")`;
+  the step and its whole subtree were skipped and the proof loaded **not
+  closed** (open node 40, 43 nodes vs. 4048 on `origin/main`).
+- **Root cause (measured 2026-11-10 — supersedes the earlier `\strictly_nothing`
+  frame attribution, which is wrong):** the goal program's `While` carried no
+  attached `LoopSpecification` because the preceding
+  `elim_double_block_3` step **rebuilds the `While` node** from the taclet
+  pattern (`{ while(e) S }` → `while(e) S`) and the node-attached invariant was
+  not carried over. Walked the replayed left spine with a scratch dump:
+  - node 24 (after `methodBodyExpand`): `For plainInv=set` — PO init +
+    `ProgVarReplaceVisitor` param substitution copy the invariant ✓
+  - node 35 (after `for_to_while`): `While plainInv=set` —
+    `ForToWhileTransformation` copies it ✓
+  - nodes 35–39 (`i=0;` execution, OSS, `elim_double_block`): `While id=X
+    plainInv=set` ✓
+  - node 40 (result of `elim_double_block_3`): **`While id=Y
+    plainInv=null`** ✗ — a fresh node, invariant lost.
+  On `origin/main` the same reconstruction still resolves the invariant,
+  because `SpecificationRepository.loopInvs` is keyed by
+  `Pair<LoopStatement, Integer>` with **structural** `equals`/`hashCode`
+  (`JavaProgramElement` hash = class + children; `LoopStatement.equals` = same
+  class + position UNDEFINED or same line): the rebuilt While (UNDEFINED
+  position) matches the registration of the original. The branch's
+  node-attached design has no such fallback —
+  `LoopInvariantBuiltInRuleApp.retrieveLoopInvariantFromSpecification` is a
+  plain `loop.getLoopInvariant()` on the fresh node.
+- **Fix:** re-attach the invariant in the reconstructing taclet, the same way
+  `unwindLoopScope` already does: `elim_double_block_3`'s replacement now uses
+  `#reattachLoopInvariant(while ( #e ) #s);` (the matched loop is the active
+  statement, so `ReattachLoopInvariant` finds it in the match context and
+  re-attaches it to the rebuilt node; no-op when no invariant is attached).
+  `ReattachLoopInvariant` was generalized from `While` to `LoopStatement`
+  (forward-compatible). The `for`/`do` variants (`elim_double_block_4..8`)
+  have the same latent loss but are **not** extended yet: the JMLtk grammar
+  (pinned `1.2.1-SNAPSHOT`) only accepts a `while` argument to
+  `#reattachLoopInvariant`, so that needs a JMLtk grammar extension first
+  (follow-up with the jmltk release pin).
+- **Result (measured at the fix commit):** replay of `relax.proof`
+  `closed=true nodes=4049`; `TestCopyingReplayer`, `TestEqualsModProofIrrelevancy`
+  and `TestReferenceSearcher` all green. The `TestTacletEquality` golden
+  (`key.core/src/test/resources/de/uka/ilkd/key/nparser/taclets.old.txt`) was updated
+  for the new `elim_double_block_3` rendering (2137/2137 green).
+- **Related (same commit):** `AnnotationMover` logged
+  `ERROR "unexpected class: …JmlQuantifiedExpr"` for every JML bound variable
+  (JMLtk parents the `VariableDeclarator` of a `\forall` under
+  `JmlQuantifiedExpr`) — 116 errors per `relax.proof` load; the `Jmlish`
+  parent is now skipped silently.
 
 ## 11. block-contract combination  — ✘ OPEN, non-JML (pre-existing KeY bug)
 
@@ -405,9 +444,27 @@ JMLtk fabricates a `JmlFieldDeclaration` (keyword as bogus type). The `JMLTransf
 of installing spurious fields; pinned per keyword by
 `exceptional/{Datagroup,MonitorsFor,ReadableIf,WritableIf,InGroup,MapsInto}.java`.
 
-### 15. `\strictly_nothing`, `\nothing`, `\everything`  — ✘ OPEN
-No token for `\strictly_nothing`; `\nothing`/`\everything` arrive as plain
-`NameExpr` — their locset meaning must be re-added in KeY's term translation.
+### 15. `\strictly_nothing`, `\nothing`, `\everything`  — ✔ RESOLVED (measured 2026-11-10)
+**Stale — the names work.** JMLtk lexes all three locset names as
+`JML_IDENTIFIER` into a `NameExpr` **that keeps the leading backslash**;
+`JmlToTextual.exprList` re-serializes them verbatim, and KeY's own `JmlLexer`
+(expr mode) re-lexes them to the special tokens `STRICTLY_NOTHING` (211),
+`NOTHING` (179) and `EVERYTHING` (133). The parse then takes the
+`storeRefUnion → storeRefList → storeref` production (not the assignable-clause
+`STRICTLY_NOTHING` alternative) and the `Translator` maps them to
+`tb.strictlyNothing()` / `tb.empty()` / `tb.createdLocs()` respectively —
+identical to the pre-takeover translation. Measured in every clause position
+(`assignable`, `modifies`, `represents`, loop contracts); pinned by
+`LocsetClauseTranslationTest` (5 tests).
+
+Residual (upstream, mitigated): JMLtk has **no method-level `accessible`
+clause** — its `JmlClassAccessible` production requires the class-level
+`accessible <var> : <exprs>;` form, so the KeY method-level forms
+(`accessible this.x;`, `accessible \nothing;`) are a hard JMLtk error. The
+`KEY_JML_FALLBACK` re-parse with KeY's own grammar recovers them, so the
+status quo is: class-level `accessible` is JMLtk-native (via
+`JmlToTextual.toDepends`), method-level `accessible` goes through the
+fallback. Tracked as a JMLtk-upstream grammar gap, not a branch defect.
 
 ### 16. assert label after `assert`  — ✘ OPEN
 ```java
