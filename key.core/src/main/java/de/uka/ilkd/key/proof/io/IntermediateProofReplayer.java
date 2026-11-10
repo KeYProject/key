@@ -1044,7 +1044,9 @@ public class IntermediateProofReplayer {
         } else {
             name = value.substring(0, colon);
             sort = services.getNamespaces().lookupSortOrAlias(value.substring(colon + 1));
-
+            if (sort == null) {
+                sort = app.getRealSort(sv, services);
+            }
         }
         LogicVariable lv = new LogicVariable(new Name(name), sort);
         JTerm instance = services.getTermFactory().createTerm(lv);
