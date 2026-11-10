@@ -464,20 +464,21 @@ public class AutocompleteInput extends JTextPane {
 
     /**
      * Replaces the {@code $token}/{@code @file}/{@code /directive} fragment before the caret by
-     * its expanded content and moves the caret to the end of the inserted text. A fragment that
-     * cannot be resolved (resolver returns {@code null} or blank text) is left untouched and the
-     * toolkit beeps.
+     * its expanded content and moves the caret to the end of the inserted text. Returns
+     * {@code true} if a fragment was replaced. A fragment that cannot be resolved (resolver
+     * returns {@code null} or blank text) is left untouched and the toolkit beeps. The boolean
+     * result lets the chat panel explain the failure in its hint line.
      */
-    public void expandAtCaret(Function<String, @Nullable String> resolver) {
+    public boolean expandAtCaret(Function<String, @Nullable String> resolver) {
         String fragment = tokenAtCaret();
         if (fragment == null) {
             getToolkit().beep();
-            return;
+            return false;
         }
         String expanded = resolver == null ? null : resolver.apply(fragment);
         if (expanded == null || expanded.isBlank()) {
             getToolkit().beep();
-            return;
+            return false;
         }
         try {
             int caret = getCaretPosition();
@@ -492,8 +493,10 @@ public class AutocompleteInput extends JTextPane {
             // the document listener was suppressed during the edit: re-highlight the fences
             scheduleHighlight();
             setCaretPosition(start + expanded.length());
+            return true;
         } catch (BadLocationException e) {
             getToolkit().beep();
+            return false;
         }
     }
 
