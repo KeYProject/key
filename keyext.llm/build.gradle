@@ -9,6 +9,12 @@ dependencies {
     implementation(libs.jackson.dataformat.yaml)
     implementation("org.slf4j:jcl-over-slf4j:1.7.5")
 
+    // Markdown rendering of the agent's answers: commonmark parses, FlyingSaucer paints
+    implementation("org.commonmark:commonmark:0.24.0")
+    implementation("org.commonmark:commonmark-ext-gfm-tables:0.24.0")
+    implementation("org.commonmark:commonmark-ext-gfm-strikethrough:0.24.0")
+    implementation("org.xhtmlrenderer:flying-saucer-core:9.13.0")
+
     implementation platform("io.modelcontextprotocol.sdk:mcp-bom:2.1.0")
     implementation("io.modelcontextprotocol.sdk:mcp-core")
     implementation("io.modelcontextprotocol.sdk:mcp-json-jackson2")

@@ -41,6 +41,7 @@ local commands such as `/skills` (see [Input markup](#4-input-markup)).
 │ [attach proof context] [Prompts]   [Clear history] [Stop] [2 queued]     │
 ├──────────────────────────────────────────────────────────────────────────┤
 │ history of inputs / answers / errors / tool activity                    │
+│  · answers rendered as Markdown (lists, code, tables, links)            │
 │  · right-click a message for actions (e.g. "into input")                │
 │  · a running tool call is shown as a live row with [Background] [Cancel]│
 │  · backgrounded calls appear as job rows while they run                 │
@@ -67,6 +68,11 @@ Source view](docs/images/agent/llm-panel.png)
   (can be turned off in the settings). While a call runs it is shown as a live row with
   *Background*/*Cancel* buttons (see [section 7.4](#74-backgrounding)); calls you moved into the
   background are tracked as job rows until they finish.
+- **Markdown answers.** The agent's answers are rendered as Markdown: headings, lists, code
+  blocks, tables and block quotes are formatted, `code` spans and fenced code blocks use a
+  monospaced font, and links open in the system browser. Rendering is strictly offline: no
+  external images or stylesheets are fetched, and raw HTML in an answer is shown as plain text
+  rather than interpreted.
 
 ---
 
