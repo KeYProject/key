@@ -312,7 +312,7 @@ public class TestTacletParser {
     @Test
     public void testSchemaJava0() {
         parseTaclet("while_right { \\find (\\<{.. while(#e2) {#p1} ...}\\>post)"
-            + "\\replacewith (\\<{.. #unwind-loop (#inner, #outer, while(#e2) {#p1});  ...}\\>post) } ");
+            + "\\replacewith (\\<{.. #unwindLoop (#inner, #outer, while(#e2) {#p1});  ...}\\>post) } ");
 
     }
 
@@ -384,7 +384,7 @@ public class TestTacletParser {
                 eval_order_array_access_right{
                     \\find(\\<{..#v=#ar[#e];...}\\>post)
                     \\varcond(\\newTypeOf(#ar1, #ar),\\newTypeOf(#v0, #e), \\newTypeOf(#k, #e))
-                    \\replacewith(\\<{..for(#k=0;#k<#length-reference(#ar);#k++){#ar1[#k]=#ar[#k];}
+                    \\replacewith(\\<{..for(#k=0;#k<#lengthReference(#ar);#k++){#ar1[#k]=#ar[#k];}
                                         #v0=#e; #v=#ar1[#v0];...}\\>post)
                     \\displayname "eval_order_array_access_right"
                 }
@@ -411,7 +411,7 @@ public class TestTacletParser {
         boolean thrown = false;
         try {
             parseTaclet("xyz { find (<{.. int j=0; for(#i;j<9;j++)" + "; ...}>post)"
-                + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});" + "  ...}>post) } ");
+                + "replacewith (<{.. #unwindLoop (while(#e2) {#p1});" + "  ...}>post) } ");
         } catch (RuntimeException e) {
             thrown = true;
         }
@@ -424,7 +424,7 @@ public class TestTacletParser {
         boolean thrown = false;
         try {
             parseTaclet("xyz { find (<{.. int j=0; for(#lab;j<42;j++) ; ...}>post)"
-                + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});  ...}>post) } ");
+                + "replacewith (<{.. #unwindLoop (while(#e2) {#p1});  ...}>post) } ");
         } catch (RuntimeException e) {
             thrown = true;
         }
