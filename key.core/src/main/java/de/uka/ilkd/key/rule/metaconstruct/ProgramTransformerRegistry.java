@@ -75,6 +75,7 @@ public final class ProgramTransformerRegistry {
         register(expressionByName, CreateObject.class);
         register(expressionByName, ArrayLength.class);
         register(expressionByName, TypeOf.class);
+        register(expressionByName, IsStatic.class);
         EXPRESSION_BY_NAME = DefaultImmutableMap.fromMap(expressionByName);
     }
 

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 
 import org.key_project.logic.Name;
@@ -389,6 +390,17 @@ public class TestTacletParser {
                     \\displayname "eval_order_array_access_right"
                 }
                 """);
+    }
+
+    @Test
+    public void testSchemaJavaIsStatic() {
+        FindTaclet taclet = (FindTaclet) parseTaclet(
+            "isstatic_test {\\find(\\<{.. #v0 = #isstatic(#v); ...}\\>true) \\replacewith(true)}");
+        JTerm find = taclet.find();
+        JavaBlock jb = find.javaBlock();
+        ContextStatementBlock ct = (ContextStatementBlock) jb.program();
+        Assignment ca = (Assignment) ct.getChildAt(0);
+        assertInstanceOf(IsStatic.class, ca.getChildAt(1));
     }
 
 
