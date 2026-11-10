@@ -17,22 +17,27 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /**
- * Global registry of the program transformers that can occur as {@code #name(...)}
- * meta-construct statements in rule files, keyed by the meta-construct name (grammar kind), e.g.
- * {@code #unwindLoop}.
+ * Global registry of the transformers that can occur as {@code #name(...)} meta-constructs in
+ * rule files, keyed by the meta-construct name (grammar kind), e.g. {@code #unwindLoop}.
  *
  * <p>
- * The keys are read from the {@link TransformerMeta} annotation of the registered classes, which
- * is therefore the single source of truth for the names. The {@code JP2KeYConverter} uses this
- * registry to resolve the kind of a parsed meta-construct statement to its transformer, and the
- * {@code JavaParserFactory} configures the JMLtk parser (via
- * {@code ParserConfiguration#setKeyMetaConstructNames}) with {@link #names()} so that only these
- * names are recognized as meta-construct statements.
+ * The {@link TransformerMeta} annotation of the registered classes is the single source of truth
+ * for the names and is checked to be present and unique. Two separate maps keep the two usages
+ * apart:
+ * <ul>
+ * <li>{@link #byName(String)}: statement-position transformers, which are parsed as
+ * {@code KeyMetaConstruct} statements.</li>
+ * <li>{@link #expressionByName(String)}: expression-position transformers, which either have a
+ * dedicated grammar production ({@link TypeOf}) or no grammar token at all and therefore parse as
+ * ordinary method calls ({@link CreateObject}, {@link ArrayLength}).</li>
+ * </ul>
  *
  * <p>
- * The registry intentionally covers only statement transformers: transformers that occur in
- * expression position (e.g. {@link CreateObject}, {@link ArrayLength}, {@link IsStatic} and
- * {@link TypeOf}) have dedicated grammar productions and are handled separately by the converter.
+ * The {@code JP2KeYConverter} uses both lookups to resolve a meta-construct name to its
+ * transformer and instantiates the transformer by matching one of its constructors against the
+ * converted arguments, and the {@code JavaParserFactory} configures the JMLtk parser (via
+ * {@code ParserConfiguration#setKeyMetaConstructNames}) with {@link #names()} so that only the
+ * statement names are recognized as meta-construct statements.
  *
  * @author Alexander Weigl
  * @version 1 (09.11.26)
@@ -40,6 +45,7 @@ import org.jspecify.annotations.Nullable;
 public final class ProgramTransformerRegistry {
 
     private static final ImmutableMap<String, Class<? extends ProgramTransformer>> BY_NAME;
+    private static final ImmutableMap<String, Class<? extends ProgramTransformer>> EXPRESSION_BY_NAME;
     private static final Set<String> NAMES;
 
     static {
@@ -64,13 +70,19 @@ public final class ProgramTransformerRegistry {
         register(byName, ReattachLoopInvariant.class);
         BY_NAME = DefaultImmutableMap.fromMap(byName);
         NAMES = Collections.unmodifiableSet(new LinkedHashSet<>(byName.keySet()));
+
+        Map<String, Class<? extends ProgramTransformer>> expressionByName = new LinkedHashMap<>();
+        register(expressionByName, CreateObject.class);
+        register(expressionByName, ArrayLength.class);
+        register(expressionByName, TypeOf.class);
+        EXPRESSION_BY_NAME = DefaultImmutableMap.fromMap(expressionByName);
     }
 
     private ProgramTransformerRegistry() {
     }
 
     /**
-     * Looks up the transformer registered under the given meta-construct name.
+     * Looks up the statement transformer registered under the given meta-construct name.
      *
      * @param name the meta-construct name including the leading {@code #}, e.g. {@code #unwindLoop}
      * @return the corresponding {@link ProgramTransformer} class, or {@code null} if the name is
@@ -82,14 +94,28 @@ public final class ProgramTransformerRegistry {
     }
 
     /**
-     * @return the names (grammar kinds) of all registered transformers as an unmodifiable set
+     * Looks up the expression transformer registered under the given name.
+     *
+     * @param name the meta-construct name including the leading {@code #}, e.g.
+     *        {@code #createObject}
+     * @return the corresponding {@link ProgramTransformer} class, or {@code null} if the name is
+     *         not registered
+     */
+    @Nullable
+    public static Class<? extends ProgramTransformer> expressionByName(@NonNull String name) {
+        return EXPRESSION_BY_NAME.get(name);
+    }
+
+    /**
+     * @return the statement names (grammar kinds) of all registered transformers as an unmodifiable
+     *         set
      */
     public static Set<String> names() {
         return NAMES;
     }
 
     /**
-     * @return the number of registered transformers
+     * @return the number of registered statement transformers
      */
     public static int size() {
         return BY_NAME.size();

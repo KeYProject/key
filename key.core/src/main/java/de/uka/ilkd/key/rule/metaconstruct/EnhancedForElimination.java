@@ -99,6 +99,15 @@ public class EnhancedForElimination extends ProgramTransformer {
 
 
     /**
+     * Creates a new enhanced for-loop elimination without an execution context.
+     *
+     * @param forStatement the enhanced for loop to eliminate
+     */
+    public EnhancedForElimination(EnhancedFor forStatement) {
+        this(null, forStatement);
+    }
+
+    /**
      * Creates a new enhanced for-loop elimination.
      *
      * @param execContextSV the execution context.
