@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * <ul>
  * <li>{@code llm-panel.png}: the main window with the panel docked at the right and a seeded
  * conversation (prompt, tool activity, answer);</li>
+ * <li>{@code llm-markdown.png}: close-up of the chat panel with the Markdown-rendered answer;</li>
  * <li>{@code llm-settings.png}: the settings dialog on the "LLM Settings" node;</li>
  * <li>{@code llm-settings-tools.png}: the settings dialog on the "Tools" node.</li>
  * </ul>
@@ -111,6 +112,19 @@ class LlmScreenshotsTest {
                         1. apply `auto` on the open goal
                         2. if it does not close, apply `seq` to split the implication
                         3. run `auto_ind` on the remaining subgoal
+
+                        ```key
+                        auto;
+                        seq;
+                        ```
+
+                        | Taclet     | Effect                        |
+                        | ---------- | ----------------------------- |
+                        | `auto`     | closes trivial goals directly |
+                        | `seq`      | splits the implication        |
+                        | `auto_ind` | applies induction heuristics  |
+
+                        See [taclets](https://key-project.org) for details.
                         """);
             return null;
         });
@@ -129,6 +143,13 @@ class LlmScreenshotsTest {
             // which depend on the preferred widths)
             main.validate();
             write(main.getRootPane(), out.resolve("llm-panel.png"));
+            return null;
+        });
+
+        // close-up of the chat panel: the Markdown-rendered answer
+        onEdt(() -> {
+            main.validate();
+            write(panel, out.resolve("llm-markdown.png"));
             return null;
         });
 
