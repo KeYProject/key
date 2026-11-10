@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.util;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.*;
@@ -59,6 +61,58 @@ public class PreferenceSaver {
             }
         }
         return null;
+    }
+
+    /**
+     * Minimum size of the KeY windows saved as preference
+     * (if window is smaller the current stored size is not overwritten)
+     */
+    static final int MIN_WINDOW_SIZE = 100;
+
+    /**
+     * The window is allowed to be placed somewhat outside the screen
+     */
+    static final int TOP_EDGE_OUTSIDE = 50;
+
+    /**
+     * Checks whether a window with the given bounds can be reached by the user
+     *
+     * @param bounds the bounds of the window
+     * @param screens the bounds of all screens
+     * @return whether the window can be reached
+     */
+    static boolean isReachable(Rectangle bounds, List<Rectangle> screens) {
+        if (bounds.width < MIN_WINDOW_SIZE || bounds.height < MIN_WINDOW_SIZE) {
+            return false;
+        }
+        if (screens.isEmpty()) {
+            return true;
+        }
+        for (Rectangle screen : screens) {
+            Rectangle visible = bounds.intersection(screen);
+            boolean topOnScreen = bounds.y >= screen.y - TOP_EDGE_OUTSIDE
+                    && bounds.y <= screen.y + screen.height - MIN_WINDOW_SIZE;
+            if (visible.width >= MIN_WINDOW_SIZE && visible.height >= MIN_WINDOW_SIZE
+                    && topOnScreen) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return the bounds of all screens; empty if there is no display
+     */
+    private static List<Rectangle> screenBounds() {
+        if (GraphicsEnvironment.isHeadless()) {
+            return List.of();
+        }
+        List<Rectangle> result = new ArrayList<>();
+        for (GraphicsDevice device : GraphicsEnvironment.getLocalGraphicsEnvironment()
+                .getScreenDevices()) {
+            result.add(device.getDefaultConfiguration().getBounds());
+        }
+        return result;
     }
 
     /** do the storing/loading from this object */
@@ -172,7 +226,9 @@ public class PreferenceSaver {
             bounds.y = prefs.getInt(name + ".y", bounds.y);
             bounds.width = prefs.getInt(name + ".width", bounds.width);
             bounds.height = prefs.getInt(name + ".height", bounds.height);
-            component.setBounds(bounds);
+            if (isReachable(bounds, screenBounds())) {
+                component.setBounds(bounds);
+            }
         }
 
         @Override
@@ -180,7 +236,15 @@ public class PreferenceSaver {
             String name = component.getName();
             assert name != null;
 
+            // A minimized window has no usable bounds. Windows reports it at (-32000, -32000).
+            if (component instanceof Frame frame
+                    && (frame.getExtendedState() & Frame.ICONIFIED) != 0) {
+                return;
+            }
             Rectangle bounds = component.getBounds();
+            if (!isReachable(bounds, screenBounds())) {
+                return;
+            }
             prefs.putInt(name + ".x", bounds.x);
             prefs.putInt(name + ".y", bounds.y);
             prefs.putInt(name + ".width", bounds.width);
