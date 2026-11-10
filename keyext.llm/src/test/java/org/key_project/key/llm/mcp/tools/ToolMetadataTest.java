@@ -70,6 +70,9 @@ class ToolMetadataTest {
         // spot-check the assignments
         assertEquals(ToolCategory.PROOF, tools.agent(KeYAgentTools.TOOL_AUTO).category());
         assertEquals(ToolCategory.SHELL, tools.agent(KeYAgentTools.TOOL_SHELL).category());
+        assertEquals(ToolCategory.WEB, tools.agent(KeYAgentTools.TOOL_WEBFETCH).category());
+        assertEquals(ToolCategory.WEB, tools.agent(KeYAgentTools.TOOL_WEBSEARCH).category());
+        assertEquals(ToolCategory.SCRIPTING, tools.agent(KeYAgentTools.TOOL_EXECUTE).category());
         assertEquals(ToolCategory.TACLETS, tools.agent(KeYAgentTools.TOOL_LIST_TACLETS).category());
         assertEquals(ToolCategory.INTERACTION, tools.agent(KeYAgentTools.TOOL_QUESTION).category());
         assertEquals(ToolCategory.SUBAGENTS,
@@ -85,7 +88,7 @@ class ToolMetadataTest {
         var tools = new KeYAgentTools();
         for (var name : java.util.List.of(KeYAgentTools.TOOL_SHELL, KeYAgentTools.TOOL_AUTO,
             KeYAgentTools.TOOL_TRYCLOSE, KeYAgentTools.TOOL_SUBAGENT,
-            KeYAgentTools.TOOL_ASK_LLM)) {
+            KeYAgentTools.TOOL_ASK_LLM, KeYAgentTools.TOOL_EXECUTE)) {
             assertTrue(tools.agent(name).backgroundable(),
                 "tool " + name + " must default to backgroundable");
         }
@@ -103,7 +106,9 @@ class ToolMetadataTest {
         // headers per category, in order
         assertTrue(doc.indexOf("## Proof") < doc.indexOf("## Files"), doc);
         assertTrue(doc.indexOf("## Files") < doc.indexOf("## Shell"), doc);
-        assertTrue(doc.indexOf("## Shell") < doc.indexOf("## Taclets"), doc);
+        assertTrue(doc.indexOf("## Shell") < doc.indexOf("## Web"), doc);
+        assertTrue(doc.indexOf("## Web") < doc.indexOf("## Scripting"), doc);
+        assertTrue(doc.indexOf("## Scripting") < doc.indexOf("## Taclets"), doc);
         assertTrue(doc.indexOf("## Taclets") < doc.indexOf("## Sub-agents"), doc);
         // each tool appears in its category section (marked with the category in the heading)
         assertTrue(doc.contains("`" + KeYAgentTools.TOOL_AUTO + "` (AUTO · Proof"),

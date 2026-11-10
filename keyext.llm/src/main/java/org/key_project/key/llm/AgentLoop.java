@@ -24,6 +24,7 @@ import org.key_project.key.llm.AgentResult.ToolCallInfo;
 import org.key_project.key.llm.LlmContext.LlmMessage;
 import org.key_project.key.llm.mcp.AgentTool;
 import org.key_project.key.llm.mcp.KeYAgentTools;
+import org.key_project.key.llm.mcp.tools.ScriptingTools;
 
 import com.google.gson.GsonBuilder;
 import org.jspecify.annotations.Nullable;
@@ -440,6 +441,33 @@ public class AgentLoop {
             // so no nested locking is possible)
             var future = session.getToolDispatcher().submitTask(
                 () -> AskLlmRunner.run(session, completions, arguments));
+            var outcome = await(future, id, name, arguments);
+            if (observer != null) {
+                observer.toolFinished(id, outcome instanceof AwaitDone done
+                        ? done.content()
+                        : "[moved to background]");
+            }
+            return switch (outcome) {
+                case AwaitDone d -> {
+                    stagedTool(id, d.content());
+                    activities.add(new ToolActivity(name, arguments, d.content()));
+                    yield null;
+                }
+                case AwaitBackgrounded bg -> new AgentResult.PausedForBackground(bg.jobId(), name,
+                    arguments);
+                case AwaitCancelled ignored -> done("(Turn cancelled by the user.)");
+            };
+        }
+
+        if (KeYAgentTools.TOOL_EXECUTE.equals(name)) {
+            var observer = session.getTurnObserver();
+            if (observer != null) {
+                observer.toolStarted(new ToolCallInfo(id, name, arguments));
+            }
+            // runs without the dispatch lock: the snippet's facade calls acquire it per call
+            // (holding the lock across the whole snippet would deadlock the facade)
+            var future = session.getToolDispatcher().submitTask(
+                () -> ScriptingTools.run(session, arguments));
             var outcome = await(future, id, name, arguments);
             if (observer != null) {
                 observer.toolFinished(id, outcome instanceof AwaitDone done

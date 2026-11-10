@@ -15,6 +15,9 @@ dependencies {
     implementation("org.commonmark:commonmark-ext-gfm-strikethrough:0.24.0")
     implementation("org.xhtmlrenderer:flying-saucer-core:9.13.0")
 
+    // webfetch: fetching web pages and converting their HTML to Markdown
+    implementation("org.jsoup:jsoup:1.21.2")
+
     implementation platform("io.modelcontextprotocol.sdk:mcp-bom:2.1.0")
     implementation("io.modelcontextprotocol.sdk:mcp-core")
     implementation("io.modelcontextprotocol.sdk:mcp-json-jackson2")

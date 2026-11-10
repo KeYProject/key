@@ -31,6 +31,10 @@ public class LlmSettings extends AbstractPropertiesSettings {
         "\\bsu\\s+-", "\\bpkexec\\b", "(curl|wget).*\\|\\s*(sh|bash|zsh)", "\\b:(\\s|{)+\\(\\)",
         "\\bchmod\\s+-R\\s+\\S*\\s+(/|/etc|/usr|/boot)");
 
+    /** The default HTML search endpoint of the {@code websearch} tool (DuckDuckGo Lite). */
+    public static final String DEFAULT_WEB_SEARCH_ENDPOINT =
+        "https://lite.duckduckgo.com/lite/";
+
     public static final LlmSettings INSTANCE = new LlmSettings();
     private static final String CATEGORY = "llm";
 
@@ -101,6 +105,21 @@ public class LlmSettings extends AbstractPropertiesSettings {
     private final PropertyEntry<List<String>> shellBlockedPatterns =
         createStringListProperty("shellBlockedPatterns",
             String.join(",", DEFAULT_SHELL_BLOCKED_PATTERNS));
+    /**
+     * Whether the {@code execute} snippet runs without the safety gate (full JVM and classpath
+     * access). There is no true confinement either way; the gate only rejects the obvious escape
+     * hatches (process spawning, exiting the JVM, reflection) and steers snippets to the
+     * {@code tools} facade.
+     */
+    private final PropertyEntry<Boolean> unrestrictedExecute =
+        createBooleanProperty("unrestrictedExecute", false);
+    private final PropertyEntry<Integer> executeTimeoutSeconds =
+        createIntegerProperty("executeTimeoutSeconds", 60);
+    private final PropertyEntry<Integer> executeMaxOutputChars =
+        createIntegerProperty("executeMaxOutputChars", 65536);
+    /** The HTML search endpoint the {@code websearch} tool queries (no API key needed). */
+    private final PropertyEntry<String> webSearchEndpoint =
+        createStringProperty("webSearchEndpoint", DEFAULT_WEB_SEARCH_ENDPOINT);
     private final PropertyEntry<Set<String>> toolsDisabled =
         createStringSetProperty("toolsDisabled", new TreeSet<>());
     private final PropertyEntry<Set<String>> allowedToolsWithApproval =
@@ -191,6 +210,10 @@ public class LlmSettings extends AbstractPropertiesSettings {
         setShellTimeoutSeconds(other.getShellTimeoutSeconds());
         setShellMaxOutputChars(other.getShellMaxOutputChars());
         setShellBlockedPatterns(new ArrayList<>(other.getShellBlockedPatterns()));
+        setUnrestrictedExecute(other.getUnrestrictedExecute());
+        setExecuteTimeoutSeconds(other.getExecuteTimeoutSeconds());
+        setExecuteMaxOutputChars(other.getExecuteMaxOutputChars());
+        setWebSearchEndpoint(other.getWebSearchEndpoint());
         setToolsDisabled(new TreeSet<>(other.getToolsDisabled()));
         setAllowedToolsWithApproval(new TreeSet<>(other.getAllowedToolsWithApproval()));
         setAllowedToolsWithoutApproval(new TreeSet<>(other.getAllowedToolsWithoutApproval()));
@@ -465,6 +488,42 @@ public class LlmSettings extends AbstractPropertiesSettings {
 
     public void setShellBlockedPatterns(List<String> v) {
         this.shellBlockedPatterns.set(v);
+    }
+
+    /** Whether the {@code execute} snippet runs without the safety gate (full JVM access). */
+    public boolean getUnrestrictedExecute() {
+        return unrestrictedExecute.get();
+    }
+
+    public void setUnrestrictedExecute(boolean v) {
+        this.unrestrictedExecute.set(v);
+    }
+
+    /** The timeout of an {@code execute} call in seconds. */
+    public int getExecuteTimeoutSeconds() {
+        return executeTimeoutSeconds.get();
+    }
+
+    public void setExecuteTimeoutSeconds(int v) {
+        this.executeTimeoutSeconds.set(v);
+    }
+
+    /** The maximum number of characters returned by an {@code execute} call. */
+    public int getExecuteMaxOutputChars() {
+        return executeMaxOutputChars.get();
+    }
+
+    public void setExecuteMaxOutputChars(int v) {
+        this.executeMaxOutputChars.set(v);
+    }
+
+    /** The HTML search endpoint the {@code websearch} tool queries. */
+    public String getWebSearchEndpoint() {
+        return webSearchEndpoint.get();
+    }
+
+    public void setWebSearchEndpoint(String v) {
+        this.webSearchEndpoint.set(v);
     }
 
     public Set<String> getToolsDisabled() {

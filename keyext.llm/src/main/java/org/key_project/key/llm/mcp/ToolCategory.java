@@ -10,9 +10,10 @@ package org.key_project.key.llm.mcp;
  * only knows name/description/parameters).
  * <p>
  * The enum declaration order is the grouping/sort order: {@link #PROOF} first, then
- * {@link #FILES}, {@link #SHELL}, {@link #TACLETS}, {@link #INTERACTION},
- * {@link #SUBAGENTS}, {@link #DOCUMENTATION} and finally {@link #GENERAL} (the default for
- * tools contributed by external MCP clients that carry no category).
+ * {@link #FILES}, {@link #SHELL}, {@link #WEB}, {@link #SCRIPTING}, {@link #TACLETS},
+ * {@link #INTERACTION}, {@link #SUBAGENTS}, {@link #DOCUMENTATION} and finally
+ * {@link #GENERAL} (the default for tools contributed by external MCP clients that carry no
+ * category).
  * <p>
  * Categories come in two tiers: the KeY-specific tools {@link #PROOF} and {@link #TACLETS}
  * (see {@link #isKeySpecific()}) are only offered to the model on request (via the
@@ -26,6 +27,8 @@ public enum ToolCategory {
     PROOF("Proof", true),
     FILES("Files", false),
     SHELL("Shell", false),
+    WEB("Web", false),
+    SCRIPTING("Scripting", false),
     TACLETS("Taclets", true),
     INTERACTION("Interaction", false),
     SUBAGENTS("Sub-agents", false),
