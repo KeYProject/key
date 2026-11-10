@@ -36,7 +36,6 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.rule.metaconstruct.*;
@@ -2096,31 +2095,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         final List<Object> args = new ArrayList<>(converted.size());
         for (Object a : converted) {
             args.add(a);
-        }
-        if (transformer == MethodCall.class) {
-            // The schema variables before the call are not positional: the variable standing for
-            // the execution context and the one holding the return value are identified by their
-            // program sort (there is no Java type that would let a positional constructor match
-            // distinguish the two roles).
-            ProgramSV execSV = null;
-            ProgramSV returnSV = null;
-            Object call = null;
-            for (Object a : converted) {
-                if (a instanceof ProgramSV sv) {
-                    if (sv.sort() == ProgramSVSort.VARIABLE) {
-                        returnSV = sv;
-                    }
-                    if (sv.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                        execSV = sv;
-                    }
-                } else {
-                    call = a;
-                }
-            }
-            args.clear();
-            args.add(execSV);
-            args.add(returnSV);
-            args.add(call);
         }
         return instantiate(transformer, args);
     }

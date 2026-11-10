@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -85,13 +86,16 @@ public final class MethodCall extends ProgramTransformer {
     }
 
     /**
-     * creates the methodcall-MetaConstruct
+     * Creates the methodcall-MetaConstruct with a single optional schema variable. The variable's
+     * program sort decides its role: an execution-context variable is passed as the execution
+     * context, a program variable as the holder of the call's result.
      *
-     * @param result the SchemaVariable that is used to keep the result
+     * @param sv the schema variable that is either the execution context or keeps the result
      * @param body the ProgramElement contained by the meta construct
      */
-    public MethodCall(SchemaVariable result, ProgramElement body) {
-        this(null, result, body);
+    public MethodCall(ProgramSV sv, ProgramElement body) {
+        this(sv.sort() == ProgramSVSort.EXECUTIONCONTEXT ? sv : null,
+            sv.sort() == ProgramSVSort.VARIABLE ? sv : null, body);
     }
 
     /**
