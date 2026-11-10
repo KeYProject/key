@@ -48,6 +48,10 @@ public final class SeqLDT extends LDT {
     private final Function seqUpd;
     private final Function seqDef;
     private final Function values;
+    private final Function seqSwap;
+    private final Function seqRemove;
+    private final Function seqNPermInv;
+    private final Function array2seq;
 
     public SeqLDT(TermServices services) {
         super(NAME, services);
@@ -62,6 +66,10 @@ public final class SeqLDT extends LDT {
         seqIndexOf = addFunction(services, "seqIndexOf");
         seqDef = addFunction(services, "seqDef");
         values = addFunction(services, "values");
+        seqSwap = addFunction(services, "seqSwap");
+        seqRemove = addFunction(services, "seqRemove");
+        seqNPermInv = addFunction(services, "seqNPermInv");
+        array2seq = addFunction(services, "array2seq");
     }
 
     public ParametricFunctionDecl getSeqGet() {
@@ -127,6 +135,22 @@ public final class SeqLDT extends LDT {
      */
     public Function getValues() {
         return values;
+    }
+
+    public Function getSeqSwap() {
+        return seqSwap;
+    }
+
+    public Function getSeqRemove() {
+        return seqRemove;
+    }
+
+    public Function getSeqNPermInv() {
+        return seqNPermInv;
+    }
+
+    public Function getArray2seq() {
+        return array2seq;
     }
 
 

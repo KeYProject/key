@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
@@ -60,6 +61,10 @@ public final class PSeqLDT extends ParametricLDT {
 
     public ParametricFunctionDecl getPseqGet() {
         return pseqGet;
+    }
+
+    public boolean isPseqGetOp(org.key_project.logic.op.Operator op) {
+        return op instanceof ParametricFunctionInstance pfi && pfi.getBase() == pseqGet;
     }
 
     public ParametricFunctionDecl getPseqLen() {

@@ -638,6 +638,11 @@ public class ProofCollections {
         g.provable("heap/vstte10_05_Queue/LinkedList_reverse.key");
         g.provable("heap/vstte10_05_Queue/LinkedList_tail.key");
 
+        g = c.group("VSTTE12");
+        g.provable("heap/vstte12_01_Swap/TwoWaySwap_set.key");
+        g.provable("heap/vstte12_01_Swap/TwoWaySwap_swap.key");
+        g.provable("heap/vstte12_01_Swap/TwoWaySwap_twoWaySort.key");
+
         g = c.group("FM2024Tutorial");
         g.provable("heap/FM2024Tutorial/BinarySearch/BinSearch_binSearchR.key");
         g.provable("heap/FM2024Tutorial/BinarySearch/BinSearch_binSearch_normal.key");
