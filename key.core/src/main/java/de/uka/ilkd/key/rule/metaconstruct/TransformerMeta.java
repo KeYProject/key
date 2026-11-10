@@ -9,8 +9,10 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * Meta data of a (program or term) transformer: its internal meta-construct name, i.e. the same
- * name that is passed to {@code super(...)} by the annotated transformer class. Used by
- * {@link de.uka.ilkd.key.doc.CodeTransformerDoc} to generate the transformer documentation.
+ * name that is passed to {@code super(...)} by the annotated transformer class. The name is the
+ * single source of truth for the meta-construct; it is used by
+ * {@link ProgramTransformerRegistry} to resolve the {@code #name(...)} meta-construct statements
+ * written in rule files to their transformer.
  *
  * @author Alexander Weigl
  * @version 1 (22.10.26)

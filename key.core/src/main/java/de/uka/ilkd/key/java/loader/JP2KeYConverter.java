@@ -46,7 +46,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 import org.key_project.logic.MetaSpace;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
-import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -453,6 +452,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                         .toList())
                 .orElse(Collections.emptyList()));
         return comments;
+    }
+
+    private static String transformerName(
+            @NonNull Class<? extends ProgramTransformer> transformer) {
+        return Objects.requireNonNull(transformer.getAnnotation(TransformerMeta.class),
+            transformer.getSimpleName() + " is missing @TransformerMeta").name();
     }
 
     @SuppressWarnings("unchecked")
@@ -949,6 +954,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         if (n.getNameAsString().startsWith("\\")) {
             return handleSpecialFunctionInvocation(n, n.getNameAsString(), n.getArguments());
+        }
+        // These transformers have no grammar tokens and therefore parse as ordinary method calls;
+        // they are matched via their @TransformerMeta names.
+        if (n.getNameAsString().equals(transformerName(CreateObject.class))) {
+            return new CreateObject(accept(n.getArguments().get(0)));
+        }
+        if (n.getNameAsString().equals(transformerName(ArrayLength.class))) {
+            return new ArrayLength(accept(n.getArguments().get(0)));
         }
 
         MethodName name;
@@ -1930,77 +1943,82 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(KeyMetaConstructExpression n, Void arg) {
-        String mcName = n.getText();
-        Expression child = accept(n.getChild());
-        return switch (mcName) {
-            case "#create-object" -> new CreateObject(child);
+        final Expression child = accept(n.getChild());
+        return switch (n.getText()) {
             case "#isstatic" -> new IsStatic(child);
-            case "#length-reference" -> new ArrayLength(child);
-            default -> reportError(n, "Program meta construct " + mcName + " unknown.");
+            default -> reportError(n, "Program meta construct " + n.getText() + " unknown.");
         };
     }
 
-
     @Override
     public Object visit(KeyMetaConstruct n, Void arg) {
-        String mcName = n.getKind();
-        final ImmutableArray<SchemaVariable> labels = map(n.getSchemas());
-        return switch (mcName) {
-            case "#switch-to-if" -> new SwitchToIf(accept(n.getChild()));
-            case "#unwind-loop" ->
-                new UnwindLoop(labels.get(0), labels.get(1), accept(n.getChild()));
-            case "#unpack" -> new Unpack(accept(n.getChild()));
+        final String kind = n.getKind();
+        if (ProgramTransformerRegistry.byName(kind) == null) {
+            return reportError(n, "Program meta construct " + kind + " unknown or unsupported.");
+        }
+        // One child per comma-separated argument: bare schema variables resolve to
+        // SchemaVariables, statements and expressions are converted as usual.
+        final ImmutableArray<Object> args = map(n.getChildren());
+        return switch (kind) {
+            case "#switchToIf" -> new SwitchToIf((SchemaVariable) args.get(0));
+            case "#unwindLoop" ->
+                new UnwindLoop((SchemaVariable) args.get(0), (SchemaVariable) args.get(1),
+                    (LoopStatement) args.get(2));
+            case "#unpack" -> new Unpack((For) args.get(0));
             case "#forInitUnfoldTransformer" ->
-                new ForInitUnfoldTransformer((ProgramSV) accept(n.getChild()));
-            case "#for-to-while" ->
-                new ForToWhile(labels.get(0), labels.get(1), accept(n.getChild()));
-            case "#enhancedfor-elim" -> {
-                EnhancedFor efor = acceptn(n.getChild());
-                if (efor == null) {
-
-                    yield reportError(n,
-                        "#enhancedfor-elim requires an enhanced for loop as argument");
-                }
-
+                new ForInitUnfoldTransformer((ProgramSV) args.get(0));
+            case "#forToWhile" -> new ForToWhile((SchemaVariable) args.get(0),
+                (SchemaVariable) args.get(1), (Statement) args.get(2));
+            case "#enhancedforElim" -> {
+                EnhancedFor efor = null;
                 ProgramSV execSV = null;
-                for (SchemaVariable programSV : labels) {
-                    if (((OperatorSV) programSV).sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                        execSV = (ProgramSV) programSV;
-                        break;
+                for (Object a : args) {
+                    if (a instanceof EnhancedFor f) {
+                        efor = f;
+                    } else if (a instanceof ProgramSV sv
+                            && sv.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                        execSV = sv;
                     }
+                }
+                if (efor == null) {
+                    yield reportError(n,
+                        "#enhancedforElim requires an enhanced for loop as argument");
                 }
                 yield new EnhancedForElimination(execSV, efor);
             }
-            case "#do-break" -> new DoBreak(accept(n.getChild()));
-            case "#expand-method-body" ->
-                new ExpandMethodBody((SchemaVariable) accept(n.getChild()));
-            case "#method-call" -> {
+            case "#doBreak" -> new DoBreak((LabeledStatement) args.get(0));
+            case "#expandMethodBody" -> new ExpandMethodBody((SchemaVariable) args.get(0));
+            case "#methodCall" -> {
                 ProgramSV execSV = null;
                 ProgramSV returnSV = null;
-                for (int i = 0; i < labels.size(); i++) {
-                    final OperatorSV sv = (OperatorSV) labels.get(i);
-                    if (sv.sort() == ProgramSVSort.VARIABLE) {
-                        returnSV = (ProgramSV) sv;
-                    }
-                    if (sv.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                        execSV = (ProgramSV) sv;
+                for (Object a : args) {
+                    if (a instanceof ProgramSV sv) {
+                        if (sv.sort() == ProgramSVSort.VARIABLE) {
+                            returnSV = sv;
+                        }
+                        if (sv.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
+                            execSV = sv;
+                        }
                     }
                 }
-                yield new MethodCall(execSV, returnSV, accept(n.getChild()));
+                yield new MethodCall(execSV, returnSV,
+                    (ProgramElement) args.get(args.size() - 1));
             }
-            case "#evaluate-arguments" -> new EvaluateArgs(accept(n.getChild()));
-            case "#constructor-call" -> new ConstructorCall(labels.get(0), accept(n.getChild()));
-            case "#special-constructor-call" -> new SpecialConstructorCall(accept(n.getChild()));
-            case "#post-work" -> new PostWork((SchemaVariable) accept(n.getChild()));
-            case "#static-initialisation" -> new StaticInitialisation(accept(n.getChild()));
-            case "#resolve-multiple-var-decl" ->
-                new MultipleVarDecl((SchemaVariable) n.getChild().accept(this, arg));
-            case "#array-post-declaration" ->
-                new ArrayPostDecl((SchemaVariable) n.getChild().accept(this, arg));
-            case "#init-array-creation" ->
-                new InitArrayCreation(labels.get(0), accept(n.getChild()));
-            case "#reattachLoopInvariant" -> new ReattachLoopInvariant(accept(n.getChild()));
-            default -> reportError(n, "Program meta construct " + n.getKind() + " unknown.");
+            case "#evaluateArguments" -> new EvaluateArgs((ProgramElement) args.get(0));
+            case "#constructorCall" ->
+                new ConstructorCall((SchemaVariable) args.get(0), (ProgramElement) args.get(1));
+            case "#specialConstructorCall" ->
+                new SpecialConstructorCall((ProgramElement) args.get(0));
+            case "#postWork" -> new PostWork((SchemaVariable) args.get(0));
+            case "#staticInitialisation" -> new StaticInitialisation((Expression) args.get(0));
+            case "#resolveMultipleVarDecl" -> new MultipleVarDecl((SchemaVariable) args.get(0));
+            case "#arrayPostDeclaration" -> new ArrayPostDecl((SchemaVariable) args.get(0));
+            case "#initArrayCreation" ->
+                new InitArrayCreation((SchemaVariable) args.get(0), (ProgramElement) args.get(1));
+            case "#reattachLoopInvariant" ->
+                new ReattachLoopInvariant((LoopStatement) args.get(0));
+            default -> throw new IllegalStateException(
+                "No conversion case for registered program meta construct " + kind);
         };
     }
 
