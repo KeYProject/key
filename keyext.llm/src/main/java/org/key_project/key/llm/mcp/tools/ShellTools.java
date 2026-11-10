@@ -55,8 +55,9 @@ public final class ShellTools implements AgentToolProvider {
                         .build(),
                 "timeout",
                 JsonSchema.builder().withType("integer")
-                        .withDescription("timeout in milliseconds (default "
-                            + DEFAULT_TIMEOUT_MS + ", capped by the configured shell timeout)")
+                        .withDescription("timeout in milliseconds (defaults to the configured"
+                            + " shell timeout, 30000 by default; at most " + DEFAULT_TIMEOUT_MS
+                            + ")")
                         .build()),
             true,
             args -> runCommand(AgentTool.stringArg(args, "command"),
@@ -127,16 +128,32 @@ public final class ShellTools implements AgentToolProvider {
         return header + "\n" + body;
     }
 
-    /** Reads at most {@code maxChars} characters from the stream (blocking). */
-    private static String readBounded(java.io.InputStream stream, int maxChars) {
-        try {
-            var bytes = stream.readAllBytes();
-            var text = new String(bytes, StandardCharsets.UTF_8);
-            if (text.length() > maxChars) {
-                text = text.substring(0, maxChars) + "\n... [output truncated at " + maxChars
-                    + " characters]";
+    /**
+     * Reads at most {@code maxChars} characters from the stream (blocking). Output beyond the
+     * cap is drained and discarded, so the child never blocks on a full pipe; the text is cut
+     * between characters, never inside a multi-byte character. Package-private so the
+     * boundedness can be tested headless.
+     */
+    static String readBounded(java.io.InputStream stream, int maxChars) {
+        try (var reader = new java.io.BufferedReader(
+            new java.io.InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            var text = new StringBuilder();
+            var buffer = new char[8192];
+            boolean truncated = false;
+            int read;
+            while ((read = reader.read(buffer)) >= 0) {
+                int room = maxChars - text.length();
+                if (room <= 0) {
+                    truncated = true;
+                    continue;
+                }
+                if (read > room) {
+                    truncated = true;
+                }
+                text.append(buffer, 0, Math.min(room, read));
             }
-            return text;
+            return truncated ? text + "\n... [output truncated at " + maxChars + " characters]"
+                    : text.toString();
         } catch (IOException e) {
             return "(output could not be read: " + e.getMessage() + ")";
         }

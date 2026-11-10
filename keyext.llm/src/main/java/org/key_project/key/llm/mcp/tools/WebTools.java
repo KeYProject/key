@@ -51,10 +51,12 @@ public final class WebTools implements AgentToolProvider {
     public List<AgentTool> get() {
         return List.of(
             AgentTool.tool(KeYAgentTools.TOOL_WEBFETCH, ToolCategory.WEB,
-                "Fetches a public web page (http/https only) and returns its content as"
+                "Fetches a web page (http/https only) and returns its content as"
                     + " Markdown (default), plain text or raw HTML. Responses are capped at"
-                    + " 2 MB; no authentication, no cookies, no local or internal addresses"
-                    + " beyond the URL given.",
+                    + " 2 MB. No authentication and no cookies are sent; there is no address"
+                    + " restriction beyond the http/https scheme - local and internal network"
+                    + " addresses are reachable like any public site, so only fetch URLs whose"
+                    + " content you intend to bring into the conversation.",
                 AgentTool.schema("url",
                     JsonSchema.builder().withType("string")
                             .withDescription("the http(s) URL to fetch").build(),
@@ -111,31 +113,74 @@ public final class WebTools implements AgentToolProvider {
         var request = HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(timeout))
                 .header("Accept", "text/html,application/xhtml+xml,text/plain;q=0.8,*/*;q=0.5")
                 .header("User-Agent", "KeY-Agent/1.0 (+https://key-project.org)").GET().build();
-        HttpResponse<byte[]> response;
+        HttpResponse<java.io.InputStream> response;
         try {
-            response = CLIENT.send(request, HttpResponse.BodyHandlers.ofByteArray());
+            response = CLIENT.send(request, HttpResponse.BodyHandlers.ofInputStream());
         } catch (IOException e) {
             return "Error: fetch failed: " + e.getMessage();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return "Error: fetch interrupted";
         }
-        int status = response.statusCode();
-        if (status >= 400) {
-            return "Error: the server answered with HTTP status " + status + " for " + url;
+        try (var body = response.body()) {
+            int status = response.statusCode();
+            if (status >= 400) {
+                return "Error: the server answered with HTTP status " + status + " for " + url;
+            }
+            // the memory cap is enforced while reading: an oversized *declared* body is not
+            // downloaded at all, and an undeclared or undersold body is drained at most to
+            // the cap (the connection is closed instead)
+            long declared = response.headers().firstValueAsLong("content-length").orElse(-1);
+            if (declared > MAX_BODY_BYTES) {
+                return "Error: the response is too large (" + declared + " bytes; the cap is "
+                    + MAX_BODY_BYTES + " bytes): " + url;
+            }
+            var bounded = readBounded(body, MAX_BODY_BYTES);
+            var text = new String(bounded.bytes(), StandardCharsets.UTF_8);
+            var mime = response.headers().firstValue("content-type").orElse("");
+            return switch (outputFormat) {
+                case "html" -> cap(text, bounded.truncated());
+                case "text" ->
+                    cap(mime.contains("html") ? toPlainText(text) : text.stripTrailing(),
+                        bounded.truncated());
+                default -> cap(mime.contains("html") ? toMarkdown(text) : text.stripTrailing(),
+                    bounded.truncated());
+            };
+        } catch (IOException e) {
+            return "Error: the response could not be read: " + e.getMessage();
         }
-        var bytes = response.body() == null ? new byte[0] : response.body();
-        var truncated = bytes.length > MAX_BODY_BYTES;
-        var text = new String(bytes, 0, Math.min(bytes.length, MAX_BODY_BYTES),
-            StandardCharsets.UTF_8);
-        var mime = response.headers().firstValue("content-type").orElse("");
-        return switch (outputFormat) {
-            case "html" -> cap(text, truncated);
-            case "text" ->
-                cap(mime.contains("html") ? toPlainText(text) : text.stripTrailing(), truncated);
-            default -> cap(mime.contains("html") ? toMarkdown(text) : text.stripTrailing(),
-                truncated);
-        };
+    }
+
+    /**
+     * One bounded response body: at most {@code maxBytes} raw bytes, and whether the stream had
+     * more.
+     */
+    record BoundedBody(byte[] bytes, boolean truncated) {
+    }
+
+    /**
+     * Reads at most {@code maxBytes} bytes from the stream; reports whether more was
+     * available. Bounded in memory: nothing beyond the cap is buffered (the caller closes the
+     * stream instead of draining it). Package-private so the boundedness can be tested
+     * headless.
+     */
+    static BoundedBody readBounded(java.io.InputStream stream, int maxBytes) throws IOException {
+        var out = new java.io.ByteArrayOutputStream(Math.min(maxBytes, 64 * 1024));
+        var buffer = new byte[8192];
+        boolean truncated = false;
+        int read;
+        while ((read = stream.read(buffer)) >= 0) {
+            int room = maxBytes - out.size();
+            if (room <= 0) {
+                truncated = true;
+                break;
+            }
+            if (read > room) {
+                truncated = true;
+            }
+            out.write(buffer, 0, Math.min(room, read));
+        }
+        return new BoundedBody(out.toByteArray(), truncated);
     }
 
     /** Appends a truncation note to a body that was cut at the size cap. */

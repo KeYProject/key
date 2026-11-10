@@ -18,13 +18,13 @@ A role (`SubagentRole`) couples:
 
 | field            | meaning                                                        |
 |------------------|----------------------------------------------------------------|
-| `name`           | id used as the `role` argument of `subagent`             |
+| `name`           | id used as the `agent` argument of `subagent`            |
 | `description`    | shown to the delegating agent                                 |
 | `systemPrompt`   | instructions prepended to the child's system prompt           |
 | `allowedTools`   | tool whitelist (empty = inherit all enabled tools)            |
 | `model`          | optional model override (empty = parent's model)              |
 | `maxTurns`       | per-child tool-round budget (0 = global `maxSubagentTurns`)   |
-| `parallelAllowed`| whether `mode: parallel` may be used                          |
+| `parallelAllowed`| whether a `prompts` array (parallel fan-out) may be used       |
 
 Roles are contributed by `SubagentRoleProvider`s via `ServiceLoader`
 (`META-INF/services/org.key_project.key.llm.subagents.SubagentRoleProvider`) — the same pattern
@@ -44,7 +44,8 @@ Built-in roles:
 `AgentLoop.processBatch` intercepts `subagent` (like `question`/`skill` and `execute`) and calls
 `SubagentRunner.run(...)`, which:
 
-1. resolves the role and the `mode` argument (`sequential` or `parallel`),
+1. resolves the role (`agent`) and the delegation shape (`prompt` for one child, a
+   `prompts` array for parallel fan-out),
 2. applies the settings gate (`subagentsEnabled`) and the depth guard (`maxSubagentDepth`,
    thread-local so nested delegations are bounded),
 3. runs the child loop: fresh `LlmContext`, system prompt + task, advertised tools =
@@ -56,21 +57,21 @@ Built-in roles:
 
 ### Parallel fan-out
 
-`mode: parallel` runs the `tasks` array (list of independent task strings) concurrently, one
-worker thread per task on a shared fixed-size pool. Constraints:
+A `prompts` array runs the independent prompts concurrently, one
+worker thread per prompt on a shared fixed-size pool. Constraints:
 
-- only roles with `parallelAllowed` accept it, and at least one task is required,
-- the pool size is `min(tasks, maxParallelSubagents)` — extra tasks queue and run as workers
-  finish,
+- only roles with `parallelAllowed` accept it, and at least one prompt is required,
+- the pool size is `min(prompts, maxParallelSubagents)` — extra prompts queue and run as
+  workers finish,
 - **tool dispatch is serialized** through a global lock: KeY `Proof` objects and the GUI
   mediator are not thread-safe, so the parallelism is in the LLM round-trips (each worker owns
   its own message thread and a fresh HTTP call) while every mutation/queries on the proof are
   mutually exclusive. Nested `subagent` calls happen *outside* that lock, so parallel
   nesting cannot deadlock,
-- the merged result is one tool message: a run header, then `(1) …`, `(2) …` per task (a task
-  that failed/interrupted is reported as such, the rest still run to completion),
+- the merged result is one tool message: a run header, then `(1) …`, `(2) …` per prompt (a
+  prompt that failed/interrupted is reported as such, the rest still run to completion),
 - the depth guard applies per worker thread (a parallel worker is at depth `parentDepth + 1`),
-  so a broadcaster can hand out tasks but filling sub-sub-agents is still bounded.
+  so a broadcaster can hand out prompts but filling sub-sub-agents is still bounded.
 
 ### Safety model
 

@@ -187,7 +187,15 @@ public class AgentLoop {
         if (observer != null) {
             observer.toolStarted(new ToolCallInfo(p.toolCallId(), p.name(), p.arguments()));
         }
-        var future = session.getToolDispatcher().submit(session, p.name(), p.arguments());
+        CompletableFuture<?> future;
+        if (KeYAgentTools.TOOL_EXECUTE.equals(p.name())) {
+            // the approved snippet runs like the intercepted call: outside the dispatch lock
+            // (the placeholder body of the execute tool cannot run a snippet)
+            future = session.getToolDispatcher()
+                    .submitTask(() -> ScriptingTools.run(session, p.arguments()));
+        } else {
+            future = session.getToolDispatcher().submit(session, p.name(), p.arguments());
+        }
         var outcome = await(future, p.toolCallId(), p.name(), p.arguments());
         if (observer != null) {
             observer.toolFinished(p.toolCallId(), outcome instanceof AwaitDone done
@@ -460,6 +468,13 @@ public class AgentLoop {
         }
 
         if (KeYAgentTools.TOOL_EXECUTE.equals(name)) {
+            // execute is ask-approved by default: the approval is decided here (like for
+            // ordinary tools below), the approved snippet then runs outside the dispatch lock
+            if (session.getMcpClient().requiresApproval(name)) {
+                commitRound();
+                pending = new PendingApproval(id, name, arguments);
+                return new AgentResult.NeedsApproval(new ToolCallInfo(id, name, arguments));
+            }
             var observer = session.getTurnObserver();
             if (observer != null) {
                 observer.toolStarted(new ToolCallInfo(id, name, arguments));
