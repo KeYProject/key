@@ -2067,21 +2067,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyMetaConstructExpression n, Void arg) {
-        // The only grammar production for a KeyMetaConstructExpression is #isstatic, which is
-        // resolved through the expression registry like every other transformer.
-        final Class<? extends ProgramTransformer> transformer =
-            ProgramTransformerRegistry.expressionByName(n.getText());
-        if (transformer == null) {
-            return reportError(n,
-                "Program meta construct " + n.getText() + " unknown or unsupported.");
-        }
-        final List<Object> args = new ArrayList<>(1);
-        args.add(accept(n.getChild()));
-        return instantiate(transformer, args);
-    }
-
-    @Override
     public Object visit(KeyMetaConstruct n, Void arg) {
         final String kind = n.getKind();
         final Class<? extends ProgramTransformer> transformer =
