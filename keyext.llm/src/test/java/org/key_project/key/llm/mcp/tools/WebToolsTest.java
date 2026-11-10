@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm.mcp.tools;
 
+import java.time.Duration;
+
 import org.key_project.key.llm.mcp.KeYAgentTools;
 import org.key_project.key.llm.mcp.Tool;
 import org.key_project.key.llm.mcp.ToolCategory;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -161,6 +164,77 @@ class WebToolsTest {
         var tool = tools.agent(KeYAgentTools.TOOL_WEBSEARCH);
         assertTrue(tool.call(java.util.Map.of()).toString().contains("'query' parameter"),
             tool.call(java.util.Map.of()).toString());
+    }
+
+    // ------------------------------------------------------------------ bounded bodies
+
+    @Test
+    void readBoundedCapsTheBodyAtTheSizeLimit() throws Exception {
+        var big = new byte[WebTools.MAX_BODY_BYTES + 1024];
+        try (var stream = new java.io.ByteArrayInputStream(big)) {
+            var body = WebTools.readBounded(stream, WebTools.MAX_BODY_BYTES);
+            assertEquals(WebTools.MAX_BODY_BYTES, body.bytes().length);
+            assertTrue(body.truncated(), "an over-cap body must be reported as truncated");
+        }
+        try (var stream = new java.io.ByteArrayInputStream(new byte[] { 1, 2, 3 })) {
+            var body = WebTools.readBounded(stream, WebTools.MAX_BODY_BYTES);
+            assertEquals(3, body.bytes().length);
+            assertFalse(body.truncated());
+        }
+        // a body of exactly the cap is not truncated
+        try (var stream = new java.io.ByteArrayInputStream(new byte[WebTools.MAX_BODY_BYTES])) {
+            var body = WebTools.readBounded(stream, WebTools.MAX_BODY_BYTES);
+            assertEquals(WebTools.MAX_BODY_BYTES, body.bytes().length);
+            assertFalse(body.truncated());
+        }
+    }
+
+    @Test
+    void webfetchRejectsResponsesDeclaredLargerThanTheCap() throws Exception {
+        var server = com.sun.net.httpserver.HttpServer
+                .create(new java.net.InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/big", exchange -> {
+            // the declared body is never actually sent: the pre-check must reject the
+            // response from its headers alone
+            exchange.sendResponseHeaders(200, WebTools.MAX_BODY_BYTES + 1L);
+            exchange.close();
+        });
+        server.start();
+        try {
+            var tools = new KeYAgentTools();
+            var tool = tools.agent(KeYAgentTools.TOOL_WEBFETCH);
+            var url = "http://127.0.0.1:" + server.getAddress().getPort() + "/big";
+            var result = String.valueOf(tool.call(java.util.Map.of("url", url)));
+            assertTrue(result.startsWith("Error: the response is too large"), result);
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    @Test
+    void webfetchTruncatesUndeclaredOversizedResponses() throws Exception {
+        var server = com.sun.net.httpserver.HttpServer
+                .create(new java.net.InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/liar", exchange -> {
+            // chunked (no content-length): the body is larger than the cap
+            exchange.sendResponseHeaders(200, 0);
+            try (var out = exchange.getResponseBody()) {
+                out.write(new byte[WebTools.MAX_BODY_BYTES + 4096]);
+            }
+        });
+        server.start();
+        try {
+            var tools = new KeYAgentTools();
+            var tool = tools.agent(KeYAgentTools.TOOL_WEBFETCH);
+            var url = "http://127.0.0.1:" + server.getAddress().getPort() + "/liar";
+            var result = assertTimeoutPreemptively(Duration.ofSeconds(30),
+                () -> String.valueOf(
+                    tool.call(java.util.Map.of("url", url, "format", "text", "timeout", 30))),
+                "the bounded drain must stop at the cap instead of buffering everything");
+            assertTrue(result.contains("[truncated at 2 MB]"), result);
+        } finally {
+            server.stop(0);
+        }
     }
 
     @Test

@@ -439,9 +439,10 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
 - `shell` *always* requires per-call approval, and commands matching the configured **blocklist**
   (e.g. `rm -rf /`, `sudo`, `chmod -R` on system directories, `curl … | sh`) are refused
   regardless of approval.
-- The web tools `webfetch` and `websearch` are read-only access to public HTTP(S) content and run
-  without approval: `webfetch` fetches only `http`/`https` URLs (2 MB cap), `websearch` queries
-  the configured search endpoint. Neither sends credentials or cookies.
+- The web tools `webfetch` and `websearch` are read-only HTTP(S) access and run without
+  approval: `webfetch` fetches only `http`/`https` URLs (2 MB cap — any address is reachable,
+  including local and internal ones), `websearch` queries the configured search endpoint.
+  Neither sends credentials or cookies.
 - `execute` requires approval for every call. Its snippets run in an embedded JShell inside the
   KeY JVM; by default a best-effort safety gate rejects snippets that spawn processes, exit the
   JVM, use reflection or raw file/network I/O (see [section 7.4](#74-scripting-execute)). The
@@ -455,12 +456,16 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
 ### 7.3 Sub-agents (`subagent`)
 
 A **sub-agent** is a delegated, bounded tool loop with a role-specific system prompt and a
-restricted tool whitelist. The `subagent` tool takes a role, a task (or a `tasks` array
-in parallel mode) and a mode:
+restricted tool whitelist. The `subagent` tool takes the role (`agent`), a short
+`description` for the chat activity and the sub-agent log, the `prompt` to solve — or a
+`prompts` array for parallel fan-out — and an optional `model` override:
 
 ```
-subagent { "role": "goal-solver", "task": "Close all open goals of the current proof.",
-           "mode": "sequential" }
+subagent { "agent": "goal-solver", "description": "Close the goals",
+           "prompt": "Close all open goals of the current proof." }
+
+subagent { "agent": "file-explorer", "description": "Map the model",
+           "prompts": ["List the classes of the model.", "Find the JML invariants."] }
 ```
 
 - **Roles** are registered via the Java `ServiceLoader` (service file
@@ -474,19 +479,19 @@ subagent { "role": "goal-solver", "task": "Close all open goals of the current p
 - **Bounded:** each sub-agent has a tool-round budget (role-specific, or `max sub-agent turns`)
   and a maximum nesting depth (`max sub-agent depth`); delegations inside a sub-agent are
   depth-guarded, cancellations of the parent turn propagate into running children.
-- **Parallel fan-out:** `mode: parallel` solves a `tasks` array of independent tasks
-  concurrently (only for roles marked `parallelAllowed`, e.g. `goal-solver` and `file-explorer`,
-  not `rule-designer`). One worker thread runs per task on a pool capped by
+- **Parallel fan-out:** a `prompts` array of independent prompts runs concurrently
+  (only for roles marked `parallelAllowed`, e.g. `goal-solver` and `file-explorer`,
+  not `rule-designer`). One worker thread runs per prompt on a pool capped by
   `max parallel sub-agents`; tool *dispatch* is serialized through a global lock, because KeY
   proofs and the GUI mediator are not thread-safe — the speed-up is in the overlapping LLM
   round-trips, while every call that touches the proof stays mutually exclusive. The merged
-  result is one tool message listing `(1) …`, `(2) …` per task. Nested spawns run outside the
-  lock, so parallel sub-sub-agents cannot deadlock.
+  result is one tool message listing `(1) …`, `(2) …` per prompt. Nested spawns run outside
+  the lock, so parallel sub-sub-agents cannot deadlock.
 - **Result:** the child's final answer (which should start with
   `KEY_AGENT_RESULT {"summary": "…"}` for machine-readable outcomes) is returned to the
   delegating agent as the tool result.
 - **Observability:** every finished delegation is recorded in a per-session log (role, mode,
-  timing, and per task the status, round count and called tools). The read-only
+  timing, and per prompt the status, round count and called tools). The read-only
   `get_subagent_logs` tool renders it for the model (newest first, optional `limit` and `role`
   filter), the chat panel shows the per-task lines indented under the `subagent` row in
   the tool-activity summary, and *Clear history* clears the log together with the conversation.

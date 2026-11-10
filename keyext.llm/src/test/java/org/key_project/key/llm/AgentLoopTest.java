@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.llm;
 
+import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import org.key_project.key.llm.mcp.KeYAgentTools;
 
@@ -18,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -168,11 +172,123 @@ class AgentLoopTest {
     }
 
     @Test
+    void executeRequiresApprovalBeforeItRuns() {
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("e1", KeYAgentTools.TOOL_EXECUTE,
+                "{\"code\":\"1+1\"}")),
+            ""));
+        mock.thenRespond(MockCompletions.text("done"));
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult first = loop.begin("run it", null, null, null);
+
+        // execute is ask-approved by default: the turn pauses before any snippet runs
+        assertInstanceOf(AgentResult.NeedsApproval.class, first);
+        assertEquals(KeYAgentTools.TOOL_EXECUTE,
+            ((AgentResult.NeedsApproval) first).toolCall().name());
+
+        // the approval resumes the turn: the approved snippet runs and reports its value
+        AgentResult resumed = loop.decideApproval(true, false);
+        assertInstanceOf(AgentResult.Done.class, resumed);
+        var lastMessages = mock.sent.get(1).messages();
+        var toolMsg = (Map<String, Object>) lastMessages.get(lastMessages.size() - 1);
+        assertEquals("2", String.valueOf(toolMsg.get("content")),
+            "the approved snippet must run through the JShell path, not the placeholder");
+    }
+
+    @Test
+    void executeApprovalDenialSkipsTheSnippet() {
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("e1", KeYAgentTools.TOOL_EXECUTE,
+                "{\"code\":\"1+1\"}")),
+            ""));
+        mock.thenRespond(MockCompletions.text("understood"));
+
+        var loop = new AgentLoop(session, mock);
+        loop.begin("run it", null, null, null);
+        AgentResult resumed = loop.decideApproval(false, false);
+
+        assertInstanceOf(AgentResult.Done.class, resumed);
+        var lastMessages = mock.sent.get(1).messages();
+        var toolMsg = (Map<String, Object>) lastMessages.get(lastMessages.size() - 1);
+        assertTrue(String.valueOf(toolMsg.get("content")).contains("denied"),
+            "the denied snippet must not run: " + toolMsg.get("content"));
+    }
+
+    @Test
+    void executeRunsWhileTheDispatchLockIsHeld() throws Exception {
+        // the snippet must not wait for the dispatch lock: another session could hold it for
+        // a whole tool call (or a parallel sub-agent for many)
+        LlmSettings.INSTANCE.setAllowedToolsWithoutApproval(
+            new java.util.TreeSet<>(Set.of(KeYAgentTools.TOOL_EXECUTE)));
+        var lockHeld = new CountDownLatch(1);
+        var releaseLock = new CountDownLatch(1);
+        Thread holder = new Thread(() -> ToolDispatcher.INSTANCE.callSynchronized(() -> {
+            lockHeld.countDown();
+            try {
+                releaseLock.await(30, TimeUnit.SECONDS);
+            } catch (InterruptedException ignored) {
+                // released early
+            }
+            return null;
+        }), "dispatch-lock-holder");
+        holder.start();
+        try {
+            assertTrue(lockHeld.await(5, TimeUnit.SECONDS), "the holder must have the lock");
+
+            var mock = new MockCompletions();
+            mock.thenRespond(MockCompletions.toolCalls(
+                List.of(MockCompletions.tool("e1", KeYAgentTools.TOOL_EXECUTE,
+                    "{\"code\":\"1+1\"}")),
+                ""));
+            mock.thenRespond(MockCompletions.text("done"));
+            var loop = new AgentLoop(session, mock);
+
+            AgentResult result = assertTimeoutPreemptively(Duration.ofSeconds(20),
+                () -> loop.begin("run it", null, null, null),
+                "execute must run outside the dispatch lock (the holder keeps it busy)");
+            assertInstanceOf(AgentResult.Done.class, result);
+        } finally {
+            releaseLock.countDown();
+            holder.join(TimeUnit.SECONDS.toMillis(5));
+        }
+    }
+
+    @Test
+    void questionAcceptsSeveralQuestions() {
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("q1", KeYAgentTools.TOOL_QUESTION,
+                "{\"questions\":[{\"question\":\"First?\"},{\"header\":\"Mode\","
+                    + "\"question\":\"Second?\",\"multiple\":true,"
+                    + "\"options\":[{\"label\":\"A\",\"description\":\"first\"},\"B\"]}]}")),
+            ""));
+        mock.thenRespond(MockCompletions.text("ok"));
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult result = loop.begin("ask", null, null, null);
+
+        assertInstanceOf(AgentResult.NeedsInput.class, result);
+        var questions = ((AgentResult.NeedsInput) result).questions();
+        assertEquals(2, questions.size());
+        assertNull(questions.get(0).header());
+        assertEquals("First?", questions.get(0).text());
+        assertEquals("Mode", questions.get(1).header());
+        assertTrue(questions.get(1).multiple());
+        assertEquals(2, questions.get(1).options().size());
+        assertEquals("A", questions.get(1).options().get(0).label());
+        assertEquals("first", questions.get(1).options().get(0).description());
+        assertEquals("B", questions.get(1).options().get(1).label());
+    }
+
+    @Test
     void useSkillIsGatedByTheSettingsFlag() {
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
             List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SKILL,
-                "{\"name\":\"optics\"}")),
+                "{\"id\":\"optics\"}")),
             ""));
         mock.thenRespond(MockCompletions.text("ok"));
 
@@ -193,7 +309,7 @@ class AgentLoopTest {
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
             List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SKILL,
-                "{\"name\":\"no-such-skill\"}")),
+                "{\"id\":\"no-such-skill\"}")),
             ""));
         mock.thenRespond(MockCompletions.text("fine"));
 

@@ -111,15 +111,15 @@ boolean hasPendingQuestion(); boolean hasPendingApproval();
 | Variant | Meaning |
 |---|---|
 | `Done(content, activities)` | final answer plus `ToolActivity` summaries (`ToolActivity(name, arguments, result)`) |
-| `NeedsInput(Question)` | the `question` tool fired; resume with `answerQuestion` |
+| `NeedsInput(List<Question>)` | the `question` tool fired; resume with `answerQuestion` |
 | `NeedsApproval(ToolCallInfo)` | a tool needs approval; resume with `decideApproval` |
 | `Failed(Throwable)` | turn aborted (HTTP error, disabled tool, …) |
 
 Tool dispatch details (`AgentLoop.processBatch`): `question` and `skill` are intercepted
 by the loop itself (gated by the settings `allowAgentQuestions` / `agentCanUseSkills`);
 `subagent` is intercepted, too (gated by `subagentsEnabled`) and runs a bounded child
-loop via `SubagentRunner` (role whitelist + depth guard; `mode: parallel` fans out a `tasks`
-array over a pool, serializing tool dispatch globally — see `docs/subagents.md`); `ask_llm`
+loop via `SubagentRunner` (role whitelist + depth guard; a `prompts` array fans out over a
+pool, serializing tool dispatch globally — see `docs/subagents.md`); `ask_llm`
 is intercepted the same way (gated by `askLlmEnabled`) and `AskLlmRunner` sends a fresh
 one-shot completion with a clean context (no history, no tools), returning the reply as the
 tool result; `execute` is intercepted as well and `ScriptingTools.run` evaluates the Java
