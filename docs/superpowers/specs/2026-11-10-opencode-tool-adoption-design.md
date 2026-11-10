@@ -78,3 +78,25 @@ Dropped: `file_info`, `patch`, `subagent.sessionID`.
 - Updated: file edit semantics (differs-check), shell parameters, interception tests,
   metadata/name-pinning tests.
 - Per commit: `spotlessCheck`, nullness compile, module test suite.
+
+## Deviations from this design (as built)
+
+1. **`shell.background?` dropped.** OpenCode's `background` parameter has no KeY-side
+   counterpart: KeY backgrounding is a chat-panel/agent-loop feature (the user moves a running
+   call into a background job; see `key-agent-doc.md` section 7.5), not a tool argument. The
+   backgroundable metadata flag covers it; the omission is visible in `shell`'s description.
+2. **Facade binding via a per-execution registry key, not a ThreadLocal.** Probing showed the
+   local JShell engine evaluates snippets on its own thread while `clientCodeEnter` runs on the
+   caller thread — a ThreadLocal binding set before `eval` never reaches the snippet. The
+   preamble is therefore `var tools = org.key_project.key.llm.ToolFacade.byKey("<uuid>")` with
+   the facade published under a fresh UUID per call (`ToolFacade.register/unregister`).
+3. **Multi-statement snippets are split statement by statement** (via
+   `SourceCodeAnalysis.analyzeCompletion`, the JShell REPL's own splitting): a single `eval` of
+   `"int x = 21; x*2+1"` yields only one event and silently loses the trailing expression.
+4. **The safety gate is a best-effort blocklist, not confinement.** It rejects the obvious
+   escape hatches (`ProcessBuilder`, `System.exit`, reflection, raw file/network I/O) by token
+   match on the source — trivially bypassable in unrestricted-ish ways; the ASK approval per
+   call is the security boundary, as the tool description and docs state.
+5. **`execute` reports expression values only** (method-call expressions and the temporary
+   `$`-named variables JShell creates for bare expressions); the initializers of user-declared
+   variables are not echoed.

@@ -93,7 +93,7 @@ optional `tools/call` — and prints every exchange:
 ```sh
 python3 scripts/mcp_sse_probe.py http://127.0.0.1:<port>/sse
 python3 scripts/mcp_sse_probe.py http://127.0.0.1:<port>/sse \
-    --token <token> --call read_file --args '{"path": "…"}'
+    --token <token> --call tryclose --args '{}'
 ```
 
 It exits non-zero if the handshake or the tool list fails (e.g. a missing

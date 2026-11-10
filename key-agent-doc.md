@@ -2,8 +2,9 @@
 
 The KeY-Agent is a chat-based assistant integrated into the KeY GUI that supports interactive
 program verification and theorem proving with the help of a large language model. It can inspect
-the current proof state, read the files of the current Java model, and run safe shell commands —
-while keeping the user in control through per-call approval and question dialogs.
+the current proof state, read and edit the files of the current Java model, fetch and search the
+web, evaluate Java snippets against its own tools, and run safe shell commands — while keeping
+the user in control through per-call approval and question dialogs.
 
 The module lives in `keyext.llm` (main classes `org.key_project.key.llm.*`). The chat window is
 deliberately thin: all prompt assembly happens in `ExtendedPrompt`, an agent turn is driven by
@@ -57,7 +58,7 @@ Source view](docs/images/agent/llm-panel.png)
 
 - **Sending.** `Ctrl+Enter` sends the current input (there is no send button). `Shift+Enter` and
   plain Enter insert a line break. Input is **always accepted**: while a turn runs or is parked,
-  your message is queued and processed in order (see [Backgrounding](#74-backgrounding)); the
+  your message is queued and processed in order (see [Backgrounding](#75-backgrounding)); the
   toolbar shows the number of queued messages.
 - **Running a turn.** The *Stop* button cancels the *active* turn only (queued messages are not
   affected). Only one turn runs at a time.
@@ -66,7 +67,7 @@ Source view](docs/images/agent/llm-panel.png)
   reported by the `$selectedFiles` token.
 - **Tool activity.** After a turn, the tool calls that were executed are summarized in the chat
   (can be turned off in the settings). While a call runs it is shown as a live row with
-  *Background*/*Cancel* buttons (see [section 7.4](#74-backgrounding)); calls you moved into the
+  *Background*/*Cancel* buttons (see [section 7.5](#75-backgrounding)); calls you moved into the
   background are tracked as job rows until they finish.
 - **Markdown answers.** The agent's answers are rendered as Markdown: headings, lists, code
   blocks, tables and block quotes are formatted, `code` spans and fenced code blocks use a
@@ -200,8 +201,8 @@ description: focus on arithmetic overflow proofs
 enabled: true
 allowedTools:         # empty/absent = no restriction
   - list_tools        # needed to load the KeY-specific (Proof/Taclets) tools
-  - list_files
-  - read_file
+  - glob
+  - read
   - get_proof_context
 ---
 
@@ -220,7 +221,7 @@ Pay special attention to integer overflow; check the goal sequent before choosin
   turn. Proof and Taclet tools are only advertised after they are loaded via `list_tools` (see
   [section 7](#7-the-agent-loop-and-tools)), so a whitelist that wants to use them must include
   `list_tools` as well — the shipped skills do.
-- The agent itself can activate a skill through the `use_skill` tool — this is **off by default**
+- The agent itself can activate a skill through the `skill` tool — this is **off by default**
   (setting *Agent may use skills*).
 
 ### 5.1 Ready-made skills shipped with KeY
@@ -236,7 +237,7 @@ instructions:
 | `explore-goal`   | sandboxed "what if" experiments — probes and `fork_proof` first, explorative edits (which reframe the theorem) only with explicit consent |
 | `code-review`    | read-only review of the Java model and its specifications                  |
 | `taclet-design`  | inspect taclets and options, export rules, add/remove taclets with approval |
-| `orchestrate`    | delegate bounded work to sub-agents (`spawn_subagent`, roles, logs) and consult fresh LLM instances (`ask_llm`) instead of doing everything inline |
+| `orchestrate`    | delegate bounded work to sub-agents (`subagent`, roles, logs) and consult fresh LLM instances (`ask_llm`) instead of doing everything inline |
 | `tool-tour`      | onboarding: the agent explains its own tool set via `list_tools` and suggests a fitting skill |
 
 Every skill that references Proof or Taclet tools whitelists `list_tools` too, so the agent can
@@ -312,21 +313,25 @@ The built-in tool set (`KeYAgentTools`):
 | `focus_goal`        | Proof          | ask      |                | keep only the formulas of a sequent pattern, hide all others (`focus`)   |
 | `let_abbrev`        | Proof          | ask      |                | introduce a term abbreviation for the proof's abbreviation table (`let`/`letf`) |
 | `list_proofs`       | Proof          | auto     |                | enumerate all open proofs with an identifier usable in the proof tools' `proof` parameter |
-| `list_files`        | Files          | auto     |                | bounded listing of the files of the current Java model              |
-| `read_file`         | Files          | auto     |                | read a text file of the model directory (respects size limits)      |
-| `edit_file`         | Files          | ask      |                | exact string replacement in a model text file (`old_string` must be unique unless `replace_all`) |
-| `file_info`         | Files          | auto     |                | metadata (size, last modified, kind) of a file                      |
-| `run_command`       | Shell          | ask      | ✓              | run a shell command in the model directory (blocklist + approval)   |
+| `glob`              | Files          | auto     |                | bounded listing of the files of the current Java model matching a glob pattern |
+| `read`              | Files          | auto     |                | read a text file of the model directory from an offset on (respects size limits); a directory is listed |
+| `edit`              | Files          | ask      |                | exact string replacement in a model text file (`oldString` must be unique unless `replaceAll`) |
+| `write`             | Files          | ask      |                | create or overwrite a text file inside the model directory (missing parent directories are created) |
+| `grep`              | Files          | auto     |                | search the text files of the model tree for a regular expression, reported as `path:line: text` (optional include glob, literal and case flags, match limit) |
+| `shell`             | Shell          | ask      | ✓              | run a shell command in the model directory (blocklist + approval)   |
+| `webfetch`          | Web            | auto     |                | fetch a public web page (http/https only) and return it as Markdown (default), plain text or raw HTML (2 MB cap) |
+| `websearch`         | Web            | auto     |                | search the web via the configured search endpoint (default DuckDuckGo Lite) and report title/URL/snippet results |
+| `execute`           | Scripting      | ask      | ✓              | evaluate a Java snippet in an embedded JShell; the snippet reaches the tools through the `tools` facade (safety gate; see section 7.4) |
 | `list_taclets`      | Taclets        | auto     |                | list the taclets available for a proof (optional substring filter) |
 | `list_taclet_options` | Taclets     | auto     |                | list the taclet options (choices) of a proof with their selected and possible values |
 | `export_taclet`     | Taclets        | auto     |                | export a taclet as a parseable KeY rule declaration |
 | `export_taclets`    | Taclets        | auto     |                | export several or all taclets of a proof as parseable declarations (optional filter, capped output) |
 | `add_taclet`        | Taclets        | ask      |                | register a new taclet for a proof from a `\taclet` declaration (future rule applications only) |
 | `remove_taclet`     | Taclets        | ask      |                | remove a taclet from a proof's rule set (past rule applications are not affected) |
-| `ask_user`          | Interaction    | auto     |                | ask the user a question; the turn pauses until it is answered       |
-| `use_skill`         | Interaction    | auto     |                | activate a user-defined skill by name (only if enabled in settings) |
+| `question`          | Interaction    | auto     |                | ask the user a question; the turn pauses until it is answered       |
+| `skill`             | Interaction    | auto     |                | activate a user-defined skill by name (only if enabled in settings) |
 | `ask_llm`           | Sub-agents     | auto     | ✓              | send a prompt to a fresh LLM instance (clean context, no tools) and deliver the reply back to the agent (only if enabled in settings) |
-| `spawn_subagent`    | Sub-agents     | ask      | ✓              | delegate a task to a sub-agent (only if enabled in settings)        |
+| `subagent`          | Sub-agents     | ask      | ✓              | delegate a task to a sub-agent (only if enabled in settings)        |
 | `get_subagent_logs` | Sub-agents     | auto     |                | list the recorded sub-agent runs (role, mode, per-task status and the tools that were called) |
 | `list_tools`        | Documentation  | auto     |                | dump the Markdown documentation of the tools; loading KeY-specific tools by `category` ("proof"/"taclets") or `names` also advertises them in the following rounds |
 
@@ -364,20 +369,20 @@ the disabled branch should be pruned before the proof can close, and they requir
 the targeted goal's sequent) that appears in `list_proofs` and can be worked on through the
 `proof` parameter, leaving the original untouched.
 
-**Categories.** Every tool carries a `category` (Proof, Files, Shell, Taclets, Interaction,
-Sub-agents, Documentation, General) and a `backgroundable` flag — pure KeY-side *metadata*: the
-model only ever sees the standard OpenAI name/description/parameters. The category groups and
-sorts the tools in the [Tools panel](#tools-sub-panel-llm-settings--tools) and in the Markdown
-documentation; the backgroundable flag controls whether a running call may be moved into the
-background (see [section 7.4](#74-backgrounding)). Tools contributed by external MCP clients
-default to *General* / not backgroundable.
+**Categories.** Every tool carries a `category` (Proof, Files, Shell, Web, Scripting, Taclets,
+Interaction, Sub-agents, Documentation, General) and a `backgroundable` flag — pure KeY-side
+*metadata*: the model only ever sees the standard OpenAI name/description/parameters. The
+category groups and sorts the tools in the [Tools panel](#tools-sub-panel-llm-settings--tools)
+and in the Markdown documentation; the backgroundable flag controls whether a running call may
+be moved into the background (see [section 7.5](#75-backgrounding)). Tools contributed by
+external MCP clients default to *General* / not backgroundable.
 
 **Two tiers of tools.** The tool set is split so the model request stays small (a smaller tool
 list means fewer tokens and more reliable tool choice):
 
-- **Standard tools** — everything outside the Proof and Taclets categories (files, shell,
-  interaction, sub-agents, documentation): always offered to the model in every request, filtered
-  by the active skill's `allowedTools` whitelist (see [section 5](#5-skills)).
+- **Standard tools** — everything outside the Proof and Taclets categories (files, shell, web,
+  scripting, interaction, sub-agents, documentation): always offered to the model in every
+  request, filtered by the active skill's `allowedTools` whitelist (see [section 5](#5-skills)).
 - **KeY-specific tools** — the Proof and Taclets categories: not advertised by default. To use
   them the agent calls `list_tools` with a `category` (`"proof"` / `"taclets"`) or an explicit
   `names` list; the tool result documents them and they are advertised from the next round on
@@ -412,8 +417,11 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
 
 ### 7.2 Approval and the safety model
 
-- File access tools are **read-only**, restricted to the current Java model directory, and run
-  without approval.
+- The read-only file tools `glob`, `read` and `grep` are restricted to the current Java model
+  directory and run without approval.
+- The mutating file tools `edit` and `write` require approval: `edit` performs an exact string
+  replacement (`oldString` must be unique unless `replaceAll`), `write` creates or overwrites a
+  file inside the model directory.
 - The proof-script tools run the corresponding KeY proof-script commands (i.e. the same actions
   as *Apply Script* / the *Auto* button): `tryclose`, `auto`, `run_macro`, `run_smt`,
   `simplify_goal` and the sandboxed probes `probe_add_formula`/`probe_edit_formula` (side proofs;
@@ -428,23 +436,31 @@ turn until you answer. Turn this off with *Allow the agent to ask questions*.
 - `add_taclet` and `remove_taclet` change the rule set of a proof and therefore require approval
   by default; inspection tools (`list_taclets`, `list_taclet_options`, `export_taclet`,
   `export_taclets`) do not.
-- `run_command` *always* requires per-call approval, and commands matching the configured
-  **blocklist** (e.g. `rm -rf /`, `sudo`, `chmod -R` on system directories, `curl … | sh`) are
-  refused regardless of approval.
+- `shell` *always* requires per-call approval, and commands matching the configured **blocklist**
+  (e.g. `rm -rf /`, `sudo`, `chmod -R` on system directories, `curl … | sh`) are refused
+  regardless of approval.
+- The web tools `webfetch` and `websearch` are read-only access to public HTTP(S) content and run
+  without approval: `webfetch` fetches only `http`/`https` URLs (2 MB cap), `websearch` queries
+  the configured search endpoint. Neither sends credentials or cookies.
+- `execute` requires approval for every call. Its snippets run in an embedded JShell inside the
+  KeY JVM; by default a best-effort safety gate rejects snippets that spawn processes, exit the
+  JVM, use reflection or raw file/network I/O (see [section 7.4](#74-scripting-execute)). The
+  gate steers snippets to the `tools` facade — it is not a confinement mechanism; approval is
+  the real gate.
 - Each tool call's approval/disabled behavior can be customized in the *Tools* panel
   (**Settings → LLM Settings → Tools**): tools can be disabled entirely, or moved to *with
   approval* / *without approval (always)*.
 - The tools exposed to the model never include the ones you disabled.
 
-### 7.3 Sub-agents (`spawn_subagent`)
+### 7.3 Sub-agents (`subagent`)
 
 A **sub-agent** is a delegated, bounded tool loop with a role-specific system prompt and a
-restricted tool whitelist. The `spawn_subagent` tool takes a role, a task (or a `tasks` array
+restricted tool whitelist. The `subagent` tool takes a role, a task (or a `tasks` array
 in parallel mode) and a mode:
 
 ```
-spawn_subagent { "role": "goal-solver", "task": "Close all open goals of the current proof.",
-                 "mode": "sequential" }
+subagent { "role": "goal-solver", "task": "Close all open goals of the current proof.",
+           "mode": "sequential" }
 ```
 
 - **Roles** are registered via the Java `ServiceLoader` (service file
@@ -453,7 +469,7 @@ spawn_subagent { "role": "goal-solver", "task": "Close all open goals of the cur
   inspection) and `rule-designer` (taclet design, sequential only).
 - **Whitelist:** the child only sees (and may only call) the tools of its role's whitelist,
   intersected with the tools enabled in the Tools panel. The child never asks the user and never
-  pauses for approval — the `spawn_subagent` call itself (ask-approval by default) is the
+  pauses for approval — the `subagent` call itself (ask-approval by default) is the
   approval point.
 - **Bounded:** each sub-agent has a tool-round budget (role-specific, or `max sub-agent turns`)
   and a maximum nesting depth (`max sub-agent depth`); delegations inside a sub-agent are
@@ -472,7 +488,7 @@ spawn_subagent { "role": "goal-solver", "task": "Close all open goals of the cur
 - **Observability:** every finished delegation is recorded in a per-session log (role, mode,
   timing, and per task the status, round count and called tools). The read-only
   `get_subagent_logs` tool renders it for the model (newest first, optional `limit` and `role`
-  filter), the chat panel shows the per-task lines indented under the `spawn_subagent` row in
+  filter), the chat panel shows the per-task lines indented under the `subagent` row in
   the tool-activity summary, and *Clear history* clears the log together with the conversation.
 
 **Self-consultation (`ask_llm`).** The `ask_llm` tool lets the agent think *about itself*: it
@@ -482,18 +498,54 @@ delivers the reply back to the caller. That makes it a round trip around the age
 reasoning: review a draft plan, play devil's advocate against a proposed proof strategy,
 summarize noisy tool output through fresh eyes, or get a second opinion from another model via
 the optional `model` override (an optional `system` prompt for the fresh context is supported
-too). Like `spawn_subagent` the call is intercepted by the agent loop — it deliberately runs
+too). Like `subagent` the call is intercepted by the agent loop — it deliberately runs
 *outside* the global dispatch lock, because an HTTP round-trip must not stall parallel
 sub-agents — but unlike a sub-agent it never touches the proof or any other tool; it is a
 read-only consultation approved automatically (`auto`) and marked backgroundable. It is gated
 by the *Agent may consult the LLM* setting (default on), and sub-agent child loops may use it
 as well (if their role whitelists it).
 
-### 7.4 Backgrounding
+### 7.4 Scripting (`execute`)
 
-Long-running calls (`auto` proof search, `run_command` builds/tests, `spawn_subagent`
-delegations, `ask_llm` reflection queries) can be **moved into the background** while they
-run:
+The `execute` tool evaluates a **Java snippet** in an embedded JShell — a read-eval-print loop
+running inside the KeY JVM (Java 21 syntax, no child process, no startup cost). The values of
+the evaluated expressions are returned, each statement is evaluated in order, and output is
+bounded (`execute timeout`, `execute max output chars`):
+
+```
+execute { "code": "var files = tools.glob(\"**/*.java\"); files.lines().count()" }
+```
+
+- **The `tools` facade.** Every snippet has a variable `tools`
+  (`org.key_project.key.llm.ToolFacade`) with one method per standard tool —
+  `tools.glob(pattern)`, `tools.read(path[, offset[, limit]])`, `tools.grep(pattern[, include])`,
+  `tools.write(path, content)`, `tools.edit(path, oldString, newString)`,
+  `tools.shell(command)`, `tools.webfetch(url)`, `tools.websearch(query)`, `tools.listTools()` —
+  plus the generic `tools.call(name, arguments)` for every registered tool (proof tools
+  included). Each facade call dispatches the real tool (same dispatch lock, same settings) and
+  returns exactly what the model would receive. Because the snippet was approved as a whole,
+  facade calls do not ask for approval again.
+- **Safety gate.** By default snippets run with a best-effort gate that rejects the obvious
+  escape hatches (`ProcessBuilder`, `System.exit`, `Runtime`, `Class.forName`, reflection,
+  `java.nio.file`, `java.net`, …) and steers snippets to the facade. The *Unrestricted execute*
+  setting switches the gate off — full JVM and classpath access ("ultimate fun and unsoundness").
+  There is no true confinement in-process either way: the approval requirement is the security
+  boundary.
+- **Bounded.** A snippet running longer than *Execute timeout (seconds)* (default 60) is stopped
+  (best effort) and reported as timed out; the returned text is capped at *Execute max output
+  chars* (default 65536).
+- **No interaction.** A snippet cannot pause the turn: the interactive tools (`question`,
+  `skill`, `subagent`, a nested `execute`) are not facade methods and return an explanatory
+  placeholder via `tools.call`.
+- **Threading.** The call is intercepted by the agent loop and runs *outside* the global
+  dispatch lock (like `ask_llm`), because the facade's own tool calls acquire that lock per call
+  — holding it across the whole snippet would deadlock the first facade call.
+
+### 7.5 Backgrounding
+
+Long-running calls (`auto` proof search, `shell` builds/tests, `subagent`
+delegations, `ask_llm` reflection queries, long `execute` snippets) can be **moved into the
+background** while they run:
 
 - While a foreground tool call runs, its live row in the chat panel shows a **Background**
   button. Clicking it hands the running call to a background job: the agent parks that turn and
@@ -504,8 +556,8 @@ run:
 - When the call finishes, its output is enqueued and the parked turn resumes with it (a
   *"In the background"* box marks where the turn parked).
 - Only tools marked **backgroundable** offer the button (by default `auto`, `tryclose`,
-  `run_command`, `run_macro`, `run_smt`, `spawn_subagent`, `ask_llm`, `probe_add_formula`,
-  `probe_edit_formula`); per-tool overrides and the
+  `shell`, `run_macro`, `run_smt`, `subagent`, `ask_llm`, `probe_add_formula`,
+  `probe_edit_formula`, `execute`); per-tool overrides and the
   concurrency limit live in the [Tools panel](#tools-sub-panel-llm-settings--tools). While a
   turn is parked on a question or an approval, further
   prompts are *deferred* (they do not start new turns); while it is parked on a background job
@@ -565,9 +617,9 @@ are edited in their own panels.
 | Max background jobs | `4` |
 | Send temperature | `false` (`temperature` 0.2) |
 | Send max output tokens | `false` (`4096`) |
-| Agent may use skills (`use_skill`) | `false` |
+| Agent may use skills (`skill`) | `false` |
 | Agent may consult the LLM (`ask_llm`) | `true` |
-| Agent may spawn sub-agents (`spawn_subagent`) | `false` |
+| Agent may spawn sub-agents (`subagent`) | `false` |
 | Max sub-agent turns (per delegation) | `8` |
 | Max sub-agent depth (nesting) | `2` |
 | Max parallel sub-agents (per parallel run) | `4` |
@@ -587,26 +639,37 @@ max model listing entries `1000`.
 ### Shell commands
 | Setting | Default |
 |---|---|
-| Enable shell commands (`run_command`) | `true` |
+| Enable shell commands (`shell`) | `true` |
 | Shell timeout (seconds) | `30` |
 | Shell max output chars | `65536` |
 | Blocked shell patterns | built-in blocklist, one regex per line |
 
+### Web & scripting
+| Setting | Default |
+|---|---|
+| Web search endpoint | `https://lite.duckduckgo.com/lite/` (the HTML endpoint `websearch` queries; no API key needed) |
+| Execute timeout (seconds) | `60` |
+| Execute max output chars | `65536` |
+| Unrestricted execute | `false` (off: the `execute` safety gate rejects process spawning, JVM exit, reflection and raw file/network I/O; on: full JVM and classpath access) |
+
 ### Tools (sub-panel: LLM Settings → Tools)
 
 ![Tool approval settings: one permission row per tool](docs/images/agent/llm-settings-tools.png)
-The tools are grouped into **category sections** (Proof, Files, Shell, Taclets, Interaction,
-Sub-agents, Documentation, General — in that order, tools by name within a section). One row per
+The tools are grouped into **category sections** (Proof, Files, Shell, Web, Scripting, Taclets,
+Interaction, Sub-agents, Documentation, General — in that order, tools by name within a section).
+One row per
 tool shows a short explanation, a radio group selecting its permission — **Default** (the tool's
 own behavior, `auto` or `ask`), **With approval** (always ask), **Without approval (always)** or
 **Disabled** (not sent to the model) — a **may run in background** checkbox, and an **export to
 MCP** checkbox. Read-only tools
-default to `auto`, `run_command` to `ask`; the background checkbox follows the tool's metadata
-(default on for `auto`, `tryclose`, `run_command`, `run_macro`, `run_smt`, `spawn_subagent`,
-`ask_llm`, `probe_add_formula`, `probe_edit_formula`; overriding it adds/removes the tool in the
+default to `auto`, `shell` and `execute` to `ask`; the background checkbox follows the tool's
+metadata
+(default on for `auto`, `tryclose`, `shell`, `run_macro`, `run_smt`, `subagent`,
+`ask_llm`, `probe_add_formula`, `probe_edit_formula`, `execute`; overriding it adds/removes the
+tool in the
 `backgroundToolsEnabled`/`backgroundToolsDisabled` settings). While such a call runs it can
 be moved to the background, the agent then continues with your queued messages and the result is
-delivered when the call finishes (see [section 7.4](#74-backgrounding)). The number of concurrent
+delivered when the call finishes (see [section 7.5](#75-backgrounding)). The number of concurrent
 background jobs is capped by *Max background jobs* (Agent behavior section).
 
 The **export to MCP** checkbox controls which tools the built-in KeY MCP server (SSE endpoint)
@@ -675,6 +738,8 @@ history and selected models are part of the proof session and are not persisted 
 | Input markup        | `org.key_project.key.llm.PromptResolver`           |
 | Autocompletion      | `org.key_project.key.llm.AutocompleteInput` + `AutocompleteProviders` |
 | Built-in tools      | `org.key_project.key.llm.mcp.KeYAgentTools`        |
+| Web tools           | `org.key_project.key.llm.mcp.tools.WebTools`       |
+| Scripting tool      | `org.key_project.key.llm.mcp.tools.ScriptingTools` + `org.key_project.key.llm.ToolFacade` (the snippets' `tools` facade) |
 | Shell safety        | `org.key_project.key.llm.ShellSafetyPolicy`        |
 | Proof context       | `org.key_project.key.llm.ProofContextCollector`    |
 | Settings            | `org.key_project.key.llm.LlmSettings` / `LlmSettingsUI` / `LlmToolsPanel` |

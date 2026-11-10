@@ -6,7 +6,7 @@ plus self-consultation (`ask_llm`).
 ## Idea
 
 A sub-agent is a *delegated, bounded tool loop*: the delegating agent calls
-`spawn_subagent`, the agent loop (instead of dispatching it like a normal tool) runs a nested
+`subagent`, the agent loop (instead of dispatching it like a normal tool) runs a nested
 loop with a fresh message thread, a role-specific system prompt and a restricted tool whitelist,
 and returns the child's final answer as the tool result. This is **method 1 (recursive
 delegation)** from the design discussion: a dedicated child loop rather than prompt-only
@@ -18,7 +18,7 @@ A role (`SubagentRole`) couples:
 
 | field            | meaning                                                        |
 |------------------|----------------------------------------------------------------|
-| `name`           | id used as the `role` argument of `spawn_subagent`             |
+| `name`           | id used as the `role` argument of `subagent`             |
 | `description`    | shown to the delegating agent                                 |
 | `systemPrompt`   | instructions prepended to the child's system prompt           |
 | `allowedTools`   | tool whitelist (empty = inherit all enabled tools)            |
@@ -36,12 +36,12 @@ Built-in roles:
 | role            | tools                                                              | parallel |
 |-----------------|--------------------------------------------------------------------|----------|
 | `goal-solver`   | `get_proof_context`, `list_proofs`, `tryclose`, `auto`, `list_taclets` | yes   |
-| `file-explorer` | `list_files`, `read_file`, `file_info`                             | yes      |
+| `file-explorer` | `glob`, `read`                                                     | yes      |
 | `rule-designer` | taclet inspection + `add_taclet`/`remove_taclet`                   | no       |
 
 ## Execution
 
-`AgentLoop.processBatch` intercepts `spawn_subagent` (like `ask_user`/`use_skill`) and calls
+`AgentLoop.processBatch` intercepts `subagent` (like `question`/`skill` and `execute`) and calls
 `SubagentRunner.run(...)`, which:
 
 1. resolves the role and the `mode` argument (`sequential` or `parallel`),
@@ -50,7 +50,7 @@ Built-in roles:
 3. runs the child loop: fresh `LlmContext`, system prompt + task, advertised tools =
    whitelist ∩ enabled tools of the parent session,
 4. dispatches the child's tool calls through the parent's `BuiltInMCPClient` — a nested
-   `spawn_subagent` is intercepted again (depth-guarded recursion),
+   `subagent` is intercepted again (depth-guarded recursion),
 5. returns `[sub-agent '<role>' finished after N round(s), called: ...]` + the child's final
    answer as the tool result text.
 
@@ -65,7 +65,7 @@ worker thread per task on a shared fixed-size pool. Constraints:
 - **tool dispatch is serialized** through a global lock: KeY `Proof` objects and the GUI
   mediator are not thread-safe, so the parallelism is in the LLM round-trips (each worker owns
   its own message thread and a fresh HTTP call) while every mutation/queries on the proof are
-  mutually exclusive. Nested `spawn_subagent` calls happen *outside* that lock, so parallel
+  mutually exclusive. Nested `subagent` calls happen *outside* that lock, so parallel
   nesting cannot deadlock,
 - the merged result is one tool message: a run header, then `(1) …`, `(2) …` per task (a task
   that failed/interrupted is reported as such, the rest still run to completion),
@@ -74,7 +74,7 @@ worker thread per task on a shared fixed-size pool. Constraints:
 
 ### Safety model
 
-- The `spawn_subagent` call itself defaults to **ask-approval** (the child runs autonomously,
+- The `subagent` call itself defaults to **ask-approval** (the child runs autonomously,
   so the approval happens before it starts; the child never pauses for approval).
 - The child only ever sees/calls whitelisted tools, and the global Tools-panel disabled set
   still applies.
@@ -92,7 +92,7 @@ kept verbatim); a dedicated structured field in the result is a later refinement
 
 ## Self-consultation (`ask_llm`)
 
-The `ask_llm` tool is the sibling of `spawn_subagent` in the same *Sub-agents* category: it
+The `ask_llm` tool is the sibling of `subagent` in the same *Sub-agents* category: it
 lets the agent think *about itself* by sending a prompt to a **fresh** LLM instance — a
 one-shot completion with a clean, empty context (no history, no tools, no proof context) —
 and delivering the reply back as the tool result. Typical uses: review a draft plan, play
@@ -120,7 +120,7 @@ Implementation (`AskLlmRunner.run`):
 | key                    | default | meaning                         |
 |------------------------|---------|---------------------------------|
 | `askLlmEnabled`        | `true`  | `ask_llm` allowed at all        |
-| `subagentsEnabled`     | `false` | `spawn_subagent` allowed at all |
+| `subagentsEnabled`     | `false` | `subagent` allowed at all |
 | `maxSubagentTurns`     | `8`     | global per-delegation round budget |
 | `maxSubagentDepth`     | `2`     | maximum nesting depth (1 = children may not spawn children) |
 | `maxParallelSubagents` | `4`     | concurrent workers in one parallel run (pool size) |
@@ -134,7 +134,7 @@ sequence-numbered so parallel workers can append concurrently):
   role, mode, timing, and per task the status (`OK` / `stopped (round limit)` / `cancelled` /
   `failed`), the number of tool rounds and the tools that were called. Optional `limit` and
   `role` parameters.
-- **Chat panel:** the tool-activity summary shows the `spawn_subagent` row with one indented
+- **Chat panel:** the tool-activity summary shows the `subagent` row with one indented
   child line per delegated task (role + task, tooltip = mode + outcome), honoring the existing
   *Show tool activity* setting. *Clear history* clears the sub-agent log together with the
   conversation.
@@ -148,5 +148,5 @@ sequence-numbered so parallel workers can append concurrently):
 |------|------|
 | `org.key_project.key.llm.SubagentRunner` | the child loop + guards |
 | `org.key_project.key.llm.AskLlmRunner` | the fresh one-shot completion behind `ask_llm` (intercepted by the agent loop and the child loop, runs without the dispatch lock) |
-| `org.key_project.key.llm.mcp.tools.SubagentTools` | the `spawn_subagent` + `ask_llm` tool schemas (both intercepted by `AgentLoop`) |
+| `org.key_project.key.llm.mcp.tools.SubagentTools` | the `subagent` + `ask_llm` tool schemas (both intercepted by `AgentLoop`) |
 | `org.key_project.key.llm.subagents.SubagentRole` / `SubagentRoleProvider` / `SubagentRegistry` / `BuiltInSubagentRoles` | role model + service loading |
