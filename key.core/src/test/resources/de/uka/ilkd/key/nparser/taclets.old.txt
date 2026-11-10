@@ -1077,7 +1077,7 @@ array2seqDef {
 \find(array2seq(h,a))
 \varcond(\notFreeIn(u (variable), h (Heap term)), \notFreeIn(u (variable), a (java.lang.Object term)))
 \replacewith(seqDef{u (variable)}(Z(0(#)),length(a),select<any>(h,a,arr(u)))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == arrayCreation (arrayCreation) =========================================
@@ -3531,7 +3531,7 @@ Choices: true}
 castedGetAny {
 \find(cast<beta>(seqGet<any>(seq,idx)))
 \replacewith(seqGet<beta>(seq,idx)) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == charLiteral_to_int (charLiteral_to_int) =========================================
@@ -5535,7 +5535,7 @@ definitionSeqdefWorkaround {
 \find(seq_def_workaround(h,lower,upper,array))
 \varcond(\notFreeIn(j (variable), upper (int term)), \notFreeIn(j (variable), lower (int term)), \notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), h (Heap term)))
 \replacewith(seqDef{j (variable)}(lower,upper,select<any>(h,array,arr(j)))) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == definitionSeqdefWorkaround2 (definitionSeqdefWorkaround2) =========================================
@@ -5543,7 +5543,7 @@ definitionSeqdefWorkaround2 {
 \find(seq_def_workaround2(h,lower,upper,array,singleton<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(o,f))))
 \varcond(\notFreeIn(j (variable), upper (int term)), \notFreeIn(j (variable), lower (int term)), \notFreeIn(j (variable), array (java.lang.Object term)), \notFreeIn(j (variable), f (Field term)), \notFreeIn(j (variable), h (Heap term)))
 \replacewith(seqDef{j (variable)}(lower,upper,select<any>(h,select<java.lang.Object>(h,array,arr(j)),f))) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == deleteMergePoint (deleteMergePoint) =========================================
@@ -7418,8 +7418,8 @@ Choices: sequences:on}
 equalityToSeqGetAndSeqLenLeft {
 \find(equals(s,s2)==>)
 \varcond(\notFreeIn(iv (variable), s2 (Seq term)), \notFreeIn(iv (variable), s (Seq term)))
-\add [and(equals(seqLen(s),seqLen(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<any>(s,iv),seqGet<any>(s2,iv)))))]==>[] 
-\heuristics(inReachableStateImplication)
+\add [and(equals(seqLen(s),seqLen(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<any>(s,iv),seqGet<any>(s2,iv)))))]==>[]
+\heuristics(seqEqExpandAntec)
 Choices: sequences:on}
 -----------------------------------------------------
 == equalityToSeqGetAndSeqLenRight (equalityToSeqGetAndSeqLenRight) =========================================
@@ -7427,7 +7427,7 @@ equalityToSeqGetAndSeqLenRight {
 \find(==>equals(s,s2))
 \varcond(\notFreeIn(iv (variable), s2 (Seq term)), \notFreeIn(iv (variable), s (Seq term)))
 \replacewith([]==>[and(equals(seqLen(s),seqLen(s2)),all{iv (variable)}(imp(and(leq(Z(0(#)),iv),lt(iv,seqLen(s))),equals(seqGet<any>(s,iv),seqGet<any>(s2,iv)))))]) 
-\heuristics(simplify_enlarging)
+\heuristics(seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == equality_comparison_double (equality comparison) =========================================
@@ -9749,7 +9749,7 @@ Choices: true}
 getOfSeqConcat {
 \find(seqGet<alpha>(seqConcat(seq,seq2),idx))
 \replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<alpha>(seq,idx),seqGet<alpha>(seq2,sub(idx,seqLen(seq))))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqRead)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqConcatEQ (getOfSeqConcatEQ) =========================================
@@ -9757,7 +9757,7 @@ getOfSeqConcatEQ {
 \assumes ([equals(seqConcat(seq,seq2),EQ)]==>[]) 
 \find(seqGet<alpha>(EQ,idx))
 \replacewith(if-then-else(lt(idx,seqLen(seq)),seqGet<alpha>(seq,idx),seqGet<alpha>(seq2,sub(idx,seqLen(seq))))) 
-\heuristics(no_self_application, simplify_enlarging)
+\heuristics(no_self_application, seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqDef (getOfSeqDef) =========================================
@@ -9765,7 +9765,7 @@ getOfSeqDef {
 \find(seqGet<alpha>(seqDef{uSub (variable)}(from,to,t),idx))
 \varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
 \replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),cast<alpha>(subst{uSub (variable)}(add(idx,from),t)),cast<alpha>(seqGetOutside))) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqDefEQ (getOfSeqDef) =========================================
@@ -9774,14 +9774,14 @@ getOfSeqDefEQ {
 \find(seqGet<alpha>(EQ,idx))
 \varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
 \replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),cast<alpha>(subst{uSub (variable)}(add(idx,from),t)),cast<alpha>(seqGetOutside))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqReverse (getOfSeqReverse) =========================================
 getOfSeqReverse {
 \find(seqGet<alpha>(seqReverse(seq),idx))
 \replacewith(seqGet<alpha>(seq,sub(sub(seqLen(seq),Z(1(#))),idx))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqRead)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqReverseEQ (getOfSeqReverseEQ) =========================================
@@ -9789,21 +9789,21 @@ getOfSeqReverseEQ {
 \assumes ([equals(seqReverse(seq),EQ)]==>[]) 
 \find(seqGet<alpha>(EQ,idx))
 \replacewith(seqGet<alpha>(seq,sub(sub(seqLen(seq),Z(1(#))),idx))) 
-\heuristics(no_self_application, simplify_enlarging)
+\heuristics(no_self_application, seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSingleton (getOfSeqSingleton) =========================================
 getOfSeqSingleton {
 \find(seqGet<alpha>(seqSingleton(x),idx))
 \replacewith(if-then-else(equals(idx,Z(0(#))),cast<alpha>(x),cast<alpha>(seqGetOutside))) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSingletonConcrete (getOfSeqSingletonConcrete) =========================================
 getOfSeqSingletonConcrete {
 \find(seqGet<alpha>(seqSingleton(x),Z(0(#))))
 \replacewith(cast<alpha>(x)) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSingletonEQ (getOfSeqSingletonEQ) =========================================
@@ -9811,14 +9811,14 @@ getOfSeqSingletonEQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqGet<alpha>(EQ,idx))
 \replacewith(if-then-else(equals(idx,Z(0(#))),cast<alpha>(x),cast<alpha>(seqGetOutside))) 
-\heuristics(no_self_application, simplify_enlarging)
+\heuristics(no_self_application, seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSub (getOfSeqSub) =========================================
 getOfSeqSub {
 \find(seqGet<alpha>(seqSub(seq,from,to),idx))
 \replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),seqGet<alpha>(seq,add(idx,from)),cast<alpha>(seqGetOutside))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqRead)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqSubEQ (getOfSeqSubEQ) =========================================
@@ -9826,14 +9826,14 @@ getOfSeqSubEQ {
 \assumes ([equals(seqSub(seq,from,to),EQ)]==>[]) 
 \find(seqGet<alpha>(EQ,idx))
 \replacewith(if-then-else(and(leq(Z(0(#)),idx),lt(idx,sub(to,from))),seqGet<alpha>(seq,add(idx,from)),cast<alpha>(seqGetOutside))) 
-\heuristics(no_self_application, simplify_enlarging)
+\heuristics(no_self_application, seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == getOfSeqUpd (getOfSeqUpd) =========================================
 getOfSeqUpd {
 \find(seqGet<alpha>(seqUpd(seq,idx,value),jdx))
 \replacewith(if-then-else(and(and(leq(Z(0(#)),jdx),lt(jdx,seqLen(seq))),equals(idx,jdx)),cast<alpha>(value),seqGet<alpha>(seq,jdx))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqRead)
 Choices: sequences:on}
 -----------------------------------------------------
 == greater (greater) =========================================
@@ -11293,7 +11293,7 @@ Choices: sequences:on}
 indexOfSeqSingleton {
 \find(seqIndexOf(seqSingleton(x),x))
 \replacewith(Z(0(#))) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == indexOfSeqSub (indexOfSeqSub) =========================================
@@ -12460,7 +12460,7 @@ Choices: sequences:on}
 lenOfSeqConcat {
 \find(seqLen(seqConcat(seq,seq2)))
 \replacewith(add(seqLen(seq),seqLen(seq2))) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqConcatEQ (lenOfSeqConcatEQ) =========================================
@@ -12468,14 +12468,14 @@ lenOfSeqConcatEQ {
 \assumes ([equals(seqConcat(seq,seq2),EQ)]==>[]) 
 \find(seqLen(EQ))
 \replacewith(add(seqLen(seq),seqLen(seq2))) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqDef (lenOfSeqDef) =========================================
 lenOfSeqDef {
 \find(seqLen(seqDef{uSub (variable)}(from,to,t)))
 \replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqDefEQ (lenOfSeqDef) =========================================
@@ -12483,14 +12483,14 @@ lenOfSeqDefEQ {
 \assumes ([equals(seqDef{uSub (variable)}(from,to,t),EQ)]==>[]) 
 \find(seqLen(EQ))
 \replacewith(if-then-else(leq(from,to),sub(to,from),Z(0(#)))) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqEmpty (lenOfSeqEmpty) =========================================
 lenOfSeqEmpty {
 \find(seqLen(seqEmpty))
 \replacewith(Z(0(#))) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqEmptyEQ (lenOfSeqEmptyEQ) =========================================
@@ -12498,14 +12498,14 @@ lenOfSeqEmptyEQ {
 \assumes ([equals(seqEmpty,EQ)]==>[]) 
 \find(seqLen(EQ))
 \replacewith(Z(0(#))) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqReverse (lenOfSeqReverse) =========================================
 lenOfSeqReverse {
 \find(seqLen(seqReverse(seq)))
 \replacewith(seqLen(seq)) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqReverseEQ (lenOfSeqReverseEQ) =========================================
@@ -12513,14 +12513,14 @@ lenOfSeqReverseEQ {
 \assumes ([equals(seqReverse(seq),EQ)]==>[]) 
 \find(seqLen(EQ))
 \replacewith(seqLen(seq)) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqSingleton (lenOfSeqSingleton) =========================================
 lenOfSeqSingleton {
 \find(seqLen(seqSingleton(x)))
 \replacewith(Z(1(#))) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqSingletonEQ (lenOfSeqSingletonEQ) =========================================
@@ -12528,14 +12528,14 @@ lenOfSeqSingletonEQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqLen(EQ))
 \replacewith(Z(1(#))) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqSub (lenOfSeqSub) =========================================
 lenOfSeqSub {
 \find(seqLen(seqSub(seq,from,to)))
 \replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqSubEQ (lenOfSeqSubEQ) =========================================
@@ -12543,14 +12543,14 @@ lenOfSeqSubEQ {
 \assumes ([equals(seqSub(seq,from,to),EQ)]==>[]) 
 \find(seqLen(EQ))
 \replacewith(if-then-else(lt(from,to),sub(to,from),Z(0(#)))) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lenOfSeqUpd (lenOfSeqUpd) =========================================
 lenOfSeqUpd {
 \find(seqLen(seqUpd(seq,idx,value)))
 \replacewith(seqLen(seq)) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == lengthReplace (lengthReplace) =========================================
@@ -16195,6 +16195,13 @@ selectOfStoreSameLoc {
 \heuristics(simplify_select_concrete)
 Choices: programRules:Java}
 -----------------------------------------------------
+== seqConcatAssoc (seqConcatAssoc) =========================================
+seqConcatAssoc {
+\find(seqConcat(seqConcat(a,b),c))
+\replacewith(seqConcat(a,seqConcat(b,c))) 
+\heuristics(seqSimplify)
+Choices: sequences:on}
+-----------------------------------------------------
 == seqConcatUnfoldLeft (seqConcatUnfold) =========================================
 seqConcatUnfoldLeft {
 \find(#allmodal ((modal operator))|{{ ..
@@ -16225,14 +16232,14 @@ Choices: programRules:Java}
 seqConcatWithSeqEmpty1 {
 \find(seqConcat(seq,seqEmpty))
 \replacewith(seq) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == seqConcatWithSeqEmpty2 (seqConcatWithEmpty) =========================================
 seqConcatWithSeqEmpty2 {
 \find(seqConcat(seqEmpty,seq))
 \replacewith(seq) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == seqDefOfSeq (seqDefOfSeq) =========================================
@@ -16240,7 +16247,15 @@ seqDefOfSeq {
 \find(seqDef{u (variable)}(Z(0(#)),x,seqGet<any>(s,u)))
 \varcond(\notFreeIn(v (variable), s (Seq term)), \notFreeIn(v (variable), x (int term)), \notFreeIn(u (variable), s (Seq term)), \notFreeIn(u (variable), x (int term)))
 \replacewith(if-then-else(equals(seqLen(s),x),s,if-then-else(gt(seqLen(s),x),seqSub(s,Z(0(#)),x),seqConcat(s,seqDef{v (variable)}(seqLen(s),x,seqGetOutside))))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqSimplifyEnlarging)
+Choices: sequences:on}
+-----------------------------------------------------
+== seqDefOfStore (seqDefOfStore) =========================================
+seqDefOfStore {
+\find(seqDef{u (variable)}(l,r,select<any>(store(h,o,arr(k),x),a,arr(u))))
+\varcond(\notFreeIn(u (variable), x (any term)), \notFreeIn(u (variable), k (int term)), \notFreeIn(u (variable), a (java.lang.Object term)), \notFreeIn(u (variable), o (java.lang.Object term)), \notFreeIn(u (variable), h (Heap term)))
+\replacewith(if-then-else(and(and(equals(o,a),leq(l,k)),lt(k,r)),seqUpd(seqDef{u (variable)}(l,r,select<any>(h,a,arr(u))),sub(k,l),x),seqDef{u (variable)}(l,r,select<any>(h,a,arr(u))))) 
+\heuristics(seqDefStore)
 Choices: sequences:on}
 -----------------------------------------------------
 == seqDef_empty (seqDef_empty) =========================================
@@ -16265,7 +16280,7 @@ seqDef_induction_lower_concrete {
 \find(seqDef{uSub (variable)}(add(Z(neglit(1(#))),from),to,t))
 \varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
 \replacewith(seqConcat(if-then-else(lt(add(Z(neglit(1(#))),from),to),seqSingleton(subst{uSub (variable)}(add(Z(neglit(1(#))),from),t)),seqEmpty),seqDef{uSub (variable)}(from,to,t))) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == seqDef_induction_upper (seqDef_induction_upper) =========================================
@@ -16281,7 +16296,7 @@ seqDef_induction_upper_concrete {
 \find(seqDef{uSub (variable)}(from,add(Z(1(#)),to),t))
 \varcond(\notFreeIn(uSub (variable), to (int term)), \notFreeIn(uSub (variable), from (int term)))
 \replacewith(seqConcat(seqDef{uSub (variable)}(from,to,t),if-then-else(leq(from,to),seqSingleton(subst{uSub (variable)}(to,t)),seqEmpty))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == seqDef_lower_equals_upper (seqDef_lower_equals_upper) =========================================
@@ -16289,7 +16304,7 @@ seqDef_lower_equals_upper {
 \find(seqDef{uSub (variable)}(idx,idx,t))
 \varcond(\notFreeIn(uSub (variable), idx (int term)))
 \replacewith(seqEmpty) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == seqDef_one_summand (seqDef_one_summand) =========================================
@@ -16408,7 +16423,7 @@ Choices: sequences:on}
 seqReverseOfSeqEmpty {
 \find(seqReverse(seqEmpty))
 \replacewith(seqEmpty) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == seqReverseUnfold (seqReverseUnfold) =========================================
@@ -16437,7 +16452,7 @@ seqSelfDefinitionEQ2 {
 \find(seqDef{u (variable)}(Z(0(#)),x,seqGet<any>(s,u)))
 \varcond(\notFreeIn(u (variable), s (Seq term)), \notFreeIn(u (variable), x (int term)))
 \replacewith(s) 
-\heuristics(simplify)
+\heuristics(seqSimplify)
 Choices: sequences:on}
 -----------------------------------------------------
 == seqSingletonUnfold (seqSingletonUnfold) =========================================
@@ -17317,14 +17332,14 @@ Choices: true}
 subSeqComplete {
 \find(seqSub(seq,Z(0(#)),seqLen(seq)))
 \replacewith(seq) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqCompleteSeqDef (subSeqCompleteSeqDef) =========================================
 subSeqCompleteSeqDef {
 \find(seqSub(seqDef{i (variable)}(Z(0(#)),u,a),Z(0(#)),u))
 \replacewith(seqDef{i (variable)}(Z(0(#)),u,a)) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqCompleteSeqDefEQ (subSeqCompleteSeqDefEQ) =========================================
@@ -17332,14 +17347,14 @@ subSeqCompleteSeqDefEQ {
 \assumes ([equals(seqDef{i (variable)}(Z(0(#)),u,a),EQ)]==>[]) 
 \find(seqSub(EQ,Z(0(#)),u))
 \replacewith(seqDef{i (variable)}(Z(0(#)),u,a)) 
-\heuristics(no_self_application, concrete)
+\heuristics(no_self_application, seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqConcat (subSeqConcat) =========================================
 subSeqConcat {
 \find(seqSub(seqConcat(s1,s2),l,u))
 \replacewith(seqConcat(seqSub(s1,l,if-then-else(lt(seqLen(s1),u),seqLen(s1),u)),seqSub(s2,if-then-else(lt(l,seqLen(s1)),Z(0(#)),sub(l,seqLen(s1))),sub(u,seqLen(s1))))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqConcatEQ (subSeqConcatEQ) =========================================
@@ -17347,21 +17362,21 @@ subSeqConcatEQ {
 \assumes ([equals(seqConcat(s1,s2),EQ)]==>[]) 
 \find(seqSub(EQ,l,u))
 \replacewith(seqConcat(seqSub(s1,l,if-then-else(lt(seqLen(s1),u),seqLen(s1),u)),seqSub(s2,if-then-else(lt(l,seqLen(s1)),Z(0(#)),sub(l,seqLen(s1))),sub(u,seqLen(s1))))) 
-\heuristics(no_self_application, simplify_enlarging)
+\heuristics(no_self_application, seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqEmpty (subSeqEmpty) =========================================
 subSeqEmpty {
 \find(seqSub(seq,i,i))
 \replacewith(seqEmpty) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqHeadSeqDef (subSeqHeadSeqDef) =========================================
 subSeqHeadSeqDef {
 \find(seqSub(seqConcat(seqDef{i (variable)}(Z(0(#)),u,a),seq),Z(0(#)),u))
 \replacewith(seqDef{i (variable)}(Z(0(#)),u,a)) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqHeadSeqDefEQ (subSeqHeadSeqDefEQ) =========================================
@@ -17369,21 +17384,21 @@ subSeqHeadSeqDefEQ {
 \assumes ([equals(seqDef{i (variable)}(Z(0(#)),u,a),EQ)]==>[]) 
 \find(seqSub(seqConcat(EQ,seq),Z(0(#)),u))
 \replacewith(seqDef{i (variable)}(Z(0(#)),u,a)) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqSingleton (subSeqSingleton) =========================================
 subSeqSingleton {
 \find(seqSub(seqSingleton(x),Z(0(#)),Z(1(#))))
 \replacewith(seqSingleton(x)) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqSingleton2 (subSeqSingleton2) =========================================
 subSeqSingleton2 {
 \find(seqSub(seqSingleton(x),l,u))
 \replacewith(seqConcat(seqSub(seqEmpty,if-then-else(lt(l,Z(0(#))),l,Z(0(#))),if-then-else(lt(u,Z(0(#))),u,Z(0(#)))),seqConcat(if-then-else(and(leq(l,Z(0(#))),geq(u,Z(1(#)))),seqSingleton(x),seqEmpty),seqSub(seqEmpty,if-then-else(gt(l,Z(0(#))),l,Z(1(#))),if-then-else(gt(u,Z(0(#))),u,Z(1(#))))))) 
-\heuristics(simplify_enlarging)
+\heuristics(seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqSingleton2EQ (subSeqSingleton2EQ) =========================================
@@ -17391,7 +17406,7 @@ subSeqSingleton2EQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqSub(EQ,l,u))
 \replacewith(seqConcat(seqSub(seqEmpty,if-then-else(lt(l,Z(0(#))),l,Z(0(#))),if-then-else(lt(u,Z(0(#))),u,Z(0(#)))),seqConcat(if-then-else(and(leq(l,Z(0(#))),geq(u,Z(1(#)))),seqSingleton(x),seqEmpty),seqSub(seqEmpty,if-then-else(gt(l,Z(0(#))),l,Z(1(#))),if-then-else(gt(u,Z(0(#))),u,Z(1(#))))))) 
-\heuristics(no_self_application, simplify_enlarging)
+\heuristics(no_self_application, seqSimplifyEnlarging)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqSingletonEQ (subSeqSingletonEQ) =========================================
@@ -17399,14 +17414,14 @@ subSeqSingletonEQ {
 \assumes ([equals(seqSingleton(x),EQ)]==>[]) 
 \find(seqSub(EQ,Z(0(#)),Z(1(#))))
 \replacewith(seqSingleton(x)) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqTailL (subSeqTail) =========================================
 subSeqTailL {
 \find(seqSub(seqConcat(seqSingleton(x),seq),Z(1(#)),add(Z(1(#)),seqLen(seq))))
 \replacewith(seq) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqTailLEQ (subSeqTailEQ) =========================================
@@ -17414,14 +17429,14 @@ subSeqTailLEQ {
 \assumes ([equals(seqLen(seq),EQ)]==>[]) 
 \find(seqSub(seqConcat(seqSingleton(x),seq),Z(1(#)),add(Z(1(#)),EQ)))
 \replacewith(seq) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqTailR (subSeqTail) =========================================
 subSeqTailR {
 \find(seqSub(seqConcat(seqSingleton(x),seq),Z(1(#)),add(seqLen(seq),Z(1(#)))))
 \replacewith(seq) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == subSeqTailREQ (subSeqTailEQ) =========================================
@@ -17429,7 +17444,7 @@ subSeqTailREQ {
 \assumes ([equals(seqLen(seq),EQ)]==>[]) 
 \find(seqSub(seqConcat(seqSingleton(x),seq),Z(1(#)),add(EQ,Z(1(#)))))
 \replacewith(seq) 
-\heuristics(concrete)
+\heuristics(seqConcrete)
 Choices: sequences:on}
 -----------------------------------------------------
 == sub_equations_left (sub_equations_left) =========================================

@@ -34,6 +34,7 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.util.ConcurrentLruCache;
+import org.key_project.util.GenerationalCache;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
@@ -120,11 +121,11 @@ public class ServiceCaches implements SessionCaches {
     private final Map<Taclet, CostReuse.ConditionalEligibility> costReuseClassificationCache =
         new ConcurrentHashMap<>();
 
-    private final Map<org.key_project.logic.Term, Monomial> monomialCache =
-        new ConcurrentLruCache<>(2000);
+    private final GenerationalCache<org.key_project.logic.Term, Monomial> monomialCache =
+        new GenerationalCache<>(5000);
 
-    private final Map<org.key_project.logic.Term, Polynomial> polynomialCache =
-        new ConcurrentLruCache<>(2000);
+    private final GenerationalCache<org.key_project.logic.Term, Polynomial> polynomialCache =
+        new GenerationalCache<>(5000);
 
     /**
      * a <code>HashMap</code> from <code>Term</code> to <code>TriggersSet</code> uses to cache all
@@ -153,7 +154,7 @@ public class ServiceCaches implements SessionCaches {
     /**
      * Cache used by the TermFactory to avoid unnecessary creation of terms
      */
-    private final Map<JTerm, JTerm> termCache = new ConcurrentLruCache<>(20000);
+    private final GenerationalCache<JTerm, JTerm> termCache = new GenerationalCache<>(40000);
 
     /**
      * Cache used by TypeComparisonCondition
@@ -164,17 +165,17 @@ public class ServiceCaches implements SessionCaches {
     /**
      * Cache used by HandleArith for caching formatted terms
      */
-    private final Map<JTerm, JTerm> formattedTermCache =
-        new ConcurrentLruCache<>(5000);
+    private final GenerationalCache<JTerm, JTerm> formattedTermCache =
+        new GenerationalCache<>(20000);
 
     /**
      * Caches used bu HandleArith to cache proof results
      */
-    private final Map<JTerm, JTerm> provedByArithFstCache =
-        new ConcurrentLruCache<>(5000);
+    private final GenerationalCache<JTerm, JTerm> provedByArithFstCache =
+        new GenerationalCache<>(20000);
 
-    private final Map<Pair<JTerm, JTerm>, JTerm> provedByArithSndCache =
-        new ConcurrentLruCache<>(5000);
+    private final GenerationalCache<Pair<JTerm, JTerm>, JTerm> provedByArithSndCache =
+        new GenerationalCache<>(40000);
 
     /** Cache used by the exhaustive macro */
     private final Map<Node, PosInOccurrence> exhaustiveMacroCache =
@@ -231,7 +232,7 @@ public class ServiceCaches implements SessionCaches {
         return costReuseClassificationCache;
     }
 
-    public final Map<org.key_project.logic.Term, Monomial> getMonomialCache() {
+    public final GenerationalCache<org.key_project.logic.Term, Monomial> getMonomialCache() {
         return monomialCache;
     }
 
@@ -239,7 +240,7 @@ public class ServiceCaches implements SessionCaches {
         return formulaOccurrenceCache;
     }
 
-    public final Map<org.key_project.logic.Term, Polynomial> getPolynomialCache() {
+    public final GenerationalCache<org.key_project.logic.Term, Polynomial> getPolynomialCache() {
         return polynomialCache;
     }
 
@@ -251,7 +252,7 @@ public class ServiceCaches implements SessionCaches {
         return graphCache;
     }
 
-    public final Map<JTerm, JTerm> getTermFactoryCache() {
+    public final GenerationalCache<JTerm, JTerm> getTermFactoryCache() {
         return termCache;
     }
 
@@ -259,15 +260,15 @@ public class ServiceCaches implements SessionCaches {
         return disjointnessCache;
     }
 
-    public final Map<JTerm, JTerm> getFormattedTermCache() {
+    public final GenerationalCache<JTerm, JTerm> getFormattedTermCache() {
         return formattedTermCache;
     }
 
-    public final Map<JTerm, JTerm> getProvedByArithFstCache() {
+    public final GenerationalCache<JTerm, JTerm> getProvedByArithFstCache() {
         return provedByArithFstCache;
     }
 
-    public final Map<Pair<JTerm, JTerm>, JTerm> getProvedByArithSndCache() {
+    public final GenerationalCache<Pair<JTerm, JTerm>, JTerm> getProvedByArithSndCache() {
         return provedByArithSndCache;
     }
 

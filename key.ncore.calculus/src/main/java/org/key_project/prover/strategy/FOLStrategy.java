@@ -398,13 +398,6 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
             applyTF(buf, ff.quantifiedFor()));
     }
 
-    protected Feature notBelowQuantifier() {
-        final TermBuffer superFor = new TermBuffer();
-        return or(fc.topLevelFindAntecOrSucc(),
-            sum(superFor, fc.superTermGenerator(any(), getServices()),
-                not(applyTF(superFor, ff.quantifierF()))));
-    }
-
     private void setupReplaceKnown(RuleSetDispatchFeature d) {
         final Feature commonF =
             add(ifZero(MatchedAssumesFeature.create(), DiffFindAndAssumesFeature.create()),
