@@ -1,9 +1,10 @@
 # KeY MCP server (SSE)
 
-The `keyext.llm` module can expose the KeY-Agent tool set as an
+The `keyext.llm` module can expose KeY's proof tools (the KeY-specific Proof
+and Taclet tools of the agent tool set) as an
 [MCP](https://modelcontextprotocol.io/) (Model Context Protocol) server over
 HTTP + Server-Sent Events (SSE), so other processes — Claude Desktop, IDEs,
-scripts or agents — can discover and invoke KeY's proof tools.
+scripts or agents — can discover and invoke them.
 
 The server is a facade around the MCP Java SDK: the SDK owns the protocol
 state (version negotiation, JSON-RPC framing, tool dispatch), while a thin
@@ -63,15 +64,18 @@ event, `/messages` POSTs) and then lists/calls the exported tools.
 
 ## Which tools are exported?
 
-Every tool of the `KeYAgentTools` registry that is *exported* is registered
-as an MCP tool. The default rule: a tool is exported when it runs without
-user approval, i.e. its metadata says AUTO and the approval settings do not
-require a confirmation. Tools that ask for approval (e.g. `run_command`,
-`add_taclet`) stay hidden unless explicitly exported.
+Only the **KeY-specific tools** (the Proof and Taclets categories) are
+registered as MCP tools: the standard tools (files, shell, interaction,
+sub-agents, documentation) are private to the chat panel and never exported.
+For the KeY-specific tools the default rule applies: a tool is exported when
+it runs without user approval, i.e. its metadata says AUTO and the approval
+settings do not require a confirmation. Tools that ask for approval
+(e.g. `add_taclet`) stay hidden unless explicitly exported.
 
 Per tool you can override the default in **LLM Settings → Tools** with the
-**export to MCP** checkbox. The exported tool set is captured when the
-server starts; change the exports and restart the server to apply them.
+**export to MCP** checkbox (disabled for the standard tools). The exported
+tool set is captured when the server starts; change the exports and restart
+the server to apply them.
 
 ![Tools panel with the per-tool export checkboxes](images/mcp/mcp-tools-export.png)
 

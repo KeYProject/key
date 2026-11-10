@@ -219,9 +219,13 @@ public final class KeYAgentTools implements McpClient {
     // ------------------------------------------------------------------- documentation tool
 
     /**
-     * The self-documenting {@code list_tools} tool: dumps the Markdown documentation of all
-     * currently registered tools. It is registered directly by {@link KeYAgentTools} (not via a
-     * provider) because it must observe the whole registry.
+     * The self-documenting {@code list_tools} tool: dumps the Markdown documentation of the
+     * registered tools, filtered by {@code category} and/or {@code names}. It is registered
+     * directly by {@link KeYAgentTools} (not via a provider) because it must observe the whole
+     * registry.
+     * <p>
+     * The Proof and Taclet tools are only advertised to the model once this tool was called with
+     * their {@code category} or {@code names}; the standard tools are always available.
      */
     private static final class ToolsDocumentation implements AgentTool {
         private final Supplier<List<AgentTool>> all;
@@ -241,16 +245,55 @@ public final class KeYAgentTools implements McpClient {
         }
 
         @Override
+        public JsonSchema parameters() {
+            return AgentTool.schema(
+                "category", JsonSchema.builder().withType("string")
+                        .withDescription(
+                            "Only document the KeY-specific tools of this category and "
+                                + "load them for the following requests (\"proof\" or \"taclets\").")
+                        .withEnum(List.of("proof", "taclets")).build(),
+                "names", JsonSchema.builder().withType("array")
+                        .withItems(JsonSchema.builder().withType("string").build())
+                        .withDescription("Load exactly these KeY-specific tool names (proof and "
+                            + "taclet tools) and document them.")
+                        .build());
+        }
+
+        @Override
         public String description() {
-            return "Dumps the Markdown documentation of every tool currently available to the"
-                + " agent - name, approval requirement, description and parameters, including"
-                + " this tool itself. Use it to inspect the available capabilities before"
-                + " calling them, or to keep the tool documentation up to date.";
+            return "Dumps the Markdown documentation of the tools available to the agent - name,"
+                + " approval requirement, description and parameters, including this tool"
+                + " itself. The always-on standard tools (files, shell, skills, sub-agents) are"
+                + " documented by default; the KeY-specific Proof and Taclet tools are kept out"
+                + " of the request to keep it small and are only loaded (and documented) when"
+                + " this tool is called with their category (\"proof\" or \"taclets\") or with"
+                + " an explicit list of names. Call this tool first whenever you need to reason"
+                + " about or change the proof.";
         }
 
         @Override
         public Object call(Map<String, Object> arguments) {
+            var category = AgentTool.stringArg(arguments, "category");
+            var names = namesArg(arguments);
+            if (category != null || names != null) {
+                return buildToolsDocumentation(all.get().stream()
+                        .filter(t -> t.category().isKeySpecific())
+                        .filter(t -> category == null
+                                || t.category().name().equalsIgnoreCase(category.trim())
+                                || t.category().label().equalsIgnoreCase(category.trim()))
+                        .filter(t -> names == null || names.contains(t.name()))
+                        .toList());
+            }
             return buildToolsDocumentation(all.get());
+        }
+
+        private static @org.jspecify.annotations.Nullable List<String> namesArg(
+                Map<String, Object> arguments) {
+            Object v = arguments.get("names");
+            if (!(v instanceof List<?> list) || list.isEmpty()) {
+                return null;
+            }
+            return list.stream().map(String::valueOf).toList();
         }
     }
 

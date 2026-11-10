@@ -37,10 +37,12 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The server is built on the MCP Java SDK: {@link McpServer} provides all protocol state (version
  * negotiation, JSON-RPC framing, tool dispatch), while {@link SseHttpServerTransportProvider}
- * implements the SSE transport on the JDK's {@link HttpServer}. Every tool of the
- * {@link KeYAgentTools} registry that is currently exported (see the per-tool export permission
- * in {@link LlmSettings}) is registered as an MCP tool; tool calls are executed through the shared
- * {@link ToolDispatcher}, i.e. serialized against tool calls of the GUI agent.
+ * implements the SSE transport on the JDK's {@link HttpServer}. Every KeY-specific tool of the
+ * {@link KeYAgentTools} registry (the Proof and Taclets categories) that is currently exported
+ * (see the per-tool export permission in {@link LlmSettings}) is registered as an MCP tool; the
+ * standard tools (files, shell, skills, sub-agents, ...) are private to the chat panel and are
+ * never exposed here. Tool calls are executed through the shared {@link ToolDispatcher}, i.e.
+ * serialized against tool calls of the GUI agent.
  * <p>
  * The server binds to a host/port (default {@code 127.0.0.1} on an ephemeral port) and can
  * optionally require a static bearer token on every request. Lifecycle observers are notified via
@@ -215,10 +217,15 @@ public class KeYMcpSseServer {
     }
 
     /**
-     * Effective export permission of a tool: the per-tool user overrides in {@link LlmSettings}
-     * win, otherwise a tool is exported when it runs without user approval by default.
+     * Effective export permission of a tool: standard tools (files, shell, skills, sub-agents, ...)
+     * are private to the chat panel and never exposed on the MCP server. For the KeY-specific
+     * tools (Proof/Taclets) the per-tool user overrides in {@link LlmSettings} win, otherwise a
+     * tool is exported when it runs without user approval by default.
      */
     static boolean isExported(AgentTool tool) {
+        if (!tool.category().isKeySpecific()) {
+            return false;
+        }
         var settings = LlmSettings.INSTANCE;
         return settings.isExportedToMCP(tool.name(),
             settings.isExportedToMCPByDefault(tool.name(),

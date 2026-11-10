@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.key_project.key.llm.mcp.AgentTool;
 import org.key_project.key.llm.mcp.AgentToolProvider;
+import org.key_project.key.llm.mcp.ToolCategory;
 
 /**
  * Test-only tool set contributed through the {@link AgentToolProvider} service loader, to verify
@@ -21,7 +22,7 @@ public class TestAgentToolProvider implements AgentToolProvider {
 
     @Override
     public List<AgentTool> get() {
-        return List.of(AgentTool.tool(EXTRA_TOOL, EXTRA_DESC,
+        return List.of(AgentTool.tool(EXTRA_TOOL, ToolCategory.PROOF, EXTRA_DESC,
             AgentTool.schema("x", org.key_project.key.llm.mcp.JsonSchema.builder()
                     .withType("string").build()),
             args -> "echo-agent:" + AgentTool.stringArg(args, "x")));

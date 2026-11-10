@@ -12,11 +12,10 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import org.key_project.key.llm.mcp.Tool;
 
 import org.jspecify.annotations.Nullable;
 
@@ -73,7 +72,9 @@ public final class ExtendedPrompt {
             messages.add(userWithImagesAndText(resolvedUserText, imageParts));
         }
 
-        var tools = session.getMcpClient().getTools().stream().map(Tool::toMap).toList();
+        // standard tools are advertised by default; KeY-specific (proof/taclet) tools are loaded
+        // on request via list_tools (see ToolSelection) - the initial request carries none of them
+        var tools = ToolSelection.advertisedTools(session, skill, Set.of());
 
         Double temperature = settings.getSendTemperature() ? settings.getTemperature() : null;
         Integer maxTokens =

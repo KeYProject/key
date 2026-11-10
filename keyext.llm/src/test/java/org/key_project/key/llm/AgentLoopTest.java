@@ -7,6 +7,7 @@ package org.key_project.key.llm;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.key_project.key.llm.mcp.KeYAgentTools;
@@ -203,6 +204,114 @@ class AgentLoopTest {
         var lastMessages = mock.sent.get(1).messages();
         var toolMsg = (Map<String, Object>) lastMessages.get(lastMessages.size() - 1);
         assertTrue(String.valueOf(toolMsg.get("content")).contains("Unknown skill"));
+    }
+
+    @Test
+    void skillWhitelistDeniesCallsOutsideTheWhitelist() {
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("c1", TestMcpToolProvider.ECHO, "{\"x\":1}")), ""));
+        mock.thenRespond(MockCompletions.text("done"));
+        var skill = new Skill("narrow", "", "",
+            List.of(KeYAgentTools.TOOL_GET_PROOF_CONTEXT), true);
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult result = loop.begin("go", null, null, skill);
+
+        assertInstanceOf(AgentResult.Done.class, result);
+        var lastMessages = mock.sent.get(1).messages();
+        var toolMsg = (Map<String, Object>) lastMessages.get(lastMessages.size() - 1);
+        assertTrue(String.valueOf(toolMsg.get("content"))
+                .contains("not in the whitelist of skill 'narrow'"),
+            String.valueOf(toolMsg.get("content")));
+        assertTrue(!String.valueOf(toolMsg.get("content")).contains("echo:"),
+            "the tool outside the whitelist must never be dispatched");
+    }
+
+    @Test
+    void skillWhitelistAllowsWhitelistedCalls() {
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("c1", TestMcpToolProvider.ECHO, "{\"x\":1}")), ""));
+        mock.thenRespond(MockCompletions.text("done"));
+        var skill = new Skill("loose", "", "", List.of(TestMcpToolProvider.ECHO), true);
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult result = loop.begin("go", null, null, skill);
+
+        assertInstanceOf(AgentResult.Done.class, result);
+        var lastMessages = mock.sent.get(1).messages();
+        var toolMsg = (Map<String, Object>) lastMessages.get(lastMessages.size() - 1);
+        assertTrue(String.valueOf(toolMsg.get("content")).contains("echo:{\"x\":1}"),
+            "the whitelisted tool call must be dispatched: " + toolMsg.get("content"));
+    }
+
+    @Test
+    void listToolsLoadsAKeySpecificCategoryForTheNextRound() {
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("d1", KeYAgentTools.TOOL_LIST_TOOLS,
+                "{\"category\":\"proof\"}")),
+            ""));
+        mock.thenRespond(MockCompletions.text("ready"));
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult result = loop.begin("prepare", null, null, null);
+
+        assertInstanceOf(AgentResult.Done.class, result);
+        var firstTools = toolsOf(mock.sent.get(0));
+        assertTrue(firstTools.contains(KeYAgentTools.TOOL_LIST_TOOLS));
+        assertTrue(!firstTools.contains(KeYAgentTools.TOOL_TRYCLOSE),
+            "proof tools are not advertised before the discovery call");
+        var secondTools = toolsOf(mock.sent.get(1));
+        assertTrue(secondTools.contains(KeYAgentTools.TOOL_TRYCLOSE),
+            "the discovered proof tools must be advertised in the next round");
+        assertTrue(!secondTools.contains(KeYAgentTools.TOOL_LIST_TACLETS),
+            "only the requested category is loaded, not the whole taclet set");
+    }
+
+    @Test
+    void listToolsLoadsNamedKeySpecificTools() {
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("d1", KeYAgentTools.TOOL_LIST_TOOLS,
+                "{\"names\":[\"list_taclets\"]}")),
+            ""));
+        mock.thenRespond(MockCompletions.text("ok"));
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult result = loop.begin("prepare", null, null, null);
+
+        assertInstanceOf(AgentResult.Done.class, result);
+        var secondTools = toolsOf(mock.sent.get(1));
+        assertTrue(secondTools.contains(KeYAgentTools.TOOL_LIST_TACLETS),
+            "the named taclet tool must be advertised in the next round");
+        assertTrue(!secondTools.contains(KeYAgentTools.TOOL_TRYCLOSE),
+            "a different proof tool must stay unadvertised");
+    }
+
+    @Test
+    void keySpecificToolCallWithoutDiscoveryIsDenied() {
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("c1", KeYAgentTools.TOOL_TRYCLOSE, "{}")), ""));
+        mock.thenRespond(MockCompletions.text("understood"));
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult result = loop.begin("close it", null, null, null);
+
+        assertInstanceOf(AgentResult.Done.class, result);
+        var lastMessages = mock.sent.get(1).messages();
+        var toolMsg = (Map<String, Object>) lastMessages.get(lastMessages.size() - 1);
+        assertTrue(String.valueOf(toolMsg.get("content")).contains("not loaded"),
+            "a proof tool the model never discovered must be denied: " + toolMsg.get("content"));
+    }
+
+    /** The advertised tool names of a request. */
+    private static Set<String> toolsOf(AgentRequest request) {
+        return request.tools().stream()
+                .map(t -> String.valueOf(((Map<?, ?>) t.get("function")).get("name")))
+                .collect(java.util.stream.Collectors.toSet());
     }
 
     /** Scripted {@link ChatCompletionsClient}. */

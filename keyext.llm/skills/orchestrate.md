@@ -3,6 +3,7 @@ name: orchestrate
 description: Delegate bounded work to sub-agents and consult fresh LLM instances instead of doing everything inline.
 enabled: true
 allowedTools:
+  - list_tools
   - get_proof_context
   - list_branches
   - list_proofs
@@ -38,7 +39,8 @@ Rules of delegation:
 4. After a delegation, check `get_subagent_logs` (role filter, newest first) for per-task status
    and the tools the child called; verify claimed results with `list_branches` /
    `assert_open_goals` style read-backs before trusting them. (`get_subagent_logs` is whitelisted
-   for exactly this; read the proof state with your own inspection tools.)
+   for exactly this; read the proof state with your own inspection tools — call `list_tools`
+   first to load the proof tools.)
 5. Depth and round budgets are bounded (max sub-agent depth 2, per-delegation turn budget);
    do not spawn a child for something that needs interactive back-and-forth with the user.
 

@@ -158,13 +158,20 @@ public class LlmToolsPanel extends SettingsPanel {
         background.addActionListener(e -> applyBackground(name, background.isSelected()));
 
         var export = new JCheckBox("export to MCP");
-        boolean defaultExport = model.isExportedToMCPByDefault(name,
-            tool.defaultApproval() == Tool.ApprovalRequirement.AUTO);
-        export.setSelected(model.isExportedToMCP(name, defaultExport));
-        export.setToolTipText("Expose this tool to external processes over the MCP server"
-            + " (SSE). By default the auto-approved tools are exported; an explicit choice"
-            + " overrides that default.");
-        export.addActionListener(e -> applyExport(name, export.isSelected()));
+        if (!tool.category().isKeySpecific()) {
+            // standard tools are private to the chat panel: never offered on the MCP server
+            export.setEnabled(false);
+            export.setToolTipText("Standard tools (everything outside Proof and Taclets) are"
+                + " private to the chat panel and are never exposed via the MCP server.");
+        } else {
+            boolean defaultExport = model.isExportedToMCPByDefault(name,
+                tool.defaultApproval() == Tool.ApprovalRequirement.AUTO);
+            export.setSelected(model.isExportedToMCP(name, defaultExport));
+            export.setToolTipText("Expose this tool to external processes over the MCP server"
+                + " (SSE). By default the auto-approved tools are exported; an explicit choice"
+                + " overrides that default.");
+            export.addActionListener(e -> applyExport(name, export.isSelected()));
+        }
 
         var checkboxes = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
         checkboxes.add(background);

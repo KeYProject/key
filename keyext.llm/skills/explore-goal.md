@@ -3,6 +3,7 @@ name: explore-goal
 description: Sandboxed experimentation on a goal — probes and forks answer "what if" questions without touching the main proof.
 enabled: true
 allowedTools:
+  - list_tools
   - get_proof_context
   - list_branches
   - list_proofs
@@ -36,7 +37,8 @@ Tools and their guarantees:
 
 Recommended loop:
 
-1. `get_proof_context` + `list_branches`; name the blocking conjecture `C`.
+1. Load the proof tools first: `list_tools` (category `"proof"` / `"taclets"` as needed), then
+   `get_proof_context` + `list_branches`; name the blocking conjecture `C`.
 2. Probe the strongest version first: `probe_add_formula` with `C` (antecedent or succedent as
    fits). If `TRUE`, ask: is `C` a lemma we want in the final proof?
    - Yes → propose applying `explorative_add_formula` with `C` (and note the disabled branch).

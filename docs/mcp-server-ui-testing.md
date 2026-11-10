@@ -46,8 +46,8 @@ Run them with:
 
 | Test class | Steps and assertions |
 |------------|----------------------|
-| `LlmStatusBarUiTest` | 1. Toggle the status-bar button on the EDT → the SSE server binds, the persisted flag `mcpServerEnabled` is set and the toggle is selected; the endpoint URL (`http://127.0.0.1:<port>/sse`) is set but hidden until the pointer hovers over the indicator (simulated mouse events), and it hides again on leave; the URL is shown in a selectable, read-only text field. 2. With the UI up, an MCP client connects, lists the exported tools (`read_file` and the auto-approved test tool present, `run_command` absent) and calls the echo tool → the reply arrives while the status bar keeps serving the endpoint. 3. Toggle off → the server stops (a socket probe on the endpoint port fails), the URL field clears and the flag clears. 4. `maybeRestore()` replays a persisted enabled server. |
-| `LlmToolsPanelExportUiTest` | With the mock tool set injected: the "export to MCP" checkboxes reflect the effective export rule (auto → checked, ask → unchecked); approval overrides recompute the default (without-approval ask tool → checked, with-approval/disabled → unchecked); explicit `mcpExportedTools`/`mcpNotExportedTools` win in both directions; clicking a checkbox writes the override set of the settings working copy; the permission radios still write the approval sets. |
+| `LlmStatusBarUiTest` | 1. Toggle the status-bar button on the EDT → the SSE server binds, the persisted flag `mcpServerEnabled` is set and the toggle is selected; the endpoint URL (`http://127.0.0.1:<port>/sse`) is set but hidden until the pointer hovers over the indicator (simulated mouse events), and it hides again on leave; the URL is shown in a selectable, read-only text field. 2. With the UI up, an MCP client connects, lists the exported tools (the auto-approved proof tools and the auto-approved test tool present, `read_file` — a standard tool — absent) and calls the echo tool → the reply arrives while the status bar keeps serving the endpoint. 3. Toggle off → the server stops (a socket probe on the endpoint port fails), the URL field clears and the flag clears. 4. `maybeRestore()` replays a persisted enabled server. |
+| `LlmToolsPanelExportUiTest` | With the mock tool set injected: the "export to MCP" checkboxes of the KeY-specific tools reflect the effective export rule (auto → checked, ask → unchecked); approval overrides recompute the default (without-approval ask tool → checked, with-approval → unchecked); explicit `mcpExportedTools`/`mcpNotExportedTools` win in both directions; clicking a checkbox writes the override set of the settings working copy; the checkboxes of standard tools are disabled and inert (standard tools are never exported); the permission radios still write the approval sets. |
 | `LlmModelsFetchUiTest` | Points the settings working copy at `MockModelsServer`, clicks "Fetch Models" and awaits (polling the model, pumping the EDT) until the mocked model ids appear in `getAvailableModels()`. |
 | `McpUiGuideTest` | Renders the documentation screenshots into `keyext.llm/build/ui-guide/` (see below) and guards that the endpoint label is visible while the server runs. |
 
@@ -58,7 +58,7 @@ Run them with:
 * `mcp-statusbar-off.png` — the status-line indicator, server off (red dot),
 * `mcp-statusbar-on.png` — the indicator with the endpoint shown on hover,
 * `mcp-tools-export.png` — the Tools panel with the per-tool "export to MCP" checkboxes
-  (the run values show explicit overrides in both directions),
+  (checked for the auto-approved KeY-specific tools, disabled for the standard tools),
 * `mcp-server-settings.png` — the LLM settings panel including the "MCP server" section.
 
 Regenerate them by running the guide test and copy the wanted files into `docs/images/mcp/`:

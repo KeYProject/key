@@ -193,6 +193,7 @@ name: optics
 description: focus on arithmetic overflow proofs
 enabled: true
 allowedTools:         # empty/absent = no restriction
+  - list_tools        # needed to load the KeY-specific (Proof/Taclets) tools
   - list_files
   - read_file
   - get_proof_context
@@ -209,7 +210,10 @@ Pay special attention to integer overflow; check the goal sequent before choosin
   files (see [section 9](#9-settings-reference-settings--llm-settings)). The directories holding
   the files (the *search path*) are editable right below the list.
 - If a skill restricts `allowedTools`, only those tools are offered to the model while the skill
-  is active.
+  is active. The whitelist also gates *dispatch*: a tool outside it is never executed in that
+  turn. Proof and Taclet tools are only advertised after they are loaded via `list_tools` (see
+  [section 7](#7-the-agent-loop-and-tools)), so a whitelist that wants to use them must include
+  `list_tools` as well — the shipped skills do.
 - The agent itself can activate a skill through the `use_skill` tool — this is **off by default**
   (setting *Agent may use skills*).
 
@@ -228,6 +232,10 @@ instructions:
 | `taclet-design`  | inspect taclets and options, export rules, add/remove taclets with approval |
 | `orchestrate`    | delegate bounded work to sub-agents (`spawn_subagent`, roles, logs) and consult fresh LLM instances (`ask_llm`) instead of doing everything inline |
 | `tool-tour`      | onboarding: the agent explains its own tool set via `list_tools` and suggests a fitting skill |
+
+Every skill that references Proof or Taclet tools whitelists `list_tools` too, so the agent can
+load those tools (and the skill instructions tell it to do so first) — see
+[section 7](#7-the-agent-loop-and-tools).
 
 The skills are **installed automatically**: when the skill search path is empty (the default),
 KeY extracts the bundled skills into the default directory (`<key-config>/llm/skills`) on first
@@ -314,7 +322,7 @@ The built-in tool set (`KeYAgentTools`):
 | `ask_llm`           | Sub-agents     | auto     | ✓              | send a prompt to a fresh LLM instance (clean context, no tools) and deliver the reply back to the agent (only if enabled in settings) |
 | `spawn_subagent`    | Sub-agents     | ask      | ✓              | delegate a task to a sub-agent (only if enabled in settings)        |
 | `get_subagent_logs` | Sub-agents     | auto     |                | list the recorded sub-agent runs (role, mode, per-task status and the tools that were called) |
-| `list_tools`        | Documentation  | auto     |                | dump the Markdown documentation of every available tool (metadata + this list) |
+| `list_tools`        | Documentation  | auto     |                | dump the Markdown documentation of the tools; loading KeY-specific tools by `category` ("proof"/"taclets") or `names` also advertises them in the following rounds |
 
 **Goal targeting and proof selection.** The proof-manipulation tools (`tryclose`, `auto`,
 `run_macro`, `run_smt`, `simplify_goal`, `apply_rule`, `instantiate_quantifier`,
@@ -358,6 +366,21 @@ documentation; the backgroundable flag controls whether a running call may be mo
 background (see [section 7.4](#74-backgrounding)). Tools contributed by external MCP clients
 default to *General* / not backgroundable.
 
+**Two tiers of tools.** The tool set is split so the model request stays small (a smaller tool
+list means fewer tokens and more reliable tool choice):
+
+- **Standard tools** — everything outside the Proof and Taclets categories (files, shell,
+  interaction, sub-agents, documentation): always offered to the model in every request, filtered
+  by the active skill's `allowedTools` whitelist (see [section 5](#5-skills)).
+- **KeY-specific tools** — the Proof and Taclets categories: not advertised by default. To use
+  them the agent calls `list_tools` with a `category` (`"proof"` / `"taclets"`) or an explicit
+  `names` list; the tool result documents them and they are advertised from the next round on
+  (until the turn ends). Calling a KeY-specific tool that was never loaded is refused with
+  *"[Tool … is not loaded. Call list_tools …]"*, so the advertised set stays the ground truth of
+  what the model may do in a turn. This only affects what is <em>offered</em>: the user-side
+  config (disable/approval/background, [section 9](#9-settings-reference-settings--llm-settings))
+  keeps working per tool.
+
 The tool set is **modular and self-describing**: every tool is contributed by an
 `AgentToolProvider` that is discovered via the Java `ServiceLoader` (service file
 `META-INF/services/org.key_project.key.llm.mcp.AgentToolProvider`) and aggregated by
@@ -365,7 +388,8 @@ The tool set is **modular and self-describing**: every tool is contributed by an
 classes are needed. The metadata of all tools (name, description, parameter schema, default
 approval, category, backgroundable) is available programmatically via `KeYAgentTools.agents()` /
 `agent(name)` and as an OpenAI-format tool list via `getTools()`; `list_tools` renders it as
-Markdown for the model (grouped by category, one `## <Category>` section each).
+Markdown for the model (grouped by category, one `## <Category>` section each — filtered to the
+requested category/names when those parameters are given).
 
 The same documentation can be printed from the command line without a GUI (useful for keeping
 the docs in sync or for scripts):
@@ -569,7 +593,8 @@ The tools are grouped into **category sections** (Proof, Files, Shell, Taclets, 
 Sub-agents, Documentation, General — in that order, tools by name within a section). One row per
 tool shows a short explanation, a radio group selecting its permission — **Default** (the tool's
 own behavior, `auto` or `ask`), **With approval** (always ask), **Without approval (always)** or
-**Disabled** (not sent to the model) — and a **may run in background** checkbox. Read-only tools
+**Disabled** (not sent to the model) — a **may run in background** checkbox, and an **export to
+MCP** checkbox. Read-only tools
 default to `auto`, `run_command` to `ask`; the background checkbox follows the tool's metadata
 (default on for `auto`, `tryclose`, `run_command`, `run_macro`, `run_smt`, `spawn_subagent`,
 `ask_llm`, `probe_add_formula`, `probe_edit_formula`; overriding it adds/removes the tool in the
@@ -577,6 +602,14 @@ default to `auto`, `run_command` to `ask`; the background checkbox follows the t
 be moved to the background, the agent then continues with your queued messages and the result is
 delivered when the call finishes (see [section 7.4](#74-backgrounding)). The number of concurrent
 background jobs is capped by *Max background jobs* (Agent behavior section).
+
+The **export to MCP** checkbox controls which tools the built-in KeY MCP server (SSE endpoint)
+offers to external processes: only the KeY-specific tools (Proof and Taclets) can be exported —
+the checkbox for standard tools (files, shell, skills, …) is disabled, because those are private
+to the chat panel and never exposed. By default the auto-approved KeY-specific tools are exported
+(`auto`, `tryclose`, `run_macro`, `run_smt`, `simplify_goal`, the read-only inspection tools and
+the sandboxed probes), while everything that asks before running stays off; ticking/unticking a
+KeY-specific tool records an explicit override.
 
 ### User interface
 Auto-scroll output (`true`) and show tool activity (`true`).

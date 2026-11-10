@@ -41,6 +41,7 @@ public final class McpUiTestHarness {
     public static final String MOCK_AUTH = "mock_auth";
     public static final String MOCK_READ = "mock_read";
     public static final String MOCK_RUN = "mock_run";
+    public static final String MOCK_MUTATE = "mock_add_taclet";
 
     private McpUiTestHarness() {
     }
@@ -97,8 +98,9 @@ public final class McpUiTestHarness {
     }
 
     /**
-     * A small, deterministic tool set for UI tests: one auto-approved proof tool, one auto-approved
-     * file tool and one ask-approved shell tool.
+     * A small, deterministic tool set for UI tests: an auto-approved proof tool and an ask-approved
+     * taclet tool (both KeY-specific, i.e. exportable) plus an auto-approved file tool and an
+     * ask-approved shell tool (both standard, i.e. never exported).
      */
     public static List<Tool> mockTools() {
         return List.of(
@@ -107,7 +109,9 @@ public final class McpUiTestHarness {
             new Tool(new FunctionDefinition(MOCK_READ, "reads a mock file"),
                 Tool.ApprovalRequirement.AUTO, ToolCategory.FILES, true),
             new Tool(new FunctionDefinition(MOCK_RUN, "runs a mock command"),
-                Tool.ApprovalRequirement.ASK, ToolCategory.SHELL, true));
+                Tool.ApprovalRequirement.ASK, ToolCategory.SHELL, true),
+            new Tool(new FunctionDefinition(MOCK_MUTATE, "adds a mock taclet"),
+                Tool.ApprovalRequirement.ASK, ToolCategory.TACLETS, false));
     }
 
     /**

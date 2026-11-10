@@ -3,6 +3,7 @@ name: prove-surgical
 description: Manual proof work on a resistant goal — cuts, quantifier instantiation, witnesses, term rewriting.
 enabled: true
 allowedTools:
+  - list_tools
   - get_proof_context
   - list_branches
   - list_proofs
@@ -29,8 +30,9 @@ calling the tool, so the approval dialog makes sense.
 
 Workflow:
 
-1. **Read the goal.** `get_proof_context` and `list_branches` first. Identify the *one* formula
-   that blocks the proof and name it explicitly in your plan.
+1. **Read the goal.** Load the proof and taclet tools first (`list_tools`, category `"proof"`
+   and `"taclets"`), then `get_proof_context` and `list_branches` first. Identify the *one*
+   formula that blocks the proof and name it explicitly in your plan.
 2. **Split the problem** with `cut_formula` when a key lemma/property is missing: cut on the
    property `P` you would like to use; the goal splits into `P ==> …` (prove the main goal with P
    as an assumption) and `… ==> P` (prove the lemma). State both sub-goals afterwards.

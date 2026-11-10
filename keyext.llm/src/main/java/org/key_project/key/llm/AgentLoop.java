@@ -5,8 +5,10 @@
 package org.key_project.key.llm;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -20,6 +22,7 @@ import org.key_project.key.llm.AgentResult.Question;
 import org.key_project.key.llm.AgentResult.ToolActivity;
 import org.key_project.key.llm.AgentResult.ToolCallInfo;
 import org.key_project.key.llm.LlmContext.LlmMessage;
+import org.key_project.key.llm.mcp.AgentTool;
 import org.key_project.key.llm.mcp.KeYAgentTools;
 
 import com.google.gson.GsonBuilder;
@@ -60,6 +63,18 @@ public class AgentLoop {
     private final List<LlmMessage> staged = new ArrayList<>();
     private final List<ToolActivity> activities = new ArrayList<>();
     private AgentRequest request;
+    /**
+     * The skill effective for the current turn (from the {@code /skill:} directive of the message
+     * or the session's active skill). A non-empty {@code allowedTools} whitelist restricts which
+     * tool calls the loop may dispatch; {@code null} (or an empty whitelist) keeps all enabled
+     * tools available.
+     */
+    private @Nullable Skill effectiveSkill;
+    /**
+     * The KeY-specific tool names (Proof/Taclets) the model loaded via {@code list_tools} in this
+     * turn; they are advertised in the following rounds. Cleared when the turn ends.
+     */
+    private final Set<String> requestedKeYSpecificTools = new LinkedHashSet<>();
     private int rounds = 0;
     private boolean cancelled = false;
     private volatile boolean backgroundRequested = false;
@@ -123,6 +138,8 @@ public class AgentLoop {
         Skill effective =
             resolved.skillName() != null ? SkillLibrary.INSTANCE.get(resolved.skillName())
                     : skill;
+        effectiveSkill = effective;
+        requestedKeYSpecificTools.clear();
         request = ExtendedPrompt.build(session, proof, node, resolved.text(), effective);
         thread.clear();
         thread.addAll(request.messages());
@@ -260,7 +277,7 @@ public class AgentLoop {
             final Map<String, Object> response;
             try {
                 response = completions.complete(session, new AgentRequest(request.model(),
-                    List.copyOf(thread), request.tools(), request.temperature(),
+                    List.copyOf(thread), currentTools(), request.temperature(),
                     request.maxOutputTokens(), request.maxToolRounds()));
             } catch (Exception e) {
                 return new AgentResult.Failed(e);
@@ -321,6 +338,32 @@ public class AgentLoop {
         var name = String.valueOf(function.get("name"));
         var arguments = function.get("arguments") == null ? "{}"
                 : String.valueOf(function.get("arguments"));
+
+        // a skill with a tool whitelist binds the whole turn: calls outside the whitelist are
+        // denied without being dispatched (mirrors the sub-agent whitelist, see SubagentRunner)
+        final var skill = effectiveSkill;
+        if (skill != null && !skill.allowedTools().isEmpty()
+                && !skill.allowedTools().contains(name)) {
+            stagedTool(id,
+                "[Tool '" + name + "' is not in the whitelist of skill '" + skill.name() + "']");
+            return null;
+        }
+
+        // KeY-specific tools (Proof/Taclets) must be loaded through list_tools first; a call
+        // to a tool that was never advertised is denied so the advertised set stays the
+        // ground truth of what the model may do this turn.
+        if (isKeySpecificTool(name) && !requestedKeYSpecificTools.contains(name)) {
+            stagedTool(id, "[Tool '" + name + "' is not loaded. Call list_tools with its "
+                + "category (\"proof\" or \"taclets\") or its name to load it, then call it"
+                + " again.]");
+            return null;
+        }
+
+        // list_tools documents the tools and, when asked for a KeY-specific category or name,
+        // loads those tools for the following rounds
+        if (KeYAgentTools.TOOL_LIST_TOOLS.equals(name)) {
+            rememberDiscoveredTools(arguments);
+        }
 
         if (KeYAgentTools.TOOL_ASK_USER.equals(name)) {
             if (!LlmSettings.INSTANCE.getAllowAgentQuestions()) {
@@ -536,6 +579,57 @@ public class AgentLoop {
 
     private AgentResult done(String content) {
         return new AgentResult.Done(content, List.copyOf(activities));
+    }
+
+    /**
+     * The tool definitions advertised in the next round: the always-on standard tools plus the
+     * KeY-specific tools loaded via {@code list_tools}, filtered by the skill whitelist.
+     */
+    private List<Map<String, Object>> currentTools() {
+        return ToolSelection.advertisedTools(session, effectiveSkill, requestedKeYSpecificTools);
+    }
+
+    /** Whether the named tool is a KeY-specific (Proof/Taclets) tool. */
+    private boolean isKeySpecificTool(String name) {
+        return session.getMcpClient().getTools().stream()
+                .filter(t -> t.function().name().equals(name))
+                .anyMatch(t -> t.category().isKeySpecific());
+    }
+
+    /**
+     * Records the KeY-specific tools requested through {@code list_tools} so they are advertised
+     * from the next round on: the {@code category} loads all tools of that category, {@code names}
+     * loads exactly the listed tools. Malformed arguments are ignored (the documentation tool
+     * itself reports the error to the model).
+     */
+    private void rememberDiscoveredTools(String arguments) {
+        final var requested = new LinkedHashSet<String>();
+        var args = AgentTool.parseArgs(arguments);
+        var enabled = session.getMcpClient().getTools();
+        var category = AgentTool.stringArg(args, "category");
+        if (category != null) {
+            for (var t : enabled) {
+                if (t.category().isKeySpecific()
+                        && (t.category().name().equalsIgnoreCase(category.trim())
+                                || t.category().label().equalsIgnoreCase(category.trim()))) {
+                    requested.add(t.function().name());
+                }
+            }
+        }
+        Object names = args.get("names");
+        if (names instanceof List<?> list) {
+            for (Object item : list) {
+                if (item == null) {
+                    continue;
+                }
+                String wanted = String.valueOf(item);
+                enabled.stream()
+                        .filter(t -> t.category().isKeySpecific()
+                                && t.function().name().equals(wanted))
+                        .map(t -> t.function().name()).findFirst().ifPresent(requested::add);
+            }
+        }
+        requestedKeYSpecificTools.addAll(requested);
     }
 
     private void addToolResult(String toolCallId, String content, boolean asActivity) {
