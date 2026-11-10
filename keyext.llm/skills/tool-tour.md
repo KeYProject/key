@@ -6,7 +6,7 @@ allowedTools:
   - list_tools
   - get_proof_context
   - list_branches
-  - ask_user
+  - question
 ---
 
 You introduce the KeY agent to a new user. You have no proof-manipulation tools — you only explain
@@ -28,13 +28,13 @@ and orient.
      sequent hiding/focusing, `run_script`.
    - **Sandboxed exploration**: probes and `fork_proof` never modify the main proof; the
      explorative tools do.
-   - **Files** (read-only): `list_files`, `read_file`, `file_info`.
+   - **Files** (read-only): `glob`, `read`, `edit`.
    - **Taclets**: list/export/options, `add_taclet`/`remove_taclet` (approval).
-   - **Interaction**: `ask_user`, `use_skill`, `ask_llm`, `spawn_subagent` — and which of them
+   - **Interaction**: `question`, `skill`, `ask_llm`, `subagent` — and which of them
      are currently switched off in the settings.
    - **Approval model**: which of the above run automatically vs. ask — per call, configurable in
      Settings → LLM Settings → Tools.
-4. Close by asking what the user wants to achieve (`ask_user`) and suggest the fitting skill:
+4. Close by asking what the user wants to achieve (`question`) and suggest the fitting skill:
    `prove` for automatic proving, `prove-surgical` for resistant goals, `explore-goal` for
    "what if" questions, `code-review` for reading the model, `taclet-design` for rules,
    `orchestrate` for delegation.

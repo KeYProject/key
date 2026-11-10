@@ -19,7 +19,7 @@ import org.key_project.key.llm.mcp.KeYAgentTools;
  * <li>{@code rule-designer} designs and registers taclets (mutating: sequential only).</li>
  * </ul>
  * Roles are tools-free by themselves - they only whitelist tools that already exist in the tool
- * set; {@code spawn_subagent} itself is never whitelisted implicitly.
+ * set; {@code subagent} itself is never whitelisted implicitly.
  *
  * @author Alexander Weigl
  */
@@ -43,8 +43,7 @@ public final class BuiltInSubagentRoles implements SubagentRoleProvider {
                 "You inspect source files of the current Java model. List the model files, read "
                     + "the relevant ones and report method signatures, JML annotations and "
                     + "invariants that matter for the task. Do not modify anything.",
-                List.of(KeYAgentTools.TOOL_LIST_FILES, KeYAgentTools.TOOL_READ_FILE,
-                    KeYAgentTools.TOOL_FILE_INFO),
+                List.of(KeYAgentTools.TOOL_GLOB, KeYAgentTools.TOOL_READ),
                 null, 6, true),
             new SubagentRole("rule-designer",
                 "Designs KeY rules (taclets) for the current proof.",

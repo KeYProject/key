@@ -160,9 +160,9 @@ class AskLlmTest {
         LlmSettings.INSTANCE.setSubagentsEnabled(true);
         var mock = new SubagentLoopTest.MockCompletions();
         mock.thenRespond(SubagentLoopTest.MockCompletions.toolCalls(
-            List.of(SubagentLoopTest.MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"" + TestSubagentRoleProvider.ASK_LLM_ROLE
-                    + "\",\"task\":\"review my plan\"}")),
+            List.of(SubagentLoopTest.MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"" + TestSubagentRoleProvider.ASK_LLM_ROLE
+                    + "\",\"prompt\":\"review my plan\"}")),
             ""));
         // the child consults a fresh LLM instance and then answers on that basis
         mock.thenRespond(SubagentLoopTest.MockCompletions.toolCalls(

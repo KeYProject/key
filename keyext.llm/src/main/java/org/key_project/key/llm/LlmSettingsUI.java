@@ -73,9 +73,9 @@ public class LlmSettingsUI extends SettingsPanel {
         addSeparator("Agent behavior");
         addSystemPromptField();
         addCheckBox("Allow the agent to ask questions", "The agent may ask you a question "
-            + "(ask_user). Questioning pauses the turn until you answer.",
+            + "(question). Questioning pauses the turn until you answer.",
             model.getAllowAgentQuestions(), model::setAllowAgentQuestions);
-        addCheckBox("Agent may use skills", "Give the agent a use_skill tool (default off).",
+        addCheckBox("Agent may use skills", "Give the agent a skill tool (default off).",
             model.getAgentCanUseSkills(), model::setAgentCanUseSkills);
         addCheckBox("Agent may consult the LLM (ask_llm)",
             "Give the agent an ask_llm tool: a fresh model context (clean, without conversation"
@@ -128,7 +128,7 @@ public class LlmSettingsUI extends SettingsPanel {
             model::setMaxModelListingEntries);
 
         addSeparator("Shell commands");
-        addCheckBox("Enable shell commands (run_command)",
+        addCheckBox("Enable shell commands (shell)",
             "Whether the agent may run shell commands at all (approval is still required).",
             model.getShellEnabled(), model::setShellEnabled);
         addIntField("Shell timeout (seconds)", "", model::getShellTimeoutSeconds,

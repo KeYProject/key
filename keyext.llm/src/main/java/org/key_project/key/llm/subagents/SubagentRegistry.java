@@ -12,7 +12,7 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Registry of all sub-agent roles contributed by {@link SubagentRoleProvider}s, sorted by name.
- * Used by the {@code spawn_subagent} tool (whose schema advertises the role names) and by
+ * Used by the {@code subagent} tool (whose schema advertises the role names) and by
  * {@code SubagentRunner} (which resolves the role for a delegation).
  *
  * @author Alexander Weigl

@@ -67,11 +67,13 @@ class ExtendedPromptTest {
         var request = ExtendedPrompt.build(session, null, null, "hi", null);
         var toolNames = toolNames(request);
         assertTrue(toolNames.contains(KeYAgentTools.TOOL_LIST_TOOLS));
-        assertTrue(toolNames.contains(KeYAgentTools.TOOL_LIST_FILES));
-        assertTrue(toolNames.contains(KeYAgentTools.TOOL_READ_FILE));
-        assertTrue(toolNames.contains(KeYAgentTools.TOOL_FILE_INFO));
-        assertTrue(toolNames.contains(KeYAgentTools.TOOL_RUN_COMMAND));
-        assertTrue(toolNames.contains(KeYAgentTools.TOOL_ASK_USER));
+        assertTrue(toolNames.contains(KeYAgentTools.TOOL_GLOB));
+        assertTrue(toolNames.contains(KeYAgentTools.TOOL_READ));
+        assertTrue(toolNames.contains(KeYAgentTools.TOOL_EDIT));
+        assertTrue(toolNames.contains(KeYAgentTools.TOOL_SHELL));
+        assertTrue(toolNames.contains(KeYAgentTools.TOOL_QUESTION));
+        assertTrue(toolNames.contains(KeYAgentTools.TOOL_SKILL));
+        assertTrue(toolNames.contains(KeYAgentTools.TOOL_SUBAGENT));
         assertTrue(toolNames.contains(TestMcpToolProvider.ECHO));
         // the KeY-specific tools (Proof/Taclets) are loaded on request via list_tools
         assertTrue(!toolNames.contains(KeYAgentTools.TOOL_GET_PROOF_CONTEXT));
@@ -81,7 +83,7 @@ class ExtendedPromptTest {
 
     @Test
     void skillWhitelistRestrictsAdvertisedToolsAndAddsInstructions() {
-        var whitelist = List.of(KeYAgentTools.TOOL_READ_FILE, KeYAgentTools.TOOL_RUN_COMMAND);
+        var whitelist = List.of(KeYAgentTools.TOOL_READ, KeYAgentTools.TOOL_SHELL);
         var skill = new Skill("lockdown", "read-only review", "Only read the model files.",
             whitelist, true);
         var request = ExtendedPrompt.build(session, null, null, "hi", skill);
@@ -96,8 +98,8 @@ class ExtendedPromptTest {
     void skillWithoutToolWhitelistKeepsTheFullStandardToolSet() {
         var skill = new Skill("coach", "hints only", "Give hints.", List.of(), true);
         var request = ExtendedPrompt.build(session, null, null, "hi", skill);
-        assertTrue(toolNames(request).contains(KeYAgentTools.TOOL_RUN_COMMAND));
-        assertTrue(toolNames(request).contains(KeYAgentTools.TOOL_ASK_USER));
+        assertTrue(toolNames(request).contains(KeYAgentTools.TOOL_SHELL));
+        assertTrue(toolNames(request).contains(KeYAgentTools.TOOL_QUESTION));
         assertTrue(toolNames(request).contains(TestMcpToolProvider.ECHO));
         assertTrue(!toolNames(request).contains(KeYAgentTools.TOOL_TRYCLOSE));
     }
@@ -105,11 +107,11 @@ class ExtendedPromptTest {
     @Test
     void disabledToolsAreNotAdvertised() {
         LlmSettings.INSTANCE
-                .setToolsDisabled(new TreeSet<>(Set.of(KeYAgentTools.TOOL_RUN_COMMAND)));
+                .setToolsDisabled(new TreeSet<>(Set.of(KeYAgentTools.TOOL_SHELL)));
         var request = ExtendedPrompt.build(session, null, null, "hi", null);
         assertTrue(
             request.tools().stream().map(t -> (String) ((Map<?, ?>) t.get("function")).get("name"))
-                    .noneMatch(KeYAgentTools.TOOL_RUN_COMMAND::equals));
+                    .noneMatch(KeYAgentTools.TOOL_SHELL::equals));
         // approval of the disabled tool is not revoked by accident
         assertTrue(LlmSettings.INSTANCE.getAllowedToolsWithApproval().isEmpty());
     }

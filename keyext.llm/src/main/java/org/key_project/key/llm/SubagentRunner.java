@@ -22,13 +22,13 @@ import org.key_project.key.llm.subagents.SubagentRole;
  * Executes one sub-agent delegation: a nested, bounded tool-calling loop with a fresh message
  * thread, a role's system prompt and tool whitelist, and the parent's chat-completion client
  * (endpoint/auth come from the parent {@link LlmSession}). Invoked synchronously by
- * {@link AgentLoop} when it intercepts the {@code spawn_subagent} tool call.
+ * {@link AgentLoop} when it intercepts the {@code subagent} tool call.
  * <p>
- * Two {@code mode}s:
+ * Two shapes (OpenCode-style single prompt is primary):
  * <ul>
- * <li>{@code sequential} - one sub-agent solves one {@code task} (the default),</li>
- * <li>{@code parallel} - the {@code tasks} array is solved concurrently, one worker thread per
- * task on a shared pool, capped by the {@code maxParallelSubagents} setting. Only roles with
+ * <li>one {@code prompt} - one sub-agent solves it (the default),</li>
+ * <li>a {@code prompts} array - solved concurrently, one worker thread per prompt on a shared
+ * pool, capped by the {@code maxParallelSubagents} setting. Only roles with
  * {@code parallelAllowed} accept it. The win is parallel LLM round-trips: tool <em>dispatch</em>
  * is serialized through a global lock, because KeY proofs and the GUI mediator are not
  * thread-safe.</li>
@@ -37,7 +37,7 @@ import org.key_project.key.llm.subagents.SubagentRole;
  * <ul>
  * <li>only the tools of the role's whitelist are advertised and may be dispatched (the parent's
  * session client still applies the global disabled set),</li>
- * <li>the child never asks the user and never pauses for approvals (the {@code spawn_subagent}
+ * <li>the child never asks the user and never pauses for approvals (the {@code subagent}
  * call itself was the approval point),</li>
  * <li>nesting is bounded by a thread-local depth counter ({@code maxSubagentDepth} setting),
  * so a sub-agent cannot spawn unbounded chains of sub-agents,</li>
@@ -60,44 +60,49 @@ final class SubagentRunner {
     }
 
     /**
-     * Runs the {@code spawn_subagent} tool call: validates the arguments, applies the settings
+     * Runs the {@code subagent} tool call: validates the arguments, applies the settings
      * and depth guards and executes the child loop(s). Returns the tool result text to be
      * inserted into the parent's thread.
      */
     static String run(LlmSession parent, ChatCompletionsClient completions, String arguments,
             BooleanSupplier cancelled) {
         var args = AgentTool.parseArgs(arguments);
-        var roleName = AgentTool.stringArg(args, "role");
+        var roleName = AgentTool.stringArg(args, "agent");
         var role = roleName == null ? null : SubagentRegistry.INSTANCE.get(roleName);
         if (role == null) {
-            return "[spawn_subagent: unknown role '" + roleName + "' (known roles: "
+            return "[subagent: unknown role '" + roleName + "' (known roles: "
                 + String.join(", ", SubagentRegistry.INSTANCE.roleNames()) + ")]";
         }
-        var mode = AgentTool.stringArg(args, "mode");
-        if ("parallel".equalsIgnoreCase(mode)) {
-            return runParallel(parent, completions, role, args, cancelled);
+        var description = AgentTool.stringArg(args, "description");
+        var model = AgentTool.stringArg(args, "model");
+        var prompts = stringListArg(args, "prompts");
+        if (prompts.isEmpty()) {
+            var prompt = AgentTool.stringArg(args, "prompt");
+            if (prompt == null || prompt.isBlank()) {
+                return "[subagent: the 'prompt' parameter must not be empty]";
+            }
+            return runSequential(parent, completions, role, description, prompt, model,
+                cancelled);
         }
-        return runSequential(parent, completions, role, args, cancelled);
+        return runParallel(parent, completions, role, description, prompts, model, cancelled);
     }
 
     // ------------------------------------------------------------------ sequential delegation
 
     private static String runSequential(LlmSession parent, ChatCompletionsClient completions,
-            SubagentRole role, Map<String, Object> args, BooleanSupplier cancelled) {
-        var task = AgentTool.stringArg(args, "task");
-        if (task == null || task.isBlank()) {
-            return "[spawn_subagent: the 'task' parameter must not be empty]";
-        }
+            SubagentRole role, String description, String prompt, String model,
+            BooleanSupplier cancelled) {
         int depth = DEPTH.get();
         int maxDepth = Math.max(1, LlmSettings.INSTANCE.getMaxSubagentDepth());
         if (depth >= maxDepth) {
-            return "[spawn_subagent: maximum nesting depth (" + maxDepth + ") reached]";
+            return "[subagent: maximum nesting depth (" + maxDepth + ") reached]";
         }
         DEPTH.set(depth + 1);
         var recorder = new RunRecorder();
         long started = System.currentTimeMillis();
         try {
-            var text = runOne(parent, completions, role, task, cancelled, recorder);
+            var text = runOne(parent, completions, role, description, prompt, model, cancelled,
+                recorder);
             parent.getSubagentLog().add(new SubagentLog.SubagentRun(0L, role.name(), "sequential",
                 started, System.currentTimeMillis() - started, recorder.snapshot()));
             return text;
@@ -109,39 +114,37 @@ final class SubagentRunner {
     // ------------------------------------------------------------------ parallel fan-out
 
     private static String runParallel(LlmSession parent, ChatCompletionsClient completions,
-            SubagentRole role, Map<String, Object> args, BooleanSupplier cancelled) {
+            SubagentRole role, String description, List<String> prompts, String model,
+            BooleanSupplier cancelled) {
         if (!role.parallelAllowed()) {
-            return "[spawn_subagent: role '" + role.name() + "' does not allow parallel execution]";
-        }
-        var tasks = stringListArg(args, "tasks");
-        if (tasks.isEmpty()) {
-            return "[spawn_subagent: parallel mode requires a non-empty \"tasks\" array]";
+            return "[subagent: role '" + role.name() + "' does not allow parallel execution]";
         }
         int depth = DEPTH.get();
         int maxDepth = Math.max(1, LlmSettings.INSTANCE.getMaxSubagentDepth());
         if (depth >= maxDepth) {
-            return "[spawn_subagent: maximum nesting depth (" + maxDepth + ") reached]";
+            return "[subagent: maximum nesting depth (" + maxDepth + ") reached]";
         }
         int poolSize =
-            Math.min(tasks.size(), Math.max(1, LlmSettings.INSTANCE.getMaxParallelSubagents()));
+            Math.min(prompts.size(), Math.max(1, LlmSettings.INSTANCE.getMaxParallelSubagents()));
         var recorder = new RunRecorder();
         long started = System.currentTimeMillis();
         var pool = Executors.newFixedThreadPool(poolSize);
         try {
             var futures = new ArrayList<Future<String>>();
-            for (int i = 0; i < tasks.size(); i++) {
-                var task = tasks.get(i);
+            for (int i = 0; i < prompts.size(); i++) {
+                var prompt = prompts.get(i);
                 futures.add(pool.submit(() -> {
                     DEPTH.set(depth + 1);
                     try {
-                        return runOne(parent, completions, role, task, cancelled, recorder);
+                        return runOne(parent, completions, role, description, prompt, model,
+                            cancelled, recorder);
                     } finally {
                         DEPTH.set(depth);
                     }
                 }));
             }
             var sb = new StringBuilder();
-            sb.append("[parallel run of ").append(tasks.size()).append(" sub-agents")
+            sb.append("[parallel run of ").append(prompts.size()).append(" sub-agents")
                     .append(" (role '").append(role.name()).append("')]").append('\n');
             for (int i = 0; i < futures.size(); i++) {
                 if (i > 0) {
@@ -186,7 +189,7 @@ final class SubagentRunner {
     }
 
     /**
-     * Thread-local accumulator of the per-task outcomes of one {@code spawn_subagent} call. The
+     * Thread-local accumulator of the per-task outcomes of one {@code subagent} call. The
      * parallel workers append concurrently; the run's record is snapshotted after they joined.
      */
     private static final class RunRecorder {
@@ -212,27 +215,31 @@ final class SubagentRunner {
     // ------------------------------------------------------------------ the child loop
 
     private static String runOne(LlmSession parent, ChatCompletionsClient completions,
-            SubagentRole role, String task, BooleanSupplier cancelled, RunRecorder recorder) {
+            SubagentRole role, String description, String prompt, String modelOverride,
+            BooleanSupplier cancelled, RunRecorder recorder) {
         var tools = advertiseTools(parent, role);
-        var model = role.model() != null && !role.model().isBlank() ? role.model()
-                : parent.getModel();
+        var model = modelOverride != null && !modelOverride.isBlank() ? modelOverride
+                : role.model() != null && !role.model().isBlank() ? role.model()
+                        : parent.getModel();
         int maxTurns = role.maxTurns() > 0 ? role.maxTurns()
                 : Math.max(1, LlmSettings.INSTANCE.getMaxSubagentTurns());
+        var title = role.name()
+                + (description == null || description.isBlank() ? "" : " (" + description + ")");
 
         var thread = new ArrayList<Map<String, Object>>();
         thread.add(Map.of("role", "system", "content", systemPrompt(role, maxTurns)));
-        thread.add(Map.of("role", "user", "content", task));
+        thread.add(Map.of("role", "user", "content", prompt));
 
         var called = new ArrayList<String>();
         int rounds = 0;
         while (true) {
             if (cancelled.getAsBoolean() || Thread.currentThread().isInterrupted()) {
-                return childDone(recorder, task, SubagentLog.Status.CANCELLED, rounds, called,
-                    "[sub-agent '" + role.name() + "' cancelled]");
+                return childDone(recorder, prompt, SubagentLog.Status.CANCELLED, rounds, called,
+                    "[sub-agent '" + title + "' cancelled]");
             }
             if (rounds >= maxTurns) {
-                return childDone(recorder, task, SubagentLog.Status.STOPPED, rounds, called,
-                    "[sub-agent '" + role.name() + "' stopped: reached its tool-round limit ("
+                return childDone(recorder, prompt, SubagentLog.Status.STOPPED, rounds, called,
+                    "[sub-agent '" + title + "' stopped: reached its tool-round limit ("
                         + maxTurns + ") without a final answer]");
             }
 
@@ -241,15 +248,15 @@ final class SubagentRunner {
                 response = completions.complete(parent,
                     new AgentRequest(model, List.copyOf(thread), tools, null, null, maxTurns));
             } catch (Exception e) {
-                return childDone(recorder, task, SubagentLog.Status.FAILED, rounds, called,
-                    "[sub-agent '" + role.name() + "' failed: " + e.getMessage() + "]");
+                return childDone(recorder, prompt, SubagentLog.Status.FAILED, rounds, called,
+                    "[sub-agent '" + title + "' failed: " + e.getMessage() + "]");
             }
 
             final Map<?, ?> message;
             try {
                 message = AgentLoop.extractMessage(response);
             } catch (Exception e) {
-                return childDone(recorder, task, SubagentLog.Status.FAILED, rounds, called,
+                return childDone(recorder, prompt, SubagentLog.Status.FAILED, rounds, called,
                     "[sub-agent '" + role.name() + "' failed: " + e.getMessage() + "]");
             }
             var toolCalls = AgentLoop.asList(message.get("tool_calls"));
@@ -257,13 +264,13 @@ final class SubagentRunner {
                     : String.valueOf(message.get("content"));
 
             if (toolCalls == null || toolCalls.isEmpty()) {
-                var header = "[sub-agent '" + role.name() + "' finished after " + rounds
+                var header = "[sub-agent '" + title + "' finished after " + rounds
                     + " tool round(s)";
                 if (!called.isEmpty()) {
                     header += ", called: " + String.join(", ", called);
                 }
                 header += "]";
-                return childDone(recorder, task, SubagentLog.Status.OK, rounds, called,
+                return childDone(recorder, prompt, SubagentLog.Status.OK, rounds, called,
                     content.isBlank() ? header : header + "\n\n" + content.stripTrailing());
             }
 
@@ -285,7 +292,7 @@ final class SubagentRunner {
                 called.add(name);
                 // a sub-agent may delegate further (depth-guarded), exactly like the parent loop;
                 // must run outside the dispatch lock, otherwise nested parallel runs deadlock
-                if (KeYAgentTools.TOOL_SPAWN_SUBAGENT.equals(name)) {
+                if (KeYAgentTools.TOOL_SUBAGENT.equals(name)) {
                     if (!LlmSettings.INSTANCE.getSubagentsEnabled()) {
                         thread.add(LlmMessage.tool(id,
                             "[Spawning sub-agents is disabled in the settings]").toOpenAiMap());

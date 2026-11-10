@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * Parking rules:
  * <ul>
- * <li>a turn parked on a {@code ask_user} question or a tool approval holds all further user
+ * <li>a turn parked on a {@code question} question or a tool approval holds all further user
  * prompts until it is resumed or stopped (the answer/decision is user interaction with that
  * turn),</li>
  * <li>a turn parked on a background tool call does <em>not</em> block: further user prompts start
@@ -132,7 +132,7 @@ public final class TurnScheduler {
         fireQueueChanged();
     }
 
-    /** Queues the answer to the pending {@code ask_user} question. */
+    /** Queues the answer to the pending {@code question} question. */
     public void answer(String answer) {
         start();
         queue.enqueue(new TurnQueue.QuestionAnswer(answer));

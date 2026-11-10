@@ -45,9 +45,9 @@ class BuiltInMCPClientTest {
     @Test
     void advertisesBuiltInAndTestTools() {
         var names = toolNames(client);
-        assertTrue(names.contains(KeYAgentTools.TOOL_READ_FILE));
-        assertTrue(names.contains(KeYAgentTools.TOOL_RUN_COMMAND));
-        assertTrue(names.contains(KeYAgentTools.TOOL_ASK_USER));
+        assertTrue(names.contains(KeYAgentTools.TOOL_READ));
+        assertTrue(names.contains(KeYAgentTools.TOOL_SHELL));
+        assertTrue(names.contains(KeYAgentTools.TOOL_QUESTION));
         assertTrue(names.contains(KeYAgentTools.TOOL_GET_PROOF_CONTEXT));
         assertTrue(names.contains(KeYAgentTools.TOOL_TRYCLOSE));
         assertTrue(names.contains(KeYAgentTools.TOOL_AUTO));
@@ -90,7 +90,7 @@ class BuiltInMCPClientTest {
         LlmSettings.INSTANCE.setToolsDisabled(new TreeSet<>(Set.of(TestMcpToolProvider.ECHO)));
         var names = toolNames(client);
         assertFalse(names.contains(TestMcpToolProvider.ECHO));
-        assertTrue(names.contains(KeYAgentTools.TOOL_READ_FILE));
+        assertTrue(names.contains(KeYAgentTools.TOOL_READ));
         assertTrue(client.isDisabled(TestMcpToolProvider.ECHO));
     }
 
@@ -104,10 +104,10 @@ class BuiltInMCPClientTest {
     @Test
     void defaultApprovalRequirements() {
         // read-only built-ins are AUTO
-        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_READ_FILE));
-        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_LIST_FILES));
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_READ));
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_GLOB));
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_GET_PROOF_CONTEXT));
-        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_ASK_USER));
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_QUESTION));
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_TRYCLOSE));
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_AUTO));
         // proof listing and taclet inspection are AUTO
@@ -120,7 +120,7 @@ class BuiltInMCPClientTest {
         assertFalse(client.requiresApproval(KeYAgentTools.TOOL_ASK_LLM));
         assertFalse(client.requiresApproval(TestMcpToolProvider.ECHO));
         // shell execution, taclet mutation and aimless test tools are ASK by default
-        assertTrue(client.requiresApproval(KeYAgentTools.TOOL_RUN_COMMAND));
+        assertTrue(client.requiresApproval(KeYAgentTools.TOOL_SHELL));
         assertTrue(client.requiresApproval(KeYAgentTools.TOOL_ADD_TACLET));
         assertTrue(client.requiresApproval(KeYAgentTools.TOOL_REMOVE_TACLET));
         assertTrue(client.requiresApproval(TestMcpToolProvider.NEEDS_APPROVAL));
@@ -130,15 +130,15 @@ class BuiltInMCPClientTest {
     void userConfiguredOverridesBeatDefaults() {
         // allowedToolsWithoutApproval overrides an ASK tool
         var without = new TreeSet<>(LlmSettings.INSTANCE.getAllowedToolsWithoutApproval());
-        without.add(KeYAgentTools.TOOL_RUN_COMMAND);
+        without.add(KeYAgentTools.TOOL_SHELL);
         LlmSettings.INSTANCE.setAllowedToolsWithoutApproval(without);
-        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_RUN_COMMAND));
+        assertFalse(client.requiresApproval(KeYAgentTools.TOOL_SHELL));
 
         // allowedToolsWithApproval overrides an AUTO tool
         var with = new TreeSet<>(LlmSettings.INSTANCE.getAllowedToolsWithApproval());
-        with.add(KeYAgentTools.TOOL_READ_FILE);
+        with.add(KeYAgentTools.TOOL_READ);
         LlmSettings.INSTANCE.setAllowedToolsWithApproval(with);
-        assertTrue(client.requiresApproval(KeYAgentTools.TOOL_READ_FILE));
+        assertTrue(client.requiresApproval(KeYAgentTools.TOOL_READ));
     }
 
     @Test

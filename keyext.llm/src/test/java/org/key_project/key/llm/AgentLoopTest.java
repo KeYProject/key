@@ -101,7 +101,7 @@ class AgentLoopTest {
     void askUserPausesAndAnswerResumes() {
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("q1", KeYAgentTools.TOOL_ASK_USER,
+            List.of(MockCompletions.tool("q1", KeYAgentTools.TOOL_QUESTION,
                 "{\"question\":\"split?\",\"options\":[\"yes\",\"no\"]}")),
             ""));
         mock.thenRespond(MockCompletions.text("proceeding with yes"));
@@ -110,9 +110,10 @@ class AgentLoopTest {
         AgentResult first = loop.begin("tell me", null, null, null);
 
         assertInstanceOf(AgentResult.NeedsInput.class, first);
-        var question = ((AgentResult.NeedsInput) first).question();
+        var question = ((AgentResult.NeedsInput) first).questions().get(0);
         assertEquals("split?", question.text());
-        assertEquals(List.of("yes", "no"), question.options());
+        assertEquals(List.of("yes", "no"),
+            question.options().stream().map(AgentResult.Question.Option::label).toList());
 
         AgentResult resumed = loop.answerQuestion("yes");
         assertInstanceOf(AgentResult.Done.class, resumed);
@@ -170,7 +171,7 @@ class AgentLoopTest {
     void useSkillIsGatedByTheSettingsFlag() {
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_USE_SKILL,
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SKILL,
                 "{\"name\":\"optics\"}")),
             ""));
         mock.thenRespond(MockCompletions.text("ok"));
@@ -191,7 +192,7 @@ class AgentLoopTest {
         LlmSettings.INSTANCE.setAgentCanUseSkills(true);
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_USE_SKILL,
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SKILL,
                 "{\"name\":\"no-such-skill\"}")),
             ""));
         mock.thenRespond(MockCompletions.text("fine"));

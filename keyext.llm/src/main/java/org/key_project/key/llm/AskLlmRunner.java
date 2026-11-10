@@ -18,7 +18,7 @@ import org.key_project.key.llm.mcp.AgentTool;
  * play devil's advocate, summarize a pile of tool output, or ask a different model (the optional
  * {@code model} override) for a second opinion.
  * <p>
- * Like {@code spawn_subagent}, the call is intercepted by the agent loop (and the sub-agent child
+ * Like {@code subagent}, the call is intercepted by the agent loop (and the sub-agent child
  * loops) and runs via {@link ToolDispatcher#submitTask} - deliberately <em>without</em> the
  * dispatch lock: an HTTP round-trip of several seconds must not stall parallel sub-agents or other
  * sessions' tool calls. It never dispatches tools itself, so no nested locking is possible.

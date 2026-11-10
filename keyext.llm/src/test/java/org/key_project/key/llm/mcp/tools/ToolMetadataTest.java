@@ -50,7 +50,7 @@ class ToolMetadataTest {
 
     @Test
     void wireFormatDoesNotLeakCategoryMetadata() {
-        var tool = new Tool(new org.key_project.key.llm.mcp.FunctionDefinition("run_command",
+        var tool = new Tool(new org.key_project.key.llm.mcp.FunctionDefinition("shell",
             "runs a command",
             new org.key_project.key.llm.mcp.JsonSchema("object")),
             Tool.ApprovalRequirement.ASK, ToolCategory.SHELL, true);
@@ -69,27 +69,27 @@ class ToolMetadataTest {
         }
         // spot-check the assignments
         assertEquals(ToolCategory.PROOF, tools.agent(KeYAgentTools.TOOL_AUTO).category());
-        assertEquals(ToolCategory.SHELL, tools.agent(KeYAgentTools.TOOL_RUN_COMMAND).category());
+        assertEquals(ToolCategory.SHELL, tools.agent(KeYAgentTools.TOOL_SHELL).category());
         assertEquals(ToolCategory.TACLETS, tools.agent(KeYAgentTools.TOOL_LIST_TACLETS).category());
-        assertEquals(ToolCategory.INTERACTION, tools.agent(KeYAgentTools.TOOL_ASK_USER).category());
+        assertEquals(ToolCategory.INTERACTION, tools.agent(KeYAgentTools.TOOL_QUESTION).category());
         assertEquals(ToolCategory.SUBAGENTS,
-            tools.agent(KeYAgentTools.TOOL_SPAWN_SUBAGENT).category());
+            tools.agent(KeYAgentTools.TOOL_SUBAGENT).category());
         assertEquals(ToolCategory.SUBAGENTS, tools.agent(KeYAgentTools.TOOL_ASK_LLM).category());
         assertEquals(ToolCategory.DOCUMENTATION,
             tools.agent(KeYAgentTools.TOOL_LIST_TOOLS).category());
-        assertEquals(ToolCategory.FILES, tools.agent(KeYAgentTools.TOOL_LIST_FILES).category());
+        assertEquals(ToolCategory.FILES, tools.agent(KeYAgentTools.TOOL_GLOB).category());
     }
 
     @Test
     void onlyLongRunningToolsAreBackgroundableByDefault() {
         var tools = new KeYAgentTools();
-        for (var name : java.util.List.of(KeYAgentTools.TOOL_RUN_COMMAND, KeYAgentTools.TOOL_AUTO,
-            KeYAgentTools.TOOL_TRYCLOSE, KeYAgentTools.TOOL_SPAWN_SUBAGENT,
+        for (var name : java.util.List.of(KeYAgentTools.TOOL_SHELL, KeYAgentTools.TOOL_AUTO,
+            KeYAgentTools.TOOL_TRYCLOSE, KeYAgentTools.TOOL_SUBAGENT,
             KeYAgentTools.TOOL_ASK_LLM)) {
             assertTrue(tools.agent(name).backgroundable(),
                 "tool " + name + " must default to backgroundable");
         }
-        for (var name : java.util.List.of(KeYAgentTools.TOOL_READ_FILE, KeYAgentTools.TOOL_ASK_USER,
+        for (var name : java.util.List.of(KeYAgentTools.TOOL_READ, KeYAgentTools.TOOL_QUESTION,
             KeYAgentTools.TOOL_LIST_TOOLS, KeYAgentTools.TOOL_GET_SUBAGENT_LOGS)) {
             assertFalse(tools.agent(name).backgroundable(),
                 "tool " + name + " must not default to backgroundable");
@@ -108,10 +108,10 @@ class ToolMetadataTest {
         // each tool appears in its category section (marked with the category in the heading)
         assertTrue(doc.contains("`" + KeYAgentTools.TOOL_AUTO + "` (AUTO · Proof"),
             "auto must be documented under Proof:\n" + doc);
-        assertTrue(doc.contains("`" + KeYAgentTools.TOOL_RUN_COMMAND + "` (ASK · Shell"),
-            "run_command must be documented under Shell:\n" + doc);
+        assertTrue(doc.contains("`" + KeYAgentTools.TOOL_SHELL + "` (ASK · Shell"),
+            "shell must be documented under Shell:\n" + doc);
         // background flag is rendered on the backgroundable tools themselves
-        assertTrue(doc.contains("`" + KeYAgentTools.TOOL_RUN_COMMAND
+        assertTrue(doc.contains("`" + KeYAgentTools.TOOL_SHELL
             + "` (ASK · Shell) · can run in background"), doc);
     }
 

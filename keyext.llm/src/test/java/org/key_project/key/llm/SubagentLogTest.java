@@ -36,7 +36,7 @@ class SubagentLogTest {
         assertEquals(0, log.latestSeq());
         log.add(run(1, 10, "goal-solver", "close goal 2", SubagentLog.Status.OK,
             "get_proof_context", "tryclose"));
-        log.add(run(2, 20, "file-explorer", "list files", SubagentLog.Status.OK, "list_files"));
+        log.add(run(2, 20, "file-explorer", "list files", SubagentLog.Status.OK, "glob"));
         assertEquals(2, log.size());
         assertEquals(2, log.latestSeq());
         // after(seq) returns the appended runs oldest first
@@ -93,7 +93,7 @@ class SubagentLogTest {
         var log = new SubagentLog();
         log.add(run(1, 500, "goal-solver", "close goal 2", SubagentLog.Status.OK,
             "get_proof_context", "tryclose"));
-        log.add(run(2, 250, "file-explorer", "list files", SubagentLog.Status.OK, "list_files"));
+        log.add(run(2, 250, "file-explorer", "list files", SubagentLog.Status.OK, "glob"));
 
         var text = SubagentTools.renderSubagentLog(log, 10, null);
         assertTrue(text.contains("newest first"));

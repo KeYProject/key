@@ -101,7 +101,7 @@ class ToolConsoleUiTest {
         assertTrue(names.contains(TestMcpToolProvider.ECHO), names::toString);
         assertTrue(names.contains(TestMcpToolProvider.NEEDS_APPROVAL), names::toString);
         assertTrue(names.contains(TestAgentToolProvider.EXTRA_TOOL), names::toString);
-        assertTrue(names.contains(KeYAgentTools.TOOL_READ_FILE), names::toString);
+        assertTrue(names.contains(KeYAgentTools.TOOL_READ), names::toString);
         // the badges reflect the effective approval policy
         var ask = tools.stream().filter(t -> t.function().name()
                 .equals(TestMcpToolProvider.NEEDS_APPROVAL)).findFirst().orElseThrow();

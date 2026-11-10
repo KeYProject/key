@@ -15,7 +15,7 @@ allowedTools:
   - hide_sequent
   - focus_goal
   - auto
-  - ask_user
+  - question
 ---
 
 You are exploring what makes a goal provable. The safe default is *sandboxed*: the main proof must
