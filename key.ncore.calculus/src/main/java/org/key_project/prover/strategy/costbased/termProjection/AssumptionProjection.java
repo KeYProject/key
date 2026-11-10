@@ -27,7 +27,7 @@ public class AssumptionProjection implements ProjectionToTerm {
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal goal,
+    public Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mutableState) {
         assert app instanceof ITacletApp
                 : "Projection is only applicable to taclet apps," + " but got " + app;
