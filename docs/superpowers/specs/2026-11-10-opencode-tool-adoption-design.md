@@ -100,3 +100,49 @@ Dropped: `file_info`, `patch`, `subagent.sessionID`.
 5. **`execute` reports expression values only** (method-call expressions and the temporary
    `$`-named variables JShell creates for bare expressions); the initializers of user-declared
    variables are not echoed.
+6. **The `question` schema is looser than the spec's mapping row** (header/options optional, no
+   30-char/1–5-word label enforcement): the runtime parsing stays tolerant (a bare string is a
+   valid question), the schema does not over-promise; recorded after the final review.
+7. **The `shell` `timeout` default differs from OpenCode's 120000 ms**: the effective default
+   is the configured shell-timeout setting (30 s) because the parameter is capped by it; the
+   tool description states the effective default (recorded after the final review).
+
+## Final review (2026-11-11, fresh reviewer over f07a1e399a..bfd85fcd12)
+
+Verdict: "No — one Critical must be fixed first": 1 Critical, 6 Important, 8 Minor.
+Critical + Important were fixed in one TDD pass (`f51c63350d`), RED→GREEN each:
+execute approval on the loop path (intercept consults the approval policy,
+`decideApproval` re-dispatches through the JShell path), bounded shell output read,
+bounded webfetch body (Content-Length pre-check + streaming drain), subagent schema in
+the docs, webfetch/shell description honesty, test gaps (approval pause/denial, outside-lock,
+multi-question, skill `id`, copy constructor).
+
+**Deferred minors** (each `Final: minor (deferred):`):
+
+- JShell leak per timed-out snippet (the abandoned shell is stopped but not closed; safe for
+  this engine per the reviewer's probe, one parked thread leaks) + cosmetic double
+  `executor.shutdownNow()`.
+- `toMarkdown`'s internal truncation check compares chars to bytes (dead code in production;
+  the note comes from `cap()`), and the byte cut can split a UTF-8 sequence (harmless U+FFFD).
+- `visible()`/`skipped()` filter dot/`build`-like segments against the absolute path: a jail
+  under `~/.config/…` or a `build` segment filters everything in `glob`/`grep`
+  (pre-existing in `FileAccess`, inherited; fix = relativize before the segment check).
+- CRLF parity with OpenCode's `read`/`edit` (read emits platform separators; edit lacks the
+  CRLF/typographic fallback).
+- `write` bypasses `maxFileSizeKB` (which `read`/`edit` enforce; ASK-gated).
+- Stale small docs: `SubagentRole` javadoc ("`role` argument", "`mode: parallel`"), the
+  `tool-tour` skill lists `edit` under read-only, `glob`/`read` schemas don't mark `path`
+  required, the 500-entry directory cap has no truncation note, the spec's "danger-styled"
+  toggle is a plain checkbox.
+- Deferred follow-up (reviewer's recommendation): intercepted-tool approval is decided per
+  intercept; `subagent` (pre-existing) still never consults `requiresApproval` — extract one
+  approval helper for the intercepted tools and apply it to `subagent`.
+
+**Declined-to-judge items, ruled by the executor:** PNG pixel content — accepted, the
+regenerated screenshots were visually inspected (new tool rows in the Tools panel); jsoup
+1.21.2/`implementation` scope — accepted; the spec's 11→15 arithmetic — accepted as spec
+bookkeeping (the registry size is pinned by tests, not the spec); `ShellSafetyPolicy` regex
+content — pre-existing, out of range; `KeYAgentTools --json` CLI — unchanged behavior; no
+Gradle runs by the reviewer — the executor ran the module suite, `spotlessCheck` and the
+nullness build green; `ToolConsoleDialog` flow — unchanged generic approval path, covered by
+`ToolConsoleUiTest`.
