@@ -5,11 +5,12 @@ were possible with KeY's pre-takeover JML front-end (`PreParser` /
 `TextualJML*` / `JmlParser.g4`) and are rejected, mis-parsed, or changed by the
 JMLtk front-end shipped in PR #3997.
 
-- Status below was **measured at HEAD `53dcefd914`** (branch tip,
-  Nov 8 2026, jmltk `1.2.1-SNAPSHOT`) by running the named test classes
-  (Appendix A). It supersedes the earlier historical triage in
+- Status below was first **measured at `53dcefd914`** (branch tip at the
+  time, Nov 8 2026, jmltk `1.2.1-SNAPSHOT`) by running the named test
+  classes (Appendix A). It supersedes the earlier historical triage in
   `HANDOFF.md §5.2` (which was recorded at an older baseline and is stale in
-  both directions).
+  both directions). The 2026-11-11 re-measurement below updates the status
+  to the current tip.
 - Re-measured at `53dcefd914`: the loop-invariant structural-lookup fix
   (`6a07c20e63`) resolved 3 previously-recorded reds — §9 (labeled
   break/continue) and 2 of the §5 `\sum` "proof doesn't close" cases
@@ -36,6 +37,16 @@ JMLtk front-end shipped in PR #3997.
     `FM2024Tutorial`, `WeideEtAl`, `redux`; Inf `ToyVoting{,_fullmacro}`,
     `ConditionalConfidential`, `SumExample{,_nomacro,_fullmacro}`,
     `ToyBanking{,_fullmacro}`, `SimpleEvoting{,_fullmacro}`).
+- Re-measured at `471381fc17` (current branch tip, 2026-11-11; local jmltk
+  `1.2.1-SNAPSHOT` jar of 2026-11-07; full local `:key.core:test` run —
+  4644 tests — plus fresh runs of the named gates): **§5, §10 and §15 are
+  now RESOLVED** (see the sections). Expected key.core red count is **3**
+  (was 11 at `53dcefd914`): §11 (block-contract combination,
+  `ParallelProverDeterminismTest`) + the 2 known `JMLParserExceptionTest`
+  cases. The load-time gaps (§17, §18, §19, §20) re-confirmed OPEN in the
+  same run (generated RAP tests); the doesn't-close drift group is
+  A/B-verified identical at `cfece36950`. Full per-failure breakdown:
+  `TODO_CI.md`, "Local full-suite triage (2026-11-11)".
 - Every entry has a fixture path so it can be re-verified.
 
 ## Status legend
@@ -281,7 +292,7 @@ JMLtk front-end shipped in PR #3997.
   Caveat: `1.2.1-SNAPSHOT` is moving — re-verify on the next snapshot bump /
   release pin.
 
-## 6. record-level JML (`/*@ nullable */` + spec comments on records)  — ⚠ REGRESSION
+## 6. record-level JML (`/*@ nullable */` + spec comments on records)  — ✔ RESOLVED (goldens regenerated 2026-10-30; re-confirmed green in the 2026-11-11 full run)
 
 ```java
 /*@ nullable */ record MyRecord(String test) { … }
@@ -537,7 +548,10 @@ fallback. Tracked as a JMLtk-upstream grammar gap, not a branch defect.
   carry a real file — fixes display *and* round-trip; (b) make
   `parseOrigin` accept the `[no file]` rendering (map it to a null-URI
   `FileOrigin`); (c) render null-URI origins as `(implicit)`.
-  Documented but not fixed at `53dcefd914`.
+  Documented but not fixed at `53dcefd914`; re-confirmed open at the
+  2026-11-11 re-measurement (`[no file]` origins present in the §5 goal
+  A/B against `origin/main`; the 3 RAP load failures in the full local run
+  are the same signature).
 
 ## 18. DL-typed ghost locals with initializer (quicksort)  — ✘ OPEN (load failure, pre-existing)
 
