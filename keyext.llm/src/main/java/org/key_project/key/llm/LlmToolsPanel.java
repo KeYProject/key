@@ -78,8 +78,9 @@ public class LlmToolsPanel extends SettingsPanel {
 
     /**
      * Adds the block for one tool to the center grid: the (bold) tool name in the left column,
-     * top-aligned with its flowing explanation, and below — spanning the full width — the
-     * permission radio group and the background/export checkboxes on one line.
+     * top-aligned with its flowing explanation, and below — aligned with the explanation text
+     * (skipping the name column) — the permission radio group and the background/export
+     * checkboxes on one line.
      */
     private void addToolRow(Tool tool) {
         var name = tool.function().name();
@@ -94,8 +95,9 @@ public class LlmToolsPanel extends SettingsPanel {
         var help = SimpleSettingsPanel.createHelpLabel(tool.function().description());
         pCenter.add(help, new CC().alignY("top").wrap());
 
-        pCenter.add(radiosPanel(tool), new CC().span(3).growX().minWidth("0").wrap());
-        pCenter.add(checkboxesPanel(tool), new CC().span(3).growX().minWidth("0").wrap());
+        // skip the name column so the controls start where the description text starts
+        pCenter.add(radiosPanel(tool), new CC().skip(1).span(2).growX().minWidth("0").wrap());
+        pCenter.add(checkboxesPanel(tool), new CC().skip(1).span(2).growX().minWidth("0").wrap());
     }
 
     /**
