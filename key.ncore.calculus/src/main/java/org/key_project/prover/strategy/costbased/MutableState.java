@@ -15,22 +15,18 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-///
 /// Realizes a variable bank for strategy features such that each feature
 /// computation can be done in parallel.
-///
 ///
 /// When the strategy computes the costs for a [RuleApp] it creates
 /// a new MutableState object and passes it on. This is then used by features
 /// to query for the value of [TermBuffer]s.
-///
 ///
 /// This mutable state should not be abused and strategy features should be stateless.
 ///
 ///
 /// @author Richard Bubel
 public class MutableState {
-
     /// maps a term buffer to its value
     private final HashMap<TermBuffer, @Nullable Term> content = HashMap.newHashMap(32);
 

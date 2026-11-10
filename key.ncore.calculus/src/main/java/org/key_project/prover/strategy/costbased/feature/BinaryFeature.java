@@ -17,7 +17,6 @@ import org.jspecify.annotations.NonNull;
 /// Abstract superclass for features that have either zero cost or top cost.
 public abstract class BinaryFeature
         implements Feature {
-
     protected BinaryFeature() {}
 
     /// Constant that represents the boolean value true

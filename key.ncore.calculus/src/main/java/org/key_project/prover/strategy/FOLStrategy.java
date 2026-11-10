@@ -16,7 +16,6 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.*;
 import org.key_project.prover.strategy.costbased.feature.*;
-import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 import org.key_project.prover.strategy.costbased.quantifierHeuristics.InstantiationCostScalerFeature;
 import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.*;
@@ -25,10 +24,13 @@ import org.key_project.prover.strategy.costbased.termfeature.IsNonRigidTermFeatu
 import static org.key_project.prover.strategy.costbased.FOLCost.*;
 
 /// Strategy for general FOL rules. This does not consider other
-/// theories like integers or Java-specific functions.
+/// theories like integers or language-specific functions.
 ///
 /// In particular, instantiation of quantifiers is not supported by this
 /// strategy, as the current E-matching depends on the theory of integers.
+///
+/// This abstract strategy is independent of the concrete KeY instance but
+/// assumes certain rule sets.
 public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatureStrategy<G>
         implements ComponentStrategy<G> {
     public static final Name NAME = new Name("FOL Strategy");
@@ -198,19 +200,17 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
         return NAME;
     }
 
-    /**
-     * Evaluate the cost of a <code>RuleApp</code>.
-     *
-     * @param app rule application
-     * @param pio corresponding {@link PosInOccurrence}
-     * @param goal corresponding goal
-     * @param mState the {@link MutableState} to query for information like current value of
-     *        {@link TermBuffer}s or
-     *        {@link ChoicePoint}s
-     * @return the cost of the rule application expressed as a <code>RuleAppCost</code> object.
-     *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
-     *         all (it is discarded by the strategy).
-     */
+    /// Evaluate the cost of a `RuleApp`.
+    ///
+    /// @param app rule application
+    /// @param pio corresponding [PosInOccurrence]
+    /// @param goal corresponding goal
+    /// @param mState the [MutableState] to query for information like current value of
+    /// [TermBuffer]s or
+    /// [ChoicePoint]s
+    /// @return the cost of the rule application expressed as a `RuleAppCost` object.
+    /// `TopRuleAppCost.INSTANCE` indicates that the rule shall not be applied at
+    /// all (it is discarded by the strategy).
     @Override
     public <GOAL extends ProofGoal<GOAL>> RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             GOAL goal, MutableState mState) {
@@ -548,7 +548,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
     protected abstract Feature allowQuantifierSplitting();
 
-    /** the value of the trigger option, fixed when this strategy was constructed */
+    /// the value of the trigger option, fixed when this strategy was constructed
     protected abstract String triggersOption();
 
     protected abstract boolean quantifierInstantiatedEnabled();

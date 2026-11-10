@@ -24,14 +24,11 @@ import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
 
 
-/**
- * Checks whether the product of two monomials has the same variables as the left side of
- * an inequation in the sequent. Required to bound the number of cross-multiplications.
- */
+/// Checks whether the product of two monomials has the same variables as the left side of
+/// an inequation in the sequent. Required to bound the number of cross-multiplications.
 @VolatileCost
 public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
-
     private final ProjectionToTerm mult1;
     private final ProjectionToTerm mult2;
     private final RelevantSequentFormulasGenerator inEquations;
@@ -39,22 +36,18 @@ public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
     private final BiFunction<Term, LogicServices, Monomial> monomialBuilder;
 
 
-    /**
-     * cached information about the variables occurring on the left side of an inequation
-     * The selected formulas are the secondary cache key: the generator hands out the same list
-     * while the goal keeps its sequent, so a new list means the sequent has moved on.
-     */
+    /// cached information about the variables occurring on the left side of an inequation
+    /// The selected formulas are the secondary cache key: the generator hands out the same list
+    /// while the goal keeps its sequent, so a new list means the sequent has moved on.
     private record InequationInfo(ImmutableList<Term> selection,
             Set<Map<Term, Integer>> variables) {
     }
 
     private final Map<GOAL, InequationInfo> relations = new ConcurrentLruCache<>(200);
 
-    /**
-     * @param mult1 the left side of the first inequation to be multiplied
-     * @param mult2 the left side of the second inequation to be multiplied
-     * @param inEquationFilter term feature describing the shape of the inequation
-     */
+    /// @param mult1 the left side of the first inequation to be multiplied
+    /// @param mult2 the left side of the second inequation to be multiplied
+    /// @param inEquationFilter term feature describing the shape of the inequation
     public IsBoundedByInequationFeature(ProjectionToTerm mult1, ProjectionToTerm mult2,
             TermFeature inEquationFilter,
             BiFunction<Term, LogicServices, Monomial> monomialBuilder) {
@@ -91,18 +84,14 @@ public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
         return variables;
     }
 
-    /**
-     * @return how often each variable occurs in the monomial
-     */
+    /// @return how often each variable occurs in the monomial
     private static Map<Term, Integer> variables(Monomial monomial) {
         final Map<Term, Integer> counts = new HashMap<>();
         count(monomial, counts);
         return counts;
     }
 
-    /**
-     * @return how often each variable occurs in the product of the two monomials
-     */
+    /// @return how often each variable occurs in the product of the two monomials
     private static Map<Term, Integer> variables(Monomial first, Monomial second) {
         final Map<Term, Integer> counts = new HashMap<>();
         count(first, counts);

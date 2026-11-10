@@ -7,25 +7,20 @@ package org.key_project.prover.strategy.costbased.termfeature;
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Property;
 import org.key_project.logic.Term;
-import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
-/**
- * Term feature for testing equality of two terms. The feature returns zero iff it is invoked on a
- * term that is equal modulo <code>equalsProp</code> to the current value of <code>pattern</code>.
- * <p>
- * NB: it is not possible to use general <code>ProjectionToTerm</code> here, because the information
- * necessary to evaluate a <code>ProjectionToTerm</code> is not available in a term feature
- */
-public class EqTermFeature<GOAL extends ProofGoal<GOAL>> extends BinaryTermFeature {
-
+/// Term feature for testing equality of two terms. The feature returns zero iff it is invoked on a
+/// term that is equal modulo `equalsProp` to the current value of `pattern`.
+///
+/// NB: it is not possible to use general `ProjectionToTerm` here, because the information
+/// necessary to evaluate a `ProjectionToTerm` is not available in a term feature
+public class EqTermFeature extends BinaryTermFeature {
     private final TermBuffer pattern;
     private final Property<Term> equalsProp;
 
-    public static <GOAL extends ProofGoal<GOAL>> TermFeature create(TermBuffer pattern,
-            Property<Term> equalsProp) {
-        return new EqTermFeature<>(pattern, equalsProp);
+    public static TermFeature create(TermBuffer pattern, Property<Term> equalsProp) {
+        return new EqTermFeature(pattern, equalsProp);
     }
 
     private EqTermFeature(TermBuffer pattern, Property<Term> equalsProp) {

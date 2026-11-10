@@ -9,10 +9,9 @@ import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-/**
- * Binary features that returns zero iff the if-formulas of a Taclet are instantiated or the Taclet
- * does not have any if-formulas.
- */
+/// Binary features that returns zero iff the assumes-formulas of a Taclet are instantiated or the
+/// Taclet
+/// does not have any assumes-formulas.
 @StableCost
 public final class MatchedAssumesFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {

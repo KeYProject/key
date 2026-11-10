@@ -16,7 +16,6 @@ import org.key_project.prover.strategy.costbased.feature.StableCost;
 /// \assumes clause of the taclet refers to).
 @StableCost
 public class AssumptionProjection implements ProjectionToTerm {
-
     private final int no;
 
     private AssumptionProjection(int no) {

@@ -16,7 +16,6 @@ import org.key_project.util.collection.ImmutableList;
 
 public abstract class AbstractMonomialSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         extends SmallerThanFeature<GOAL> {
-
     private final Function mul;
 
     protected AbstractMonomialSmallerThanFeature(TermOrdering termOrdering, IIntLdt numbers) {
@@ -24,17 +23,15 @@ public abstract class AbstractMonomialSmallerThanFeature<GOAL extends ProofGoal<
         this.mul = numbers.getMul();
     }
 
-    /**
-     * The point at which the definitional skolem symbol {@code op} was introduced, counted in
-     * the rule applications its goal had seen, or -1 for every other operator. Such a symbol
-     * abbreviates a term through a defining equation ({@code \skolemTerm[definitional]}), and
-     * the ordering places it below all symbols that existed when it was made, newest lowest, so
-     * that applying a definition is a decrease, also in chains of definitions. Kind and time are
-     * constants of the symbol, which makes features built on this {@code StableCost}.
-     *
-     * @param op the Operator whose introduction time is queried
-     * @return the introduction time, or -1 for an operator that is no definitional symbol
-     */
+    /// The point at which the definitional Skolem symbol `op` was introduced, counted in
+    /// the rule applications its goal had seen, or -1 for every other operator. Such a symbol
+    /// abbreviates a term through a defining equation (`\\skolemTerm[definitional]`), and
+    /// the ordering places it below all symbols that existed when it was made, newest lowest, so
+    /// that applying a definition is a decrease, also in chains of definitions. Kind and time are
+    /// constants of the symbol, which makes features built on this `StableCost`.
+    ///
+    /// @param op the Operator whose introduction time is queried
+    /// @return the introduction time, or -1 for an operator that is no definitional symbol
     protected int introductionTime(Operator op) {
         if (op instanceof Function func && func.isDefinitionalSkolem()) {
             final int time = func.introductionTime();

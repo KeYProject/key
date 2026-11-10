@@ -18,11 +18,9 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Walking from the root of a formula down to the focus of a rule application, count how often we
- * choose the left branch (subterm) and how the right branches. This is used to identify the
- * upper/righter/bigger summands in a polynomial that is arranged in a left-associated way.
- */
+/// Walking from the root of a formula down to the focus of a rule application, count how often we
+/// choose the left branch (subterm) and how the right branches. This is used to identify the
+/// upper/righter/bigger summands in a polynomial that is arranged in a left-associated way.
 @StableCost
 public class FindRightishFeature implements Feature {
     private final Operator add;
@@ -59,6 +57,4 @@ public class FindRightishFeature implements Feature {
 
         return res;
     }
-
-
 }

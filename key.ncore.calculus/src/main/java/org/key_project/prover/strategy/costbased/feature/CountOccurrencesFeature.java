@@ -18,27 +18,23 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Counts how often a given term occurs in the sequent: the returned cost is the number of
- * to the given term modulo {@code equalsProp}. Used by the splitting heuristics to prefer cutting
- * over formulas that occur often.
- *
- * <p>
- * The count is computed directly instead of with a comprehension over all subterms
- * ({@code sum(sf, sequent, sum(sub, subterms(sf), ...))}): two terms that are equal
- * up to {@code equalsProp} have the same depth, so subterms whose depth differs from the target's
- * cannot be occurrences, and subterms shallower than the target cannot contain one either. The walk
- * therefore only descends while a node is deeper than the target and only compares nodes of
- * exactly the target's depth. On large sequents this skips almost the whole traversal; the
- * counted result is the same. ({@link Term#depth()} is cached on the term, so the guard costs a
- * field read.)
- *
- * <p>
- * If the projection has no value (its schema variable is not instantiated), the result is
- * {@link TopRuleAppCost}, as with the comprehension it replaces.
- */
+/// Counts how often a given term occurs in the sequent: the returned cost is the number of
+/// to the given term modulo `equalsProp`. Used by the splitting heuristics to prefer cutting
+/// over formulas that occur often.
+///
+/// The count is computed directly instead of with a comprehension over all subterms
+/// (`sum(sf, sequent, sum(sub, subterms(sf), ...))`): two terms that are equal
+/// up to `equalsProp` have the same depth, so subterms whose depth differs from the target's
+/// cannot be occurrences, and subterms shallower than the target cannot contain one either. The
+/// walk
+/// therefore only descends while a node is deeper than the target and only compares nodes of
+/// exactly the target's depth. On large sequents this skips almost the whole traversal; the
+/// counted result is the same. ([Term#depth()] is cached on the term, so the guard costs a
+/// field read.)
+///
+/// If the projection has no value (its schema variable is not instantiated), the result is
+/// [TopRuleAppCost], as with the comprehension it replaces.
 public class CountOccurrencesFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
-
     private final ProjectionToTerm target;
     private final Property<Term> equalsProp;
 
@@ -49,7 +45,7 @@ public class CountOccurrencesFeature<Goal extends ProofGoal<@NonNull Goal>> impl
 
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
             ProjectionToTerm target, Property<Term> equalsProp) {
-        return new CountOccurrencesFeature<>(target, equalsProp);
+        return new CountOccurrencesFeature<Goal>(target, equalsProp);
     }
 
     @SuppressWarnings("unchecked")

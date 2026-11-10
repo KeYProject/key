@@ -16,15 +16,13 @@ import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
-/**
- * Return zero iff the monomial <code>dividend</code> can be made smaller (in the polynomial
- * reduction ordering) by adding or subtracting <code>divisor</code> ({@link #createReducible}), or
- * iff it is divided by it ({@link #createDivides}).
- */
+/// Return zero iff the monomial `dividend` can be made smaller (in the polynomial
+/// reduction ordering) by adding or subtracting `divisor` ([#createReducible]), or
+/// iff it is divided by it ([#createDivides]).
 @StableCost
 public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
-    /** Which monomial relation an instance checks. */
+    /// Which monomial relation an instance checks.
     private enum Check {
         REDUCIBLE, DIVIDES
     }
@@ -42,15 +40,13 @@ public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
         this.builder = monBuilder;
     }
 
-    /**
-     * creates a feature that checks whether a monomial can be reduced by another one
-     *
-     * @param dividend the monomial that is queried for reducibility
-     * @param divisor
-     * @param monBuilder builder used to create a term from a monomial
-     * @return
-     * @param <GOAL>
-     */
+    /// creates a feature that checks whether a monomial can be reduced by another one
+    ///
+    /// @param dividend the monomial that is queried for reducibility
+    /// @param divisor
+    /// @param monBuilder builder used to create a term from a monomial
+    /// @return
+    /// @param <GOAL>
     public static <GOAL extends ProofGoal<GOAL>> Feature createReducible(
             ProjectionToTerm dividend,
             ProjectionToTerm divisor,
@@ -58,15 +54,13 @@ public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
         return new ReducibleMonomialsFeature<>(dividend, divisor, Check.REDUCIBLE, monBuilder);
     }
 
-    /**
-     * creates a feature that checks whether a monomial can be divided by another one
-     *
-     * @param dividend
-     * @param divisor
-     * @param monBuilder builder used to create a term from a monomial
-     * @return
-     * @param <GOAL>
-     */
+    /// creates a feature that checks whether a monomial can be divided by another one
+    ///
+    /// @param dividend
+    /// @param divisor
+    /// @param monBuilder builder used to create a term from a monomial
+    /// @return
+    /// @param <GOAL>
     public static <GOAL extends ProofGoal<GOAL>> Feature createDivides(
             ProjectionToTerm dividend,
             ProjectionToTerm divisor, BiFunction<Term, LogicServices, Monomial> monBuilder) {

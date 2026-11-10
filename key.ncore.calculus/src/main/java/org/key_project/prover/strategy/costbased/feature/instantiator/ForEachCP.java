@@ -27,12 +27,10 @@ public class ForEachCP<G extends ProofGoal<G>> implements Feature {
     private final TermGenerator<@NonNull G> generator;
     private final Feature body;
 
-    /**
-     * @param var <code>TermBuffer</code> in which the terms are going to be stored
-     * @param generator the terms that are to be iterated over
-     * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
-     *        <code>var</code>
-     */
+    /// @param var`TermBuffer` in which the terms are going to be stored
+    /// @param generator the terms that are to be iterated over
+    /// @param body a feature that is supposed to be evaluated repeatedly for the possible values of
+    /// `var`
     public static <G extends ProofGoal<G>> Feature create(TermBuffer var,
             TermGenerator<@NonNull G> generator,
             Feature body) {

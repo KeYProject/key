@@ -24,7 +24,6 @@ import org.jspecify.annotations.NonNull;
 // find position is unmodified, so the projected focus term is stable.)
 @StableCost
 public class LetFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
-
     private final TermBuffer var;
     private final ProjectionToTerm value;
     private final Feature body;
@@ -52,5 +51,4 @@ public class LetFeature<Goal extends ProofGoal<@NonNull Goal>> implements Featur
         var.setContent(outerVarContent, mState);
         return res;
     }
-
 }

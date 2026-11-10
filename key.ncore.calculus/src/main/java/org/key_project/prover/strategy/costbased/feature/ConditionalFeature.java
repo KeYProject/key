@@ -17,7 +17,6 @@ import org.jspecify.annotations.NonNull;
 /// A feature that evaluates one of two given features, depending on the result of a
 /// <code>RuleFilter</code>
 public class ConditionalFeature implements Feature {
-
     private ConditionalFeature(RuleFilter p_cond, Feature p_thenFeature,
             Feature p_elseFeature) {
         cond = p_cond;

@@ -14,26 +14,21 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * Feature that returns the number of branches for a given taclet application Size of "assumes"
- * sequents is currently not considered
- */
+/// Feature that returns the number of branches for a given taclet application Size of "assumes"
+/// sequents is currently not considered
 public class CountBranchFeature implements Feature {
-
     public static final Feature INSTANCE = new CountBranchFeature();
 
     private CountBranchFeature() {
     }
 
-    /**
-     * Compute the cost of a RuleApp.
-     *
-     * @param app the RuleApp
-     * @param pos position where <code>app</code> is to be applied
-     * @param goal the goal on which <code>app</code> is to be applied
-     * @param mState
-     * @return the cost of <code>app</code>
-     */
+    /// Compute the cost of a RuleApp.
+    ///
+    /// @param app the RuleApp
+    /// @param pos position where `app` is to be applied
+    /// @param goal the goal on which `app` is to be applied
+    /// @param mState
+    /// @return the cost of `app`
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, Goal goal,

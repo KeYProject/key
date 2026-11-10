@@ -7,6 +7,7 @@ package org.key_project.prover.strategy;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+/// Features allowing strategy definitions over formulas.
 public interface IFormulaTermFeatures {
     TermFeature forF();
 

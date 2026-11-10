@@ -23,7 +23,7 @@ public interface Feature extends CostClassifiable {
     /// @param pos position where <code>app</code> is to be applied
     /// @param goal the goal on which <code>app</code> is to be applied
     /// @param mState variable bank / local storage for feature who might require to store temporary
-    /// information that changes during computation, e.g. [TermBuffer]s
+    /// information that changes during computation, e.g. `TermBuffer`s
     /// @return the cost of the rule application expressed as a <code>RuleAppCost</code> object.
     /// <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
     /// all (it is discarded by the strategy).

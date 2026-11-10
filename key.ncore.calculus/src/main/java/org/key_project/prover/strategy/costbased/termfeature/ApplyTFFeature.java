@@ -20,7 +20,6 @@ import org.jspecify.annotations.NonNull;
 /// Feature for invoking a term feature on the instantiation of a schema variable
 @StableCost
 public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
-
     private final ProjectionToTerm proj;
     private final TermFeature termFeature;
     private final RuleAppCost noInstCost;
@@ -55,7 +54,7 @@ public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
     public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, G goal,
             MutableState mState) {
-        final Term te = proj.toTerm(app, pos, (Goal) goal, mState);
+        final Term te = proj.toTerm(app, pos, goal, mState);
         if (te == null) {
             assert !demandInst : "ApplyTFFeature: got undefined argument (null)";
             return noInstCost;
@@ -63,5 +62,4 @@ public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
 
         return termFeature.compute(te, mState, goal.proof().getServices());
     }
-
 }

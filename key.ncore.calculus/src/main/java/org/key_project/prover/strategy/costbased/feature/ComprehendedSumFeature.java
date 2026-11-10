@@ -17,26 +17,22 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 import org.jspecify.annotations.NonNull;
 
-/**
- * A feature that computes the sum of the values of a feature term when a given variable ranges over
- * a sequence of terms
- */
+/// A feature that computes the sum of the values of a feature term when a given variable ranges
+/// over
+/// a sequence of terms
 // @StableCost: transparent -- it sums its (recursed) body over a TermGenerator. CostReuse also
 // classifies that generator: it stays local only with a find-local generator (e.g.
 // SuperTermGenerator), and is non-local with a sequent-scanning one (SequentFormulasGenerator).
 @StableCost
 public class ComprehendedSumFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
-
     private final TermBuffer var;
     private final TermGenerator<Goal> generator;
     private final Feature body;
 
-    /**
-     * @param var <code>TermBuffer</code> in which the terms are going to be stored
-     * @param generator the terms that are to be iterated over
-     * @param body a feature that is supposed to be evaluated repeatedly for the possible values of
-     *        <code>var</code>
-     */
+    /// @param var`TermBuffer` in which the terms are going to be stored
+    /// @param generator the terms that are to be iterated over
+    /// @param body a feature that is supposed to be evaluated repeatedly for the possible values of
+    /// `var`
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(TermBuffer var,
             TermGenerator<Goal> generator,
             Feature body) {

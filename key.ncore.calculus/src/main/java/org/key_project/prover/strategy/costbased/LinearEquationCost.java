@@ -4,13 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy.costbased;
 
-/**
- * Polynomial <em>equation solving</em> (Gaussian / Gröbner). These {@code polySimp_*} rule sets
- * live
- * here rather than in {@link PolynomialCost} on purpose: they do not just canonicalise a term, they
- * <em>derive</em> from and apply equations, so they belong to the "linear" (solving) layer next to
- * {@link LinearInequationCost}.
- */
+/// Polynomial _equation solving_ (Gaussian / Gröbner). These `polySimp_*` rule sets
+/// live
+/// here rather than in [PolynomialCost] on purpose: they do not just canonicalize a term, they
+/// _derive_ from and apply equations, so they belong to the "linear" (solving) layer next to
+/// [LinearInequationCost].
 final public class LinearEquationCost {
     private LinearEquationCost() {}
 
@@ -21,14 +19,12 @@ final public class LinearEquationCost {
 
     /** polySimp_balance, polySimp_normalise. */
     static public final long BALANCE = -30;
-    /**
-     * polySimp_applyEq — a small tie-break rider on top of the general demodulation cost
-     * {@link CombinationCost#ORDERED_REWRITING} (the {@code apply_eq_monomials} taclet carries both
-     * rule sets, so the effective cost is their sum). The rigid variant polySimp_applyEqRigid is
-     * written {@code APPLY_EQ_MONOMIAL_TIEBREAK + 1} at the call site; that +1 is only an
-     * (uninteresting) tie-break between the two rules, a step-3 candidate to flatten. Step-3 idea:
-     * test whether this specialised variant is needed at all, or should just be a small delta
-     * preferring the original {@code apply_equations} rules.
-     */
+    /// polySimp\_applyEq — a small tie-break rider on top of the general demodulation cost
+    /// [CombinationCost#ORDERED_REWRITING] (the `apply_eq_monomials` taclet carries both
+    /// rule sets, so the effective cost is their sum). The rigid variant polySimp\_applyEqRigid is
+    /// written `APPLY_EQ_MONOMIAL_TIEBREAK + 1` at the call site; that +1 is only an
+    /// (uninteresting) tie-break between the two rules, a step-3 candidate to flatten. Step-3 idea:
+    /// test whether this specialised variant is needed at all, or should just be a small delta
+    /// preferring the original `apply_equations` rules.
     static public final long APPLY_EQ_MONOMIAL_TIEBREAK = 1;
 }

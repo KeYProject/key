@@ -7,17 +7,14 @@ package org.key_project.prover.strategy.costbased.feature.findprefix;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 
-/**
- * Interface for prefix checkers. Each checker is called on initialisation, on every operator of the
- * prefix starting with the outermost operator and for getting the result.
- *
- * @author christoph
- */
+/// Interface for prefix checkers. Each checker is called on initialization, on every operator of
+/// the
+/// prefix starting with the outermost operator and for getting the result.
+///
+/// @author christoph
 public interface Checker {
-    /**
-     * Called to get the result of the prefix check.
-     *
-     * @param pio the initial position of occurrence
-     */
+    /// Called to get the result of the prefix check.
+    ///
+    /// @param pio the initial position of occurrence
     boolean check(PosInOccurrence pio);
 }

@@ -22,10 +22,8 @@ public class Monomial {
         this.coefficient = coefficient;
     }
 
-    /**
-     * @return the list of all terms that occur in <code>a</code> but not in <code>b</code>.
-     *         multiplicity is treated as well here, so this is really difference of multisets
-     */
+    /// @return the list of all terms that occur in `a` but not in `b`.
+    /// multiplicity is treated as well here, so this is really difference of multisets
     private static ImmutableList<Term> difference(ImmutableList<Term> a, ImmutableList<Term> b) {
         ImmutableList<Term> res = a;
         final Iterator<Term> it = b.iterator();
@@ -51,9 +49,7 @@ public class Monomial {
         return new Monomial(parts, coefficient.add(c));
     }
 
-    /**
-     * @return true iff the monomial <code>this</code> divides the monomial <code>m</code>
-     */
+    /// @return true iff the monomial `this` divides the monomial `m`
     public boolean divides(Monomial m) {
         if (m.coefficient.signum() == 0) {
             return true;
@@ -68,11 +64,9 @@ public class Monomial {
         return Monomial.difference(this.parts, m.parts).isEmpty();
     }
 
-    /**
-     * @return true iff the variables/parts of <code>this</code> subsume the variables of
-     *         <code>m</code>, i.e., if each variable that occurs in <code>m</code> occurs in the
-     *         same or a higher power in <code>this</code>
-     */
+    /// @return true iff the variables/parts of `this` subsume the variables of
+    /// `m`, i.e., if each variable that occurs in `m` occurs in the
+    /// same or a higher power in `this`
     public boolean variablesSubsume(Monomial m) {
         return this.parts.size() >= m.parts.size()
                 && Monomial.difference(m.parts, this.parts).isEmpty();
@@ -86,10 +80,8 @@ public class Monomial {
         return Monomial.difference(m.parts, this.parts).size() == m.parts.size();
     }
 
-    /**
-     * @return true iff the coefficient of <code>m</code> can be made smaller (absolutely) by
-     *         subtracting a multiple of <code>this</code>
-     */
+    /// @return true iff the coefficient of `m` can be made smaller (absolutely) by
+    /// subtracting a multiple of `this`
     public boolean reducible(Monomial m) {
         final BigInteger a = m.coefficient;
         final BigInteger c = this.coefficient;
@@ -101,9 +93,7 @@ public class Monomial {
         return Monomial.difference(this.parts, m.parts).isEmpty();
     }
 
-    /**
-     * @return the result of dividing the monomial <code>m</code> by the monomial <code>this</code>
-     */
+    /// @return the result of dividing the monomial `m` by the monomial `this`
     public Monomial reduce(Monomial m) {
         final BigInteger a = m.coefficient;
         final BigInteger c = this.coefficient;
@@ -115,10 +105,8 @@ public class Monomial {
         return new Monomial(Monomial.difference(m.parts, this.parts), divide(a, c));
     }
 
-    /**
-     * @return the result of dividing the least common reducible (LCR) of monomial <code>m</code>
-     *         and <code>this</code> by the monomial <code>this</code>
-     */
+    /// @return the result of dividing the least common reducible (LCR) of monomial `m`
+    /// and `this` by the monomial `this`
     public Monomial divideLCR(Monomial m) {
         assert coefficient.signum() != 0;
         assert m.coefficient.signum() != 0;
@@ -147,10 +135,8 @@ public class Monomial {
          */
     }
 
-    /**
-     * Extended euclidian algorithm for computing cofactors. This satisfies the equation
-     * <code>gcd(a,b)=a*cofactor(a,b)+b*cofactor(b,a)</code>
-     */
+    /// Extended Euclidean algorithm for computing cofactors. This satisfies the equation
+    /// `gcd(a,b)=a\*cofactor(a,b)+b\*cofactor(b,a)`
     @SuppressWarnings("unused")
     private BigInteger cofactor(BigInteger v0, BigInteger v1) {
         final boolean neg = v0.signum() < 0;
@@ -224,16 +210,14 @@ public class Monomial {
         return Monomial.difference(parts, m.parts).equals(parts);
     }
 
-    /**
-     * TODO: this should also be used when comparing terms
-     *
-     * The reduction ordering on integers that is described in "A critical-pair/completion algorithm
-     * for finitely generated ideals in rings", with the difference that positive numbers are here
-     * considered as smaller than negative numbers (with the same absolute value)
-     *
-     * @return a negative number, zero, or a positive number, if <code>a</code> is smaller, equal to
-     *         or greater than <code>b</code>
-     */
+    /// TODO: this should also be used when comparing terms
+    /// The reduction ordering on integers that is described in "A critical-pair/completion
+    /// algorithm
+    /// for finitely generated ideals in rings", with the difference that positive numbers are here
+    /// considered as smaller than negative numbers (with the same absolute value)
+    ///
+    /// @return a negative number, zero, or a positive number, if `a` is smaller, equal to
+    /// or greater than `b`
     public static int compare(BigInteger a, BigInteger b) {
         final int c = a.abs().compareTo(b.abs());
         if (c != 0) {
@@ -242,11 +226,9 @@ public class Monomial {
         return b.signum() - a.signum();
     }
 
-    /**
-     * @return the result of dividing <code>a</code> by <code>c</code>, such that the remainder
-     *         becomes minimal in the reduction ordering <code>LexPathOrdering.compare</code> on
-     *         integers
-     */
+    /// @return the result of dividing `a` by `c`, such that the remainder
+    /// becomes minimal in the reduction ordering `LexPathOrdering.compare` on
+    /// integers
     public static BigInteger divide(BigInteger a, BigInteger c) {
         final BigInteger[] divRem = a.divideAndRemainder(c);
         while (true) {

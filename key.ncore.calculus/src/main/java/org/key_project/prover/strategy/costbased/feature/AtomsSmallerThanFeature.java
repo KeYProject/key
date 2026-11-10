@@ -15,23 +15,20 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 
-/**
- * Feature that returns zero iff each variable/atom of one monomial is smaller than all variables of
- * a second monomial.
- *
- * <p>
- * The value is determined by the compared instantiation terms alone: the atom ordering consists
- * of the number-literal distinction, the term-only {@link TermOrdering},
- * and the introduction time of definitional skolem symbols, which is a constant of the symbol
- * (see {@link AbstractMonomialSmallerThanFeature#introductionTime}). Hence {@link StableCost} --
- * the same classification, for the same reason, as {@link MonomialsSmallerThanFeature}, which
- * orders whole monomials by the same ingredients.
- * </p>
- */
+/// Feature that returns zero iff each variable/atom of one monomial is smaller than all variables
+/// of
+/// a second monomial.
+///
+/// The value is determined by the compared instantiation terms alone: the atom ordering consists
+/// of the number-literal distinction, the term-only [TermOrdering],
+/// and the introduction time of definitional skolem symbols, which is a constant of the symbol
+/// (see [AbstractMonomialSmallerThanFeature#introductionTime]). Hence [StableCost] --
+/// the same classification, for the same reason, as [MonomialsSmallerThanFeature], which
+/// orders whole monomials by the same ingredients.
+///
 @StableCost
 public class AtomsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         extends AbstractMonomialSmallerThanFeature<GOAL> {
-
     private final ProjectionToTerm left, right;
     private final Function Z;
 
@@ -42,7 +39,6 @@ public class AtomsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         this.right = right;
         this.Z = numbers.getNumberSymbol();
     }
-
 
     public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm left,
             ProjectionToTerm right,
@@ -60,9 +56,7 @@ public class AtomsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         return lessThan(collectAtoms(leftTerm), collectAtoms(rightTerm), pos, goal);
     }
 
-    /**
-     * this overwrites the method of <code>SmallerThanFeature</code>
-     */
+    /// this overwrites the method of `SmallerThanFeature`
     @Override
     protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, GOAL goal) {
         if (t1.op() == Z) {

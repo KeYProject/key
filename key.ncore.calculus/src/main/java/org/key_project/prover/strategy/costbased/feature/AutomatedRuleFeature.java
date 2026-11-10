@@ -17,7 +17,6 @@ import org.jspecify.annotations.NonNull;
 /// rules which are not member of any rule set.
 public class AutomatedRuleFeature
         extends BinaryFeature {
-
     private static final Feature INSTANCE = new AutomatedRuleFeature();
 
     private AutomatedRuleFeature() {}

@@ -35,6 +35,10 @@ import org.jspecify.annotations.Nullable;
 /// it supports linear integer arithmetics via Gaussian elimination,
 /// Fourier-Motzkin; and non-linear integer reasoning via cross-multiplication
 /// and Gröbner basis.
+///
+/// This abstract strategy is independent of the concrete KeY instance but
+/// assumes and requires a certain signature of integer symbols (as defined by
+/// [IIntLdt]) and rule sets.
 public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFeatureStrategy<G>
         implements ComponentStrategy<G> {
 
@@ -819,28 +823,24 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     }
 
-    /**
-     * Sets up the cost/approval features for the cross-multiplication of inequations
-     * (rule set inEqSimp_nonLin_multiply).
-     *
-     * <p>
-     * The multiply_2_inEq* taclets used to carry the inEqSimp_nonLin rule set in addition to
-     * inEqSimp_nonLin_multiply, which contributed the base cost {@link #IN_EQ_SIMP_NON_LIN_COST}
-     * and, in DefOps mode, the infinite off-switch. They no longer do; the base cost is therefore
-     * passed in explicitly via {@code baseCost} so that inEqSimp_nonLin can keep its stock cost
-     * and DefOps proofs that never cross-multiply stay on their stock path.
-     * </p>
-     *
-     * @param d the dispatcher to bind the features to
-     * @param baseCost cost added unconditionally (previously supplied by the inEqSimp_nonLin
-     *        rule set); zero for the approval dispatcher, {@link #IN_EQ_SIMP_NON_LIN_COST} for
-     *        the cost dispatcher
-     * @param notAllowedF the costs in case the multiplication is not allowed
-     * @param atApproval whether the features are bound to the approval dispatcher, which is the
-     *        only place a limit can be enforced that depends on how far the proof has come: a
-     *        candidate's cost is computed when it enters the queue, while the sequent and the
-     *        branch keep growing until it is applied
-     */
+    /// Sets up the cost/approval features for the cross-multiplication of inequations
+    /// (rule set inEqSimp\_nonLin\_multiply).
+    ///
+    /// The multiply\_2\_inEq\* taclets used to carry the inEqSimp\_nonLin rule set in addition to
+    /// inEqSimp\_nonLin\_multiply, which contributed the base cost [#IN_EQ_SIMP_NON_LIN_COST]
+    /// and, in DefOps mode, the infinite off-switch. They no longer do; the base cost is therefore
+    /// passed in explicitly via `baseCost` so that inEqSimp\_nonLin can keep its stock cost
+    /// and DefOps proofs that never cross-multiply stay on their stock path.
+    ///
+    /// @param d the dispatcher to bind the features to
+    /// @param baseCost cost added unconditionally (previously supplied by the inEqSimp\_nonLin
+    /// rule set); zero for the approval dispatcher, [#IN_EQ_SIMP_NON_LIN_COST] for
+    /// the cost dispatcher
+    /// @param notAllowedF the costs in case the multiplication is not allowed
+    /// @param atApproval whether the features are bound to the approval dispatcher, which is the
+    /// only place a limit can be enforced that depends on how far the proof has come: a
+    /// candidate's cost is computed when it enters the queue, while the sequent and the
+    /// branch keep growing until it is applied
     private void setupMultiplyInequations(RuleSetDispatchFeature d, Feature baseCost,
             Feature notAllowedF, boolean atApproval) {
         // In DefOps a product is admitted only when it exactly matches the left side of an

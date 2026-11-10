@@ -42,7 +42,6 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
         return new SVInstantiationCP<G>(null, value);
     }
 
-
     private SVInstantiationCP(@Nullable Name svToInstantiate, ProjectionToTerm value) {
         this.svToInstantiate = svToInstantiate;
         this.value = value;
@@ -76,7 +75,6 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
             + "Either the name of the variable is wrong, or the variable\n"
             + "has already been instantiated.");
     }
-
 
     private class CP implements ChoicePoint {
         private final PosInOccurrence pos;
@@ -120,6 +118,5 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
 
             return ImmutableList.singleton(branch).iterator();
         }
-
     }
 }

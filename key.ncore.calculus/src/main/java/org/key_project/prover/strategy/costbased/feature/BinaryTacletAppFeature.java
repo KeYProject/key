@@ -14,7 +14,6 @@ import org.jspecify.annotations.NonNull;
 
 /// Abstract superclass for features of TacletApps that have either zero or top cost.
 public abstract class BinaryTacletAppFeature<G extends ProofGoal<G>> extends BinaryFeature {
-
     private final boolean nonTacletValue;
 
     protected BinaryTacletAppFeature() {

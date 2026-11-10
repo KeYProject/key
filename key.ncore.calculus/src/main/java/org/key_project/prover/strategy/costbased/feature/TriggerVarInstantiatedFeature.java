@@ -13,7 +13,6 @@ import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationP
 
 public class TriggerVarInstantiatedFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
-
     public static <GOAL extends ProofGoal<GOAL>> TriggerVarInstantiatedFeature<GOAL> create() {
         return new TriggerVarInstantiatedFeature<>();
     }
@@ -32,6 +31,4 @@ public class TriggerVarInstantiatedFeature<GOAL extends ProofGoal<GOAL>>
 
         return instProj.toTerm(app, pos, goal, mState) != null;
     }
-
-
 }

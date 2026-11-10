@@ -12,19 +12,13 @@ import org.key_project.util.collection.ImmutableList;
 import org.jspecify.annotations.Nullable;
 
 public class Polynomial {
-    /**
-     * The polynomial expression of the BigInteger constant '0'.
-     */
+    /// The polynomial expression of the BigInteger constant '0'.
     public final static Polynomial ZERO =
         new Polynomial(BigInteger.ZERO, ImmutableList.nil());
-    /**
-     * The polynomial expression of the BigInteger constant '1'.
-     */
+    /// The polynomial expression of the BigInteger constant '1'.
     public final static Polynomial ONE =
         new Polynomial(BigInteger.ONE, ImmutableList.nil());
-    /**
-     * The BigInteger constant for the value '-1'.
-     */
+    /// The BigInteger constant for the value '-1'.
     private static final BigInteger MINUS_ONE = BigInteger.valueOf(-1);
     protected final BigInteger constantPart;
     protected final ImmutableList<Monomial> parts;
@@ -34,10 +28,8 @@ public class Polynomial {
         this.parts = parts;
     }
 
-    /**
-     * @return the list of all monomials that occur in <code>a</code> but not in <code>b</code>.
-     *         multiplicity is treated as well here, so this is really difference of multisets
-     */
+    /// @return the list of all monomials that occur in `a` but not in `b`.
+    /// multiplicity is treated as well here, so this is really difference of multisets
     private static ImmutableList<Monomial> difference(ImmutableList<Monomial> a,
             ImmutableList<Monomial> b) {
         ImmutableList<Monomial> res = a;
@@ -140,11 +132,9 @@ public class Polynomial {
         return new Polynomial(newConst, newParts);
     }
 
-    /**
-     * @return the greatest common divisor of the coefficients of the monomials of this polynomial.
-     *         The constant part of the polynomial is not taken into account. If there are no
-     *         monomials (apart from the constant term), the result is <code>BigInteger.ZERO</code>
-     */
+    /// @return the greatest common divisor of the coefficients of the monomials of this polynomial.
+    /// The constant part of the polynomial is not taken into account. If there are no
+    /// monomials (apart from the constant term), the result is `BigInteger.ZERO`
     public BigInteger coeffGcd() {
         BigInteger res = BigInteger.ZERO;
         for (Monomial part : parts) {
@@ -153,11 +143,9 @@ public class Polynomial {
         return res;
     }
 
-    /**
-     * @return <code>true</code> if the value of <code>this</code> will always be less than the
-     *         value of <code>p</code> (i.e., same monomials, but the constant part is less or
-     *         equal)
-     */
+    /// @return `true` if the value of `this` will always be less than the
+    /// value of `p` (i.e., same monomials, but the constant part is less or
+    /// equal)
     public boolean valueLess(Polynomial p) {
         if (!sameParts(p)) {
             return false;
@@ -165,10 +153,8 @@ public class Polynomial {
         return constantPart.compareTo(p.constantPart) < 0;
     }
 
-    /**
-     * @return <code>true</code> if the value of <code>this</code> will always be equal to the value
-     *         of <code>p</code> (i.e., same monomials and same constant part)
-     */
+    /// @return `true` if the value of `this` will always be equal to the value
+    /// of `p` (i.e., same monomials and same constant part)
     public boolean valueEq(Polynomial p) {
         if (!sameParts(p)) {
             return false;
@@ -197,11 +183,9 @@ public class Polynomial {
         return !constantPart.equals(c);
     }
 
-    /**
-     * @return <code>true</code> if the value of <code>this</code> will always be less or equal than
-     *         the value of <code>p</code> (i.e., same monomials, but the constant part is less or
-     *         equal)
-     */
+    /// @return `true` if the value of `this` will always be less or equal than
+    /// the value of `p` (i.e., same monomials, but the constant part is less or
+    /// equal)
     public boolean valueLeq(Polynomial p) {
         if (!sameParts(p)) {
             return false;

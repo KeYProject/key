@@ -24,27 +24,22 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.collection.ImmutableList;
 
 
-/**
- * Feature that returns zero iff each monomial of one polynomial is smaller than all monomials of a
- * second polynomial.
- *
- * <p>
- * {@link StableCost}: the monomial ordering is determined by the compared instantiation terms alone
- * -- multiplication degree, atom counts, the term-only
- * {@link TermOrdering}, and the introduction time of basis symbols, which
- * is a constant for every operator a cost evaluation can encounter (the argument is given at
- * {@link AbstractMonomialSmallerThanFeature#introductionTime}).
- * </p>
- */
+/// Feature that returns zero iff each monomial of one polynomial is smaller than all monomials of a
+/// second polynomial.
+///
+/// [StableCost]: the monomial ordering is determined by the compared instantiation terms alone
+/// -- multiplication degree, atom counts, the term-only
+/// [TermOrdering], and the introduction time of basis symbols, which
+/// is a constant for every operator a cost evaluation can encounter (the argument is given at
+/// [AbstractMonomialSmallerThanFeature#introductionTime]).
+///
 @StableCost
 public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         extends AbstractMonomialSmallerThanFeature<GOAL> {
-
     private final TermFeature hasCoeff;
 
     private final ProjectionToTerm left, right;
     private final Function Z, mul, add;
-
 
     private MonomialsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
             TermOrdering termOrdering, IIntLdt numbers) {
@@ -68,7 +63,7 @@ public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
     public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm left,
             ProjectionToTerm right,
             TermOrdering termOrdering, IIntLdt numbers) {
-        return new MonomialsSmallerThanFeature(left, right, termOrdering, numbers);
+        return new MonomialsSmallerThanFeature<GOAL>(left, right, termOrdering, numbers);
     }
 
     @Override
@@ -87,9 +82,7 @@ public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
 
     }
 
-    /**
-     * this overwrites the method of <code>SmallerThanFeature</code>
-     */
+    /// this overwrites the method of `SmallerThanFeature`
     @Override
     protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, GOAL goal) {
 
@@ -155,13 +148,10 @@ public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         return 0;
     }
 
-
-
-    /**
-     * @return the degree of a monomial (number of terms that are connected multiplicatively) -1. To
-     *         ensure that also cases like <tt>f(a*b)=a*b</tt> are handled properly, we simply count
-     *         the total number of multiplication operators in the term.
-     */
+    /// @return the degree of a monomial (number of terms that are connected multiplicatively) -1.
+    /// To
+    /// ensure that also cases like `f(a\*b)=a\*b` are handled properly, we simply count
+    /// the total number of multiplication operators in the term.
     private int degree(Term t) {
         int res = 0;
 

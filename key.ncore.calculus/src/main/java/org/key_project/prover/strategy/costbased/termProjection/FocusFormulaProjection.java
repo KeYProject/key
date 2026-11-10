@@ -17,8 +17,6 @@ import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 @WeakStableCost
 public class FocusFormulaProjection
         implements ProjectionToTerm {
-
-
     public static FocusFormulaProjection create() {
         return new FocusFormulaProjection();
     }
@@ -32,5 +30,4 @@ public class FocusFormulaProjection
 
         return pos.sequentFormula().formula();
     }
-
 }

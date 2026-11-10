@@ -15,30 +15,25 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-/**
- * Feature that decides whether the multiplication of two inequations (using rules of set
- * inEqSimp_nonLin_multiply) is allowed. We only do this if the product of the left sides of the
- * inequations has factors in common with the left side of some other inequation, similarly to how
- * it is decided in the Buchberger algorithm.
- */
+/// Feature that decides whether the multiplication of two inequations (using rules of set
+/// inEqSimp\_nonLin\_multiply) is allowed. We only do this if the product of the left sides of the
+/// inequations has factors in common with the left side of some other inequation, similarly to how
+/// it is decided in the Buchberger algorithm.
 public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
-
     protected final ProjectionToTerm targetCandidate;
     protected final ProjectionToTerm mult1Candidate;
     protected final ProjectionToTerm mult2Candidate;
     // creates a monomial from a given term
     protected final BiFunction<Term, LogicServices, Monomial> builder;
 
-    /**
-     * Return zero iff the multiplication of mult1 and mult2 is allowed, because the resulting
-     * product is partially covered by target.
-     *
-     * @param mult1Candidate the left side of the first inequation to be multiplied
-     * @param mult2Candidate the left side of the second inequation to be multiplied
-     * @param targetCandidate the left side of the inequation that is supposed to bound the other
-     *        two inequations
-     */
+    /// Return zero iff the multiplication of mult1 and mult2 is allowed, because the resulting
+    /// product is partially covered by target.
+    ///
+    /// @param mult1Candidate the left side of the first inequation to be multiplied
+    /// @param mult2Candidate the left side of the second inequation to be multiplied
+    /// @param targetCandidate the left side of the inequation that is supposed to bound the other
+    /// two inequations
     public static <GOAL extends ProofGoal<GOAL>> Feature partiallyBounded(
             ProjectionToTerm mult1Candidate,
             ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate,
@@ -53,9 +48,7 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
         };
     }
 
-    /**
-     * Return zero iff the product of mult1 and mult2 is a factor of target
-     */
+    /// Return zero iff the product of mult1 and mult2 is a factor of target
     public static <GOAL extends ProofGoal<GOAL>> Feature totallyBounded(
             ProjectionToTerm mult1Candidate,
             ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate,
@@ -69,9 +62,7 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
         };
     }
 
-    /**
-     * Return zero iff the product of mult1 and mult2 is target
-     */
+    /// Return zero iff the product of mult1 and mult2 is target
     public static <GOAL extends ProofGoal<GOAL>> Feature exactlyBounded(
             ProjectionToTerm mult1Candidate,
             ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate,

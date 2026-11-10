@@ -28,25 +28,20 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 
-/**
- * Feature for relating rule sets with feature terms. Given a taclet application, this feature will
- * iterate over the rule sets that the taclet belongs to, and for each rule set the corresponding
- * feature term (if existing) is evaluated. The result of the feature is the sum of the results of
- * the different rule set features.
- */
+/// Feature for relating rule sets with feature terms. Given a taclet application, this feature will
+/// iterate over the rule sets that the taclet belongs to, and for each rule set the corresponding
+/// feature term (if existing) is evaluated. The result of the feature is the sum of the results of
+/// the different rule set features.
 public class RuleSetDispatchFeature implements Feature {
-
     private static final Feature[] NO_FEATURES = new Feature[0];
 
     private final Map<@NonNull RuleSet, @NonNull Feature> rulesetToFeature = new LinkedHashMap<>();
 
-    /**
-     * For each taclet the features bound to the rule sets the taclet belongs to, in rule
-     * set order. The bindings in {@link #rulesetToFeature} only change during strategy
-     * setup, while {@code computeCost} is called for every rule application candidate —
-     * caching avoids one map lookup per rule set of the taclet on every call. Invalidated
-     * by all mutating methods; concurrent because proofs may run in parallel.
-     */
+    /// For each taclet the features bound to the rule sets the taclet belongs to, in rule
+    /// set order. The bindings in [#rulesetToFeature] only change during strategy
+    /// setup, while `computeCost` is called for every rule application candidate —
+    /// caching avoids one map lookup per rule set of the taclet on every call. Invalidated
+    /// by all mutating methods; concurrent because proofs may run in parallel.
     private final Map<Taclet, Feature[]> featuresByTaclet = new ConcurrentHashMap<>();
 
     public Set<@KeyFor("this.rulesetToFeature") RuleSet> ruleSets() {
@@ -89,10 +84,8 @@ public class RuleSetDispatchFeature implements Feature {
         return features;
     }
 
-    /**
-     * Bind feature <code>f</code> to the rule set <code>ruleSet</code>. If this method is called
-     * more than once for the same rule set, the given features are added to each other.
-     */
+    /// Bind feature `f` to the rule set `ruleSet`. If this method is called
+    /// more than once for the same rule set, the given features are added to each other.
     public void add(RuleSet ruleSet, Feature f) {
         Feature combinedF = rulesetToFeature.get(ruleSet);
         if (combinedF == null) {
@@ -105,32 +98,26 @@ public class RuleSetDispatchFeature implements Feature {
         featuresByTaclet.clear();
     }
 
-    /**
-     * Remove all features that have been related to <code>ruleSet</code>.
-     */
+    /// Remove all features that have been related to `ruleSet`.
     public void clear(RuleSet ruleSet) {
         rulesetToFeature.remove(ruleSet);
         featuresByTaclet.clear();
     }
 
-    /**
-     * Returns the used {@link Feature} for the given {@link RuleSet}.
-     *
-     * @param ruleSet The {@link RuleSet} to get its {@link Feature}.
-     * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
-     *         available.
-     */
+    /// Returns the used [Feature] for the given [RuleSet].
+    ///
+    /// @param ruleSet The [RuleSet] to get its [Feature].
+    /// @return The [Feature] used for the given [RuleSet] or `null` if not
+    /// available.
     public @Nullable Feature get(@NonNull RuleSet ruleSet) {
         return rulesetToFeature.get(ruleSet);
     }
 
-    /**
-     * Returns the used {@link Feature} for the given {@link RuleSet} and removes it.
-     *
-     * @param ruleSet The {@link RuleSet} to get its {@link Feature}.
-     * @return The {@link Feature} used for the given {@link RuleSet} or {@code null} if not
-     *         available.
-     */
+    /// Returns the used [Feature] for the given [RuleSet] and removes it.
+    ///
+    /// @param ruleSet The [RuleSet] to get its [Feature].
+    /// @return The [Feature] used for the given [RuleSet] or `null` if not
+    /// available.
     public @Nullable Feature remove(@NonNull RuleSet ruleSet) {
         featuresByTaclet.clear();
         return rulesetToFeature.remove(ruleSet);

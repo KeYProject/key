@@ -17,7 +17,6 @@ import org.jspecify.annotations.NonNull;
 
 public class InstantiationCostScalerFeature
         implements Feature {
-
     private final Feature costFeature;
     private final Feature allowSplitting;
 
@@ -38,7 +37,6 @@ public class InstantiationCostScalerFeature
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, Goal goal,
             MutableState mState) {
-
         final RuleAppCost cost = costFeature.computeCost(app, pos, goal, mState);
 
         if (cost.equals(NumberRuleAppCost.getZeroCost())) {
@@ -61,5 +59,4 @@ public class InstantiationCostScalerFeature
         final NumberRuleAppCost longCost = (NumberRuleAppCost) cost;
         return NumberRuleAppCost.create(longCost.getValue() + 200);
     }
-
 }

@@ -24,7 +24,6 @@ import org.jspecify.annotations.Nullable;
 /// for their branches. The manager simulates a backtracking behaviour by repeated evaluation of the
 /// feature term.
 public final class BackTrackingManager {
-
     /// The original rule application in question, i.e., the application without the changes that
     /// can
     /// possibly be applied by <code>ChoicePoint</code>s
@@ -177,5 +176,4 @@ public final class BackTrackingManager {
         }
         return branch.getRuleAppForBranch();
     }
-
 }

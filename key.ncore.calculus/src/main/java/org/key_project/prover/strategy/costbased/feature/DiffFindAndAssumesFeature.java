@@ -13,11 +13,9 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.util.collection.ImmutableList;
 
-/**
- * Binary feature that returns zero iff the <tt>\assumes</tt>- and find-formula of a Taclet are
- * matched to different members of the sequent. If a taclet has more than one formula in its
- * <tt>\assumes</tt> part, all of them must be matched to different members.
- */
+/// Binary feature that returns zero iff the `\assumes`- and find-formula of a Taclet are
+/// matched to different members of the sequent. If a taclet has more than one formula in its
+/// `\assumes` part, all of them must be matched to different members.
 // Weakly stable: compares the whole find FORMULA (pos.sequentFormula(), by content) to the
 // application's \assumes instantiations. The find can be a proper sub-formula (replace_known's
 // \find(b)), so the formula sits above the find term; a sibling rewrite then changes the formula

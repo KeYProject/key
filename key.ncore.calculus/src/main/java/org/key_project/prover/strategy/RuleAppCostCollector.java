@@ -7,10 +7,8 @@ package org.key_project.prover.strategy;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-/**
- * Interface for collecting <code>RuleApp</code>s, together with their assigned cost. This interface
- * is used in the signature of the method <code>Strategy.instantiateApp</code>
- */
+/// Interface for collecting `RuleApp`s, together with their assigned cost. This interface
+/// is used in the signature of the method `Strategy.instantiateApp`
 public interface RuleAppCostCollector {
     void collect(RuleApp app, RuleAppCost cost);
 }

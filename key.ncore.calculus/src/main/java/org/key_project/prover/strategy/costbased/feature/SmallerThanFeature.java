@@ -10,11 +10,8 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
-
-/**
- * Abstract superclass for features comparing terms (in particular polynomials or monomials) using
- * the term ordering
- */
+/// Abstract superclass for features comparing terms (in particular polynomials or monomials) using
+/// the term ordering
 public abstract class SmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
 
@@ -33,10 +30,8 @@ public abstract class SmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         return termOrdering.compare(t1, t2);
     }
 
-    /**
-     * @return <code>true</code> iff each element of <code>list1</code> is strictly smaller than all
-     *         elements of <code>list2</code>
-     */
+    /// @return `true` iff each element of `list1` is strictly smaller than all
+    /// elements of `list2`
     protected final boolean lessThan(ImmutableList<Term> list1, ImmutableList<Term> list2,
             PosInOccurrence focus, GOAL currentGoal) {
         if (list2.isEmpty()) {
@@ -53,7 +48,6 @@ public abstract class SmallerThanFeature<GOAL extends ProofGoal<GOAL>>
     }
 
     protected abstract static class Collector {
-
         private ImmutableList<Term> terms = ImmutableList.nil();
 
         protected void addTerm(Term mon) {
@@ -63,7 +57,5 @@ public abstract class SmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         public ImmutableList<Term> getResult() {
             return terms;
         }
-
     }
-
 }

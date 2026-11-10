@@ -15,12 +15,11 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-/**
- * Return zero of the least common reducible of two monomials is so trivial that it is not necessary
- * to do the critical pair completion
- * <p>
- * "A critical-pair/completion algorithm for finitely generated ideals in rings"
- */
+/// Return zero of the least common reducible of two monomials is so trivial that it is not
+/// necessary
+/// to do the critical pair completion
+///
+/// "A critical-pair/completion algorithm for finitely generated ideals in rings"
 @StableCost
 public class TrivialMonomialLCRFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
@@ -38,7 +37,7 @@ public class TrivialMonomialLCRFeature<GOAL extends ProofGoal<GOAL>>
     public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm a,
             ProjectionToTerm b,
             BiFunction<Term, LogicServices, Monomial> builder) {
-        return new TrivialMonomialLCRFeature(a, b, builder);
+        return new TrivialMonomialLCRFeature<GOAL>(a, b, builder);
     }
 
     @Override

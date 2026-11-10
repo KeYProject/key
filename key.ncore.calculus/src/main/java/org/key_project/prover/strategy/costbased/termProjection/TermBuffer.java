@@ -19,7 +19,6 @@ import org.jspecify.annotations.Nullable;
 /// <code>ForEachCP</code>.
 @StableCost
 public class TermBuffer implements ProjectionToTerm {
-
     public @Nullable Term getContent(MutableState mState) {
         return mState.read(this);
     }

@@ -22,14 +22,11 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
 
-/**
- * Enumerates the formulas of the sequent that satisfy a term feature.
- */
+/// Enumerates the formulas of the sequent that satisfy a term feature.
 @VolatileCost
 public final class RelevantSequentFormulasGenerator<G extends ProofGoal<G>>
         implements TermGenerator<G> {
-
-    /** Specifies whether to iterate over all formulas or only one of those of one semisequent */
+    /// Specifies whether to iterate over all formulas or only one of those of one semisequent
     private enum SequentScope {
         SEQUENT, ANTECEDENT, SUCCEDENT
     }
@@ -38,18 +35,13 @@ public final class RelevantSequentFormulasGenerator<G extends ProofGoal<G>>
 
     private final TermFeature accepted;
 
-
-    /**
-     * Secondary cache key to invalidate a cache hit if goal's sequent has changed
-     * (compared by identity). The cache is for reuse of
-     * many rule applications candidates on one goal for one proof step
-     */
+    /// Secondary cache key to invalidate a cache hit if goal's sequent has changed
+    /// (compared by identity). The cache is for reuse of
+    /// many rule applications candidates on one goal for one proof step
     private record Selection(Sequent sequent, ImmutableList<Term> formulas) {
     }
 
-    /**
-     * Caching of selected formulas to be iterated over (second key for cache is in Selection)
-     */
+    /// Caching of selected formulas to be iterated over (second key for cache is in Selection)
     private final Map<G, Selection> selections = new ConcurrentLruCache<>(200);
 
     private RelevantSequentFormulasGenerator(SequentScope part, TermFeature accepted) {
@@ -57,42 +49,34 @@ public final class RelevantSequentFormulasGenerator<G extends ProofGoal<G>>
         this.accepted = accepted;
     }
 
-    /**
-     * @param filter the TermFeature used to filter the formulas of the sequent
-     * @return the formulas of the sequent the feature accepts
-     */
+    /// @param filter the TermFeature used to filter the formulas of the sequent
+    /// @return the formulas of the sequent the feature accepts
     public static <G extends ProofGoal<G>> RelevantSequentFormulasGenerator<G> sequent(
             TermFeature filter) {
         return new RelevantSequentFormulasGenerator<>(SequentScope.SEQUENT, filter);
     }
 
-    /**
-     * @param filter the TermFeature used to filter the formulas of the sequent
-     * @return the formulas of the antecedent the feature accepts
-     */
+    /// @param filter the TermFeature used to filter the formulas of the sequent
+    /// @return the formulas of the antecedent the feature accepts
     public static <G extends ProofGoal<G>> RelevantSequentFormulasGenerator<G> antecedent(
             TermFeature filter) {
         return new RelevantSequentFormulasGenerator<>(SequentScope.ANTECEDENT, filter);
     }
 
-    /**
-     * @param filter the TermFeature used to filter the formulas of the sequent
-     * @return the formulas of the succedent the feature accepts
-     */
+    /// @param filter the TermFeature used to filter the formulas of the sequent
+    /// @return the formulas of the succedent the feature accepts
     public static <G extends ProofGoal<G>> RelevantSequentFormulasGenerator<G> succedent(
             TermFeature filter) {
         return new RelevantSequentFormulasGenerator<>(SequentScope.SUCCEDENT, filter);
     }
 
-    /**
-     * The formulas the filter accepts. The same list is returned while the goal keeps its sequent,
-     * so a caller that derives something from the selection can hold that result and reuse it for
-     * as long as it is handed the same list.
-     *
-     * @param goal the goal whose formulas are selected
-     * @param mState the state the filter is evaluated in
-     * @return the accepted formulas
-     */
+    /// The formulas the filter accepts. The same list is returned while the goal keeps its sequent,
+    /// so a caller that derives something from the selection can hold that result and reuse it for
+    /// as long as it is handed the same list.
+    ///
+    /// @param goal the goal whose formulas are selected
+    /// @param mState the state the filter is evaluated in
+    /// @return the accepted formulas
     public ImmutableList<Term> selection(G goal, MutableState mState) {
         final Sequent sequent = goal.sequent();
         final Selection cached = selections.get(goal);

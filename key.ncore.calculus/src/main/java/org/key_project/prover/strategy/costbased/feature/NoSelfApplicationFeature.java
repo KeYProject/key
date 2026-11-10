@@ -11,14 +11,11 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.util.collection.ImmutableList;
 
-/**
- * This feature checks that the position of application is not contained in the if-formulas. If the
- * rule application is admissible, zero is returned.
- */
+/// This feature checks that the position of application is not contained in the if-formulas. If the
+/// rule application is admissible, zero is returned.
 @StableCost
 public class NoSelfApplicationFeature<GOAL extends ProofGoal<GOAL>>
         extends BinaryTacletAppFeature<GOAL> {
-
     public static <GOAL extends ProofGoal<GOAL>> NoSelfApplicationFeature<GOAL> create() {
         return new NoSelfApplicationFeature<>();
     }

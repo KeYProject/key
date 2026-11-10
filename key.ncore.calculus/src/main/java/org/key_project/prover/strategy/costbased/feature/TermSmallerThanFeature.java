@@ -12,12 +12,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-/**
- * Feature that returns zero iff one term is smaller than another term in the current term ordering
- */
+/// Feature that returns zero iff one term is smaller than another term in the current term ordering
 @StableCost
 public class TermSmallerThanFeature<GOAL extends ProofGoal<GOAL>> extends SmallerThanFeature<GOAL> {
-
     private final ProjectionToTerm left, right;
 
     public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm left,
@@ -41,5 +38,4 @@ public class TermSmallerThanFeature<GOAL extends ProofGoal<GOAL>> extends Smalle
                 : "@AssumeAssertion(nullness): Term should not be null";
         return lessThan(leftTerm, rightTerm, pos, goal);
     }
-
 }
