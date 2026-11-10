@@ -106,8 +106,8 @@ class LlmStatusBarUiTest {
             client.initialize();
             var names = client.listTools().tools().stream().map(McpSchema.Tool::name)
                     .collect(Collectors.toSet());
-            assertTrue(names.contains(KeYAgentTools.TOOL_READ_FILE),
-                "auto-approved tools must be served, got " + names);
+            assertTrue(names.contains(KeYAgentTools.TOOL_LIST_PROOFS),
+                "exported auto-approved tools must be served, got " + names);
             assertTrue(names.contains(TestAgentToolProvider.EXTRA_TOOL));
             assertFalse(names.contains(KeYAgentTools.TOOL_RUN_COMMAND),
                 "ask-approved tools must stay hidden, got " + names);
