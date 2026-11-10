@@ -57,7 +57,7 @@ JMLtk front-end shipped in PR #3997.
 | 2 | `\by {…}` assertion-proof scripts / `obtain` | `/*@ assert x > 2 \by {…} */` | `scripts/jml/*.java`, `exceptional/AssertProofScript.java` | ✔ RESOLVED (fallback) |
 | 3 | `\seq(0)` inside a model-method body | `… : \seq_concat(b(n-1), \seq(0));` | `nparser/fix3452/fix/Issue3452Fixture.java` | ✔ RESOLVED — ⚠ was mis-attributed to JMLtk |
 | 4 | comma-separated store-ref `represents` | `//@ represents footprint = this.*, o.*;` → `//@ represents footprint = \locset(this.*, o.*);` | 10 example files, 11 sites (`heap/{simple,list,javacard,information_flow,vacid0_05_RedBlackTrees}`, `InformationFlow/PasswordFile`) | ✔ RESOLVED by syntax adoption (2026-11-09); load failures cleared, residual drift recorded below |
-| 5 | `\sum` comprehension fidelity | `ensures \result == (\sum int i; …)` | `comprehensions/{sum0,sum1}.key` | ✘ OPEN (sum0/sum1 don't close; `arrayMax`/`polishFlagSort` were loop-invariant, resolved by `6a07c20e63`) |
+| 5 | `\sum` comprehension fidelity | `ensures \result == (\sum int i; …)` | `comprehensions/{sum0,sum1}.key` | ✔ RESOLVED (2026-11-11: sum0/sum1 close again, `\bsum` term byte-identical to `origin/main`; restored by the jmltk `1.2.1-SNAPSHOT` line — see §5) |
 | 6 | record-level `/*@ nullable */` + record pipeline output | `/*@ nullable */ record MyRecord(…)` | `pipelineTests/records/**` | ✔ RESOLVED — goldens regenerated for the JMLtk output; `KeyJavaPipelineTest` 142/0 |
 | 7 | `spec_*_math` class/method pragmas | `/*@ spec_java_math @*/` | `testcase/specMath/{java,bigint}/Test.java`, `testPackage/TestClass.java` | ✔ RESOLVED (JML modifiers → `SpecMathMode`; `SpecMathModeTest` 2 + `ContractLoadingTests` 6 green) |
 | 8 | `ensures \result = max;` (single `=`) | — | `exceptional/WrongEquals.java` | ✔ RESOLVED (guarded via `JmlSideEffectChecker`) |
@@ -239,9 +239,10 @@ JMLtk front-end shipped in PR #3997.
     the cause). Open goal is the outer-loop exit obligation; its
     loop-invariant terms carry `<<origin(… ([loop_invariant @ [no file]]))>>`
     (cf. §17).
-  - `heap/comprehensions/sum1.key` remains a doesn't-close failure (gap §5).
+  - ~~`heap/comprehensions/sum1.key` remains a doesn't-close failure (gap
+    §5).~~ — closes again as of 2026-11-11 (gap §5 re-measured RESOLVED).
 
-## 5. `\sum` comprehension fidelity  — ✘ OPEN (sum0/sum1 don't close)
+## 5. `\sum` comprehension fidelity  — ✔ RESOLVED (re-measured 2026-11-11)
 
 ```java
 @   ensures \result == (\sum int i; 0 <= i && i < a.length; a[i]);
@@ -258,7 +259,27 @@ JMLtk front-end shipped in PR #3997.
   fresh-substituted-loop regression, now resolved by the structural-lookup
   fix (`6a07c20e63`). They close again and are removed from this gap.
 - Not strictly a "parse" gap — semantics/fidelity difference (same family as
-  #3, but unresolved).
+  #3, but resolved).
+- **Resolution 2026-11-11 (re-measured at tip `cfece36950`, local jmltk
+  `1.2.1-SNAPSHOT` jar of 2026-11-07):** the `\bsum` fidelity is restored —
+  no branch code change was needed. Verified three ways:
+  - The two named gates are green in a fresh run: `ScDeterminismTest` 14/0
+    (`sum1.key` closes in both runs, bit-identical) and
+    `RealProofMtEquivalenceTest` 8/0 (`sum0.key` closes single-threaded and
+    multi-threaded).
+  - Term-level A/B against `origin/main`: the initial goal sequents of
+    `sum0.key`/`sum1.key` carry the byte-identical `\bsum` term
+    `bsum{i:int}(Z(0(#)), length(a), select<int>(heap,a,arr(i)))`; the only
+    difference between the front-ends is the §17 `ensures @ [no file]` origin
+    label.
+  - The whole Fun `comprehensions` RunAll group matches its expectations: all
+    10 `provable` fixtures close, `bsumSplitInvalid.key` stays open.
+  No branch commit between the red measurement (`53dcefd914`, CI 2026-11-08)
+  and the green re-measurement touches the JML-to-term path, so the fidelity
+  improvement comes from the jmltk `1.2.1-SNAPSHOT` line itself (CI fetches
+  the snapshot at build time; the exact fixing snapshot is unpinned).
+  Caveat: `1.2.1-SNAPSHOT` is moving — re-verify on the next snapshot bump /
+  release pin.
 
 ## 6. record-level JML (`/*@ nullable */` + spec comments on records)  — ⚠ REGRESSION
 
