@@ -75,13 +75,13 @@ class ShippedSkillsTest {
     @Test
     void serializationRoundTripMatchesTheShippedFormat() {
         var skill = new Skill("demo-name", "a description", "instructions body",
-            List.of(KeYAgentTools.TOOL_READ_FILE, KeYAgentTools.TOOL_LIST_FILES), true);
+            List.of(KeYAgentTools.TOOL_READ, KeYAgentTools.TOOL_GLOB), true);
         var markdown = SkillLibrary.serialize(skill);
         var parsed = SkillLibrary.parse(markdown);
         assertEquals(skill, parsed);
         assertTrue(markdown.startsWith("---\nname: demo-name"));
         assertTrue(markdown.contains("allowedTools:"));
-        Set.of("read_file", "list_files").forEach(t -> assertTrue(markdown.contains("- " + t)));
+        Set.of("read", "glob").forEach(t -> assertTrue(markdown.contains("- " + t)));
     }
 
     // ------------------------------------------------------------------------ bundled archive

@@ -14,7 +14,7 @@ allowedTools:
   - remove_taclet
   - tryclose
   - auto
-  - ask_user
+  - question
 ---
 
 You are working with KeY's rule system (taclets). This covers inspecting the available rules,

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 /**
  * Blocks dangerous shell commands before they reach the OS. The policy is defense-in-depth:
- * approval of the {@code run_command} tool asks the user for consent, but a command matching one
+ * approval of the {@code shell} tool asks the user for consent, but a command matching one
  * of the blocklist patterns is refused regardless of approval.
  * <p>
  * The built-in patterns cover destructive/privilege-escalating commands; users can extend the list

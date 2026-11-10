@@ -41,12 +41,12 @@ import org.jspecify.annotations.Nullable;
  * The built-in tools provided by {@code keyext.llm}:
  * <ul>
  * <li>{@code get_proof_context} - the current proof state as a text block</li>
- * <li>{@code list_files} / {@code read_file} / {@code edit_file} / {@code file_info} - bounded,
- * sandboxed access to the files of the current Java model ({@code edit_file} performs an exact
- * string replacement and requires user approval)</li>
- * <li>{@code run_command} - executes a shell command in the model directory (blocklist + user
+ * <li>{@code glob} / {@code read} / {@code edit} - bounded, sandboxed access to the files of the
+ * current Java model ({@code glob} matches glob patterns, {@code read} reads a bounded line
+ * range, {@code edit} performs an exact string replacement and requires user approval)</li>
+ * <li>{@code shell} - executes a shell command in the model directory (blocklist + user
  * approval required)</li>
- * <li>{@code ask_user} - asks the user a question (intercepted by the agent loop)</li>
+ * <li>{@code question} - asks the user a question (intercepted by the agent loop)</li>
  * <li>{@code tryclose} - applies the {@code tryclose} proof-script command (TryClose macro) to a
  * goal, a branch or all open goals</li>
  * <li>{@code auto} - applies KeY's automatic proof strategy with a given step limit
@@ -67,14 +67,13 @@ import org.jspecify.annotations.Nullable;
 public final class KeYAgentTools implements McpClient {
 
     public static final String TOOL_GET_PROOF_CONTEXT = "get_proof_context";
-    public static final String TOOL_LIST_FILES = "list_files";
-    public static final String TOOL_READ_FILE = "read_file";
-    public static final String TOOL_EDIT_FILE = "edit_file";
-    public static final String TOOL_FILE_INFO = "file_info";
-    public static final String TOOL_RUN_COMMAND = "run_command";
-    public static final String TOOL_ASK_USER = "ask_user";
-    public static final String TOOL_USE_SKILL = "use_skill";
-    public static final String TOOL_SPAWN_SUBAGENT = "spawn_subagent";
+    public static final String TOOL_GLOB = "glob";
+    public static final String TOOL_READ = "read";
+    public static final String TOOL_EDIT = "edit";
+    public static final String TOOL_SHELL = "shell";
+    public static final String TOOL_QUESTION = "question";
+    public static final String TOOL_SKILL = "skill";
+    public static final String TOOL_SUBAGENT = "subagent";
     public static final String TOOL_GET_SUBAGENT_LOGS = "get_subagent_logs";
     /** Consults a fresh LLM instance with a clean context; intercepted by the agent loop. */
     public static final String TOOL_ASK_LLM = "ask_llm";

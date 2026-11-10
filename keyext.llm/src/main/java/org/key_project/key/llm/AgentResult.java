@@ -12,7 +12,7 @@ import java.util.List;
  * A turn ends in one of four ways:
  * <ul>
  * <li>{@link Done} - a final (non tool-calling) answer was produced.</li>
- * <li>{@link NeedsInput} - the agent asked a question ({@code ask_user}) and waits for the user
+ * <li>{@link NeedsInput} - the agent asked a question ({@code question}) and waits for the user
  * to answer before continuing.</li>
  * <li>{@link NeedsApproval} - the agent wants to call a tool that requires user approval and
  * waits for a decision.</li>
@@ -25,8 +25,10 @@ public sealed interface AgentResult {
     record Done(String content, List<ToolActivity> activities) implements AgentResult {
     }
 
-    /** The agent asked a question; resume with {@code AgentLoop.answerQuestion(String)}. */
-    record NeedsInput(Question question) implements AgentResult {
+    /**
+     * The agent asked one or more questions; resume with {@code AgentLoop.answerQuestion(String)}.
+     */
+    record NeedsInput(List<Question> questions) implements AgentResult {
     }
 
     /** A tool call awaits user approval; resume with {@code AgentLoop.decideApproval(...)}. */
@@ -49,7 +51,7 @@ public sealed interface AgentResult {
 
     /**
      * One executed tool call, rendered to the user when tool activity is shown. {@code children}
-     * holds the indented sub-activity of a {@code spawn_subagent} call (one entry per delegated
+     * holds the indented sub-activity of a {@code subagent} call (one entry per delegated
      * task).
      */
     record ToolActivity(String name, String arguments, String result,
@@ -60,10 +62,22 @@ public sealed interface AgentResult {
         }
     }
 
-    /** A question to be shown to the user, with optional predefined answer options. */
-    record Question(
-            @com.google.gson.annotations.SerializedName("question") String text,
-            List<String> options) {
+    /**
+     * One question shown to the user (the {@code question} tool, following OpenCode's schema):
+     * an optional short header (at most 30 characters, used as the dialog title), the question
+     * text, predefined answer options with an optional explanation each, and whether several
+     * options may be selected. The user can always answer with free text instead.
+     */
+    record Question(String header, String text, List<Option> options, boolean multiple) {
+
+        /** A predefined answer option: a short label plus an optional explanation. */
+        record Option(String label, String description) {
+        }
+
+        /** A plain question without header, options or multiple choice. */
+        public Question(String text) {
+            this(null, text, List.of(), false);
+        }
     }
 
     /** A pending tool call that awaits an approval decision. */

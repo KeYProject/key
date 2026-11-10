@@ -62,8 +62,8 @@ class McpUiGuideTest {
             McpUiTestHarness.resetSettings();
             var model = new LlmSettings(LlmSettings.INSTANCE);
             // show both directions of the override feature in the picture
-            model.setMcpExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_RUN_COMMAND)));
-            model.setMcpNotExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ_FILE)));
+            model.setMcpExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_SHELL)));
+            model.setMcpNotExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ)));
             McpUiTestHarness.render(new LlmToolsPanel(model),
                 outDir.resolve("mcp-tools-export.png"));
         });

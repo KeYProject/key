@@ -423,7 +423,7 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
                 addToolActivity(done.activities());
                 addOutput(done.content());
             }
-            case AgentResult.NeedsInput needsInput -> addQuestionBox(needsInput.question());
+            case AgentResult.NeedsInput needsInput -> addQuestionBox(needsInput.questions());
             case AgentResult.NeedsApproval needsApproval ->
                 addApprovalBox(needsApproval.toolCall());
             case AgentResult.PausedForBackground paused ->
@@ -437,8 +437,8 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
         scrollToEnd();
     }
 
-    private void addQuestionBox(AgentResult.Question question) {
-        pOutput.add(new AskUserBox(question, this), new CC().growX());
+    private void addQuestionBox(List<AgentResult.Question> questions) {
+        pOutput.add(new AskUserBox(questions, this), new CC().growX());
         scrollToEnd();
     }
 
@@ -871,48 +871,157 @@ class OutputBox<T> extends JPanel {
 
 
 /**
- * Renders a question asked by the agent via {@code ask_user}. Answers are relayed to the running
- * {@link AgentLoop}, which continues the turn.
+ * Renders the questions asked by the agent via {@code question} (OpenCode schema: an optional
+ * header, options with an optional explanation, and optional multiple selections). One box per
+ * turn; the answers of all questions are combined into one text and relayed to the running
+ * agent loop, which continues the turn.
  */
 class AskUserBox extends JPanel {
-    public AskUserBox(AgentResult.Question question, LlmPrompt panel) {
+
+    private final List<AgentResult.Question> questions;
+    private final LlmPrompt panel;
+    /** One list of option widgets per question (buttons for single choice, toggles otherwise). */
+    private final List<List<JToggleButton>> optionWidgets = new java.util.ArrayList<>();
+    /** One free-text field per question. */
+    private final List<JTextField> fields = new java.util.ArrayList<>();
+
+    public AskUserBox(List<AgentResult.Question> questions, LlmPrompt panel) {
+        this.questions = questions == null ? List.of() : questions;
+        this.panel = panel;
         setLayout(new BorderLayout(8, 8));
         setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY),
             BorderFactory.createEmptyBorder(8, 10, 8, 10)));
         setBackground(LlmPrompt.COLOR_BG_ACTION.get());
-        var label = new JLabel("<html><b>Question:</b> " + text(question.text()) + "</html>");
-        label.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
-        add(label, BorderLayout.NORTH);
+        add(sections(), BorderLayout.CENTER);
+    }
 
-        var options = question.options() == null ? List.<String>of() : question.options();
-        if (options.isEmpty()) {
-            var field = new JTextField(40);
-            var go = new JButton("Send");
-            var skip = new JButton("Skip");
-            go.addActionListener(
-                e -> panel.answerQuestion(field.getText()));
-            skip.addActionListener(e -> panel.skipTurn());
-            var row = new JPanel(new BorderLayout(4, 0));
-            row.add(field, BorderLayout.CENTER);
-            var buttons = new JPanel();
-            buttons.add(go);
-            buttons.add(skip);
-            row.add(buttons, BorderLayout.EAST);
-            field.addActionListener(e -> go.doClick());
-            add(row, BorderLayout.CENTER);
-        } else {
-            var buttons = new JPanel(new java.awt.FlowLayout(
-                java.awt.FlowLayout.LEFT, 6, 0));
-            for (String option : options) {
-                var b = new JButton(option);
-                b.addActionListener(e -> panel.answerQuestion(option));
-                buttons.add(b);
-            }
-            var skip = new JButton("Skip");
-            skip.addActionListener(e -> panel.skipTurn());
-            buttons.add(skip);
-            add(buttons, BorderLayout.CENTER);
+    /** The stacked question sections; each carries its own answer widgets. */
+    private JComponent sections() {
+        var sections = new JPanel();
+        sections.setOpaque(false);
+        sections.setLayout(new javax.swing.BoxLayout(sections, javax.swing.BoxLayout.Y_AXIS));
+        for (var question : this.questions) {
+            sections.add(section(question));
         }
+        return sections;
+    }
+
+    /** One question section: title, optional option widgets and the free-text field. */
+    private JComponent section(AgentResult.Question question) {
+        var section = new JPanel();
+        section.setOpaque(false);
+        section.setLayout(new BorderLayout(4, 4));
+
+        var title = "<html><b>"
+            + text(question.header() == null ? "Question" : question.header())
+            + ":</b> " + text(question.text()) + "</html>";
+        var label = new JLabel(title);
+        label.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+        section.add(label, BorderLayout.NORTH);
+
+        var options = question.options() == null ? List.<AgentResult.Question.Option>of()
+                : question.options();
+        var widgets = new ArrayList<JToggleButton>();
+        var center = new JPanel();
+        center.setOpaque(false);
+
+        if (options.isEmpty()) {
+            center.setLayout(new BorderLayout(4, 0));
+        } else if (question.multiple()) {
+            center.setLayout(new javax.swing.BoxLayout(center, javax.swing.BoxLayout.Y_AXIS));
+            var toggles = new JPanel(new java.awt.GridLayout(0, 1, 4, 2));
+            toggles.setOpaque(false);
+            for (var option : options) {
+                var box = new JCheckBox(option.label());
+                box.setToolTipText(option.description() == null ? null
+                        : text(option.description()));
+                widgets.add(box);
+                toggles.add(box);
+            }
+            center.add(toggles, BorderLayout.NORTH);
+        } else {
+            var buttons = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 6, 0));
+            buttons.setOpaque(false);
+            for (var option : options) {
+                if (this.questions.size() == 1) {
+                    // single question: clicking an option answers immediately (OpenCode behavior)
+                    var b = new JButton(option.label());
+                    b.setToolTipText(option.description() == null ? null
+                            : text(option.description()));
+                    b.addActionListener(e -> panel.answerQuestion(option.label()));
+                    buttons.add(b);
+                } else {
+                    var box = new JToggleButton(option.label());
+                    box.setToolTipText(option.description() == null ? null
+                            : text(option.description()));
+                    widgets.add(box);
+                    buttons.add(box);
+                }
+            }
+            center.add(buttons, BorderLayout.NORTH);
+        }
+
+        // a free-text answer is always available
+        var field = new JTextField(40);
+        var send = new JButton("Send");
+        send.addActionListener(e -> panel.answerQuestion(answer()));
+        var skip = new JButton("Skip");
+        skip.addActionListener(e -> panel.skipTurn());
+        var row = new JPanel(new BorderLayout(4, 0));
+        row.setOpaque(false);
+        row.add(field, BorderLayout.CENTER);
+        var buttons = new JPanel();
+        buttons.setOpaque(false);
+        buttons.add(send);
+        buttons.add(skip);
+        row.add(buttons, BorderLayout.EAST);
+        field.addActionListener(e -> send.doClick());
+        if (options.isEmpty()) {
+            center.add(row, BorderLayout.CENTER);
+        } else {
+            center.add(row, BorderLayout.SOUTH);
+        }
+
+        fields.add(field);
+        optionWidgets.add(widgets);
+        section.add(center, BorderLayout.CENTER);
+        return section;
+    }
+
+    /** The combined answer of all questions of this box. */
+    private String answer() {
+        var parts = new ArrayList<String>();
+        for (int i = 0; i < questions.size(); i++) {
+            var question = questions.get(i);
+            var field = i < fields.size() ? fields.get(i) : null;
+            var free = field == null ? "" : field.getText().strip();
+            var selected = new ArrayList<String>();
+            if (i < optionWidgets.size()) {
+                for (var widget : optionWidgets.get(i)) {
+                    if (widget.isSelected()) {
+                        selected.add(label(widget));
+                    }
+                }
+            }
+            var chosen = String.join(", ", selected);
+            if (!free.isEmpty()) {
+                chosen = chosen.isEmpty() ? free : chosen + "; " + free;
+            }
+            if (chosen.isEmpty()) {
+                continue;
+            }
+            var name = question.header() == null ? question.text() : question.header();
+            parts.add(questions.size() == 1 ? chosen : name + ": " + chosen);
+        }
+        if (parts.isEmpty()) {
+            return "(no answer given)";
+        }
+        return String.join("\n", parts);
+    }
+
+    /** The label of an option widget (the button text). */
+    private static String label(JToggleButton widget) {
+        return widget instanceof AbstractButton button ? button.getText() : "";
     }
 
     private static String text(String s) {

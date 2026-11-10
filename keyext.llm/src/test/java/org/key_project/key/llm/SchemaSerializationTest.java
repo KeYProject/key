@@ -51,17 +51,17 @@ class SchemaSerializationTest {
 
     @Test
     void functionDefinitionEmitsNameDescriptionParameters() {
-        var fn = new FunctionDefinition("list_files", "lists files",
+        var fn = new FunctionDefinition("glob", "lists files",
             new JsonSchema("object"));
         var map = fn.toMap();
-        assertEquals("list_files", map.get("name"));
+        assertEquals("glob", map.get("name"));
         assertEquals("lists files", map.get("description"));
         assertTrue(map.containsKey("parameters"));
     }
 
     @Test
     void toolMapDoesNotLeakApprovalMetadata() {
-        var tool = new Tool(new FunctionDefinition("run_command", "runs a command",
+        var tool = new Tool(new FunctionDefinition("shell", "runs a command",
             new JsonSchema("object")), Tool.ApprovalRequirement.ASK);
         var map = tool.toMap();
         assertEquals("function", map.get("type"));

@@ -59,7 +59,7 @@ class PromptSkillStorageTest {
     @Test
     void savesSkillsAsMarkdownFilesWithFrontMatter() throws IOException {
         var skill = new Skill("optics", "focus on overflow",
-            "Pay attention to overflow.\nSecond paragraph.", List.of("read_file", "auto"), false);
+            "Pay attention to overflow.\nSecond paragraph.", List.of("read", "auto"), false);
 
         assertNull(SkillLibrary.INSTANCE.save(skill));
 
@@ -73,7 +73,7 @@ class PromptSkillStorageTest {
                 || text.contains("name: \"optics\""),
             "front matter must carry the name:\n" + text);
         assertTrue(text.contains("enabled: false"), "front matter must carry 'enabled'");
-        assertTrue(text.contains("read_file"), "allowedTools must be serialized");
+        assertTrue(text.contains("read"), "allowedTools must be serialized");
         assertTrue(text.contains("Pay attention to overflow."), "body must hold instructions");
 
         // the file is read back as the same skill

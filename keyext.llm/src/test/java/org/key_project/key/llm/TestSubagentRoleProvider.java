@@ -13,7 +13,7 @@ import org.key_project.key.llm.subagents.SubagentRoleProvider;
 /**
  * Test-only sub-agent roles registered via a test {@code META-INF/services} entry. {@code
  * echo-role} only whitelists the test echo tool; {@code spawner-role} additionally whitelists
- * {@code spawn_subagent} so the depth guard can be exercised.
+ * {@code subagent} so the depth guard can be exercised.
  */
 public class TestSubagentRoleProvider implements SubagentRoleProvider {
     public static final String ECHO_ROLE = "echo-role";
@@ -29,12 +29,12 @@ public class TestSubagentRoleProvider implements SubagentRoleProvider {
                 List.of(TestMcpToolProvider.ECHO), null, 4, true),
             new SubagentRole(SPAWNER_ROLE, "test role that may spawn sub-agents",
                 "You may delegate work to sub-agents.",
-                List.of(KeYAgentTools.TOOL_SPAWN_SUBAGENT, TestMcpToolProvider.ECHO), null, 4,
+                List.of(KeYAgentTools.TOOL_SUBAGENT, TestMcpToolProvider.ECHO), null, 4,
                 false),
             new SubagentRole(PARALLEL_SPAWNER_ROLE,
                 "test role that may spawn sub-agents in parallel",
                 "You may delegate work to sub-agents.",
-                List.of(KeYAgentTools.TOOL_SPAWN_SUBAGENT, TestMcpToolProvider.ECHO), null, 4,
+                List.of(KeYAgentTools.TOOL_SUBAGENT, TestMcpToolProvider.ECHO), null, 4,
                 true),
             new SubagentRole(ASK_LLM_ROLE, "test role that may consult the LLM",
                 "Consult a fresh LLM instance if needed, then answer.",

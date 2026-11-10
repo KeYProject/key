@@ -87,7 +87,7 @@ public class AgentLoop {
             implements Pending {
     }
 
-    private record PendingQuestion(String toolCallId, Question question) implements Pending {
+    private record PendingQuestion(String toolCallId, List<Question> questions) implements Pending {
     }
 
     private record PendingBackground(String jobId, String toolCallId, String name, String arguments)
@@ -365,7 +365,7 @@ public class AgentLoop {
             rememberDiscoveredTools(arguments);
         }
 
-        if (KeYAgentTools.TOOL_ASK_USER.equals(name)) {
+        if (KeYAgentTools.TOOL_QUESTION.equals(name)) {
             if (!LlmSettings.INSTANCE.getAllowAgentQuestions()) {
                 stagedTool(id, "[Asking the user is disabled in the settings]");
                 return null;
@@ -373,20 +373,20 @@ public class AgentLoop {
             // mid-batch pause: the messages up to here are part of the context (pre-existing
             // behaviour); the rest of the batch is aborted
             commitRound();
-            var question = parseQuestion(arguments);
-            pending = new PendingQuestion(id, question);
-            return new AgentResult.NeedsInput(question);
+            var questions = parseQuestions(arguments);
+            pending = new PendingQuestion(id, questions);
+            return new AgentResult.NeedsInput(questions);
         }
 
-        if (KeYAgentTools.TOOL_USE_SKILL.equals(name)) {
+        if (KeYAgentTools.TOOL_SKILL.equals(name)) {
             if (!LlmSettings.INSTANCE.getAgentCanUseSkills()) {
                 stagedTool(id, "[Skills are disabled in the settings]");
                 return null;
             }
-            var skillName = parseSkillName(arguments);
+            var skillName = parseSkillId(arguments);
             if (skillName == null || SkillLibrary.INSTANCE.get(skillName) == null) {
                 stagedTool(id,
-                    "[Unknown skill: " + (skillName == null ? "(missing name)" : skillName)
+                    "[Unknown skill: " + (skillName == null ? "(missing id)" : skillName)
                         + "]");
                 return null;
             }
@@ -395,7 +395,7 @@ public class AgentLoop {
             return null;
         }
 
-        if (KeYAgentTools.TOOL_SPAWN_SUBAGENT.equals(name)) {
+        if (KeYAgentTools.TOOL_SUBAGENT.equals(name)) {
             if (!LlmSettings.INSTANCE.getSubagentsEnabled()) {
                 stagedTool(id, "[Spawning sub-agents is disabled in the settings]");
                 return null;
@@ -541,7 +541,7 @@ public class AgentLoop {
     }
 
     /**
-     * Builds the tool activity of a {@code spawn_subagent} call with one indented child per task
+     * Builds the tool activity of a {@code subagent} call with one indented child per task
      * of every run recorded since {@code seqBefore} (the runs of this call).
      */
     private ToolActivity subagentActivity(String name, String arguments, String outcome,
@@ -638,21 +638,87 @@ public class AgentLoop {
         session.getContext().addMessage(msg);
     }
 
-    private static Question parseQuestion(String arguments) {
+    /**
+     * Parses the {@code question} tool call arguments into the list of questions (OpenCode
+     * schema: {@code questions: [{question, header?, options?: [{label, description?}],
+     * multiple?}]}). Tolerant: options may be plain strings, a single flat question object is
+     * accepted, and unparsable arguments degrade to one question with the raw text.
+     */
+    private static List<Question> parseQuestions(String arguments) {
         try {
-            var parsed = new GsonBuilder().create().fromJson(arguments, Question.class);
-            return parsed == null ? new Question(arguments, List.of()) : parsed;
-        } catch (Exception e) {
-            return new Question(arguments, List.of());
+            var parsed = com.google.gson.JsonParser.parseString(arguments);
+            if (parsed.isJsonObject()) {
+                var obj = parsed.getAsJsonObject();
+                var result = new ArrayList<Question>();
+                if (obj.has("questions") && obj.get("questions").isJsonArray()) {
+                    for (var element : obj.getAsJsonArray("questions")) {
+                        var question = questionOf(element);
+                        if (question != null) {
+                            result.add(question);
+                        }
+                    }
+                } else {
+                    var question = questionOf(parsed);
+                    if (question != null) {
+                        result.add(question);
+                    }
+                }
+                if (!result.isEmpty()) {
+                    return List.copyOf(result);
+                }
+            }
+        } catch (Exception ignored) {
+            // fall through to the raw-text fallback
         }
+        return List.of(new Question(arguments));
     }
 
-    private static @Nullable String parseSkillName(String arguments) {
+    /** Builds a {@link Question} from one (sub-)object of the {@code question} tool arguments. */
+    private static @org.jspecify.annotations.Nullable Question questionOf(
+            com.google.gson.JsonElement element) {
+        if (!element.isJsonObject()) {
+            return null;
+        }
+        var obj = element.getAsJsonObject();
+        String text = stringField(obj, "question");
+        if (text == null) {
+            return null;
+        }
+        var header = stringField(obj, "header");
+        var multiple = obj.has("multiple") && obj.get("multiple").isJsonPrimitive()
+                && obj.get("multiple").getAsBoolean();
+        var options = new ArrayList<Question.Option>();
+        if (obj.has("options") && obj.get("options").isJsonArray()) {
+            for (var option : obj.getAsJsonArray("options")) {
+                if (option.isJsonPrimitive()) {
+                    options.add(new Question.Option(option.getAsString(), null));
+                } else if (option.isJsonObject()) {
+                    var o = option.getAsJsonObject();
+                    var label = stringField(o, "label");
+                    if (label != null) {
+                        options.add(new Question.Option(label, stringField(o, "description")));
+                    }
+                }
+            }
+        }
+        return new Question(header, text, List.copyOf(options), multiple);
+    }
+
+    /** A string field of a JSON object, or {@code null} if absent or not a string. */
+    private static @org.jspecify.annotations.Nullable String stringField(
+            com.google.gson.JsonObject obj, String field) {
+        return obj.has(field) && obj.get(field).isJsonPrimitive()
+                ? obj.get(field).getAsString()
+                : null;
+    }
+
+    /** The {@code id} parameter of a {@code skill} tool call, or {@code null}. */
+    private static @Nullable String parseSkillId(String arguments) {
         try {
             var parsed = new GsonBuilder().create().fromJson(arguments, Map.class);
             if (parsed != null) {
-                Object name = parsed.get("name");
-                return name == null ? null : String.valueOf(name);
+                Object id = parsed.get("id");
+                return id == null ? null : String.valueOf(id);
             }
         } catch (Exception e) {
             // fall through

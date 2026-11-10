@@ -61,7 +61,7 @@ class TurnSchedulerTest {
     void questionParksTheTurnAndTheAnswerResumesIt() throws Exception {
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("q1", "ask_user",
+            List.of(MockCompletions.tool("q1", "question",
                 "{\"question\":\"split?\",\"options\":[\"yes\",\"no\"]}")),
             ""));
         mock.thenRespond(MockCompletions.text("resumed"));
@@ -70,7 +70,7 @@ class TurnSchedulerTest {
         scheduler.setListener(listener);
 
         scheduler.submitPrompt("go", null, null, null);
-        assertTrue(listener.awaitPaused(10_000), "the ask_user pause must be reported");
+        assertTrue(listener.awaitPaused(10_000), "the question pause must be reported");
 
         scheduler.answer("yes");
         assertTrue(listener.awaitDoneContent("resumed", 10_000));
@@ -83,7 +83,7 @@ class TurnSchedulerTest {
     void promptsAreDeferredWhileAQuestionIsParked() throws Exception {
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("q1", "ask_user", "{\"question\":\"sure?\"}")), ""));
+            List.of(MockCompletions.tool("q1", "question", "{\"question\":\"sure?\"}")), ""));
         mock.thenRespond(MockCompletions.text("after question"));
         mock.thenRespond(MockCompletions.text("queued prompt answer"));
         var scheduler = new TurnScheduler(session, mock);

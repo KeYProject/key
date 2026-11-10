@@ -23,7 +23,7 @@ import org.jspecify.annotations.Nullable;
  * another turn is parked on a question or approval).</li>
  * <li>{@link ToolOutput} - a background tool call finished; resumes the parked turn of the
  * background job.</li>
- * <li>{@link QuestionAnswer} - the user answered an {@code ask_user} question; resumes the parked
+ * <li>{@link QuestionAnswer} - the user answered an {@code question} question; resumes the parked
  * question turn.</li>
  * <li>{@link ApprovalDecision} - the user decided on a tool approval; resumes the parked approval
  * turn.</li>
@@ -48,7 +48,7 @@ public final class TurnQueue {
     public record ToolOutput(String jobId, String content) implements Entry {
     }
 
-    /** The user answered an {@code ask_user} question. */
+    /** The user answered an {@code question} question. */
     public record QuestionAnswer(String answer) implements Entry {
     }
 

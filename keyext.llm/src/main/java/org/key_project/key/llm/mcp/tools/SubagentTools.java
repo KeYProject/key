@@ -18,10 +18,10 @@ import org.key_project.key.llm.mcp.ToolCategory;
 import org.key_project.key.llm.subagents.SubagentRegistry;
 
 /**
- * The {@code spawn_subagent} tool, the self-consultation tool {@code ask_llm} and the
- * observability counterpart {@code get_subagent_logs}. The {@code spawn_subagent} schema is
+ * The {@code subagent} delegation tool, the self-consultation tool {@code ask_llm} and the
+ * observability counterpart {@code get_subagent_logs}. The {@code subagent} schema is
  * advertised to the model, but the call itself is intercepted by the agent loop ({@code AgentLoop}
- * runs the sub-agent) - like {@code ask_user} and {@code use_skill}, a direct call only produces
+ * runs the sub-agent) - like {@code question} and {@code skill}, a direct call only produces
  * an explanatory placeholder. It requires user approval by default, because a sub-agent works
  * autonomously on its whole tool round. {@code ask_llm} is likewise intercepted by the agent loop
  * (and by the sub-agent child loops) so the nested one-shot completion never occupies the global
@@ -36,38 +36,39 @@ public final class SubagentTools implements AgentToolProvider {
     @Override
     public List<AgentTool> get() {
         var roleNames = SubagentRegistry.INSTANCE.roleNames();
-        return List.of(AgentTool.tool(KeYAgentTools.TOOL_SPAWN_SUBAGENT, ToolCategory.SUBAGENTS,
+        return List.of(AgentTool.tool(KeYAgentTools.TOOL_SUBAGENT, ToolCategory.SUBAGENTS,
             "Delegates a task to a sub-agent with a dedicated role. The sub-agent runs its own"
                 + " bounded tool loop with a role-specific system prompt and a restricted tool"
                 + " whitelist, and returns a summary. Available roles: "
-                + String.join(", ", roleNames) + ". Use \"mode\": \"sequential\" with a \"task\""
-                + " for one sub-agent, or \"mode\": \"parallel\" with a \"tasks\" array of"
-                + " independent tasks (run concurrently, capped by the max-parallel-sub-agents"
-                + " setting; only roles that allow parallel execution accept it). Delegation may"
-                + " take a while; this tool can run in the background, so you can keep asking"
-                + " questions while it works. Enabled only when the 'agent may spawn sub-agents'"
-                + " setting is on.",
+                + String.join(", ", roleNames)
+                + ". Pass a single \"prompt\" for one sub-agent, or a \"prompts\" array of"
+                + " independent prompts to run several sub-agents concurrently (capped by the"
+                + " max-parallel-sub-agents setting; only roles that allow parallel execution"
+                + " accept it). Delegation may take a while; this tool can run in the"
+                + " background, so you can keep asking questions while it works. Enabled only"
+                + " when the 'agent may spawn sub-agents' setting is on.",
             Tool.ApprovalRequirement.ASK,
-            AgentTool.schema("role",
+            AgentTool.schema("agent",
                 JsonSchema.builder().withType("string").withDescription("the sub-agent role")
                         .withEnum(roleNames).build(),
-                "task",
+                "description",
                 JsonSchema.builder().withType("string").withDescription(
-                    "the precise task the sub-agent should solve on its own (sequential"
-                        + " mode)").build(),
-                "tasks",
+                    "a short 3-5 word label of the delegation, shown in the chat activity and"
+                        + " the sub-agent log").build(),
+                "prompt",
+                JsonSchema.builder().withType("string").withDescription(
+                    "the precise task the sub-agent should solve on its own (single"
+                        + " delegation)").build(),
+                "prompts",
                 JsonSchema.builder().withType("array")
-                        .withDescription("independent tasks solved concurrently (parallel mode)")
+                        .withDescription("independent prompts solved concurrently (parallel"
+                            + " fan-out)")
                         .withItems(JsonSchema.builder().withType("string").build()).build(),
-                "mode",
-                JsonSchema.builder().withType("string")
-                        .withDescription("execution mode ('sequential' or 'parallel')")
-                        .withEnum(List.of("sequential", "parallel")).build(),
                 "model",
                 JsonSchema.builder().withType("string")
                         .withDescription("optional model override for the sub-agent").build()),
             true,
-            args -> "[spawn_subagent is handled by the agent loop; it cannot be called"
+            args -> "[subagent is handled by the agent loop; it cannot be called"
                 + " directly]"),
             AgentTool.tool(KeYAgentTools.TOOL_ASK_LLM, ToolCategory.SUBAGENTS,
                 "Sends the given \"prompt\" to a FRESH instance of the configured LLM - a"
@@ -97,7 +98,7 @@ public final class SubagentTools implements AgentToolProvider {
                 args -> "[ask_llm is handled by the agent loop; it cannot be called directly]"),
             AgentTool.tool(KeYAgentTools.TOOL_GET_SUBAGENT_LOGS, ToolCategory.SUBAGENTS,
                 "Lists the sub-agent runs recorded for the current session (newest first,"
-                    + " empty until spawn_subagent has been used): role, mode, timing, and per"
+                    + " empty until subagent has been used): role, mode, timing, and per"
                     + " task the status, the number of tool rounds and the tools that were"
                     + " called. Optional \"role\" filter and \"limit\".",
                 AgentTool.schema("limit",

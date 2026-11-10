@@ -25,7 +25,7 @@ import org.jspecify.annotations.Nullable;
  * name: optics
  * description: focus on arithmetic overflow proofs
  * enabled: true
- * allowedTools: [read_file]
+ * allowedTools: [read]
  * ---
  * Pay special attention to integer overflow; ...
  * </pre>

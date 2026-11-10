@@ -29,8 +29,8 @@ class AgentToolsTest {
         // the built-in set (16 tools) + list_tools + the test provider's tool
         assertTrue(agents.size() >= 18, "expected at least 18 tools, got: " + agents.size());
         for (var name : List.of(KeYAgentTools.TOOL_GET_PROOF_CONTEXT,
-            KeYAgentTools.TOOL_LIST_FILES, KeYAgentTools.TOOL_RUN_COMMAND,
-            KeYAgentTools.TOOL_ASK_USER, KeYAgentTools.TOOL_TRYCLOSE, KeYAgentTools.TOOL_AUTO,
+            KeYAgentTools.TOOL_GLOB, KeYAgentTools.TOOL_SHELL,
+            KeYAgentTools.TOOL_QUESTION, KeYAgentTools.TOOL_TRYCLOSE, KeYAgentTools.TOOL_AUTO,
             KeYAgentTools.TOOL_LIST_PROOFS, KeYAgentTools.TOOL_LIST_TACLETS,
             KeYAgentTools.TOOL_ADD_TACLET, KeYAgentTools.TOOL_LIST_TOOLS,
             TestAgentToolProvider.EXTRA_TOOL)) {
@@ -51,9 +51,9 @@ class AgentToolsTest {
         }
         // approval metadata: read-only tools are AUTO, the shell and taclet mutation are ASK
         assertEquals(Tool.ApprovalRequirement.AUTO,
-            tools.agent(KeYAgentTools.TOOL_READ_FILE).approval());
+            tools.agent(KeYAgentTools.TOOL_READ).approval());
         assertEquals(Tool.ApprovalRequirement.ASK,
-            tools.agent(KeYAgentTools.TOOL_RUN_COMMAND).approval());
+            tools.agent(KeYAgentTools.TOOL_SHELL).approval());
         assertEquals(Tool.ApprovalRequirement.ASK,
             tools.agent(KeYAgentTools.TOOL_ADD_TACLET).approval());
     }
@@ -80,7 +80,7 @@ class AgentToolsTest {
     @Test
     void toolsMarkdownRendersTheSameDocumentation() {
         var tools = new KeYAgentTools();
-        assertTrue(tools.toolsMarkdown().contains("### `" + KeYAgentTools.TOOL_READ_FILE + "`"));
+        assertTrue(tools.toolsMarkdown().contains("### `" + KeYAgentTools.TOOL_READ + "`"));
         // metadata stays live: the registry snapshot equals the per-tool markdown list
         assertEquals(tools.agents().size(), tools.toolsMarkdown().split("### `").length - 1);
     }
@@ -90,7 +90,7 @@ class AgentToolsTest {
         // the CLI output delegates to the same rendering as list_tools
         var doc = KeYAgentTools.cliDocumentation(false);
         assertTrue(doc.startsWith("# KeY-Agent tools"), "expected the Markdown document");
-        assertTrue(doc.contains("### `" + KeYAgentTools.TOOL_RUN_COMMAND + "`"));
+        assertTrue(doc.contains("### `" + KeYAgentTools.TOOL_SHELL + "`"));
         // --json prints the OpenAI-format definitions as a JSON array
         var json = KeYAgentTools.cliDocumentation(true);
         assertTrue(json.startsWith("["), "expected a JSON array");

@@ -38,36 +38,36 @@ class LlmMcpSettingsTest {
 
     @Test
     void metadataApprovalGovernsTheDefaultExport() {
-        // read_file is AUTO by metadata -> exported by default; run_command is ASK -> not
-        assertTrue(settings.isExportedToMCPByDefault(KeYAgentTools.TOOL_READ_FILE, true));
-        assertFalse(settings.isExportedToMCPByDefault(KeYAgentTools.TOOL_RUN_COMMAND, false));
+        // read is AUTO by metadata -> exported by default; shell is ASK -> not
+        assertTrue(settings.isExportedToMCPByDefault(KeYAgentTools.TOOL_READ, true));
+        assertFalse(settings.isExportedToMCPByDefault(KeYAgentTools.TOOL_SHELL, false));
     }
 
     @Test
     void approvalSettingsAdjustTheDefaultExport() {
         // an ASK tool the user approves without asking becomes exported by default
         settings.setAllowedToolsWithoutApproval(
-            new TreeSet<>(Set.of(KeYAgentTools.TOOL_RUN_COMMAND)));
-        assertTrue(settings.isExportedToMCPByDefault(KeYAgentTools.TOOL_RUN_COMMAND, false));
+            new TreeSet<>(Set.of(KeYAgentTools.TOOL_SHELL)));
+        assertTrue(settings.isExportedToMCPByDefault(KeYAgentTools.TOOL_SHELL, false));
 
         // an AUTO tool the user wants confirmed is no longer exported by default
-        settings.setAllowedToolsWithApproval(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ_FILE)));
-        assertFalse(settings.isExportedToMCPByDefault(KeYAgentTools.TOOL_READ_FILE, true));
+        settings.setAllowedToolsWithApproval(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ)));
+        assertFalse(settings.isExportedToMCPByDefault(KeYAgentTools.TOOL_READ, true));
 
         // a disabled tool is never exported by default
-        settings.setToolsDisabled(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ_FILE)));
-        assertFalse(settings.isExportedToMCPByDefault(KeYAgentTools.TOOL_READ_FILE, true));
+        settings.setToolsDisabled(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ)));
+        assertFalse(settings.isExportedToMCPByDefault(KeYAgentTools.TOOL_READ, true));
     }
 
     @Test
     void explicitExportChoicesBeatTheDefault() {
-        assertTrue(settings.isExportedToMCP(KeYAgentTools.TOOL_READ_FILE, true));
-        assertFalse(settings.isExportedToMCP(KeYAgentTools.TOOL_RUN_COMMAND, false));
+        assertTrue(settings.isExportedToMCP(KeYAgentTools.TOOL_READ, true));
+        assertFalse(settings.isExportedToMCP(KeYAgentTools.TOOL_SHELL, false));
 
-        settings.setMcpNotExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ_FILE)));
-        settings.setMcpExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_RUN_COMMAND)));
-        assertFalse(settings.isExportedToMCP(KeYAgentTools.TOOL_READ_FILE, true));
-        assertTrue(settings.isExportedToMCP(KeYAgentTools.TOOL_RUN_COMMAND, false));
+        settings.setMcpNotExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ)));
+        settings.setMcpExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_SHELL)));
+        assertFalse(settings.isExportedToMCP(KeYAgentTools.TOOL_READ, true));
+        assertTrue(settings.isExportedToMCP(KeYAgentTools.TOOL_SHELL, false));
     }
 
     @Test

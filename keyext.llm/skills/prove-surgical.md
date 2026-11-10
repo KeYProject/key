@@ -21,7 +21,7 @@ allowedTools:
   - unhide_sequent
   - focus_goal
   - auto
-  - ask_user
+  - question
 ---
 
 You are doing manual proof surgery on goals that resist the automatic strategies. All tools here

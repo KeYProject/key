@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The {@code edit_file} tool: exact search/replace on text files of the Java model directory,
+ * The {@code edit} tool: exact search/replace on text files of the Java model directory,
  * requiring user approval. The core {@link FileTools#applyEdit} semantics are tested headless on
  * a temporary file; the tool body itself resolves the model directory via the selected proof and
  * is thus only testable inside the running GUI.
@@ -35,24 +35,24 @@ class FileToolsEditTest {
     @Test
     void editFileToolMetadata() {
         var tools = new KeYAgentTools();
-        var tool = tools.agent(KeYAgentTools.TOOL_EDIT_FILE);
-        assertNotNull(tool, "edit_file must be registered");
+        var tool = tools.agent(KeYAgentTools.TOOL_EDIT);
+        assertNotNull(tool, "edit must be registered");
         assertEquals(ToolCategory.FILES, tool.category());
-        // modifying files must require user approval, like run_command
+        // modifying files must require user approval, like shell
         assertEquals(Tool.ApprovalRequirement.ASK, tool.approval());
         assertFalse(tool.backgroundable());
         var parameters = tool.parameters();
         assertNotNull(parameters.properties().get("path"));
-        assertNotNull(parameters.properties().get("old_string"));
-        assertNotNull(parameters.properties().get("new_string"));
-        assertNotNull(parameters.properties().get("replace_all"));
+        assertNotNull(parameters.properties().get("oldString"));
+        assertNotNull(parameters.properties().get("newString"));
+        assertNotNull(parameters.properties().get("replaceAll"));
         assertTrue(parameters.required().contains("path"));
-        assertTrue(parameters.required().contains("old_string"));
-        assertTrue(parameters.required().contains("new_string"));
+        assertTrue(parameters.required().contains("oldString"));
+        assertTrue(parameters.required().contains("newString"));
         // the tool documents itself
         var markdown = tool.toMarkdown();
-        assertTrue(markdown.contains("`old_string`"));
-        assertTrue(markdown.contains("`replace_all`"));
+        assertTrue(markdown.contains("`oldString`"));
+        assertTrue(markdown.contains("`replaceAll`"));
     }
 
     // ------------------------------------------------------- applyEdit semantics (core logic)
@@ -73,7 +73,7 @@ class FileToolsEditTest {
         var file = dir.resolve("Main.java");
         Files.writeString(file, "class Main {}\n");
         var result = FileTools.applyEdit(file, "src/Main.java", "not present", "x", false);
-        assertTrue(result.startsWith("Error: old_string not found"), result);
+        assertTrue(result.startsWith("Error: oldString not found"), result);
         assertEquals("class Main {}\n", Files.readString(file, StandardCharsets.UTF_8),
             "the file must stay untouched");
     }
@@ -83,7 +83,7 @@ class FileToolsEditTest {
         var file = dir.resolve("Main.java");
         Files.writeString(file, "a b a b\n");
         var ambiguous = FileTools.applyEdit(file, "Main.java", "a", "x", false);
-        assertTrue(ambiguous.startsWith("Error: old_string occurs 2 times"), ambiguous);
+        assertTrue(ambiguous.startsWith("Error: oldString occurs 2 times"), ambiguous);
         assertEquals("a b a b\n", Files.readString(file, StandardCharsets.UTF_8),
             "the file must stay untouched");
 

@@ -22,9 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests sub-agent delegation through {@code spawn_subagent}: the nested loop executes the child's
+ * Tests sub-agent delegation through {@code subagent}: the nested loop executes the child's
  * tool calls and returns its final answer, the role whitelist blocks foreign tools, the settings
- * gate and the depth guard stop unwanted delegations, and parallel mode fans out over a tasks
+ * gate and the depth guard stop unwanted delegations, and parallel fan-out over a prompts array
  * array (only for roles that allow it, with a thread-safe client expectation).
  */
 class SubagentLoopTest {
@@ -51,8 +51,8 @@ class SubagentLoopTest {
         LlmSettings.INSTANCE.setSubagentsEnabled(true);
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"echo-role\",\"task\":\"say hi\",\"mode\":\"sequential\"}")),
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"echo-role\",\"prompt\":\"say hi\"}")),
             ""));
         mock.thenRespond(MockCompletions.toolCalls(
             List.of(MockCompletions.tool("c1", TestMcpToolProvider.ECHO, "{\"x\":1}")), ""));
@@ -88,8 +88,8 @@ class SubagentLoopTest {
         LlmSettings.INSTANCE.setSubagentsEnabled(true);
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"echo-role\",\"task\":\"x\"}")),
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"echo-role\",\"prompt\":\"x\"}")),
             ""));
         // the (misbehaving) child tries a tool outside its whitelist
         mock.thenRespond(MockCompletions.toolCalls(
@@ -116,8 +116,8 @@ class SubagentLoopTest {
         // subagentsEnabled is false from setUp
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"echo-role\",\"task\":\"x\"}")),
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"echo-role\",\"prompt\":\"x\"}")),
             ""));
         mock.thenRespond(MockCompletions.text("understood"));
 
@@ -137,8 +137,8 @@ class SubagentLoopTest {
         LlmSettings.INSTANCE.setSubagentsEnabled(true);
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"no-such-role\",\"task\":\"x\"}")),
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"no-such-role\",\"prompt\":\"x\"}")),
             ""));
         mock.thenRespond(MockCompletions.text("fine"));
 
@@ -158,12 +158,12 @@ class SubagentLoopTest {
         LlmSettings.INSTANCE.setMaxSubagentDepth(1); // children may not spawn children
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"spawner-role\",\"task\":\"delegate deep\"}")),
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"spawner-role\",\"prompt\":\"delegate deep\"}")),
             ""));
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s2", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"spawner-role\",\"task\":\"deeper\"}")),
+            List.of(MockCompletions.tool("s2", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"spawner-role\",\"prompt\":\"deeper\"}")),
             ""));
         mock.thenRespond(MockCompletions.text("done"));
         mock.thenRespond(MockCompletions.text("ok"));
@@ -210,25 +210,27 @@ class SubagentLoopTest {
     }
 
     @Test
-    void parallelRequiresTasksArray() {
+    void singlePromptWithParallelRoleRunsSequentially() {
         LlmSettings.INSTANCE.setSubagentsEnabled(true);
         var mock = new MockCompletions();
-        // mode parallel but only a single 'task', no 'tasks' array
+        // a parallel-capable role addressed with a single prompt runs sequentially
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"echo-role\",\"task\":\"x\",\"mode\":\"parallel\"}")),
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"echo-role\",\"prompt\":\"x\"}")),
             ""));
+        mock.thenRespond(MockCompletions.text("KEY_AGENT_RESULT {\"summary\":\"ok\"}"));
         mock.thenRespond(MockCompletions.text("ok"));
 
         var loop = new AgentLoop(session, mock);
         AgentResult result = loop.begin("delegate", null, null, null);
 
         assertInstanceOf(AgentResult.Done.class, result);
-        assertTrue(TestMcpToolProvider.EXECUTED.isEmpty());
-        var lastMessages = mock.sent.get(1).messages();
+        var lastMessages = mock.sent.get(2).messages();
         var toolMsg = (Map<String, Object>) lastMessages.get(lastMessages.size() - 1);
-        assertTrue(String.valueOf(toolMsg.get("content")).contains("tasks"),
-            "parallel mode without a tasks array must be rejected");
+        var content = String.valueOf(toolMsg.get("content"));
+        assertTrue(content.contains("sub-agent 'echo-role' finished"),
+            "a single prompt must run sequentially, got: " + content);
+        assertFalse(content.contains("parallel run"), content);
     }
 
     @Test
@@ -257,8 +259,8 @@ class SubagentLoopTest {
         var mock = new MockCompletions();
         // the built-in rule-designer is flagged sequential-only
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"rule-designer\",\"task\":\"x\",\"mode\":\"parallel\"}")),
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"rule-designer\",\"prompt\":\"x\",\"prompts\":[\"a\",\"b\"]}")),
             ""));
         mock.thenRespond(MockCompletions.text("ok"));
 
@@ -276,8 +278,8 @@ class SubagentLoopTest {
         LlmSettings.INSTANCE.setSubagentsEnabled(true);
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"echo-role\",\"task\":\"say hi\",\"mode\":\"sequential\"}")),
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"echo-role\",\"prompt\":\"say hi\"}")),
             ""));
         mock.thenRespond(MockCompletions.toolCalls(
             List.of(MockCompletions.tool("c1", TestMcpToolProvider.ECHO, "{\"x\":1}")), ""));
@@ -339,8 +341,8 @@ class SubagentLoopTest {
         LlmSettings.INSTANCE.setSubagentsEnabled(true);
         var mock = new MockCompletions();
         mock.thenRespond(MockCompletions.toolCalls(
-            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                "{\"role\":\"echo-role\",\"task\":\"loop\",\"mode\":\"sequential\"}")),
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"echo-role\",\"prompt\":\"loop\"}")),
             ""));
         for (int i = 1; i <= 4; i++) { // echo-role's budget is 4 tool rounds
             mock.thenRespond(MockCompletions.toolCalls(
@@ -433,13 +435,12 @@ class SubagentLoopTest {
                 }
                 return spawnNesting
                         ? MockCompletions.toolCalls(List.of(MockCompletions.tool("s1",
-                            KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                            "{\"role\":\"parallel-spawner-role\",\"tasks\":[\"nest\"],"
-                                + "\"mode\":\"parallel\"}")),
+                            KeYAgentTools.TOOL_SUBAGENT,
+                            "{\"agent\":\"parallel-spawner-role\",\"prompts\":[\"nest\"]}")),
                             "")
                         : MockCompletions.toolCalls(List.of(MockCompletions.tool("s1",
-                            KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                            "{\"role\":\"echo-role\",\"tasks\":[\"A1\",\"B1\"],\"mode\":\"parallel\"}")),
+                            KeYAgentTools.TOOL_SUBAGENT,
+                            "{\"agent\":\"echo-role\",\"prompts\":[\"A1\",\"B1\"]}")),
                             "");
             }
             if (user.startsWith("A")) {
@@ -454,8 +455,8 @@ class SubagentLoopTest {
             if (user.startsWith("nest")) {
                 return perTask.merge("nest", 1, Integer::sum) == 1
                         ? MockCompletions.toolCalls(List.of(MockCompletions.tool("n1",
-                            KeYAgentTools.TOOL_SPAWN_SUBAGENT,
-                            "{\"role\":\"spawner-role\",\"task\":\"deeper\"}")), "")
+                            KeYAgentTools.TOOL_SUBAGENT,
+                            "{\"agent\":\"spawner-role\",\"prompt\":\"deeper\"}")), "")
                         : MockCompletions.text("nest done");
             }
             return MockCompletions.text("all done");

@@ -8,15 +8,15 @@ allowedTools:
   - list_branches
   - list_proofs
   - assert_open_goals
-  - list_files
-  - read_file
-  - file_info
+  - glob
+  - read
+
   - tryclose
   - auto
   - run_macro
   - run_smt
   - simplify_goal
-  - ask_user
+  - question
 ---
 
 You are proving with KeY. Work strictly in this order and stop as soon as the proof is closed:
@@ -26,7 +26,7 @@ You are proving with KeY. Work strictly in this order and stop as soon as the pr
    labels and leading formulas. If several proofs are loaded, `list_proofs` tells you which one
    is selected; address another proof only on request (parameter `proof`).
 2. **Understand before running.** If the goal mentions classes or methods you have not seen, use
-   `list_files` and `read_file` on the Java model first — the proof obligation usually becomes
+   `glob` and `read` on the Java model first — the proof obligation usually becomes
    obvious from the source and its specifications.
 3. **Escalate the automation:**
    1. `tryclose` on the targeted goal — cheap, finishes trivial goals.
@@ -53,4 +53,4 @@ Notes:
 - `simplify_goal` applies the one-step simplifier (`oss`) to exactly one goal; use it to clean up
   a sequent before reading it, never as a proof attempt.
 - If the goal seems unprovable as stated (e.g. wrong specification), say so and ask the user via
-  `ask_user` instead of hammering the automation.
+  `question` instead of hammering the automation.

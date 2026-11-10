@@ -318,7 +318,7 @@ public class LlmSettings extends AbstractPropertiesSettings {
         this.askLlmEnabled.set(enabled);
     }
 
-    /** Whether the agent may delegate tasks to sub-agents ({@code spawn_subagent}). */
+    /** Whether the agent may delegate tasks to sub-agents ({@code subagent}). */
     public boolean getSubagentsEnabled() {
         return subagentsEnabled.get();
     }
@@ -346,7 +346,7 @@ public class LlmSettings extends AbstractPropertiesSettings {
     }
 
     /**
-     * Maximum number of sub-agents that run concurrently in one parallel {@code spawn_subagent}
+     * Maximum number of sub-agents that run concurrently in one parallel {@code subagent}
      * call (the pool size; additional tasks queue and run as workers finish).
      */
     public int getMaxParallelSubagents() {

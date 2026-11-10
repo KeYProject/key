@@ -24,7 +24,7 @@ import java.util.function.Supplier;
  * wrapping the tool error). Used by the agent loop, which polls the future so it can honor
  * cancellation and user-initiated backgrounding while the call runs.</li>
  * <li>{@link #submitTask(Supplier)} - asynchronous execution of an arbitrary task <em>without</em>
- * the dispatch lock; used for {@code spawn_subagent}, whose children acquire the lock themselves
+ * the dispatch lock; used for {@code subagent}, whose children acquire the lock themselves
  * per child tool call (holding it across the whole delegation would deadlock parallel
  * fan-out).</li>
  * <li>{@link #callNow(LlmSession, String, String)} - synchronous serialized dispatch; used by the

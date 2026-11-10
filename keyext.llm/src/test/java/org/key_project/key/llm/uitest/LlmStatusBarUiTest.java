@@ -109,7 +109,7 @@ class LlmStatusBarUiTest {
             assertTrue(names.contains(KeYAgentTools.TOOL_LIST_PROOFS),
                 "exported auto-approved tools must be served, got " + names);
             assertTrue(names.contains(TestAgentToolProvider.EXTRA_TOOL));
-            assertFalse(names.contains(KeYAgentTools.TOOL_RUN_COMMAND),
+            assertFalse(names.contains(KeYAgentTools.TOOL_SHELL),
                 "ask-approved tools must stay hidden, got " + names);
 
             var result = client.callTool(McpSchema.CallToolRequest

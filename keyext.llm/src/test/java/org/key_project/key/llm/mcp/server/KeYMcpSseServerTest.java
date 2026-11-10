@@ -80,9 +80,9 @@ class KeYMcpSseServerTest {
                 "auto-approved agents must be exported by default, got " + names);
             assertTrue(names.contains(KeYAgentTools.TOOL_GET_PROOF_CONTEXT),
                 "auto-approved proof tools must be exported by default, got " + names);
-            assertFalse(names.contains(KeYAgentTools.TOOL_READ_FILE),
+            assertFalse(names.contains(KeYAgentTools.TOOL_READ),
                 "standard tools must never be exported, got " + names);
-            assertFalse(names.contains(KeYAgentTools.TOOL_RUN_COMMAND),
+            assertFalse(names.contains(KeYAgentTools.TOOL_SHELL),
                 "ASK tools must not be exported by default");
 
             var result = client.callTool(McpSchema.CallToolRequest
@@ -138,7 +138,7 @@ class KeYMcpSseServerTest {
                 .filter(t -> t.name().equals(KeYAgentTools.TOOL_ADD_TACLET)).findFirst()
                 .orElseThrow();
         var readFile = tools.agents().stream()
-                .filter(t -> t.name().equals(KeYAgentTools.TOOL_READ_FILE)).findFirst()
+                .filter(t -> t.name().equals(KeYAgentTools.TOOL_READ)).findFirst()
                 .orElseThrow();
 
         // metadata default for KeY-specific tools: AUTO tools are exported, ASK tools are not
@@ -148,7 +148,7 @@ class KeYMcpSseServerTest {
         // standard tools are private to the chat panel and can never be exported
         assertFalse(KeYMcpSseServer.isExported(readFile));
         LlmSettings.INSTANCE
-                .setMcpExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ_FILE)));
+                .setMcpExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ)));
         assertFalse(KeYMcpSseServer.isExported(readFile),
             "a standard tool must stay off the MCP server even when explicitly selected");
         LlmSettings.INSTANCE.setMcpExportedTools(new TreeSet<>());

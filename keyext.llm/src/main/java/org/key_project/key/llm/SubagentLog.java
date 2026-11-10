@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * A bounded, thread-safe record of finished sub-agent runs of one {@link LlmSession}, for
  * observability: the {@code get_subagent_logs} tool renders it for the model, and the chat panel
- * shows the newest run's per-task lines indented under the {@code spawn_subagent} activity.
+ * shows the newest run's per-task lines indented under the {@code subagent} activity.
  * <p>
  * Runs are stored oldest first and pruned from the head once the capacity is exceeded. The
  * sequence numbers are monotonically increasing and never reused, so a caller can snapshot the
@@ -52,7 +52,7 @@ public class SubagentLog {
             String outcome) {
     }
 
-    /** One finished {@code spawn_subagent} call: roles, mode, timing and the per-task outcomes. */
+    /** One finished {@code subagent} call: roles, mode, timing and the per-task outcomes. */
     public record SubagentRun(long seq, String role, String mode, long startedAt, long durationMs,
             List<SubagentTask> tasks) {
     }
