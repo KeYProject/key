@@ -47,6 +47,10 @@ import org.jspecify.annotations.Nullable;
  * {@code write} creates or overwrites files; both require user approval)</li>
  * <li>{@code shell} - executes a shell command in the model directory (blocklist + user
  * approval required)</li>
+ * <li>{@code webfetch} / {@code websearch} - fetch a web page (HTML to Markdown) and search the
+ * web via the configured search endpoint (automatic approval)</li>
+ * <li>{@code execute} - evaluates a code snippet in an embedded JShell with a {@code tools}
+ * facade (user approval required)</li>
  * <li>{@code question} - asks the user a question (intercepted by the agent loop)</li>
  * <li>{@code tryclose} - applies the {@code tryclose} proof-script command (TryClose macro) to a
  * goal, a branch or all open goals</li>
@@ -74,6 +78,9 @@ public final class KeYAgentTools implements McpClient {
     public static final String TOOL_WRITE = "write";
     public static final String TOOL_GREP = "grep";
     public static final String TOOL_SHELL = "shell";
+    public static final String TOOL_WEBFETCH = "webfetch";
+    public static final String TOOL_WEBSEARCH = "websearch";
+    public static final String TOOL_EXECUTE = "execute";
     public static final String TOOL_QUESTION = "question";
     public static final String TOOL_SKILL = "skill";
     public static final String TOOL_SUBAGENT = "subagent";

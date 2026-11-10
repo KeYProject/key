@@ -31,6 +31,15 @@ public record JsonSchema(
         @JsonProperty("items") JsonSchema items,
         @JsonProperty("enum") List<String> enumValues,
         @JsonProperty("description") String description) {
+
+    /**
+     * The required property names; empty when none are declared (never {@code null}).
+     */
+    @Override
+    public List<String> required() {
+        return required == null ? List.of() : required;
+    }
+
     /**
      * Creates an empty JSON Schema (defaults to an object type).
      */

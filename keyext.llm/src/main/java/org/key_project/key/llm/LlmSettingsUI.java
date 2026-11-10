@@ -142,6 +142,21 @@ public class LlmSettingsUI extends SettingsPanel {
                 Arrays.stream(s.split("\n")).map(String::strip).filter(x -> !x.isBlank())
                         .toList()));
 
+        addSeparator("Web & scripting");
+        addTextField("Web search endpoint", model.getWebSearchEndpoint(),
+            "The HTML search endpoint the websearch tool queries (no API key needed;"
+                + " default: DuckDuckGo Lite).",
+            model::setWebSearchEndpoint);
+        addIntField("Execute timeout (seconds)", "", model::getExecuteTimeoutSeconds,
+            model::setExecuteTimeoutSeconds);
+        addIntField("Execute max output chars", "", model::getExecuteMaxOutputChars,
+            model::setExecuteMaxOutputChars);
+        addCheckBox("Unrestricted execute",
+            "Let the execute tool run snippets without the safety gate: full JVM and classpath"
+                + " access instead of only the tools facade. There is no true confinement either"
+                + " way; approval is still required for every call.",
+            model.getUnrestrictedExecute(), model::setUnrestrictedExecute);
+
         addSeparator("MCP server");
         addCheckBox("Enable MCP server (SSE)",
             "Expose the KeY-Agent tool set to other processes over the Model Context Protocol"
