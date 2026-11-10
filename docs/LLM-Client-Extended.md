@@ -111,18 +111,20 @@ boolean hasPendingQuestion(); boolean hasPendingApproval();
 | Variant | Meaning |
 |---|---|
 | `Done(content, activities)` | final answer plus `ToolActivity` summaries (`ToolActivity(name, arguments, result)`) |
-| `NeedsInput(Question)` | the `ask_user` tool fired; resume with `answerQuestion` |
+| `NeedsInput(Question)` | the `question` tool fired; resume with `answerQuestion` |
 | `NeedsApproval(ToolCallInfo)` | a tool needs approval; resume with `decideApproval` |
 | `Failed(Throwable)` | turn aborted (HTTP error, disabled tool, …) |
 
-Tool dispatch details (`AgentLoop.processBatch`): `ask_user` and `use_skill` are intercepted
+Tool dispatch details (`AgentLoop.processBatch`): `question` and `skill` are intercepted
 by the loop itself (gated by the settings `allowAgentQuestions` / `agentCanUseSkills`);
-`spawn_subagent` is intercepted, too (gated by `subagentsEnabled`) and runs a bounded child
+`subagent` is intercepted, too (gated by `subagentsEnabled`) and runs a bounded child
 loop via `SubagentRunner` (role whitelist + depth guard; `mode: parallel` fans out a `tasks`
 array over a pool, serializing tool dispatch globally — see `docs/subagents.md`); `ask_llm`
 is intercepted the same way (gated by `askLlmEnabled`) and `AskLlmRunner` sends a fresh
 one-shot completion with a clean context (no history, no tools), returning the reply as the
-tool result. Both intercepted calls run **outside** the global dispatch lock, so an LLM
+tool result; `execute` is intercepted as well and `ScriptingTools.run` evaluates the Java
+snippet in an embedded JShell with the `tools` facade. The intercepted calls run **outside**
+the global dispatch lock, so an LLM
 round-trip never stalls parallel sub-agents or other sessions' tool calls — and since they
 never dispatch tools themselves, no nested locking is possible. Every
 other call goes through `session.getMcpClient()`. If `requiresApproval(name)` holds, the loop
@@ -223,11 +225,14 @@ public interface McpToolProvider {
 * `KeYAgentTools` (registered via `KeYAgentToolsProvider`) aggregates the built-in tools,
   which are contributed by `AgentToolProvider`s discovered through the Java `ServiceLoader`
   (service file `META-INF/services/...AgentToolProvider`; providers live in
-  `org.key_project.key.llm.mcp.tools`): `get_proof_context`, `list_files`, `read_file`,
-  `edit_file` (exact search/replace, requires approval), `file_info`, `run_command` (gated by
+  `org.key_project.key.llm.mcp.tools`): `get_proof_context`, `glob`, `read`, `edit`
+  (exact search/replace, requires approval), `write` (create/overwrite, requires approval),
+  `grep`, `shell` (gated by
   `ShellSafetyPolicy` blocklist, timeout and output
-  caps), `ask_user`, `use_skill`, the delegation and self-consultation tools
-  `spawn_subagent`, `get_subagent_logs`, `ask_llm` (intercepted by the agent loop; see
+  caps), `webfetch`, `websearch`, `execute` (Java snippet in an embedded JShell with the
+  `tools` facade, intercepted by the agent loop; see `key-agent-doc.md` section 7.4),
+  `question`, `skill`, the delegation and self-consultation tools
+  `subagent`, `get_subagent_logs`, `ask_llm` (intercepted by the agent loop; see
   `docs/subagents.md`), the proof-script tools `tryclose` and `auto`, and the
   taclet-management tools `list_proofs`, `list_taclets`, `list_taclet_options`,
   `export_taclet`, `export_taclets` (bounded bulk export), `add_taclet` / `remove_taclet`
@@ -349,7 +354,7 @@ Approvals made here carry over to the chat (and vice versa) because both read th
 | `LlmSettingsUI` | main settings page incl. *Fetch Models* (`SwingWorker`, timeouts in `Util`, HTTP status in the error dialog) |
 | `LlmToolsPanel` | per-tool approval/disablement table |
 | `LibraryEditorPanel` + editors | lightweight library editing: file list, template creation via *New*, external editing via *Edit*, `Delete`/`Reload`/export/import and the search path editor |
-| `SubagentRunner` + `subagents.*` | sequential + parallel sub-agent delegation (`spawn_subagent` child loop, role registry/whitelist, depth guard, parallel fan-out with serialized tool dispatch); see `docs/subagents.md` |
+| `SubagentRunner` + `subagents.*` | sequential + parallel sub-agent delegation (`subagent` child loop, role registry/whitelist, depth guard, parallel fan-out with serialized tool dispatch); see `docs/subagents.md` |
 | `AskLlmRunner` | fresh one-shot completion behind `ask_llm` (clean context, no tools; intercepted by the agent loop and the sub-agent child loop, runs without the dispatch lock) |
 | `SubagentLog` | per-session, bounded record of sub-agent runs (role, mode, per-task status/tools), exposed via the `get_subagent_logs` tool and rendered in the chat panel's tool-activity summary |
 
