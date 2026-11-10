@@ -10,16 +10,17 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
-import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
- * Construct for re-attaching a loop invariant that otherwise would get lost after a transformation,
- * for instance, the loop scope-based unwinding rule. Copied from the 2015 TimSort tweaks branch (by
- * DS), original work by Richard. Changed extraction of active statement to also work with labeled
- * loops.
+ * Construct for re-attaching a loop invariant that otherwise would get lost after a
+ * transformation, for instance, the loop scope-based unwinding rule or the block-elimination
+ * taclets (which rebuild the loop node from the taclet pattern). The invariant is taken from the
+ * loop that is the active statement of the match context, so the taclet must match the loop it
+ * re-builds as the active statement. Copied from the 2015 TimSort tweaks branch (by DS), original
+ * work by Richard. Changed extraction of active statement to also work with labeled loops.
  *
  * @author Richard Bubel
  */
@@ -45,8 +46,8 @@ public class ReattachLoopInvariant extends ProgramTransformer {
             LoopSpecification li = loop.getLoopInvariant();
 
             if (li != null) {
-                li = li.setLoop((While) pe);
-                ((While) pe).setLoopInvariant(li);
+                li = li.setLoop((LoopStatement) pe);
+                ((LoopStatement) pe).setLoopInvariant(li);
             }
         }
 
