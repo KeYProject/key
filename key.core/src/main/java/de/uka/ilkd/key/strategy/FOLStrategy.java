@@ -457,13 +457,6 @@ public class FOLStrategy extends AbstractFeatureStrategy implements ComponentStr
             applyTF(buf, ff.quantifiedFor));
     }
 
-    protected Feature notBelowQuantifier() {
-        final TermBuffer superFor = new TermBuffer();
-        return or(TopLevelFindFeature.ANTEC_OR_SUCC,
-            sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
-                not(applyTF(superFor, OperatorClassTF.create(Quantifier.class)))));
-    }
-
     private void setupReplaceKnown(RuleSetDispatchFeature d) {
         final Feature commonF =
             add(ifZero(MatchedAssumesFeature.INSTANCE, DiffFindAndIfFeature.INSTANCE),
