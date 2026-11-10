@@ -41,9 +41,10 @@ import org.jspecify.annotations.Nullable;
  * The built-in tools provided by {@code keyext.llm}:
  * <ul>
  * <li>{@code get_proof_context} - the current proof state as a text block</li>
- * <li>{@code glob} / {@code read} / {@code edit} - bounded, sandboxed access to the files of the
- * current Java model ({@code glob} matches glob patterns, {@code read} reads a bounded line
- * range, {@code edit} performs an exact string replacement and requires user approval)</li>
+ * <li>{@code glob} / {@code read} / {@code edit} / {@code write} / {@code grep} - bounded,
+ * sandboxed access to the files of the current Java model ({@code glob} matches glob patterns,
+ * {@code grep} searches text files, {@code edit} performs an exact string replacement and
+ * {@code write} creates or overwrites files; both require user approval)</li>
  * <li>{@code shell} - executes a shell command in the model directory (blocklist + user
  * approval required)</li>
  * <li>{@code question} - asks the user a question (intercepted by the agent loop)</li>
@@ -70,6 +71,8 @@ public final class KeYAgentTools implements McpClient {
     public static final String TOOL_GLOB = "glob";
     public static final String TOOL_READ = "read";
     public static final String TOOL_EDIT = "edit";
+    public static final String TOOL_WRITE = "write";
+    public static final String TOOL_GREP = "grep";
     public static final String TOOL_SHELL = "shell";
     public static final String TOOL_QUESTION = "question";
     public static final String TOOL_SKILL = "skill";
