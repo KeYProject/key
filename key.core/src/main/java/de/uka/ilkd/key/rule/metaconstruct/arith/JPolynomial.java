@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 import java.util.Iterator;
-import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -19,6 +18,7 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
+import org.key_project.util.GenerationalCache;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -31,7 +31,7 @@ public class JPolynomial {
     }
 
     public static Polynomial create(Term polyTerm, Services services) {
-        final Map<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
+        final GenerationalCache<Term, Polynomial> cache = services.getCaches().getPolynomialCache();
         polyTerm = TermLabelManager.removeIrrelevantLabels((JTerm) polyTerm,
             services);
 
@@ -39,7 +39,7 @@ public class JPolynomial {
 
         if (res == null) {
             res = createHelp(polyTerm, services);
-            cache.put(polyTerm, res);
+            cache.putIfAbsent(polyTerm, res);
         }
         return res;
     }

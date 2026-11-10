@@ -6,7 +6,6 @@ package de.uka.ilkd.key.rule.metaconstruct.arith;
 
 import java.math.BigInteger;
 import java.util.Iterator;
-import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -18,6 +17,7 @@ import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
+import org.key_project.util.GenerationalCache;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -29,7 +29,8 @@ public class JMonomial {
 
     public static Monomial create(Term monoTerm, LogicServices p_services) {
         final Services services = (Services) p_services;
-        final Map<Term, Monomial> monomialCache = services.getCaches().getMonomialCache();
+        final GenerationalCache<Term, Monomial> monomialCache =
+            services.getCaches().getMonomialCache();
         monoTerm = TermLabelManager.removeIrrelevantLabels((JTerm) monoTerm,
             services);
         // ConcurrentLruCache: get/put are individually atomic, no external lock needed.
@@ -37,7 +38,7 @@ public class JMonomial {
 
         if (res == null) {
             res = createHelp(monoTerm, services);
-            monomialCache.put(monoTerm, res);
+            monomialCache.putIfAbsent(monoTerm, res);
         }
         return res;
     }

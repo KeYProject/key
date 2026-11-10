@@ -11,46 +11,53 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.strategy.feature.JavaFeatureConstants;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.SeqEqualLengthFeature;
 import de.uka.ilkd.key.strategy.feature.SeqSameBasesFeature;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature.PrefixChecker;
-import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy;
+import org.key_project.prover.strategy.FeatureConstants;
 import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.FindDepthFeature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.strategy.SeqCost.*;
+import static de.uka.ilkd.key.strategy.StaticFeatureCollection.directlyBelowSymbolAtIndex;
 
 /// Strategy for reasoning about sequences
-public class SeqStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class SeqStrategy extends JavaAbstractFeatureStrategy implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("Sequence Strategy");
 
     private final SeqTermFeatures tf;
     private final RuleSetDispatchFeature costDispatcher;
     private final RuleSetDispatchFeature approvalDispatcher;
     private final boolean stopAtFirstNonCloseableGoal;
+    private final FeatureConstants<Goal> fc = new JavaFeatureConstants();
+    private final FormulaTermFeatures ff;
 
     public SeqStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
         final TypeConverter types = getServices().getTypeConverter();
+        ff = new FormulaTermFeatures(new JavaArithTermFeatures(types.getIntegerLDT()));
         tf = new SeqTermFeatures(types.getSeqLDT(), types.getPSeqLDT(), types.getIntegerLDT(),
             types.getBooleanLDT());
         costDispatcher = setupCostDispatcher();
@@ -62,7 +69,7 @@ public class SeqStrategy extends AbstractFeatureStrategy implements ComponentStr
 
     private RuleSetDispatchFeature setupCostDispatcher() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
-        final ProjectionToTerm<Goal> focus = FocusProjection.INSTANCE;
+        final ProjectionToTerm focus = FocusProjection.create();
 
         // === Rewriting Defaults ===
 
@@ -128,7 +135,7 @@ public class SeqStrategy extends AbstractFeatureStrategy implements ComponentStr
         // Hence, it should be done late if both sequences are built from the same base sequences
         // (as they usually share then some of the element numbers).
         // Otherwise, it should only be used as a last resort if nothing else can be done anymore.
-        bindRuleSet(d, "seqPermCount", add(focusInSuccedent, notBelowQuantifier(),
+        bindRuleSet(d, "seqPermCount", add(focusInSuccedent, notBelowQuantifier(fc, ff),
             ifZero(SeqSameBasesFeature.create(tf), CostBand.DEFER_STRONG.cost(),
                 CostBand.LAST_RESORT.cost())));
 
@@ -141,13 +148,13 @@ public class SeqStrategy extends AbstractFeatureStrategy implements ComponentStr
             add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(AXIOM_LIKE)));
 
         bindRuleSet(d, "seqNPermProperties", add(NonDuplicateAppModPositionFeature.INSTANCE,
-            notBelowQuantifier(), longConst(AXIOM_LIKE)));
+            notBelowQuantifier(fc, ff), longConst(AXIOM_LIKE)));
     }
 
     /// The returned feature checks that the focus term is a `seqGet` that appears as top level
     /// on one side of an equation and the sequence it queries is not concrete.
     private Feature isReadFromSymbolicSequenceInEquation() {
-        return add(applyTF(sub(FocusProjection.INSTANCE, 0), not(tf.concreteSeq)),
+        return add(applyTF(sub(FocusProjection.create(), 0), not(tf.concreteSeq)),
             or(directlyBelowSymbolAtIndex(Equality.EQUALS, 0),
                 directlyBelowSymbolAtIndex(Equality.EQUALS, 1)));
     }
@@ -215,7 +222,7 @@ public class SeqStrategy extends AbstractFeatureStrategy implements ComponentStr
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule<Goal> rule) {
         return false;
     }
 }

@@ -43,7 +43,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
     protected final IFormulaTermFeatures ff;
 
-    final FeatureConstants<G> fc;
+    protected final FeatureConstants<G> fc;
 
     public FOLStrategy(IFormulaTermFeatures ff,
             FeatureConstants<G> featureConstants, Feature globalF) {
@@ -238,7 +238,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
         bindRuleSet(d, "conjNormalForm",
             ifZero(
-                add(or(FocusInAntecFeature.getInstance(), notBelowQuantifier()),
+                add(or(FocusInAntecFeature.getInstance(), notBelowQuantifier(fc, ff)),
                     fc.notInScopeOfModalityFeature()),
                 add(longConst(CombinationCost.CNF_CONVERSION),
                     ScaleFeature.createScaled(FindDepthFeature.getInstance(), 20)),
@@ -457,7 +457,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                     .createSum(
                         not(fc.topLevelFindAntecOrSuccWithUpdate()),
                         fc.allowedCutPositions(),
-                        ifZero(notBelowQuantifier(),
+                        ifZero(notBelowQuantifier(fc, ff),
                             add(
                                 applyTF(cutFormula, add(ff.cutAllowed(),
                                     // do not cut over formulas containing
@@ -487,7 +487,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
             sum(subFor, fc.allowedCutPositionsGenerator(), compareCutAllowed);
 
         bindRuleSet(d, "cut_direct", add(allowSplitting(FocusFormulaProjection.create()),
-            ifZero(notBelowQuantifier(), noBetterCut)));
+            ifZero(notBelowQuantifier(fc, ff), noBetterCut)));
     }
 
     // //////////////////////////////////////////////////////////////////////////

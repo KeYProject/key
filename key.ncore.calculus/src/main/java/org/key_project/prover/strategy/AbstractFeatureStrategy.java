@@ -90,6 +90,10 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
 
     protected abstract Feature isBelow(TermFeature t);
 
+    protected Feature notBelowQuantifier(FeatureConstants<G> fc, IFormulaTermFeatures ff) {
+        return or(fc.topLevelFindAntecOrSucc(), not(isBelow(ff.quantifierF())));
+    }
+
     @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio,
             G goal,
