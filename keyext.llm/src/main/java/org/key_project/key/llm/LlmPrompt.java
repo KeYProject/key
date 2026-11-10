@@ -109,6 +109,8 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
     private final JLabel hint = new JLabel();
     /** The print mode last shown in the hint (to avoid redundant label updates). */
     private @Nullable PrintMode lastHintMode;
+    /** Restores the default hint after a transient message (see {@link #flashHint}). */
+    private @Nullable Timer hintTimer;
 
     public LlmPrompt(MainWindow mainWindow, @NonNull KeYMediator mediator) {
         this.mainWindow = mainWindow;
@@ -156,8 +158,23 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
         txtInput.getActionMap().put("sendPrompt", sendAction);
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(sendStroke, "sendPrompt");
         getActionMap().put("sendPrompt", sendAction);
-        // Ctrl+Space expands the $token / @file / /directive at the caret in place. The hook is
-        // invoked directly from the input's key listener, before any key binding processing.
+        // Ctrl+Space expands the $token / @file / /directive at the caret in place. The input's
+        // key listener handles the shortcut while the input itself has the focus (it consumes the
+        // event before any key binding processing); the panel-level binding covers the rest of the
+        // panel (toolbar, output area), where the shortcut would otherwise fall through to the
+        // root pane's AutoMode binding and start the automatic prover instead.
+        var expandAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                expandAtCaret();
+            }
+        };
+        var expandStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
+        txtInput.getInputMap().put(expandStroke, "expandAtCaret");
+        txtInput.getActionMap().put("expandAtCaret", expandAction);
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(expandStroke,
+            "expandAtCaret");
+        getActionMap().put("expandAtCaret", expandAction);
         txtInput.setExpandHook(this::expandAtCaret);
 
         // simple KeY syntax highlighting for ```key fenced blocks typed into the prompt
@@ -263,7 +280,7 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
     /**
      * Replaces the {@code $token}/{@code @file}/{@code /directive} before the caret with its
      * currently resolved content (Ctrl+Space). Unknown {@code $tokens} and bare activation
-     * directives stay untouched.
+     * directives stay untouched; the failure is reported in the hint line below the input.
      */
     private void expandAtCaret() {
         var session = LlmUtils.getSession(mediator.getSelectedProof());
@@ -278,9 +295,40 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
                 return mediator.getSelectedNode();
             }
         };
-        txtInput.expandAtCaret(fragment -> fragment.startsWith("$")
-                ? PromptResolver.token(fragment.substring(1), session, context)
-                : resolveDirective(fragment, session, context));
+        boolean expanded = txtInput.expandAtCaret(fragment -> {
+            String value = fragment.startsWith("$")
+                    ? PromptResolver.token(fragment.substring(1), session, context)
+                    : resolveDirective(fragment, session, context);
+            if (value == null || value.isBlank()) {
+                flashHint("cannot expand <b>" + fragment + "</b>");
+            }
+            return value;
+        });
+        if (!expanded) {
+            flashHint("place the caret right after a <b>$token</b>, <b>@file</b> or "
+                + "<b>/directive</b>");
+        }
+    }
+
+    /**
+     * Shows a transient message in the hint line below the input (e.g. why a Ctrl+Space expansion
+     * failed); the default hint returns automatically after a few seconds. A running term/sequent
+     * drag keeps its own print-mode hint.
+     */
+    private void flashHint(String html) {
+        if (lastHintMode != null) {
+            return; // a drag owns the hint line
+        }
+        hint.setText("<html>" + html + "</html>");
+        if (hintTimer == null) {
+            hintTimer = new Timer(4000, e -> {
+                if (lastHintMode == null) {
+                    hint.setText(HINT_SEND);
+                }
+            });
+            hintTimer.setRepeats(false);
+        }
+        hintTimer.restart();
     }
 
     private static @Nullable String resolveDirective(String fragment, LlmSession session,
