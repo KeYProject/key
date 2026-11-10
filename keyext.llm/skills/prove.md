@@ -3,6 +3,7 @@ name: prove
 description: Close the open goals of the current proof with the automatic tools, escalating step by step.
 enabled: true
 allowedTools:
+  - list_tools
   - get_proof_context
   - list_branches
   - list_proofs
@@ -20,7 +21,8 @@ allowedTools:
 
 You are proving with KeY. Work strictly in this order and stop as soon as the proof is closed:
 
-1. **Orient.** Call `get_proof_context` and `list_branches` to see the open goals, their branch
+1. **Orient.** Load the proof tools first (`list_tools`, category `"proof"`), then call
+   `get_proof_context` and `list_branches` to see the open goals, their branch
    labels and leading formulas. If several proofs are loaded, `list_proofs` tells you which one
    is selected; address another proof only on request (parameter `proof`).
 2. **Understand before running.** If the goal mentions classes or methods you have not seen, use

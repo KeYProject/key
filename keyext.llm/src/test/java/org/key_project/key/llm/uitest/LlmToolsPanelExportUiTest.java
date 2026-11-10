@@ -23,9 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * UI test of the per-tool "export to MCP" checkboxes with an injected mock tool set: the initial
- * state follows the effective export rule and toggling writes the explicit override sets of the
- * settings working copy.
+ * UI test of the per-tool "export to MCP" checkboxes with an injected mock tool set: the
+ * KeY-specific
+ * tools (Proof/Taclets) follow the effective export rule and toggling writes the explicit override
+ * sets of the settings working copy, while the standard tools are disabled because they are never
+ * exposed over the MCP server.
  */
 class LlmToolsPanelExportUiTest {
 
@@ -51,50 +53,66 @@ class LlmToolsPanelExportUiTest {
     @Test
     void checkboxesReflectTheEffectiveExportRule() {
         var box = panelWith(model).exportCheckboxes();
-        // order: mock_auth (PROOF), mock_read (FILES), mock_run (SHELL)
-        assertTrue(box.get(0).isSelected(), "auto-approved tools are exported by default");
-        assertTrue(box.get(1).isSelected());
-        assertFalse(box.get(2).isSelected(), "ask-approved tools stay hidden by default");
+        // order: mock_auth (PROOF), mock_read (FILES), mock_run (SHELL), mock_add_taclet (TACLETS)
+        assertTrue(box.get(0).isSelected() && box.get(0).isEnabled(),
+            "auto-approved KeY-specific tools are exported by default");
+        assertTrue(!box.get(1).isEnabled() && !box.get(1).isSelected(),
+            "standard tools must never be exported");
+        assertTrue(!box.get(2).isEnabled() && !box.get(2).isSelected());
+        assertTrue(!box.get(3).isSelected() && box.get(3).isEnabled(),
+            "ask-approved KeY-specific tools stay hidden by default");
     }
 
     @Test
     void approvalOverridesRecomputeTheDefaultExport() {
-        model.setAllowedToolsWithoutApproval(new TreeSet<>(Set.of(McpUiTestHarness.MOCK_RUN)));
-        model.setAllowedToolsWithApproval(new TreeSet<>(Set.of(McpUiTestHarness.MOCK_READ)));
-        model.setToolsDisabled(new TreeSet<>(Set.of(McpUiTestHarness.MOCK_AUTH)));
+        model.setAllowedToolsWithoutApproval(new TreeSet<>(Set.of(McpUiTestHarness.MOCK_MUTATE)));
+        model.setAllowedToolsWithApproval(new TreeSet<>(Set.of(McpUiTestHarness.MOCK_AUTH)));
+        model.setToolsDisabled(new TreeSet<>(Set.of(McpUiTestHarness.MOCK_READ)));
 
         var box = panelWith(model).exportCheckboxes();
-        assertFalse(box.get(0).isSelected(), "disabled tools are never exported");
-        assertFalse(box.get(1).isSelected(), "with-approval AUTO tools are not exported");
-        assertTrue(box.get(2).isSelected(),
+        assertFalse(box.get(0).isSelected(), "with-approval AUTO tools are not exported");
+        assertTrue(!box.get(1).isEnabled() && !box.get(1).isSelected(),
+            "standard tools stay off the MCP server even when disabled");
+        assertTrue(!box.get(2).isEnabled() && !box.get(2).isSelected(),
+            "standard tools stay off the MCP server regardless of approval");
+        assertTrue(box.get(3).isSelected(),
             "without-approval ASK tools are exported by default");
     }
 
     @Test
     void explicitChoicesBeatTheDefaultInBothDirections() {
-        model.setMcpExportedTools(new TreeSet<>(Set.of(McpUiTestHarness.MOCK_RUN)));
+        model.setMcpExportedTools(new TreeSet<>(Set.of(McpUiTestHarness.MOCK_MUTATE)));
         model.setMcpNotExportedTools(
             new TreeSet<>(Set.of(McpUiTestHarness.MOCK_AUTH, McpUiTestHarness.MOCK_READ)));
 
         var box = panelWith(model).exportCheckboxes();
         assertFalse(box.get(0).isSelected(), "explicit exclusion wins over AUTO");
-        assertFalse(box.get(1).isSelected());
-        assertTrue(box.get(2).isSelected(), "explicit inclusion wins over ASK");
+        assertTrue(!box.get(1).isEnabled() && !box.get(1).isSelected(),
+            "an explicit export choice cannot enable a standard tool");
+        assertTrue(box.get(3).isSelected(), "explicit inclusion wins over ASK");
     }
 
     @Test
     void togglingWritesTheOverrideSets() {
         var panel = panelWith(model);
         var box = panel.exportCheckboxes();
-        // mock_read is exported by default; unchecking it must record an explicit exclusion
-        McpUiTestHarness.onEdt(() -> box.get(1).doClick());
-        assertTrue(model.getMcpNotExportedTools().contains(McpUiTestHarness.MOCK_READ));
-        assertFalse(model.getMcpExportedTools().contains(McpUiTestHarness.MOCK_READ));
+        // mock_auth is exported by default; unchecking it must record an explicit exclusion
+        McpUiTestHarness.onEdt(() -> box.get(0).doClick());
+        assertTrue(model.getMcpNotExportedTools().contains(McpUiTestHarness.MOCK_AUTH));
+        assertFalse(model.getMcpExportedTools().contains(McpUiTestHarness.MOCK_AUTH));
 
         // checking an ask tool records an explicit inclusion
+        McpUiTestHarness.onEdt(() -> box.get(3).doClick());
+        assertTrue(model.getMcpExportedTools().contains(McpUiTestHarness.MOCK_MUTATE));
+        assertTrue(panel.exportCheckboxes().get(3).isSelected());
+
+        // a disabled standard checkbox is inert: clicking it writes no override
+        McpUiTestHarness.onEdt(() -> box.get(1).doClick());
         McpUiTestHarness.onEdt(() -> box.get(2).doClick());
-        assertTrue(model.getMcpExportedTools().contains(McpUiTestHarness.MOCK_RUN));
-        assertTrue(panel.exportCheckboxes().get(2).isSelected());
+        assertFalse(model.getMcpExportedTools().contains(McpUiTestHarness.MOCK_READ));
+        assertFalse(model.getMcpNotExportedTools().contains(McpUiTestHarness.MOCK_READ));
+        assertFalse(model.getMcpExportedTools().contains(McpUiTestHarness.MOCK_RUN));
+        assertFalse(model.getMcpNotExportedTools().contains(McpUiTestHarness.MOCK_RUN));
     }
 
     @Test

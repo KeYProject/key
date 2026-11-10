@@ -72,12 +72,16 @@ class KeYMcpSseServerTest {
             assertNotNull(init);
             assertFalse(init.protocolVersion().isBlank());
 
-            // the test-only AUTO tool is exported, built-in tools follow their metadata default
+            // the test-only AUTO tool is exported (it is a KeY-specific tool), built-in
+            // KeY-specific tools follow their metadata default; standard tools stay private
             var names = client.listTools().tools().stream().map(McpSchema.Tool::name)
                     .collect(Collectors.toSet());
             assertTrue(names.contains(TestAgentToolProvider.EXTRA_TOOL),
                 "auto-approved agents must be exported by default, got " + names);
-            assertTrue(names.contains(KeYAgentTools.TOOL_READ_FILE));
+            assertTrue(names.contains(KeYAgentTools.TOOL_GET_PROOF_CONTEXT),
+                "auto-approved proof tools must be exported by default, got " + names);
+            assertFalse(names.contains(KeYAgentTools.TOOL_READ_FILE),
+                "standard tools must never be exported, got " + names);
             assertFalse(names.contains(KeYAgentTools.TOOL_RUN_COMMAND),
                 "ASK tools must not be exported by default");
 
@@ -125,29 +129,41 @@ class KeYMcpSseServerTest {
     }
 
     @Test
-    void exportOverridesInSettingsBeatMetadataDefaults() {
+    void exportCoversOnlyKeySpecificToolsAndHonorsSettingsOverrides() {
         var tools = new KeYAgentTools();
+        var tryClose = tools.agents().stream()
+                .filter(t -> t.name().equals(KeYAgentTools.TOOL_TRYCLOSE)).findFirst()
+                .orElseThrow();
+        var addTaclet = tools.agents().stream()
+                .filter(t -> t.name().equals(KeYAgentTools.TOOL_ADD_TACLET)).findFirst()
+                .orElseThrow();
         var readFile = tools.agents().stream()
                 .filter(t -> t.name().equals(KeYAgentTools.TOOL_READ_FILE)).findFirst()
                 .orElseThrow();
-        var runCommand = tools.agents().stream()
-                .filter(t -> t.name().equals(KeYAgentTools.TOOL_RUN_COMMAND)).findFirst()
-                .orElseThrow();
 
-        // metadata default: AUTO tools are exported, ASK tools are not
-        assertTrue(KeYMcpSseServer.isExported(readFile));
-        assertFalse(KeYMcpSseServer.isExported(runCommand));
+        // metadata default for KeY-specific tools: AUTO tools are exported, ASK tools are not
+        assertTrue(KeYMcpSseServer.isExported(tryClose));
+        assertFalse(KeYMcpSseServer.isExported(addTaclet));
 
-        // explicit exclusion wins over the metadata default
-        LlmSettings.INSTANCE
-                .setMcpNotExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ_FILE)));
+        // standard tools are private to the chat panel and can never be exported
         assertFalse(KeYMcpSseServer.isExported(readFile));
+        LlmSettings.INSTANCE
+                .setMcpExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_READ_FILE)));
+        assertFalse(KeYMcpSseServer.isExported(readFile),
+            "a standard tool must stay off the MCP server even when explicitly selected");
+        LlmSettings.INSTANCE.setMcpExportedTools(new TreeSet<>());
 
-        // explicit inclusion wins over the metadata default
+        // explicit exclusion wins over the metadata default for KeY-specific tools
+        LlmSettings.INSTANCE
+                .setMcpNotExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_TRYCLOSE)));
+        assertFalse(KeYMcpSseServer.isExported(tryClose));
+
+        // explicit inclusion wins over the metadata default for KeY-specific tools
         LlmSettings.INSTANCE.setMcpNotExportedTools(new TreeSet<>());
         LlmSettings.INSTANCE
-                .setMcpExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_RUN_COMMAND)));
-        assertTrue(KeYMcpSseServer.isExported(runCommand));
+                .setMcpExportedTools(new TreeSet<>(Set.of(KeYAgentTools.TOOL_ADD_TACLET)));
+        assertTrue(KeYMcpSseServer.isExported(addTaclet));
+        LlmSettings.INSTANCE.setMcpExportedTools(new TreeSet<>());
     }
 
     @Test

@@ -3,6 +3,7 @@ name: code-review
 description: Read-only inspection and review of the Java model and its specifications — no proof manipulation.
 enabled: true
 allowedTools:
+  - list_tools
   - get_proof_context
   - list_files
   - read_file
@@ -19,8 +20,9 @@ Workflow:
    user named a class or package, start there.
 2. `read_file` the classes in question. Files may be large — prefer `file_info` first to check the
    size, and if a file is too big to read in one go, say which portions you read.
-3. If a proof is loaded, `get_proof_context` links the proof obligation to the source: explain
-   which contract/specification produces the current goal.
+3. If a proof is loaded, first load the proof tools with `list_tools` (category `"proof"`), then
+   `get_proof_context` links the proof obligation to the source: explain which
+   contract/specification produces the current goal.
 4. Review for:
    - **Specification defects**: contracts that don't match the code (missing `assignable`
      clauses, wrong `requires`, unverifiable `ensures`), inconsistent invariants,

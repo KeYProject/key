@@ -3,6 +3,7 @@ name: taclet-design
 description: Inspect, export and extend the rule set of a proof — taclets in and out.
 enabled: true
 allowedTools:
+  - list_tools
   - get_proof_context
   - list_branches
   - list_taclets
@@ -20,7 +21,8 @@ You are working with KeY's rule system (taclets). This covers inspecting the ava
 adjusting taclet *options*, exporting rules for documentation, and — with approval — extending or
 shrinking the rule set of a proof.
 
-1. **Survey the rules.** `list_taclets` (optionally with a substring filter, e.g. `"quantifier"`,
+1. **Survey the rules.** Load the taclet tools first (`list_tools`, category `"taclets"` and
+   `"proof"`), then `list_taclets` (optionally with a substring filter, e.g. `"quantifier"`,
    `"arith"`) shows the applicable taclets with their schematic shape. `list_taclet_options`
    lists the option groups (choices) of the proof with their selected and possible values — if a
    rule set behaves "strangely", an unusual option value is a likely cause.

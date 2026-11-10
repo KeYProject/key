@@ -44,6 +44,15 @@ class ExtendedPromptTest {
         return messages.stream().map(m -> String.valueOf(m.get("role"))).toList();
     }
 
+    /** The advertised tool names of a request. */
+    private static Set<String> toolNames(AgentRequest request) {
+        var names = new java.util.LinkedHashSet<String>();
+        for (var t : request.tools()) {
+            names.add(String.valueOf(((Map<?, ?>) t.get("function")).get("name")));
+        }
+        return names;
+    }
+
     @Test
     void minimalRequestHasSystemAndUser() {
         var request = ExtendedPrompt.build(session, null, null, "hello there", null);
@@ -54,18 +63,43 @@ class ExtendedPromptTest {
     }
 
     @Test
-    void advertisesTheBuiltInToolSet() {
+    void advertisesTheStandardToolsButNoKeySpecificToolsByDefault() {
         var request = ExtendedPrompt.build(session, null, null, "hi", null);
-        var toolNames = request.tools().stream()
-                .map(t -> (Map<?, ?>) t.get("function")).map(f -> f.get("name"))
-                .map(String::valueOf).toList();
-        assertTrue(toolNames.contains(KeYAgentTools.TOOL_GET_PROOF_CONTEXT));
+        var toolNames = toolNames(request);
+        assertTrue(toolNames.contains(KeYAgentTools.TOOL_LIST_TOOLS));
         assertTrue(toolNames.contains(KeYAgentTools.TOOL_LIST_FILES));
         assertTrue(toolNames.contains(KeYAgentTools.TOOL_READ_FILE));
         assertTrue(toolNames.contains(KeYAgentTools.TOOL_FILE_INFO));
         assertTrue(toolNames.contains(KeYAgentTools.TOOL_RUN_COMMAND));
         assertTrue(toolNames.contains(KeYAgentTools.TOOL_ASK_USER));
         assertTrue(toolNames.contains(TestMcpToolProvider.ECHO));
+        // the KeY-specific tools (Proof/Taclets) are loaded on request via list_tools
+        assertTrue(!toolNames.contains(KeYAgentTools.TOOL_GET_PROOF_CONTEXT));
+        assertTrue(!toolNames.contains(KeYAgentTools.TOOL_TRYCLOSE));
+        assertTrue(!toolNames.contains(KeYAgentTools.TOOL_LIST_TACLETS));
+    }
+
+    @Test
+    void skillWhitelistRestrictsAdvertisedToolsAndAddsInstructions() {
+        var whitelist = List.of(KeYAgentTools.TOOL_READ_FILE, KeYAgentTools.TOOL_RUN_COMMAND);
+        var skill = new Skill("lockdown", "read-only review", "Only read the model files.",
+            whitelist, true);
+        var request = ExtendedPrompt.build(session, null, null, "hi", skill);
+        assertEquals(Set.copyOf(whitelist), toolNames(request),
+            "only the whitelisted standard tools may be offered while the skill is active");
+        String sys = String.valueOf(request.messages().get(0).get("content"));
+        assertTrue(sys.contains("# Active skill: lockdown"), sys);
+        assertTrue(sys.contains("Only read the model files."), sys);
+    }
+
+    @Test
+    void skillWithoutToolWhitelistKeepsTheFullStandardToolSet() {
+        var skill = new Skill("coach", "hints only", "Give hints.", List.of(), true);
+        var request = ExtendedPrompt.build(session, null, null, "hi", skill);
+        assertTrue(toolNames(request).contains(KeYAgentTools.TOOL_RUN_COMMAND));
+        assertTrue(toolNames(request).contains(KeYAgentTools.TOOL_ASK_USER));
+        assertTrue(toolNames(request).contains(TestMcpToolProvider.ECHO));
+        assertTrue(!toolNames(request).contains(KeYAgentTools.TOOL_TRYCLOSE));
     }
 
     @Test
