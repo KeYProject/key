@@ -101,9 +101,17 @@ class LlmScreenshotsTest {
                 new AgentResult.ToolActivity("get_proof_context", "{}",
                     "proof 'tacletops' with one open goal: x > 0")));
             panel.addOutput(
-                "For this goal the taclets `auto`, `seq` and `auto_ind` look promising. I "
-                    + "recommend trying `auto` first: it applies a set of standard rules "
-                    + "and closes the goal directly.");
+                """
+                        For this goal the taclets `auto`, `seq` and `auto_ind` look promising. I recommend \
+                        trying `auto` first: it applies a set of standard rules and closes the goal \
+                        directly.
+
+                        **Suggested steps:**
+
+                        1. apply `auto` on the open goal
+                        2. if it does not close, apply `seq` to split the implication
+                        3. run `auto_ind` on the remaining subgoal
+                        """);
             return null;
         });
         onEdt(() -> {
@@ -116,6 +124,10 @@ class LlmScreenshotsTest {
 
         // the main window: menu bar, proof views and the docked chat panel
         onEdt(() -> {
+            // a second pass lets the conversation layout settle (the preferred width of the
+            // Markdown boxes depends on the viewport width, which depends on the scrollbars,
+            // which depend on the preferred widths)
+            main.validate();
             write(main.getRootPane(), out.resolve("llm-panel.png"));
             return null;
         });

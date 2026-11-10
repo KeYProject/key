@@ -6,7 +6,8 @@ package org.key_project.key.llm;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Point;
+import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DragSourceAdapter;
 import java.awt.dnd.DragSourceDragEvent;
@@ -14,7 +15,6 @@ import java.awt.dnd.DragSourceDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -75,8 +75,7 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
 
     private final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     private final AutocompleteInput txtInput = new AutocompleteInput();
-    private final JPanel pOutput =
-        new JPanel(new MigLayout(new LC().fillX().topToBottom().wrapAfter(1)));
+    private final JPanel pOutput = new ConversationPanel();
     private final JScrollPane scrpOutput = new JScrollPane(pOutput);
 
     private final KeyAction actionSwitchOrientation = new SwitchOrientationAction();
@@ -794,43 +793,71 @@ public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnLis
 
 
 /**
- * A rendered message box in the conversation (input, answer or error). Right-click offers the
- * registered context actions (e.g. "into input").
+ * The conversation content: stacks the message boxes top to bottom and always fills the viewport
+ * width, so the messages wrap to the width of the panel and the conversation only ever scrolls
+ * vertically (like a line-wrapped text area).
+ */
+class ConversationPanel extends JPanel implements Scrollable {
+    ConversationPanel() {
+        super(new MigLayout(new LC().fillX().topToBottom().wrapAfter(1)));
+    }
+
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return getPreferredSize();
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 16;
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return orientation == SwingConstants.VERTICAL ? visibleRect.height : visibleRect.width;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return true;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        // the conversation scrolls vertically
+        return false;
+    }
+}
+
+
+/**
+ * A rendered message box in the conversation (input, answer or error). Agent answers are rendered
+ * as Markdown ({@link MarkdownView}), user prompts and errors stay plain text. Right-click offers
+ * the registered context actions (e.g. "into input").
  */
 class OutputBox<T> extends JPanel {
     protected final LlmPromptModel<T> model;
-    protected final JTextArea output = new JTextArea();
+    /** The message content: a Markdown view for answers, a plain text area otherwise. */
+    protected final JComponent output;
     protected final JPopupMenu menu = new JPopupMenu();
 
     public OutputBox(LlmPromptModel<T> userData) {
         this.model = userData;
         setLayout(new BorderLayout());
-        output.setEditable(false);
-        output.setText(userData.text());
-        output.setLineWrap(true);
-        output.setWrapStyleWord(true);
-        output.setComponentPopupMenu(menu);
         setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
-        // The box shows its full text: the inner scroll pane never scrolls, but it swallows all
-        // mouse wheel events over the box. Forward them to the conversation scroll pane.
-        var scroll = new JScrollPane(output);
-        scroll.addMouseWheelListener(this::forwardWheel);
-        output.addMouseWheelListener(this::forwardWheel);
-        add(scroll, BorderLayout.CENTER);
-    }
-
-    /** Forwards a mouse wheel event to the enclosing conversation scroll pane. */
-    private void forwardWheel(MouseWheelEvent e) {
-        var ancestor = SwingUtilities.getAncestorOfClass(JScrollPane.class, this);
-        if (ancestor instanceof JScrollPane conversation) {
-            Point point = SwingUtilities.convertPoint(e.getComponent(), e.getPoint(), conversation);
-            Point screen = e.getLocationOnScreen();
-            var forwarded = new MouseWheelEvent(conversation, e.getID(), e.getWhen(),
-                e.getModifiers(), point.x, point.y, screen.x, screen.y, e.getClickCount(),
-                e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation(),
-                e.getPreciseWheelRotation());
-            conversation.dispatchEvent(forwarded);
+        if (userData.kind() == LlmPromptModel.Kind.OUTPUT) {
+            output = new MarkdownView();
+            ((MarkdownView) output).setMarkdown(userData.text());
+        } else {
+            var text = new JTextArea();
+            text.setEditable(false);
+            text.setText(userData.text());
+            text.setLineWrap(true);
+            text.setWrapStyleWord(true);
+            output = text;
         }
+        output.setComponentPopupMenu(menu);
+        add(output, BorderLayout.CENTER);
     }
 
     @Override
