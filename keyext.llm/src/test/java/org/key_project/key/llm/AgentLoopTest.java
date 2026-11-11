@@ -218,6 +218,84 @@ class AgentLoopTest {
     }
 
     @Test
+    void subagentRequiresApprovalBeforeItRuns() {
+        LlmSettings.INSTANCE.setSubagentsEnabled(true);
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"echo-role\",\"description\":\"test\",\"prompt\":\"say hi\"}")),
+            ""));
+        // the child answers immediately without a tool call: its answer ends the delegation
+        mock.thenRespond(MockCompletions.text("KEY_AGENT_RESULT {\"summary\":\"hi\"}"));
+        mock.thenRespond(MockCompletions.text("done"));
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult first = loop.begin("delegate", null, null, null);
+
+        // subagent is ask-approved by default: the turn pauses before the child loop runs
+        assertInstanceOf(AgentResult.NeedsApproval.class, first);
+        assertEquals(KeYAgentTools.TOOL_SUBAGENT,
+            ((AgentResult.NeedsApproval) first).toolCall().name());
+        assertTrue(TestMcpToolProvider.EXECUTED.isEmpty(),
+            "no child tool may run before the approval");
+
+        // the approval resumes the turn: the child loop runs and its answer is the tool result
+        AgentResult resumed = loop.decideApproval(true, false);
+        assertInstanceOf(AgentResult.Done.class, resumed);
+        var lastMessages = mock.sent.get(2).messages();
+        var toolMsg = (Map<String, Object>) lastMessages.get(lastMessages.size() - 1);
+        assertTrue(String.valueOf(toolMsg.get("content")).contains("hi"),
+            "the approved delegation must run the child loop: " + toolMsg.get("content"));
+    }
+
+    @Test
+    void subagentApprovalDenialSkipsTheChildLoop() {
+        LlmSettings.INSTANCE.setSubagentsEnabled(true);
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"echo-role\",\"description\":\"test\",\"prompt\":\"say hi\"}")),
+            ""));
+        mock.thenRespond(MockCompletions.text("understood"));
+
+        var loop = new AgentLoop(session, mock);
+        loop.begin("delegate", null, null, null);
+        AgentResult resumed = loop.decideApproval(false, false);
+
+        assertInstanceOf(AgentResult.Done.class, resumed);
+        assertTrue(TestMcpToolProvider.EXECUTED.isEmpty(), "the child must not run");
+        assertEquals(2, mock.sent.size(),
+            "the denied delegation must not start a child loop");
+        var lastMessages = mock.sent.get(1).messages();
+        var toolMsg = (Map<String, Object>) lastMessages.get(lastMessages.size() - 1);
+        assertTrue(String.valueOf(toolMsg.get("content")).contains("denied"),
+            "the denial is the tool result: " + toolMsg.get("content"));
+    }
+
+    @Test
+    void subagentWithoutApprovalRequirementRunsDirectly() {
+        LlmSettings.INSTANCE.setSubagentsEnabled(true);
+        LlmSettings.INSTANCE.setAllowedToolsWithoutApproval(
+            new java.util.TreeSet<>(Set.of(KeYAgentTools.TOOL_SUBAGENT)));
+        var mock = new MockCompletions();
+        mock.thenRespond(MockCompletions.toolCalls(
+            List.of(MockCompletions.tool("s1", KeYAgentTools.TOOL_SUBAGENT,
+                "{\"agent\":\"echo-role\",\"description\":\"test\",\"prompt\":\"say hi\"}")),
+            ""));
+        mock.thenRespond(MockCompletions.text("KEY_AGENT_RESULT {\"summary\":\"hi\"}"));
+        mock.thenRespond(MockCompletions.text("done"));
+
+        var loop = new AgentLoop(session, mock);
+        AgentResult result = loop.begin("delegate", null, null, null);
+
+        assertInstanceOf(AgentResult.Done.class, result);
+        var lastMessages = mock.sent.get(1).messages();
+        var toolMsg = (Map<String, Object>) lastMessages.get(lastMessages.size() - 1);
+        assertTrue(String.valueOf(toolMsg.get("content")).contains("hi"),
+            "the delegation ran without the approval pause: " + toolMsg.get("content"));
+    }
+
+    @Test
     void executeRunsWhileTheDispatchLockIsHeld() throws Exception {
         // the snippet must not wait for the dispatch lock: another session could hold it for
         // a whole tool call (or a parallel sub-agent for many)

@@ -7,6 +7,7 @@ package org.key_project.key.llm;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,7 +40,10 @@ class SubagentLoopTest {
         LlmSettings.INSTANCE.setMaxParallelSubagents(4);
         LlmSettings.INSTANCE.setSubagentsEnabled(false);
         LlmSettings.INSTANCE.setAllowedToolsWithApproval(new java.util.TreeSet<>());
-        LlmSettings.INSTANCE.setAllowedToolsWithoutApproval(new java.util.TreeSet<>());
+        // these tests exercise the child-loop mechanics; the approval pause itself is covered
+        // by AgentLoopTest, so the delegation approval is granted up front here
+        LlmSettings.INSTANCE.setAllowedToolsWithoutApproval(
+            new java.util.TreeSet<>(Set.of(KeYAgentTools.TOOL_SUBAGENT)));
         LlmSettings.INSTANCE.setToolsDisabled(new java.util.TreeSet<>());
         LlmSettings.INSTANCE.setAgentCanUseSkills(false);
         TestMcpToolProvider.reset();

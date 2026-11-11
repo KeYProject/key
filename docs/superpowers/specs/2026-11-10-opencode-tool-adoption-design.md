@@ -134,9 +134,13 @@ multi-question, skill `id`, copy constructor).
   `tool-tour` skill lists `edit` under read-only, `glob`/`read` schemas don't mark `path`
   required, the 500-entry directory cap has no truncation note, the spec's "danger-styled"
   toggle is a plain checkbox.
-- Deferred follow-up (reviewer's recommendation): intercepted-tool approval is decided per
-  intercept; `subagent` (pre-existing) still never consults `requiresApproval` — extract one
-  approval helper for the intercepted tools and apply it to `subagent`.
+- Deferred follow-up, **done 2026-11-11**: the approval pause and the approved (re-)dispatch
+  are one shared pair of helpers (`AgentLoop.pauseForApproval` / `dispatchApproved`), applied
+  to the ordinary path, `execute` and `subagent` — the pre-existing subagent approval gap is
+  closed (the ask-approval the docs always promised now actually pauses).
+- Approved tools are missing from the final `Done` activity list: `decideApproval` appends
+  the tool result to the context but never to `activities` (pre-existing for every approved
+  tool; the chat panel's per-call activity summary omits them).
 
 **Declined-to-judge items, ruled by the executor:** PNG pixel content — accepted, the
 regenerated screenshots were visually inspected (new tool rows in the Tools panel); jsoup
