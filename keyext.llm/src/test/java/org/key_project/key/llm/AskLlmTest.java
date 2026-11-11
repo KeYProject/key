@@ -5,6 +5,7 @@
 package org.key_project.key.llm;
 
 import java.util.List;
+import java.util.Set;
 
 import org.key_project.key.llm.mcp.KeYAgentTools;
 
@@ -35,7 +36,10 @@ class AskLlmTest {
         LlmSettings.INSTANCE.setSubagentsEnabled(false);
         LlmSettings.INSTANCE.setAskLlmEnabled(true);
         LlmSettings.INSTANCE.setAllowedToolsWithApproval(new java.util.TreeSet<>());
-        LlmSettings.INSTANCE.setAllowedToolsWithoutApproval(new java.util.TreeSet<>());
+        // the delegation call itself is ask-approved; these tests exercise the ask_llm
+        // mechanics, so the approval is granted up front (the pause is covered by AgentLoopTest)
+        LlmSettings.INSTANCE.setAllowedToolsWithoutApproval(
+            new java.util.TreeSet<>(Set.of(KeYAgentTools.TOOL_SUBAGENT)));
         LlmSettings.INSTANCE.setToolsDisabled(new java.util.TreeSet<>());
         LlmSettings.INSTANCE.setAgentCanUseSkills(false);
         TestMcpToolProvider.reset();

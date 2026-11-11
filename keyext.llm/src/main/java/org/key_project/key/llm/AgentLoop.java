@@ -187,15 +187,7 @@ public class AgentLoop {
         if (observer != null) {
             observer.toolStarted(new ToolCallInfo(p.toolCallId(), p.name(), p.arguments()));
         }
-        CompletableFuture<?> future;
-        if (KeYAgentTools.TOOL_EXECUTE.equals(p.name())) {
-            // the approved snippet runs like the intercepted call: outside the dispatch lock
-            // (the placeholder body of the execute tool cannot run a snippet)
-            future = session.getToolDispatcher()
-                    .submitTask(() -> ScriptingTools.run(session, p.arguments()));
-        } else {
-            future = session.getToolDispatcher().submit(session, p.name(), p.arguments());
-        }
+        var future = dispatchApproved(p.name(), p.arguments());
         var outcome = await(future, p.toolCallId(), p.name(), p.arguments());
         if (observer != null) {
             observer.toolFinished(p.toolCallId(), outcome instanceof AwaitDone done
@@ -210,6 +202,38 @@ public class AgentLoop {
             case AwaitBackgrounded bg -> new AgentResult.PausedForBackground(bg.jobId(),
                 p.name(), p.arguments());
             case AwaitCancelled ignored -> done("(Turn cancelled by the user.)");
+        };
+    }
+
+    /**
+     * The approval pause shared by ordinary tools and the intercepted ones ({@code subagent},
+     * {@code execute}): consults the approval policy and, if the tool needs it, commits the
+     * round and parks the turn. Returns the pause result, or {@code null} when the tool may
+     * run right away.
+     */
+    private @Nullable AgentResult pauseForApproval(String id, String name, String arguments) {
+        if (!session.getMcpClient().requiresApproval(name)) {
+            return null;
+        }
+        commitRound();
+        pending = new PendingApproval(id, name, arguments);
+        return new AgentResult.NeedsApproval(new ToolCallInfo(id, name, arguments));
+    }
+
+    /**
+     * Dispatches an approved tool call: the intercepted tools run their real task outside the
+     * dispatch lock (their registered bodies are placeholders that cannot run; the snippets'
+     * facade calls and the child loops acquire the lock themselves per call), while ordinary
+     * tools are dispatched serialized.
+     */
+    private CompletableFuture<?> dispatchApproved(String name, String arguments) {
+        return switch (name) {
+            case KeYAgentTools.TOOL_EXECUTE -> session.getToolDispatcher()
+                    .submitTask(() -> ScriptingTools.run(session, arguments));
+            case KeYAgentTools.TOOL_SUBAGENT -> session.getToolDispatcher()
+                    .submitTask(() -> SubagentRunner.run(session, completions, arguments,
+                        this::isCancelled));
+            default -> session.getToolDispatcher().submit(session, name, arguments);
         };
     }
 
@@ -409,14 +433,18 @@ public class AgentLoop {
                 stagedTool(id, "[Spawning sub-agents is disabled in the settings]");
                 return null;
             }
+            // subagent is ask-approved by default: the approval is decided like for ordinary
+            // tools, the approved delegation then runs outside the dispatch lock
+            var pause = pauseForApproval(id, name, arguments);
+            if (pause != null) {
+                return pause;
+            }
             long seqBefore = session.getSubagentLog().latestSeq();
             var observer = session.getTurnObserver();
             if (observer != null) {
                 observer.toolStarted(new ToolCallInfo(id, name, arguments));
             }
-            // runs without the dispatch lock: the child loops serialize their own tool calls
-            var future = session.getToolDispatcher().submitTask(
-                () -> SubagentRunner.run(session, completions, arguments, this::isCancelled));
+            var future = dispatchApproved(name, arguments);
             var outcome = await(future, id, name, arguments);
             if (observer != null) {
                 observer.toolFinished(id, outcome instanceof AwaitDone done
@@ -468,21 +496,19 @@ public class AgentLoop {
         }
 
         if (KeYAgentTools.TOOL_EXECUTE.equals(name)) {
-            // execute is ask-approved by default: the approval is decided here (like for
-            // ordinary tools below), the approved snippet then runs outside the dispatch lock
-            if (session.getMcpClient().requiresApproval(name)) {
-                commitRound();
-                pending = new PendingApproval(id, name, arguments);
-                return new AgentResult.NeedsApproval(new ToolCallInfo(id, name, arguments));
+            // execute is ask-approved by default: the approval is decided like for ordinary
+            // tools, the approved snippet then runs outside the dispatch lock (the snippet's
+            // facade calls acquire the lock per call; holding it across the whole snippet
+            // would deadlock the facade)
+            var pause = pauseForApproval(id, name, arguments);
+            if (pause != null) {
+                return pause;
             }
             var observer = session.getTurnObserver();
             if (observer != null) {
                 observer.toolStarted(new ToolCallInfo(id, name, arguments));
             }
-            // runs without the dispatch lock: the snippet's facade calls acquire it per call
-            // (holding the lock across the whole snippet would deadlock the facade)
-            var future = session.getToolDispatcher().submitTask(
-                () -> ScriptingTools.run(session, arguments));
+            var future = dispatchApproved(name, arguments);
             var outcome = await(future, id, name, arguments);
             if (observer != null) {
                 observer.toolFinished(id, outcome instanceof AwaitDone done
@@ -501,10 +527,9 @@ public class AgentLoop {
             };
         }
 
-        if (session.getMcpClient().requiresApproval(name)) {
-            commitRound();
-            pending = new PendingApproval(id, name, arguments);
-            return new AgentResult.NeedsApproval(new ToolCallInfo(id, name, arguments));
+        var pause = pauseForApproval(id, name, arguments);
+        if (pause != null) {
+            return pause;
         }
 
         var observer = session.getTurnObserver();

@@ -117,7 +117,9 @@ boolean hasPendingQuestion(); boolean hasPendingApproval();
 
 Tool dispatch details (`AgentLoop.processBatch`): `question` and `skill` are intercepted
 by the loop itself (gated by the settings `allowAgentQuestions` / `agentCanUseSkills`);
-`subagent` is intercepted, too (gated by `subagentsEnabled`) and runs a bounded child
+`subagent` is intercepted, too (gated by `subagentsEnabled`, ask-approved like an ordinary
+tool — the approval pause and the outside-lock re-dispatch are shared with `execute`) and
+runs a bounded child
 loop via `SubagentRunner` (role whitelist + depth guard; a `prompts` array fans out over a
 pool, serializing tool dispatch globally — see `docs/subagents.md`); `ask_llm`
 is intercepted the same way (gated by `askLlmEnabled`) and `AskLlmRunner` sends a fresh

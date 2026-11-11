@@ -193,10 +193,19 @@ class WebToolsTest {
     void webfetchRejectsResponsesDeclaredLargerThanTheCap() throws Exception {
         var server = com.sun.net.httpserver.HttpServer
                 .create(new java.net.InetSocketAddress("127.0.0.1", 0), 0);
+        var bodyNeverSent = new java.util.concurrent.CountDownLatch(1);
         server.createContext("/big", exchange -> {
-            // the declared body is never actually sent: the pre-check must reject the
-            // response from its headers alone
+            // the response declares a body far larger than the cap, but never sends it: the
+            // pre-check must reject the response from its headers alone (the connection stays
+            // open until the test is done, so the client sees a healthy response)
             exchange.sendResponseHeaders(200, WebTools.MAX_BODY_BYTES + 1L);
+            try (var out = exchange.getResponseBody()) {
+                out.write(1); // force the headers out; the rest of the body is never sent
+                out.flush();
+                bodyNeverSent.await(30, java.util.concurrent.TimeUnit.SECONDS);
+            } catch (InterruptedException ignored) {
+                // the test finished
+            }
             exchange.close();
         });
         server.start();
@@ -207,6 +216,7 @@ class WebToolsTest {
             var result = String.valueOf(tool.call(java.util.Map.of("url", url)));
             assertTrue(result.startsWith("Error: the response is too large"), result);
         } finally {
+            bodyNeverSent.countDown();
             server.stop(0);
         }
     }
