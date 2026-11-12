@@ -78,3 +78,6 @@ checkstyle-diff.txt
 
 # Java Flight Recorder output (e.g. runJfrProbe default mt-jfr-probe.jfr)
 *.jfr
+
+# Hermes tool cache (agent/tooling state; never version-controlled)
+.hermes/

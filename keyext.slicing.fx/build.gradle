@@ -1,0 +1,57 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2,
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+
+plugins {
+    // JavaFX is not bundled with the JDK; this plugin resolves the matching
+    // platform-specific runtime artifacts (see gradle/libs.versions.toml).
+    alias(libs.plugins.openjfx)
+}
+
+description = "JavaFX port of the keyext.slicing extension (MP9.4)"
+
+javafx {
+    version = libs.versions.javafx.get()
+    // wp6 (slicing): javafx.web hosts the WebView of the HTML dialog seam (HtmlDialogF /
+    // RuleStatisticsDialogF / SliceToFixedPointDialogF), the same seam SoundinessDialogF uses
+    // in key.ui.fx (Swing JEditorPane "text/html" counterpart)
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics', 'javafx.web']
+}
+
+dependencies {
+    implementation project(":key.ui.fx")
+    implementation project(":keyext.slicing")
+
+    // MP9.4 (slicing port): needed on the COMPILE classpath. key.ui.fx and keyext.slicing
+    // declare :key.core as `implementation`, which does not leak into a consumer's compile
+    // classpath — yet the KeYGuiExtensionF SPI (PosInSequent, Goal, Proof), KeYMediatorF
+    // (Proof/Node accessors) and the keyext.slicing logic APIs all reference key.core types.
+    // key.core itself `api`-exposes key.util, key.ncore and key.ncore.calculus
+    // (org.key_project.prover.sequent.PosInOccurrence), so a single implementation dep suffices.
+    implementation project(":key.core")
+    // MP10 icon review: ikonli FontAwesome glyph for the left-panel tab (the graphic becomes the
+    // west drawer toggle button's icon, mirroring the Swing SlicingLeftPanel SLICE_ICON)
+    implementation libs.ikonli.javafx
+    implementation libs.ikonli.fontawesome6
+
+    // The slicing settings singleton lives behind the Swing SlicingSettingsProvider
+    // (SlicingSettingsProvider.getSlicingSettings) and the reused slicing logic reads it
+    // from there, so resolving that class file requires key.ui (the same "key.ui transitively,
+    // accepted for the user-approved extension migration; the FX sources never import Swing"
+    // wiring the key.ui.fx scaffold documents). No Swing type is used in this module's code.
+    implementation project(":key.ui")
+}
+// reviewer request: the verify harness (org.key_project.slicing.fx.SlicingVerifyF) lives in the test source set (test code must
+// not ship in the main sources) and is published for the key.ui.fx run task via the
+// "testArtifacts" configuration (MainWindowF invokes it reflectively on the run classpath).
+configurations {
+    testArtifacts
+}
+tasks.register('testJar', Jar) {
+    archiveClassifier = 'test'
+    from sourceSets.test.output
+}
+artifacts {
+    testArtifacts testJar
+}
