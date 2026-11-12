@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Tue Nov 10 23:10:57 CET 2026
+# Date: Thu Nov 12 21:18:21 CET 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -14355,7 +14355,7 @@ methodCallSuper {
   super.#mn(#elist);
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #methodCall(super.#mn(#elist))
+  #methodCall(#ex, super.#mn(#elist))
 ... }}| (post)) 
 \heuristics(method_expand, simplify_autoname)
 Choices: programRules:Java}
@@ -14409,7 +14409,7 @@ methodCallWithAssignment {
 \add [equals(#se,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #methodCall(#se.#mn(#selist))
+  #methodCall(#v0, #se.#mn(#selist))
   #lhs = #v0;
 ... }}| (post)]) 
 \heuristics(method_expand)
@@ -14423,7 +14423,7 @@ methodCallWithAssignmentSuper {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #methodCall(super.#mn(#elist))
+  #methodCall(#ex, #v0, super.#mn(#elist))
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(method_expand, simplify_autoname)
@@ -14462,7 +14462,7 @@ methodCallWithAssignmentWithinClass {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #methodCall(#mn(#elist))
+  #methodCall(#ex, #v0, #mn(#elist))
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(method_expand)
@@ -19247,7 +19247,7 @@ staticMethodCall {
 ... }}| (post))
 \varcond(\staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #methodCall(#se.#mn(#elist))
+  #methodCall(#v0, #se.#mn(#elist))
 ... }}| (post)) 
 \heuristics(method_expand)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
@@ -19271,7 +19271,7 @@ staticMethodCallStaticWithAssignmentViaTypereference {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #methodCall(#t.#mn(#elist))
+  #methodCall(#v0, #t.#mn(#elist))
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(method_expand)
@@ -19285,7 +19285,7 @@ staticMethodCallWithAssignment {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #methodCall(#se.#mn(#elist))
+  #methodCall(#v0, #se.#mn(#elist))
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(method_expand)

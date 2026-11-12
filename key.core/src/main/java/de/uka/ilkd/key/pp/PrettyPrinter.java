@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopContract;
@@ -280,7 +281,26 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
         layouter.print(x.name().toString());
         layouter.print("(");
-        if (x.getChildAt(0) != null) {
+        // A meta construct may carry schema-variable arguments (e.g. #methodCall(#ex, #v0, body))
+        // that are not ProgramElements and are therefore not exposed through getChildAt. Emit them
+        // in the same order the source grammar expects so the printed form can be re-parsed.
+        if (x instanceof MethodCall mc) {
+            if (mc.executionContextSV() != null) {
+                performActionOnSchemaVariable(mc.executionContextSV());
+            }
+            if (mc.resultVariable() != null) {
+                if (mc.executionContextSV() != null) {
+                    layouter.print(",").brk();
+                }
+                performActionOnSchemaVariable(mc.resultVariable());
+            }
+            if (x.getChildAt(0) != null) {
+                if (mc.executionContextSV() != null || mc.resultVariable() != null) {
+                    layouter.print(",").brk();
+                }
+                x.getChildAt(0).visit(this);
+            }
+        } else if (x.getChildAt(0) != null) {
             x.getChildAt(0).visit(this);
         }
         layouter.print(")");

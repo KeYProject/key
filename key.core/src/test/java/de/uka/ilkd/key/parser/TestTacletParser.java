@@ -17,12 +17,14 @@ import de.uka.ilkd.key.java.loader.JavaBuildingExceptions;
 import de.uka.ilkd.key.java.loader.JavaBuildingIssue;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
+import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
@@ -56,6 +58,8 @@ public class TestTacletParser {
                   \\program Statement #p1, #s ;\s
                   \\program Expression #e2, #e ;\s
                   \\program SimpleExpression #se ;\s
+                  \\program MethodName #mn ;\s
+                  \\program[list] SimpleExpression #selist ;\s
                   \\program Variable #slhs, #arr, #ar, #ar1 ;\s
                   \\program LoopInit #i ;\s
                   \\program Label #lab, #lb0, #lb1 ;\s
@@ -450,6 +454,34 @@ public class TestTacletParser {
                 + " \\replacewith(true)}"));
         assertTrue(hasCause(e, JavaBuildingExceptions.class),
             "two-arg #lengthReference must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testMethodCallResultVarRoundtrips() {
+        // The pretty printer must emit every #methodCall schema-variable argument so that a rule
+        // can
+        // be printed and re-parsed (Agent-KeY needs roundtrippable rules). The result variable #v0
+        // must survive a print + re-parse cycle instead of being dropped.
+        FindTaclet original = (FindTaclet) parseTaclet("methodCallRt {\\find(\\<{.. "
+            + "#methodCall(#v0, #se.#mn(#selist)); ...}\\>true) \\replacewith(true)}");
+
+        // the parsed \find contains the MethodCall transformer as its single statement
+        ContextStatementBlock block =
+            (ContextStatementBlock) original.find().javaBlock().program();
+        MethodCall mc = (MethodCall) block.getChildAt(0);
+
+        // serialise exactly the meta-construct, as the pretty printer does during rule output
+        PrettyPrinter pp = PrettyPrinter.purePrinter();
+        pp.printFragment(mc);
+        String printed = pp.result();
+
+        assertTrue(printed.contains("#methodCall(#v0,"),
+            "printed #methodCall must keep its result variable, but was:\n" + printed);
+
+        // the printed fragment must re-parse as a rule holding the same meta-construct
+        Taclet reparsed =
+            parseTaclet("rt2 {\\find(\\<{.. " + printed + "; ...}\\>true) \\replacewith(true)}");
+        assertNotNull(reparsed);
     }
 
     @Test
