@@ -105,7 +105,7 @@ public class MediatorProofControl extends AbstractProofControl {
             return; // a run is still active or winding down; do not overlap it
         }
         worker = new AutoModeWorker(proof, goals, ptl);
-        ui.getMediator().initiateAutoMode(proof, true, false);
+        ui.getMediator().initiateAutoMode(proof, true);
         worker.execute();
     }
 
@@ -166,7 +166,7 @@ public class MediatorProofControl extends AbstractProofControl {
         final ProofMacroWorker worker = new ProofMacroWorker(node, macro, mediator, posInOcc);
         worker.setOnTerminated(() -> autoModeActive.set(false));
         interactionListeners.forEach(worker::addInteractionListener);
-        mediator.initiateAutoMode(node.proof(), true, false);
+        mediator.initiateAutoMode(node.proof(), true);
         mediator.addInterruptedListener(worker);
         worker.execute();
     }
@@ -176,7 +176,7 @@ public class MediatorProofControl extends AbstractProofControl {
      * construct(), and then finished(). Note that finished() is called even if the worker is
      * interrupted because we catch the InterruptedException in doWork(). </p> <p> <b>Attention:</b>
      * Before this thread is started it is required to freeze the MainWindow via {@code
-     * mediator().stopInterface(true); mediator().setInteractive(false); }. The thread itself
+     * mediator().stopInterface(true); }. The thread itself
      * unfreezes the UI when it is finished. </p>
      */
     private class AutoModeWorker extends SwingWorker<ProofSearchInformation<Proof, Goal>, Object> {
@@ -232,7 +232,7 @@ public class MediatorProofControl extends AbstractProofControl {
                     applyStrategy.removeProverTaskObserver(ui);
                     applyStrategy.clear();
                 }
-                ui.getMediator().finishAutoMode(proof, true, true, null);
+                ui.getMediator().finishAutoMode(proof, true, null);
                 // 'info' is assigned in doInBackground only after applyStrategy.start() returns; on
                 // a Stop (cancel), done() can run before that assignment completes, so it may still
                 // be null here. The synchronized(applyStrategy) above already guarantees the run

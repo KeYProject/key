@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.macros;
 
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.RuleAppIndexMode;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -56,6 +57,11 @@ public abstract class FilterStrategy implements Strategy<@NonNull Goal> {
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             RuleAppCostCollector collector) {
         delegate.instantiateApp(app, pio, goal, collector);
+    }
+
+    @Override
+    public RuleAppIndexMode getRuleAppIndexMode() {
+        return delegate.getRuleAppIndexMode();
     }
 
 }

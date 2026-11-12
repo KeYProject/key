@@ -2,10 +2,10 @@
 public final class SimpleRecord extends Record {
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    private final /*@ nullable */ String name;
+    private final [[JML modifiers]] String name;
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final /*@ nullable */ String name() {
+    public final [[JML modifiers]] String name() {
         return name;
     }
 
@@ -43,7 +43,7 @@ public final class SimpleRecord extends Record {
 
     @Override()
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    public final non_null String toString() {
+    public final /*@ non_null */ String toString() {
         return "SimpleRecord[" + "name=" + name + "]";
     }
 

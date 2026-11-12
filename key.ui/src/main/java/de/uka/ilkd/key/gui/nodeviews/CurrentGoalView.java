@@ -228,6 +228,13 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
             mediator.getServices(), getVisibleTermLabels()));
     }
 
+    public void resetPrinter() {
+        // set a printer for the currently selected proof or just a default printer with no services
+        // avoids a memory leak by the printer holding services for an abandoned proof
+        setLogicPrinter(SequentViewLogicPrinter.positionPrinter(getMediator().getNotationInfo(),
+            mediator.getServices(), getVisibleTermLabels()));
+    }
+
     /**
      * returns the mediator of this view
      *

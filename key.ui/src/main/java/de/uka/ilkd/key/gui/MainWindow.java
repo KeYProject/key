@@ -332,15 +332,7 @@ public final class MainWindow extends JFrame {
 
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(this);
-        // Postpone load for faster UI creation.
-        SwingUtilities.invokeLater(() -> {
-            recentFileMenu.loadEntries();
-            // otherwise open most recent cannot be used with a fresh started KeY
-            if (openMostRecentFileAction != null) {
-                // should always be the case, but better safe than sorry
-                openMostRecentFileAction.updateEnabledStatus();
-            }
-        });
+        recentFileMenu.loadEntries();
 
         proofTreeView = new ProofTreeView(mediator);
         infoView = new InfoView(mediator);
@@ -1119,6 +1111,7 @@ public final class MainWindow extends JFrame {
         if (selected == null) {
             proof.addSeparator();
             proof.add(new SearchInProofTreeAction(this));
+            proof.add(new GotoNodeAction(this));
             proof.add(new SearchInSequentAction(this, sequentViewSearchBar));
             proof.add(new SearchNextAction(this, sequentViewSearchBar));
             proof.add(new SearchPreviousAction(this, sequentViewSearchBar));
@@ -1340,6 +1333,9 @@ public final class MainWindow extends JFrame {
                     newSequentView.printSequent();
                 }
             }
+        }
+        if (newSequentView != currentGoalView) {
+            currentGoalView.resetPrinter();
         }
 
         Runnable sequentUpdater = () -> {

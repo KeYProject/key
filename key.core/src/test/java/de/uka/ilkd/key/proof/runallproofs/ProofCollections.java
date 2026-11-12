@@ -186,7 +186,7 @@ public class ProofCollections {
          * pervar g = c.group("- one subprocess is created for each group
          * perFile-one subprocess is created for each file
          */
-        settings.setForkMode(ForkMode.PERGROUP);
+        settings.setForkMode(ForkMode.NOFORK);
 
         /*
          * Enable or disable proof reloading.
@@ -241,7 +241,7 @@ public class ProofCollections {
          * test can be restricted to these groups (for debugging).
          */
         // runOnlyOn = group1, group2 (the space after each comma is mandatory)
-        // settings.setRunOnlyOn("performance, performancePOConstruction");
+        // settings.setRunOnlyOn("example-algos");
 
         settings.setKeySettings(GenerateUnitTestsUtil.loadFromFile("automaticJAVADL.properties"));
 
@@ -416,6 +416,10 @@ public class ProofCollections {
         g.provable("heap/verifyThis11_1_Maximum/project.key");
         g.provable("heap/fm12_01_LRS/lcp.key");
         g.provable("heap/SemanticSlicing/project.key");
+        g.provable("heap/verifyThis26_01_hIndex/compute.key");
+        g.provable("heap/verifyThis26_01_hIndex/compute_opt.key");
+        g.provable("heap/verifyThis26_01_hIndex/lemma1.key");
+        g.provable("heap/verifyThis26_01_hIndex/update.key");
 
         g = c.group("funOfIF");
         g.provable("heap/information_flow/ArrayList_contains.key");
@@ -532,8 +536,9 @@ public class ProofCollections {
         g.setDirectory("heap/quicksort");
         g.provable("toplevel.key");
         g.provable("sort.key");
+        g.provable("sort-jmlscript.key");
+        g.provable("split-jmlscript.key");
         g.provable("split.key");
-
 
         /*
          * These are simpler regression tests that show a certain feature works
@@ -632,6 +637,11 @@ public class ProofCollections {
         g.provable("heap/vstte10_05_Queue/LinkedList_LinkedList3.key");
         g.provable("heap/vstte10_05_Queue/LinkedList_reverse.key");
         g.provable("heap/vstte10_05_Queue/LinkedList_tail.key");
+
+        g = c.group("VSTTE12");
+        g.provable("heap/vstte12_01_Swap/TwoWaySwap_set.key");
+        g.provable("heap/vstte12_01_Swap/TwoWaySwap_swap.key");
+        g.provable("heap/vstte12_01_Swap/TwoWaySwap_twoWaySort.key");
 
         g = c.group("FM2024Tutorial");
         g.provable("heap/FM2024Tutorial/BinarySearch/BinSearch_binSearchR.key");
@@ -1216,9 +1226,9 @@ public class ProofCollections {
 
         g = c.group("JavaFeatures");
         g.loadable("Java/TextBlockLiterals/project.key");
-
         g.loadable("Java/Records/Use.key");
         g.loadable("Java/Records/Constructor.key");
+        g.provable("Java/Annotations/test_annotation.key");
 
         g = c.group("StipuLa");
         g.provable("case-studies/stipula/behavior_run_bet.key");
@@ -1227,6 +1237,10 @@ public class ProofCollections {
         g.provable("case-studies/stipula/behavior_run_license.key");
         g.provable("case-studies/stipula/behavior_run_loanForUse.key");
 
+        g = c.group("regression"); // proof files that fixed regressions
+        // must not be provable
+        g.notprovable(
+            "../../key.core/src/test/resources/testcase/issues/metaDisjointBug/metaDisjointBug.key");
 
         // use for debugging purposes.
         // c.keep("VSTTE10");

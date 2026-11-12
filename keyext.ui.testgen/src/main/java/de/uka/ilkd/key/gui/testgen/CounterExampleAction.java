@@ -167,7 +167,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
         }
 
         public void start() {
-            getMediator().initiateAutoMode(oldProof, true, false);
+            getMediator().initiateAutoMode(oldProof, true);
             getMediator().addInterruptedListener(this);
             execute();
         }
@@ -187,7 +187,7 @@ public class CounterExampleAction extends MainWindowAction implements PropertyCh
 
         @Override
         protected void done() {
-            getMediator().finishAutoMode(oldProof, true, true, null);
+            getMediator().finishAutoMode(oldProof, true, null);
             getMediator().removeInterruptedListener(this);
         }
 

@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.QueueRuleApplicationManager;
 import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.util.PerfScope;
 import de.uka.ilkd.key.util.properties.MapProperties;
 import de.uka.ilkd.key.util.properties.Properties;
 import de.uka.ilkd.key.util.properties.Properties.Property;
@@ -46,6 +47,8 @@ import org.key_project.prover.strategy.RuleApplicationManager;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
+
+import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
 
 /**
  * A proof is represented as a tree of nodes containing sequents. The initial proof consists of just
@@ -252,10 +255,9 @@ public final class Goal implements ProofGoal<Goal> {
      * event object.
      */
     private void fireSequentChanged(SequentChangeInfo sci) {
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         getFormulaTagManager().sequentChanged(sci, getTime());
-        var time1 = System.nanoTime();
-        PERF_UPDATE_TAG_MANAGER.getAndAdd(time1 - time);
+        final long time1 = PerfScope.stop(PERF_UPDATE_TAG_MANAGER, time);
         ruleAppIndex.sequentChanged(sci);
         // Feed the change to the (possibly delegation-wrapped) queue manager so it can wake parked
         // assumes-bases on their matching round (see the parked field of
@@ -267,12 +269,11 @@ public final class Goal implements ProofGoal<Goal> {
         if (m instanceof QueueRuleApplicationManager qm) {
             qm.sequentChanged(sci);
         }
-        var time2 = System.nanoTime();
-        PERF_UPDATE_RULE_APP_INDEX.getAndAdd(time2 - time1);
+        final long time2 = PerfScope.stop(PERF_UPDATE_RULE_APP_INDEX, time1);
         for (GoalListener listener : listeners) {
             listener.sequentChanged(this, sci);
         }
-        PERF_UPDATE_LISTENERS.getAndAdd(System.nanoTime() - time2);
+        PerfScope.stop(PERF_UPDATE_LISTENERS, time2);
     }
 
     private void fireGoalReplaced(Goal goal, Node parent, ImmutableList<Goal> newGoals) {
@@ -410,10 +411,10 @@ public final class Goal implements ProofGoal<Goal> {
         }
         node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         // updates the index
         fireSequentChanged(sci);
-        PERF_SET_SEQUENT.getAndAdd(System.nanoTime() - time);
+        PerfScope.stop(PERF_SET_SEQUENT, time);
     }
 
     /**
@@ -715,7 +716,7 @@ public final class Goal implements ProofGoal<Goal> {
         final Node n = node;
 
         final ImmutableList<Goal> goalList;
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         ruleApp.checkApplicability();
         ruleApp.registerSkolemConstants(localNamespaces.functions());
         addAppliedRuleApp(ruleApp);
@@ -735,7 +736,7 @@ public final class Goal implements ProofGoal<Goal> {
             removeGoalListener(journal);
             return null;
         } finally {
-            PERF_APP_EXECUTE.getAndAdd(System.nanoTime() - time);
+            PerfScope.stop(PERF_APP_EXECUTE, time);
         }
 
         return new PendingRuleApp(ruleApp, journal, n, goalList);
@@ -857,7 +858,6 @@ public final class Goal implements ProofGoal<Goal> {
 
     public List<TacletApp> getAllTacletApps(Services services) {
         RuleAppIndex index = ruleAppIndex();
-        index.autoModeStopped();
         List<TacletApp> allApps = new LinkedList<>();
         TacletFilter filter = new TacletFilter() {
             @Override
@@ -867,13 +867,13 @@ public final class Goal implements ProofGoal<Goal> {
         };
         for (SequentFormula sf : node().sequent().antecedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services);
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true), services, INTERACTIVE);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
 
         for (SequentFormula sf : node().sequent().succedent()) {
             ImmutableList<TacletApp> tacletAppAtAndBelow = index.getTacletAppAtAndBelow(filter,
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services);
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false), services, INTERACTIVE);
             tacletAppAtAndBelow.forEach(allApps::add);
         }
         return allApps;

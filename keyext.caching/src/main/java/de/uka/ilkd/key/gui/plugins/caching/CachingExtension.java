@@ -309,11 +309,11 @@ public class CachingExtension
             }
             if (CachingSettingsProvider.getCachingSettings().getDispose()
                     .equals(ProofCachingSettings.DISPOSE_COPY)) {
-                mediator.initiateAutoMode(newProof, true, false);
+                mediator.initiateAutoMode(newProof, true);
                 try {
                     CopyReferenceResolver.copyCachedGoals(newProof, referencedProof, null, null);
                 } finally {
-                    mediator.finishAutoMode(newProof, true, true,
+                    mediator.finishAutoMode(newProof, true,
                         /* do not select a different node */ () -> {
                         });
                 }

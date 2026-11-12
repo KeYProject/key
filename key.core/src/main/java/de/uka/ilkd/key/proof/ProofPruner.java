@@ -165,12 +165,6 @@ class ProofPruner {
         proof.removeOpenGoals(residualLeaves);
         proof.removeClosedGoals(residualLeaves);
 
-        /*
-         * this ensures that the open goals are in interactive mode and thus all rules are
-         * available in the just pruned goal (see GitLab #1480)
-         */
-        proof.setRuleAppIndexToInteractiveMode();
-
         return subtrees;
     }
 

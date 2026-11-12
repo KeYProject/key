@@ -29,7 +29,6 @@ the feature under test (verified by loading each and inspecting the error):
 | `generics-*` (plain, bounded, wildcard, method, diamond) | converter aborts with *"Unexpected type to convert"* on the type parameter/argument |
 | `local-class` | `Unsupported element: LocalClassDeclarationStmt` |
 | `static-import` | `Unsupported element: ImportDeclaration` (the `static` import) |
-| `annotation-declaration` | `Unsupported element: AnnotationDeclaration` (the `@interface`) |
 | `lambda` | `Unsupported element: LambdaExpr` |
 | `method-reference` | `Unsupported element: MethodReferenceExpr` |
 | `instanceof-pattern` | `Unsupported element: TypePatternExpr` (the bound pattern) |
@@ -58,6 +57,6 @@ its surroundings.
 - `var-primitive` / `var-in-for` load, but `var-reference-type` does not.
 - Generics come in five variants (`plain`, `bounded`, `wildcard`, `method`,
   `diamond`), all rejected.
-- "Parses" is not "soundly reasoned about": `autoboxing` and
+- "Parses" is not "soundly reasoned about": `autoboxing`, `annotation-declaration` and
   `try-with-resources` sit in `supported/` because they load, but KeY does not
   model them soundly (see the documentation's *Comments* column).

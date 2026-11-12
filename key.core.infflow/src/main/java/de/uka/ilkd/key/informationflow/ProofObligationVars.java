@@ -8,6 +8,8 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -47,9 +49,9 @@ public class ProofObligationVars {
     private final TermBuilder tb;
 
 
-    public ProofObligationVars(IProgramMethod pm, KeYJavaType kjt, Services services) {
-        this.pre = StateVars.buildMethodContractPreVars(pm, kjt, services);
-        this.post = StateVars.buildMethodContractPostVars(this.pre, pm, kjt, services);
+    public ProofObligationVars(IProgramMethod pm, TypeReference typeRef, Services services) {
+        this.pre = StateVars.buildMethodContractPreVars(pm, typeRef, services);
+        this.post = StateVars.buildMethodContractPostVars(this.pre, pm, typeRef, services);
         this.tb = services.getTermBuilder();
         this.exceptionParameter = buildExceptionParameter(services);
         this.formalParams = buildFormalParamVars(services);
@@ -125,7 +127,7 @@ public class ProofObligationVars {
         JavaInfo javaInfo = services.getJavaInfo();
         final KeYJavaType eType = javaInfo.getTypeByClassName("java.lang.Exception");
         final ProgramElementName ePEN = new ProgramElementName("e");
-        return tb.var(new LocationVariable(ePEN, eType));
+        return tb.var(new LocationVariable(ePEN, new TypeRef(eType)));
     }
 
     /**
@@ -139,7 +141,8 @@ public class ProofObligationVars {
         for (JTerm param : pre.localVars) {
             ProgramVariable paramVar = param.op(ProgramVariable.class);
             ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
-            LocationVariable formalParamVar = new LocationVariable(pen, paramVar.getKeYJavaType());
+            LocationVariable formalParamVar =
+                new LocationVariable(pen, paramVar.getTypeReference());
             register(formalParamVar, services);
             JTerm formalParam = tb.var(formalParamVar);
             formalParamVars = formalParamVars.append(formalParam);

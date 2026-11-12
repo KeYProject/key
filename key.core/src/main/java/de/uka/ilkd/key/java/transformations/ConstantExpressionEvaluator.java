@@ -12,7 +12,6 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.KeyEscapeExpression;
 import com.github.javaparser.ast.key.KeyPassiveExpression;
-import com.github.javaparser.ast.key.KeyRangeExpression;
 import com.github.javaparser.ast.key.sv.KeyExpressionSV;
 import com.github.javaparser.ast.key.sv.KeyMetaConstructExpression;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
@@ -80,7 +79,7 @@ public class ConstantExpressionEvaluator {
     private static class ConstantExpressionEvaluatorVisitor
             extends GenericVisitorAdapter<Object, Void> {
 
-        private Queue<FieldDeclaration> path = new LinkedList<FieldDeclaration>();
+        private final Queue<FieldDeclaration> path = new LinkedList<>();
 
         @Override
         public Object visit(ArrayAccessExpr n, Void arg) {
@@ -107,6 +106,9 @@ public class ConstantExpressionEvaluator {
             Object left = n.getLeft().accept(this, arg);
             Object right = n.getRight().accept(this, arg);
             return switch (n.getOperator()) {
+                case IMPLICATION, ANTIVALENCE, EQUIVALENCE, RIMPLICATION, SUB_LOCKE, SUB_LOCK,
+                        RANGE, SUBTYPE ->
+                    throw new RuntimeException();
                 case OR -> {
                     if (left instanceof Boolean && right instanceof Boolean)
                         yield ((Boolean) left) || (Boolean) right;
@@ -425,12 +427,6 @@ public class ConstantExpressionEvaluator {
 
         @Override
         public Object visit(KeyEscapeExpression n, Void arg) {
-            throw new RuntimeException("unsupported expression");
-
-        }
-
-        @Override
-        public Object visit(KeyRangeExpression n, Void arg) {
             throw new RuntimeException("unsupported expression");
 
         }

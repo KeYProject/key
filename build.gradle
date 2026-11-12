@@ -317,7 +317,6 @@ subprojects {
             afterEvaluate {
                 description = project.description
                 assert (project.description != null && project.description != "") : "Description of modules are required at maven-central"
-                print(project.description)
             }
             url = 'https://key-project.org/'
 
@@ -469,6 +468,6 @@ def envOrPropertyValue(String key) {
     if(key in System.getenv()) {
         return System.getenv(key)
     }else{
-        return project.properties.getOrDefault(key, "")
+        return providers.gradleProperty(key).getOrElse("")
     }
 }

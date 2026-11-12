@@ -30,8 +30,7 @@ public class InstantiationCostScalerFeature
         this.allowSplitting = allowSplitting;
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
-            Feature costFeature, Feature allowSplitting) {
+    public static Feature create(Feature costFeature, Feature allowSplitting) {
         return new InstantiationCostScalerFeature(costFeature, allowSplitting);
     }
 

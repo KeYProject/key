@@ -93,9 +93,10 @@ public class DefaultProofControl extends AbstractProofControl {
 
     @Override
     public void waitWhileAutoMode() {
-        while (isInAutoMode()) { // Wait until auto mode has stopped.
+        Thread running;
+        while ((running = autoModeThread) != null) {
             try {
-                Thread.sleep(100);
+                running.join();
             } catch (InterruptedException e) {
             }
         }
