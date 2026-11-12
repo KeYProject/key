@@ -33,15 +33,22 @@ public class WeakValueInternerTest {
         assertTrue(a != c, "different keys must intern to different instances");
     }
 
+    private static final class Interned {
+        private final Integer key;
+
+        Interned(Integer key) {
+            this.key = key;
+        }
+    }
+
     @Test
     void concurrentInternNeverProducesDistinctInstancesForSameKey() throws Exception {
         final int threads = 16;
         final int keys = 500;
-        final WeakValueInterner<Integer, Object> interner = new WeakValueInterner<>();
+        final WeakValueInterner<Integer, Interned> interner = new WeakValueInterner<>();
         // For each key, collect every instance any thread received. Identity holds iff each key
-        // maps
-        // to exactly one instance across all threads.
-        final ConcurrentHashMap<Integer, Set<Object>> perKey = new ConcurrentHashMap<>();
+        // maps to exactly one instance across all threads.
+        final ConcurrentHashMap<Integer, Set<Interned>> perKey = new ConcurrentHashMap<>();
         final CopyOnWriteArrayList<Throwable> failures = new CopyOnWriteArrayList<>();
         final CountDownLatch start = new CountDownLatch(1);
         final CountDownLatch done = new CountDownLatch(threads);
@@ -51,7 +58,7 @@ public class WeakValueInternerTest {
                 try {
                     start.await();
                     for (int i = 0; i < keys; i++) {
-                        Object v = interner.intern(i, k -> new Object());
+                        Interned v = interner.intern(i, Interned::new);
                         perKey.computeIfAbsent(i, k -> ConcurrentHashMap.newKeySet()).add(v);
                     }
                 } catch (Throwable th) {
