@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.reference.ArrayReference;
+import de.uka.ilkd.key.java.loader.JavaBuildingExceptions;
+import de.uka.ilkd.key.java.loader.JavaBuildingIssue;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
@@ -22,6 +24,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -403,6 +406,78 @@ public class TestTacletParser {
         assertInstanceOf(IsStatic.class, ca.getChildAt(1));
     }
 
+    @Test
+    public void testMethodCallRejectsWrongSortExecutionContext() {
+        // 3-arg form (ProgramSV ec, SchemaVariable result, ProgramElement body): slot 0 is the
+        // execution context. Passing a VARIABLE-sort #v0 there must be rejected at parse time
+        // with a positioned reportError instead of being silently accepted.
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badMethodCall {\\find(\\<{.. #methodCall(#v0, #v, #s); ...}\\>true)"
+                + " \\replacewith(true)}"));
+        assertTrue(hasCause(e, JavaBuildingExceptions.class),
+            "wrong execution-context sort must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testMethodCallRejectsUnsupportedProgramSort() {
+        // Single-ProgramSV form: #p1 has STATEMENT sort, which is neither EXECUTIONCONTEXT nor
+        // VARIABLE, so it must not be silently nulled but rejected at parse time.
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badMethodCall {\\find(\\<{.. #methodCall(#p1, #s); ...}\\>true)"
+                + " \\replacewith(true)}"));
+        assertTrue(hasCause(e, JavaBuildingExceptions.class),
+            "unsupported program sort must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testIsStaticZeroArgsRejected() {
+        // Expression-position transformers take exactly one argument. #isstatic() with zero
+        // arguments must yield a parse error rather than an IndexOutOfBoundsException.
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badIsStatic {\\find(\\<{.. #v0 = #isstatic(); ...}\\>true) \\replacewith(true)}"));
+        assertFalse(hasCause(e, IndexOutOfBoundsException.class),
+            "zero-arg #isstatic must not crash with IndexOutOfBoundsException");
+        assertTrue(hasCause(e, JavaBuildingExceptions.class),
+            "zero-arg #isstatic must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testLengthReferenceTwoArgsRejected() {
+        // Expression-position transformers take exactly one argument. #lengthReference(a, b)
+        // with two arguments must be rejected rather than silently dropping the second.
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badLength {\\find(\\<{.. #v0 = #lengthReference(#ar, #ar1); ...}\\>true)"
+                + " \\replacewith(true)}"));
+        assertTrue(hasCause(e, JavaBuildingExceptions.class),
+            "two-arg #lengthReference must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testMetaConstructErrorCarriesPosition() {
+        // A broken meta-construct must surface a positioned parsing error (a real line/column,
+        // not the -1 that PositionInfo.UNDEFINED corresponds to).
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badIsStatic {\\find(\\<{.. #v0 = #isstatic(); ...}\\>true) \\replacewith(true)}"));
+        JavaBuildingExceptions jbe =
+            (JavaBuildingExceptions) causeOf(e, JavaBuildingExceptions.class);
+        assertNotNull(jbe);
+        JavaBuildingIssue issue = jbe.getIssues().get(0);
+        assertNotEquals(-1, issue.getLine(), "error must carry a real line number");
+        assertNotEquals(-1, issue.getColumn(), "error must carry a real column number");
+    }
+
+    private static boolean hasCause(Throwable t, Class<? extends Throwable> type) {
+        return causeOf(t, type) != null;
+    }
+
+    private static Throwable causeOf(Throwable t, Class<? extends Throwable> type) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            if (type.isInstance(c)) {
+                return c;
+            }
+        }
+        return null;
+    }
 
     @Test
     public void testFreeReplacewithVariables() {

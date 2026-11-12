@@ -461,16 +461,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * rules.
      */
     private ProgramTransformer instantiate(Class<? extends ProgramTransformer> transformer,
-            List<?> args) {
-        final Constructor<?> ctor = getMatchingConstructor(transformer, args);
+            List<?> args, Node n) {
+        final Constructor<?> ctor = getMatchingConstructor(transformer, args, n);
         try {
             return (ProgramTransformer) ctor.newInstance(args.toArray());
         } catch (IllegalAccessException | InstantiationException e) {
-            throw new IllegalStateException(
-                "Cannot instantiate " + transformer.getSimpleName(), e);
+            return reportError(n, "Cannot instantiate " + transformer.getSimpleName() + ": " + e);
         } catch (InvocationTargetException e) {
-            throw new IllegalStateException(
-                "Cannot instantiate " + transformer.getSimpleName(), e.getCause());
+            return reportError(n, "Cannot instantiate " + transformer.getSimpleName() + ": "
+                + e.getCause());
         }
     }
 
@@ -482,8 +481,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * {@link SchemaVariable} parameters (the taclet-facing constructors), and finally a
      * deterministic order via the parameter type names.
      */
-    private static Constructor<?> getMatchingConstructor(
-            Class<? extends ProgramTransformer> transformer, List<?> args) {
+    private Constructor<?> getMatchingConstructor(Class<? extends ProgramTransformer> transformer,
+            List<?> args, Node n) {
         final List<Constructor<?>> candidates = new ArrayList<>();
         for (Constructor<?> ctor : transformer.getConstructors()) {
             final Class<?>[] params = ctor.getParameterTypes();
@@ -503,8 +502,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             }
         }
         if (candidates.isEmpty()) {
-            throw new IllegalStateException("No constructor of " + transformer.getSimpleName()
-                + " accepts the meta-construct arguments " + args);
+            return reportError(n, "No constructor of " + transformer.getSimpleName()
+                + " accepts " + args.size() + " meta-construct arguments " + args);
         }
         candidates.sort((a, b) -> {
             // Prefer the taclet-facing constructor, which takes the schema variable(s) directly,
@@ -1080,13 +1079,17 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return handleSpecialFunctionInvocation(n, n.getNameAsString(), n.getArguments());
         }
         // Expression-position transformers have no grammar token; they parse as ordinary method
-        // calls and are resolved through the expression registry.
+        // calls and are resolved through the expression registry. Every registered expression
+        // transformer takes a single argument, so any other arity is rejected by the constructor
+        // matching below (reported as a positioned parse error).
         final Class<? extends ProgramTransformer> expressionTransformer =
             ProgramTransformerRegistry.expressionByName(n.getNameAsString());
         if (expressionTransformer != null) {
-            final List<Object> args = new ArrayList<>(1);
-            args.add(accept(n.getArguments().get(0)));
-            return instantiate(expressionTransformer, args);
+            final List<Object> args = new ArrayList<>(n.getArguments().size());
+            for (var a : n.getArguments()) {
+                args.add(accept(a));
+            }
+            return instantiate(expressionTransformer, args, n);
         }
 
         MethodName name;
@@ -2081,7 +2084,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         for (Object a : converted) {
             args.add(a);
         }
-        return instantiate(transformer, args);
+        return instantiate(transformer, args, n);
     }
 
     @Override
@@ -2094,7 +2097,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
         final List<Object> args = new ArrayList<>(1);
         args.add(accept(n.getExpr()));
-        return instantiate(transformer, args);
+        return instantiate(transformer, args, n);
     }
 
 

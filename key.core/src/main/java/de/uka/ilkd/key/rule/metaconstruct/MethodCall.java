@@ -96,6 +96,10 @@ public final class MethodCall extends ProgramTransformer {
     public MethodCall(ProgramSV sv, ProgramElement body) {
         this(sv.sort() == ProgramSVSort.EXECUTIONCONTEXT ? sv : null,
             sv.sort() == ProgramSVSort.VARIABLE ? sv : null, body);
+        if (sv.sort() != ProgramSVSort.EXECUTIONCONTEXT && sv.sort() != ProgramSVSort.VARIABLE) {
+            throw new IllegalArgumentException("A single schema variable of #methodCall must be "
+                + "an execution context or a result variable, but was " + sv.sort() + ".");
+        }
     }
 
     /**
@@ -106,6 +110,10 @@ public final class MethodCall extends ProgramTransformer {
      */
     public MethodCall(ProgramSV ec, SchemaVariable result, ProgramElement body) {
         this(new Name("#methodCall"), ec, result, body);
+        if (ec != null && ec.sort() != ProgramSVSort.EXECUTIONCONTEXT) {
+            throw new IllegalArgumentException("The execution context of #methodCall must be "
+                + "an execution-context variable, but was " + ec.sort() + ".");
+        }
     }
 
     /**
