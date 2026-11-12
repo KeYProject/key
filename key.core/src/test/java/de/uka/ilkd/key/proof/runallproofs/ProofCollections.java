@@ -1237,6 +1237,10 @@ public class ProofCollections {
         g.provable("case-studies/stipula/behavior_run_license.key");
         g.provable("case-studies/stipula/behavior_run_loanForUse.key");
 
+        g = c.group("regression"); // proof files that fixed regressions
+        // must not be provable
+        g.notprovable(
+            "../../key.core/src/test/resources/testcase/issues/metaDisjointBug/metaDisjointBug.key");
 
         // use for debugging purposes.
         // c.keep("VSTTE10");
