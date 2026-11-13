@@ -44,6 +44,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGe
 
 import org.jspecify.annotations.NonNull;
 
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.strategy.HeapSelectCost.*;
 import static de.uka.ilkd.key.strategy.JavaCardDLCost.*;
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
@@ -341,7 +342,8 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             applyTF("result",
                 rec(any(),
                     add(SimplifiedSelectTermFeature.create(heapLDT), not(ff.ifThenElse)))),
-            not(ContainsTermFeature.create(instOf("result"), instOf("auxiliarySK"))));
+            not(ContainsTermFeature.create(instOf("result"), instOf("auxiliarySK"),
+                RENAMING_TERM_PROPERTY)));
 
         final int pullOutHeapBound = getHeapSizeBound();
         bindRuleSet(d, "hide_auxiliary_eq",
@@ -427,7 +429,8 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         return add(sequentContainsNoPrograms(),
             sum(sf, SequentFormulasGenerator.<Goal>sequent(),
                 or(StaticFeatureCollection.eq(sf, FocusFormulaProjection.create()),
-                    not(ContainsTermFeature.create(sf, instOf("auxiliarySK"))))));
+                    not(ContainsTermFeature.create(sf, instOf("auxiliarySK"),
+                        RENAMING_TERM_PROPERTY)))));
     }
 
     private void setupSystemInvariantSimp(RuleSetDispatchFeature d) {
@@ -537,7 +540,8 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
                 applyTF("s",
                     rec(any(),
                         add(SimplifiedSelectTermFeature.create(heapLDT), not(ff.ifThenElse)))),
-                not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
+                not(ContainsTermFeature.create(instOf("s"), instOf("t1"),
+                    RENAMING_TERM_PROPERTY))));
 
         return d;
     }

@@ -86,25 +86,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     private final BiFunction<Term, LogicServices, Monomial> monomialBuilder;
 
-    public record Config(ArithTermFeatures tf, boolean nonLinearArithmeticEnabled,
-            boolean divAndModuloReasoningEnabled,
-            boolean stopAtFirstNonCloseableGoal, IIntLdt numbers,
-            BiFunction<Term, LogicServices, Monomial> monomialBuilder,
-            BinaryOperator<ProjectionToTerm> reduceMonomials,
-            BinaryOperator<ProjectionToTerm> monomialColumnOp,
-            BinaryOperator<ProjectionToTerm> roundingUpDividePolynomials,
-            BinaryOperator<ProjectionToTerm> roundingDownDividePolynomials,
-            BinaryOperator<ProjectionToTerm> coeffGcd,
-            BiFunction<ProjectionToTerm, ProjectionToTerm, Feature> polyLt,
-            QuadFunction<ProjectionToTerm, ProjectionToTerm, ProjectionToTerm, ProjectionToTerm, Feature> polyLtCoeff,
-            BiFunction<ProjectionToTerm, ProjectionToTerm, Feature> polyLeq,
-            QuadFunction<ProjectionToTerm, ProjectionToTerm, ProjectionToTerm, ProjectionToTerm, Feature> polyLeqCoeff,
-            BiFunction<ProjectionToTerm, ProjectionToTerm, Feature> polyEq,
-            BiFunction<ProjectionToTerm, ProjectionToTerm, Feature> polyDivides,
-            BiFunction<ProjectionToTerm, ProjectionToTerm, TermGenerator<?>> multiplesModEquations,
-            BiFunction<ProjectionToTerm, LogicServices, TermGenerator<?>> roots) {
-    }
-
     protected Config cfg;
 
     public IntegerStrategy(Config cfg, IFormulaTermFeatures ff,
@@ -1199,4 +1180,23 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     protected abstract LogicServices getServices();
 
     protected abstract TermOrdering createTermOrdering();
+
+    public record Config(ArithTermFeatures tf, boolean nonLinearArithmeticEnabled,
+            boolean divAndModuloReasoningEnabled,
+            boolean stopAtFirstNonCloseableGoal, IIntLdt numbers,
+            BiFunction<Term, LogicServices, Monomial> monomialBuilder,
+            BinaryOperator<ProjectionToTerm> reduceMonomials,
+            BinaryOperator<ProjectionToTerm> monomialColumnOp,
+            BinaryOperator<ProjectionToTerm> roundingUpDividePolynomials,
+            BinaryOperator<ProjectionToTerm> roundingDownDividePolynomials,
+            BinaryOperator<ProjectionToTerm> coeffGcd,
+            BiFunction<ProjectionToTerm, ProjectionToTerm, Feature> polyLt,
+            QuadFunction<ProjectionToTerm, ProjectionToTerm, ProjectionToTerm, ProjectionToTerm, Feature> polyLtCoeff,
+            BiFunction<ProjectionToTerm, ProjectionToTerm, Feature> polyLeq,
+            QuadFunction<ProjectionToTerm, ProjectionToTerm, ProjectionToTerm, ProjectionToTerm, Feature> polyLeqCoeff,
+            BiFunction<ProjectionToTerm, ProjectionToTerm, Feature> polyEq,
+            BiFunction<ProjectionToTerm, ProjectionToTerm, Feature> polyDivides,
+            BiFunction<ProjectionToTerm, ProjectionToTerm, TermGenerator<?>> multiplesModEquations,
+            BiFunction<ProjectionToTerm, LogicServices, TermGenerator<?>> roots) {
+    }
 }
