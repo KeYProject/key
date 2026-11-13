@@ -8,29 +8,32 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-public class IntroducedSymbolBy extends BinaryTacletAppFeature {
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+
+public class IntroducedSymbolBy extends BinaryTacletAppFeature<Goal> {
     private final Name ruleSetName;
     private final Name schemaVar;
-    private final ProjectionToTerm<Goal> term;
+    private final ProjectionToTerm term;
 
-    public static Feature create(ProjectionToTerm<Goal> termWithTopLevelOpToCheck,
+    public static Feature create(ProjectionToTerm termWithTopLevelOpToCheck,
             String ruleSetName,
             String schemaVar) {
         return new IntroducedSymbolBy(termWithTopLevelOpToCheck, new Name(ruleSetName),
             new Name(schemaVar));
     }
 
-    protected IntroducedSymbolBy(ProjectionToTerm<Goal> termWithTopLevelOpToCheck, Name ruleSetName,
+    protected IntroducedSymbolBy(ProjectionToTerm termWithTopLevelOpToCheck, Name ruleSetName,
             Name schemaVar) {
         this.term = termWithTopLevelOpToCheck;
         this.ruleSetName = ruleSetName;
@@ -38,7 +41,8 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, Goal goal,
+            MutableState mState) {
         final Node root = goal.proof().root();
 
         Node n = goal.node();

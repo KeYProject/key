@@ -19,9 +19,9 @@ import org.jspecify.annotations.NonNull;
 
 public class ImplicitCastNecessary<Goal extends ProofGoal<@NonNull Goal>> extends BinaryFeature {
 
-    private final ProjectionToTerm<Goal> projection;
+    private final ProjectionToTerm projection;
 
-    private ImplicitCastNecessary(ProjectionToTerm<Goal> projection) {
+    private ImplicitCastNecessary(ProjectionToTerm projection) {
         this.projection = projection;
     }
 
@@ -37,7 +37,7 @@ public class ImplicitCastNecessary<Goal extends ProofGoal<@NonNull Goal>> extend
     }
 
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
-            ProjectionToTerm<Goal> s1) {
+            ProjectionToTerm s1) {
         return new ImplicitCastNecessary<>(s1);
     }
 

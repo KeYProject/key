@@ -18,8 +18,7 @@ import org.jspecify.annotations.Nullable;
 /// mainly used like bound variables and together with features like <code>LetFeature</code> and
 /// <code>ForEachCP</code>.
 @StableCost
-public class TermBuffer<Goal extends ProofGoal<Goal>> implements ProjectionToTerm<Goal> {
-
+public class TermBuffer implements ProjectionToTerm {
     public @Nullable Term getContent(MutableState mState) {
         return mState.read(this);
     }
@@ -28,7 +27,8 @@ public class TermBuffer<Goal extends ProofGoal<Goal>> implements ProjectionToTer
         mState.assign(this, t);
     }
 
-    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         return getContent(mState);
     }
 }

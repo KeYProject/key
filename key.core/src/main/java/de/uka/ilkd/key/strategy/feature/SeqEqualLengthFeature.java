@@ -8,7 +8,7 @@ import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 import de.uka.ilkd.key.strategy.SeqTermFeatures;
 
 import org.key_project.logic.Term;
@@ -19,6 +19,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
@@ -28,11 +29,11 @@ import org.jspecify.annotations.Nullable;
 /// Determines whether the equality of the length of two sequences can be easily derived from their
 /// syntactic form
 public final class SeqEqualLengthFeature extends BinaryFeature {
-    private final ProjectionToTerm<Goal> first;
-    private final ProjectionToTerm<Goal> second;
+    private final ProjectionToTerm first;
+    private final ProjectionToTerm second;
     private final SeqTermFeatures tf;
 
-    private SeqEqualLengthFeature(ProjectionToTerm<Goal> first, ProjectionToTerm<Goal> second,
+    private SeqEqualLengthFeature(ProjectionToTerm first, ProjectionToTerm second,
             SeqTermFeatures tf) {
         this.first = first;
         this.second = second;
@@ -43,7 +44,7 @@ public final class SeqEqualLengthFeature extends BinaryFeature {
     /// @param second the projection to the second sequence
     /// @param tf the term features of the sequence theories
     /// @return the feature
-    public static Feature create(ProjectionToTerm<Goal> first, ProjectionToTerm<Goal> second,
+    public static Feature create(ProjectionToTerm first, ProjectionToTerm second,
             SeqTermFeatures tf) {
         return new SeqEqualLengthFeature(first, second, tf);
     }
@@ -72,11 +73,11 @@ public final class SeqEqualLengthFeature extends BinaryFeature {
             final Polynomial b = length(seq.sub(1), mState, services);
             return a == null || b == null ? null : a.add(b);
         } else if (isConstructorTerm(seq, tf.def, mState, services)) {
-            return Polynomial.create(seq.sub(1), services)
-                    .sub(Polynomial.create(seq.sub(0), services));
+            return JPolynomial.create(seq.sub(1), services)
+                    .sub(JPolynomial.create(seq.sub(0), services));
         } else if (isConstructorTerm(seq, tf.subSequence, mState, services)) {
-            return Polynomial.create(seq.sub(2), services)
-                    .sub(Polynomial.create(seq.sub(1), services));
+            return JPolynomial.create(seq.sub(2), services)
+                    .sub(JPolynomial.create(seq.sub(1), services));
         } else if (isConstructorTerm(seq, tf.upd, mState, services)
                 || isConstructorTerm(seq, tf.swap, mState, services)
                 || isConstructorTerm(seq, tf.reverse, mState, services)) {
@@ -85,7 +86,7 @@ public final class SeqEqualLengthFeature extends BinaryFeature {
                 || isConstructorTerm(seq, tf.nPermInv, mState, services)) {
             return null;
         }
-        return Polynomial.create(seq, services);
+        return JPolynomial.create(seq, services);
     }
 
     private static boolean isConstructorTerm(Term seq, TermFeature constructor,

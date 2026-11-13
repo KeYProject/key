@@ -8,10 +8,10 @@ import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
+import org.key_project.logic.op.Modality;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -72,6 +72,11 @@ public abstract class AbstractBetaFeature implements Feature {
     }
 
     private abstract static class MaxPathHelper {
+
+        public MaxPathHelper() {
+
+        }
+
         public int compute(JTerm p_t, boolean p_positive) {
             if (p_t.op() == (p_positive ? Junctor.AND : Junctor.OR)) {
                 return compute(p_t.sub(0), p_positive) + compute(p_t.sub(1), p_positive);
@@ -274,7 +279,7 @@ public abstract class AbstractBetaFeature implements Feature {
      *         negative)
      */
     public static boolean alwaysReplace(JTerm p_t) {
-        return p_t.op() instanceof JModality || p_t.op() instanceof Quantifier;
+        return p_t.op() instanceof Modality || p_t.op() instanceof Quantifier;
     }
 
     /**

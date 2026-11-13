@@ -11,16 +11,17 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
@@ -37,18 +38,18 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  */
 public class RootsGenerator implements TermGenerator<Goal> {
 
-    private final ProjectionToTerm<Goal> powerRelation;
+    private final ProjectionToTerm powerRelation;
 
     private final TermBuilder tb;
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf(2);
 
-    public static TermGenerator<Goal> create(ProjectionToTerm<Goal> powerRelation,
-            TermServices services) {
-        return new RootsGenerator(powerRelation, services.getTermBuilder());
+    public static TermGenerator<Goal> create(ProjectionToTerm powerRelation,
+            LogicServices services) {
+        return new RootsGenerator(powerRelation, ((Services) services).getTermBuilder());
     }
 
-    private RootsGenerator(ProjectionToTerm<Goal> powerRelation, TermBuilder tb) {
+    private RootsGenerator(ProjectionToTerm powerRelation, TermBuilder tb) {
         this.powerRelation = powerRelation;
         this.tb = tb;
     }
@@ -68,7 +69,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
         final BigInteger lit = new BigInteger(
             AbstractTermTransformer.convertToDecimalString(powerRel.sub(1), services));
 
-        final Monomial mon = Monomial.create(powerRel.sub(0), services);
+        final Monomial mon = JMonomial.create(powerRel.sub(0), services);
         final int pow = mon.getParts().size();
         if (pow <= 1 || !mon.getCoefficient().equals(one)) {
             return emptyIterator();

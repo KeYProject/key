@@ -13,7 +13,6 @@ import org.jspecify.annotations.NonNull;
 
 public abstract class CompareCostsFeature
         extends BinaryFeature {
-
     protected final Feature a, b;
 
     private CompareCostsFeature(Feature a, Feature b) {
@@ -53,5 +52,4 @@ public abstract class CompareCostsFeature
             }
         };
     }
-
 }

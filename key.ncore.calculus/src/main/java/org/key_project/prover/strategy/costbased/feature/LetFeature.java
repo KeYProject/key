@@ -24,17 +24,16 @@ import org.jspecify.annotations.NonNull;
 // find position is unmodified, so the projected focus term is stable.)
 @StableCost
 public class LetFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
-
-    private final TermBuffer<Goal> var;
-    private final ProjectionToTerm<Goal> value;
+    private final TermBuffer var;
+    private final ProjectionToTerm value;
     private final Feature body;
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(TermBuffer<Goal> var,
-            ProjectionToTerm<Goal> value, Feature body) {
+    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(TermBuffer var,
+            ProjectionToTerm value, Feature body) {
         return new LetFeature<>(var, value, body);
     }
 
-    private LetFeature(TermBuffer<Goal> var, ProjectionToTerm<Goal> value, Feature body) {
+    private LetFeature(TermBuffer var, ProjectionToTerm value, Feature body) {
         this.var = var;
         this.value = value;
         this.body = body;
@@ -52,5 +51,4 @@ public class LetFeature<Goal extends ProofGoal<@NonNull Goal>> implements Featur
         var.setContent(outerVarContent, mState);
         return res;
     }
-
 }

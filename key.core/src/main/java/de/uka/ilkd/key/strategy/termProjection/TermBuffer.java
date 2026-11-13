@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termProjection;
 
-import de.uka.ilkd.key.proof.Goal;
-
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 /**
@@ -17,5 +15,5 @@ import org.key_project.prover.strategy.costbased.feature.StableCost;
  */
 @StableCost
 public class TermBuffer
-        extends org.key_project.prover.strategy.costbased.termProjection.TermBuffer<Goal> {
+        extends org.key_project.prover.strategy.costbased.termProjection.TermBuffer {
 }

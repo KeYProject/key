@@ -9,6 +9,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.indexing.RuleAppIndexMode;
 import org.key_project.prover.proof.rulefilter.AnyRuleSetTacletFilter;
 import org.key_project.prover.proof.rulefilter.NotRuleFilter;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
@@ -20,7 +21,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
-import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
+import static org.key_project.prover.indexing.RuleAppIndexMode.INTERACTIVE;
 
 /**
  * manages the possible application of rules (RuleApps)

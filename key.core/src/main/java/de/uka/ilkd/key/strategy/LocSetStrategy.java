@@ -7,40 +7,52 @@ package de.uka.ilkd.key.strategy;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
+import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.AbstractFeatureStrategy;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
+import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
+import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /// Strategy for location sets
 /// Do not create directly; use [SetStrategyFactory] instead.
-public class LocSetStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
+        implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("LocSet Strategy");
 
     private final RuleSetDispatchFeature costComputationDispatcher;
 
     private final boolean stopAtFirstNonCloseableGoal;
     private final LocSetTermFeatures lsf;
+    private final Proof proof;
 
     public LocSetStrategy(Proof proof, StrategyProperties strategyProperties) {
-        super(proof);
+        this.proof = proof;
+        TypeConverter typeConverter = proof.getServices().getTypeConverter();
         this.lsf = new LocSetTermFeatures(
-            getServices().getTypeConverter().getLDT(de.uka.ilkd.key.ldt.SetLDT.class),
-            getServices().getTypeConverter().getLocSetLDT(),
-            getServices().getTypeConverter().getHeapLDT());
+            typeConverter.getLDT(de.uka.ilkd.key.ldt.SetLDT.class),
+            typeConverter.getLocSetLDT(),
+            typeConverter.getHeapLDT());
         costComputationDispatcher = setupCostComputationF();
 
         stopAtFirstNonCloseableGoal =
@@ -57,11 +69,11 @@ public class LocSetStrategy extends AbstractFeatureStrategy implements Component
         /// rest of the sequent (e.g, ==> l \in allObjects(f) would lead to an application but
         /// allObjects(f) = EQ ==> l \in EQ not)
         bindRuleSet(d, "locSetEqualityBlastingRight",
-            ifZero(applyTF(FocusFormulaProjection.INSTANCE, lsf.requireLocationDecomposition),
+            ifZero(applyTF(FocusFormulaProjection.<Goal>create(), lsf.requireLocationDecomposition),
                 longConst(-100), longConst(-80)));
 
         bindRuleSet(d, "locSetArrayRangeMerge",
-            add(ifZero(MatchedAssumesFeature.INSTANCE,
+            add(ifZero(MatchedAssumesFeature.create(),
                 add(PolynomialValuesCmpFeature.leq(instOf("lower"), instOf("upper")),
                     PolynomialValuesCmpFeature.lt(instOf("upper"), instOf("lower2")),
                     PolynomialValuesCmpFeature.leq(instOf("lower2"), instOf("upper2"))),
@@ -69,27 +81,27 @@ public class LocSetStrategy extends AbstractFeatureStrategy implements Component
                 longConst(-4000)));
 
         bindRuleSet(d, "locSetArrayRangeInterNested",
-            add(ifZero(MatchedAssumesFeature.INSTANCE,
+            add(ifZero(MatchedAssumesFeature.create(),
                 add(PolynomialValuesCmpFeature.leq(instOf("lower"), instOf("lower2")),
                     PolynomialValuesCmpFeature.leq(instOf("upper2"), instOf("upper"))),
                 longConst(0)),
                 longConst(-4000)));
 
         bindRuleSet(d, "locSetArrayRangeInterNested2",
-            add(ifZero(MatchedAssumesFeature.INSTANCE,
+            add(ifZero(MatchedAssumesFeature.create(),
                 add(PolynomialValuesCmpFeature.leq(instOf("lower2"), instOf("lower")),
                     PolynomialValuesCmpFeature.leq(instOf("upper"), instOf("upper2"))),
                 longConst(0)),
                 longConst(-4000)));
 
         bindRuleSet(d, "locSetArrayRangeInterDisjoint",
-            add(ifZero(MatchedAssumesFeature.INSTANCE,
+            add(ifZero(MatchedAssumesFeature.create(),
                 PolynomialValuesCmpFeature.lt(instOf("upper"), instOf("lower2")),
                 longConst(0)),
                 longConst(-4000)));
 
         bindRuleSet(d, "locSetArrayRangeInterDisjoint2",
-            add(ifZero(MatchedAssumesFeature.INSTANCE,
+            add(ifZero(MatchedAssumesFeature.create(),
                 PolynomialValuesCmpFeature.lt(instOf("upper2"), instOf("lower")),
                 longConst(0)),
                 longConst(-4000)));
@@ -144,7 +156,27 @@ public class LocSetStrategy extends AbstractFeatureStrategy implements Component
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule<Goal> rule) {
         return false;
+    }
+
+
+    @Override
+    protected RuleSet getHeuristic(String p_name) {
+        final NamespaceSet nss = proof.getNamespaces();
+        final Namespace<@NonNull RuleSet> ns = nss.ruleSets();
+        final RuleSet h = ns.lookup(new Name(p_name));
+
+        assert h != null : "Did not find the rule set " + p_name;
+
+        return h;
+    }
+
+    @Override
+    protected Feature isBelow(TermFeature t) {
+        final de.uka.ilkd.key.strategy.termProjection.TermBuffer superTerm =
+            new de.uka.ilkd.key.strategy.termProjection.TermBuffer();
+        return not(sum(superTerm, SuperTermGenerator.upwards(any(), proof.getServices()),
+            not(applyTF(superTerm, t))));
     }
 }

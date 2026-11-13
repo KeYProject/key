@@ -27,9 +27,9 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
         implements TermGenerator<Goal> {
 
     private final TermFeature cond;
-    private final ProjectionToTerm<Goal> completeTerm;
+    private final ProjectionToTerm completeTerm;
 
-    private SubtermGenerator(ProjectionToTerm<Goal> completeTerm, TermFeature cond) {
+    private SubtermGenerator(ProjectionToTerm completeTerm, TermFeature cond) {
         this.cond = cond;
         this.completeTerm = completeTerm;
     }
@@ -37,7 +37,7 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
     /// Left-traverse the subterms of a term in depth-first order. Each term is returned before its
     /// proper subterms.
     public static <Goal extends ProofGoal<@NonNull Goal>> TermGenerator<Goal> leftTraverse(
-            ProjectionToTerm<Goal> cTerm, TermFeature cond) {
+            ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator<>(cTerm, cond) {
             public Iterator<Term> generate(RuleApp app,
                     PosInOccurrence pos, Goal goal,
@@ -51,7 +51,7 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
     /// Right-traverse the subterms of a term in depth-first order. Each term is returned before its
     /// proper subterms.
     public static <Goal extends ProofGoal<@NonNull Goal>> TermGenerator<Goal> rightTraverse(
-            ProjectionToTerm<Goal> cTerm, TermFeature cond) {
+            ProjectionToTerm cTerm, TermFeature cond) {
         return new SubtermGenerator<>(cTerm, cond) {
             public Iterator<Term> generate(RuleApp app,
                     PosInOccurrence pos, Goal goal,

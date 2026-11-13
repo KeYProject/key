@@ -12,6 +12,7 @@ import de.uka.ilkd.key.strategy.definition.StrategyPropertyValueDefinition;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.strategy.FOLStrategy;
 
 /// Factory for [JFOLStrategy]. Additionally, handles all strategy settings
 /// relevant to it.
@@ -50,8 +51,11 @@ public class JFOLStrategyFactory implements StrategyFactory {
             + "The previous behaviour; use only if a proof was tuned to it.</html>";
 
     @Override
-    public Strategy<Goal> create(Proof proof, StrategyProperties strategyProperties) {
-        return new JFOLStrategy(proof, strategyProperties);
+    public org.key_project.prover.strategy.Strategy<Goal> create(Proof proof,
+            StrategyProperties strategyProperties) {
+        var tf = new JavaArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
+        var ff = new FormulaTermFeatures(tf);
+        return new JFOLStrategy(tf, ff, proof, strategyProperties);
     }
 
     private static OneOfStrategyPropertyDefinition getQuantifierTreatment() {

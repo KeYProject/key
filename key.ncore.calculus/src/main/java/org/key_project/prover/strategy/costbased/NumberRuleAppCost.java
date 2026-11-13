@@ -8,7 +8,6 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 public abstract class NumberRuleAppCost implements RuleAppCost {
-
     private static final NumberRuleAppCost ZERO_COST = new IntRuleAppCost(0);
 
     /// Pre-allocated instances for frequently occurring cost values.
@@ -148,5 +147,4 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
             return cost;
         }
     }
-
 }

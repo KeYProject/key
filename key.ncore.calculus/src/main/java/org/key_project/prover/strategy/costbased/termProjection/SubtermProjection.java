@@ -1,0 +1,42 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+package org.key_project.prover.strategy.costbased.termProjection;
+
+import org.key_project.logic.PosInTerm;
+import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.RuleApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.StableCost;
+
+import org.jspecify.annotations.NonNull;
+
+/// Projection for computing a subterm of a given term. The position of the subterm within the
+/// complete term is described using a `PosInTerm`.
+@StableCost
+public class SubtermProjection implements ProjectionToTerm {
+    private final PosInTerm pit;
+    private final ProjectionToTerm completeTerm;
+
+    public static ProjectionToTerm create(
+            ProjectionToTerm completeTerm,
+            PosInTerm pit) {
+        return new SubtermProjection(completeTerm, pit);
+    }
+
+    private SubtermProjection(ProjectionToTerm completeTerm, PosInTerm pit) {
+        this.completeTerm = completeTerm;
+        this.pit = pit;
+    }
+
+    @Override
+    public Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal<? extends @NonNull Object> goal,
+            MutableState mState) {
+        final Term completeTermInst = completeTerm.toTerm(app, pos, goal, mState);
+        assert completeTermInst != null : "@AssumeAssertion(nullness): Term should not be null";
+        return pit.getSubTerm(completeTermInst);
+    }
+}

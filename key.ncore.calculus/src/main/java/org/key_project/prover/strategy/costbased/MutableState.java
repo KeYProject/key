@@ -15,24 +15,20 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-///
 /// Realizes a variable bank for strategy features such that each feature
 /// computation can be done in parallel.
-///
 ///
 /// When the strategy computes the costs for a [RuleApp] it creates
 /// a new MutableState object and passes it on. This is then used by features
 /// to query for the value of [TermBuffer]s.
-///
 ///
 /// This mutable state should not be abused and strategy features should be stateless.
 ///
 ///
 /// @author Richard Bubel
 public class MutableState {
-
     /// maps a term buffer to its value
-    private final HashMap<TermBuffer<?>, @Nullable Term> content = HashMap.newHashMap(32);
+    private final HashMap<TermBuffer, @Nullable Term> content = HashMap.newHashMap(32);
 
     /// The branch currently chosen at each `OneOfCP`-style choice point, keyed by the choice point.
     /// This state belongs to a single feature-term evaluation, so it is kept here (per evaluation)
@@ -48,7 +44,7 @@ public class MutableState {
     ///
     /// @param v the [TermBuffer]
     /// @param value the Term which is assigned as the value
-    public <Goal extends ProofGoal<Goal>> void assign(@NonNull TermBuffer<Goal> v,
+    public <Goal extends ProofGoal<Goal>> void assign(@NonNull TermBuffer v,
             @Nullable Term value) {
         content.put(v, value);
     }
@@ -57,7 +53,7 @@ public class MutableState {
     ///
     /// @param v the TermBuffer whose value is asked for
     /// @return the current value of the [TermBuffer] or `null` if there is none
-    public <Goal extends @NonNull ProofGoal<Goal>> @Nullable Term read(TermBuffer<Goal> v) {
+    public <Goal extends @NonNull ProofGoal<Goal>> @Nullable Term read(TermBuffer v) {
         return content.get(v);
     }
 
@@ -81,7 +77,7 @@ public class MutableState {
     /// returns the backtracking manager to access [ChoicePoint]s
     ///
     /// @return the backtracking manager
-    public @Nullable BackTrackingManager getBacktrackingManager() {
+    public BackTrackingManager getBacktrackingManager() {
         if (btManager == null) {
             btManager = new BackTrackingManager();
         }

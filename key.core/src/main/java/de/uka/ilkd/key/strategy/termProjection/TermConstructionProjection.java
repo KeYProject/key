@@ -5,10 +5,11 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.Operator;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -23,25 +24,27 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * bound variables, etc to be specified
  */
 @StableCost
-public class TermConstructionProjection implements ProjectionToTerm<Goal> {
+public class TermConstructionProjection implements ProjectionToTerm {
 
     private final Operator op;
-    private final ProjectionToTerm<Goal>[] subTerms;
+    private final ProjectionToTerm[] subTerms;
 
 
-    private TermConstructionProjection(Operator op, ProjectionToTerm<Goal>[] subTerms) {
-        assert !(op instanceof JModality); // XXX
+    private TermConstructionProjection(Operator op, ProjectionToTerm[] subTerms) {
+        assert !(op instanceof Modality); // XXX
         this.op = op;
         this.subTerms = subTerms;
         assert op.arity() == subTerms.length;
     }
 
-    public static ProjectionToTerm<Goal> create(Operator op, ProjectionToTerm<Goal>[] subTerms) {
+    public static ProjectionToTerm create(Operator op, ProjectionToTerm[] subTerms) {
         return new TermConstructionProjection(op, subTerms);
     }
 
     @Override
-    public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public JTerm toTerm(RuleApp app, PosInOccurrence pos, ProofGoal<?> p_goal,
+            MutableState mState) {
+        final Goal goal = (Goal) p_goal;
         final JTerm[] subs = new JTerm[subTerms.length];
         for (int i = 0; i != subTerms.length; ++i) {
             subs[i] = (JTerm) subTerms[i].toTerm(app, pos, goal, mState);

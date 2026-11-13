@@ -17,7 +17,6 @@ import org.jspecify.annotations.NonNull;
 /// A feature that applies an affine transformation to the result of a given feature. As a special
 /// case, it can be used to scale the given feature.
 public abstract class ScaleFeature implements Feature {
-
     /// the base feature
     private final Feature feature;
 
@@ -184,5 +183,4 @@ public abstract class ScaleFeature implements Feature {
             return NumberRuleAppCost.create((long) (coeff * costVal) + offset);
         }
     }
-
 }

@@ -15,7 +15,6 @@ import org.jspecify.annotations.NonNull;
 /// A feature that returns a constant value
 @StableCost
 public class ConstFeature implements Feature {
-
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, Goal goal, MutableState mState) {

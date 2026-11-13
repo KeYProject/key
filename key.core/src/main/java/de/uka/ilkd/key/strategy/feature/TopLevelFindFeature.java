@@ -6,11 +6,12 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 
@@ -20,7 +21,7 @@ import org.key_project.prover.strategy.costbased.feature.StableCost;
  * variants also accept a focus that sits below a prefix of update applications only.
  */
 @StableCost
-public final class TopLevelFindFeature extends BinaryTacletAppFeature {
+public final class TopLevelFindFeature extends BinaryTacletAppFeature<Goal> {
 
     /** Whether a focus below a pure update prefix still counts as top-level. */
     private enum Update {
@@ -56,7 +57,7 @@ public final class TopLevelFindFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
         return atTopLevel(pos) && matchesSide(pos);
     }

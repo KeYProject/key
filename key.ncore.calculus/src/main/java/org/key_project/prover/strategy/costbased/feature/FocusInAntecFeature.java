@@ -15,7 +15,6 @@ import org.jspecify.annotations.NonNull;
 // for a given rule application.
 @StableCost
 public class FocusInAntecFeature extends BinaryFeature {
-
     private static final Feature INSTANCE = new FocusInAntecFeature();
 
     private FocusInAntecFeature() {}

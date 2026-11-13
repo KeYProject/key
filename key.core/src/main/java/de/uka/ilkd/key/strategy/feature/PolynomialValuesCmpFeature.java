@@ -10,13 +10,16 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
@@ -25,18 +28,18 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * some constant before comparison.
  */
 @StableCost
-public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
+public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature<Goal> {
 
     /** Which polynomial-value relation an instance checks. */
     private enum Cmp {
         LT, LEQ, EQ, DIVIDES
     }
 
-    private final ProjectionToTerm<Goal> left, right, leftCoeff, rightCoeff;
+    private final ProjectionToTerm left, right, leftCoeff, rightCoeff;
     private final Cmp cmp;
 
-    private PolynomialValuesCmpFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff, Cmp cmp) {
+    private PolynomialValuesCmpFeature(ProjectionToTerm left, ProjectionToTerm right,
+            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff, Cmp cmp) {
         this.left = left;
         this.right = right;
         this.leftCoeff = leftCoeff;
@@ -44,47 +47,48 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
         this.cmp = cmp;
     }
 
-    public static Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static Feature lt(ProjectionToTerm left, ProjectionToTerm right) {
         return lt(left, right, null, null);
     }
 
-    public static Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+    public static Feature lt(ProjectionToTerm left, ProjectionToTerm right,
+            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.LT);
     }
 
-    public static Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static Feature leq(ProjectionToTerm left, ProjectionToTerm right) {
         return leq(left, right, null, null);
     }
 
-    public static Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+    public static Feature leq(ProjectionToTerm left, ProjectionToTerm right,
+            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.LEQ);
     }
 
-    public static Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static Feature eq(ProjectionToTerm left, ProjectionToTerm right) {
         return eq(left, right, null, null);
     }
 
-    public static Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+    public static Feature eq(ProjectionToTerm left, ProjectionToTerm right,
+            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.EQ);
     }
 
-    public static Feature divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right) {
+    public static Feature divides(ProjectionToTerm left, ProjectionToTerm right) {
         return divides(left, right, null, null);
     }
 
-    public static Feature divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+    public static Feature divides(ProjectionToTerm left, ProjectionToTerm right,
+            ProjectionToTerm leftCoeff, ProjectionToTerm rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.DIVIDES);
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos,
+    protected boolean filter(ITacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
-        return compare(getPolynomial(left, leftCoeff, app, pos, goal, mState),
-            getPolynomial(right, rightCoeff, app, pos, goal, mState));
+        final TacletApp tacletApp = (TacletApp) app;
+        return compare(getPolynomial(left, leftCoeff, tacletApp, pos, goal, mState),
+            getPolynomial(right, rightCoeff, tacletApp, pos, goal, mState));
     }
 
     private boolean compare(Polynomial leftPoly, Polynomial rightPoly) {
@@ -109,12 +113,12 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
         return leftPoly.getConstantTerm().mod(rightPoly.getConstantTerm().abs()).signum() == 0;
     }
 
-    private Polynomial getPolynomial(ProjectionToTerm<Goal> polyProj,
-            ProjectionToTerm<Goal> coeffProj,
+    private Polynomial getPolynomial(ProjectionToTerm polyProj,
+            ProjectionToTerm coeffProj,
             TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
         final Polynomial poly =
-            Polynomial.create(polyProj.toTerm(app, pos, goal, mState), services);
+            JPolynomial.create(polyProj.toTerm(app, pos, goal, mState), services);
 
         if (coeffProj == null) {
             return poly;

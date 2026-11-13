@@ -11,38 +11,41 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
-import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.SmallerThanFeature;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-public class LiteralsSmallerThanFeature extends SmallerThanFeature {
+public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
 
-    private final ProjectionToTerm<Goal> left, right;
+    private final ProjectionToTerm left, right;
     private final IntegerLDT numbers;
 
     private final QuanEliminationAnalyser quanAnalyser = new QuanEliminationAnalyser();
 
 
-    private LiteralsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IntegerLDT numbers) {
+    private LiteralsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+            TermOrdering termOrdering, IntegerLDT numbers) {
+        super(termOrdering);
         this.left = left;
         this.right = right;
         this.numbers = numbers;
     }
 
-    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IntegerLDT numbers) {
-        return new LiteralsSmallerThanFeature(left, right, numbers);
+    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+            TermOrdering termOrdering, IntegerLDT numbers) {
+        return new LiteralsSmallerThanFeature(left, right, termOrdering, numbers);
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos,
+    protected boolean filter(ITacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
@@ -112,8 +115,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
             }
 
             final Services services = goal.proof().getServices();
-            final Polynomial t1RHS = Polynomial.create(t1.sub(1), services);
-            final Polynomial t2RHS = Polynomial.create(t2.sub(1), services);
+            final Polynomial t1RHS = JPolynomial.create(t1.sub(1), services);
+            final Polynomial t2RHS = JPolynomial.create(t2.sub(1), services);
             if (t1RHS.valueLess(t2RHS)) {
                 return true;
             }
