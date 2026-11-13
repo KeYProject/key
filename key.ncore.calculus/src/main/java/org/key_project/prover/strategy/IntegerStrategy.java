@@ -82,11 +82,11 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     private final IIntLdt numbers;
 
-    final FeatureConstants<G> fc;
+    protected final FeatureConstants<G> fc;
 
     private final BiFunction<Term, LogicServices, Monomial> monomialBuilder;
 
-    protected Config cfg;
+    protected final Config cfg;
 
     public IntegerStrategy(Config cfg, IFormulaTermFeatures ff,
             FeatureConstants<G> featureConstants) {
