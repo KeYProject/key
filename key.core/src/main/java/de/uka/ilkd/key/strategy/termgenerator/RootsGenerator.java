@@ -11,12 +11,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -45,8 +45,8 @@ public class RootsGenerator implements TermGenerator<Goal> {
     private final BigInteger two = BigInteger.valueOf(2);
 
     public static TermGenerator<Goal> create(ProjectionToTerm powerRelation,
-            TermServices services) {
-        return new RootsGenerator(powerRelation, services.getTermBuilder());
+            LogicServices services) {
+        return new RootsGenerator(powerRelation, ((Services) services).getTermBuilder());
     }
 
     private RootsGenerator(ProjectionToTerm powerRelation, TermBuilder tb) {

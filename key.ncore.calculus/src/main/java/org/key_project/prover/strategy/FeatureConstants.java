@@ -33,53 +33,12 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     TermFeature createEliminableQuantifier();
 
-    ProjectionToTerm createReduceMonomialsProjection(ProjectionToTerm dividend,
-            ProjectionToTerm divisor);
-
-    ProjectionToTerm createMonomialColumnOp(ProjectionToTerm leftCoefficient,
-            ProjectionToTerm polynomial);
-
-    ProjectionToTerm createRoundingUpDividePolynomialsProjection(
-            ProjectionToTerm leftCoefficient, ProjectionToTerm polynomial);
-
-    ProjectionToTerm createRoundingDownDividePolynomialsProjection(
-            ProjectionToTerm leftCoefficient, ProjectionToTerm polynomial);
-
-    ProjectionToTerm createCoeffGcdProjection(
-            ProjectionToTerm monomialLeft, ProjectionToTerm monomialRight);
-
-    Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right);
-
-    Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right, ProjectionToTerm leftCoeff,
-            ProjectionToTerm rightCoeff);
-
-    Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right);
-
-    Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right, ProjectionToTerm leftCoeff,
-            ProjectionToTerm rightCoeff);
-
-    Feature createEqPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right);
-
-    Feature createDividesPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right);
-
     TermFeature createEqTermFeature(TermBuffer t);
 
     Feature directlyBelowSymbolAtIndex(Operator symbol, int index);
 
-    TermGenerator<G> createMultiplesModEquationsGenerator(
-            ProjectionToTerm source, ProjectionToTerm target);
-
     ProjectionToTerm opTerm(Operator op, ProjectionToTerm subTerm0,
             ProjectionToTerm subTerm1);
-
-    TermGenerator<G> createRootsGenerator(ProjectionToTerm powerRelation,
-            LogicServices services);
 
     TermGenerator<G> upwardsWithIndexSuperGenerator(TermFeature cond, LogicServices services);
 

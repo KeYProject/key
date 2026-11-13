@@ -8,7 +8,6 @@ package de.uka.ilkd.key.strategy;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
@@ -19,7 +18,6 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.Term;
 import org.key_project.logic.TermOrdering;
 import org.key_project.prover.rules.RuleSet;
-import org.key_project.prover.strategy.ArithTermFeatures;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.IntegerStrategy;
@@ -44,20 +42,9 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
     /// a settings strategy pane (not the strategy pane)
     private static final int BRANCH_MULT_CAP = 8;
 
-    public JavaIntegerStrategy(ArithTermFeatures tf, IFormulaTermFeatures ff, Proof proof,
-            StrategyProperties strategyProperties) {
-        super(tf, ff, StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(
-            strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY)),
-            StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(
-                strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY))
-                    || StrategyProperties.NON_LIN_ARITH_DEF_OPS.equals(
-                        strategyProperties
-                                .getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY)),
-            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                    .equals(StrategyProperties.STOPMODE_NONCLOSE),
-            new JavaFeatureConstants(),
-            proof.getServices().getTypeConverter().getIntegerLDT(),
-            JMonomial::create);
+    public JavaIntegerStrategy(Config cfg, IFormulaTermFeatures ff, Proof proof) {
+        super(cfg, ff,
+            new JavaFeatureConstants());
         this.proof = proof;
         init();
     }

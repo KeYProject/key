@@ -15,12 +15,9 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.jspecify.annotations.NonNull;
-
-
 
 /// Generic interface for evaluating the cost of a RuleApp with regard to a specific strategy
-public interface Strategy<Goal extends ProofGoal<@NonNull Goal>> extends Named, Feature {
+public interface Strategy<Goal extends ProofGoal<Goal>> extends Named, Feature {
     /// Evaluate the cost of a `RuleApp`. Starts a new independent computation.
     ///
     /// @param app the RuleApp

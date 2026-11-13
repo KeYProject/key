@@ -206,8 +206,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     /// @param pio corresponding [PosInOccurrence]
     /// @param goal corresponding goal
     /// @param mState the [MutableState] to query for information like current value of
-    /// [TermBuffer]s or
-    /// [ChoicePoint]s
+    /// [TermBuffer]s or `ChoicePoint`s
     /// @return the cost of the rule application expressed as a `RuleAppCost` object.
     /// `TopRuleAppCost.INSTANCE` indicates that the rule shall not be applied at
     /// all (it is discarded by the strategy).

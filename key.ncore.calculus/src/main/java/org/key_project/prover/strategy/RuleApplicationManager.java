@@ -15,7 +15,6 @@ import org.jspecify.annotations.Nullable;
 ///
 /// Rule application managers are associated with a specific proof goal.
 /// Each proof goal has its own copy of a manager (see [#copy()]).
-///
 public interface RuleApplicationManager<G extends @Nullable ProofGoal<G>> extends NewRuleListener {
     /// Clear existing caches of applicable rules
     void clearCache();

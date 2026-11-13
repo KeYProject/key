@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.StaticFeatureCollection;
@@ -76,74 +75,6 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public ProjectionToTerm createReduceMonomialsProjection(
-            ProjectionToTerm dividend, ProjectionToTerm divisor) {
-        return ReduceMonomialsProjection.create(dividend, divisor);
-    }
-
-    @Override
-    public ProjectionToTerm createMonomialColumnOp(ProjectionToTerm leftCoefficient,
-            ProjectionToTerm polynomial) {
-        return MonomialColumnOp.create(leftCoefficient, polynomial);
-    }
-
-    @Override
-    public ProjectionToTerm createRoundingUpDividePolynomialsProjection(
-            ProjectionToTerm leftCoefficient, ProjectionToTerm polynomial) {
-        return DividePolynomialsProjection.createRoundingUp(leftCoefficient, polynomial);
-    }
-
-    @Override
-    public ProjectionToTerm createRoundingDownDividePolynomialsProjection(
-            ProjectionToTerm leftCoefficient, ProjectionToTerm polynomial) {
-        return DividePolynomialsProjection.createRoundingDown(leftCoefficient, polynomial);
-    }
-
-    @Override
-    public ProjectionToTerm createCoeffGcdProjection(ProjectionToTerm monomialLeft,
-            ProjectionToTerm monomialRight) {
-        return CoeffGcdProjection.create(monomialLeft, monomialRight);
-    }
-
-    @Override
-    public Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right) {
-        return PolynomialValuesCmpFeature.lt(left, right);
-    }
-
-    @Override
-    public Feature createLtPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right, ProjectionToTerm leftCoeff,
-            ProjectionToTerm rightCoeff) {
-        return PolynomialValuesCmpFeature.lt(left, right, leftCoeff, rightCoeff);
-    }
-
-    @Override
-    public Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right) {
-        return PolynomialValuesCmpFeature.leq(left, right);
-    }
-
-    @Override
-    public Feature createLeqPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right, ProjectionToTerm leftCoeff,
-            ProjectionToTerm rightCoeff) {
-        return PolynomialValuesCmpFeature.leq(left, right, leftCoeff, rightCoeff);
-    }
-
-    @Override
-    public Feature createEqPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right) {
-        return PolynomialValuesCmpFeature.eq(left, right);
-    }
-
-    @Override
-    public Feature createDividesPolynomialValuesCmpFeature(ProjectionToTerm left,
-            ProjectionToTerm right) {
-        return PolynomialValuesCmpFeature.divides(left, right);
-    }
-
-    @Override
     public TermFeature createEqTermFeature(TermBuffer t) {
         return EqTermFeature.create(t, RenamingTermProperty.RENAMING_TERM_PROPERTY);
     }
@@ -154,21 +85,9 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public TermGenerator<Goal> createMultiplesModEquationsGenerator(
-            ProjectionToTerm source, ProjectionToTerm target) {
-        return MultiplesModEquationsGenerator.create(source, target);
-    }
-
-    @Override
     public ProjectionToTerm opTerm(Operator op, ProjectionToTerm subTerm0,
             ProjectionToTerm subTerm1) {
         return TermConstructionProjection.create(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
-    }
-
-    @Override
-    public TermGenerator<Goal> createRootsGenerator(ProjectionToTerm powerRelation,
-            LogicServices services) {
-        return RootsGenerator.create(powerRelation, (TermServices) services);
     }
 
     @Override
