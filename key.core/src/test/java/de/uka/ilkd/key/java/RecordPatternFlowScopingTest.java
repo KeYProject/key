@@ -61,6 +61,69 @@ class RecordPatternFlowScopingTest {
     }
 
     @Test
+    void compoundAndAssignmentUsesBindings(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("CompoundAndAssignment.java");
+        Files.writeString(source, """
+                public class CompoundAndAssignment {
+                    record Point(int x, int y) { }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static boolean m(Object o) {
+                        boolean b;
+                        b = o instanceof Point(int x, int y) && x > 0;
+                        return b;
+                    }
+                }
+                """);
+        prove(source);
+    }
+
+    @Test
+    void compoundOrAssignmentUsesBindings(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("CompoundOrAssignment.java");
+        Files.writeString(source, """
+                public class CompoundOrAssignment {
+                    record Point(int x, int y) { }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static boolean m(Object o) {
+                        boolean b;
+                        b = !(o instanceof Point(int x, int y)) || x > 0;
+                        return b;
+                    }
+                }
+                """);
+        prove(source);
+    }
+
+    @Test
+    void conditionalAssignmentUsesBindings(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("ConditionalAssignment.java");
+        Files.writeString(source, """
+                public class ConditionalAssignment {
+                    record Point(int x, int y) { }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m(Object o) {
+                        int r;
+                        r = o instanceof Point(int x, int y) ? x + y : 0;
+                        return r;
+                    }
+                }
+                """);
+        prove(source);
+    }
+
+    @Test
     void conditionalComponentIsTested(@TempDir Path tempDir) throws Exception {
         Path source = tempDir.resolve("ConditionalComponent.java");
         Files.writeString(source, """
