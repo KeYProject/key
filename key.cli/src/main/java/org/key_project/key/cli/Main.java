@@ -1,0 +1,142 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+package org.key_project.key.cli;
+
+import java.util.concurrent.Callable;
+
+import de.uka.ilkd.key.settings.PathConfig;
+
+import org.key_project.key.cli.prove.ProveCommand;
+
+import picocli.CommandLine;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.IParameterExceptionHandler;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.ParseResult;
+import picocli.CommandLine.ScopeType;
+
+/**
+ * Entry point of the headless KeY command-line interface.
+ * <p>
+ * This class is the picocli root command. Before the command line is parsed, {@link #main}
+ * pre-scans the arguments for a {@code --config-dir} option and redirects KeY's user-persistence
+ * directory (the {@code key.home} system property) accordingly, so that KeY never touches
+ * {@code ~/.key} when requested otherwise. The pre-scan runs before any KeY class is loaded.
+ */
+@Command(name = "key-cli",
+    description = "Headless command-line interface for KeY.",
+    mixinStandardHelpOptions = true,
+    subcommands = { ProveCommand.class })
+public final class Main implements Callable<Integer> {
+
+    @Option(names = "--config-dir", paramLabel = "<DIR>", scope = ScopeType.INHERIT,
+        description = "Use DIR as the base directory for all of KeY's user-persistence "
+            + "(default: ~/.key).")
+    private String configDir;
+
+    /**
+     * Program entry point.
+     *
+     * @param args the command-line arguments
+     */
+    public static void main(String[] args) {
+        System.exit(run(args));
+    }
+
+    /**
+     * Runs the CLI with the given arguments and returns the process exit code.
+     *
+     * @param args the command-line arguments
+     * @return the exit code as specified by the headless interface contract
+     */
+    public static int run(String[] args) {
+        preScanConfigDir(args);
+        Log.configureLogging(Verbosity.ERROR);
+        return createCommandLine().execute(args);
+    }
+
+    /**
+     * Creates the picocli command line for the root command with custom error handlers mapping
+     * usage errors and unexpected exceptions to the documented exit codes.
+     *
+     * @return the configured {@link CommandLine}
+     */
+    public static CommandLine createCommandLine() {
+        return new CommandLine(new Main())
+                .setParameterExceptionHandler(new ParameterExceptionHandler())
+                .setExecutionExceptionHandler(new ExecutionExceptionHandler());
+    }
+
+    /**
+     * Invoked when the CLI is executed without a subcommand.
+     *
+     * @return the input-error exit code, since a subcommand is required
+     */
+    @Override
+    public Integer call() {
+        System.err.println("KEY_ERROR subcommand required (e.g. `prove`).");
+        CommandLine.usage(this, System.err);
+        return 3;
+    }
+
+    /**
+     * Pre-scans the raw arguments for a {@code --config-dir} option and sets the
+     * {@code key.home} system property before any KeY class is loaded. An explicit
+     * {@code --config-dir} overrides a previously set {@code key.home} property
+     * (e.g. via {@code -Dkey.home=...}).
+     *
+     * @param args the raw command-line arguments
+     */
+    static void preScanConfigDir(String[] args) {
+        String dir = findConfigDir(args);
+        if (dir != null && !dir.isEmpty()) {
+            System.setProperty(PathConfig.KEY_HOME_PROPERTY, dir);
+        }
+    }
+
+    private static String findConfigDir(String[] args) {
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if ("--config-dir".equals(arg) && i + 1 < args.length) {
+                return args[i + 1];
+            }
+            String prefix = "--config-dir=";
+            if (arg.startsWith(prefix)) {
+                return arg.substring(prefix.length());
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Remaps picocli usage errors (unknown options, missing arguments, ...) to the input-error
+     * exit code {@code 3}.
+     */
+    private static final class ParameterExceptionHandler implements IParameterExceptionHandler {
+        @Override
+        public int handleParseException(CommandLine.ParameterException ex, String[] args) {
+            System.err.println("KEY_ERROR " + ex.getMessage());
+            CommandLine cmd = ex.getCommandLine();
+            cmd.getErr().println(cmd.getUsageMessage());
+            return 3;
+        }
+    }
+
+    /**
+     * Remaps unexpected execution exceptions to the internal-error exit code {@code 4}.
+     */
+    private static final class ExecutionExceptionHandler
+            implements CommandLine.IExecutionExceptionHandler {
+        @Override
+        public int handleExecutionException(Exception ex, CommandLine commandLine,
+                ParseResult parseResult) {
+            System.err.println("KEY_ERROR internal error: " + ex.getMessage());
+            if (ex.getMessage() == null) {
+                ex.printStackTrace(System.err);
+            }
+            return 4;
+        }
+    }
+}
