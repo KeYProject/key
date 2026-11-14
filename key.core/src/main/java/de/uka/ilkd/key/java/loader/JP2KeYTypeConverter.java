@@ -209,6 +209,21 @@ public class JP2KeYTypeConverter {
             addArrayType(type.asArrayType());
         } else if (type.isVoid()) {
             addVoidType(type);
+        } else if (type.isTypeVariable()) {
+            // Type variables are erased in the KeY Java model; map them to their upper
+            // bound, which is java.lang.Object for an unbounded parameter (JavaParser does
+            // not materialize the implicit extends Object bound). This allows JavaRedux
+            // boot stubs to declare generic signatures, e.g. java.util.function.Function<T, R>
+            // with R apply(T arg0). User-level generics remain unsupported (see
+            // JavaFeatureCoverageTest): the erasure applies only while library/boot classes
+            // are parsed, so that the generic JDK stubs can be converted into the model.
+            if (!jp2KeY.isParsingLibraries()) {
+                LOGGER.error("Unexpected type to convert: " + type);
+                throw new AssertionFailure("Unexpected type to convert");
+            }
+            var tp = type.asTypeParameter();
+            return getKeYJavaType(tp.hasUpperBound() ? tp.getUpperBound() : tp.object(),
+                cachedOnly);
         } else {
             LOGGER.error("Unexpected type to convert: " + type);
             throw new AssertionFailure("Unexpected type to convert");
