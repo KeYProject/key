@@ -52,7 +52,7 @@ public class ConstructorCall extends ProgramTransformer {
      *        The constructor reference.
      */
     protected ConstructorCall(Name name, SchemaVariable newObjectSV, ProgramElement consRef) {
-        super(name, consRef);
+        super(name, consRef, newObjectSV);
         this.newObjectSV = newObjectSV;
         newObjectVar = null;
     }

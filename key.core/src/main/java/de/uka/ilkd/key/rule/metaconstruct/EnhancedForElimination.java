@@ -114,7 +114,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param forStatement the enhanced for loop to eliminate.
      */
     public EnhancedForElimination(ProgramSV execContextSV, EnhancedFor forStatement) {
-        super("#enhancedforElim", forStatement);
+        super("#enhancedforElim", forStatement, execContextSV);
         this.execContextSV = execContextSV;
     }
 
