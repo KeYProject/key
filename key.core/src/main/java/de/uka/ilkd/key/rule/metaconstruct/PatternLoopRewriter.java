@@ -5,27 +5,34 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.statement.Continue;
+import de.uka.ilkd.key.java.ast.statement.Do;
+import de.uka.ilkd.key.java.ast.statement.For;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.java.visitor.BindingVariableVisitor;
 import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
+import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopContract;
+import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
@@ -102,6 +109,10 @@ public final class PatternLoopRewriter extends ProgramTransformer {
             Services services) {
         if (loop instanceof While whileLoop) {
             return rewriteWhile(whileLoop, boolVar, services);
+        } else if (loop instanceof For forLoop) {
+            return rewriteFor(forLoop, boolVar, services);
+        } else if (loop instanceof Do doLoop) {
+            return rewriteDo(doLoop, services);
         }
         throw new UnsupportedOperationException(
             "Unsupported loop kind in #rewritePatternBlock: " + loop.getClass().getSimpleName());
@@ -143,6 +154,126 @@ public final class PatternLoopRewriter extends ProgramTransformer {
             result.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenFalse())));
         }
         return result.toArray(ProgramElement[]::new);
+    }
+
+    /**
+     * Rewrites a {@code for} loop. The for-init declarations stay in an inner block so they do not
+     * leak; the after-loop declarations are outside that block.
+     */
+    static ProgramElement[] rewriteFor(For loop, ProgramVariable boolVar, Services services) {
+        Expression guard = loop.getGuardExpression();
+        Statement body = loop.getBody();
+        var bindings = BindingVariableVisitor.analyze(guard);
+
+        List<Statement> updates = new ArrayList<>();
+        var updateExpressions = loop.getUpdates();
+        if (updateExpressions != null) {
+            for (Expression update : updateExpressions) {
+                updates.add((ExpressionStatement) update);
+            }
+        }
+
+        Statement rewrittenBody = rewriteContinues(body, boolVar, guard, updates, services);
+        var bodyStatements = new ArrayList<Statement>();
+        bodyStatements.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenTrue())));
+        addBodyStatements(bodyStatements, rewrittenBody);
+        bodyStatements.addAll(updates);
+        bodyStatements.add(KeYJavaASTFactory.assign(boolVar, guard));
+
+        While newLoop = KeYJavaASTFactory.whileLoop(boolVar,
+            KeYJavaASTFactory.block(bodyStatements.toArray(Statement[]::new)),
+            loop.getPositionInfo());
+        copyLoopSpec(loop, newLoop, services);
+
+        var initBlock = new ArrayList<Statement>();
+        var initializers = loop.getInitializers();
+        if (initializers != null) {
+            for (var init : initializers) {
+                if (init instanceof Statement statement) {
+                    initBlock.add(statement);
+                }
+            }
+        }
+        initBlock.add(booleanDeclaration(boolVar, guard, services));
+        initBlock.add(newLoop);
+
+        var result = new ArrayList<Statement>();
+        result.add(KeYJavaASTFactory.block(initBlock.toArray(Statement[]::new)));
+        if (!bindings.whenFalse().isEmpty()
+                && !hasUnlabeledBreak(body, services)
+                && afterBindingsUseNoForInitVariables(loop, bindings.whenFalse(), services)) {
+            result.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenFalse())));
+        }
+        return result.toArray(ProgramElement[]::new);
+    }
+
+    /**
+     * Rewrites a {@code do} loop by normalizing it with the existing unwind transformation and
+     * rewriting the generated while. The after-loop declarations stay outside the normalized
+     * block so they are visible after the original {@code do}.
+     */
+    static ProgramElement[] rewriteDo(Do loop, Services services) {
+        var inner = new ProgramElementName(services.getTermBuilder().newName("inner"));
+        var outer = new ProgramElementName(services.getTermBuilder().newName("outer"));
+        var transformation = new WhileLoopTransformation(loop, outer, inner, services);
+        transformation.start();
+        ProgramElement normalized = transformation.result();
+        While generated = findFirstWhile(normalized);
+        if (generated == null) {
+            return new ProgramElement[] { normalized };
+        }
+        var boolVar = freshBoolean(services);
+        ProgramElement[] rewritten = rewriteWhile(generated, boolVar, services);
+        var replacement =
+            KeYJavaASTFactory.block((Statement) rewritten[0], (Statement) rewritten[1]);
+        ProgramElement newNormalized =
+            new ProgramElementReplacer((JavaProgramElement) normalized, services)
+                    .replace(generated, replacement);
+        var result = new ArrayList<ProgramElement>();
+        result.add(newNormalized);
+        for (int i = 2; i < rewritten.length; i++) {
+            result.add(rewritten[i]);
+        }
+        return result.toArray(ProgramElement[]::new);
+    }
+
+    private static While findFirstWhile(ProgramElement element) {
+        if (element instanceof While whileLoop) {
+            return whileLoop;
+        }
+        for (int i = 0; i < element.getChildCount(); i++) {
+            if (element.getChild(i) instanceof ProgramElement child) {
+                While found = findFirstWhile(child);
+                if (found != null) {
+                    return found;
+                }
+            }
+        }
+        return null;
+    }
+
+    private static boolean afterBindingsUseNoForInitVariables(For loop,
+            java.util.Map<LocationVariable, Expression> whenFalse, Services services) {
+        var initVariables = new LinkedHashSet<LocationVariable>();
+        var initializers = loop.getInitializers();
+        if (initializers != null) {
+            for (var init : initializers) {
+                if (init instanceof LocalVariableDeclaration declaration) {
+                    for (var specification : declaration.getVariables()) {
+                        initVariables.add(
+                            (LocationVariable) specification.getProgramVariable());
+                    }
+                }
+            }
+        }
+        for (Expression expression : whenFalse.values()) {
+            for (LocationVariable read : MiscTools.getLocalIns(expression, services)) {
+                if (initVariables.contains(read)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
