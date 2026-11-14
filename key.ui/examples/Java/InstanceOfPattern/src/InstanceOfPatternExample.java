@@ -102,7 +102,7 @@ public class InstanceOfPatternExample {
      * Pattern matching with method calls.
      */
     /*@ normal_behavior
-      @ requires true;
+      @ requires \invariant_for(obj);
       @ ensures \result >= -1;
       @*/
     public static int getToStringLength(Object obj) {
