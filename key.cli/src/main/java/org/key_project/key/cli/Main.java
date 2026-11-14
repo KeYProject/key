@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli;
 
+import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 
 import de.uka.ilkd.key.settings.PathConfig;
@@ -13,9 +14,11 @@ import org.key_project.key.cli.prove.ProveCommand;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IParameterExceptionHandler;
+import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParseResult;
 import picocli.CommandLine.ScopeType;
+import picocli.CommandLine.Spec;
 
 /**
  * Entry point of the headless KeY command-line interface.
@@ -31,9 +34,14 @@ import picocli.CommandLine.ScopeType;
     subcommands = { ProveCommand.class })
 public final class Main implements Callable<Integer> {
 
+    @Spec
+    @SuppressWarnings("initialization.field.uninitialized")
+    private CommandSpec spec;
+
     @Option(names = "--config-dir", paramLabel = "<DIR>", scope = ScopeType.INHERIT,
         description = "Use DIR as the base directory for all of KeY's user-persistence "
             + "(default: ~/.key).")
+    @org.jspecify.annotations.Nullable
     private String configDir;
 
     /**
@@ -76,9 +84,10 @@ public final class Main implements Callable<Integer> {
      */
     @Override
     public Integer call() {
-        System.err.println("KEY_ERROR subcommand required (e.g. `prove`).");
-        CommandLine.usage(this, System.err);
-        return 3;
+        PrintWriter err = spec.commandLine().getErr();
+        err.println("KEY_ERROR subcommand required (e.g. `prove`).");
+        err.println(spec.commandLine().getUsageMessage());
+        return ExitCode.INPUT_ERROR.code();
     }
 
     /**
@@ -96,7 +105,7 @@ public final class Main implements Callable<Integer> {
         }
     }
 
-    private static String findConfigDir(String[] args) {
+    private static @org.jspecify.annotations.Nullable String findConfigDir(String[] args) {
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if ("--config-dir".equals(arg) && i + 1 < args.length) {
@@ -117,10 +126,11 @@ public final class Main implements Callable<Integer> {
     private static final class ParameterExceptionHandler implements IParameterExceptionHandler {
         @Override
         public int handleParseException(CommandLine.ParameterException ex, String[] args) {
-            System.err.println("KEY_ERROR " + ex.getMessage());
-            CommandLine cmd = ex.getCommandLine();
-            cmd.getErr().println(cmd.getUsageMessage());
-            return 3;
+            CommandLine commandLine = ex.getCommandLine();
+            PrintWriter err = commandLine.getErr();
+            err.println("KEY_ERROR " + ex.getMessage());
+            err.println(commandLine.getUsageMessage());
+            return ExitCode.INPUT_ERROR.code();
         }
     }
 
@@ -132,11 +142,10 @@ public final class Main implements Callable<Integer> {
         @Override
         public int handleExecutionException(Exception ex, CommandLine commandLine,
                 ParseResult parseResult) {
-            System.err.println("KEY_ERROR internal error: " + ex.getMessage());
-            if (ex.getMessage() == null) {
-                ex.printStackTrace(System.err);
-            }
-            return 4;
+            String message = ex.getMessage() != null ? ex.getMessage()
+                    : ex.getClass().getSimpleName();
+            commandLine.getErr().println("KEY_ERROR internal error: " + message);
+            return ExitCode.INTERNAL_ERROR.code();
         }
     }
 }

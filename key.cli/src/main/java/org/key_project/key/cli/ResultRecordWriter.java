@@ -4,6 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli;
 
+import java.nio.file.Path;
+
+import org.jspecify.annotations.Nullable;
+
 /**
  * Renders a {@link ContractResult} as a single line of the machine-readable {@code KEY_RESULT}
  * protocol (§2 of the headless interface contract). The output is hand-rolled so that it is
@@ -37,11 +41,11 @@ public final class ResultRecordWriter {
         return sb.toString();
     }
 
-    private static String renderPath(java.nio.file.Path proofFile) {
+    private static String renderPath(@Nullable Path proofFile) {
         return proofFile == null ? "null" : renderString(proofFile.toString());
     }
 
-    private static String renderString(String value) {
+    private static String renderString(@Nullable String value) {
         return value == null ? "null" : "\"" + escape(value) + "\"";
     }
 

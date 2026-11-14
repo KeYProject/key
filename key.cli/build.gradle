@@ -34,3 +34,19 @@ shadowJar {
         attributes 'Main-Class': 'org.key_project.key.cli.Main'
     }
 }
+
+checkerFramework {
+    if (System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^org\\.key_project\\.key\\.cli",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub:checker.jar/junit-assertions.astub",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}
