@@ -1228,7 +1228,15 @@ public class ProofCollections {
         g.loadable("Java/TextBlockLiterals/project.key");
         g.loadable("Java/Records/Use.key");
         g.loadable("Java/Records/Constructor.key");
-        g.loadable("Java/InstanceOfPattern/project.key");
+        g.provable("Java/InstanceOfPattern/getString.key");
+        g.provable("Java/InstanceOfPattern/isString.key");
+        g.provable("Java/InstanceOfPattern/getStringLength.key");
+        g.provable("Java/InstanceOfPattern/checkNotString.key");
+        g.provable("Java/InstanceOfPattern/processNumber.key");
+        g.provable("Java/InstanceOfPattern/getToStringLength.key");
+        g.provable("Java/InstanceOfPattern/traditionalVsPattern.key");
+        g.provable("Java/InstanceOfPattern/whilePattern.key");
+        g.provable("Java/InstanceOfPattern/afterLoopPattern.key");
         g.provable("Java/Annotations/test_annotation.key");
 
         g = c.group("StipuLa");
