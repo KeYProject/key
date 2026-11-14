@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -57,7 +58,8 @@ class ProofObligationByNameTest {
     private static String contractNameOfLoadedProof(KeYEnvironment<?> env) {
         Proof proof = env.getLoadedProof();
         assertThat(proof).isNotNull();
-        ProofOblInput po = env.getServices().getSpecificationRepository().getProofOblInput(proof);
+        ProofOblInput po = Objects.requireNonNull(
+            env.getServices().getSpecificationRepository().getProofOblInput(proof));
         assertThat(po).isInstanceOf(ContractPO.class);
         return ((ContractPO) po).getContract().getName();
     }
