@@ -14,7 +14,6 @@
  *   }
  */
 public class InstanceOfPatternExample {
-    //@ static invariant_free (\forall String s; true; s.length() >= 0);
 
     /*@ normal_behavior
       @ requires obj != null;
@@ -53,7 +52,7 @@ public class InstanceOfPatternExample {
     public static int getStringLength(Object obj) {
         if (obj instanceof String s) {
             // Pattern variable 's' is bound and has type String here
-            // @ assert s != null;
+            //@ assert s != null;
             return s.length();
         }
         return -1;
@@ -75,7 +74,7 @@ public class InstanceOfPatternExample {
             return 0;
         } else {
             // 's' IS bound here (in the else branch)
-            // @ assert s != null;
+            //@ assert s != null;
             return s.length();
         }
     }
@@ -167,12 +166,9 @@ public class InstanceOfPatternExample {
         System.out.println(checkNotString("World"));   // 5
         
         System.out.println(processNumber(42));         // 42
-        System.out.println(processNumber(3.14));       // 3
-        System.out.println(processNumber(100L));       // 100
+        System.out.println(processNumber(3.14));       // 1
+        System.out.println(processNumber(100L));       // 2
         
         System.out.println(getToStringLength("Test")); // 4
-        
-        System.out.println(compareIfBothStrings("A", "B")); // -1
-        System.out.println(compareIfBothStrings("A", 42));  // 0
     }
 }
