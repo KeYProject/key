@@ -33,6 +33,11 @@ public class BindingExpressionCond implements VariableCondition {
     }
 
     @Override
+    public String toString() {
+        return (negated ? "\\not " : "") + "\\isBindingExpr(" + svExpr.name() + ")";
+    }
+
+    @Override
     public @Nullable MatchResultInfo check(
             @Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
             @NonNull MatchResultInfo matchCond, @NonNull LogicServices services) {

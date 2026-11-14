@@ -10831,7 +10831,8 @@ ifElseUnfold {
   if (#nse) #s0
   else #s1
 ... }}| (post))
-\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)),
+\not \isBindingExpr(#nse))
 \replacewith(#allmodal ((modal operator))|{{ ..
   boolean #boolv;
   #boolv = #nse;
@@ -11119,7 +11120,8 @@ ifUnfold {
 \find(#allmodal ((modal operator))|{{ ..
   if (#nse) #s0
 ... }}| (post))
-\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)),
+\not \isBindingExpr(#nse))
 \replacewith(#allmodal ((modal operator))|{{ ..
   boolean #boolv;
   #boolv = #nse;
