@@ -85,10 +85,8 @@ class BindingsOfExprTest {
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS.add(sv, guard, services);
 
         return Arrays.stream(meta.transform(null, services, inst))
-                .map(pe -> {
-                    assertInstanceOf(LocalVariableDeclaration.class, pe);
-                    return (LocalVariableDeclaration) pe;
-                })
+                .filter(LocalVariableDeclaration.class::isInstance)
+                .map(LocalVariableDeclaration.class::cast)
                 .map(decl -> decl.getVariableSpecifications().get(0))
                 .toArray(VariableSpecification[]::new);
     }

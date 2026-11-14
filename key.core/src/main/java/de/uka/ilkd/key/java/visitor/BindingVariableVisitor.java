@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.visitor;
 
 import java.util.*;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
@@ -13,7 +14,17 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.statement.JmlAssert;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
+import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
+
+import org.key_project.util.collection.ImmutableList;
 
 /**
  *
@@ -170,13 +181,46 @@ public class BindingVariableVisitor {
      *        {@link Bindings#whenFalse()}
      * @return one fresh {@link LocalVariableDeclaration} per bound pattern variable
      */
-    public static Statement[] toStatements(Map<LocationVariable, Expression> bindings) {
-        return bindings.entrySet().stream()
-                .map(entry -> new LocalVariableDeclaration(
-                    new TypeRef(entry.getKey().getKeYJavaType()),
-                    new VariableSpecification(entry.getKey(), entry.getValue(),
-                        entry.getKey().getKeYJavaType())))
-                .toArray(Statement[]::new);
+    public static Statement[] toStatements(Map<LocationVariable, Expression> bindings,
+            Services services) {
+        var result = new ArrayList<Statement>();
+        for (var entry : bindings.entrySet()) {
+            var variable = entry.getKey();
+            result.add(new LocalVariableDeclaration(
+                new TypeRef(variable.getKeYJavaType()),
+                new VariableSpecification(variable, entry.getValue(),
+                    variable.getKeYJavaType())));
+            var assumption = equalityAssumption(variable, entry.getValue(), services);
+            if (assumption != null) {
+                result.add(assumption);
+            }
+        }
+        return result.toArray(Statement[]::new);
+    }
+
+    private static JmlAssert equalityAssumption(LocationVariable variable,
+            Expression boundExpression,
+            Services services) {
+        var value = boundExpression instanceof TypeCast cast ? cast.getExpressionAt(0)
+                : boundExpression;
+        final JTerm valueTerm;
+        try {
+            valueTerm = services.getTypeConverter().convertToLogicElement(value, null);
+        } catch (RuntimeException e) {
+            return null;
+        }
+        var termBuilder = services.getTermBuilder();
+        var equality = termBuilder.equals(valueTerm, termBuilder.var(variable));
+
+        var condition = (JmlParser.ExpressionContext) JmlFacade.parseExpr("true");
+        var construct = new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSUME,
+            new KeyAst.Expression(condition));
+        var assumption = new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, construct, null);
+        var variables = new ProgramVariableCollection(null, ImmutableList.nil(), null, null,
+            Map.of(), Map.of(), Map.of(), Map.of());
+        services.getSpecificationRepository().addStatementSpec(assumption,
+            new SpecificationRepository.JmlStatementSpec(variables, ImmutableList.of(equality)));
+        return assumption;
     }
 
     private static void requireDisjoint(Map<LocationVariable, Expression> a,
