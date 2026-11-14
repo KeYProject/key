@@ -57,6 +57,7 @@ public class FloatRemainderHandler implements SMTHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked") // the translation state is a heterogeneous map keyed by String
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
 
         Map<Term, SExpr> map = (Map<Term, SExpr>) trans.getTranslationState().get(MAP_KEY);

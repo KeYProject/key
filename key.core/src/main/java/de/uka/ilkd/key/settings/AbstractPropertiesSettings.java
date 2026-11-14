@@ -88,6 +88,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         return properties != null;
     }
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void readSettings(Properties props) {
         propertyEntries.forEach(it -> {
@@ -98,6 +99,7 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         });
     }
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void writeSettings(Properties props) {
         for (PropertyEntry<?> entry : propertyEntries) {
@@ -164,6 +166,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         return pe;
     }
 
+    @SuppressWarnings("unchecked") // the converter receives a raw Object from the Properties
+    // storage; its runtime type is a Collection<String> as produced by parseStringSet
     protected PropertyEntry<Set<String>> createStringSetProperty(String key, String defValue) {
         PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key, parseStringSet(defValue),
             AbstractPropertiesSettings::parseStringSet,
@@ -180,6 +184,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
+    @SuppressWarnings("unchecked") // the converter receives a raw Object from the Properties
+    // storage; its runtime type is a List<String> as produced by parseStringList
     protected PropertyEntry<List<String>> createStringListProperty(@NonNull String key,
             @Nullable String defValue) {
         PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
@@ -252,6 +258,8 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         }
 
         @Override
+        @SuppressWarnings("unchecked") // the value was put with type T via set(); Properties
+        // exposes it back as Object
         public T get() {
             var v = properties.getOrDefault(key, defaultValue);
             if (v == null) {

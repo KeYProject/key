@@ -56,6 +56,8 @@ public class FocussedBreakpointRuleApplicationManager
     }
 
     @Override
+    @SuppressWarnings("unchecked") // clone() returns Object; the clone is a
+    // FocussedBreakpointRuleApplicationManager
     public RuleApplicationManager<Goal> copy() {
         return (RuleApplicationManager<Goal>) clone();
     }

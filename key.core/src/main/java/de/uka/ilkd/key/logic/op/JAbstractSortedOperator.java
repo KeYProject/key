@@ -20,6 +20,8 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * Abstract sorted operator class offering some common functionality.
  */
+@SuppressWarnings("deprecation") // constructor signatures are bound to the deprecated
+                                 // ImmutableArray
 public abstract class JAbstractSortedOperator extends AbstractSortedOperator
         implements Sorted, Operator {
 

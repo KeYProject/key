@@ -268,6 +268,7 @@ public abstract class TacletApp implements RuleApp {
      *        SchemaVariables
      * @return true iff the instantiation of a Bound Schemavariable contains the given Logicvariable
      */
+    @SuppressWarnings("deprecation") // bound-schema-variable matching uses deprecated API elements
     private static boolean contains(ImmutableArray<QuantifiableVariable> boundVars,
             LogicVariable x,
             SVInstantiations insts) {
@@ -696,7 +697,6 @@ public abstract class TacletApp implements RuleApp {
      * later (by "createSkolemFunctions") be replaced by a function having the occurring
      * metavariables as arguments
      *
-     * @param services the Services class allowing access to the type model
      */
     public TacletApp createSkolemConstant(String instantiation, JOperatorSV sv,
             boolean interesting, Goal goal) {
@@ -947,6 +947,7 @@ public abstract class TacletApp implements RuleApp {
      *        program model
      * @return a list of tacletapps with the found if formula instantiations
      */
+    @SuppressWarnings("deprecation") // assume-formula instantiations reference deprecated elements
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
             ImmutableList<SequentFormula> ruleSuccTail,
             ImmutableList<SequentFormula> ruleAntecTail,

@@ -150,10 +150,10 @@ class FinalFieldCodeValidator {
             validateMethodReference(methodReference);
         } else if (element instanceof New _new) {
             validateNew(_new);
+        } else if (element instanceof Assignment<?> assignment) {
+            validateAssignment(assignment);
         } else if (element instanceof FieldReference fieldReference) {
             validateFieldReference(fieldReference);
-        } else if (element instanceof Assignment assignment) {
-            validateAssignment(assignment);
         } else {
             validateChildren(element);
         }
@@ -249,7 +249,7 @@ class FinalFieldCodeValidator {
      * Validate assignments. 'this' must not be assigned to any field or variable.
      * References to final fields are ok on the left hand side.
      */
-    private void validateAssignment(Assignment assignment) {
+    private void validateAssignment(Assignment<?> assignment) {
         SyntaxElement assignee = assignment.getChild(0);
         if (assignment instanceof BinaryAssignment) {
             SyntaxElement value = assignment.getChild(1);

@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * The rule application for {@link de.uka.ilkd.key.java.statement.SetStatement}
+ * The rule application for {@link de.uka.ilkd.key.java.ast.statement.SetStatement}
  *
  * @author Julian Wiesler
  */

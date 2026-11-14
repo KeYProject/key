@@ -59,6 +59,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
         return new NewSMTTranslationSettings(this);
     }
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void readSettings(Properties props) {
         for (Object k : props.keySet()) {
@@ -69,6 +70,7 @@ public class NewSMTTranslationSettings extends AbstractSettings {
         }
     }
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void writeSettings(Properties props) {
         for (Entry<String, String> en : map.entrySet()) {

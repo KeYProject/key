@@ -28,6 +28,9 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * class tests the term factory
  */
+// The term factory under test still builds terms with the deprecated ImmutableArray
+// container; most tests construct such terms directly, so the whole class keeps the legacy type.
+@SuppressWarnings("deprecation")
 public class TestTermFactory {
 
 

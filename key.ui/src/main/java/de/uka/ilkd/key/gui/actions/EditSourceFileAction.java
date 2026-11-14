@@ -12,7 +12,6 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.BadLocationException;
@@ -163,14 +162,12 @@ public class EditSourceFileAction extends KeyAction {
             }
         };
         textPane.setHighlighter(new CurrentLineHighlighter(textPane.getHighlighter()));
-        Optional<URI> fileOpt = location.getFileURI();
-        if (fileOpt.isEmpty()) {
+        URI file = location.getFileUri();
+        if (file == null) {
             JTextPane jTextPane = new JTextPane();
             jTextPane.setText("No file location available");
             return jTextPane;
         }
-
-        URI file = fileOpt.get();
         String source = IOUtil.readFrom(file);
         // workaround for #1641: replace all carriage returns, since JavaDocument can currently
         // not handle them

@@ -20,11 +20,18 @@ import org.key_project.prover.sequent.PosInOccurrence;
  * abandoned in KeY 2.0. Until the strategy for quantifier instantiations is adapted, we cannot get
  * rid of them completely (they are used to determine triggers).
  */
+// The override below narrows SyntacticalReplaceVisitor's generic <T> toTerm(T) to the concrete
+// Term type. The resulting unchecked-override warning cannot be suppressed on the method (see
+// the analogous note on Taclet), hence the class-level suppression.
+@SuppressWarnings("unchecked")
 public class ConstraintAwareSyntacticalReplaceVisitor extends SyntacticalReplaceVisitor {
 
     @Deprecated
     private final Constraint metavariableInst;
 
+    // Constraint is deprecated wholesale (quantifierHeuristics.constraint); no replacement API
+    // exists.
+    @SuppressWarnings("deprecation")
     public ConstraintAwareSyntacticalReplaceVisitor(TermLabelState termLabelState,
             Services services, Constraint metavariableInst,
             PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,

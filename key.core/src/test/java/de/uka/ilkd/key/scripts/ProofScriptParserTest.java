@@ -72,6 +72,7 @@ public class ProofScriptParserTest {
      * not keep the stray '\r' inside the argument value.
      */
     @Test
+    @SuppressWarnings("deprecation") // test deliberately exercises the legacy ScriptLineParser
     void scriptLineParserIgnoresCarriageReturns() throws Exception {
         String crlf = "select formula=\"line one\r\nline two\";\r\n";
 

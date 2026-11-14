@@ -649,13 +649,14 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
         return displayName();
     }
 
-    public UseDependencyContractApp createApp(PosInOccurrence pos) {
+    public UseDependencyContractApp<UseDependencyContractRule> createApp(PosInOccurrence pos) {
         return createApp(pos, null);
     }
 
     @Override
-    public UseDependencyContractApp createApp(PosInOccurrence pos, TermServices services) {
-        return new UseDependencyContractApp(this, pos);
+    public UseDependencyContractApp<UseDependencyContractRule> createApp(PosInOccurrence pos,
+            TermServices services) {
+        return new UseDependencyContractApp<>(this, pos);
     }
 
     /**

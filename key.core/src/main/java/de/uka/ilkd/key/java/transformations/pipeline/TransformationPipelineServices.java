@@ -272,7 +272,7 @@ public class TransformationPipelineServices {
     public NodeList<Statement> getInitializers(ClassOrInterfaceDeclaration cd) {
         NodeList<Statement> result = new NodeList<>();
         int objectInitializerCount = 0;
-        for (BodyDeclaration<?> member : cd.getMembers().toArray(new BodyDeclaration[0])) {
+        for (BodyDeclaration<?> member : cd.getMembers().toArray(new BodyDeclaration<?>[0])) {
             if (member instanceof InitializerDeclaration init &&
                     !init.isStatic()) {
                 String name =
@@ -300,6 +300,8 @@ public class TransformationPipelineServices {
         return result;
     }
 
+    @SuppressWarnings("unchecked") // Node.clone() erases the element type; N is the caller-chosen
+    // element type and cannot be verified statically
     public static <N extends Node> NodeList<N> cloneList(NodeList<N> list) {
         if (list == null) {
             return null;

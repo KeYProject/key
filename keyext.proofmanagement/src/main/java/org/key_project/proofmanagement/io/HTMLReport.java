@@ -100,6 +100,7 @@ public final class HTMLReport {
         });
 
         // provide access to entrySet property of Maps
+        @SuppressWarnings("unchecked") // StringTemplate needs the erased Map class
         Class<Map<?, ?>> mapClass = (Class<Map<?, ?>>) (Class) Map.class;
         group.registerModelAdaptor(mapClass, new MapModelAdaptor() {
             @Override
@@ -119,6 +120,7 @@ public final class HTMLReport {
          * keyext.proofmanagement:
          * jvmArgs += ['--add-opens', 'java.base/java.util=ALL-UNNAMED']
          */
+        @SuppressWarnings("unchecked") // StringTemplate needs the erased Map.Entry class
         Class<Map.Entry<?, ?>> mapEntryClass = (Class<Map.Entry<?, ?>>) (Class) Map.Entry.class;
         group.registerModelAdaptor(mapEntryClass, new ObjectModelAdaptor<>() {
             @Override

@@ -104,7 +104,7 @@ public class BasicLoopExecutionSnippet extends ReplaceAndRegisterMethod implemen
         LoopSpecification inv = (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         StatementBlock sb = (StatementBlock) inv.getLoop().getBody();
 
-        final Assignment guardVarDecl =
+        final Assignment<?> guardVarDecl =
             new BinaryAssignment(COPY, (LocationVariable) d.origVars.guard.op(),
                 inv.getLoop().getGuardExpression());
         final Statement guardVarMethodFrame = context == null ? guardVarDecl

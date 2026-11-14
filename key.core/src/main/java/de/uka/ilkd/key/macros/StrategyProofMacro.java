@@ -99,13 +99,13 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         }
         List<Node> nodes = goals.stream().map(Goal::node).collect(Collectors.toList());
 
-        final GoalChooser goalChooser =
-            proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
+        final GoalChooser<Proof, Goal> goalChooser = proof.getInitConfig().getProfile()
+                .<Proof, Goal>getSelectedGoalChooserBuilder().create();
         // Route through the central prover selection so the macro runs on the multi-core prover
         // when it is
         // enabled, the proof's profile supports it, and the macro's strategy tolerates concurrent
         // use (see allowParallel()); otherwise the single-threaded ApplyStrategy.
-        final ProverCore applyStrategy =
+        final ProverCore<Proof, Goal> applyStrategy =
             AutoProvers.create(goalChooser, proof.getInitConfig().getProfile(), allowParallel());
         final ImmutableList<Goal> ignoredOpenGoals = setDifference(proof.openGoals(), goals);
 
@@ -116,7 +116,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         applyStrategy.addProverTaskObserver(pml);
         // add a focus manager if there is a focus
         if (posInOcc != null) {
-            RuleApplicationManager realManager;
+            RuleApplicationManager<Goal> realManager;
             FocussedRuleApplicationManager manager;
             for (Goal goal : goals) {
                 realManager = goal.getRuleAppManager();
@@ -150,7 +150,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
             // this resets the proof strategy and the managers after the automation
             // has run
             for (final Goal openGoal : proof.openGoals()) {
-                RuleApplicationManager manager = openGoal.getRuleAppManager();
+                RuleApplicationManager<Goal> manager = openGoal.getRuleAppManager();
                 // touch the manager only if necessary
                 if (manager instanceof FocussedRuleApplicationManager) {
                     manager = ((FocussedRuleApplicationManager) manager).rootManager;

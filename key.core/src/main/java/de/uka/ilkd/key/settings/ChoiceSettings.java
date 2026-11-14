@@ -152,6 +152,7 @@ public class ChoiceSettings extends AbstractSettings {
      * gets a Properties object and has to perform the necessary steps in order to change this
      * object in a way that it represents the stored settings
      */
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     public void readSettings(Properties props) {
         String choiceSequence = props.getProperty("[" + CATEGORY + "]" + KEY_DEFAULT_CHOICES);
         // set choices
@@ -177,6 +178,7 @@ public class ChoiceSettings extends AbstractSettings {
      * * @param props the Properties object where to write the
      * settings as (key, value) pair
      */
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void writeSettings(Properties props) {
         var choiceSequence = category2Default.entrySet().stream()
