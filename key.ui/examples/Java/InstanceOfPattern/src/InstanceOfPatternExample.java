@@ -26,6 +26,20 @@ public class InstanceOfPatternExample {
 
     /*@ normal_behavior
       @ requires obj != null;
+      @ ensures true;
+      @*/
+    public static boolean testForNull(Object obj) {
+        if( obj instanceof Object o) {
+            //@ assert obj != null;
+            //@ assert o != null;
+            return true;
+        }
+        return false;
+    }
+
+    
+    /*@ normal_behavior
+      @ requires obj != null;
       @ ensures \result;
       @*/
     public static boolean isString(Object obj) {

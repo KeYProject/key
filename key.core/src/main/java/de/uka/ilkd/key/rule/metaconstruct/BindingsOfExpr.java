@@ -52,6 +52,6 @@ public abstract class BindingsOfExpr extends ProgramTransformer {
         var e = (Expression) svInst.getInstantiation(sv);
         var bindings = BindingVariableVisitor.analyze(e);
         return BindingVariableVisitor.toStatements(
-            positive ? bindings.whenTrue() : bindings.whenFalse());
+            positive ? bindings.whenTrue() : bindings.whenFalse(), services);
     }
 }
