@@ -14,7 +14,6 @@ import org.key_project.key.cli.Main;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
-
 import picocli.CommandLine;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -133,7 +132,8 @@ class OpenGoalPrintTest {
     @Timeout(300)
     void f1TwoRunsOnSameOpenContractAreByteIdentical() {
         String[] args =
-            {"prove", Fixtures.indexKey().toString(), "--choose-contract", TWO, "--print-open-goals"};
+            { "prove", Fixtures.indexKey().toString(), "--choose-contract", TWO,
+                "--print-open-goals" };
         Run first = run(args);
         Run second = run(args);
 
@@ -183,8 +183,8 @@ class OpenGoalPrintTest {
     @Test
     @Timeout(300)
     void noTruncateFormulasTwoRunsByteIdentical() {
-        String[] args = {"prove", Fixtures.sizeOpenKey().toString(), "--choose-contract", SIZE,
-            "--print-open-goals", "0", "--no-truncate-formulas"};
+        String[] args = { "prove", Fixtures.sizeOpenKey().toString(), "--choose-contract", SIZE,
+            "--print-open-goals", "0", "--no-truncate-formulas" };
         Run first = run(args);
         Run second = run(args);
 

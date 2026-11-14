@@ -54,6 +54,12 @@ import picocli.CommandLine.Spec;
  * contracts is an input error (exit {@code 3}). The written file is reported in each result's
  * {@code proofFile} field (absolute path or {@code null}).
  * <p>
+ * With {@code --print-open-goals [MAX]} (§6), the open goals of each contract are printed after
+ * proof search and before its {@code KEY_RESULT} line: an {@code OPEN-GOAL-COUNT} line with the
+ * true total followed by up to {@code MAX} {@code GOAL} blocks (default {@code 10},
+ * {@code 0} = unlimited); {@code --no-truncate-formulas} disables the length truncation of
+ * printed formulas.
+ * <p>
  * Errors follow §1 of the headless interface spec and are reported as {@link CliError}s: input
  * errors (negative timeout, missing file, unknown contract, unloadable file) exit {@code 3}, and
  * unexpected exceptions while processing a file exit {@code 4}. A file that exists but cannot be
@@ -118,6 +124,18 @@ public final class ProveCommand implements Callable<Integer> {
             + "'KEY_PROOF_STATUS open <n>') when --proof or --proof-dir is given (§3).")
     private boolean savePartial;
 
+    @Option(names = "--print-open-goals", arity = "0..1", fallbackValue = "10",
+        paramLabel = "[<MAX>]",
+        description = "After proof search, print the open goals to stdout: an OPEN-GOAL-COUNT "
+            + "line (always the true total) followed by up to MAX GOAL blocks with their "
+            + "position paths (0 = unlimited, default 10).")
+    private @org.jspecify.annotations.Nullable Integer printOpenGoals;
+
+    @Option(names = "--no-truncate-formulas",
+        description = "Disable the length truncation of formulas in the --print-open-goals "
+            + "output.")
+    private boolean noTruncateFormulas;
+
     /**
      * Runs the prove command.
      *
@@ -131,6 +149,9 @@ public final class ProveCommand implements Callable<Integer> {
     public Integer call() throws CliError {
         if (timeout < 0) {
             throw CliError.input("--timeout must not be negative: " + timeout);
+        }
+        if (printOpenGoals != null && printOpenGoals < 0) {
+            throw CliError.input("--print-open-goals must not be negative: " + printOpenGoals);
         }
         if (settingsFile != null && !Files.exists(settingsFile)) {
             throw CliError.input("file not found: " + settingsFile);
@@ -155,6 +176,10 @@ public final class ProveCommand implements Callable<Integer> {
         PrintWriter out = spec.commandLine().getOut();
         HeadlessProver prover = new HeadlessProver(timeout, runnerSettings);
         ProofOutput output = new ProofOutput(proof, proofDir, savePartial);
+        if (printOpenGoals != null) {
+            prover.setOpenGoalPrinter(
+                new OpenGoalPrinter(out, printOpenGoals, !noTruncateFormulas));
+        }
         List<ContractResult> results = new ArrayList<>();
         for (Path file : files) {
             try {
