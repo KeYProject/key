@@ -70,6 +70,8 @@ public final class HeadlessProver {
 
     private final @Nullable HeadlessRunnerSettings runnerSettings;
 
+    private @Nullable OpenGoalPrinter openGoalPrinter;
+
     /**
      * Creates a prover without a timeout.
      */
@@ -96,6 +98,17 @@ public final class HeadlessProver {
     public HeadlessProver(long timeoutMs, @Nullable HeadlessRunnerSettings runnerSettings) {
         this.timeoutMs = Math.max(0, timeoutMs);
         this.runnerSettings = runnerSettings;
+    }
+
+    /**
+     * Sets the optional open-goal printer applied after each contract's proof search (§6 of the
+     * headless interface spec): its output appears on the command's stdout before the
+     * contract's {@code KEY_RESULT} line.
+     *
+     * @param printer the open-goal printer, or {@code null} to disable the open-goal output
+     */
+    public void setOpenGoalPrinter(@Nullable OpenGoalPrinter printer) {
+        this.openGoalPrinter = printer;
     }
 
     /**
@@ -224,6 +237,9 @@ public final class HeadlessProver {
             long elapsedMs = info.getTime();
             int openGoals = proof.openGoals().size();
             boolean closed = proof.closed() || openGoals == 0;
+            if (openGoalPrinter != null) {
+                openGoalPrinter.print(proof);
+            }
             ResultStatus status = classifyStatus(closed, timeoutMs, elapsedMs);
             SmtCounters.Counts smt = SmtCounters.of(proof);
             Path proofFile = saveProofIfRequested(proof, closed, openGoals, position, output);
