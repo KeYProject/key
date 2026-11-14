@@ -136,7 +136,13 @@ public final class MethodCall extends ProgramTransformer {
 
     @Override
     public ImmutableList<ProgramElement> getArguments() {
-        return argumentsOf(body(), (SchemaVariable) execContextSV, resultVar);
+        final ProgramElement ec = (ProgramElement) execContextSV;
+        final ProgramElement result = (ProgramElement) resultVar;
+        if (ec != null) {
+            return result == null ? ImmutableList.of(ec, body())
+                    : ImmutableList.of(ec, result, body());
+        }
+        return result == null ? ImmutableList.of(body()) : ImmutableList.of(result, body());
     }
 
     /** gets an array of expression and returns a list of types */
