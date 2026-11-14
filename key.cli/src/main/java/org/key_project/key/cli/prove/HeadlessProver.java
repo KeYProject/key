@@ -22,6 +22,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 import org.key_project.key.cli.ContractResult;
 import org.key_project.key.cli.ExitCode;
 import org.key_project.key.cli.ResultStatus;
+import org.key_project.key.cli.settings.HeadlessRunnerSettings;
 import org.key_project.prover.engine.ProofSearchInformation;
 
 import org.jspecify.annotations.Nullable;
@@ -60,11 +61,13 @@ public final class HeadlessProver {
 
     private final long timeoutMs;
 
+    private final @Nullable HeadlessRunnerSettings runnerSettings;
+
     /**
      * Creates a prover without a timeout.
      */
     public HeadlessProver() {
-        this(0);
+        this(0, null);
     }
 
     /**
@@ -73,7 +76,19 @@ public final class HeadlessProver {
      * @param timeoutMs the proof-search timeout in milliseconds, or {@code 0} for no timeout
      */
     public HeadlessProver(long timeoutMs) {
+        this(timeoutMs, null);
+    }
+
+    /**
+     * Creates a prover with an optional per-contract timeout and per-run strategy settings.
+     *
+     * @param timeoutMs the proof-search timeout in milliseconds, or {@code 0} for no timeout
+     * @param runnerSettings the §5.1 strategy settings to apply for the whole run, or {@code null}
+     *        if none were requested
+     */
+    public HeadlessProver(long timeoutMs, @Nullable HeadlessRunnerSettings runnerSettings) {
         this.timeoutMs = Math.max(0, timeoutMs);
+        this.runnerSettings = runnerSettings;
     }
 
     /**
@@ -106,17 +121,27 @@ public final class HeadlessProver {
      */
     public List<ContractResult> prove(Path problem, List<String> selectors)
             throws ProblemLoaderException, UnknownContractException {
-        KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(problem);
+        HeadlessRunnerSettings settings = runnerSettings;
+        if (settings != null) {
+            settings.apply();
+        }
         try {
-            ContractIndex index = ContractIndex.fromEnvironment(environment);
-            List<Contract> selected = select(environment, index, selectors);
-            List<ContractResult> results = new ArrayList<>(selected.size());
-            for (Contract contract : selected) {
-                results.add(prove(environment, contract));
+            KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(problem);
+            try {
+                ContractIndex index = ContractIndex.fromEnvironment(environment);
+                List<Contract> selected = select(environment, index, selectors);
+                List<ContractResult> results = new ArrayList<>(selected.size());
+                for (Contract contract : selected) {
+                    results.add(prove(environment, contract));
+                }
+                return results;
+            } finally {
+                environment.dispose();
             }
-            return results;
         } finally {
-            environment.dispose();
+            if (settings != null) {
+                settings.close();
+            }
         }
     }
 
