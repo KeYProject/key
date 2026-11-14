@@ -122,6 +122,24 @@ public final class ContractIndex {
     }
 
     /**
+     * Returns all contracts with the given canonical name, in stable index order. Several
+     * contracts may share a canonical name (overloads, §4.4 of the headless interface spec);
+     * selection treats all of them as one multi-set entry.
+     *
+     * @param name the canonical contract name
+     * @return the matching contracts, possibly empty
+     */
+    public List<Contract> byNames(String name) {
+        List<Contract> result = new ArrayList<>();
+        for (Contract contract : contracts) {
+            if (contract.getName().equals(name)) {
+                result.add(contract);
+            }
+        }
+        return result;
+    }
+
+    /**
      * Returns the contract at the given index if it also has the given canonical name. This
      * disambiguates overloads that share a canonical name.
      *
@@ -131,5 +149,16 @@ public final class ContractIndex {
      */
     public Optional<Contract> byNameAndIdx(String name, int idx) {
         return byIdx(idx).filter(contract -> contract.getName().equals(name));
+    }
+
+    /**
+     * Renders one line of the contract listing (§4.3 of the headless interface spec):
+     * {@code <IDX>\t<target>\t<NAME>}.
+     *
+     * @param row the row to render
+     * @return the tab-separated listing line without trailing newline
+     */
+    public static String renderLine(Row row) {
+        return row.idx() + "\t" + row.targetName() + "\t" + row.name();
     }
 }

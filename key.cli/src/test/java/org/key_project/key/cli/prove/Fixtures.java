@@ -11,16 +11,26 @@ import java.nio.file.Path;
 /**
  * Resolves the test fixtures on the test runtime classpath.
  */
-final class Fixtures {
+public final class Fixtures {
     private Fixtures() {
     }
 
     /// The load file of the two-method fixture {@code C} (one closed, one open contract).
-    static Path indexKey() {
+    public static Path indexKey() {
         return resource("/fixtures/index/index.key");
     }
 
-    static Path resource(String name) {
+    /// The load file selecting the closed {@code one()} contract via {@code \chooseContract}.
+    public static Path chooseKey() {
+        return resource("/fixtures/index/choose.key");
+    }
+
+    /// The load file selecting the closed {@code one()} contract via {@code \proofObligation}.
+    public static Path proofObligationKey() {
+        return resource("/fixtures/index/proofobl.key");
+    }
+
+    public static Path resource(String name) {
         URL url = Fixtures.class.getResource(name);
         if (url == null) {
             throw new IllegalStateException("test resource not found: " + name);
