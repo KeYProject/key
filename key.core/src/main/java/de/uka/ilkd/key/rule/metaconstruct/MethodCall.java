@@ -45,7 +45,6 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,6 +114,10 @@ public final class MethodCall extends ProgramTransformer {
             throw new IllegalArgumentException("The execution context of #methodCall must be "
                 + "an execution-context variable, but was " + ec.sort() + ".");
         }
+        if (result != null && result.sort() != ProgramSVSort.VARIABLE) {
+            throw new IllegalArgumentException("The result variable of #methodCall must be "
+                + "a program-variable schema variable, but was " + result.sort() + ".");
+        }
     }
 
     /**
@@ -126,33 +129,9 @@ public final class MethodCall extends ProgramTransformer {
      * @param ec The Schema Variable.
      */
     protected MethodCall(Name name, ProgramSV ec, SchemaVariable result, ProgramElement body) {
-        super(name, body);
+        super(name, body, ec, result);
         this.resultVar = result;
         this.execContextSV = ec;
-    }
-
-    /**
-     * Returns the schema variable that holds the result of the call, if any.
-     *
-     * <p>
-     * A schema variable is not a {@link ProgramElement}, so it cannot be surfaced through
-     * {@link #getChildAt(int)}; the pretty printer reads it from here to print all
-     * {@code #methodCall}
-     * arguments for a roundtrippable representation.
-     *
-     * @return the result schema variable, or {@code null} if the call has none
-     */
-    public @Nullable SchemaVariable resultVariable() {
-        return resultVar;
-    }
-
-    /**
-     * Returns the execution-context schema variable, if any.
-     *
-     * @return the execution-context schema variable, or {@code null} if the call has none
-     */
-    public @Nullable SchemaVariable executionContextSV() {
-        return (SchemaVariable) execContextSV;
     }
 
     /** gets an array of expression and returns a list of types */

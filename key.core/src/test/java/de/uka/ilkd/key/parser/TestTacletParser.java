@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
 import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
+import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
@@ -66,6 +67,9 @@ public class TestTacletParser {
                   \\program Label #inner, #outer ;\s
                   \\program Type #typ ;\s
                   \\program Variable #v0, #v, #v1, #k, #boolv ;\s
+                  \\program ExecutionContext #ex ;\s
+                  \\program SimpleInstanceCreation #n ;\s
+                  \\program ArrayInitializer #arrayinitializer ;\s
                   \\program[list] Catch #cf ;\s
                   \\term s x,x0 ;
                   \\skolemTerm s sk ;
@@ -496,6 +500,51 @@ public class TestTacletParser {
         JavaBuildingIssue issue = jbe.getIssues().get(0);
         assertNotEquals(-1, issue.getLine(), "error must carry a real line number");
         assertNotEquals(-1, issue.getColumn(), "error must carry a real column number");
+    }
+
+    @Test
+    public void testMethodCallRejectsWrongSortResultVariable() {
+        // 3-arg form: slot 1 is the result variable and must be a program variable. A
+        // Statement-sort schema variable there must be rejected at parse time.
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badMethodCallResult {\\find(\\<{.. #methodCall(#ex, #p1, #s); ...}\\>true)"
+                + " \\replacewith(true)}"));
+        assertTrue(hasCause(e, JavaBuildingExceptions.class),
+            "wrong result-variable sort must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testMetaConstructArgumentsRoundtrip() {
+        // The pretty printer must emit every schema-variable argument of a meta construct, not
+        // only #methodCall's, so that rules can be printed and re-parsed (Agent-KeY needs
+        // roundtrippable rules).
+        assertMetaConstructRoundtrips("unwindLoopRt",
+            "#unwindLoop(#inner, #outer, while (#e) #s)", "#unwindLoop(#inner,");
+        assertMetaConstructRoundtrips("constructorCallRt",
+            "#constructorCall(#v0, #n)", "#constructorCall(#v0,");
+        assertMetaConstructRoundtrips("initArrayCreationRt",
+            "#initArrayCreation(#v0, #arrayinitializer)", "#initArrayCreation(#v0,");
+    }
+
+    private void assertMetaConstructRoundtrips(String name, String metaConstruct,
+            String expectedPrefix) {
+        FindTaclet original = (FindTaclet) parseTaclet(name + " {\\find(\\<{.. "
+            + metaConstruct + "; ...}\\>true) \\replacewith(true)}");
+        ContextStatementBlock block =
+            (ContextStatementBlock) original.find().javaBlock().program();
+        ProgramTransformer transformer = (ProgramTransformer) block.getChildAt(0);
+
+        PrettyPrinter pp = PrettyPrinter.purePrinter();
+        pp.printFragment(transformer);
+        String printed = pp.result();
+
+        assertTrue(printed.contains(expectedPrefix),
+            "printed meta construct must keep its schema-variable arguments, but was:\n"
+                + printed);
+
+        Taclet reparsed = parseTaclet(
+            name + "Reparsed {\\find(\\<{.. " + printed + "; ...}\\>true) \\replacewith(true)}");
+        assertNotNull(reparsed);
     }
 
     private static boolean hasCause(Throwable t, Class<? extends Throwable> type) {

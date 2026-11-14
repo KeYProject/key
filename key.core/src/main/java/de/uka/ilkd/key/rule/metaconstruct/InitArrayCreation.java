@@ -50,7 +50,7 @@ public class InitArrayCreation extends InitArray {
     private final static String createArrayName = "$createArray";
 
     public InitArrayCreation(SchemaVariable newObjectSV, ProgramElement newExpr) {
-        super("#initArrayCreation", newExpr);
+        super("#initArrayCreation", newExpr, newObjectSV);
         this.newObjectSV = newObjectSV;
     }
 

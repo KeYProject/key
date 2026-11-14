@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Thu Nov 12 21:18:21 CET 2026
+# Date: Sat Nov 14 10:08:32 CET 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1088,7 +1088,7 @@ arrayCreation {
 \varcond(\new(#v0 (program Variable), \typeof(#na (program ArrayCreation))))
 \replacewith(#normal ((modal operator))|{{ ..
   #typeof(#na) #v0;
-  #initArrayCreation(#na)
+  #initArrayCreation(#v0, #na)
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -1102,7 +1102,7 @@ arrayCreationWithInitializers {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #initArrayCreation(#arrayinitializer)
+  #initArrayCreation(#v0, #arrayinitializer)
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -6361,7 +6361,9 @@ doWhileUnwind {
 ... }}| (post))
 \varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #unwindLoop(do #s
+  #unwindLoop(#innerLabel,
+  #outerLabel,
+  do #s
   while (#e);)
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -10000,7 +10002,7 @@ for_to_while {
 ... }}| (post))
 \varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #forToWhile(#forloop)
+  #forToWhile(#innerLabel, #outerLabel, #forloop)
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -12191,7 +12193,7 @@ instanceCreation {
 \varcond(\new(#v0 (program Variable), \typeof(#n (program SimpleInstanceCreation))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#v0) #v0 = #createObject(#n);
-  #constructorCall(#n)
+  #constructorCall(#v0, #n)
   #postWork(#v0)
 ... }}| (post)) 
 \heuristics(method_expand)
@@ -12205,7 +12207,7 @@ instanceCreationAssignment {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#normal ((modal operator))|{{ ..
   #typeof(#v0) #v0 = #createObject(#n);
-  #constructorCall(#n)
+  #constructorCall(#v0, #n)
   #postWork(#v0)
   #lhs = #v0;
 ... }}| (post)) 
@@ -13974,7 +13976,7 @@ loopUnwind {
 ... }}| (post))
 \varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #unwindLoop(while (#e) #s)
+  #unwindLoop(#innerLabel, #outerLabel, while (#e) #s)
 ... }}| (post)) 
 \heuristics(loop_expand)
 Choices: programRules:Java}

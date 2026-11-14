@@ -56,7 +56,7 @@ public class UnwindLoop extends ProgramTransformer {
      * @param outerLabel The outer label SV
      */
     public UnwindLoop(SchemaVariable innerLabel, SchemaVariable outerLabel, LoopStatement loop) {
-        super("#unwindLoop", loop);
+        super("#unwindLoop", loop, innerLabel, outerLabel);
         this.innerLabel = innerLabel;
         this.outerLabel = outerLabel;
     }
