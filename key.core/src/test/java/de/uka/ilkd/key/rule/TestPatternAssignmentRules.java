@@ -221,6 +221,20 @@ class TestPatternAssignmentRules {
     }
 
     @Test
+    void orPatternAssignmentWithBoundVariable() {
+        // A negated instanceof in the left operand of || binds the pattern variable when it is
+        // false, i.e. in the else-branch, where the right operand is evaluated: the declaration
+        // must be introduced by #negBinding, otherwise s is undeclared in that branch.
+        var goal = applyRule("orPatternAssignment",
+            "boolean b = !(new String(\"x\") instanceof String s) || s.isEmpty();");
+        assertSuccedent(goal,
+            "\\<{boolean b; boolean b_1; { b_1 = !(new String(\"x\") instanceof String s); }"
+                + " if (b_1) { b = true; }"
+                + " else { java.lang.String s = (String) new String(\"x\"); b = s.isEmpty(); }}"
+                + "\\> true");
+    }
+
+    @Test
     void notPatternAssignment() {
         var goal = applyRule("notPatternAssignment",
             "boolean b = !(new String(\"x\") instanceof String s);");
