@@ -135,6 +135,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      */
     private final Map<FullVariableDeclarator, ProgramVariable> fieldSpecificationMapping =
         new LinkedHashMap<>();
+    /**
+     * Maps the name of a type pattern to the program variable it binds. The variable occurs both
+     * in the pattern that declares it and in every use within the pattern's scope, where the
+     * symbol resolver maps the use back to the same name node. All occurrences must be converted
+     * to the same program variable; otherwise a declaration generated for the pattern variable
+     * would not be visible to its uses.
+     */
+    private final Map<SimpleName, IProgramVariable> patternVariableMapping =
+        new IdentityHashMap<>();
 
     JP2KeYVisitor(@NonNull Services services,
             @NonNull Namespace<SchemaVariable> schemaVariables) {
@@ -172,6 +181,27 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
         List<Comment> c = createComments(n);
         return new ProgramElementName(n.asString(), c.toArray(Comment[]::new));
+    }
+
+    /**
+     * Returns the program variable bound by the type pattern with the given name, creating it on
+     * first use.
+     *
+     * @param name the name of the pattern variable
+     * @param type the type of the pattern variable
+     * @return the program variable bound by the pattern
+     */
+    private IProgramVariable getPatternVariable(SimpleName name, TypeReference type) {
+        IProgramVariable variable = patternVariableMapping.get(name);
+        if (variable == null) {
+            if (name.getIdentifier().startsWith("#")) {
+                variable = (ProgramSV) lookupSchemaVariable(name);
+            } else {
+                variable = new LocationVariable(new ProgramElementName(name.getIdentifier()), type);
+            }
+            patternVariableMapping.put(name, variable);
+        }
+        return variable;
     }
 
     @Override
@@ -1052,18 +1082,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         if (n.getName().isPresent()) {
             final SimpleName nName = n.getName().get();
-            var name = nName.getIdentifier();
 
             PositionInfo piVar = createPositionInfo(nName);
             List<Comment> cVar = createComments(nName);
 
-            IProgramVariable pvar;
-            if (!name.startsWith("#")) {
-                pvar = new LocationVariable(
-                    new ProgramElementName(name), type);
-            } else {
-                pvar = (ProgramSV) lookupSchemaVariable(nName);
-            }
+            IProgramVariable pvar = getPatternVariable(nName, type);
 
             final var vs =
                 new VariableSpecification(piVar, cVar, null, pvar, 0, type.getKeYJavaType());
@@ -2339,22 +2362,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(TypePatternExpr n, Void arg) {
-        // weigl: This is somehow crude and called by a type resolution in NameExpr, expecting a
-        // VariableDeclaration
+        // A name expression in the scope of a pattern resolves to this node, so the declaration
+        // is built here; the variable is shared with the declaring InstanceOfExpr.
         var nName = n.getName();
         TypeRef type = accept(n.getType());
-        var name = nName.getIdentifier();
 
-        PositionInfo piVar = createPositionInfo(nName);
-        List<Comment> cVar = createComments(nName);
-
-        IProgramVariable pvar;
-        if (!name.startsWith("#")) {
-            pvar = new LocationVariable(
-                new ProgramElementName(name), type);
-        } else {
-            pvar = (ProgramSV) lookupSchemaVariable(nName);
-        }
+        IProgramVariable pvar = getPatternVariable(nName, type);
 
         ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> mods = map(n.getModifiers());
         return new LocalVariableDeclaration(mods, type, new VariableSpecification(pvar));

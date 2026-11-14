@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.StatementBlock;
@@ -15,14 +17,18 @@ import de.uka.ilkd.key.java.ast.expression.operator.TypeCast;
 import de.uka.ilkd.key.java.ast.statement.If;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.NamespaceBuilder;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.logic.SyntaxElementCursor;
+
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -30,6 +36,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BindingsOfExprTest {
@@ -111,6 +118,31 @@ class BindingsOfExprTest {
     private String[] split(String expected) {
         return expected == null || expected.isBlank() ? new String[0]
                 : expected.trim().split("\\s+");
+    }
+
+    /**
+     * A use of a pattern variable in the scope of the pattern must refer to the very variable the
+     * pattern binds; otherwise a declaration generated for the pattern variable is not visible to
+     * its uses.
+     */
+    @Test
+    void patternVariableIsSharedWithItsUses() {
+        String block = "{ boolean r = o instanceof String s && s.isEmpty(); }";
+        StatementBlock sb =
+            (StatementBlock) services.getJavaService().readBlock(block, context, null).program();
+
+        List<ProgramVariable> occurrences = new ArrayList<>();
+        SyntaxElementCursor cursor = sb.getCursor();
+        do {
+            if (cursor.getCurrentNode() instanceof ProgramVariable pv
+                    && pv.name().toString().equals("s")) {
+                occurrences.add(pv);
+            }
+        } while (cursor.goToNext());
+
+        assertEquals(2, occurrences.size(), "expected the binding and its use");
+        assertSame(occurrences.get(0), occurrences.get(1),
+            "the use of the pattern variable must refer to the bound variable");
     }
 
     /** the introduced variables must be declared with a type cast as initializer */
