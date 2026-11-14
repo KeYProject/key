@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -117,9 +116,9 @@ public class ClassDeclaration extends TypeDeclaration implements Statement {
         this(children, fullName, isLibrary, false, false, false);
     }
 
-    public ClassDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
+    public ClassDeclaration(PositionInfo pi, List<Comment> c, ImmutableList<Modifier> modArray,
             ProgramElementName name, ProgramElementName fullName,
-            ImmutableArray<MemberDeclaration> members, boolean parentIsInterface,
+            ImmutableList<MemberDeclaration> members, boolean parentIsInterface,
             boolean isLibrary, Extends extending, Implements implementing, boolean innerClass,
             boolean localClassDeclaration, boolean isAnonymousClass,
             ImmutableList<TextualJMLConstruct> spec) {

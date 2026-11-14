@@ -17,7 +17,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -158,7 +158,7 @@ public class IsabelleMasterHandler {
      * @param terms terms to be translated
      * @return a List of StringBuilders containing translations in the same order as the given terms
      */
-    public List<StringBuilder> translate(ImmutableArray<? extends Term> terms) {
+    public List<StringBuilder> translate(ImmutableList<? extends Term> terms) {
         List<StringBuilder> result = new LinkedList<>();
         for (Term term : terms) {
             result.add(translate(term));

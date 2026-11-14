@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Inheritance specification.
@@ -26,7 +26,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      * Supertypes.
      */
 
-    protected final ImmutableArray<TypeReference> supertypes;
+    protected final ImmutableList<TypeReference> supertypes;
 
 
     /**
@@ -45,7 +45,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     protected InheritanceSpecification(TypeReference supertype) {
-        this.supertypes = new ImmutableArray<>(supertype);
+        this.supertypes = ImmutableList.of(supertype);
     }
 
     /**
@@ -56,7 +56,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
 
     protected InheritanceSpecification(TypeReference[] supertypes) {
-        this.supertypes = new ImmutableArray<>(supertypes);
+        this.supertypes = ImmutableList.of(supertypes);
     }
 
     /**
@@ -68,10 +68,10 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      */
     protected InheritanceSpecification(ExtList children) {
         super(children);
-        this.supertypes = new ImmutableArray<>(children.collect(TypeReference.class));
+        this.supertypes = ImmutableList.of(children.collect(TypeReference.class));
     }
 
-    public InheritanceSpecification(ImmutableArray<TypeReference> types) {
+    public InheritanceSpecification(ImmutableList<TypeReference> types) {
         this.supertypes = types;
     }
 
@@ -121,7 +121,7 @@ public abstract class InheritanceSpecification extends JavaNonTerminalProgramEle
      * @return the type reference array wrapper.
      */
 
-    public ImmutableArray<TypeReference> getSupertypes() {
+    public ImmutableList<TypeReference> getSupertypes() {
         return supertypes;
     }
 

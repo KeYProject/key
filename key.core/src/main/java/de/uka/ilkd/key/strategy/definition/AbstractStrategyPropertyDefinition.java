@@ -6,7 +6,7 @@ package de.uka.ilkd.key.strategy.definition;
 
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Provides the basic function definition of user interface controls to edit a single key-value-pair
@@ -35,7 +35,7 @@ public abstract class AbstractStrategyPropertyDefinition {
      * Optional children which edits related properties to this. They might be shown different in
      * the user interface.
      */
-    private final ImmutableArray<AbstractStrategyPropertyDefinition> subProperties;
+    private final ImmutableList<AbstractStrategyPropertyDefinition> subProperties;
 
     /**
      * Constructor.
@@ -50,7 +50,7 @@ public abstract class AbstractStrategyPropertyDefinition {
         this.apiKey = apiKey;
         this.name = name;
         this.tooltip = tooltip;
-        this.subProperties = new ImmutableArray<>(subProperties);
+        this.subProperties = ImmutableList.of(subProperties);
     }
 
     /**
@@ -78,9 +78,9 @@ public abstract class AbstractStrategyPropertyDefinition {
      * Returns children which edits related properties to this. They might be shown different in the
      * user interface.
      *
-     * @return The children if available or an empty {@link ImmutableArray} otherwise.
+     * @return The children if available or an empty {@link ImmutableList} otherwise.
      */
-    public ImmutableArray<AbstractStrategyPropertyDefinition> getSubProperties() {
+    public ImmutableList<AbstractStrategyPropertyDefinition> getSubProperties() {
         return subProperties;
     }
 }

@@ -28,7 +28,6 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.UpdateableOperator;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
@@ -43,8 +42,8 @@ public final class ProgramSV extends JOperatorSV
         implements ProgramConstruct, UpdateableOperator {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
-    private static final ImmutableArray<ProgramElement> EMPTY_LIST_INSTANTIATION =
-        new ImmutableArray<>(new ProgramElement[0]);
+    private static final ImmutableList<ProgramElement> EMPTY_LIST_INSTANTIATION =
+        ImmutableList.of(new ProgramElement[0]);
 
     private final boolean isListSV;
 
@@ -168,12 +167,12 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public ImmutableArray<Expression> getUpdates() {
+    public ImmutableList<Expression> getUpdates() {
         return null;
     }
 
     @Override
-    public ImmutableArray<LoopInitializer> getInits() {
+    public ImmutableList<LoopInitializer> getInits() {
         return null;
     }
 
@@ -264,7 +263,7 @@ public final class ProgramSV extends JOperatorSV
      * @return the updated match conditions including mapping <code>var</code> to <code>list</code>
      *         or null if some variable condition would be hurt by the mapping
      */
-    private MatchConditions addProgramInstantiation(ImmutableArray<ProgramElement> list,
+    private MatchConditions addProgramInstantiation(ImmutableList<ProgramElement> list,
             MatchConditions matchCond,
             Services services) {
         if (matchCond == null) {
@@ -272,7 +271,7 @@ public final class ProgramSV extends JOperatorSV
         }
 
         SVInstantiations insts = matchCond.getInstantiations();
-        final var pl = (ImmutableArray<ProgramElement>) insts.getInstantiation(this);
+        final var pl = (ImmutableList<ProgramElement>) insts.getInstantiation(this);
         if (pl != null) {
             if (pl.equals(list)) {
                 return matchCond;
@@ -309,7 +308,8 @@ public final class ProgramSV extends JOperatorSV
             src = source.getSource();
         }
 
-        return addProgramInstantiation(new ImmutableArray<>(matchedElements), matchCond, services);
+        return addProgramInstantiation(ImmutableList.fromList(matchedElements), matchCond,
+            services);
     }
 
     /**
@@ -470,7 +470,7 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public ImmutableArray<ParameterDeclaration> getParameters() {
+    public ImmutableList<ParameterDeclaration> getParameters() {
         return null;
     }
 
@@ -505,12 +505,12 @@ public final class ProgramSV extends JOperatorSV
     }
 
     @Override
-    public ImmutableArray<Modifier> getModifiers() {
+    public ImmutableList<Modifier> getModifiers() {
         return null;
     }
 
     @Override
-    public ImmutableArray<KeYJavaType> getParamTypes() {
+    public ImmutableList<KeYJavaType> getParamTypes() {
         return null;
     }
 

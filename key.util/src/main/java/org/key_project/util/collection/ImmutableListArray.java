@@ -192,6 +192,8 @@ final class ImmutableListArray<T extends @Nullable Object> implements ImmutableL
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(data);
+        // must be consistent with the hashCode of the list-based implementations
+        // (e.g. ImmutableSLList), otherwise equal lists have different hashes
+        return ImmutableList.hash(this);
     }
 }

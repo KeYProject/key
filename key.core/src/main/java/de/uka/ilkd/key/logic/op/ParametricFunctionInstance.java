@@ -17,7 +17,6 @@ import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.Strings;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.WeakValueInterner;
 
@@ -54,7 +53,7 @@ public class ParametricFunctionInstance extends JFunction {
     }
 
     private ParametricFunctionInstance(ParametricFunctionDecl base,
-            ImmutableList<GenericArgument> args, ImmutableArray<Sort> argSorts, Sort sort) {
+            ImmutableList<GenericArgument> args, ImmutableList<Sort> argSorts, Sort sort) {
         super(makeName(base, args), sort, argSorts, base.getWhereToBind(), base.isUnique(),
             base.isRigid(), base.isSkolemConstant() ? SKOLEM : ORDINARY,
             UNRECORDED);
@@ -77,7 +76,7 @@ public class ParametricFunctionInstance extends JFunction {
 
     /// Instantiates the arguments of `base` with the instantiations for the generic sorts in
     /// `instMap`.
-    private static ImmutableArray<Sort> instantiate(ParametricFunctionDecl base,
+    private static ImmutableList<Sort> instantiate(ParametricFunctionDecl base,
             Map<GenericSort, GenericArgument> instMap, Services services) {
         var baseArgSorts = base.argSorts();
         var argSorts = new Sort[baseArgSorts.size()];
@@ -87,7 +86,7 @@ public class ParametricFunctionInstance extends JFunction {
             argSorts[i] = ParametricSortInstance.instantiate(sort, instMap, services);
         }
 
-        return new ImmutableArray<>(argSorts);
+        return ImmutableList.of(argSorts);
     }
 
     /// Computes an instantiation mapping for `base`.

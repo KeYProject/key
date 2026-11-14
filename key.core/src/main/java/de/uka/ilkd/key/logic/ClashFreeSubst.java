@@ -10,7 +10,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 public class ClashFreeSubst {
@@ -60,13 +60,13 @@ public class ClashFreeSubst {
     }
 
     // XXX
-    protected static ImmutableArray<QuantifiableVariable> getSingleArray(
-            ImmutableArray<QuantifiableVariable>[] bv) {
+    protected static ImmutableList<QuantifiableVariable> getSingleArray(
+            ImmutableList<QuantifiableVariable>[] bv) {
         if (bv == null) {
             return null;
         }
-        ImmutableArray<QuantifiableVariable> result = null;
-        for (ImmutableArray<QuantifiableVariable> arr : bv) {
+        ImmutableList<QuantifiableVariable> result = null;
+        for (ImmutableList<QuantifiableVariable> arr : bv) {
             if (arr != null && !arr.isEmpty()) {
                 if (result == null) {
                     result = arr;
@@ -87,7 +87,7 @@ public class ClashFreeSubst {
         final int arity = t.arity();
         final JTerm[] newSubterms = new JTerm[arity];
         @SuppressWarnings("unchecked")
-        final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[arity];
+        final ImmutableList<QuantifiableVariable>[] newBoundVars = new ImmutableList[arity];
         for (int i = 0; i < arity; i++) {
             applyOnSubterm(t, i, newSubterms, newBoundVars);
         }
@@ -100,14 +100,14 @@ public class ClashFreeSubst {
      * <code>newBoundVars</code> (at index <code>subtermIndex</code>)
      */
     protected void applyOnSubterm(JTerm completeTerm, int subtermIndex, JTerm[] newSubterms,
-            ImmutableArray<QuantifiableVariable>[] newBoundVars) {
+            ImmutableList<QuantifiableVariable>[] newBoundVars) {
         if (subTermChanges(completeTerm.varsBoundHere(subtermIndex),
             completeTerm.sub(subtermIndex))) {
             final QuantifiableVariable[] nbv =
                 new QuantifiableVariable[completeTerm.varsBoundHere(subtermIndex).size()];
             applyOnSubterm(0, completeTerm.varsBoundHere(subtermIndex), nbv, subtermIndex,
                 completeTerm.sub(subtermIndex), newSubterms);
-            newBoundVars[subtermIndex] = new ImmutableArray<>(nbv);
+            newBoundVars[subtermIndex] = ImmutableList.of(nbv);
         } else {
             newBoundVars[subtermIndex] = completeTerm.varsBoundHere(subtermIndex);
             newSubterms[subtermIndex] = completeTerm.sub(subtermIndex);
@@ -125,7 +125,7 @@ public class ClashFreeSubst {
      * free in <code>subTerm</code>, but does not occurr in <code>boundVars</code> from
      * <code>varInd</code> upwards..
      */
-    private void applyOnSubterm(int varInd, ImmutableArray<QuantifiableVariable> boundVars,
+    private void applyOnSubterm(int varInd, ImmutableList<QuantifiableVariable> boundVars,
             QuantifiableVariable[] newBoundVars, int subInd, JTerm subTerm, JTerm[] newSubterms) {
         if (varInd >= boundVars.size()) {
             newSubterms[subInd] = apply1(subTerm);
@@ -151,7 +151,7 @@ public class ClashFreeSubst {
                 new ClashFreeSubst(qv, tb.var(qv1), tb).applyOnSubterm1(varInd + 1, boundVars,
                     newBoundVars, subInd, subTerm, newSubterms);
                 // then continue recursively, on the result.
-                applyOnSubterm(varInd + 1, new ImmutableArray<>(newBoundVars),
+                applyOnSubterm(varInd + 1, ImmutableList.of(newBoundVars),
                     newBoundVars, subInd, newSubterms[subInd], newSubterms);
             } else {
                 newBoundVars[varInd] = qv;
@@ -164,7 +164,7 @@ public class ClashFreeSubst {
      * Same as applyOnSubterm, but v doesn't have to occurr free in the considered quantified
      * subterm. It is however assumed that no more clash can occurr.
      */
-    private void applyOnSubterm1(int varInd, ImmutableArray<QuantifiableVariable> boundVars,
+    private void applyOnSubterm1(int varInd, ImmutableList<QuantifiableVariable> boundVars,
             QuantifiableVariable[] newBoundVars, int subInd, JTerm subTerm, JTerm[] newSubterms) {
         if (varInd >= boundVars.size()) {
             newSubterms[subInd] = apply(subTerm);
@@ -190,7 +190,7 @@ public class ClashFreeSubst {
      * @return true if <code>subTerm</code> bound by <code>boundVars</code> would change under
      *         application of this substitution
      */
-    protected boolean subTermChanges(ImmutableArray<QuantifiableVariable> boundVars,
+    protected boolean subTermChanges(ImmutableList<QuantifiableVariable> boundVars,
             JTerm subTerm) {
         if (!subTerm.freeVars().contains(v)) {
             return false;

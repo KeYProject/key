@@ -522,7 +522,7 @@ public class MergeRuleUtils {
             }
 
             return services.getTermFactory().createTerm(term.op(),
-                new ImmutableArray<>(transfSubs), term.boundVars(),
+                ImmutableList.fromList(transfSubs), term.boundVars(),
                 term.getLabels());
 
         }

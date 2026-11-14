@@ -9,7 +9,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The Members (written as methods) inside {@link AnnotationInterfaceDeclaration}s. They
@@ -24,7 +24,7 @@ public class AnnotationInterfaceMemberDeclaration extends JavaDeclaration
     private final ProgramElementName name;
 
     public AnnotationInterfaceMemberDeclaration(TypeReference typeRef, ProgramElementName name,
-            ImmutableArray<Modifier> modifiers) {
+            ImmutableList<Modifier> modifiers) {
         super(modifiers);
 
         this.typeRef = typeRef;
