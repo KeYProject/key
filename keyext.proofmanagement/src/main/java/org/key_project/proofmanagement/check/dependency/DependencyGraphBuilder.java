@@ -6,6 +6,7 @@ package org.key_project.proofmanagement.check.dependency;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -37,23 +38,24 @@ public abstract class DependencyGraphBuilder {
         // first create the nodes of the graph (one for each loaded proof)
         for (CheckerData.ProofEntry line : proofEntries) {
 
-            Proof proof = line.proof;
+            Proof proof = Objects.requireNonNull(line.proof);
             String contractName = proof.name().toString();
             Services services = proof.getServices();
             SpecificationRepository specRepo = services.getSpecificationRepository();
             Contract contract = specRepo.getContractByName(contractName);
 
             // create fresh node for current contract
-            DependencyNode node = new DependencyNode(contract);
+            DependencyNode node = new DependencyNode(Objects.requireNonNull(contract));
             graph.addNode(node);
         }
 
         // add dependencies between nodes
         for (CheckerData.ProofEntry line : proofEntries) {
             // get current node and root of proof
-            Proof proof = line.proof;
-            DependencyNode currentNode = graph.getNodeByName(proof.name().toString());
-            BranchNodeIntermediate node = line.parseResult.parsedResult();
+            Proof proof = Objects.requireNonNull(line.proof);
+            DependencyNode currentNode =
+                Objects.requireNonNull(graph.getNodeByName(proof.name().toString()));
+            BranchNodeIntermediate node = Objects.requireNonNull(line.parseResult).parsedResult();
 
             // collect all contracts the current proof refers to
             Services services = proof.getServices();
@@ -70,7 +72,7 @@ public abstract class DependencyGraphBuilder {
                 // This is the case for contracts that have no proof in bundle,
                 // particularly those from JavaRedux shipped with KeY.
                 if (dependentNode == null) {
-                    Contract contract = specRepo.getContractByName(depName);
+                    Contract contract = Objects.requireNonNull(specRepo.getContractByName(depName));
                     dependentNode = new DependencyNode(contract);
                     graph.addNode(dependentNode);
                 }
