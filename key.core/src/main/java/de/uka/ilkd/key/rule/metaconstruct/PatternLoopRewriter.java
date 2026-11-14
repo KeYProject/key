@@ -143,7 +143,8 @@ public final class PatternLoopRewriter extends ProgramTransformer {
         Statement rewrittenBody =
             rewriteContinues(body, boolVar, strippedGuard, List.of(), services);
         var bodyStatements = new ArrayList<Statement>();
-        bodyStatements.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenTrue())));
+        bodyStatements.addAll(
+            List.of(BindingVariableVisitor.toStatements(bindings.whenTrue(), services)));
         addBodyStatements(bodyStatements, rewrittenBody);
         bodyStatements.add(KeYJavaASTFactory.assign(boolVar, strippedGuard));
 
@@ -156,7 +157,8 @@ public final class PatternLoopRewriter extends ProgramTransformer {
         result.add(booleanDeclaration(boolVar, guard, services));
         result.add(newLoop);
         if (!bindings.whenFalse().isEmpty() && !hasUnlabeledBreak(body, services)) {
-            result.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenFalse())));
+            result.addAll(
+                List.of(BindingVariableVisitor.toStatements(bindings.whenFalse(), services)));
         }
         return result.toArray(ProgramElement[]::new);
     }
@@ -182,7 +184,8 @@ public final class PatternLoopRewriter extends ProgramTransformer {
         Statement rewrittenBody =
             rewriteContinues(body, boolVar, strippedGuard, updates, services);
         var bodyStatements = new ArrayList<Statement>();
-        bodyStatements.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenTrue())));
+        bodyStatements.addAll(
+            List.of(BindingVariableVisitor.toStatements(bindings.whenTrue(), services)));
         addBodyStatements(bodyStatements, rewrittenBody);
         bodyStatements.addAll(updates);
         bodyStatements.add(KeYJavaASTFactory.assign(boolVar, strippedGuard));
@@ -209,7 +212,8 @@ public final class PatternLoopRewriter extends ProgramTransformer {
         if (!bindings.whenFalse().isEmpty()
                 && !hasUnlabeledBreak(body, services)
                 && afterBindingsUseNoForInitVariables(loop, bindings.whenFalse(), services)) {
-            result.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenFalse())));
+            result.addAll(
+                List.of(BindingVariableVisitor.toStatements(bindings.whenFalse(), services)));
         }
         return result.toArray(ProgramElement[]::new);
     }
