@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sat Nov 14 23:18:21 CET 2026
+# Date: Sun Nov 15 00:37:08 CET 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -11196,7 +11196,7 @@ ifUnfold {
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
-== ifUnfoldPattern (ifElseUnfoldPattern) =========================================
+== ifUnfoldPattern (ifUnfoldPattern) =========================================
 ifUnfoldPattern {
 \find(#allmodal ((modal operator))|{{ ..
   if (#nse) #s0
@@ -11215,7 +11215,7 @@ ifUnfoldPattern {
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
-== ifUnfoldPatternUnreachable (ifElseUnfoldPatternUnreachable) =========================================
+== ifUnfoldPatternUnreachable (ifUnfoldPatternUnreachable) =========================================
 ifUnfoldPatternUnreachable {
 \find(#allmodal ((modal operator))|{{ ..
   if (#nse) #s0
@@ -12421,7 +12421,7 @@ instanceof_eval_id_or {
   #v = !(#b0 instanceof #t #id) || #nse;
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #v = #b0 instanceof #t;
+  #v = !(#b0 instanceof #t);
   if (!#v) {
     #t #id = (#t) #b0;
     #v = #nse;
