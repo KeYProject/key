@@ -218,7 +218,7 @@ class TestPatternIfRules {
         assertSuccedent(goal,
             "\\<{boolean b; { b = new String(\"x\") instanceof String s; }"
                 + " if (b) { java.lang.String s = (String) new String(\"x\");"
-                + " { int x = s.length(); } }}\\> true");
+                + " int x = s.length(); }}\\> true");
     }
 
     @Test
@@ -237,9 +237,9 @@ class TestPatternIfRules {
             + " instanceof String s)) { int x = 1; } else { int y = s.length(); }");
         assertSuccedent(goal,
             "\\<{boolean b; { b = !(new String(\"x\") instanceof String s); }"
-                + " if (b) { { int x = 1; } } else {"
+                + " if (b) { int x = 1; } else {"
                 + " java.lang.String s = (String) new String(\"x\");"
-                + " { int y = s.length(); } }}\\> true");
+                + " int y = s.length(); }}\\> true");
     }
 
     @Test
@@ -268,7 +268,7 @@ class TestPatternIfRules {
             "if (!(new String(\"x\") instanceof String s)) { return; }");
         assertSuccedent(goal,
             "\\<{boolean b; { b = !(new String(\"x\") instanceof String s); }"
-                + " if (b) { { return; } }"
+                + " if (b) { return; }"
                 + " java.lang.String s = (String) new String(\"x\");}\\> true");
     }
 
@@ -283,12 +283,32 @@ class TestPatternIfRules {
     }
 
     @Test
+    void ifUnfoldPatternKeepsAllStatementsOfBracedThen() {
+        Goal goal = applyRule("ifUnfoldPattern",
+            "if (new String(\"x\") instanceof String s) { int x = 1; int y = s.length(); }");
+        assertSuccedent(goal,
+            "\\<{boolean b; { b = new String(\"x\") instanceof String s; }"
+                + " if (b) { java.lang.String s = (String) new String(\"x\");"
+                + " int x = 1; int y = s.length(); }}\\> true");
+    }
+
+    @Test
+    void ifUnfoldPatternUnreachableKeepsAllStatementsOfBracedThen() {
+        Goal goal = applyRule("ifUnfoldPatternUnreachable",
+            "if (!(new String(\"x\") instanceof String s)) { int x = 1; return; }");
+        assertSuccedent(goal,
+            "\\<{boolean b; { b = !(new String(\"x\") instanceof String s); }"
+                + " if (b) { int x = 1; return; }"
+                + " java.lang.String s = (String) new String(\"x\");}\\> true");
+    }
+
+    @Test
     void ifUnfoldPatternUnreachableDoesNotBindAfterPositivePattern() {
         Goal goal = applyRule("ifUnfoldPatternUnreachable",
             "if (new String(\"x\") instanceof String s) { return; }");
         assertSuccedent(goal,
             "\\<{boolean b; { b = new String(\"x\") instanceof String s; }"
                 + " if (b) { java.lang.String s = (String) new String(\"x\");"
-                + " { return; } }}\\> true");
+                + " return; }}\\> true");
     }
 }
