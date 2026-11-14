@@ -17,6 +17,8 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
+import de.uka.ilkd.key.java.ast.expression.operator.Instanceof;
+import de.uka.ilkd.key.java.ast.expression.operator.InstanceofPattern;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.statement.Continue;
 import de.uka.ilkd.key.java.ast.statement.Do;
@@ -135,12 +137,14 @@ public final class PatternLoopRewriter extends ProgramTransformer {
         Expression guard = loop.getGuardExpression();
         Statement body = loop.getBody();
         var bindings = BindingVariableVisitor.analyze(guard);
+        Expression strippedGuard = stripPatterns(guard, services);
 
-        Statement rewrittenBody = rewriteContinues(body, boolVar, guard, List.of(), services);
+        Statement rewrittenBody =
+            rewriteContinues(body, boolVar, strippedGuard, List.of(), services);
         var bodyStatements = new ArrayList<Statement>();
         bodyStatements.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenTrue())));
         addBodyStatements(bodyStatements, rewrittenBody);
-        bodyStatements.add(KeYJavaASTFactory.assign(boolVar, guard));
+        bodyStatements.add(KeYJavaASTFactory.assign(boolVar, strippedGuard));
 
         While newLoop = KeYJavaASTFactory.whileLoop(boolVar,
             KeYJavaASTFactory.block(bodyStatements.toArray(Statement[]::new)),
@@ -164,6 +168,7 @@ public final class PatternLoopRewriter extends ProgramTransformer {
         Expression guard = loop.getGuardExpression();
         Statement body = loop.getBody();
         var bindings = BindingVariableVisitor.analyze(guard);
+        Expression strippedGuard = stripPatterns(guard, services);
 
         List<Statement> updates = new ArrayList<>();
         var updateExpressions = loop.getUpdates();
@@ -173,12 +178,13 @@ public final class PatternLoopRewriter extends ProgramTransformer {
             }
         }
 
-        Statement rewrittenBody = rewriteContinues(body, boolVar, guard, updates, services);
+        Statement rewrittenBody =
+            rewriteContinues(body, boolVar, strippedGuard, updates, services);
         var bodyStatements = new ArrayList<Statement>();
         bodyStatements.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenTrue())));
         addBodyStatements(bodyStatements, rewrittenBody);
         bodyStatements.addAll(updates);
-        bodyStatements.add(KeYJavaASTFactory.assign(boolVar, guard));
+        bodyStatements.add(KeYJavaASTFactory.assign(boolVar, strippedGuard));
 
         While newLoop = KeYJavaASTFactory.whileLoop(boolVar,
             KeYJavaASTFactory.block(bodyStatements.toArray(Statement[]::new)),
@@ -332,6 +338,17 @@ public final class PatternLoopRewriter extends ProgramTransformer {
             new VariableSpecification(boolVar, guard, booleanType));
     }
 
+    /**
+     * Returns a copy of {@code expression} with every {@link InstanceofPattern} replaced by a plain
+     * {@link Instanceof}. The pattern declarations are provided by {@code #posBinding}; keeping
+     * them in the body-end guard would declare the same variable a second time.
+     */
+    private static Expression stripPatterns(Expression expression, Services services) {
+        var stripper = new PatternStripper(expression, services);
+        stripper.start();
+        return (Expression) stripper.result();
+    }
+
     /** Rewrites target continues and preserves the rest of the body. */
     private static final class ContinueRewriter extends CreatingASTVisitor {
         private final ProgramVariable boolVar;
@@ -386,6 +403,38 @@ public final class PatternLoopRewriter extends ProgramTransformer {
             } else {
                 doDefaultAction(x);
             }
+        }
+    }
+
+    /** Copies an expression while replacing instanceof patterns with plain instanceof. */
+    private static final class PatternStripper extends CreatingASTVisitor {
+        private ProgramElement result;
+
+        private PatternStripper(Expression expression, Services services) {
+            super(expression, true, services);
+        }
+
+        @Override
+        public void start() {
+            stack.push(new ExtList());
+            walk(root());
+            ExtList elements = stack.peek();
+            int i = 0;
+            while (!(elements.get(i) instanceof ProgramElement)) {
+                i++;
+            }
+            result = (ProgramElement) elements.get(i);
+        }
+
+        ProgramElement result() {
+            return result;
+        }
+
+        @Override
+        public void performActionOnInstanceofPattern(InstanceofPattern x) {
+            addChild(new Instanceof(x.getPositionInfo(),
+                List.of(x.getComments()), x.getExpressionAt(0), x.getTypeReference()));
+            changed();
         }
     }
 }
