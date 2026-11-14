@@ -861,11 +861,23 @@ public static int afterLoopPattern(Object obj) {
 }
 ```
 
-Add a short README section explaining that `while`/`for` bodies and after-loop `whenFalse` bindings are supported, and that `do` bodies do not see the variable. Register the example project in the `JavaFeatures` group of `ProofCollections.automaticJavaDL()`:
+Add a short README section explaining that `while`/`for` bodies and after-loop `whenFalse` bindings are supported, and that `do` bodies do not see the variable.
 
-```java
-g.loadable("Java/InstanceOfPattern/project.key");
+Create one `.key` proof-obligation file per contract-bearing example method in `Java/InstanceOfPattern/`, using the `FunctionalOperationContractPO` class and the contract names from `KeYEnvironment.getProofContracts()`:
+
+```text
+getString.key
+isString.key
+getStringLength.key
+checkNotString.key
+processNumber.key
+getToStringLength.key
+traditionalVsPattern.key
+whilePattern.key
+afterLoopPattern.key
 ```
+
+The two loop proof files carry a `\settings` block with `LOOP_OPTIONS_KEY = LOOP_SCOPE_EXPAND`. Register all nine as `provable` in the `JavaFeatures` group of `ProofCollections.automaticJavaDL()`.
 
 - [ ] **Step 3: Run the targeted suites**
 
