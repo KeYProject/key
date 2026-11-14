@@ -1981,7 +1981,39 @@ public class JMLSpecFactory {
         if (hasUnlabeledBreak(loop.getBody())) {
             return ImmutableList.nil();
         }
-        return collectPatternVariables(false, loop.getGuardExpression());
+        var bindings = BindingVariableVisitor.analyze(loop.getGuardExpression()).whenFalse();
+        if (bindings.isEmpty()) {
+            return ImmutableList.nil();
+        }
+        if (loop instanceof For forLoop
+                && afterBindingsUseForInitVariables(forLoop, bindings)) {
+            return ImmutableList.nil();
+        }
+        return ImmutableList.fromList(bindings.keySet());
+    }
+
+    private boolean afterBindingsUseForInitVariables(For loop,
+            Map<LocationVariable, Expression> bindings) {
+        var initVariables = new java.util.LinkedHashSet<LocationVariable>();
+        var initializers = loop.getInitializers();
+        if (initializers != null) {
+            for (var init : initializers) {
+                if (init instanceof LocalVariableDeclaration declaration) {
+                    for (var specification : declaration.getVariables()) {
+                        initVariables.add(
+                            (LocationVariable) specification.getProgramVariable());
+                    }
+                }
+            }
+        }
+        for (Expression expression : bindings.values()) {
+            for (LocationVariable read : MiscTools.getLocalIns(expression, services)) {
+                if (initVariables.contains(read)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private static StatementContainer asContainer(Statement body) {
