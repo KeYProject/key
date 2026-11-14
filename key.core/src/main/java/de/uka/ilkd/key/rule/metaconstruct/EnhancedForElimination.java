@@ -100,7 +100,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     /**
      * Execution context sv.
      */
-    private final ProgramSV execContextSV;
+    private final @Nullable ProgramSV execContextSV;
 
 
     /**
@@ -118,7 +118,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param execContextSV the execution context.
      * @param forStatement the enhanced for loop to eliminate.
      */
-    public EnhancedForElimination(ProgramSV execContextSV, EnhancedFor forStatement) {
+    public EnhancedForElimination(@Nullable ProgramSV execContextSV, EnhancedFor forStatement) {
         super("#enhancedforElim", forStatement);
         this.execContextSV = execContextSV;
     }

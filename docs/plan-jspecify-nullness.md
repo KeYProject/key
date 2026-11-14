@@ -16,6 +16,20 @@ its full-checker compile hangs ~6h on GitHub Actions (the `checkerFramework`
 job is disabled with `if: false`). The per-module/per-wave commit history is in
 the PR description.
 
+**ℹ️ Rebased on `main` (`624adc3699`).** The branch was replayed onto the
+current `main` (55 commits past the previous base `76167728c6`): all 75 commits
+linear, conflicts resolved with **main's API priority** (JMLtk 1.0.1 generic
+meta-construct grammar `#4025` — `@TransformerMeta` registry, `KeyMetaConstruct`
+node, transformer renames; PMap LDTs `#4024`; `metaDisjoint` fix `#4031`;
+`GenerationalCache` OSS/MT refactor `#4023`; sequence strategies `#4026`;
+key.ui window/recent-files fixes `#4027`/`#4028`) with the branch's JSpecify
+annotations re-applied. NullAway findings introduced by main's new code were
+driven to zero (guards + honest `@Nullable` widenings in `AppliedRuleAppsNameCache`,
+`SeqStrategy`, `SeqEqualLengthFeature`, `JP2KeYConverter`, `EnhancedForElimination`,
+`TestTacletParser`). Locally verified on the new head: `spotlessCheck`,
+`testClasses`, and the full NullAway gate
+`./gradlew -DENABLE_NULLAWAY=true compileTestJava` → **0 findings**, all modules.
+
 ## Strategy (agreed with maintainer)
 
 1. **Goal 1 — annotations only.** Parallel annotation campaign across disjoint

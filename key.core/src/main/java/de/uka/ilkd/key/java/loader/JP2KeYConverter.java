@@ -565,7 +565,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         dist.put(from, 0);
         while (!work.isEmpty()) {
             final Class<?> current = work.removeFirst();
-            final int d = dist.get(current);
+            final int d = Objects.requireNonNull(dist.get(current),
+                "a class on the widening work list has a distance");
             if (current == to) {
                 return d;
             }

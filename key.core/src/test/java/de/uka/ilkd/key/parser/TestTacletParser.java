@@ -558,7 +558,7 @@ public class TestTacletParser {
         return causeOf(t, type) != null;
     }
 
-    private static Throwable causeOf(Throwable t, Class<? extends Throwable> type) {
+    private static @Nullable Throwable causeOf(Throwable t, Class<? extends Throwable> type) {
         for (Throwable c = t; c != null; c = c.getCause()) {
             if (type.isInstance(c)) {
                 return c;
