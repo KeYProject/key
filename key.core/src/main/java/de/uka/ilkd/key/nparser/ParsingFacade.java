@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
@@ -171,8 +173,30 @@ public final class ParsingFacade {
         return parseFile(file.toPath());
     }
 
+    /**
+     * Parses a KeY file from the given stream.
+     * <p>
+     * A first line starting with the {@code KEY_PROOF_STATUS } marker prefix (§3 of the headless
+     * interface spec, written by {@link ProofSaver#marker}) is skipped before lexing; any other
+     * first line is passed through unchanged, so files without a marker parse exactly as before.
+     * When a marker line is skipped, the line numbers reported for the remaining tokens still
+     * refer to the original file (the marker counts as line 1).
+     *
+     * @param stream the stream to parse
+     * @return the parsed file AST
+     */
     public static KeyAst.File parseFile(CharStream stream) {
-        JavaKeYParser p = createParser(stream);
+        int markerLineLength = leadingMarkerLineLength(stream);
+        if (markerLineLength > 0) {
+            String rest = stream.getText(Interval.of(markerLineLength, stream.size() - 1));
+            stream = CharStreams.fromString(rest, stream.getSourceName());
+            return parseFile(stream, 2);
+        }
+        return parseFile(stream, 1);
+    }
+
+    private static KeyAst.File parseFile(CharStream stream, int firstLine) {
+        JavaKeYParser p = createParser(lexerAt(stream, firstLine));
 
         p.getInterpreter().setPredictionMode(PredictionMode.SLL);
         p.removeErrorListeners();
@@ -189,7 +213,7 @@ public final class ParsingFacade {
             // there are several. Zero errors means SLL was merely insufficient and the LL parse
             // actually succeeded - fall through and return the tree.
             stream.seek(0);
-            p = createParser(stream);
+            p = createParser(lexerAt(stream, firstLine));
             ctx = p.file();
             if (p.getErrorReporter().errorCount() == 1) {
                 throw ex;
@@ -198,6 +222,48 @@ public final class ParsingFacade {
 
         p.getErrorReporter().throwException();
         return new KeyAst.File(ctx);
+    }
+
+    /**
+     * Creates a lexer for the given stream that reports line numbers starting at the given line
+     * (used after skipping a status marker line).
+     *
+     * @param stream the stream to lex
+     * @param firstLine the line number of the stream's first line in the original file
+     * @return the lexer
+     */
+    private static JavaKeYLexer lexerAt(CharStream stream, int firstLine) {
+        JavaKeYLexer lexer = createLexer(stream);
+        lexer.getInterpreter().setLine(firstLine);
+        return lexer;
+    }
+
+    /**
+     * Returns the length in characters of the first line of the given stream if that line starts
+     * with the {@code KEY_PROOF_STATUS } marker prefix, or {@code 0} otherwise. The returned
+     * length includes the line terminator, so the stream content after the marker line starts at
+     * that offset.
+     *
+     * @param stream the stream to inspect
+     * @return the number of characters to skip past the marker line, or {@code 0}
+     */
+    private static int leadingMarkerLineLength(CharStream stream) {
+        int size = stream.size();
+        if (size <= 0) {
+            return 0;
+        }
+        int lineEnd = size;
+        for (int i = 1; i <= size; i++) {
+            if (stream.LA(i) == '\n') {
+                lineEnd = i;
+                break;
+            }
+        }
+        String firstLine = stream.getText(Interval.of(0, lineEnd - 1));
+        if (firstLine.endsWith("\r")) {
+            firstLine = firstLine.substring(0, firstLine.length() - 1);
+        }
+        return firstLine.startsWith(ProofSaver.KEY_PROOF_STATUS_PREFIX + " ") ? lineEnd : 0;
     }
 
     public static KeyAst.Term parseExpression(CharStream stream) {
