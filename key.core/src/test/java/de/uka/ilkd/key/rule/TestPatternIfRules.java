@@ -241,4 +241,54 @@ class TestPatternIfRules {
                 + " java.lang.String s = (String) new String(\"x\");"
                 + " { int y = s.length(); } }}\\> true");
     }
+
+    @Test
+    void abortingThenUsesUnreachableRule() {
+        List<String> rules = applicableRules(
+            "if (!(new String(\"x\") instanceof String s)) { return; }");
+        assertTrue(rules.contains("ifUnfoldPatternUnreachable"),
+            "ifUnfoldPatternUnreachable should apply: " + rules);
+        assertFalse(rules.contains("ifUnfoldPattern"),
+            "ifUnfoldPattern must not apply: " + rules);
+    }
+
+    @Test
+    void completingThenUsesRegularPatternRule() {
+        List<String> rules =
+            applicableRules("if (!(new String(\"x\") instanceof String s)) { int y = 1; }");
+        assertTrue(rules.contains("ifUnfoldPattern"),
+            "ifUnfoldPattern should apply: " + rules);
+        assertFalse(rules.contains("ifUnfoldPatternUnreachable"),
+            "ifUnfoldPatternUnreachable must not apply: " + rules);
+    }
+
+    @Test
+    void ifUnfoldPatternUnreachableDeclaresPatternVariableAfterIf() {
+        Goal goal = applyRule("ifUnfoldPatternUnreachable",
+            "if (!(new String(\"x\") instanceof String s)) { return; }");
+        assertSuccedent(goal,
+            "\\<{boolean b; { b = !(new String(\"x\") instanceof String s); }"
+                + " if (b) { { return; } }"
+                + " java.lang.String s = (String) new String(\"x\");}\\> true");
+    }
+
+    @Test
+    void ifUnfoldPatternUnreachableHandlesBracelessThen() {
+        Goal goal = applyRule("ifUnfoldPatternUnreachable",
+            "if (!(new String(\"x\") instanceof String s)) return;");
+        assertSuccedent(goal,
+            "\\<{boolean b; { b = !(new String(\"x\") instanceof String s); }"
+                + " if (b) { return; }"
+                + " java.lang.String s = (String) new String(\"x\");}\\> true");
+    }
+
+    @Test
+    void ifUnfoldPatternUnreachableDoesNotBindAfterPositivePattern() {
+        Goal goal = applyRule("ifUnfoldPatternUnreachable",
+            "if (new String(\"x\") instanceof String s) { return; }");
+        assertSuccedent(goal,
+            "\\<{boolean b; { b = new String(\"x\") instanceof String s; }"
+                + " if (b) { java.lang.String s = (String) new String(\"x\");"
+                + " { return; } }}\\> true");
+    }
 }

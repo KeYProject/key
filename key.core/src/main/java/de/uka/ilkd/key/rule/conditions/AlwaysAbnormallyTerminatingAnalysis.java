@@ -4,253 +4,233 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
-import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
 import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind;
-import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 
 import org.key_project.util.collection.ImmutableArray;
 
 import org.jspecify.annotations.Nullable;
 
-/// This analysis returns true iff a statement has the possibility to terminate normally
-/// iff not every run terminates abnormally.
+/// Decides whether a statement cannot complete normally in the sense of JLS 14.22. Such a
+/// statement always leaves the current flow of control abruptly, i.e. by a {@code return},
+/// {@code throw}, {@code break}, {@code continue} or by not terminating at all.
 ///
-class AlwaysAbnormallyTerminatingAnalysis {
+/// The analysis is conservative: it may return {@code false} for a statement that actually cannot
+/// complete normally, but it never claims that a statement cannot complete normally when it can.
+/// This direction is required by the pattern-matching rules, which use the analysis to decide
+/// whether a pattern variable is definitely bound after an {@code if} statement.
+final class AlwaysAbnormallyTerminatingAnalysis {
 
-    record TerminationReason(boolean isReturn, Set<KeYJavaType> isThrow, String breakTo,
-            String continueTo) {
-        public TerminationReason(boolean isReturn) {
-            this(isReturn, Set.of(), null, null);
-        }
-
-        public TerminationReason(KeYJavaType keYJavaType) {
-            this(false, Set.of(keYJavaType), null, null);
-        }
-
-        public boolean isAbnormallTerminating() {
-            return isReturn || !isThrow.isEmpty() || breakTo != null && continueTo != null;
-        }
-    }
-
-    private final KeYJavaType assertionException;
-    private final LinkedList<Label> labelStack = new LinkedList<>();
-    private final ExecutionContext ec;
     private final Services services;
 
-    AlwaysAbnormallyTerminatingAnalysis(ExecutionContext ec, Services services) {
-        this.ec = ec;
+    AlwaysAbnormallyTerminatingAnalysis(Services services) {
         this.services = services;
-
-        assertionException = services.getJavaInfo().getKeYJavaType("java.lang.AssertionError");
     }
 
-    public @Nullable TerminationReason abnormallyTerminating(Statement stmt) {
-        return switch (stmt) {
-            case EnhancedFor forStmt -> abnormallyTerminating(forStmt.getBody());
-            case Do doStmt -> abnormallyTerminating(doStmt.getBody());
-            case For forStmt -> abnormallyTerminating(forStmt.getBody());
-            case Switch switchStmt -> {
-                if (hasDefaultBranch(switchStmt)) {
-                    yield allAbnormallyTerminating(switchStmt.getBranchList());
-                }
-                yield null;
-            }
-            case If ifStmt -> //
-                alwaysTrue(ifStmt.getExpression())
-                        ? abnormallyTerminating(ifStmt.getThen())
-                        : alwaysFalse(ifStmt.getExpression())
-                                ? abnormallyTerminating(ifStmt.getElse())
-                                : and(abnormallyTerminating(ifStmt.getThen()),
-                                    abnormallyTerminating(ifStmt.getElse()));
-
-            case Try tStmt -> {
-                var s1 = abnormallyTerminating(tStmt.getBody());
-                var s2 = removeCatchClauses(s1, tStmt.getBranchList());
-                yield isAbnormallTerminating(s2) ? s2 : null;
-            }
-            case While wStmt -> abnormallyTerminating(wStmt.getBody());
-            case Assert aStmt ->
-                alwaysFalse(aStmt.getCondition()) ? new TerminationReason(assertionException)
-                        : null;
-            case StatementBlock b -> abnormallyTerminating(b.getBody());
-            case Continue cStmt ->
-                new TerminationReason(false, Set.of(), null,
-                    cStmt.getLabel() == null ? "" : cStmt.getLabel().toString());
-            case Break bStmt ->
-                new TerminationReason(false, Set.of(),
-                    bStmt.getLabel() == null ? "" : bStmt.getLabel().toString(), null);
-            case Return ret -> new TerminationReason(true);
-            case Throw thr -> {
-                yield new TerminationReason(thr.getExpression().getKeYJavaType(services, ec));
-            }
-            case LabeledStatement ignored1 -> {
-                labelStack.addLast(ignored1.getLabel());
-                var b = abnormallyTerminating(ignored1.getBody());
-                labelStack.removeLast();
-                yield b;
-            }
-            case SynchronizedBlock s -> abnormallyTerminating(s.getBody());
-            case LoopScopeBlock s -> abnormallyTerminating(s.getBody());
-            default -> null;
+    /// Returns whether the given statement cannot complete normally.
+    boolean isAlwaysAbnormallyTerminating(@Nullable Statement statement) {
+        if (statement == null) {
+            return false;
+        }
+        return switch (statement) {
+            case StatementBlock block -> isAlwaysAbnormallyTerminating(block.getBody());
+            case Return ignored -> true;
+            case Throw ignored -> true;
+            case Break ignored -> true;
+            case Continue ignored -> true;
+            case If ifStmt -> ifStatement(ifStmt);
+            case Try tryStmt -> tryStatement(tryStmt);
+            case While whileStmt -> loopCannotCompleteNormally(whileStmt);
+            case For forStmt -> loopCannotCompleteNormally(forStmt);
+            case Do doStmt -> doStatement(doStmt);
+            case EnhancedFor ignored -> false;
+            case Switch switchStmt -> switchStatement(switchStmt);
+            case LabeledStatement labeled -> labeledStatement(labeled);
+            case SynchronizedBlock block -> isAlwaysAbnormallyTerminating(block.getBody());
+            case LoopScopeBlock block -> isAlwaysAbnormallyTerminating(block.getBody());
+            case Assert assertStmt -> alwaysFalse(assertStmt.getCondition());
+            default -> false;
         };
     }
 
-    private boolean hasDefaultBranch(Switch switchStmt) {
-        return switchStmt.getBranchList().stream().anyMatch(it -> it instanceof Default);
+    /// Returns whether the given sequence cannot complete normally. This is the case as soon as
+    /// one of its statements cannot complete normally.
+    boolean isAlwaysAbnormallyTerminating(@Nullable ImmutableArray<?> body) {
+        if (body == null) {
+            return false;
+        }
+        for (Object element : body) {
+            if (element instanceof Statement statement
+                    && isAlwaysAbnormallyTerminating(statement)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private TerminationReason removeCatchClauses(@Nullable TerminationReason s1,
-            ImmutableArray<Branch> branchList) {
-        var exc = new HashSet<>(s1 == null ? Set.of() : s1.isThrow);
-        var newExcCatch = new HashSet<KeYJavaType>();
-        final var isReturn = s1 != null && s1.isReturn;
+    private boolean ifStatement(If ifStmt) {
+        var elseBranch = ifStmt.getElse();
+        if (alwaysTrue(ifStmt.getExpression())) {
+            return isAlwaysAbnormallyTerminating(ifStmt.getThen());
+        } else if (alwaysFalse(ifStmt.getExpression())) {
+            return isAlwaysAbnormallyTerminating(elseBranch);
+        }
+        return isAlwaysAbnormallyTerminating(ifStmt.getThen())
+                && isAlwaysAbnormallyTerminating(elseBranch);
+    }
 
-        var catchReturns = true;
-
-        boolean finallyReturn = false;
-        for (var branch : branchList) {
-            if (branch instanceof Catch c) {
-                var t =
-                    (KeYJavaType) c.getParameterDeclaration().getVariableSpecification().getType();
-                exc.remove(t);
-                var q = abnormallyTerminating(c);
-                if (q != null) {
-                    newExcCatch.addAll(q.isThrow);
-                    catchReturns = catchReturns && q.isReturn;
-                } else {
-                    catchReturns = false;
-                }
-            }
+    private boolean tryStatement(Try tryStmt) {
+        Finally finallyBranch = null;
+        boolean allCatchesAbort = true;
+        for (Branch branch : tryStmt.getBranchList()) {
             if (branch instanceof Finally f) {
-                var q = abnormallyTerminating(f);
-                if (q != null) {
-                    newExcCatch.addAll(q.isThrow);
-                    finallyReturn = q.isReturn;
-                } else {
-                    finallyReturn = false;
-                }
+                finallyBranch = f;
+            } else if (!isAlwaysAbnormallyTerminating(branch)) {
+                allCatchesAbort = false;
             }
         }
-
-        exc.addAll(newExcCatch);
-        var ret = finallyReturn || isReturn && (!s1.isThrow().isEmpty() && catchReturns);
-        return new TerminationReason(ret, exc, s1 == null ? null : s1.breakTo,
-            s1 == null ? null : s1.continueTo);
-    }
-
-    private boolean isAbnormallTerminatingOnlyException(TerminationReason s1) {
-        return s1 != null && !s1.isThrow.isEmpty() && s1.isReturn;
-    }
-
-    private boolean isAbnormallTerminating(TerminationReason b) {
-        return b != null && b.isAbnormallTerminating();
-    }
-
-    private @Nullable TerminationReason or(@Nullable TerminationReason a, TerminationReason b) {
-        final var a1 = isAbnormallTerminating(a);
-        final var b1 = isAbnormallTerminating(b);
-        if (a1 && b1) {
-            var s = new HashSet<>(a.isThrow);
-            s.addAll(b.isThrow);
-            return new TerminationReason(a.isReturn || b.isReturn, s, a.breakTo, a.continueTo);
-        } else if (a1) {
-            return a;
-        } else if (b1) {
-            return b;
+        if (isAlwaysAbnormallyTerminating(finallyBranch)) {
+            return true;
         }
-        return null;
+        return isAlwaysAbnormallyTerminating(tryStmt.getBody()) && allCatchesAbort;
     }
 
-    private @Nullable TerminationReason and(@Nullable TerminationReason a,
-            @Nullable TerminationReason b) {
-        if (a != null && a.isAbnormallTerminating()
-                && b != null && b.isAbnormallTerminating()) {
-            var s = new HashSet<>(a.isThrow);
-            s.addAll(b.isThrow);
-            return new TerminationReason(a.isReturn || b.isReturn, s, a.breakTo, a.continueTo);
-        }
-        return null;
+    /// A {@code while} or {@code for} loop cannot complete normally if its guard is always true
+    /// and no {@code break} leaves the loop.
+    private boolean loopCannotCompleteNormally(LoopStatement loop) {
+        return guardIsAlwaysTrue(loop.getGuardExpression())
+                && !hasUnlabeledBreak(loop.getBody());
     }
 
-    private TerminationReason abnormallyTerminatingFinally(ImmutableArray<Branch> branchList) {
-        for (var branch : branchList) {
-            if (branch instanceof Finally) {
-                return abnormallyTerminating(branch);
-            }
-        }
-        return null;
-    }
-
-
-    private boolean alwaysTrue(@Nullable Expression guardExpression) {
-        if (guardExpression == null)
+    /// A {@code do} loop executes its body at least once. It cannot complete normally if that
+    /// body always aborts, or if the guard is always true and no {@code break} leaves the loop.
+    private boolean doStatement(Do doStmt) {
+        if (hasUnlabeledBreak(doStmt.getBody())) {
             return false;
-        if (guardExpression instanceof BooleanLiteral bl) {
-            return bl.getValue();
-        } else if (guardExpression instanceof BinaryOperator bo) {
-            if (bo.getKind() == BinaryOperatorKind.LOGICAL_AND) {
-                return alwaysTrue(bo.getLeft()) && alwaysTrue(bo.getRight());
-            } else if (bo.getKind() == BinaryOperatorKind.LOGICAL_OR) {
-                return alwaysTrue(bo.getLeft()) || alwaysTrue(bo.getRight());
-            }
         }
-        return false;
+        return isAlwaysAbnormallyTerminating(doStmt.getBody())
+                || guardIsAlwaysTrue(doStmt.getGuardExpression());
     }
 
-    private boolean alwaysFalse(@Nullable Expression guardExpression) {
-        if (guardExpression == null)
+    private boolean switchStatement(Switch switchStmt) {
+        boolean hasDefault = false;
+        for (Branch branch : switchStmt.getBranchList()) {
+            if (branch instanceof Default) {
+                hasDefault = true;
+            }
+            if (hasUnlabeledBreak(branch) || !isAlwaysAbnormallyTerminating(branch)) {
+                return false;
+            }
+        }
+        return hasDefault;
+    }
+
+    /// A labeled statement can complete normally if its body contains a {@code break} to that
+    /// label. Otherwise it inherits the behavior of its body.
+    private boolean labeledStatement(LabeledStatement labeled) {
+        return !hasBreakTo(labeled.getBody(), labeled.getLabel())
+                && isAlwaysAbnormallyTerminating(labeled.getBody());
+    }
+
+    private boolean isAlwaysAbnormallyTerminating(@Nullable Branch branch) {
+        if (branch == null) {
             return false;
-        if (guardExpression instanceof BooleanLiteral bl) {
-            return !bl.getValue();
-        } else if (guardExpression instanceof BinaryOperator bo) {
-            if (bo.getKind() == BinaryOperatorKind.LOGICAL_AND) {
-                return alwaysFalse(bo.getLeft()) && alwaysFalse(bo.getRight());
-            } else if (bo.getKind() == BinaryOperatorKind.LOGICAL_OR) {
-                return alwaysFalse(bo.getLeft()) || alwaysFalse(bo.getRight());
-            }
         }
-        return false;
-    }
-
-    private TerminationReason allAbnormallyTerminating(ImmutableArray<Branch> branchList) {
-        return branchList.stream().map(this::abnormallyTerminating)
-                .reduce(this::and).orElse(null);
-    }
-
-    private TerminationReason abnormallyTerminating(ImmutableArray<? extends Statement> body) {
-        for (var statement : body) {
-            final var terminationReason = abnormallyTerminating(statement);
-            if (terminationReason != null && terminationReason.isAbnormallTerminating())
-                return terminationReason;
-        }
-        return null;
-    }
-
-    private @Nullable TerminationReason abnormallyTerminating(@Nullable Branch it) {
-        if (it == null)
-            return null;
-        return switch (it) {
-            case Finally f -> abnormallyTerminating(f.getBody());
-            case Case f -> abnormallyTerminating(f.getBody());
-            case Default f -> abnormallyTerminating(f.getBody());
-            case Ccatch f -> abnormallyTerminating(f.getBody());
-            case Then f -> abnormallyTerminating(f.getBody());
-            case Else f -> abnormallyTerminating(f.getBody());
-            case Catch f -> abnormallyTerminating(f.getBody());
-            default -> null;
+        return switch (branch) {
+            case Then then -> isAlwaysAbnormallyTerminating(then.getBody());
+            case Else elseBranch -> isAlwaysAbnormallyTerminating(elseBranch.getBody());
+            case Case caseBranch -> isAlwaysAbnormallyTerminating(caseBranch.getBody());
+            case Default defaultBranch -> isAlwaysAbnormallyTerminating(defaultBranch.getBody());
+            case Catch catchBranch -> isAlwaysAbnormallyTerminating(catchBranch.getBody());
+            case Finally finallyBranch -> isAlwaysAbnormallyTerminating(finallyBranch.getBody());
+            case Ccatch ccatch -> isAlwaysAbnormallyTerminating(ccatch.getBody());
+            default -> false;
         };
     }
 
+    /// Returns whether a {@code break} without a label leaves the given loop. Unlabeled breaks in
+    /// nested loops or switches only leave those inner statements.
+    private boolean hasUnlabeledBreak(Statement body) {
+        var collector = new OuterBreakContinueAndReturnCollector(body, List.of(), services);
+        collector.collect();
+        return collector.getBreaks().stream().anyMatch(b -> b.getLabel() == null);
+    }
+
+    private boolean hasUnlabeledBreak(Branch branch) {
+        var body = switch (branch) {
+            case Case caseBranch -> caseBranch.getBody();
+            case Default defaultBranch -> defaultBranch.getBody();
+            default -> null;
+        };
+        if (body == null) {
+            return false;
+        }
+        for (Statement statement : body) {
+            if (hasUnlabeledBreak(statement)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasBreakTo(Statement body, Label label) {
+        var collector = new OuterBreakContinueAndReturnCollector(body, List.of(), services);
+        collector.collect();
+        return collector.getBreaks().stream().anyMatch(b -> label.equals(b.getLabel()));
+    }
+
+    private boolean guardIsAlwaysTrue(@Nullable Expression guardExpression) {
+        return guardExpression == null || alwaysTrue(guardExpression);
+    }
+
+    private boolean alwaysTrue(@Nullable Expression expression) {
+        if (expression == null) {
+            return false;
+        }
+        if (expression instanceof ParenthesizedExpression parenthesized) {
+            return alwaysTrue(parenthesized.getExpressionAt(0));
+        }
+        if (expression instanceof BooleanLiteral literal) {
+            return literal.getValue();
+        }
+        if (expression instanceof BinaryOperator operator) {
+            if (operator.getKind() == BinaryOperatorKind.LOGICAL_AND) {
+                return alwaysTrue(operator.getLeft()) && alwaysTrue(operator.getRight());
+            } else if (operator.getKind() == BinaryOperatorKind.LOGICAL_OR) {
+                return alwaysTrue(operator.getLeft()) || alwaysTrue(operator.getRight());
+            }
+        }
+        return false;
+    }
+
+    private boolean alwaysFalse(@Nullable Expression expression) {
+        if (expression == null) {
+            return false;
+        }
+        if (expression instanceof ParenthesizedExpression parenthesized) {
+            return alwaysFalse(parenthesized.getExpressionAt(0));
+        }
+        if (expression instanceof BooleanLiteral literal) {
+            return !literal.getValue();
+        }
+        if (expression instanceof BinaryOperator operator) {
+            if (operator.getKind() == BinaryOperatorKind.LOGICAL_AND) {
+                return alwaysFalse(operator.getLeft()) || alwaysFalse(operator.getRight());
+            } else if (operator.getKind() == BinaryOperatorKind.LOGICAL_OR) {
+                return alwaysFalse(operator.getLeft()) && alwaysFalse(operator.getRight());
+            }
+        }
+        return false;
+    }
 }
