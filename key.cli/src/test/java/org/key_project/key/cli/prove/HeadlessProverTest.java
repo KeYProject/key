@@ -42,10 +42,6 @@ class HeadlessProverTest {
         assertThat(results).extracting(ContractResult::contract)
                 .containsExactly(ONE_NAME, TWO_NAME);
 
-        assertThat(results).hasSize(2);
-        assertThat(results).extracting(ContractResult::contract)
-                .containsExactly(ONE_NAME, TWO_NAME);
-
         // results come back in the stable index order: one() = closed, two() = open
         ContractResult closed = results.get(0);
         ContractResult open = results.get(1);
