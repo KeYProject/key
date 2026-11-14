@@ -22,10 +22,10 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableList;
 
-@TransformerMeta(name = "#staticInitialisation")
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@TransformerMeta(name = "#staticInitialisation")
 @NullMarked
 public class StaticInitialisation extends ProgramTransformer {
 

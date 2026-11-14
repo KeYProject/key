@@ -14,9 +14,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.collection.ImmutableList;
 
-@TransformerMeta(name = "#lengthReference")
 import org.jspecify.annotations.NullMarked;
 
+@TransformerMeta(name = "#lengthReference")
 @NullMarked
 public class ArrayLength extends ProgramTransformer {
 

@@ -14,9 +14,9 @@ import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 
 import org.key_project.logic.Name;
 
-@TransformerMeta(name = "#add")
 import org.jspecify.annotations.NullMarked;
 
+@TransformerMeta(name = "#add")
 @NullMarked
 public final class MetaAdd extends AbstractTermTransformer {
 

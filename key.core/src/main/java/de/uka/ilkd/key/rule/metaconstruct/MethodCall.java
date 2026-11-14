@@ -126,7 +126,6 @@ public final class MethodCall extends ProgramTransformer {
                 + "a program-variable schema variable, but was " + result.sort() + ".");
         }
     }
-    }
 
     /**
      * creates the methodcall-MetaConstruct
