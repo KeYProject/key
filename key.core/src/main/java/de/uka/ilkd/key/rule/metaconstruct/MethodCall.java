@@ -129,20 +129,9 @@ public final class MethodCall extends ProgramTransformer {
      * @param ec The Schema Variable.
      */
     protected MethodCall(Name name, ProgramSV ec, SchemaVariable result, ProgramElement body) {
-        super(name, body);
+        super(name, body, ec, result);
         this.resultVar = result;
         this.execContextSV = ec;
-    }
-
-    @Override
-    public ImmutableList<ProgramElement> getArguments() {
-        final ProgramElement ec = (ProgramElement) execContextSV;
-        final ProgramElement result = (ProgramElement) resultVar;
-        if (ec != null) {
-            return result == null ? ImmutableList.of(ec, body())
-                    : ImmutableList.of(ec, result, body());
-        }
-        return result == null ? ImmutableList.of(body()) : ImmutableList.of(result, body());
     }
 
     /** gets an array of expression and returns a list of types */
