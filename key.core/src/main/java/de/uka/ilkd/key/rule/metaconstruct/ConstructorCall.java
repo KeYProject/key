@@ -59,7 +59,8 @@ public class ConstructorCall extends ProgramTransformer {
 
     @Override
     public ImmutableList<ProgramElement> getArguments() {
-        return argumentsOf(body(), newObjectSV);
+        return newObjectSV == null ? ImmutableList.of(body())
+                : ImmutableList.of((ProgramElement) newObjectSV, body());
     }
 
     /**

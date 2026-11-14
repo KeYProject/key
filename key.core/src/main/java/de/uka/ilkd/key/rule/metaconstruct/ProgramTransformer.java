@@ -4,9 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -82,30 +79,6 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @return the arguments of this meta construct, ordered as in the source
      */
     public abstract ImmutableList<ProgramElement> getArguments();
-
-    /**
-     * Builds the argument list of a meta construct from its schema-variable arguments (in source
-     * order, {@code null} entries ignored) and its encapsulated program element. Schema variables
-     * are always {@link ProgramSV}s when they are program-meta-construct arguments, and
-     * {@link ProgramSV} is a {@link ProgramElement}.
-     *
-     * @param body the encapsulated program element, may be {@code null}
-     * @param schemaVariables the schema-variable arguments in source order
-     * @return the ordered, {@code null}-free argument list
-     */
-    protected static ImmutableList<ProgramElement> argumentsOf(ProgramElement body,
-            SchemaVariable... schemaVariables) {
-        final List<ProgramElement> args = new ArrayList<>(schemaVariables.length + 1);
-        for (SchemaVariable sv : schemaVariables) {
-            if (sv != null) {
-                args.add((ProgramElement) sv);
-            }
-        }
-        if (body != null) {
-            args.add(body);
-        }
-        return ImmutableList.fromList(args);
-    }
 
     /**
      * performs the program transformation needed for symbolic program transformation

@@ -136,6 +136,6 @@ public class EvaluateArgs extends ProgramTransformer {
 
     @Override
     public ImmutableList<ProgramElement> getArguments() {
-        return argumentsOf(body());
+        return ImmutableList.of(body());
     }
 }

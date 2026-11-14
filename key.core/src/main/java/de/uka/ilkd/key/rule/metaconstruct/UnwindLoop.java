@@ -63,7 +63,13 @@ public class UnwindLoop extends ProgramTransformer {
 
     @Override
     public ImmutableList<ProgramElement> getArguments() {
-        return argumentsOf(body(), innerLabel, outerLabel);
+        final ProgramElement inner = (ProgramElement) innerLabel;
+        final ProgramElement outer = (ProgramElement) outerLabel;
+        if (inner != null) {
+            return outer == null ? ImmutableList.of(inner, body())
+                    : ImmutableList.of(inner, outer, body());
+        }
+        return outer == null ? ImmutableList.of(body()) : ImmutableList.of(outer, body());
     }
 
     @Override

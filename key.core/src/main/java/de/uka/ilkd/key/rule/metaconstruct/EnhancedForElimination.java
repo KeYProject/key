@@ -120,7 +120,8 @@ public class EnhancedForElimination extends ProgramTransformer {
 
     @Override
     public ImmutableList<ProgramElement> getArguments() {
-        return argumentsOf(body(), execContextSV);
+        return execContextSV == null ? ImmutableList.of(body())
+                : ImmutableList.of((ProgramElement) execContextSV, body());
     }
 
     /**

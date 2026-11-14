@@ -57,7 +57,8 @@ public class InitArrayCreation extends InitArray {
 
     @Override
     public ImmutableList<ProgramElement> getArguments() {
-        return argumentsOf(body(), newObjectSV);
+        return newObjectSV == null ? ImmutableList.of(body())
+                : ImmutableList.of((ProgramElement) newObjectSV, body());
     }
 
     /**
