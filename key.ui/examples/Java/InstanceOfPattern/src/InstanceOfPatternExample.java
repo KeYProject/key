@@ -164,6 +164,7 @@ public class InstanceOfPatternExample {
       @*/
     public static int whilePattern(Object obj) {
         int n = 0;
+        /*@ loop_invariant n >= 0; @*/
         while (obj instanceof String s) {
             n += s.length();
             obj = null;
@@ -180,6 +181,7 @@ public class InstanceOfPatternExample {
       @*/
     public static int afterLoopPattern() {
         Object obj = new String("x");
+        /*@ loop_invariant true; @*/
         while (!(obj instanceof String s)) {
             obj = null;
         }
