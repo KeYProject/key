@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
@@ -29,8 +30,8 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public abstract class InitArray extends ProgramTransformer {
 
-    protected InitArray(String name, ProgramElement body) {
-        super(name, body);
+    protected InitArray(String name, ProgramElement body, SchemaVariable... schemaVariables) {
+        super(name, body, schemaVariables);
     }
 
     /**
