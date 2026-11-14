@@ -197,7 +197,7 @@ class TestPatternLoopRules {
         assertSuccedent(goal,
             "\\<{boolean b = new String(\"x\") instanceof String s;"
                 + " while (b) { java.lang.String s = (String) new String(\"x\");"
-                + " int y = s.length(); b = new String(\"x\") instanceof String s; }}\\> true");
+                + " int y = s.length(); b = new String(\"x\") instanceof String; }}\\> true");
     }
 
     @Test
@@ -207,7 +207,7 @@ class TestPatternLoopRules {
                 + " int z = s.length();");
         assertSuccedent(goal,
             "\\<{boolean b = !(new String(\"x\") instanceof String s);"
-                + " while (b) { int y = 1; b = !(new String(\"x\") instanceof String s); }"
+                + " while (b) { int y = 1; b = !(new String(\"x\") instanceof String); }"
                 + " java.lang.String s = (String) new String(\"x\");"
                 + " int z = s.length();}\\> true");
     }
@@ -218,7 +218,7 @@ class TestPatternLoopRules {
             "while (!(new String(\"x\") instanceof String s)) { break; }");
         assertSuccedent(goal,
             "\\<{boolean b = !(new String(\"x\") instanceof String s);"
-                + " while (b) { break; b = !(new String(\"x\") instanceof String s); }}\\> true");
+                + " while (b) { break; b = !(new String(\"x\") instanceof String); }}\\> true");
     }
 
 
@@ -259,7 +259,7 @@ class TestPatternLoopRules {
         String printed = ProofSaver.printAnything(
             goal.sequent().succedent().getFirst().formula(), services);
         assertTrue(printed.matches(
-            "(?s).*b = new String\\(\"x\"\\) instanceof String s;\\s+continue;.*"),
+            "(?s).*b = new String\\(\"x\"\\) instanceof String;\\s+continue;.*"),
             printed);
     }
 }

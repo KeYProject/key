@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sat Nov 14 10:08:32 CET 2026
+# Date: Sat Nov 14 23:18:21 CET 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -720,6 +720,28 @@ andLeft {
 \replacewith([b,c]==>[]) 
 \heuristics(alpha)
 Choices: true}
+-----------------------------------------------------
+== andPatternAssignment (andPatternAssignment) =========================================
+andPatternAssignment {
+\find(#allmodal ((modal operator))|{{ ..
+  boolean #b = #nse && #nse2;
+... }}| (post))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \isBindingExpr(#nse))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  boolean #b;
+  boolean #boolv;
+  {
+    #boolv = #nse;
+  }
+  if (#boolv) {
+    #posBinding(#nse)
+    #b = #nse2;
+  } else {
+    #b = false;
+  }
+... }}| (post)) 
+\heuristics(simplify_autoname)
+Choices: programRules:Java}
 -----------------------------------------------------
 == andRight (andRight) =========================================
 andRight {
@@ -5099,6 +5121,29 @@ condition_simple {
 ... }}| (post))
 \replacewith(update-application(elem-update(#lhs (program LeftHandSide))(if-then-else(equals(#se0,TRUE),#se1,#se2)),#allmodal(post))) 
 \heuristics(simplify_prog)
+Choices: programRules:Java}
+-----------------------------------------------------
+== conditionalPatternAssignment (conditionalPatternAssignment) =========================================
+conditionalPatternAssignment {
+\find(#allmodal ((modal operator))|{{ ..
+  #t #v = #nse ? #nse2 : #nse3;
+... }}| (post))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \isBindingExpr(#nse))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  #t #v;
+  boolean #boolv;
+  {
+    #boolv = #nse;
+  }
+  if (#boolv) {
+    #posBinding(#nse)
+    #v = #nse2;
+  } else {
+    #negBinding(#nse)
+    #v = #nse3;
+  }
+... }}| (post)) 
+\heuristics(simplify_autoname)
 Choices: programRules:Java}
 -----------------------------------------------------
 == contains (contains) =========================================
@@ -10831,14 +10876,36 @@ ifElseUnfold {
   if (#nse) #s0
   else #s1
 ... }}| (post))
-\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)),
-\not \isBindingExpr(#nse))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \not \isBindingExpr(#nse))
 \replacewith(#allmodal ((modal operator))|{{ ..
   boolean #boolv;
   #boolv = #nse;
   if (#boolv) #s0
   else {
     #s1
+  }
+... }}| (post)) 
+\heuristics(simplify_autoname)
+Choices: programRules:Java}
+-----------------------------------------------------
+== ifElseUnfoldPattern (ifElseUnfoldPattern) =========================================
+ifElseUnfoldPattern {
+\find(#allmodal ((modal operator))|{{ ..
+  if (#nse) #s0
+  else #s1
+... }}| (post))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \isBindingExpr(#nse))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  boolean #boolv;
+  {
+    #boolv = #nse;
+  }
+  if (#boolv) {
+    #posBinding(#nse)
+    #blockBody(#s0)
+  } else {
+    #negBinding(#nse)
+    #blockBody(#s1)
   }
 ... }}| (post)) 
 \heuristics(simplify_autoname)
@@ -11120,12 +11187,50 @@ ifUnfold {
 \find(#allmodal ((modal operator))|{{ ..
   if (#nse) #s0
 ... }}| (post))
-\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)),
-\not \isBindingExpr(#nse))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \not \isBindingExpr(#nse))
 \replacewith(#allmodal ((modal operator))|{{ ..
   boolean #boolv;
   #boolv = #nse;
   if (#boolv) #s0
+... }}| (post)) 
+\heuristics(simplify_autoname)
+Choices: programRules:Java}
+-----------------------------------------------------
+== ifUnfoldPattern (ifElseUnfoldPattern) =========================================
+ifUnfoldPattern {
+\find(#allmodal ((modal operator))|{{ ..
+  if (#nse) #s0
+... }}| (post))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \isBindingExpr(#nse), \not \alwaysAbnormallyTerminates(#s0))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  boolean #boolv;
+  {
+    #boolv = #nse;
+  }
+  if (#boolv) {
+    #posBinding(#nse)
+    #blockBody(#s0)
+  }
+... }}| (post)) 
+\heuristics(simplify_autoname)
+Choices: programRules:Java}
+-----------------------------------------------------
+== ifUnfoldPatternUnreachable (ifElseUnfoldPatternUnreachable) =========================================
+ifUnfoldPatternUnreachable {
+\find(#allmodal ((modal operator))|{{ ..
+  if (#nse) #s0
+... }}| (post))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \isBindingExpr(#nse), \alwaysAbnormallyTerminates(#s0))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  boolean #boolv;
+  {
+    #boolv = #nse;
+  }
+  if (#boolv) {
+    #posBinding(#nse)
+    #blockBody(#s0)
+  }
+  #negBinding(#nse)
 ... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
@@ -12247,6 +12352,28 @@ instance_for_final_types {
 \heuristics(simplify)
 Choices: programRules:Java}
 -----------------------------------------------------
+== instanceofPatternAssignmentNSE (instanceofPatternAssignmentNSE) =========================================
+instanceofPatternAssignmentNSE {
+\find(#allmodal ((modal operator))|{{ ..
+  boolean #b = #nse instanceof #t #v;
+... }}| (post))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  boolean #b = #nse instanceof #t;
+... }}| (post)) 
+
+Choices: programRules:Java}
+-----------------------------------------------------
+== instanceofPatternAssignmentSE (instanceofPatternAssignmentSE) =========================================
+instanceofPatternAssignmentSE {
+\find(#allmodal ((modal operator))|{{ ..
+  boolean #b = #se instanceof #t #v;
+... }}| (post))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  boolean #b = #se instanceof #t;
+... }}| (post)) 
+
+Choices: programRules:Java}
+-----------------------------------------------------
 == instanceof_eval (instanceof_eval) =========================================
 instanceof_eval {
 \find(#allmodal ((modal operator))|{{ ..
@@ -12256,6 +12383,60 @@ instanceof_eval {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#nse) #v0 = #nse;
   #v = #v0 instanceof #t;
+... }}| (post)) 
+\heuristics(simplify_autoname)
+Choices: programRules:Java}
+-----------------------------------------------------
+== instanceof_eval_id (instanceof_eval_id) =========================================
+instanceof_eval_id {
+\find(#allmodal ((modal operator))|{{ ..
+  #v = #nse instanceof #t #id;
+... }}| (post))
+\varcond(\new(#v0 (program Variable), \typeof(#nse (program NonSimpleExpression))))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  #typeof(#nse) #v0 = #nse;
+  #v = #v0 instanceof #t;
+... }}| (post)) 
+\heuristics(simplify_autoname)
+Choices: programRules:Java}
+-----------------------------------------------------
+== instanceof_eval_id_and (instanceof_eval_id_and) =========================================
+instanceof_eval_id_and {
+\find(#allmodal ((modal operator))|{{ ..
+  #v = #b0 instanceof #t #id && #nse;
+... }}| (post))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  #v = #b0 instanceof #t;
+  if (#v) {
+    #t #id = (#t) #b0;
+    #v = #nse;
+  }
+... }}| (post)) 
+\heuristics(simplify_autoname)
+Choices: programRules:Java}
+-----------------------------------------------------
+== instanceof_eval_id_or (instanceof_eval_id_or) =========================================
+instanceof_eval_id_or {
+\find(#allmodal ((modal operator))|{{ ..
+  #v = !(#b0 instanceof #t #id) || #nse;
+... }}| (post))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  #v = #b0 instanceof #t;
+  if (!#v) {
+    #t #id = (#t) #b0;
+    #v = #nse;
+  }
+... }}| (post)) 
+\heuristics(simplify_autoname)
+Choices: programRules:Java}
+-----------------------------------------------------
+== instanceof_eval_id_simple (instanceof_eval_id_simple) =========================================
+instanceof_eval_id_simple {
+\find(#allmodal ((modal operator))|{{ ..
+  #v = #b0 instanceof #t #id;
+... }}| (post))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  #v = #b0 instanceof #t;
 ... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
@@ -15189,6 +15370,23 @@ notLeft {
 \heuristics(alpha)
 Choices: true}
 -----------------------------------------------------
+== notPatternAssignment (notPatternAssignment) =========================================
+notPatternAssignment {
+\find(#allmodal ((modal operator))|{{ ..
+  boolean #b = !#nse;
+... }}| (post))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \isBindingExpr(#nse))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  boolean #b;
+  boolean #boolv;
+  {
+    #boolv = #nse;
+  }
+  #b = !#boolv;
+... }}| (post)) 
+\heuristics(simplify_autoname)
+Choices: programRules:Java}
+-----------------------------------------------------
 == notRight (notRight) =========================================
 notRight {
 \find(==>not(b))
@@ -15385,6 +15583,28 @@ orLeft {
 \heuristics(beta)
 Choices: true}
 -----------------------------------------------------
+== orPatternAssignment (orPatternAssignment) =========================================
+orPatternAssignment {
+\find(#allmodal ((modal operator))|{{ ..
+  boolean #b = #nse || #nse2;
+... }}| (post))
+\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \isBindingExpr(#nse))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  boolean #b;
+  boolean #boolv;
+  {
+    #boolv = #nse;
+  }
+  if (#boolv) {
+    #b = true;
+  } else {
+    #negBinding(#nse)
+    #b = #nse2;
+  }
+... }}| (post)) 
+\heuristics(simplify_autoname)
+Choices: programRules:Java}
+-----------------------------------------------------
 == orRight (orRight) =========================================
 orRight {
 \find(==>or(b,c))
@@ -15421,6 +15641,34 @@ partition_inequation {
 \add []==>[lt(i1,i0)] 
 
 Choices: true}
+-----------------------------------------------------
+== patternLoopUnfold (patternLoopUnfold) =========================================
+patternLoopUnfold {
+\find(#allmodal ((modal operator))|{{
+  #slist
+}}| (post))
+\varcond(\isBindingExpr(#slist))
+\replacewith(#allmodal ((modal operator))|{{
+  #rewritePatternBlock(#slist)
+}}| (post)) 
+\heuristics(pattern_loop_binding)
+Choices: programRules:Java}
+-----------------------------------------------------
+== patternLoopUnfoldNested (patternLoopUnfoldNested) =========================================
+patternLoopUnfoldNested {
+\find(#allmodal ((modal operator))|{{ ..
+  {
+    #slist
+  }
+... }}| (post))
+\varcond(\isBindingExpr(#slist))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  {
+    #rewritePatternBlock(#slist)
+  }
+... }}| (post)) 
+\heuristics(pattern_loop_binding)
+Choices: programRules:Java}
 -----------------------------------------------------
 == permissionDefaultValue (permissionDefaultValue) =========================================
 permissionDefaultValue {
