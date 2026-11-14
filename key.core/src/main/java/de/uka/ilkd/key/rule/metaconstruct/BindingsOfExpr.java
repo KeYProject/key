@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.visitor.BindingVariableVisitor;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Expands an expression into the declarations of the pattern variables that are definitely bound
@@ -37,6 +38,11 @@ public abstract class BindingsOfExpr extends ProgramTransformer {
         super(name, body);
         assert body instanceof SchemaVariable;
         this.positive = positive;
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return ImmutableList.of(body());
     }
 
     @Override
