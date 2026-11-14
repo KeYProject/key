@@ -219,9 +219,8 @@ public final class ProveCommand implements Callable<Integer> {
      * @return the error record for the failed file
      */
     private static ContractResult loadFailureResult(Path file, ProblemLoaderException failure) {
-        String message = failure.getMessage() != null ? failure.getMessage()
-                : failure.getClass().getSimpleName();
-        return new ContractResult(file.toString(), ResultStatus.ERROR, 0, 0, null, 0, 0, message);
+        return new ContractResult(file.toString(), ResultStatus.ERROR, 0, 0, null, 0, 0,
+            CliError.loadFailureMessage(file, failure));
     }
 
     private static String errorMessage(Exception e) {

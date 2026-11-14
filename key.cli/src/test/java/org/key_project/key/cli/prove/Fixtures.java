@@ -7,6 +7,7 @@ package org.key_project.key.cli.prove;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Resolves the test fixtures on the test runtime classpath.
@@ -68,6 +69,31 @@ public final class Fixtures {
     /// A settings file with the value typo {@code intRules:javaSemantic}.
     public static Path typoSettings() {
         return resource("/fixtures/settings/typo-value.json");
+    }
+
+    /// The §9 acceptance settings file citing the unknown key {@code "foo"}.
+    public static Path acceptanceSettings() {
+        return resource("/acceptance/s.json");
+    }
+
+    /// The §8 load file whose contract cites {@code assignable bucketData[*][*];}.
+    public static Path bucketStarKey() {
+        return resource("/acceptance/bucket-star/index.key");
+    }
+
+    /// The §8 load file containing {@code int[][] a = new int[n][];}.
+    public static Path unsizedNewKey() {
+        return resource("/acceptance/unsized-new/index.key");
+    }
+
+    /// The §8 load file containing {@code int[][] a = new int[][]{{1,2}};}.
+    public static Path initNewKey() {
+        return resource("/acceptance/init-new/index.key");
+    }
+
+    /// All §8 bad-construct load files (one per listed construct).
+    public static List<Path> badConstructKeys() {
+        return List.of(bucketStarKey(), unsizedNewKey(), initNewKey());
     }
 
     public static Path resource(String name) {

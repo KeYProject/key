@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Set;
 
+import de.uka.ilkd.key.proof.io.ConstructNotSupportedException;
+
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -109,17 +111,44 @@ public final class CliError extends RuntimeException {
     /**
      * Classifies a failure to load a problem file. Load failures are input errors (exit 3) unless
      * the cause chain contains a {@link NullPointerException} or an {@link Error}, which are
-     * treated as internal bugs (exit 4).
+     * treated as internal bugs (exit 4). A
+     * {@link ConstructNotSupportedException} in the cause chain (an unsupported JML/Java
+     * construct, §8 of the headless interface spec) is always an input error whose message is the
+     * structured construct diagnostic, passed through verbatim.
      *
      * @param file the problem file that could not be loaded
      * @param cause the loader exception
      * @return the classified error
      */
     public static CliError loadFailure(Path file, Throwable cause) {
+        ConstructNotSupportedException constructError =
+            findCause(cause, ConstructNotSupportedException.class);
+        if (constructError != null) {
+            return input(constructError.formattedMessage(), constructError);
+        }
         String message = "cannot load '" + file + "': "
             + (cause.getMessage() != null ? cause.getMessage()
                     : cause.getClass().getSimpleName());
         return isInternalCause(cause) ? internal(message, cause) : input(message, cause);
+    }
+
+    /**
+     * Returns the message reported for a failure to load a problem file: the structured
+     * construct diagnostic (see {@link #loadFailure(Path, Throwable)}) when the cause chain
+     * carries a {@link ConstructNotSupportedException}, and the loader summary otherwise.
+     *
+     * @param file the problem file that could not be loaded
+     * @param cause the loader exception
+     * @return the message for the error record's {@code errorMessage} field
+     */
+    public static String loadFailureMessage(Path file, Throwable cause) {
+        ConstructNotSupportedException constructError =
+            findCause(cause, ConstructNotSupportedException.class);
+        if (constructError != null) {
+            return constructError.formattedMessage();
+        }
+        return "cannot load '" + file + "': "
+            + (cause.getMessage() != null ? cause.getMessage() : cause.getClass().getSimpleName());
     }
 
     /**
@@ -137,5 +166,24 @@ public final class CliError extends RuntimeException {
             }
         }
         return false;
+    }
+
+    /**
+     * Returns the first throwable of the given type in the cause chain (including the throwable
+     * itself), or {@code null} if absent. Cycle-safe.
+     *
+     * @param throwable the exception to inspect
+     * @param type the type to look for
+     * @param <T> the throwable type
+     * @return the first matching throwable, or {@code null}
+     */
+    static @Nullable <T extends Throwable> T findCause(Throwable throwable, Class<T> type) {
+        Set<Throwable> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Throwable c = throwable; c != null && seen.add(c); c = c.getCause()) {
+            if (type.isInstance(c)) {
+                return type.cast(c);
+            }
+        }
+        return null;
     }
 }
