@@ -1704,30 +1704,22 @@ public class JMLSpecFactory {
                     return result;
                 }
             } else if (s instanceof If ifStmt) {
-                final int branchCount = ifStmt.getBranchCount();
                 final var condition = ifStmt.getExpression();
-                if (branchCount == 1) {
-                    var thenBranch = ifStmt.getBranchAt(0);
-                    final ImmutableList<LocationVariable> visibleLocalVariables =
-                        collectLocalVariablesVisibleTo(statement, thenBranch);
-                    if (visibleLocalVariables != null) {
-                        result = result.prepend(visibleLocalVariables);
-                        ImmutableList<LocationVariable> pattern =
-                            collectPatternVariables(true, condition);
-                        result = result.prepend(pattern);
-                        return result;
-                    }
+
+                final ImmutableList<LocationVariable> visibleInThen =
+                    collectLocalVariablesVisibleTo(statement, ifStmt.getBranchAt(0));
+                if (visibleInThen != null) {
+                    result = result.prepend(visibleInThen);
+                    result = result.prepend(collectPatternVariables(true, condition));
+                    return result;
                 }
 
-                if (branchCount == 2) { // also consider else-branch
-                    var elseBranch = ifStmt.getBranchAt(1);
-                    final ImmutableList<LocationVariable> visibleLocalVariables =
-                        collectLocalVariablesVisibleTo(statement, elseBranch);
-                    if (visibleLocalVariables != null) {
-                        result = result.prepend(visibleLocalVariables);
-                        ImmutableList<LocationVariable> pattern =
-                            collectPatternVariables(false, condition);
-                        result = result.prepend(pattern);
+                if (ifStmt.getBranchCount() == 2) { // also consider else-branch
+                    final ImmutableList<LocationVariable> visibleInElse =
+                        collectLocalVariablesVisibleTo(statement, ifStmt.getBranchAt(1));
+                    if (visibleInElse != null) {
+                        result = result.prepend(visibleInElse);
+                        result = result.prepend(collectPatternVariables(false, condition));
                         return result;
                     }
                 }
