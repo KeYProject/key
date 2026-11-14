@@ -11,12 +11,14 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.JTerm;
 
-
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Common superinterface of all constructs created by the specification language front ends and
  * managed by SpecificationRepository.
  */
+@NullMarked
 public interface SpecificationElement {
 
     /**
@@ -32,6 +34,7 @@ public interface SpecificationElement {
     /**
      * Returns the visibility of the invariant (null for default visibility)
      */
+    @Nullable
     ModifierKind getVisibility();
 
 

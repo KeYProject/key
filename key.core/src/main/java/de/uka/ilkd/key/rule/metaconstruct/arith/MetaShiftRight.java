@@ -10,10 +10,13 @@ import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  */
 @TransformerMeta(name = "#ShiftRight")
+@NullMarked
 public final class MetaShiftRight extends MetaShift {
 
     /**

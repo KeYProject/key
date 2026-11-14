@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -29,6 +30,9 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 /**
@@ -39,6 +43,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * an equality or equivalence whose two sides are equal up to renaming, and decides an arbitrary
  * literal that equals an assumed one up to renaming (or contradicts it under a negation).
  */
+@NullMarked
 final class EqualityTheorySupport implements QuantifierTheorySupport {
 
     /**
@@ -50,7 +55,8 @@ final class EqualityTheorySupport implements QuantifierTheorySupport {
      * @return the verdict
      */
     @Override
-    public CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services) {
+    public CandidateVerdict verdictOn(JTerm candidate, @Nullable JTerm enclosing,
+            Services services) {
         return candidate.op() == Equality.EQUALS ? CandidateVerdict.FORBIDDEN
                 : CandidateVerdict.ACCEPTABLE;
     }
@@ -173,7 +179,8 @@ final class EqualityTheorySupport implements QuantifierTheorySupport {
                     // make useful triggers
                     continue;
                 }
-                final JTerm solvedEquation = mv2qv.replace(tb.equals(tb.var(mv), solution));
+                final JTerm solvedEquation =
+                    Objects.requireNonNull(mv2qv.replace(tb.equals(tb.var(mv), solution)));
                 solvedEquations.add(solvedEquation);
                 solvedEquations.add(tb.equals(solvedEquation.sub(1), solvedEquation.sub(0)));
             }

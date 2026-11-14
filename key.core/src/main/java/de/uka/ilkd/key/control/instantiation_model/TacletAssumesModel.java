@@ -28,6 +28,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 import org.key_project.util.parsing.RecognitionException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInstantiation> {
 
     /**
@@ -44,7 +48,8 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
             }
 
             @Override
-            public SequentFormula getSequentFormula() {
+            @SuppressWarnings("NullAway") // sentinel is matched by identity, never dereferenced
+            public @Nullable SequentFormula getSequentFormula() {
                 return null;
             }
         };
@@ -58,6 +63,20 @@ public class TacletAssumesModel extends DefaultComboBoxModel<AssumesFormulaInsta
     private final TacletApp app;
     private final Goal goal;
 
+    /**
+     * Creates a model for the given assumption instantiations.
+     * <p>
+     * The {@link #addElement} call below operates on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here since the entry is a
+     * fully-constructed named object, suppressed with a scoped key.
+     */
+    /**
+     * The {@link #addElement} call below operates on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here since the entry is a
+     * fully-constructed named object and the super-class model is fully set up by
+     * {@code super(...)}, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TacletAssumesModel(Term ifFma, ImmutableList<AssumesFormulaInstantiation> candidates,
             TacletApp app, Goal goal, Services services, NamespaceSet nss, AbbrevMap scm) {
         super(createIfInsts(candidates));

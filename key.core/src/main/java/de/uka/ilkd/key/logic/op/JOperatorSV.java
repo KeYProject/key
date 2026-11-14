@@ -13,9 +13,12 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Abstract base class for schema variables.
  */
+@NullMarked
 public abstract class JOperatorSV extends JAbstractSortedOperator
         implements OperatorSV, SchemaVariable, Named {
 

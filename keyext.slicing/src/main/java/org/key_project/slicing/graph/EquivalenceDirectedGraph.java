@@ -13,6 +13,8 @@ import java.util.Map;
 import org.key_project.util.EqualsAndHashCodeDelegator;
 import org.key_project.util.collection.DirectedGraph;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A directed graph, extended to store equivalence groups of vertices.
  * Equivalence groups are identified using equality modulo proof irrelevancy.
@@ -20,6 +22,7 @@ import org.key_project.util.collection.DirectedGraph;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, AnnotatedEdge> {
     /**
      * Vertices in this graph, grouped using equality modulo proof irrelevancy.
@@ -51,6 +54,10 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
                     (t1, t2) -> t1.equalsModProofIrrelevancy(t2),
                     t -> t.hashCodeModProofIrrelevancy());
             Collection<GraphNode> group = verticesModProof.get(wrapper);
+            if (group == null) {
+                throw new NullPointerException(
+                    "No equivalence group recorded for tracked formula " + tf + ".");
+            }
             group.remove(v);
             if (group.isEmpty()) {
                 verticesModProof.remove(wrapper);
@@ -64,10 +71,15 @@ public class EquivalenceDirectedGraph extends DirectedGraph<GraphNode, Annotated
      */
     public Collection<GraphNode> getVerticesModProofIrrelevancy(GraphNode v) {
         if (v instanceof TrackedFormula tf) {
-            return verticesModProof
+            Collection<GraphNode> group = verticesModProof
                     .get(new EqualsAndHashCodeDelegator<>(tf,
                         TrackedFormula::equalsModProofIrrelevancy,
                         TrackedFormula::hashCodeModProofIrrelevancy));
+            if (group == null) {
+                throw new NullPointerException(
+                    "No equivalence group recorded for tracked formula " + tf + ".");
+            }
+            return group;
         } else {
             return List.of(v);
         }

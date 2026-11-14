@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -14,10 +15,12 @@ import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 
+@NullMarked
 public class FloatHandler extends LDTHandler {
 
     private final Map<JMLOperator, TypedOperator> opMap = new EnumMap<>(JMLOperator.class);
@@ -26,7 +29,9 @@ public class FloatHandler extends LDTHandler {
         super(services);
 
         FloatLDT floatLDT = services.getTypeConverter().getFloatLDT();
-        KeYJavaType floatKjt = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+        KeYJavaType floatKjt = Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT),
+            "float KJT not registered");
 
         opMap.put(ADD, new TypedOperator(floatKjt, floatLDT.getAdd()));
         opMap.put(SUBTRACT, new TypedOperator(floatKjt, floatLDT.getSub()));

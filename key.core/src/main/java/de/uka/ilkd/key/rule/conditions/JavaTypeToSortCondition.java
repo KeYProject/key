@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
@@ -24,11 +26,15 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Variable condition that enforces a given generic sort to be instantiated with the sort of a
  * program expression a schema variable is instantiated with
  */
+@NullMarked
 public final class JavaTypeToSortCondition implements VariableCondition {
 
     private final JOperatorSV exprOrTypeSV;
@@ -57,7 +63,8 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement svSubst,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement svSubst,
             MatchResultInfo matchCond, LogicServices services) {
         if (var != exprOrTypeSV) {
             return matchCond;
@@ -71,10 +78,14 @@ public final class JavaTypeToSortCondition implements VariableCondition {
         if (svSubst instanceof JTerm) {
             type = ((JTerm) svSubst).sort();
         } else if (svSubst instanceof TypeReference) {
-            type = ((TypeReference) svSubst).getKeYJavaType().getSort();
+            type = Objects.requireNonNull(((TypeReference) svSubst).getKeYJavaType(),
+                "no KeYJavaType for type " + svSubst).getSort();
         } else {
-            final Expression expr = (Expression) svSubst;
-            type = expr.getKeYJavaType((Services) services, inst.getExecutionContext()).getSort();
+            final Expression expr = (Expression) Objects.requireNonNull(svSubst,
+                "no expression instantiation for " + exprOrTypeSV);
+            type = Objects.requireNonNull(
+                expr.getKeYJavaType((Services) services, inst.getExecutionContext()),
+                "no KeYJavaType for expression " + expr).getSort();
         }
         if (elemSort) {
             if (type instanceof ArraySort) {
@@ -84,8 +95,10 @@ public final class JavaTypeToSortCondition implements VariableCondition {
             }
         }
         try {
-            return matchCond.setInstantiations(
-                inst.add(GenericSortCondition.createIdentityCondition(sort, type), services));
+            return matchCond.setInstantiations(inst.add(
+                GenericSortCondition.createIdentityCondition(sort, Objects.requireNonNull(type,
+                    "no sort for generic sort condition")),
+                services));
         } catch (SortException e) {
             return null;
         }

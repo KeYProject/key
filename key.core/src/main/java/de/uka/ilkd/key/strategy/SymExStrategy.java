@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -32,12 +33,15 @@ import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.strategy.SymExCost.*;
 
 /// Strategy for symbolic execution rules.
 ///
 /// Do not create directly. Use [SymExStrategyFactory] instead.
+@NullMarked
 public class SymExStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
     public static final Name NAME = new Name("SymExStrategy");
 
@@ -80,7 +84,7 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
     }
 
     @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
+    public @Nullable RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
         return switch (aspect) {
             case StrategyAspect.Cost -> costComputationDispatcher;
             case StrategyAspect.Instantiation -> instantiationDispatcher;
@@ -91,8 +95,8 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
 
     private Feature setupGlobalF(Feature dispatcher) {
         final Feature methodSpecF;
-        final String methProp =
-            strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
+        final String methProp = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY));
         switch (methProp) {
             case StrategyProperties.METHOD_CONTRACT ->
                 methodSpecF = methodSpecFeature(longConst(METHOD_CONTRACT_PREFERENCE));
@@ -105,7 +109,8 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         }
 
         Feature loopInvF;
-        final String loopProp = strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
+        final String loopProp = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY));
         if (loopProp.equals(StrategyProperties.LOOP_INVARIANT)) {
             loopInvF = loopInvFeature(longConst(0));
         } else {
@@ -115,8 +120,8 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         final Feature blockFeature;
         final Feature loopBlockFeature;
         final Feature loopBlockApplyHeadFeature;
-        final String blockProperty =
-            strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY);
+        final String blockProperty = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.BLOCK_OPTIONS_KEY));
         if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_INTERNAL)) {
             blockFeature = blockContractInternalFeature(longConst(BLOCK_CONTRACT));
             loopBlockFeature =
@@ -139,15 +144,15 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         }
 
         final Feature mergeRuleF;
-        final String mpsProperty =
-            strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
+        final String mpsProperty = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY));
         if (mpsProperty.equals(StrategyProperties.MPS_MERGE)) {
             mergeRuleF = mergeRuleFeature(longConst(MERGE_RULE));
         } else {
             mergeRuleF = mergeRuleFeature(inftyConst());
         }
-        return SumFeature.createSum(mergeRuleF, methodSpecF, loopInvF, blockFeature,
-            loopBlockFeature, loopBlockApplyHeadFeature, dispatcher);
+        return SumFeature.createSum(mergeRuleF, Objects.requireNonNull(methodSpecF), loopInvF,
+            blockFeature, loopBlockFeature, loopBlockApplyHeadFeature, dispatcher);
     }
 
     private RuleSetDispatchFeature setupCostComputationF() {
@@ -183,14 +188,15 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
         // taclets for special invariant handling
         bindRuleSet(d, "loopInvariant", longConst(LOOP_INVARIANT));
 
-        boolean useLoopExpand = strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
+        boolean useLoopExpand = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY))
                 .equals(StrategyProperties.LOOP_EXPAND);
-        boolean useLoopInvTaclets =
-            strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
-                    .equals(StrategyProperties.LOOP_SCOPE_INV_TACLET);
-        boolean useLoopScopeExpand =
-            strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
-                    .equals(StrategyProperties.LOOP_SCOPE_EXPAND);
+        boolean useLoopInvTaclets = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY))
+                .equals(StrategyProperties.LOOP_SCOPE_INV_TACLET);
+        boolean useLoopScopeExpand = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.LOOP_OPTIONS_KEY))
+                .equals(StrategyProperties.LOOP_SCOPE_EXPAND);
 
         bindRuleSet(d, "loop_expand", useLoopExpand ? longConst(0) : inftyConst());
         bindRuleSet(d, "loop_scope_inv_taclet", useLoopInvTaclets ? longConst(0) : inftyConst());
@@ -198,8 +204,8 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
             useLoopScopeExpand ? longConst(LOOP_SCOPE_EXPAND) : inftyConst());
 
 
-        final String methProp =
-            strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY);
+        final String methProp = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.METHOD_OPTIONS_KEY));
         switch (methProp) {
             case StrategyProperties.METHOD_CONTRACT ->
                 /*
@@ -215,7 +221,8 @@ public class SymExStrategy extends AbstractFeatureStrategy implements ComponentS
             default -> throw new RuntimeException("Unexpected strategy property " + methProp);
         }
 
-        final String mpsProp = strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY);
+        final String mpsProp = Objects.requireNonNull(
+            strategyProperties.getProperty(StrategyProperties.MPS_OPTIONS_KEY));
         switch (mpsProp) {
             case StrategyProperties.MPS_MERGE ->
                 /*

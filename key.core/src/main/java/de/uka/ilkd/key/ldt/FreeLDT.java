@@ -18,6 +18,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Generic data type, which has no predefined theory. It is meant as a basis to implement an
@@ -64,8 +65,12 @@ public final class FreeLDT extends LDT {
         return services.getTermBuilder().func(atom);
     }
 
+    /**
+     * Stub that is never reached: {@code assert false} aborts when this LDT would be used. The
+     * return is declared {@code @Nullable} like the base contract.
+     */
     @Override
-    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public @Nullable Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         assert false;
         return null;
     }
@@ -75,8 +80,12 @@ public final class FreeLDT extends LDT {
         return "atom".equals(f.name().toString());
     }
 
+    /**
+     * Stub that is never reached: {@code assert false} aborts when this LDT would be used. The
+     * return is declared {@code @Nullable} like the base contract.
+     */
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op() instanceof Function && hasLiteralFunction((Function) t.op())) {
             return FreeLiteral.INSTANCE;
         }
@@ -84,8 +93,12 @@ public final class FreeLDT extends LDT {
         return null;
     }
 
+    /**
+     * Stub that is never reached: {@code assert false} aborts when this LDT would be used. The
+     * return is declared {@code @Nullable} like the base contract.
+     */
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false;
         return null;
     }

@@ -7,10 +7,14 @@ package de.uka.ilkd.key.java.ast;
 
 import de.uka.ilkd.key.logic.ProgramElementName;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Named program element. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public interface NamedProgramElement extends NamedModelElement, NonTerminalProgramElement {
 
     /**
@@ -18,6 +22,7 @@ public interface NamedProgramElement extends NamedModelElement, NonTerminalProgr
      *
      * @return the identifier.
      */
+    @Nullable
     ProgramElementName getProgramElementName();
 
 }

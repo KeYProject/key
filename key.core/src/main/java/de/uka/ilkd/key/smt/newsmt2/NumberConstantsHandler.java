@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -13,20 +14,24 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This handler is responsible to render number constants Z(3(2(1(#)))) as "123".
  *
  * TODO Should that also do character constants (C) with the same machinery?
  */
+@NullMarked
 public class NumberConstantsHandler implements SMTHandler {
 
-    private Function numberSymbol;
-    private Services services;
-    private Function negNumberSign;
+    private @Nullable Function numberSymbol;
+    private @Nullable Services services;
+    private @Nullable Function negNumberSign;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.services = services;
         numberSymbol = services.getTypeConverter().getIntegerLDT().getNumberSymbol();
         negNumberSign = services.getTypeConverter().getIntegerLDT().getNegativeNumberSign();
@@ -39,6 +44,7 @@ public class NumberConstantsHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) {
+        Services services = Objects.requireNonNull(this.services, "services");
         if (term.sub(0).op() == negNumberSign) {
             String s = AbstractTermTransformer.convertToDecimalString(term, services);
             return new SExpr("-", IntegerOpHandler.INT, s.substring(1));

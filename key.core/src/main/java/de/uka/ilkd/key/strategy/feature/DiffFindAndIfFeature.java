@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -16,6 +18,8 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Binary feature that returns zero iff the <tt>\assumes</tt>- and find-formula of a Taclet are
  * matched to different members of the sequent. If a taclet has more than one formula in its
@@ -25,6 +29,7 @@ import org.key_project.util.collection.ImmutableList;
 // application's \assumes instantiations. The find can be a proper sub-formula (replace_known's
 // \find(b)), so the formula sits above the find term; a sibling rewrite then changes the formula
 // while the find subterm survives. Reusable only while the find formula is unchanged.
+@NullMarked
 @WeakStableCost
 public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
 
@@ -41,9 +46,7 @@ public class DiffFindAndIfFeature extends BinaryTacletAppFeature {
         final var findFormula = pos.sequentFormula();
         final boolean findIsInAntec = pos.isInAntec();
 
-        assert list != null;
-
-        for (final AssumesFormulaInstantiation aList : list) {
+        for (final AssumesFormulaInstantiation aList : Objects.requireNonNull(list)) {
             final AssumesFormulaInstSeq instantiationOfAssumesFormula =
                 (AssumesFormulaInstSeq) aList;
             assert instantiationOfAssumesFormula != null;

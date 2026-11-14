@@ -4,12 +4,16 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt.model;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a sequence in an SMT model.
  *
  * @author mihai
  *
  */
+@NullMarked
 public class Sequence {
     /**
      * The name of the sequence.
@@ -18,8 +22,14 @@ public class Sequence {
     /**
      * The values contained by the sequence.
      */
-    private String[] content;
+    private @Nullable String[] content;
 
+    /**
+     * The content array is deliberately left {@code null} for negative lengths and filled in later;
+     * the initialization check cannot verify the deliberately unset {@code @Nullable} array, so the
+     * difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     public Sequence(int length, String name) {
         super();
         this.name = name;
@@ -40,11 +50,15 @@ public class Sequence {
         return content.length;
     }
 
-    public String get(int i) {
+    /**
+     * Returns the value stored at the given index; entries may be <code>null</code> before they
+     * have been set for a freshly extracted sequence (cf. {@link #set(int, String)}).
+     */
+    public @Nullable String get(int i) {
         return content[i];
     }
 
-    public void set(int i, String s) {
+    public void set(int i, @Nullable String s) {
         content[i] = s;
     }
 

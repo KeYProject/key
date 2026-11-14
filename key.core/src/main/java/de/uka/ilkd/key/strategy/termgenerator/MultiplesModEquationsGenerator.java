@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -25,6 +26,8 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Try to rewrite a monomial (term) <code>source</code> so that it becomes a multiple of another
  * monomial <code>target</code>, using the integer equations of the antecedent. The output of the
@@ -39,6 +42,7 @@ import org.key_project.util.collection.ImmutableList;
  * In the future, this class should also be used for instantiating explicit quantifiers over the
  * integers.
  */
+@NullMarked
 public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
 
     private final ProjectionToTerm<Goal> source;
@@ -60,8 +64,10 @@ public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
             MutableState mState) {
         final Services services = goal.proof().getServices();
 
-        final Monomial sourceM = Monomial.create(source.toTerm(app, pos, goal, mState), services);
-        final Monomial targetM = Monomial.create(target.toTerm(app, pos, goal, mState), services);
+        final Monomial sourceM = Monomial.create(
+            Objects.requireNonNull(source.toTerm(app, pos, goal, mState)), services);
+        final Monomial targetM = Monomial.create(
+            Objects.requireNonNull(target.toTerm(app, pos, goal, mState)), services);
 
         if (targetM.divides(sourceM)) {
             return toIterator(targetM.reduce(sourceM).toTerm(services));

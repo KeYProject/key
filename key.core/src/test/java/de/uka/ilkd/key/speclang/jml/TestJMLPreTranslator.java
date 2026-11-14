@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.jml;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
@@ -153,7 +155,8 @@ public class TestJMLPreTranslator {
         assertEquals(0, specCase.getSignals().size());
         assertEquals(0, specCase.getSignalsOnly().size());
         assertEquals("requirestrue;",
-            specCase.getRequires().head().first.getText().trim());
+            Objects.requireNonNull(specCase.getRequires().head().first, "the clause is labeled")
+                    .getText().trim());
     }
 
 
@@ -185,15 +188,21 @@ public class TestJMLPreTranslator {
         System.out.println(specCase);
 
         assertEquals("ensuresfalse;",
-            specCase.getEnsures().head().first.getText().trim());
+            Objects.requireNonNull(specCase.getEnsures().head().first, "the clause is labeled")
+                    .getText().trim());
         assertEquals("assignable\\nothing;",
-            specCase.getAssignable().head().first.getText().trim());
+            Objects.requireNonNull(specCase.getAssignable().head().first, "the clause is labeled")
+                    .getText().trim());
         assertEquals("signals(Exception)e;",
-            specCase.getSignals().head().first.getText().trim());
+            Objects.requireNonNull(specCase.getSignals().head().first, "the clause is labeled")
+                    .getText().trim());
         assertEquals("signals_onlyonlythis;",
-            specCase.getSignalsOnly().head().first.getText().trim());
+            Objects.requireNonNull(specCase.getSignalsOnly().head().first,
+                "the clause is labeled")
+                    .getText().trim());
         assertEquals("requirestrue;",
-            specCase.getRequires().head().first.getText().trim());
+            Objects.requireNonNull(specCase.getRequires().head().first, "the clause is labeled")
+                    .getText().trim());
     }
 
 

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -19,6 +20,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,24 +29,25 @@ import org.slf4j.LoggerFactory;
  * Walks through a java AST in depth-left-fist-order. This walker is used to transform a loop (not
  * only while loops) according to the rules of the dynamic logic.
  */
+@NullMarked
 public class WhileInvariantTransformation extends WhileLoopTransformation {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(WhileInvariantTransformation.class);
 
-    private JavaInfo javaInfo = null;
+    private JavaInfo javaInfo;
 
-    private ProgramVariable cont = null;
-    private ProgramVariable exc = null;
-    private ProgramVariable rtrn = null;
-    private ProgramVariable brk = null;
-    private ProgramVariable thrownExc = null;
-    private ProgramVariable excParam = null;
-    private ProgramVariable returnExpr = null;
+    private ProgramVariable cont;
+    private ProgramVariable exc;
+    private ProgramVariable rtrn;
+    private ProgramVariable brk;
+    private ProgramVariable thrownExc;
+    private ProgramVariable excParam;
+    private @Nullable ProgramVariable returnExpr;
 
     private boolean continueOccurred = false;
     private boolean returnOccurred = false;
 
-    private LinkedList<BreakToBeReplaced> breakList = null;
+    private LinkedList<BreakToBeReplaced> breakList;
 
     /**
      * creates the WhileLoopTransformation for the transformation mode
@@ -53,10 +57,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * @param innerLabel the ProgramElementName of the inner label
      */
     public WhileInvariantTransformation(
-            ProgramElement root, ProgramElementName outerLabel,
-            ProgramElementName innerLabel, ProgramVariable cont, ProgramVariable exc,
+            ProgramElement root, @Nullable ProgramElementName outerLabel,
+            @Nullable ProgramElementName innerLabel, ProgramVariable cont, ProgramVariable exc,
             ProgramVariable excParam, ProgramVariable thrownException, ProgramVariable brk,
-            ProgramVariable rtrn, ProgramVariable returnExpr,
+            ProgramVariable rtrn, @Nullable ProgramVariable returnExpr,
             LinkedList<BreakToBeReplaced> breakList, Services services) {
 
         super(root, outerLabel, innerLabel, services);
@@ -77,6 +81,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
      * @param root the ProgramElement where to begin
      * @param inst the SVInstantiations if available
      */
+    // check mode only collects breaks and flags; the transformation fields stay unset here
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     public WhileInvariantTransformation(ProgramElement root, SVInstantiations inst,
             Services services) {
         super(root, inst, services);
@@ -128,7 +134,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                     // Keep the PositionInfo because it is required for symbolic
                     // execution tree extraction and this assignment is the only
                     // unique representation of the replaced return
-                    Statement assignExpr = KeYJavaASTFactory.assign(returnExpr, x.getExpression(),
+                    Statement assignExpr = KeYJavaASTFactory.assign(returnExpr,
+                        Objects.requireNonNull(x.getExpression(), "no return expression in " + x),
                         x.getPositionInfo());
 
                     // changed order of statements to fix #991 (MT-1579)
@@ -138,8 +145,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 // execution tree extraction and there is no other unique
                 // representation of the replaced return
                 {
-                    stmnts = KeYJavaASTFactory.block(assignFlag, KeYJavaASTFactory
-                            .breakStatement(breakInnerLabel.getLabel(), x.getPositionInfo()));
+                    stmnts = KeYJavaASTFactory.block(assignFlag,
+                        KeYJavaASTFactory.breakStatement(Objects.requireNonNull(
+                            breakInnerLabel.getLabel(), "no label in " + breakInnerLabel),
+                            x.getPositionInfo()));
                 }
                 addChild(stmnts);
                 changed();
@@ -161,8 +170,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 // Keep the PositionInfo because it is required for symbolic
                 // execution tree extraction and there is no other unique
                 // representation of the replaced continue
-                addChild(KeYJavaASTFactory.block(assign, KeYJavaASTFactory
-                        .breakStatement(breakInnerLabel.getLabel(), x.getPositionInfo())));
+                addChild(KeYJavaASTFactory.block(assign,
+                    KeYJavaASTFactory.breakStatement(Objects.requireNonNull(
+                        breakInnerLabel.getLabel(), "no label in " + breakInnerLabel),
+                        x.getPositionInfo())));
                 changed();
             }
         } else {
@@ -187,7 +198,9 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                         // symbolic execution tree extraction and this
                         // assignment is the only unique representation of the
                         // replaced break
-                        Statement assign = KeYJavaASTFactory.assign(b.getProgramVariable(),
+                        Statement assign = KeYJavaASTFactory.assign(
+                            Objects.requireNonNull(b.getProgramVariable(),
+                                "no flag variable for " + b),
                             BooleanLiteral.TRUE, x.getPositionInfo());
                         replaced = true;
                         addChild(KeYJavaASTFactory.block(assignFlag, assign, breakInnerLabel));
@@ -215,10 +228,13 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             @SuppressWarnings("unused")
             Expression guard = ((Guard) changeList.removeFirst()).getExpression();
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
-            body = KeYJavaASTFactory.ifThen(x.getGuardExpression(), body);
+            body = KeYJavaASTFactory.ifThen(
+                Objects.requireNonNull(x.getGuardExpression(), "no guard expression in " + x),
+                Objects.requireNonNull(body, "no loop body in " + x));
             if (breakInnerLabel != null) {
                 // an unlabeled continue needs to be handled with (replaced)
-                body = KeYJavaASTFactory.labeledStatement(breakInnerLabel.getLabel(), body,
+                body = KeYJavaASTFactory.labeledStatement(Objects.requireNonNull(
+                    breakInnerLabel.getLabel(), "no label in " + breakInnerLabel), body,
                     PositionInfo.UNDEFINED);
             }
             StatementBlock block = KeYJavaASTFactory.block(body);
@@ -226,7 +242,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             if (breakOuterLabel != null) {
                 // an unlabeled break occurs in the
                 // while loop therefore we need a labeled statement
-                newBody = KeYJavaASTFactory.labeledStatement(breakOuterLabel.getLabel(), block,
+                newBody = KeYJavaASTFactory.labeledStatement(Objects.requireNonNull(
+                    breakOuterLabel.getLabel(), "no label in " + breakOuterLabel), block,
                     PositionInfo.UNDEFINED);
 
             }
@@ -234,10 +251,10 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
             Statement[] catchStatements = { KeYJavaASTFactory.assign(exc, BooleanLiteral.TRUE),
                 KeYJavaASTFactory.assign(thrownExc, excParam) };
 
-            Catch ctch =
-                KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(
-                    new TypeRef(javaInfo.getKeYJavaType("java.lang.Throwable")), excParam),
-                    catchStatements);
+            Catch ctch = KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(
+                new TypeRef(Objects.requireNonNull(
+                    javaInfo.getKeYJavaType("java.lang.Throwable"), "no Throwable type")),
+                excParam), catchStatements);
 
             Branch[] branch = { ctch };
             Statement res = KeYJavaASTFactory.tryBlock(newBody, branch);
@@ -249,7 +266,8 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
                 Expression guard = ((Guard) changeList.removeFirst()).getExpression();
                 Statement body =
                     (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
-                While newLoop = KeYJavaASTFactory.whileLoop(guard, body, x.getPositionInfo());
+                While newLoop = KeYJavaASTFactory.whileLoop(guard,
+                    Objects.requireNonNull(body, "no loop body in " + x), x.getPositionInfo());
                 services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
                 addChild(newLoop);
                 changed();
@@ -291,20 +309,22 @@ public class WhileInvariantTransformation extends WhileLoopTransformation {
 
             // label statement if there are returns / continue / breaks
             if (breakOuterLabel != null) {
-                body = KeYJavaASTFactory.labeledStatement(breakOuterLabel.getLabel(), body,
+                body = KeYJavaASTFactory.labeledStatement(Objects.requireNonNull(
+                    breakOuterLabel.getLabel(), "no label in " + breakOuterLabel),
+                    Objects.requireNonNull(body, "no loop body in " + x),
                     PositionInfo.UNDEFINED);
-
             }
 
             Statement[] catchStatements = { KeYJavaASTFactory.assign(exc, BooleanLiteral.TRUE),
                 KeYJavaASTFactory.assign(thrownExc, excParam) };
 
-            Catch ctch =
-                KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(
-                    new TypeRef(javaInfo.getKeYJavaType("java.lang.Throwable")), excParam),
-                    catchStatements);
+            Catch ctch = KeYJavaASTFactory.catchClause(KeYJavaASTFactory.parameterDeclaration(
+                new TypeRef(Objects.requireNonNull(
+                    javaInfo.getKeYJavaType("java.lang.Throwable"), "no Throwable type")),
+                excParam), catchStatements);
 
-            addChild(KeYJavaASTFactory.tryBlock(body, ctch));
+            addChild(KeYJavaASTFactory.tryBlock(
+                Objects.requireNonNull(body, "no loop body"), ctch));
             changed();
         } else {
             super.performActionOnEnhancedFor(x);

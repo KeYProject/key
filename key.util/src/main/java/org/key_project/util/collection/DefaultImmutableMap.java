@@ -99,14 +99,14 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     public @Nullable T get(S key) {
         DefaultImmutableMap<S, T> queue = this;
         while (!queue.isEmpty()) {
-            final ImmutableMapEntry<S, T> e = queue.entry;
+            final ImmutableMapEntry<S, T> e = Objects.requireNonNull(queue.entry);
 
             final S entryKey = e.key();
             if (entryKey == key || entryKey.equals(key)) {
                 return e.value();
             }
 
-            queue = queue.parent;
+            queue = Objects.requireNonNull(queue.parent);
         }
         return null;
     }
@@ -132,13 +132,13 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     public boolean containsKey(S key) {
         DefaultImmutableMap<S, T> queue = this;
         while (!queue.isEmpty()) {
-            final ImmutableMapEntry<S, T> e = queue.entry;
+            final ImmutableMapEntry<S, T> e = Objects.requireNonNull(queue.entry);
             final S entryKey = e.key();
             if (entryKey == key || entryKey.equals(key)) {
                 return true;
             }
 
-            queue = queue.parent;
+            queue = Objects.requireNonNull(queue.parent);
         }
         return false;
     }
@@ -147,12 +147,12 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
     public boolean containsValue(T value) {
         DefaultImmutableMap<S, T> queue = this;
         while (!queue.isEmpty()) {
-            final ImmutableMapEntry<S, T> e = queue.entry;
+            final ImmutableMapEntry<S, T> e = Objects.requireNonNull(queue.entry);
             final T entryVal = e.value();
             if (entryVal == value || entryVal.equals(value)) {
                 return true;
             }
-            queue = queue.parent;
+            queue = Objects.requireNonNull(queue.parent);
 
         }
         return false;
@@ -178,19 +178,19 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         final ImmutableMapEntry<S, T>[] stack = new ImmutableMapEntry[size()];
         int counter = 0;
         while (!queue.isEmpty()) {
-            final ImmutableMapEntry<S, T> e = queue.entry;
+            final ImmutableMapEntry<S, T> e = Objects.requireNonNull(queue.entry);
 
             final S entryKey = e.key();
 
             if (entryKey == key || entryKey.equals(key)) {
-                return createMap(stack, counter, queue.parent);
+                return createMap(stack, counter, Objects.requireNonNull(queue.parent));
             }
 
 
             stack[counter] = e;
             counter++;
 
-            queue = queue.parent;
+            queue = Objects.requireNonNull(queue.parent);
         }
         return this;
     }
@@ -206,7 +206,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
         final ImmutableMapEntry<S, T>[] stack = new ImmutableMapEntry[size()];
         int counter = 0;
         while (!queue.isEmpty()) {
-            final ImmutableMapEntry<S, T> e = queue.entry;
+            final ImmutableMapEntry<S, T> e = Objects.requireNonNull(queue.entry);
 
             final T entryVal = e.value();
 
@@ -215,7 +215,7 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
                 counter++;
             }
 
-            queue = queue.parent;
+            queue = Objects.requireNonNull(queue.parent);
 
         }
 
@@ -303,8 +303,8 @@ public final class DefaultImmutableMap<S, T> implements ImmutableMap<S, T> {
             if (map.isEmpty()) {
                 throw new IllegalStateException("No more elements in iterator");
             }
-            final @NonNull ImmutableMapEntry<S, T> entry = map.entry;
-            map = map.parent;
+            final @NonNull ImmutableMapEntry<S, T> entry = Objects.requireNonNull(map.entry);
+            map = Objects.requireNonNull(map.parent);
             return entry;
         }
 

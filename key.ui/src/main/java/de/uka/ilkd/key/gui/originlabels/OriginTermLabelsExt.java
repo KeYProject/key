@@ -27,6 +27,8 @@ import de.uka.ilkd.key.proof.Node;
 import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extension adapter for {@link OriginTermLabel}s and {@link OriginTermLabelVisualizer}s.
@@ -35,14 +37,15 @@ import org.jspecify.annotations.NonNull;
  */
 @KeYGuiExtension.Info(name = "Origin Tracking", optional = true,
     description = "UI support for origin tracking", experimental = false)
+@NullMarked
 public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.ContextMenu,
         KeYGuiExtension.Tooltip, KeYGuiExtension.MainMenu, KeYGuiExtension.TermInfo {
 
     /** @see ToggleTermOriginTrackingAction */
-    private ToggleTermOriginTrackingAction toggleTrackingAction;
+    private @Nullable ToggleTermOriginTrackingAction toggleTrackingAction;
 
     /** @see ToggleOriginHighlightAction */
-    private ToggleOriginHighlightAction toggleSourceViewHighlightAction;
+    private @Nullable ToggleOriginHighlightAction toggleSourceViewHighlightAction;
 
     private ToggleTermOriginTrackingAction getToggleTrackingAction(MainWindow mainWindow) {
         if (toggleTrackingAction == null) {
@@ -96,7 +99,8 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
     }
 
     @Override
-    public List<String> getTooltipStrings(MainWindow mainWindow, PosInSequent pos) {
+    public List<String> getTooltipStrings(MainWindow mainWindow,
+            @Nullable PosInSequent pos) {
         if (pos == null || pos.isSequent()) {
             return Collections.emptyList();
         }
@@ -135,6 +139,15 @@ public class OriginTermLabelsExt implements KeYGuiExtension, KeYGuiExtension.Con
         /** The visualizer shown by this action. */
         private final NodeInfoVisualizer vis;
 
+        /**
+         * Creates the open-visualizer action.
+         *
+         * <p>
+         * The action sets its name, menu path and icon while the receiver is still under
+         * initialization (EISOP initialization check); all of them only materialize once the
+         * action is displayed after construction, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         private OpenVisualizerAction(NodeInfoVisualizer vis) {
             setName(vis.getLongName());
             setMenuPath("Windows");

@@ -13,6 +13,8 @@ import org.key_project.util.collection.ImmutableList;
 /** A contentless container for tests that drive the parked map without a rule application. */
 final class StubRuleAppContainer extends RuleAppContainer {
 
+    // the stub deliberately carries no rule application
+    @SuppressWarnings("NullAway")
     StubRuleAppContainer() {
         super(null, NumberRuleAppCost.getZeroCost());
     }

@@ -35,6 +35,7 @@ import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,13 +45,14 @@ import org.slf4j.LoggerFactory;
  * The node info object contains additional information about a node used to give user feedback. The
  * content does not have any influence on the proof or carry something of logical value.
  */
+@NullMarked
 public class NodeInfo {
     private static final Logger LOGGER = LoggerFactory.getLogger(NodeInfo.class);
 
     private static final Set<Name> symbolicExecNames = new HashSet<>(9);
 
     /** firstStatement stripped of method frames */
-    private SourceElement activeStatement = null;
+    private @Nullable SourceElement activeStatement = null;
 
     /** Materialised (resolved) branch label; computed lazily from the raw label / supplier. */
     private @Nullable String branchLabel = null;
@@ -67,9 +69,9 @@ public class NodeInfo {
     private boolean determinedFstAndActiveStatement = false;
 
     /** used for proof tree annotation when applicable */
-    private SourceElement firstStatement = null;
+    private @Nullable SourceElement firstStatement = null;
 
-    private String firstStatementString = null;
+    private @Nullable String firstStatementString = null;
 
     /** the node this info object belongs to */
     private final Node node;
@@ -93,6 +95,8 @@ public class NodeInfo {
 
     public NodeInfo(Node node) {
         this.node = node;
+        // eager init so the field can stay @NonNull (matches the "initialize in ctor" pattern)
+        this.sequentChangeInfo = SequentChangeInfo.createSequentChangeInfo(node.sequent());
     }
 
     static {
@@ -165,7 +169,7 @@ public class NodeInfo {
      * @param ruleApp The given {@link RuleApp}.
      * @return The active statement or {@code null} if no one is provided.
      */
-    public static SourceElement computeActiveStatement(
+    public static @Nullable SourceElement computeActiveStatement(
             RuleApp ruleApp) {
         SourceElement firstStatement = computeFirstStatement(ruleApp);
         return computeActiveStatement(firstStatement);
@@ -182,8 +186,15 @@ public class NodeInfo {
      *
      * @param ruleApp The given {@link RuleApp}.
      * @return The first statement or {@code null} if no one is provided.
+     *         <p>
+     *         The occurrence position of a positioned taclet application is guaranteed to carry a
+     *         term
+     *         when the receiver is non-null; the dereference of the (nullable) position is
+     *         suppressed
+     *         with a scoped key.
      */
-    public static SourceElement computeFirstStatement(
+    @SuppressWarnings("nullness:dereference.of.nullable")
+    public static @Nullable SourceElement computeFirstStatement(
             RuleApp ruleApp) {
         SourceElement firstStatement = null;
         // TODO: unify with MiscTools getActiveStatement
@@ -212,7 +223,8 @@ public class NodeInfo {
      * @param firstStatement The given {@link SourceElement}.
      * @return The active statement or {@code null} if no one is provided.
      */
-    public static SourceElement computeActiveStatement(SourceElement firstStatement) {
+    public static @Nullable SourceElement computeActiveStatement(
+            @Nullable SourceElement firstStatement) {
         SourceElement activeStatement = null;
         // TODO: unify with MiscTools getActiveStatement
         if (firstStatement != null) {
@@ -245,7 +257,7 @@ public class NodeInfo {
      * @param node The {@link Node} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
-    public static boolean isSymbolicExecutionRuleApplied(Node node) {
+    public static boolean isSymbolicExecutionRuleApplied(@Nullable Node node) {
         if (node != null) {
             return isSymbolicExecutionRuleApplied(node.getAppliedRuleApp());
         } else {
@@ -259,11 +271,11 @@ public class NodeInfo {
      * @param app The {@link RuleApp} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
-    public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
+    public static boolean isSymbolicExecutionRuleApplied(@Nullable RuleApp app) {
         return app instanceof AbstractAuxiliaryContractBuiltInRuleApp
                 || app instanceof AbstractContractRuleApp
-                || app instanceof LoopInvariantBuiltInRuleApp || app instanceof TacletApp
-                        && isSymbolicExecution(((TacletApp) app).taclet());
+                || app instanceof LoopInvariantBuiltInRuleApp || app instanceof TacletApp tacletApp
+                        && isSymbolicExecution(tacletApp.taclet());
     }
 
     public static boolean isSymbolicExecution(Taclet t) {
@@ -286,7 +298,7 @@ public class NodeInfo {
      *
      * @return active statement as described above
      */
-    public synchronized SourceElement getActiveStatement() {
+    public synchronized @Nullable SourceElement getActiveStatement() {
         determineFirstAndActiveStatement();
         return activeStatement;
     }
@@ -296,7 +308,7 @@ public class NodeInfo {
      *
      * @return branch label
      */
-    public @Nullable synchronized String getBranchLabel() {
+    public synchronized @Nullable String getBranchLabel() {
         if (!branchLabelResolved) {
             branchLabel = resolveBranchLabel(
                 branchLabelSupplier != null ? branchLabelSupplier.get() : rawBranchLabel);
@@ -320,7 +332,7 @@ public class NodeInfo {
      *
      * @return string representation of first statement as described above
      */
-    public synchronized String getFirstStatementString() {
+    public synchronized @Nullable String getFirstStatementString() {
         determineFirstAndActiveStatement();
         if (firstStatement != null) {
             if (firstStatementString == null) {
@@ -338,7 +350,7 @@ public class NodeInfo {
      *
      * @param s the String to be set
      */
-    public synchronized void setBranchLabel(String s) {
+    public synchronized void setBranchLabel(@Nullable String s) {
         // Store only the raw label; the #sv substitution / term pretty-printing below is deferred
         // to
         // getBranchLabel() (display/save). setBranchLabel is called during rule application for
@@ -363,7 +375,7 @@ public class NodeInfo {
      *
      * @param labelSupplier supplies the raw branch label on demand
      */
-    public synchronized void setBranchLabel(Supplier<String> labelSupplier) {
+    public synchronized void setBranchLabel(@Nullable Supplier<String> labelSupplier) {
         if (labelSupplier == null) {
             return;
         }
@@ -382,10 +394,11 @@ public class NodeInfo {
      * @return the resolved label, or {@code null}
      */
     private @Nullable String resolveBranchLabel(@Nullable String s) {
-        if (s == null || node.parent() == null) {
+        Node parent = node.parent();
+        if (s == null || parent == null) {
             return null;
         }
-        RuleApp ruleApp = node.parent().getAppliedRuleApp();
+        RuleApp ruleApp = parent.getAppliedRuleApp();
         if (ruleApp instanceof TacletApp tacletApp) {
             Pattern p = Pattern.compile("#\\w+");
             Matcher m = p.matcher(s);
@@ -421,7 +434,11 @@ public class NodeInfo {
                             }
                         }
                     }
-                    res = ProofSaver.printAnything(val, node.proof().getServices());
+                    res = Objects.requireNonNull(
+                        ProofSaver.printAnything(
+                            Objects.requireNonNull(val, "no branch label instantiation found"),
+                            node.proof().getServices()),
+                        "proof saver could not print the branch label instantiation");
                 }
                 m.appendReplacement(sb, res.replace("$", "\\$"));
             }

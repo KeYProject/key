@@ -16,6 +16,9 @@ import de.uka.ilkd.key.ldt.RealLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * JML {@code \real} literal.
  * <p>
@@ -27,6 +30,7 @@ import org.key_project.util.ExtList;
  *
  * @author bruns
  */
+@NullMarked
 public non-sealed class RealLiteral extends Literal {
 
     private final BigInteger unscaledValue;
@@ -105,7 +109,7 @@ public non-sealed class RealLiteral extends Literal {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -168,7 +172,7 @@ public non-sealed class RealLiteral extends Literal {
         v.performActionOnRealLiteral(this);
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_REAL);
     }
 

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
@@ -70,13 +71,14 @@ public class TestTermParser extends AbstractTestTermParser {
             );
         }
 
-        elem = lookup_sort("elem");
-        list = lookup_sort("list");
-        head = lookup_func("head");
-        tail = lookup_func("tail");
-        nil = lookup_func("nil");
-        cons = lookup_func("cons");
-        isempty = lookup_func("isempty");
+        elem = Objects.requireNonNull(lookup_sort("elem"), "the elem sort must be declared");
+        list = Objects.requireNonNull(lookup_sort("list"), "the list sort must be declared");
+        head = Objects.requireNonNull(lookup_func("head"), "the head function must be declared");
+        tail = Objects.requireNonNull(lookup_func("tail"), "the tail function must be declared");
+        nil = Objects.requireNonNull(lookup_func("nil"), "the nil function must be declared");
+        cons = Objects.requireNonNull(lookup_func("cons"), "the cons function must be declared");
+        isempty = Objects
+                .requireNonNull(lookup_func("isempty"), "the isempty predicate must be declared");
 
         // The declaration parser cannot parse LogicVariables; these
         // are normally declared in quantifiers, so we introduce them

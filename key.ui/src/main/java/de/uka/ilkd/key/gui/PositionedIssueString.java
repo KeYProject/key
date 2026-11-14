@@ -11,12 +11,15 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Small data class that in addition to the information already contained by PositionedString
  * (text, filename, position) contains a String for additional information which can be used to
  * store a stacktrace if present.
  */
+@NullMarked
 public class PositionedIssueString extends PositionedString
         implements Comparable<PositionedIssueString> {
 
@@ -60,7 +63,7 @@ public class PositionedIssueString extends PositionedString
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

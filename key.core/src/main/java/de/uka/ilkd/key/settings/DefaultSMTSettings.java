@@ -9,6 +9,7 @@ import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Taclet;
@@ -16,21 +17,25 @@ import de.uka.ilkd.key.smt.SMTSettings;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.taclettranslation.assumptions.SupportedTaclets;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * The default implementation of {@link SMTSettings}.
  */
+@NullMarked
 public class DefaultSMTSettings implements SMTSettings {
     private final ProofDependentSMTSettings pdSettings;
     private final ProofIndependentSMTSettings piSettings;
-    private final Proof proof;
-    private LinkedList<Taclet> taclets = null;
+    private final @Nullable Proof proof;
+    private @Nullable LinkedList<Taclet> taclets = null;
     private final NewSMTTranslationSettings newTranslationSettings;
 
 
     public DefaultSMTSettings(ProofDependentSMTSettings pdSettings,
             ProofIndependentSMTSettings piSettings, NewSMTTranslationSettings newTransSettings,
-            Proof proof) {
+            @Nullable Proof proof) {
         super();
         this.pdSettings = pdSettings;
         this.piSettings = piSettings;
@@ -54,7 +59,7 @@ public class DefaultSMTSettings implements SMTSettings {
         return piSettings;
     }
 
-    public Proof getProof() {
+    public @Nullable Proof getProof() {
         return proof;
     }
 
@@ -72,7 +77,9 @@ public class DefaultSMTSettings implements SMTSettings {
 
     @Override
     public Path getSMTTemporaryFolder() {
-        return PathConfig.currentPaths.keyConfigDir.resolve("smt_formula");
+        return Objects.requireNonNull(PathConfig.currentPaths,
+            "key configuration paths not set; call setBaseKeyConfigDir first").keyConfigDir
+                .resolve("smt_formula");
     }
 
     @Override
@@ -83,7 +90,8 @@ public class DefaultSMTSettings implements SMTSettings {
                 return taclets;
             }
 
-            for (Taclet taclet : proof.getInitConfig().activatedTaclets()) {
+            for (Taclet taclet : Objects.requireNonNull(proof.getInitConfig(),
+                "the proof carries an init config while SMT translation runs").activatedTaclets()) {
                 if (pdSettings.getSupportedTaclets().contains(taclet.name().toString(), true)) {
                     taclets.add(taclet);
                 }

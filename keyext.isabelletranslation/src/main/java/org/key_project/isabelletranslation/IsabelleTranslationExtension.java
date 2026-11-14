@@ -7,6 +7,7 @@ package org.key_project.isabelletranslation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -21,12 +22,15 @@ import org.key_project.isabelletranslation.gui.controller.IsabelleTranslateAllAc
 import org.key_project.isabelletranslation.gui.controller.IsabelleTranslationAction;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extension class for Isabelle translation
  */
 @KeYGuiExtension.Info(name = "Isabelle Translation", optional = true,
     experimental = false)
+@NullMarked
 public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExtension.Settings,
         KeYGuiExtension.ContextMenu, KeYGuiExtension.Startup {
     @Override
@@ -41,10 +45,12 @@ public class IsabelleTranslationExtension implements KeYGuiExtension, KeYGuiExte
     private final ContextMenuAdapter adapter = new ContextMenuAdapter() {
         @Override
         public <T> List<Action> getContextActions(
-                KeYMediator mediator, ContextMenuKind<T> kind, T object) {
+                KeYMediator mediator, ContextMenuKind<T> kind, @Nullable T object) {
             if (kind != ContextMenuKind.SEQUENT_VIEW)
                 return Collections.emptyList();
-            var pos = (PosInSequent) object;
+            // the sequent view menu is only opened on a selected position
+            var pos = (PosInSequent) Objects.requireNonNull(object,
+                "the menu is opened on a sequent position");
             if (pos.getPosInOccurrence() != null || mediator.getSelectedGoal() == null) {
                 return List.of();
             }

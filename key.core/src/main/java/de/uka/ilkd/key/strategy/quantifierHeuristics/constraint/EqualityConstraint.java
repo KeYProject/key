@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
@@ -27,6 +28,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAMING_SOURCE_ELEMENT_PROPERTY;
 
 
@@ -39,6 +43,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAM
  * constraint would not be satisfiable (cycles, unification failed) the Constraint TOP of interface
  * Constraint is returned.
  */
+@NullMarked
 public class EqualityConstraint implements Constraint {
 
     /**
@@ -47,9 +52,9 @@ public class EqualityConstraint implements Constraint {
     private final HashMap<Metavariable, JTerm> map;
 
     /** cache for return values of getInstantiation */
-    private HashMap<Metavariable, JTerm> instantiationCache = null;
+    private @Nullable HashMap<Metavariable, JTerm> instantiationCache = null;
 
-    private Integer hashCode = null;
+    private @Nullable Integer hashCode = null;
 
     /** Don't use this constructor, use Constraint.BOTTOM instead */
     public EqualityConstraint() {
@@ -133,7 +138,7 @@ public class EqualityConstraint implements Constraint {
      *         be replaced if the constraint is valid (or null if the constraint allows arbitrary
      *         instantiations of p_mv). This is just the entry of map.
      */
-    public JTerm getDirectInstantiation(Metavariable p_mv) {
+    public @Nullable JTerm getDirectInstantiation(Metavariable p_mv) {
         return map.get(p_mv);
     }
 
@@ -170,7 +175,7 @@ public class EqualityConstraint implements Constraint {
         return t;
     }
 
-    private synchronized JTerm getInstantiationIfExisting(Metavariable p_mv) {
+    private synchronized @Nullable JTerm getInstantiationIfExisting(Metavariable p_mv) {
         if (instantiationCache == null) {
             return null;
         }
@@ -532,8 +537,12 @@ public class EqualityConstraint implements Constraint {
      *         modified. <code>Constraint.TOP</code> is always returned for ununifiable terms
      */
     private Constraint unifyHelp(JTerm t1, JTerm t2, boolean modifyThis, Services services) {
-        return unifyHelp(t1, t2, ImmutableList.nil(),
-            ImmutableList.nil(), null, modifyThis, services);
+        // nat may be null: a fresh name abstraction table is created on demand (see checkNat);
+        // the 7-argument helper's parameter is not nullable. Suppressed with a scoped key.
+        @SuppressWarnings("NullAway")
+        final Constraint result = unifyHelp(t1, t2, ImmutableList.nil(), ImmutableList.nil(),
+            null, modifyThis, services);
+        return result;
     }
 
 
@@ -567,7 +576,7 @@ public class EqualityConstraint implements Constraint {
             // cycle
             return TOP;
         } else if (map.containsKey(mv)) {
-            return unifyHelp(valueOf(mv), t, modifyThis, services);
+            return unifyHelp(Objects.requireNonNull(valueOf(mv)), t, modifyThis, services);
         }
 
         final EqualityConstraint newConstraint = getMutableConstraint(modifyThis);
@@ -586,8 +595,17 @@ public class EqualityConstraint implements Constraint {
     /**
      * checks equality of constraints by subsuming relation (only equal if no new sorts need to be
      * introduced for subsumption)
+     *
+     * <p>
+     * The subsumption checks pass {@code null} services to {@link #join(Constraint, Services)}:
+     * the legacy join protocol documents that a null value is allowed (unification fails, i.e.
+     * TOP is returned, only when e.g. intersection sorts are required). The lambda-free compound
+     * return expression cannot carry a scoped statement annotation; suppressed at method scope
+     * with a scoped key.
+     * </p>
      */
-    public boolean equals(Object obj) {
+    @SuppressWarnings("NullAway")
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }
@@ -606,6 +624,7 @@ public class EqualityConstraint implements Constraint {
      *         "this" also satisfies "co".
      */
     @Override
+    @SuppressWarnings("NullAway") // join(null services): documented legacy protocol, see equals()
     public boolean isAsStrongAs(Constraint co) {
         if (this == co) {
             return true;
@@ -625,6 +644,7 @@ public class EqualityConstraint implements Constraint {
      *         also satisfies "this".
      */
     @Override
+    @SuppressWarnings("NullAway") // join(null services): documented legacy protocol, see equals()
     public boolean isAsWeakAs(Constraint co) {
         if (this == co) {
             return true;
@@ -756,8 +776,8 @@ public class EqualityConstraint implements Constraint {
                     return true;
                 }
             } else {
-                if (map.containsKey(metavariable)
-                        && hasCycle(mv, getDirectInstantiation(metavariable), services)) {
+                if (map.containsKey(metavariable) && hasCycle(mv,
+                    Objects.requireNonNull(getDirectInstantiation(metavariable)), services)) {
                     return true;
                 }
             }
@@ -778,8 +798,9 @@ public class EqualityConstraint implements Constraint {
     /**
      * ONLY FOR TESTS DONT USE THEM IN ANOTHER WAY
      *
-     * @return mapping to mv
+     * @return mapping to mv, or null if mv is not contained in the constraint
      */
+    @Nullable
     JTerm valueOf(Metavariable mv) {
         return map.get(mv);
     }

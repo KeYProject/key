@@ -26,6 +26,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
+import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -42,9 +43,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestJMLTranslator {
     public static final Path testFile = HelperClassForTests.TESTCASE_DIRECTORY
             .resolve("speclang").resolve("testFile.key");
+    // assigned once in setUp(); JUnit-lifecycle assignment is invisible to NullAway's field
+    // initialization analysis
+    @SuppressWarnings("NullAway")
     private static TermBuilder TB;
+    @SuppressWarnings("NullAway")
     private static JavaInfo javaInfo;
+    @SuppressWarnings("NullAway")
     private static Services services;
+    @SuppressWarnings("NullAway")
     private static KeYJavaType testClassType;
     private static final Map<LocationVariable, JTerm> atPres = new LinkedHashMap<>();
     private JmlIO jmlIO;
@@ -53,15 +60,19 @@ public class TestJMLTranslator {
     @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
-            javaInfo =
-                HelperClassForTests.parse(testFile).getFirstProof().getJavaInfo();
+            javaInfo = Objects
+                    .requireNonNull(HelperClassForTests.parse(testFile).getFirstProof(),
+                        "the test file must contain a proof")
+                    .getJavaInfo();
             services = javaInfo.getServices();
             TB = services.getTermBuilder();
             testClassType = Objects.requireNonNull(
                 javaInfo.getKeYJavaType("testPackage.TestClass"));
 
-            atPres.put(services.getTypeConverter().getHeapLDT().getHeap(),
-                TB.var(TB.heapAtPreVar("heapAtPre", false)));
+            var heapLDT = Objects
+                    .requireNonNull(services.getTypeConverter().getHeapLDT(),
+                        "the heap LDT must be available");
+            atPres.put(heapLDT.getHeap(), TB.var(TB.heapAtPreVar("heapAtPre", false)));
         }
         jmlIO = new JmlIO(services).classType(testClassType)
                 .specMathMode(JMLInfoExtractor.getSpecMathModeOrDefault(testClassType))
@@ -75,7 +86,8 @@ public class TestJMLTranslator {
 
 
     protected LocationVariable buildExcVar() {
-        KeYJavaType excType = javaInfo.getTypeByClassName("java.lang.Throwable");
+        KeYJavaType excType = Objects.requireNonNull(
+            javaInfo.getTypeByClassName("java.lang.Throwable"), "the exception type must exist");
         ProgramElementName excPEN = new ProgramElementName("exc");
         return new LocationVariable(excPEN, new TypeRef(excType));
     }
@@ -83,7 +95,8 @@ public class TestJMLTranslator {
 
     protected LocationVariable buildResultVar(IProgramMethod pm) {
         ProgramElementName resPEN = new ProgramElementName("result");
-        return new LocationVariable(resPEN, new TypeRef(pm.getReturnType()));
+        return new LocationVariable(resPEN, new TypeRef(
+            Objects.requireNonNull(pm.getReturnType(), "the method has a return type")));
     }
 
 
@@ -168,8 +181,11 @@ public class TestJMLTranslator {
     @Test
     public void testSimpleQuery() {
         ProgramVariable selfVar = buildSelfVarAsProgVar();
-        IProgramMethod getOne = javaInfo.getProgramMethod(testClassType, "getOne",
-            ImmutableList.nil(), testClassType);
+        IProgramMethod getOne = Objects
+                .requireNonNull(
+                    javaInfo.getProgramMethod(testClassType, "getOne", ImmutableList.nil(),
+                        testClassType),
+                    "the method must exist");
         JTerm result = jmlIO.parseExpression("this.getOne()");
         assertNotNull(result);
         assertTrue(termContains(result, selfVar));
@@ -185,8 +201,10 @@ public class TestJMLTranslator {
         assertEquals(Quantifier.ALL, result.op());
         assertTrue(termContains(result, TB.zTerm("2147483647")));
         assertTrue(termContains(result, Junctor.AND));
-        LogicVariable i = new LogicVariable(new Name("i"),
-            services.getNamespaces().sorts().lookup(new Name("int")));
+        Sort intSort = Objects
+                .requireNonNull(services.getNamespaces().sorts().lookup(new Name("int")),
+                    "the int sort exists");
+        LogicVariable i = new LogicVariable(new Name("i"), intSort);
         JTerm expected = TB.all(i, TB.imp(TB.inInt(TB.var(i)),
             TB.and(TB.leq(TB.zTerm("0"), TB.var(i)), TB.leq(TB.var(i), TB.zTerm("2147483647")))));
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
@@ -204,8 +222,10 @@ public class TestJMLTranslator {
         assertEquals(Quantifier.EX, result.op());
         assertTrue(termContains(result, TB.zTerm("2147483647")));
         assertTrue(termContains(result, Junctor.AND));
-        LogicVariable i = new LogicVariable(new Name("i"),
-            services.getNamespaces().sorts().lookup(new Name("int")));
+        Sort intSort = Objects
+                .requireNonNull(services.getNamespaces().sorts().lookup(new Name("int")),
+                    "the int sort exists");
+        LogicVariable i = new LogicVariable(new Name("i"), intSort);
         JTerm expected = TB.ex(i, TB.and(TB.inInt(TB.var(i)),
             TB.and(TB.leq(TB.zTerm("0"), TB.var(i)), TB.leq(TB.var(i), TB.zTerm("2147483647")))));
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(result, expected),
@@ -222,7 +242,9 @@ public class TestJMLTranslator {
         JTerm result = jmlIO.parseExpression("(\\bsum int i; 0; 2147483647; i)");
         NamespaceSet nss = services.getNamespaces();
         Function q = nss.functions().lookup(new Name("bsum"));
-        LogicVariable i = new LogicVariable(new Name("i"), nss.sorts().lookup(new Name("int")));
+        Sort intSort = Objects
+                .requireNonNull(nss.sorts().lookup(new Name("int")), "the int sort exists");
+        LogicVariable i = new LogicVariable(new Name("i"), intSort);
         JTerm expected = TB.func(services.getTypeConverter().getIntegerLDT().getModuloInt(),
             TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i)));
         assertNotNull(result);
@@ -240,7 +262,9 @@ public class TestJMLTranslator {
         JTerm result = jmlIO.parseExpression("(\\bsum \\bigint i; 0; 2147483647; i)");
         NamespaceSet nss = services.getNamespaces();
         Function q = nss.functions().lookup(new Name("bsum"));
-        LogicVariable i = new LogicVariable(new Name("i"), nss.sorts().lookup(new Name("int")));
+        Sort intSort = Objects
+                .requireNonNull(nss.sorts().lookup(new Name("int")), "the int sort exists");
+        LogicVariable i = new LogicVariable(new Name("i"), intSort);
         JTerm expected = TB.bsum(i, TB.zTerm("0"), TB.zTerm("2147483647"), TB.var(i));
         assertNotNull(result);
         assertSame(q, result.op());
@@ -257,8 +281,10 @@ public class TestJMLTranslator {
         JTerm result = jmlIO.parseExpression(input);
         assertNotNull(result);
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
-        LogicVariable o =
-            new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
+        Sort objectSort =
+            Objects.requireNonNull(services.getJavaInfo().getJavaLangObject().getSort(),
+                "the object sort exists");
+        LogicVariable o = new LogicVariable(new Name("o"), objectSort);
         assertSame(unionOp, result.op());
         JTerm guard = TB.and(TB.convertToFormula(TB.created(TB.var(o))),
             TB.not(TB.equals(TB.var(o), TB.NULL())));
@@ -278,8 +304,10 @@ public class TestJMLTranslator {
         JTerm result = jmlIO.parseExpression(input);
         assertNotNull(result);
         Operator unionOp = services.getTypeConverter().getLocSetLDT().getInfiniteUnion();
-        LogicVariable o =
-            new LogicVariable(new Name("o"), services.getJavaInfo().getJavaLangObject().getSort());
+        Sort objectSort =
+            Objects.requireNonNull(services.getJavaInfo().getJavaLangObject().getSort(),
+                "the object sort exists");
+        LogicVariable o = new LogicVariable(new Name("o"), objectSort);
         assertSame(unionOp, result.op());
         JTerm guard =
             TB.or(TB.convertToFormula(TB.created(TB.var(o))), TB.equals(TB.var(o), TB.NULL()));
@@ -311,9 +339,15 @@ public class TestJMLTranslator {
 
         assertNotNull(result);
         assertEquals(Equality.EQUALS, result.op());
-        assertTrue(termContains(result, services.getTypeConverter().getHeapLDT().getHeap()));
+        var heapLDT = Objects
+                .requireNonNull(services.getTypeConverter().getHeapLDT(),
+                    "the heap LDT must be available");
+        assertTrue(termContains(result, heapLDT.getHeap()));
         assertTrue(termContains(result,
-            atPres.get(services.getTypeConverter().getHeapLDT().getHeap()).op()));
+            Objects
+                    .requireNonNull(atPres.get(heapLDT.getHeap()),
+                        "the pre-heap must be registered")
+                    .op()));
     }
 
     @Test
@@ -322,8 +356,10 @@ public class TestJMLTranslator {
 
         ImmutableList<KeYJavaType> signature = ImmutableList.nil();
 
-        IProgramMethod pm =
-            javaInfo.getProgramMethod(testClassType, "getOne", signature, testClassType);
+        IProgramMethod pm = Objects
+                .requireNonNull(
+                    javaInfo.getProgramMethod(testClassType, "getOne", signature, testClassType),
+                    "the method must exist");
 
         LocationVariable resultVar = buildResultVar(pm);
 
@@ -353,8 +389,12 @@ public class TestJMLTranslator {
             jmlIO.atPres(atPres).parseExpression("\\is_initialized(testPackage.TestClass)");
         assertNotNull(result);
         assertEquals(Equality.EQUALS, result.op());
-        assertTrue(termContains(result, TB.var(
-            javaInfo.getAttribute(PipelineConstants.IMPLICIT_CLASS_INITIALIZED, testClassType))));
+        ProgramVariable clsVar = Objects
+                .requireNonNull(
+                    javaInfo.getAttribute(PipelineConstants.IMPLICIT_CLASS_INITIALIZED,
+                        testClassType),
+                    "the implicit class initialization attribute must exist");
+        assertTrue(termContains(result, TB.var(clsVar)));
     }
 
     @Test
@@ -369,7 +409,9 @@ public class TestJMLTranslator {
     @Test
     public void testComplexQueryResolving1() {
         ImmutableList<KeYJavaType> signature = ImmutableList.nil();
-        signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
+        signature = signature.append(
+            Objects.requireNonNull(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT),
+                "the int type must exist"));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
 
@@ -384,7 +426,9 @@ public class TestJMLTranslator {
     @Test
     public void testComplexQueryResolving2() {
         ImmutableList<KeYJavaType> signature = ImmutableList.nil();
-        signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_LONG));
+        signature = signature.append(
+            Objects.requireNonNull(javaInfo.getKeYJavaType(PrimitiveType.JAVA_LONG),
+                "the long type must exist"));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
 
@@ -399,7 +443,9 @@ public class TestJMLTranslator {
     @Test
     public void testComplexQueryResolving3() {
         ImmutableList<KeYJavaType> signature = ImmutableList.nil();
-        signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
+        signature = signature.append(
+            Objects.requireNonNull(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT),
+                "the int type must exist"));
 
         IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
 
@@ -435,11 +481,12 @@ public class TestJMLTranslator {
         assertNotNull(resultTypeofClass);
         assertNotNull(resultTypeofPrimitive);
 
+        Sort intSort =
+            Objects.requireNonNull(services.getNamespaces().sorts().lookup("int"),
+                "the int sort exists");
         Function ioFuncObject =
             services.getJavaDLTheory().getInstanceofSymbol(javaInfo.objectSort(), services);
-        Function ioFuncInt =
-            services.getJavaDLTheory()
-                    .getInstanceofSymbol(services.getNamespaces().sorts().lookup("int"), services);
+        Function ioFuncInt = services.getJavaDLTheory().getInstanceofSymbol(intSort, services);
 
         assertTrue(termContains(resultTypeofClass, ioFuncObject));
         assertTrue(termContains(resultTypeofPrimitive, ioFuncInt));
@@ -449,23 +496,28 @@ public class TestJMLTranslator {
     @Test
     public void testCorrectImplicitThisResolution() {
         LocationVariable selfVar = buildSelfVarAsProgVar();
-        LocationVariable array =
-            (LocationVariable) javaInfo.getAttribute("testPackage.TestClass::array");
+        LocationVariable array = Objects.requireNonNull(
+            (LocationVariable) javaInfo.getAttribute("testPackage.TestClass::array"),
+            "the array field must exist");
 
         JTerm result = jmlIO.selfVar(selfVar)
                 .parseExpression("(\\forall TestClass a;a.array == array; a == this)");
 
         assertNotNull(result);
         final LogicVariable qv = new LogicVariable(new Name("a"), selfVar.sort());
-        final Function fieldSymbol =
-            services.getTypeConverter().getHeapLDT().getFieldSymbolForPV(array, services);
+        final Function fieldSymbol = Objects
+                .requireNonNull(services.getTypeConverter().getHeapLDT(),
+                    "the heap LDT must be available")
+                .getFieldSymbolForPV(array, services);
         JTerm expected = TB.all(qv,
             TB.imp(
                 TB.and(
                     TB.and(
                         TB.equals(TB.dot(array.sort(), TB.var(qv), fieldSymbol),
                             TB.dot(array.sort(), TB.var(selfVar), fieldSymbol)),
-                        TB.reachableValue(TB.var(qv), selfVar.getKeYJavaType())),
+                        TB.reachableValue(TB.var(qv),
+                            Objects.requireNonNull(selfVar.getKeYJavaType(),
+                                "the self variable has a type"))),
                     TB.not(TB.equals(TB.var(qv), TB.NULL()))), // implicit non null
                 TB.equals(TB.var(qv), TB.var(selfVar))));
 

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -24,6 +25,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -42,6 +47,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Mattias Ulbrich, 2019
  */
+@NullMarked
 public final class MayExpandMethodCondition extends VariableConditionAdapter {
 
     /**
@@ -67,7 +73,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
     /**
      * Schema variable used as first argument: The receiver of the call may be null (if class local)
      */
-    private final SchemaVariable receiver;
+    private final @Nullable SchemaVariable receiver;
 
     /**
      * Schema variable used as 2nd argument: The method name
@@ -87,7 +93,7 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
      * @param args non-null program schema var for the arguments of the call
      * @param negation {@code true} iff the condition is to be negated
      */
-    public MayExpandMethodCondition(SchemaVariable receiver, SchemaVariable methname,
+    public MayExpandMethodCondition(@Nullable SchemaVariable receiver, SchemaVariable methname,
             SchemaVariable args, boolean negation) {
         this.negation = negation;
         this.receiver = receiver;
@@ -112,16 +118,19 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement subst,
+            SVInstantiations svInst,
             Services services) {
-        Map<String, String> tacletOptions =
-            services.getProof().getSettings().getChoiceSettings().getDefaultChoices();
+        Map<String, String> tacletOptions = Objects.requireNonNull(services.getProof(),
+            "no proof available for method expansion")
+                .getSettings().getChoiceSettings().getDefaultChoices();
 
         if (tacletOptions.getOrDefault(TACLET_OPTION_KEY, "").equals(RELAXED_VALUE)) {
             return !negation;
         }
 
-        ExecutionContext ec = svInst.getContextInstantiation().activeStatementContext();
+        ExecutionContext ec = Objects.requireNonNull(svInst.getContextInstantiation(),
+            "no context instantiation").activeStatementContext();
         ReferencePrefix rp = null;
         if (receiver != null) {
             rp = svInst.getInstantiation(receiver);
@@ -130,9 +139,12 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         MethodName mn = svInst.getInstantiation(methname);
 
         ImmutableArray<Expression> ar =
-            toExpArray(svInst.getInstantiation(args));
+            toExpArray(Objects.requireNonNull(svInst.getInstantiation(args),
+                "no instantiation of " + args));
         if (var == args) {
-            ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst);
+            ar = toExpArray(Objects.requireNonNull(
+                (ImmutableArray<? extends ProgramElement>) subst,
+                "no instantiation of " + args));
         }
 
         if (mn == null) {
@@ -147,9 +159,12 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
         KeYJavaType prefixType;
         if (rp == null && ec != null) {
             // This there is no receiver, so take the context of method frame
-            prefixType = ec.getTypeReference().getKeYJavaType();
+            prefixType = Objects.requireNonNull(ec.getTypeReference().getKeYJavaType(),
+                "no KeYJavaType in execution context");
         } else {
-            prefixType = services.getTypeConverter().getKeYJavaType((Expression) rp, ec);
+            prefixType = services.getTypeConverter().getKeYJavaType(
+                Objects.requireNonNull((Expression) rp, "no receiver to determine the prefix type"),
+                ec);
         }
 
         if (ec != null) {
@@ -158,8 +173,11 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
             // must be declared in the static context.
         } else {
             // no execution context
-            method =
-                mr.method(services, prefixType, mr.getMethodSignature(services, ec), prefixType);
+            // MethodReference#getMethodSignature tolerates a null execution context (used for
+            // the argument types); the parameter is still declared @NonNull there.
+            @SuppressWarnings("NullAway")
+            ImmutableList<KeYJavaType> signature = mr.getMethodSignature(services, ec);
+            method = mr.method(services, prefixType, signature, prefixType);
         }
 
         if (method == null) {
@@ -181,11 +199,13 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
             return true;
         }
 
-        Type type = method.getContainerType().getJavaType();
+        Type type = Objects.requireNonNull(method.getContainerType(),
+            "no container type of " + method).getJavaType();
         assert type instanceof ClassType
                 : "Calling a method on sth that does not have a class type";
 
-        ClassType classType = (ClassType) type;
+        final ClassType classType = (ClassType) Objects.requireNonNull(type,
+            "no java type of " + method);
 
         return classType.isFinal();
     }

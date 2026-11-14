@@ -56,22 +56,23 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+@NullMarked
 public final class ProblemInitializer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProblemInitializer.class);
 
     private final Services services;
-    private final ProgressMonitor progMon;
+    private final @Nullable ProgressMonitor progMon;
     private final Set<EnvInput> alreadyParsed = new LinkedHashSet<>();
-    private final ProblemInitializerListener listener;
+    private final @Nullable ProblemInitializerListener listener;
     /**
      * the FileRepo responsible for consistency between source code and proofs
      */
-    private FileRepo fileRepo;
+    private @Nullable FileRepo fileRepo;
     private ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
     private @Nullable Configuration additionalProfileOptions;
 
@@ -79,8 +80,13 @@ public final class ProblemInitializer {
     // constructors
     // -------------------------------------------------------------------------
 
-    public ProblemInitializer(ProgressMonitor mon, Services services,
-            ProblemInitializerListener listener) {
+    /**
+     * @param mon the progress monitor; may be {@code null} when no progress reporting is desired
+     * @param services the services of the profile to use
+     * @param listener the listener for progress and result events; may be {@code null}
+     */
+    public ProblemInitializer(@Nullable ProgressMonitor mon, Services services,
+            @Nullable ProblemInitializerListener listener) {
         this.services = services;
         this.progMon = mon;
         this.listener = listener;
@@ -180,8 +186,9 @@ public final class ProblemInitializer {
         reportStatus("Read LDT Includes", in.getIncludes().size());
 
         for (String name : in.getLDTIncludes()) {
-            keyFile[i] =
-                new KeYFile(name, in.get(name), progMon, initConfig.getProfile(), fileRepo);
+            keyFile[i] = new KeYFile(name,
+                Objects.requireNonNull(in.get(name), "Referenced LDT include not found: " + name),
+                progMon, initConfig.getProfile(), fileRepo);
             i++;
             setProgress(i);
         }
@@ -189,7 +196,8 @@ public final class ProblemInitializer {
         LDTInput ldtInp = new LDTInput(keyFile, (status, progress) -> {
             ProblemInitializer.this.reportStatus(status);
             ProblemInitializer.this.setProgress(progress);
-        }, initConfig.getProfile());
+        }, Objects.requireNonNull(initConfig.getProfile(),
+            "The init config always provides a profile"));
 
         // read the LDTInput
         readEnvInput(ldtInp, initConfig);
@@ -211,7 +219,10 @@ public final class ProblemInitializer {
         int i = 0;
         for (String fileName : in.getIncludes()) {
             KeYFile keyFile =
-                new KeYFile(fileName, in.get(fileName), progMon, envInput.getProfile(), fileRepo);
+                new KeYFile(fileName,
+                    Objects.requireNonNull(in.get(fileName),
+                        "Referenced include not found: " + fileName),
+                    progMon, envInput.getProfile(), fileRepo);
             readEnvInput(keyFile, initConfig);
             setProgress(++i);
         }
@@ -220,7 +231,12 @@ public final class ProblemInitializer {
     /**
      * get a vector of Strings containing all .java file names in the cfile directory. Helper for
      * readJava().
+     * <p>
+     * The files walked in a Java directory are regular files whose file name is never
+     * {@code null}; the dereference of the (nullable) file-name path is suppressed with a scoped
+     * key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private Collection<Path> getClasses(Path javaRoot) throws ProofInputException {
         if (Files.isDirectory(javaRoot)) {
             try (var walker = Files.walk(javaRoot)) {
@@ -239,7 +255,11 @@ public final class ProblemInitializer {
 
     /**
      * Helper for readEnvInput().
+     * <p>
+     * The included files are regular files whose file name is never {@code null}; the dereference
+     * of the (nullable) file-name path is suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void readJava(EnvInput envInput, InitConfig initConfig) throws ProofInputException {
         // read Java source and classpath settings
         envInput.setInitConfig(initConfig);
@@ -276,7 +296,7 @@ public final class ProblemInitializer {
             Collection<Path> classes = getClasses(javaPath);
             if (envInput.isIgnoreOtherJavaFiles()) {
                 Path file = envInput.getJavaFile();
-                if (classes.contains(file)) {
+                if (file != null && classes.contains(file)) {
                     classes = Collections.singletonList(file);
                 }
             }
@@ -385,7 +405,11 @@ public final class ProblemInitializer {
     /**
      * Ensures that the passed proof's namespaces contain all functions and program variables used
      * in its root sequent.
+     * <p>
+     * Every opened proof has a root node; the dereference of the (nullable) root node is
+     * suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void populateNamespaces(Proof proof) {
         final NamespaceSet namespaces = proof.getNamespaces();
         final Goal rootGoal = proof.openGoals().head();
@@ -405,7 +429,19 @@ public final class ProblemInitializer {
         return initConfig;
     }
 
-    private void setUpProofHelper(ProofOblInput problem, ProofAggregate pl)
+    /**
+     * Registers the rules of all proofs contained in the loaded proof aggregate.
+     *
+     * @param problem The proof obligation that was loaded.
+     * @param pl The proof aggregate whose proofs are set up, or {@code null} if loading failed.
+     * @throws ProofInputException If no proof could be set up.
+     *         <p>
+     *         Each loaded proof has an init config and a profile; the dereferences of the
+     *         (nullable)
+     *         init configs and the profile are suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
+    private void setUpProofHelper(ProofOblInput problem, @Nullable ProofAggregate pl)
             throws ProofInputException {
         if (pl == null) {
             throw new ProofInputException("No proof");
@@ -438,7 +474,8 @@ public final class ProblemInitializer {
         }
     }
 
-    private void activateInitConfigJava(InitConfig config, EnvInput envInput, FileRepo fileRepo) {
+    private void activateInitConfigJava(InitConfig config, EnvInput envInput,
+            @Nullable FileRepo fileRepo) {
         var bootClassPath = envInput.readBootClassPath();
         var classPath = envInput.readClassPath();
         config.getServices().activateJava(bootClassPath,
@@ -490,7 +527,11 @@ public final class ProblemInitializer {
 
     /**
      * Creates an initConfig / a proof environment and reads an EnvInput into it
+     * <p>
+     * The profile of the created init config is always set; the dereference of the (nullable)
+     * profile is suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
         progressStarted(this);
         alreadyParsed.clear();
@@ -622,6 +663,20 @@ public final class ProblemInitializer {
                             : null);
     }
 
+    /**
+     * Prepares the init config for the given reference config by reading the environment input
+     * and registering the symbols of the Java model.
+     *
+     * @param envInput The environment input to read.
+     * @param referenceConfig The init config to prepare.
+     * @return The prepared init config.
+     * @throws ProofInputException If the environment input cannot be read.
+     *         <p>
+     *         The heap LDT of a prepared init config is always present (the assertion at its
+     *         retrieval is
+     *         an internal check); the dereference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)
             throws ProofInputException {
         // create initConfig
@@ -675,6 +730,19 @@ public final class ProblemInitializer {
     // public interface
     // -------------------------------------------------------------------------
 
+    /**
+     * Loads the proof obligation into the init config and reports the resulting proof aggregate.
+     *
+     * @param initConfig The init config to load the obligation into.
+     * @param po The proof obligation to load.
+     * @return The loaded proof aggregate.
+     * @throws ProofInputException If the obligation cannot be loaded.
+     *         <p>
+     *         The proof obligation always yields a proof aggregate after being read; the
+     *         dereference of
+     *         the (nullable) aggregate is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public ProofAggregate startProver(InitConfig initConfig, ProofOblInput po)
             throws ProofInputException {
         progressStarted(this);
@@ -691,11 +759,13 @@ public final class ProblemInitializer {
             setUpProofHelper(po, pa);
 
             if (Debug.ENABLE_DEBUG) {
-                print(pa.getFirstProof());
+                print(Objects.requireNonNull(pa.getFirstProof(),
+                    "A loaded proof aggregate always contains a first proof"));
             }
 
             // done
-            proofCreated(pa);
+            proofCreated(Objects.requireNonNull(pa,
+                "The proof aggregate is non-null: setUpProofHelper already rejected null"));
             return pa;
         } catch (Exception e) {
             // This has been generalised from ProofInputException to not miss exceptions
@@ -744,11 +814,11 @@ public final class ProblemInitializer {
         this.fileRepo = fileRepo;
     }
 
-    public ProblemInitializerListener getListener() {
+    public @Nullable ProblemInitializerListener getListener() {
         return listener;
     }
 
-    public ProgressMonitor getProgMon() {
+    public @Nullable ProgressMonitor getProgMon() {
         return progMon;
     }
 

@@ -1,5 +1,0 @@
-package java.beans;
-
-public class PropertyChangeSupport implements Serializable {
-    public PropertyChangeSupport(@UnderInitialization(Object.class) Object sourceBean);
-}

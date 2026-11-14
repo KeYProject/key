@@ -9,6 +9,8 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.JTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * What trigger selection found for one clause: the triggers of each literal, and whether
  * elements of several literals combined into a covering multi-trigger.
@@ -22,6 +24,7 @@ import de.uka.ilkd.key.logic.JTerm;
  * @param literals the triggers found per literal, in the order of {@code clause.literals()}
  * @param multiCovered whether a covering multi-trigger was built from the literals' elements
  */
+@NullMarked
 public record ClauseTriggers(ClauseAnalysis clause, List<LiteralTriggers> literals,
         boolean multiCovered) {
 

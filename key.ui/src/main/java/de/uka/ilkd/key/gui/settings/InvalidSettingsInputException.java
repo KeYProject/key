@@ -6,10 +6,13 @@ package de.uka.ilkd.key.gui.settings;
 
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @date 2019-04-11
  */
+@NullMarked
 public class InvalidSettingsInputException extends Exception {
     private static final long serialVersionUID = -7504257775646675899L;
     private final SettingsProvider panel;

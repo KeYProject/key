@@ -77,6 +77,7 @@ abstract class ImmutableSLList<T extends @Nullable Object> implements ImmutableL
 
 
     @Override
+    @SuppressWarnings("NullAway") // foreach var of nullable-bounded T into T-typed parameter
     public ImmutableList<T> append(Iterable<T> collection) {
         ImmutableList<T> tmp = this;
         for (T elem : collection) {
@@ -86,7 +87,8 @@ abstract class ImmutableSLList<T extends @Nullable Object> implements ImmutableL
     }
 
     @Override
-    public ImmutableList<T> prependReverse(Iterable<T> collection) {
+    @SuppressWarnings("NullAway") // NullAway cannot infer nullability of Cons<S> type arguments
+    public ImmutableList<T> prependReverse(Iterable<? extends T> collection) {
         ImmutableSLList<T> tmp = this;
         for (T elem : collection) {
             tmp = new Cons<>(elem, tmp);

@@ -17,10 +17,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -132,7 +134,7 @@ public final class FeatureStatelessnessLintTest {
     }
 
     /** @return a description of the problem, or {@code null} if the field is fine */
-    private static String judge(Field field) {
+    private static @Nullable String judge(Field field) {
         if (!Modifier.isFinal(field.getModifiers())) {
             return "non-final instance field on a shared cost-machinery object: two worker threads "
                 + "evaluating this feature write it at the same time. Move per-evaluation state "
@@ -179,11 +181,21 @@ public final class FeatureStatelessnessLintTest {
         if (!Files.isDirectory(classesRoot)) {
             throw new IllegalStateException("expected a classes directory, got: " + classesRoot);
         }
-        // the strategy machinery lives in key.core and in key.ncore.calculus; scan both class roots
+        // the strategy machinery lives in key.core and in key.ncore.calculus; scan both class
+        // roots. The layout is fixed (key.core/build/classes/java/main), so every parent exists.
         final List<Path> roots = new ArrayList<>();
         roots.add(classesRoot);
-        final Path ncoreCalculus = classesRoot.getParent().getParent().getParent().getParent()
-                .getParent().resolve("key.ncore.calculus/build/classes/java/main");
+        final Path buildDir = Objects.requireNonNull(classesRoot.getParent(),
+            "the java/main classes dir has a parent");
+        final Path moduleDir = Objects.requireNonNull(buildDir.getParent(),
+            "the classes dir has a parent");
+        final Path moduleRoot = Objects.requireNonNull(moduleDir.getParent(),
+            "the build dir has a parent");
+        final Path repoRoot = Objects.requireNonNull(moduleRoot.getParent(),
+            "the module dir has a parent");
+        final Path ncoreCalculus = Objects.requireNonNull(repoRoot.getParent(),
+            "the module root has a parent")
+                .resolve("key.ncore.calculus/build/classes/java/main");
         if (Files.isDirectory(ncoreCalculus)) {
             roots.add(ncoreCalculus);
         }

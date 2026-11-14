@@ -27,6 +27,7 @@ import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.java.transformations.AstFactory.*;
 
@@ -40,6 +41,7 @@ import static de.uka.ilkd.key.java.transformations.AstFactory.*;
  * another implicit method <code>lt;prepare&gt;</code> for setting the fields
  * default values.
  */
+@NullMarked
 public class CreateBuilder extends JavaTransformerAbstract {
 
     public static final String IMPLICIT_CREATE = "$create";

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -17,10 +19,12 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Feature that returns the number of branches after instantiated the quantifier formula.
  */
+@NullMarked
 public class InstantiationCost implements Feature {
 
     final private ProjectionToTerm<Goal> varInst;
@@ -49,7 +53,7 @@ public class InstantiationCost implements Feature {
         final de.uka.ilkd.key.proof.Goal jgoal = (de.uka.ilkd.key.proof.Goal) goal;
         final var instance = varInst.toTerm(app, pos, jgoal, mState);
 
-        return Instantiation.computeCost(instance, formula, goal.sequent(),
-            (Services) goal.proof().getServices(), treatment);
+        return Instantiation.computeCost(Objects.requireNonNull(instance), formula,
+            goal.sequent(), (Services) goal.proof().getServices(), treatment);
     }
 }

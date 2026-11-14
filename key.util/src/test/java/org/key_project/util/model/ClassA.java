@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.model;
 
+import org.jspecify.annotations.Nullable;
+
 @SuppressWarnings({ "unused", "nullness" })
 public class ClassA {
     private final int privateField = 1;
@@ -22,7 +24,7 @@ public class ClassA {
 
     public static boolean staticBooleanField = false;
 
-    public static String staticStringField = null;
+    public static @Nullable String staticStringField = null;
 
     private int getPrivate() {
         return 42;

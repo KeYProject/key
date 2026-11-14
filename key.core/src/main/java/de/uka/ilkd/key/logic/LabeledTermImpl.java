@@ -18,6 +18,9 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * The labeled term class is used for terms that have a label attached.
@@ -34,6 +37,7 @@ import org.key_project.util.java.CollectionUtil;
  * @see JTerm
  * @see TermImpl
  */
+@NullMarked
 public class LabeledTermImpl extends TermImpl {
 
     /**
@@ -92,6 +96,11 @@ public class LabeledTermImpl extends TermImpl {
         return labels;
     }
 
+    /**
+     * Looking up a label by name may legitimately yield no result; the interface declares the
+     * result non-null, so the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     @Override
     public TermLabel getLabel(final Name termLabelName) {
         return CollectionUtil.search(labels,
@@ -116,7 +125,7 @@ public class LabeledTermImpl extends TermImpl {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }

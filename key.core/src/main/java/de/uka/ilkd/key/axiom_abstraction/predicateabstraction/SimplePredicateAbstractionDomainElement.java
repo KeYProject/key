@@ -9,12 +9,16 @@ import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * An abstract domain element for a predicate abstraction lattice encapsulating exactly one
  * abstraction predicate.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class SimplePredicateAbstractionDomainElement
         extends AbstractPredicateAbstractionDomainElement {
 
@@ -64,7 +68,7 @@ public class SimplePredicateAbstractionDomainElement
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         return obj instanceof SimplePredicateAbstractionDomainElement && (this != TOP || obj == TOP)
                 && (this != BOTTOM || obj == BOTTOM) && this.getPredicates()
                         .equals(((SimplePredicateAbstractionDomainElement) obj).getPredicates());

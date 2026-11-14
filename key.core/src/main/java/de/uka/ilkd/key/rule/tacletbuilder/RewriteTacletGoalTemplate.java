@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.BoundVarsVisitor;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
@@ -16,10 +18,14 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * this class inherits from TacletGoalTemplate. It is used if there is a replacewith in the
  * ruleGoals that replaces a term by another term. For a sequent {@link AntecSuccTacletGoalTemplate}
  */
+@NullMarked
 public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
     /** term that replaces another one */
@@ -82,11 +88,12 @@ public class RewriteTacletGoalTemplate extends TacletGoalTemplate {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!super.equals(o)) {
             return false;
         }
-        final RewriteTacletGoalTemplate other = (RewriteTacletGoalTemplate) o;
+        final RewriteTacletGoalTemplate other = (RewriteTacletGoalTemplate) Objects
+                .requireNonNull(o, "super.equals guarantees a non-null argument");
         return replacewith.equals(other.replacewith);
     }
 

@@ -12,17 +12,20 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.ScriptAwareMacro;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.util.KeYConstants;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -50,10 +53,11 @@ public class JmlScriptTest {
             Path projectFile = tmpDir.resolve("project.key");
             createKeYFile(projectFile, identifier.replace(".java", ""));
             KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(projectFile);
+            Proof proof = Objects.requireNonNull(env.getLoadedProof(), "no proof loaded");
             System.out.println(params.settings);
             if (params.settings != null && !params.settings.isEmpty()) {
                 for (Map.Entry<String, String> entry : params.settings.entrySet()) {
-                    env.getLoadedProof().getSettings().getStrategySettings()
+                    proof.getSettings().getStrategySettings()
                             .getActiveStrategyProperties()
                             .setProperty(entry.getKey(), entry.getValue());
                 }
@@ -62,25 +66,25 @@ public class JmlScriptTest {
             var macro = new ScriptAwareMacro();
             macro.applyTo(
                 env.getUi(),
-                env.getLoadedProof(),
-                env.getLoadedProof().openGoals(),
+                proof,
+                proof.openGoals(),
                 null,
                 env.getUi().getProofControl().getDefaultProverTaskListener());
 
             if (SAVE_PROOF) {
                 String filename = tmpDir.resolve("saved.proof").toString();
                 ProofSaver saver =
-                    new ProofSaver(env.getLoadedProof(), filename, KeYConstants.INTERNAL_VERSION);
+                    new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
                 saver.save();
                 LOGGER.info("Saved proof to {}", filename);
             }
 
-            System.out.println(env.getLoadedProof());
+            System.out.println(proof);
 
             if (params.shouldClose) {
-                Assertions.assertTrue(env.getLoadedProof().closed(), "Proof did not close.");
+                Assertions.assertTrue(proof.closed(), "Proof did not close.");
             } else {
-                Assertions.assertFalse(env.getLoadedProof().closed(), "Proof closes unexpectedly.");
+                Assertions.assertFalse(proof.closed(), "Proof closes unexpectedly.");
             }
         } finally {
             // Uncomment the following line to delete the temporary directory after the test
@@ -155,10 +159,10 @@ public class JmlScriptTest {
 
     static class Parameters {
         public boolean shouldClose = true;
-        public String method;
-        public String exception;
+        public @Nullable String method;
+        public @Nullable String exception;
         public boolean deleteTmpDir = true;
-        public Map<String, String> settings;
+        public @Nullable Map<String, String> settings;
 
         @Override
         public String toString() {

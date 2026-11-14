@@ -10,6 +10,8 @@ import com.github.javaparser.ast.stmt.CatchClause;
 import com.github.javaparser.ast.stmt.TryStmt;
 import com.github.javaparser.ast.type.UnionType;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Desugaring of Multi-Catch statements to multiple single catch statements.
 /// ## Transformation Rules (per JLS 14.20)
 /// ### Multi-Catch:
@@ -44,6 +46,7 @@ import com.github.javaparser.ast.type.UnionType;
 /// @author Alexander Weigl
 /// @version 1 (12.07.26)
 /// @see [JLS 14.20](https://docs.oracle.com/javase/specs/jls/se21/html/jls-14.html#jls-14.20)
+@NullMarked
 public class MultiCatchReducer implements JavaTransformer {
     @Override
     public void apply(TypeDeclaration<?> td) {

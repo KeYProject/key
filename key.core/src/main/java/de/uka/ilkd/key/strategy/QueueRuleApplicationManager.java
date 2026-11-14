@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -161,8 +162,10 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         // <code>FocussedRuleApplicationManager</code>) the rule index
         // reports its contents to the rule manager of the goal, which is not
         // necessarily this object
-        goal.ruleAppIndex().reportAutomatedRuleApps(goal.getRuleAppManager(),
-            goal.proof().getServices());
+        final Goal g = Objects.requireNonNull(goal, "no goal set");
+        g.ruleAppIndex().reportAutomatedRuleApps(
+            Objects.requireNonNull(g.getRuleAppManager(), "the goal has no rule app manager"),
+            g.proof().getServices());
     }
 
     /**
@@ -178,7 +181,8 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         }
 
         final long time = PerfScope.start();
-        RuleAppContainer c = RuleAppContainer.createAppContainer(rule, pos, goal);
+        RuleAppContainer c = RuleAppContainer.createAppContainer(rule, pos,
+            Objects.requireNonNull(goal, "no goal set"));
         PerfScope.stop(PERF_CREATE_CONTAINER, time);
 
         ensureQueueExists();
@@ -200,7 +204,8 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
 
         final long time = PerfScope.start();
         final ImmutableList<RuleAppContainer> containers =
-            RuleAppContainer.createAppContainers(rules, pos, goal);
+            RuleAppContainer.createAppContainers(rules, pos,
+                Objects.requireNonNull(goal, "no goal set"));
         PerfScope.stop(PERF_CREATE_CONTAINER, time);
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
@@ -211,7 +216,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     private void addRuleApp(RuleAppContainer rac) {
         final long time = PerfScope.start();
         try {
-            queue = push(rac, queue);
+            queue = push(rac, Objects.requireNonNull(queue, "no rule app queue"));
         } finally {
             PerfScope.stop(PERF_QUEUE_OPS, time);
         }
@@ -270,13 +275,21 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      *         not obsolete and caches the result of this operation to save some time the next time
      *         the method nextAndCache() or next() is called. A call of next() empties the cache
      *         again.
+     *         <p>
+     *         When both queues are exhausted without a completing candidate, {@code null} is
+     *         returned: the rule-app-manager interface (key.ncore.calculus) declares the result
+     *         non-null, but main's protocol uses {@code null} to signal "no more applicable rules"
+     *         (e.g. {@link de.uka.ilkd.key.proof.Goal#hasApplicableRules}), so the return is
+     *         suppressed with a scoped key.
      */
+    @SuppressWarnings("NullAway")
     @Override
     public RuleApp peekNext() {
         final long otime = PerfScope.start();
         try {
             ensureQueueExists();
 
+            final Goal goal = Objects.requireNonNull(this.goal, "no goal set");
             final long currentTime = goal.getTime();
             if (currentTime != nextRuleTime) {
                 clearNextRuleApp();
@@ -297,7 +310,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
                 createFurtherApps(previousMinimum, goal);
             previousMinimum = null;
 
-            computeNextRuleApp(furtherAppsQueue);
+            computeNextRuleApp(furtherAppsQueue, goal);
             return nextRuleApp;
         } finally {
             PerfScope.stop(PERF_PEEK, otime);
@@ -324,7 +337,8 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
      * iteration includes all rule app containers that are contained either in primary or secondary
      * queue.
      */
-    private void computeNextRuleApp(ImmutableHeap<@NonNull RuleAppContainer> furtherAppsQueue) {
+    private void computeNextRuleApp(ImmutableHeap<@NonNull RuleAppContainer> furtherAppsQueue,
+            Goal goal) {
         /*
          * Working list contains rule apps that cannot be completed in the current round but will be
          * reconsidered during the next round.
@@ -335,6 +349,11 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         // match, so it re-expands in this round. This is the round in which an un-parked copy
         // would first see that formula as new (see the comment on the parking field).
         wakeParkedBases();
+
+        // the main queue is set up once a goal is known (see ensureQueueExists); main dereferences
+        // it unconditionally below, so a missing queue is a pre-existing crash
+        ImmutableHeap<@NonNull RuleAppContainer> queue =
+            Objects.requireNonNull(this.queue, "no rule app queue");
 
         /*
          * Try to find a rule app that can be completed until both queues are exhausted.
@@ -441,6 +460,7 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         try {
             queue = queue.insert(workingList.iterator());
             queue = queue.insert(furtherAppsQueue);
+            this.queue = queue;
         } finally {
             PerfScope.stop(PERF_QUEUE_OPS, time);
         }
@@ -469,7 +489,8 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
         if (!woken.isEmpty()) {
             final long time = PerfScope.start();
             try {
-                queue = queue.insert(woken.iterator());
+                queue =
+                    Objects.requireNonNull(queue, "no rule app queue").insert(woken.iterator());
             } finally {
                 PerfScope.stop(PERF_QUEUE_OPS, time);
             }

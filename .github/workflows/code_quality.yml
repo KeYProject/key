@@ -9,7 +9,11 @@ on:
       - 'KeY-*'
 
 jobs:
+  # EISOP (Checker Framework NullnessChecker) hangs during compilation on CI, burning the
+  # full job timeout (~6h). Disabled for now; the operating nullness gate is NullAway
+  # (see the `nullaway` job below). Flip `if: false` -> `if: true` to restore this run.
   checkerFramework:
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -23,6 +27,21 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
       - name: Build with Gradle
         run: ./gradlew -DENABLE_NULLNESS=true compileTestJava
+
+  nullaway:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6.1.0
+        with:
+          java-version: 21
+          distribution: 'corretto'
+          cache: 'gradle'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: Build with Gradle
+        run: ./gradlew -DENABLE_NULLAWAY=true compileTestJava
 
   formatting:
     runs-on: ubuntu-latest

@@ -14,11 +14,12 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Schema variable matching modal operators.
  */
+@NullMarked
 public final class ModalOperatorSV extends JModality.JavaModalityKind
         implements SchemaVariable {
 
@@ -48,7 +49,7 @@ public final class ModalOperatorSV extends JModality.JavaModalityKind
 
 
     @Override
-    public @NonNull String toString() {
+    public String toString() {
         // TODO: HACKS, remove new-line and re-generate taclets.old.txt
         return name() + " ((modal operator))";
     }
@@ -80,17 +81,17 @@ public final class ModalOperatorSV extends JModality.JavaModalityKind
 
     // Operator interface methods (irrelevant for this kind of SV)
     @Override
-    public @NonNull Sort argSort(int i) {
+    public Sort argSort(int i) {
         throw new IndexOutOfBoundsException("A JavaModalityKind does not have arguments.");
     }
 
     @Override
-    public @NonNull ImmutableArray<Sort> argSorts() {
+    public ImmutableArray<Sort> argSorts() {
         return new ImmutableArray<>();
     }
 
     @Override
-    public @NonNull Sort sort() {
+    public Sort sort() {
         throw new UnsupportedOperationException("A JavaModalityKind does not have a sort.");
     }
 
@@ -100,7 +101,7 @@ public final class ModalOperatorSV extends JModality.JavaModalityKind
     }
 
     @Override
-    public @NonNull Sort sort(@NonNull Sort @NonNull [] sorts) {
+    public Sort sort(Sort[] sorts) {
         throw new IndexOutOfBoundsException("A JavaModalityKind does not have a sort.");
     }
 
@@ -110,12 +111,12 @@ public final class ModalOperatorSV extends JModality.JavaModalityKind
     }
 
     @Override
-    public @NonNull Modifier modifier() {
+    public Modifier modifier() {
         return Modifier.NONE;
     }
 
     @Override
-    public boolean hasModifier(@NonNull Modifier mod) {
+    public boolean hasModifier(Modifier mod) {
         return SchemaVariable.super.hasModifier(mod);
     }
 

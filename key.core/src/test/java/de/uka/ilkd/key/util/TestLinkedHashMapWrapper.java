@@ -7,6 +7,7 @@ package de.uka.ilkd.key.util;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
@@ -40,6 +41,9 @@ public class TestLinkedHashMapWrapper {
     private TermFactory tf;
 
     final private TermLabel relevantLabel = ParameterlessTermLabel.UNDEFINED_VALUE_LABEL;
+    // assigned in setIrrelevantLabel() (@BeforeAll) before any test runs; the JUnit lifecycle
+    // assignment is invisible to NullAway's field initialization analysis
+    @SuppressWarnings("NullAway")
     private static TermLabel irrelevantLabel = null;
     final private static OriginTermLabelFactory factory = new OriginTermLabelFactory();
 
@@ -90,14 +94,14 @@ public class TestLinkedHashMapWrapper {
         assertFalse(wrappedMap.containsValue(3));
 
         // remove mapping t1 -> 1
-        int t1Val = wrappedMap.remove(t1);
+        int t1Val = Objects.requireNonNull(wrappedMap.remove(t1), "the mapping must be present");
         assertEquals(1, wrappedMap.size());
         assertFalse(wrappedMap.containsKey(t1));
         assertEquals(1, t1Val);
         assertFalse(wrappedMap.containsValue(1));
 
         // remove mapping t2 -> 2
-        int t2Val = wrappedMap.remove(t2);
+        int t2Val = Objects.requireNonNull(wrappedMap.remove(t2), "the mapping must be present");
         assertEquals(0, wrappedMap.size());
         assertTrue(wrappedMap.isEmpty());
         assertFalse(wrappedMap.containsKey(t2));

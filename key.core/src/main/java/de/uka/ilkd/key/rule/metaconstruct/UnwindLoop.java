@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
@@ -12,6 +14,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a
@@ -41,6 +45,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  */
 @TransformerMeta(name = "#unwindLoop")
+@NullMarked
 public class UnwindLoop extends ProgramTransformer {
 
     /** the outer label that is used to leave the while loop ('l1') */
@@ -80,8 +85,11 @@ public class UnwindLoop extends ProgramTransformer {
         }
 
         final WhileLoopTransformation w = new WhileLoopTransformation(originalLoop,
-            (ProgramElementName) svInst.getInstantiation(outerLabel),
-            (ProgramElementName) svInst.getInstantiation(innerLabel), services);
+            (ProgramElementName) Objects.requireNonNull(svInst.getInstantiation(outerLabel),
+                "no instantiation of " + outerLabel),
+            (ProgramElementName) Objects.requireNonNull(svInst.getInstantiation(innerLabel),
+                "no instantiation of " + innerLabel),
+            services);
         w.start();
         return new ProgramElement[] { w.result() };
     }

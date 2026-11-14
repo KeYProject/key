@@ -9,11 +9,14 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The abstract superclass of caches for taclet app indexes that are separated by different prefixes
  * of bound variables. This class simply stores a <code>IList<QuantifiableVariable></code> and
  * offers a couple of access functions to this list.
  */
+@NullMarked
 abstract class PrefixTermTacletAppIndexCache implements ITermTacletAppIndexCache {
 
     private final ImmutableList<QuantifiableVariable> prefix;

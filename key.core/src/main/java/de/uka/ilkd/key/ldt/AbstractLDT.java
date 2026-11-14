@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.ldt;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
@@ -19,8 +21,11 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public abstract class AbstractLDT implements Named {
     protected final Name name;
 
@@ -37,7 +42,7 @@ public abstract class AbstractLDT implements Named {
     /// adds a function to the LDT
     ///
     /// @return the added function (for convenience reasons)
-    protected final Function addFunction(Function f) {
+    protected final Function addFunction(@UnderInitialization AbstractLDT this, Function f) {
         functions.addSafely(f);
         return f;
     }
@@ -45,7 +50,8 @@ public abstract class AbstractLDT implements Named {
     /// adds a parametric function to the LDT
     ///
     /// @return the added parametric function (for convenience reasons)
-    protected final ParametricFunctionDecl addParametricFunction(ParametricFunctionDecl f) {
+    protected final ParametricFunctionDecl addParametricFunction(
+            @UnderInitialization AbstractLDT this, ParametricFunctionDecl f) {
         parametricFunctions.addSafely(f);
         return f;
     }
@@ -54,7 +60,8 @@ public abstract class AbstractLDT implements Named {
     ///
     /// @param funcName the String with the name of the function to look up
     /// @return the added function (for convenience reasons)
-    protected final <F extends Function> F addFunction(TermServices services, String funcName) {
+    protected final <F extends Function> F addFunction(@UnderInitialization AbstractLDT this,
+            TermServices services, String funcName) {
         final Namespace<Function> funcNS = services.getNamespaces().functions();
         final Function f = funcNS.lookup(new Name(funcName));
         if (f == null) {
@@ -64,12 +71,11 @@ public abstract class AbstractLDT implements Named {
         return (F) addFunction(f);
     }
 
-    protected final ParametricFunctionDecl addParametricFunction(TermServices services,
-            String name) {
-        final ParametricFunctionDecl f =
-            services.getNamespaces().parametricFunctions().lookup(name);
-        assert f != null : "LDT: Parametric function " + name + " not found";
-        return addParametricFunction(f);
+    protected final ParametricFunctionDecl addParametricFunction(
+            @UnderInitialization AbstractLDT this, TermServices services, String name) {
+        return addParametricFunction(Objects.requireNonNull(
+            services.getNamespaces().parametricFunctions().lookup(name),
+            "LDT: Parametric function " + name + " not found"));
     }
 
     /// returns the basic functions of the model
@@ -127,7 +133,7 @@ public abstract class AbstractLDT implements Named {
     ///
     /// @param lit the Literal to be translated
     /// @return the Term that represents the given literal in its logic form
-    public abstract JTerm translateLiteral(Literal lit, Services services);
+    public abstract @Nullable JTerm translateLiteral(Literal lit, Services services);
 
     /// returns the function symbol for the given _Java_ operator.
     ///
@@ -156,5 +162,6 @@ public abstract class AbstractLDT implements Named {
     public abstract boolean hasLiteralFunction(Function f);
 
     /// Is called whenever `hasLiteralFunction()` returns true.
-    public abstract Expression translateTerm(JTerm t, ExtList children, Services services);
+    public abstract @Nullable Expression translateTerm(JTerm t, ExtList children,
+            Services services);
 }

@@ -4,13 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.core;
 
-
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The KeYSelectionListener is notified if the proof or the node the user works with has changed.
  */
+@NullMarked
 public interface KeYSelectionListener {
 
     /**

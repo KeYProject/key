@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -15,10 +17,14 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Instances of this class are immutable
  */
+@NullMarked
 public class BuiltInRuleAppContainer extends RuleAppContainer {
 
     /**
@@ -27,8 +33,8 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * formula, and <code>applicationPosition</code> is the original position for which the rule app
      * was created
      */
-    private final FormulaTag positionTag;
-    private final PosInOccurrence applicationPosition;
+    private final @Nullable FormulaTag positionTag;
+    private final @Nullable PosInOccurrence applicationPosition;
 
     private final IBuiltInRuleApp bir;
 
@@ -39,7 +45,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
     // -------------------------------------------------------------------------
 
     private BuiltInRuleAppContainer(IBuiltInRuleApp bir,
-            PosInOccurrence pio, RuleAppCost cost,
+            @Nullable PosInOccurrence pio, RuleAppCost cost,
             Goal goal) {
         super(bir, cost);
         applicationPosition = pio;
@@ -62,6 +68,11 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         if (applicationPosition == null) {
             return bir.rule().isApplicable(goal, null);
         } else {
+            // the constructor guarantees a non-null position tag for every non-null application
+            // position; declaring the parameter non-null, the tag manager look-up tolerates null
+            // (it would answer "no such formula"), which main relies on only for the impossibility
+            // rejected by the constructor assertion
+            @SuppressWarnings("NullAway") // positionTag is non-null when applicationPosition is not
             final PosInOccurrence topPos =
                 goal.getFormulaTagManager().getPosForTag(positionTag);
             if (topPos == null) {
@@ -78,12 +89,13 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      * Copied from FindTaclet.
      */
     private PosInOccurrence getPosInOccurrence(Goal p_goal) {
-        final PosInOccurrence topPos =
-            p_goal.getFormulaTagManager().getPosForTag(positionTag);
+        final PosInOccurrence topPos = Objects.requireNonNull(
+            p_goal.getFormulaTagManager().getPosForTag(
+                Objects.requireNonNull(positionTag, "no position tag for the formula")),
+            "the formula for the stored position does not exist any more");
 
-        assert topPos != null;
-
-        return applicationPosition.replaceSequentFormula(topPos.sequentFormula());
+        return Objects.requireNonNull(applicationPosition, "no application position")
+                .replaceSequentFormula(topPos.sequentFormula());
     }
 
 
@@ -99,8 +111,12 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      *         <code>TopRuleAppCost</code>.
      */
     static RuleAppContainer createAppContainer(IBuiltInRuleApp bir,
-            PosInOccurrence pio,
+            @Nullable PosInOccurrence pio,
             Goal goal) {
+        // a null position (a rule app without a find section) is legitimately handed to the
+        // strategy's cost computation, which tolerates it; the parameter is still declared @NonNull
+        // there.
+        @SuppressWarnings("NullAway")
         final RuleAppCost cost =
             withAge(goal.getGoalStrategy().computeCost(bir, pio, goal), goal);
         return new BuiltInRuleAppContainer(bir, pio, cost, goal);
@@ -113,7 +129,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
      *         <code>TopRuleAppCost</code>.
      */
     static ImmutableList<RuleAppContainer> createInitialAppContainers(
-            ImmutableList<IBuiltInRuleApp> birs, PosInOccurrence pio,
+            ImmutableList<IBuiltInRuleApp> birs, @Nullable PosInOccurrence pio,
             Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableList.nil();
 
@@ -143,7 +159,7 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 
 
     @Override
-    public RuleApp completeRuleApp(Goal goal) {
+    public @Nullable RuleApp completeRuleApp(Goal goal) {
         if (!isStillApplicable(goal)) {
             return null;
         }

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -37,7 +39,9 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
         implements Strategy<Goal> {
 
@@ -85,11 +89,8 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
     protected RuleSet getHeuristic(String p_name) {
         final NamespaceSet nss = getProof().getNamespaces();
         final Namespace<@NonNull RuleSet> ns = nss.ruleSets();
-        final RuleSet h = ns.lookup(new Name(p_name));
-
-        assert h != null : "Did not find the rule set " + p_name;
-
-        return h;
+        return Objects.requireNonNull(ns.lookup(new Name(p_name)),
+            "Did not find the rule set " + p_name);
     }
 
     protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, Feature f) {
@@ -122,10 +123,12 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection
             Goal goal,
             RuleAppCostCollector collector) {
         final MutableState mState = new MutableState();
-        final BackTrackingManager btManager = mState.getBacktrackingManager();
+        final BackTrackingManager btManager = Objects.requireNonNull(
+            mState.getBacktrackingManager(), "no backtracking manager");
         btManager.setup(app);
         do {
-            final RuleAppCost cost = instantiateApp(app, pio, goal, mState);
+            final RuleAppCost cost = Objects.requireNonNull(instantiateApp(app, pio, goal, mState),
+                "no rule app cost computed");
             if (cost instanceof TopRuleAppCost) {
                 continue;
             }

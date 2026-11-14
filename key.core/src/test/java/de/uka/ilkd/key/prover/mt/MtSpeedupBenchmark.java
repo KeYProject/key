@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -76,7 +78,8 @@ public class MtSpeedupBenchmark {
      * corpus
      * order. {@link #run} restores this snapshot before every load.
      */
-    private static String settingsBaseline;
+    // captured by benchmark() before any proof is loaded; null if the test never ran
+    private static @Nullable String settingsBaseline;
 
     @Test
     void benchmark() throws Exception {
@@ -166,7 +169,8 @@ public class MtSpeedupBenchmark {
             System.setProperty(ParallelProver.PARALLEL_PROPERTY, "false");
         }
         try {
-            Proof proof = env.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
             // Optional step-budget override: some proofs need more rule applications than the

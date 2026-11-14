@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -30,6 +31,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,7 @@ import static de.uka.ilkd.key.nparser.ParsingFacade.parseFiles;
  * @author Alexander Weigl
  * @version 1 (17.10.19)
  */
+@NullMarked
 public class KeyIO {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyIO.class);
 
@@ -53,7 +56,7 @@ public class KeyIO {
     private final NamespaceSet nss;
     private @Nullable Namespace<SchemaVariable> schemaNamespace;
     private List<BuildingIssue> warnings = new LinkedList<>();
-    private AbbrevMap abbrevMap;
+    private @Nullable AbbrevMap abbrevMap;
 
 
     public KeyIO(@NonNull Services services, @NonNull NamespaceSet nss) {
@@ -95,7 +98,9 @@ public class KeyIO {
 
     private JTerm interpretExpression(KeyAst.Term ctx) {
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
-        visitor.setAbbrevMap(abbrevMap);
+        if (abbrevMap != null) {
+            visitor.setAbbrevMap(abbrevMap);
+        }
         if (schemaNamespace != null) {
             visitor.setSchemaVariables(schemaNamespace);
         }
@@ -115,7 +120,9 @@ public class KeyIO {
     public @NonNull Sequent parseSequent(@NonNull CharStream stream) {
         KeyAst.Seq ctx = ParsingFacade.parseSequent(stream);
         ExpressionBuilder visitor = new ExpressionBuilder(services, nss);
-        visitor.setAbbrevMap(abbrevMap);
+        if (abbrevMap != null) {
+            visitor.setAbbrevMap(abbrevMap);
+        }
         if (schemaNamespace != null) {
             visitor.setSchemaVariables(schemaNamespace);
         }
@@ -208,7 +215,7 @@ public class KeyIO {
         this.abbrevMap = abbrevMap;
     }
 
-    public AbbrevMap getAbbrevMap() {
+    public @Nullable AbbrevMap getAbbrevMap() {
         return abbrevMap;
     }
 
@@ -229,21 +236,21 @@ public class KeyIO {
      * Little sister of {@link ProblemInitializer}.
      */
     public class Loader {
-        private final URL resource;
-        private final CharStream content;
+        private final @Nullable URL resource;
+        private final @Nullable CharStream content;
         private List<KeyAst.File> ctx = new LinkedList<>();
-        private Namespace<SchemaVariable> schemaNamespace;
+        private @Nullable Namespace<SchemaVariable> schemaNamespace;
 
         Loader(URL resource) {
             this(null, resource);
         }
 
-        Loader(CharStream content, URL url) {
+        Loader(@Nullable CharStream content, @Nullable URL url) {
             resource = url;
             this.content = content;
         }
 
-        public Namespace<SchemaVariable> getSchemaNamespace() {
+        public @Nullable Namespace<SchemaVariable> getSchemaNamespace() {
             return schemaNamespace;
         }
 
@@ -281,7 +288,9 @@ public class KeyIO {
             if (resource != null) {
                 ctx = parseFiles(resource);
             } else {
-                KeyAst.File c = ParsingFacade.parseFile(content);
+                CharStream in =
+                    Objects.requireNonNull(content, "content stream must not be null");
+                KeyAst.File c = ParsingFacade.parseFile(in);
                 ctx.add(c);
             }
             long stop = System.currentTimeMillis();
@@ -360,7 +369,7 @@ public class KeyIO {
             return taclets;
         }
 
-        public JTerm getProblem() {
+        public @Nullable JTerm getProblem() {
             // TODO weigl tbd
             return null;
         }

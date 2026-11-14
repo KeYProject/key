@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -95,9 +96,8 @@ public class ParserMessageTest {
             exception = e;
         }
 
-        location = ExceptionTools.getLocation(exception);
-
-        assertNotNull(location, "Cannot recover error location from Exception: " + exception);
+        location = Objects.requireNonNull(ExceptionTools.getLocation(exception),
+            "Cannot recover error location from Exception: " + exception);
 
         assertNotNull(location.getFileURI().orElse(null),
             "Couldn't recreate file URL from received exception.");
@@ -114,11 +114,13 @@ public class ParserMessageTest {
             "First line of file " + javaFile + " must start with \"//MSG *regexp*\", "
                 + "to specify a regular expression for the " + "expected parser message.");
         String parserMessageRegExp = firstLine.substring(6);
+        String message =
+            Objects.requireNonNull(exception.getMessage(), "the exception has a message");
 
-        assertTrue(exception.getMessage().matches(parserMessageRegExp),
+        assertTrue(message.matches(parserMessageRegExp),
             "Message of ProblemLoaderException doesn't match regular expression, "
                 + "that was specified in file " + javaFile + "\nRequested regular expression: "
-                + parserMessageRegExp + "\nRetrieved exception message: " + exception.getMessage());
+                + parserMessageRegExp + "\nRetrieved exception message: " + message);
     }
 
     @Test

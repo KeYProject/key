@@ -20,12 +20,21 @@ import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class UrlRuleSource extends RuleSource {
 
     private final URL url;
     private final long numberOfBytes;
 
+    /**
+     * The byte-count helpers operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because both helpers only stream
+     * the {@link #url} assigned just above and never read instance state, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     UrlRuleSource(final URL url) {
         this.url = url;
         if ("file".equals(url.getProtocol())) {

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.prover.proof.ProofGoal;
@@ -17,12 +19,14 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
  * Binary feature that returns zero iff the find-formula of the concerned rule app was introduced by
  * a certain kind rule of rule (described via a <code>RuleFilter</code>)
  */
+@NullMarked
 public class FormulaAddedByRuleFeature extends BinaryFeature {
 
     private final RuleFilter filter;
@@ -46,11 +50,11 @@ public class FormulaAddedByRuleFeature extends BinaryFeature {
         Node node = ((de.uka.ilkd.key.proof.Goal) goal).node();
 
         while (!node.root()) {
-            final Node par = node.parent();
+            final Node par = Objects.requireNonNull(node.parent());
             final Sequent pseq = par.sequent();
 
             if (!(antec ? pseq.antecedent() : pseq.succedent()).contains(cfma)) {
-                return filter.filter(par.getAppliedRuleApp().rule());
+                return filter.filter(Objects.requireNonNull(par.getAppliedRuleApp()).rule());
             }
 
             node = par;

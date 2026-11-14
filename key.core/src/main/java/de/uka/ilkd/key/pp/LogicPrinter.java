@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.pp;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
@@ -44,6 +45,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +67,7 @@ import static de.uka.ilkd.key.pp.PosTableLayouter.DEFAULT_LINE_WIDTH;
  * @see Notation
  * @see de.uka.ilkd.key.util.pp.Layouter
  */
+@NullMarked
 public class LogicPrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogicPrinter.class);
 
@@ -75,7 +79,7 @@ public class LogicPrinter {
     /**
      * the services object
      */
-    protected final Services services;
+    protected final @Nullable Services services;
 
     /**
      * This chooses the layout.
@@ -105,8 +109,16 @@ public class LogicPrinter {
      * @param notationInfo the NotationInfo for the concrete syntax
      * @param services services.
      * @param layouter the layouter to use
+     *        <p>
+     *        The field printers are only reached when JavaDL field terms are printed, which
+     *        requires services. In the services-less mode (e.g. contract rendering in {@link
+     *        de.uka.ilkd.key.speclang.FunctionalOperationContractImpl}) they are never invoked; the
+     *        (nullable) services are therefore passed on deliberately and the argument errors are
+     *        suppressed with a scoped key.
      */
-    public LogicPrinter(NotationInfo notationInfo, Services services, PosTableLayouter layouter) {
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    public LogicPrinter(NotationInfo notationInfo, @Nullable Services services,
+            PosTableLayouter layouter) {
         this.notationInfo = notationInfo;
         this.services = services;
         if (services != null) {
@@ -122,9 +134,10 @@ public class LogicPrinter {
      * Creates a LogicPrinter that does not create a position table.
      *
      * @param notationInfo the NotationInfo for the concrete syntax
-     * @param services The Services object
+     * @param services the Services object, or {@code null} for syntax-only printing
+     *        (delegates to the nullable-services constructor)
      */
-    public static LogicPrinter purePrinter(NotationInfo notationInfo, Services services) {
+    public static LogicPrinter purePrinter(NotationInfo notationInfo, @Nullable Services services) {
         return new LogicPrinter(notationInfo, services, PosTableLayouter.pure());
     }
 
@@ -135,7 +148,19 @@ public class LogicPrinter {
         return layouter;
     }
 
-    public static SequentViewLogicPrinter quickPrinter(Services services,
+    /**
+     * Creates a printer without a position table, optionally used without services.
+     *
+     * @param services services or {@code null} for syntax-only printing.
+     *        <p>
+     *        Printing JavaDL field terms requires services; without them the printer still handles
+     *        the remaining syntax (e.g. contract rendering in {@link
+     *        de.uka.ilkd.key.speclang.FunctionalOperationContractImpl}). The possibly null services
+     *        are forwarded to the {@link SequentViewLogicPrinter} factory, whose argument error is
+     *        suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    public static SequentViewLogicPrinter quickPrinter(@Nullable Services services,
             boolean usePrettyPrinting, boolean useUnicodeSymbols,
             boolean hidePackagePrefix) {
         final NotationInfo ni = new NotationInfo();
@@ -153,10 +178,10 @@ public class LogicPrinter {
      * Converts a term to a string.
      *
      * @param t a term.
-     * @param services services.
+     * @param services services (may be null for degraded printing).
      * @return the printed term.
      */
-    public static String quickPrintTerm(JTerm t, Services services) {
+    public static String quickPrintTerm(JTerm t, @Nullable Services services) {
         return quickPrintTerm(t, services, NotationInfo.DEFAULT_PRETTY_SYNTAX,
             NotationInfo.DEFAULT_UNICODE_ENABLED, NotationInfo.DEFAULT_HIDE_PACKAGE_PREFIX);
     }
@@ -196,14 +221,14 @@ public class LogicPrinter {
      * Converts a term to a string.
      *
      * @param t a term.
-     * @param services services.
+     * @param services services (may be null for degraded printing).
      * @param usePrettyPrinting whether to use pretty-printing.
      * @param useUnicodeSymbols whether to use unicode symbols.
      * @param hidePackagePrefix
      * @return the printed term.
      */
-    public static String quickPrintTerm(JTerm t, Services services, boolean usePrettyPrinting,
-            boolean useUnicodeSymbols, boolean hidePackagePrefix) {
+    public static String quickPrintTerm(JTerm t, @Nullable Services services,
+            boolean usePrettyPrinting, boolean useUnicodeSymbols, boolean hidePackagePrefix) {
         var p = quickPrinter(services, usePrettyPrinting, useUnicodeSymbols, hidePackagePrefix);
         p.layouter().beginC();
         p.printTerm(t);
@@ -276,7 +301,7 @@ public class LogicPrinter {
      * @param lineWidth the max. number of character to put on one line (the actual taken linewidth
      *        is the max of {@link PosTableLayouter#DEFAULT_LINE_WIDTH} and the given value
      */
-    public void update(SequentPrintFilter filter, int lineWidth) {
+    public void update(@Nullable SequentPrintFilter filter, int lineWidth) {
         setLineWidth(lineWidth);
         reset();
         if (filter != null) {
@@ -299,7 +324,12 @@ public class LogicPrinter {
      * @param showWholeTaclet Should the find, varcond and heuristic part be pretty-printed?
      * @param declareSchemaVars Should declarations for the schema variables used in the taclet be
      *        pretty-printed?
+     *        <p>
+     *        The notation for a schema variable is guaranteed to be present for every registered
+     *        schema variable type; the dereference of the (nullable) notation is suppressed with a
+     *        scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void printTaclet(org.key_project.prover.rules.Taclet taclet, SVInstantiations sv,
             boolean showWholeTaclet,
             boolean declareSchemaVars) {
@@ -363,7 +393,7 @@ public class LogicPrinter {
         printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, true, true);
     }
 
-    protected HeapLDT getHeapLDT() {
+    protected @Nullable HeapLDT getHeapLDT() {
         return services == null ? null : services.getTypeConverter().getHeapLDT();
     }
 
@@ -382,6 +412,15 @@ public class LogicPrinter {
         layouter.print("" + '\"').end();
     }
 
+    /**
+     * Prints the rewrite attributes of the given rewrite taclet.
+     *
+     * @param taclet The taclet whose rewrite attributes are printed.
+     *        <p>
+     *        The application restriction of a rewrite taclet is always set; the dereference of the
+     *        (nullable) restriction is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected void printRewriteAttributes(RewriteTaclet taclet) {
         final var applicationRestriction = taclet.applicationRestriction();
         layouter.nl().print(applicationRestriction.toString());
@@ -452,6 +491,15 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
+    /**
+     * Prints the type-guard varcond of the given new-varcond declaration.
+     *
+     * @param p_sv The schema variable whose declared type is printed.
+     *        <p>
+     *        A schema variable that is defined by type has a type attached; the dereference of the
+     *        (nullable) type is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected void printNewVarcond(NewVarcond p_sv) {
         de.uka.ilkd.key.rule.NewVarcond sv = (de.uka.ilkd.key.rule.NewVarcond) p_sv;
         layouter.beginC();
@@ -466,7 +514,8 @@ public class LogicPrinter {
             }
         } else {
             layouter.print("\\typeof(").brk(0);
-            printSchemaVariable(sv.getPeerSchemaVariable());
+            // in this branch the varcond is not defined by type, so the peer variable is present
+            printSchemaVariable(Objects.requireNonNull(sv.getPeerSchemaVariable()));
             layouter.brk(0, -2).print(")").brk(0);
         }
         layouter.brk(0, -2).print(")").end();
@@ -503,6 +552,15 @@ public class LogicPrinter {
         layouter.print(sv.name().toString());
     }
 
+    /**
+     * Prints the trigger of the given taclet.
+     *
+     * @param taclet The taclet whose trigger is printed.
+     *        <p>
+     *        {@code hasTrigger()} guarantees that the trigger is present; the dereference of the
+     *        (nullable) trigger is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected void printTriggers(Taclet taclet) {
         if (!taclet.hasTrigger()) {
             return;
@@ -547,7 +605,7 @@ public class LogicPrinter {
         layouter.brk(0, -2).print(")").end();
     }
 
-    protected void printTextSequent(Sequent seq, String text) {
+    protected void printTextSequent(@Nullable Sequent seq, String text) {
         layouter.nl();
 
         layouter.beginC().print(text).print("(").brk(0);
@@ -574,10 +632,11 @@ public class LogicPrinter {
     }
 
     protected void printGoalTemplate(TacletGoalTemplate tgt) {
+        final var name = tgt.name();
         // layouter.beginC(0);
-        if (tgt.name() != null) {
-            if (!tgt.name().isEmpty()) {
-                layouter.nl().beginC().print("\"" + tgt.name() + "\"").print(":");
+        if (name != null) {
+            if (!name.isEmpty()) {
+                layouter.nl().beginC().print("\"" + name + "\"").print(":");
             }
 
         }
@@ -599,8 +658,8 @@ public class LogicPrinter {
             printAddProgVars(tgt.addedProgVars());
         }
 
-        if (tgt.name() != null) {
-            if (!tgt.name().isEmpty()) {
+        if (name != null) {
+            if (!name.isEmpty()) {
                 layouter.end();
             }
         }
@@ -708,7 +767,12 @@ public class LogicPrinter {
      * the Sequent.
      *
      * @param filter The SequentPrintFilter for seq
+     *        <p>
+     *        The filtered antecedent and succedent of a sequent print filter are always present;
+     *        the
+     *        dereferences of the (nullable) filtrate lists are suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void printFilteredSequent(SequentPrintFilter filter) {
         try {
             ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
@@ -844,7 +908,8 @@ public class LogicPrinter {
         layouter.beginC();
         if (notationInfo.getAbbrevMap().isEnabled(t)) {
             layouter.startTerm(0);
-            layouter.print(notationInfo.getAbbrevMap().getAbbrev(t));
+            // an enabled abbreviation is by construction registered in the map
+            layouter.print(Objects.requireNonNull(notationInfo.getAbbrevMap().getAbbrev(t)));
         } else {
             // printTerm is the central recursive method (called once per subterm), so the
             // notation and the visible-label set are looked up once here instead of up to three
@@ -884,10 +949,30 @@ public class LogicPrinter {
         return t.getLabels();
     }
 
+    /**
+     * Prints the term labels of the given term as a bracketed list.
+     *
+     * @param t The term whose labels are printed.
+     *        <p>
+     *        The notation table is fully populated when printing; the dereference of the (nullable)
+     *        notation is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void printLabels(JTerm t) {
         notationInfo.getNotation(TermLabel.class).print(t, this);
     }
 
+    /**
+     * Prints the term labels of the given term between the given delimiters.
+     *
+     * @param t The term whose labels are printed.
+     * @param left The opening delimiter.
+     * @param right The closing delimiter.
+     *        <p>
+     *        The number of term-label children of a label matches its declared child count; the
+     *        dereference of a (nullable) label child is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     void printLabels(JTerm t, String left, String right) {
 
         ImmutableArray<TermLabel> termLabelList = getVisibleTermLabels(t);
@@ -980,17 +1065,18 @@ public class LogicPrinter {
      */
     public void printFunctionTerm(JTerm t) {
         boolean isKeyword = false;
-        if (services != null) {
+        final HeapLDT heapLDT = getHeapLDT();
+        if (services != null && heapLDT != null) {
             Function measuredByEmpty = services.getTermBuilder().getMeasuredByEmpty();
             BooleanLDT bool = services.getTypeConverter().getBooleanLDT();
             IntegerLDT integer = services.getTypeConverter().getIntegerLDT();
 
-            isKeyword = (t.op() == getHeapLDT().getWellFormed() || t.op() == measuredByEmpty
+            isKeyword = (t.op() == heapLDT.getWellFormed() || t.op() == measuredByEmpty
                     || t.op() == bool.getFalseConst() || t.op() == bool.getTrueConst()
                     || t.op() == integer.getBsum());
         }
-        if (notationInfo.isPrettySyntax() && services != null
-                && FieldPrinter.isJavaFieldConstant(t, getHeapLDT(), services)
+        if (notationInfo.isPrettySyntax() && services != null && heapLDT != null
+                && FieldPrinter.isJavaFieldConstant(t, heapLDT, services)
                 && getNotationInfo().isHidePackagePrefix()) {
             // Hide package prefix when printing field constants.
             layouter.startTerm(0);
@@ -1118,11 +1204,11 @@ public class LogicPrinter {
             } else {
                 layouter.beginC(0);
             }
-            if (t.op() == getHeapLDT().getCreated()) {
+            if (t.op() == heapLDT.getCreated()) {
                 layouter.markStartKeyword();
             }
             layouter.print("[" + opName + "(").beginC(0);
-            if (t.op() == getHeapLDT().getCreated()) {
+            if (t.op() == heapLDT.getCreated()) {
                 layouter.markEndKeyword();
             }
             for (int i = 1; i < t.arity(); i++) {
@@ -1169,7 +1255,7 @@ public class LogicPrinter {
     /*
      * Print a term of the form: T::select(heap, object, field).
      */
-    public void printSelect(JTerm t, JTerm tacitHeap) {
+    public void printSelect(JTerm t, @Nullable JTerm tacitHeap) {
         selectPrinter.printSelect(this, t, tacitHeap);
     }
 
@@ -1223,7 +1309,18 @@ public class LogicPrinter {
         }
     }
 
-    public void printObserver(JTerm t, JTerm tacitHeap) {
+    /**
+     * Pretty-prints an observer term.
+     *
+     * @param t The observer term to print.
+     * @param tacitHeap The tacit heap to print with, or {@code null} for implicit heaps.
+     *        <p>
+     *        The fancy notation is only selected when the heap LDT and the services are present;
+     *        the
+     *        dereferences inside the fancy branch are suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
+    public void printObserver(JTerm t, @Nullable JTerm tacitHeap) {
         assert t.op() instanceof IObserverFunction;
         assert t.boundVars().isEmpty();
 
@@ -1236,7 +1333,8 @@ public class LogicPrinter {
         if (notationInfo.isPrettySyntax() && heapLDT != null) {
 
             Sort heapSort = heapLDT.targetSort();
-            int numHeaps = obs.getHeapCount(services);
+            // the heap LDT is only available when services are set, which this branch requires
+            int numHeaps = obs.getHeapCount(Objects.requireNonNull(services));
             int stateCount = obs.getStateCount();
             int totalHeaps = stateCount * numHeaps;
 
@@ -1291,10 +1389,12 @@ public class LogicPrinter {
                             final KeYJavaType keYJavaType =
                                 services.getJavaInfo().getKeYJavaType(object.sort());
                             canonical =
+                                // the receiver type is always present for the term being printed;
+                                // a missing type surfaces as an NPE caught below anyway
                                 obs.isStatic() || ((obs instanceof IProgramMethod)
                                         && services.getJavaInfo()
                                                 .isCanonicalProgramMethod((IProgramMethod) obs,
-                                                    keYJavaType));
+                                                    Objects.requireNonNull(keYJavaType)));
                         }
                         if (canonical) {
                             p = symbolName;
@@ -1406,7 +1506,7 @@ public class LogicPrinter {
         layouter.markEndSub();
     }
 
-    public void printElementOf(JTerm t, String symbol) {
+    public void printElementOf(JTerm t, @Nullable String symbol) {
         if (symbol == null) {
             printElementOf(t);
             return;
@@ -1619,8 +1719,9 @@ public class LogicPrinter {
                 }
                 if (services != null && notationInfo.getAbbrevMap()
                         .containsTerm(services.getTermFactory().createTerm(v))) {
-                    layouter.print(notationInfo.getAbbrevMap()
-                            .getAbbrev(services.getTermFactory().createTerm(v)));
+                    // containsTerm returned true, so the abbreviation is present
+                    layouter.print(Objects.requireNonNull(notationInfo.getAbbrevMap()
+                            .getAbbrev(services.getTermFactory().createTerm(v))));
                 } else {
                     layouter.print(v.name().toString());
                 }
@@ -1746,9 +1847,10 @@ public class LogicPrinter {
     public void printConstant(JTerm t, String s) {
         layouter.startTerm(0);
         boolean isKeyword = false;
-        if (getHeapLDT() != null) {
+        final HeapLDT heapLDT = getHeapLDT();
+        if (heapLDT != null) {
             isKeyword = (t.op() == Junctor.FALSE || t.op() == Junctor.TRUE
-                    || t.op() == getHeapLDT().getCreated());
+                    || t.op() == heapLDT.getCreated());
         }
         if (isKeyword) {
             layouter.markStartKeyword();
@@ -1776,8 +1878,11 @@ public class LogicPrinter {
      * where <code>psi = phi.sub(0)</code>. No line breaks are inserted, as the program itself is
      * always broken. In case of a program modality with arity greater than 1, the subformulae are
      * listed between parens, like <code>&lt;Program&gt;(psi1,psi2)</code>
+     * <p>
+     * The services are present whenever a term is printed; the dereference of the (nullable)
+     * services field is suppressed with a scoped key.
      */
-
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void printModalityTerm(String left, JavaBlock jb, String right, JTerm phi, int ass) {
         assert jb != null;
         assert jb.program() != null;
@@ -1786,7 +1891,9 @@ public class LogicPrinter {
             if (o instanceof JModality.JavaModalityKind kind) {
                 if (notationInfo.getAbbrevMap().isEnabled(phi)) {
                     layouter.startTerm(0);
-                    layouter.print(notationInfo.getAbbrevMap().getAbbrev(phi));
+                    // an enabled abbreviation is by construction registered in the map
+                    layouter.print(Objects.requireNonNull(
+                        notationInfo.getAbbrevMap().getAbbrev(phi)));
                 } else {
                     JTerm[] ta = new JTerm[phi.arity()];
                     for (int i = 0; i < phi.arity(); i++) {
@@ -1794,8 +1901,9 @@ public class LogicPrinter {
                     }
                     final JModality m =
                         JModality.getModality((JModality.JavaModalityKind) o, mod.programBlock());
+                    // TermFactory treats an empty label list exactly like none (null)
                     final JTerm term = services.getTermFactory().createTerm(m, ta,
-                        phi.boundVars(), null);
+                        phi.boundVars(), new ImmutableArray<TermLabel>());
                     notationInfo.getNotation(m).print(term, this);
                     return;
                 }
@@ -1850,8 +1958,9 @@ public class LogicPrinter {
      */
     protected void maybeParens(JTerm t, int ass) {
         if (t.op() instanceof SchemaVariable && instantiations != null
-                && instantiations.getInstantiation((SchemaVariable) t.op()) instanceof JTerm) {
-            t = instantiations.getInstantiation((SchemaVariable) t.op());
+                && instantiations.getInstantiation((SchemaVariable) t.op()) instanceof JTerm jt) {
+            // reuse the instantiation checked above instead of a second (nullable) map lookup
+            t = jt;
         }
 
         if (notationInfo.getNotation(t.op()).getPriority() < ass) {
@@ -1909,6 +2018,7 @@ public class LogicPrinter {
      * @return true if the attribute is uniquely determined
      */
     public boolean printInShortForm(String programName, Sort sort) {
+        // the static variant tolerates null services and reports "not in short form" then
         return printInShortForm(programName, sort, services);
     }
 
@@ -1951,15 +2061,19 @@ public class LogicPrinter {
      *
      * @param programName the String denoting the program name of the attribute
      * @param sort the ObjectSort specifying the hierarchy where to test for uniqueness
-     * @param services the Services class used to access the type hierarchy
+     * @param services the Services class used to access the type hierarchy, or {@code null} (in
+     *        which case {@code false} is returned)
      * @return true if the attribute is uniquely determined
      */
-    public static boolean printInShortForm(String programName, Sort sort, Services services) {
+    public static boolean printInShortForm(String programName, Sort sort,
+            @Nullable Services services) {
         if (!(services != null && sort.extendsTrans(services.getJavaInfo().objectSort()))) {
             return false;
         }
         final KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
         assert kjt != null : "Did not find KeYJavaType for " + sort;
-        return services.getJavaInfo().getAllAttributes(programName, kjt).size() == 1;
+        // the assert above documents that every reachable object sort has a KeYJavaType
+        return services.getJavaInfo().getAllAttributes(programName, Objects.requireNonNull(kjt))
+                .size() == 1;
     }
 }

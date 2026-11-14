@@ -8,9 +8,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -21,6 +23,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.TacletForTests;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -33,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class TestJP2KeY {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestJP2KeY.class);
-    private static JavaService c2k;
+    private static @Nullable JavaService c2k;
 
     // some nonsense java blocks with lots of statements and expressions
     private static final String[] JAVA_BLOCKS = new String[] {
@@ -129,9 +132,12 @@ public class TestJP2KeY {
 
     @Test
     public void testReadBlockWithContext() {
+        Objects.requireNonNull(c2k, "initialized in @BeforeEach setUp()");
+        final KeYJavaType intType = Objects.requireNonNull(
+            TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT),
+            "the primitive type int must be known");
         IProgramVariable pv = new LocationVariable(new ProgramElementName("i"),
-            new TypeRef(
-                TacletForTests.services().getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT)));
+            new TypeRef(intType));
         var list = Collections.singletonList(pv);
         JavaBlock block = c2k.readBlock("{ i = 2; }", c2k.createContext(list), null);
         ProgramVariable prgVarCmp =
@@ -146,6 +152,7 @@ public class TestJP2KeY {
     @TestFactory
     public Stream<DynamicTest> testJBlocks() {
         return Arrays.stream(JAVA_BLOCKS).map(it -> DynamicTest.dynamicTest(it, () -> {
+            Objects.requireNonNull(c2k, "initialized in @BeforeEach setUp()");
             String keyProg = removeBlanks(c2k.readBlockWithEmptyContext(it, null).toString());
             String recoderProg =
                 removeBlanks(c2k.parseBlock(it, c2k.createEmptyContext()).toString());
@@ -154,6 +161,7 @@ public class TestJP2KeY {
     }
 
     private void testClass(String is) {
+        Objects.requireNonNull(c2k, "initialized in @BeforeEach setUp()");
         try {
             c2k.readCompilationUnit(is);
         } catch (RuntimeException e) {

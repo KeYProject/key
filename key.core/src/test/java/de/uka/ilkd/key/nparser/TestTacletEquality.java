@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -24,6 +25,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
@@ -89,13 +91,14 @@ public class TestTacletEquality {
         return seq.build();
     }
 
-    private static InitConfig initConfig;
+    private static @Nullable InitConfig initConfig;
 
     @BeforeAll
     static void setUp() throws Exception {
         Path file = HelperClassForTests.TESTCASE_DIRECTORY.resolve("merge/gcd.closed.proof");
         if (initConfig == null) {
             ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
+            @SuppressWarnings("NullAway") // unused loader options; null was always passed here
             SingleThreadProblemLoader loader =
                 new SingleThreadProblemLoader(file, null, null, null,
                     JavaProfile.getDefaultInstance(), true, control, false, null);
@@ -109,7 +112,8 @@ public class TestTacletEquality {
     @SuppressWarnings("unused")
     public static void createNewOracle() {
         var path = Paths.get("src/test/resources/de/uka/ilkd/key/nparser/taclets.new.txt");
-        var taclets = new ArrayList<>(initConfig.activatedTaclets());
+        InitConfig cfg = Objects.requireNonNull(initConfig, "setUp() must have been executed");
+        var taclets = new ArrayList<>(cfg.activatedTaclets());
         // sort by name
         taclets.sort(Comparator.comparing(it -> it.name().toString()));
 
@@ -152,9 +156,10 @@ public class TestTacletEquality {
 
     final HashMap<String, Taclet> cache = new HashMap<>();
 
-    private Taclet findTaclet(String name) {
+    private @Nullable Taclet findTaclet(String name) {
         if (cache.isEmpty()) {
-            for (Taclet taclet : initConfig.activatedTaclets()) {
+            InitConfig cfg = Objects.requireNonNull(initConfig, "setUp() must have been executed");
+            for (Taclet taclet : cfg.activatedTaclets()) {
                 cache.put(taclet.name().toString(), taclet);
             }
         }

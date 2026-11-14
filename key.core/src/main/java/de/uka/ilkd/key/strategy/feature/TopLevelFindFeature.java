@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -14,11 +16,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Feature for investigating whether the focus of a rule application is a top-level formula, a
  * top-level formula of the antecedent or a top-level formula of the succedent. The {@code …_UPDATE}
  * variants also accept a focus that sits below a prefix of update applications only.
  */
+@NullMarked
 @StableCost
 public final class TopLevelFindFeature extends BinaryTacletAppFeature {
 
@@ -71,7 +76,7 @@ public final class TopLevelFindFeature extends BinaryTacletAppFeature {
         // ALLOW: accept iff everything above the focus is an update application
         final PIOPathIterator it = pos.iterator();
         while (it.next() != -1) {
-            if (!(it.getSubTerm().op() instanceof UpdateApplication)) {
+            if (!(Objects.requireNonNull(it.getSubTerm()).op() instanceof UpdateApplication)) {
                 return false;
             }
         }

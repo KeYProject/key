@@ -9,10 +9,12 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class contains the standard rules provided by a profile.
  */
+@NullMarked
 public record RuleCollection(ImmutableList<RuleSource> standardTaclets,
         ImmutableList<BuiltInRule> standardBuiltInRules) {
 

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.proof.Goal;
@@ -20,8 +21,10 @@ import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import org.key_project.logic.Name;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /// Creates a [ModularJavaDLStrategy] and handles strategy settings relevant to it.
+@NullMarked
 public class ModularJavaDLStrategyFactory implements StrategyFactory {
     private final List<StrategyFactory> componentFactories =
         Arrays.asList(new JFOLStrategyFactory(),
@@ -147,7 +150,8 @@ public class ModularJavaDLStrategyFactory implements StrategyFactory {
         final OneOfStrategyPropertyDefinition userOptions = getUserOptions();
 
         List<AbstractStrategyPropertyDefinition> componentSettings = componentFactories.stream()
-                .flatMap(f -> f.getSettingsDefinition().getProperties().stream())
+                .flatMap(f -> Objects.requireNonNull(f.getSettingsDefinition())
+                        .getProperties().stream())
                 .collect(Collectors.toCollection(ArrayList::new));
         componentSettings.addFirst(stopAt);
         componentSettings.add(userOptions);

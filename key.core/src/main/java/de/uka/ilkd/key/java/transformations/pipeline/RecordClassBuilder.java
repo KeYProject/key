@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.github.javaparser.StaticJavaParser;
@@ -19,6 +20,7 @@ import com.github.javaparser.ast.nodeTypes.NodeWithSimpleName;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
@@ -31,6 +33,7 @@ import static de.uka.ilkd.key.java.transformations.AstFactory.attributeThis;
 /// @author weigl
 /// @see [Java SE 25](https://docs.oracle.com/en/java/javase/25/language/records.html)
 /// @since 2026-03-11
+@NullMarked
 public class RecordClassBuilder extends JavaTransformerAbstract {
     public RecordClassBuilder(TransformationPipelineServices pipelineServices) {
         super(pipelineServices);
@@ -180,7 +183,9 @@ public class RecordClassBuilder extends JavaTransformerAbstract {
                 }
             }
             concatBuilder.addStr("]");
-            toString.getBody().get().addStatement(new ReturnStmt(concatBuilder.expr));
+            toString.getBody().get().addStatement(
+                new ReturnStmt(Objects.requireNonNull(concatBuilder.expr,
+                    "toString() body is always non-empty")));
             addGenerated(toString);
         }
     }
@@ -308,7 +313,7 @@ public class RecordClassBuilder extends JavaTransformerAbstract {
     }
 
     private static final class ConcatBuilder {
-        public Expression expr = null;
+        public @Nullable Expression expr = null;
 
 
         public ConcatBuilder addStr(String s) {

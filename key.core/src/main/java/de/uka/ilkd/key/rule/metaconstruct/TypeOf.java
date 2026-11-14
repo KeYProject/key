@@ -18,7 +18,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 @TransformerMeta(name = "#typeof")
+@NullMarked
 public class TypeOf extends ProgramTransformer {
 
     /**

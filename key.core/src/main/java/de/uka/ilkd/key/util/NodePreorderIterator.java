@@ -4,8 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Node;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -25,6 +28,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class NodePreorderIterator {
     /**
      * The element at that the iteration has started used as end condition to make sure that only
@@ -111,14 +115,16 @@ public class NodePreorderIterator {
      * Computes the next element and updates {@link #next()}.
      */
     protected void updateNext() {
+        // the iteration protocol guarantees a current node when stepping (hasNext checked next)
+        Node current = Objects.requireNonNull(next, "current node");
         Node newNext = null;
-        if (next.childrenCount() >= 1) {
+        if (current.childrenCount() >= 1) {
             this.childIndexOnParent = 0;
             this.returnedParents = 0;
-            newNext = next.child(0);
+            newNext = current.child(0);
         } else {
             this.returnedParents = 1;
-            newNext = getNextOnParent(next);
+            newNext = getNextOnParent(current);
         }
         this.next = newNext;
     }

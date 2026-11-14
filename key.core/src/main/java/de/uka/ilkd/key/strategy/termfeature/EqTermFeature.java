@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termfeature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.LogicServices;
@@ -12,6 +14,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
+
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -22,6 +26,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * NB: it is not possible to use general <code>ProjectionToTerm</code> here, because the information
  * necessary to evaluate a <code>ProjectionToTerm</code> is not available in a term feature
  */
+@NullMarked
 public class EqTermFeature extends BinaryTermFeature {
 
     private final TermBuffer<Goal> pattern;
@@ -36,6 +41,7 @@ public class EqTermFeature extends BinaryTermFeature {
 
     @Override
     protected boolean filter(Term term, MutableState mState, LogicServices services) {
-        return RENAMING_TERM_PROPERTY.equalsModThisProperty(term, pattern.getContent(mState));
+        return RENAMING_TERM_PROPERTY.equalsModThisProperty(term,
+            Objects.requireNonNull(pattern.getContent(mState)));
     }
 }

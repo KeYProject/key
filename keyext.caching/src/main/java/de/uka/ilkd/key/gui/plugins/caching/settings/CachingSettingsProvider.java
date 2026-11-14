@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.settings.SettingsProvider;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import net.miginfocom.layout.CC;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings.DISPOSE_COPY;
 import static de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings.DISPOSE_REOPEN;
@@ -23,6 +24,7 @@ import static de.uka.ilkd.key.gui.plugins.caching.settings.ProofCachingSettings.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class CachingSettingsProvider extends SettingsPanel implements SettingsProvider {
     /**
      * Singleton instance of the caching settings.
@@ -64,7 +66,12 @@ public class CachingSettingsProvider extends SettingsPanel implements SettingsPr
 
     /**
      * Construct a new settings provider.
+     * <p>
+     * The component-building calls are made on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since all fields are assigned by
+     * these calls, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public CachingSettingsProvider() {
         setHeaderText("Proof Caching Options");
 

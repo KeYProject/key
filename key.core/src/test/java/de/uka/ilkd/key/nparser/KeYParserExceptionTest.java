@@ -39,6 +39,7 @@ public class KeYParserExceptionTest extends ParserExceptionTest {
      * If this here is not null, this file name (referring to the resources
      * directory) will be loaded.
      */
+    @SuppressWarnings("NullAway") // FIX_FILE is deliberately null; getFiles() scans a directory
     private static final String FIX_FILE = null; // "conflict.java";
 
     /// FIXME weigl: this seems to be broken and should always result into NPE.

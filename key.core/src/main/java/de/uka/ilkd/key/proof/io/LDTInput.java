@@ -39,7 +39,7 @@ public class LDTInput implements EnvInput {
     private final LDTInputListener listener;
     private final Profile profile;
 
-    private InitConfig initConfig = null;
+    private @Nullable InitConfig initConfig = null;
 
     /**
      * creates a representation of the LDT files to be used as input to the KeY prover.
@@ -106,7 +106,7 @@ public class LDTInput implements EnvInput {
 
     // no class path elements here
     @Override
-    public Path readBootClassPath() {
+    public @Nullable Path readBootClassPath() {
         return null;
     }
 
@@ -118,8 +118,12 @@ public class LDTInput implements EnvInput {
      * declared sorts in all rules.
      *
      * @return a list of warnings during the parsing the process
+     *         <p>
+     *         The init config of a loading problem file is present while its content is read; the
+     *         dereference of the (nullable) init config is suppressed with a scoped key.
      */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public ImmutableSet<PositionedString> read() {
         var warnings = new ArrayList<PositionedString>();
 
@@ -150,7 +154,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof LDTInput li)) {
             return false;
         }
@@ -195,7 +199,7 @@ public class LDTInput implements EnvInput {
     }
 
     @Override
-    public Path getInitialFile() {
+    public @Nullable Path getInitialFile() {
         return null;
     }
 }

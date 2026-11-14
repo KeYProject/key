@@ -25,12 +25,16 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerServices;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This is the dialog for the new smt translation mechnism (newsmt2) which aims at a higher degree
  * of flexibility.
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
 
     /**
@@ -38,7 +42,13 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
      * *currently* known to the SMTHandlerServices instance. Hence, either the creation of this
      * object needs to take place only after the necessary smt properties are known or it needs to
      * be created anew when new smt properties become known.
+     *
+     * <p>
+     * The header and the components are configured while the receiver is still under
+     * initialization (EISOP initialization check); they are only rendered after construction
+     * completes, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public NewTranslationOptions() {
         setHeaderText(getDescription());
         makeComponents();
@@ -54,7 +64,7 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
             Collection<SMTHandlerProperty<?>> properties =
                 SMTHandlerServices.getInstance().getSMTProperties();
             for (SMTHandlerProperty<?> property : properties) {
-                JComponent comp = property.accept(new ComCreationVisitor(), null);
+                JComponent comp = property.accept(new ComCreationVisitor(), "");
                 comp.putClientProperty("smtProperty", property);
                 components.add(comp);
             }
@@ -62,7 +72,6 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
             throw new RuntimeException(ex);
         }
     }
-
 
     @Override
     public String getDescription() {
@@ -76,6 +85,10 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         for (JComponent component : components) {
             SMTHandlerProperty<?> prop =
                 (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
+            if (prop == null) {
+                // every component created in makeComponents carries its property
+                throw new NullPointerException("No SMT property attached.");
+            }
             String id = prop.getIdentifier();
             String val = newSMTSettings.get(id);
             if (val != null) {
@@ -92,67 +105,75 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         for (JComponent component : components) {
             SMTHandlerProperty<?> prop =
                 (SMTHandlerProperty<?>) component.getClientProperty("smtProperty");
+            if (prop == null) {
+                // every component created in makeComponents carries its property
+                throw new NullPointerException("No SMT property attached.");
+            }
             prop.accept(visitor, component);
         }
     }
 
-    private class ComCreationVisitor implements SMTHandlerPropertyVisitor<Void, JComponent> {
+    private class ComCreationVisitor implements SMTHandlerPropertyVisitor<String, JComponent> {
         @Override
-        public JComponent visit(EnumProperty<?> eprop, Void unit) {
-            return addComboBox(eprop.getLabel(), eprop.getDescription(), 0, null,
-                eprop.getEnumType().getEnumConstants());
+        public JComponent visit(EnumProperty<?> eprop, String unit) {
+            Object @Nullable [] constants = eprop.getEnumType().getEnumConstants();
+            if (constants == null) {
+                // an enum type always exposes its constants
+                throw new NullPointerException("No enum constants available.");
+            }
+            return addComboBox(eprop.getLabel(), eprop.getDescription(), 0, null, constants);
         }
 
         @Override
-        public JComponent visit(IntegerProperty iprop, Void unit) {
+        public JComponent visit(IntegerProperty iprop, String unit) {
             return addNumberField(iprop.getLabel(), iprop.getMinimum(), iprop.getMaximum(), 1,
                 iprop.getDescription(), emptyValidator());
         }
 
         @Override
-        public JComponent visit(BooleanProperty bprop, Void unit) {
+        public JComponent visit(BooleanProperty bprop, String unit) {
             return addCheckBox(bprop.getLabel(), bprop.getDescription(), false, emptyValidator());
         }
 
         @Override
-        public JComponent visit(StringProperty sprop, Void unit) {
+        public JComponent visit(StringProperty sprop, String unit) {
             return addTextField(sprop.getLabel(), sprop.getDescription(), "", emptyValidator());
         }
     }
 
     private static class SetVisitor
-            implements SMTHandlerPropertyVisitor<Pair<String, JComponent>, Void> {
+            implements SMTHandlerPropertyVisitor<Pair<String, JComponent>, String> {
 
         @Override
-        public Void visit(EnumProperty<?> enumProp, Pair<String, JComponent> arg) {
+        public String visit(EnumProperty<?> enumProp, Pair<String, JComponent> arg) {
             JComboBox<?> box = (JComboBox<?>) arg.second;
             box.setSelectedItem(arg.first);
-            return null;
+            return "";
         }
 
         @Override
-        public Void visit(IntegerProperty integerProp, Pair<String, JComponent> arg) {
+        public String visit(IntegerProperty integerProp, Pair<String, JComponent> arg) {
             JTextField field = (JTextField) arg.second;
             field.setText(arg.first);
-            return null;
+            return "";
         }
 
         @Override
-        public Void visit(BooleanProperty booleanProp, Pair<String, JComponent> arg) {
+        public String visit(BooleanProperty booleanProp, Pair<String, JComponent> arg) {
             JCheckBox box = (JCheckBox) arg.second;
             box.setSelected(Boolean.parseBoolean(arg.first));
-            return null;
+            return "";
         }
 
         @Override
-        public Void visit(StringProperty stringProp, Pair<String, JComponent> arg) {
+        public String visit(StringProperty stringProp, Pair<String, JComponent> arg) {
             JTextField field = (JTextField) arg.second;
             field.setText(arg.first);
-            return null;
+            return "";
         }
     }
 
-    private static class ApplyVisitor implements SMTHandlerPropertyVisitor<JComponent, Void> {
+    private static class ApplyVisitor implements SMTHandlerPropertyVisitor<JComponent, String> {
         private final NewSMTTranslationSettings settings;
 
         public ApplyVisitor(NewSMTTranslationSettings newSMTSettings) {
@@ -160,31 +181,36 @@ class NewTranslationOptions extends SettingsPanel implements SettingsProvider {
         }
 
         @Override
-        public Void visit(EnumProperty<?> enumProp, JComponent arg) {
-            String val = ((JComboBox<?>) arg).getSelectedItem().toString();
+        public String visit(EnumProperty<?> enumProp, JComponent arg) {
+            Object selectedItem = ((JComboBox<?>) arg).getSelectedItem();
+            if (selectedItem == null) {
+                // a combo box always has a selected entry when applied
+                throw new NullPointerException("No combo box entry selected.");
+            }
+            String val = selectedItem.toString();
             settings.put(enumProp.getIdentifier(), val);
-            return null;
+            return "";
         }
 
         @Override
-        public Void visit(IntegerProperty integerProp, JComponent arg) {
+        public String visit(IntegerProperty integerProp, JComponent arg) {
             String val = ((JTextField) arg).getText();
             settings.put(integerProp.getIdentifier(), val);
-            return null;
+            return "";
         }
 
         @Override
-        public Void visit(BooleanProperty booleanProp, JComponent arg) {
+        public String visit(BooleanProperty booleanProp, JComponent arg) {
             String val = ((JCheckBox) arg).isSelected() ? "true" : "false";
             settings.put(booleanProp.getIdentifier(), val);
-            return null;
+            return "";
         }
 
         @Override
-        public Void visit(StringProperty stringProp, JComponent arg) {
+        public String visit(StringProperty stringProp, JComponent arg) {
             String val = ((JTextField) arg).getText();
             settings.put(stringProp.getIdentifier(), val);
-            return null;
+            return "";
         }
     }
 }

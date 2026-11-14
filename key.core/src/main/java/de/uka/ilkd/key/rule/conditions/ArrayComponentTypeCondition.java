@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -17,10 +18,14 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * This variable condition checks if an array component is of reference type
  */
+@NullMarked
 public final class ArrayComponentTypeCondition extends VariableConditionAdapter {
 
     private final SchemaVariable var;
@@ -48,7 +53,8 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
 
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement candidate, SVInstantiations svInst,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement candidate,
+            SVInstantiations svInst,
             Services services) {
         if (var != this.var) {
             return true;
@@ -57,10 +63,12 @@ public final class ArrayComponentTypeCondition extends VariableConditionAdapter 
         if (candidate instanceof JTerm) {
             s = ((JTerm) candidate).sort();
         } else if (candidate instanceof Expression) {
-            s = ((Expression) candidate).getKeYJavaType(services, svInst.getExecutionContext())
-                    .getSort();
+            s = Objects.requireNonNull(
+                ((Expression) candidate).getKeYJavaType(services, svInst.getExecutionContext()),
+                "no KeYJavaType for expression candidate").getSort();
         } else if (candidate instanceof TypeReference) {
-            s = ((TypeReference) candidate).getKeYJavaType().getSort();
+            s = Objects.requireNonNull(((TypeReference) candidate).getKeYJavaType(),
+                "no KeYJavaType for type-reference candidate").getSort();
         }
 
         if (!(s instanceof ArraySort)) {

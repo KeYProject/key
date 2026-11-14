@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.java.StringUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
  * @version 1 (06.01.25)
  */
 @Deprecated
+@NullMarked
 public class JavaLogger {
     private final static Logger log = LoggerFactory.getLogger(JavaLogger.class);
     private final static File findJavaAst;

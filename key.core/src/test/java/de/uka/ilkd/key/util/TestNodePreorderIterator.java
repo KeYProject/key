@@ -6,6 +6,7 @@ package de.uka.ilkd.key.util;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Node;
@@ -49,12 +50,16 @@ public class TestNodePreorderIterator {
         appendNode(proof, l4);
         // Test tree
         ExpectedNode[] level111 = createExpectedNodes(3);
-        ExpectedNode[] level11 = createExpectedNodes(new int[] { 2, 4 }, level111, null);
+        ExpectedNode[] level11 =
+            createExpectedNodes(new int[] { 2, 4 }, level111, new ExpectedNode[0]);
         ExpectedNode[] level122 = createExpectedNodes(8, 9);
-        ExpectedNode[] level12 = createExpectedNodes(new int[] { 6, 7, 10 }, null, level122, null);
+        ExpectedNode[] level12 =
+            createExpectedNodes(new int[] { 6, 7, 10 }, new ExpectedNode[0], level122,
+                new ExpectedNode[0]);
         ExpectedNode[] level14 = createExpectedNodes(13);
         ExpectedNode[] level1 =
-            createExpectedNodes(new int[] { 1, 5, 11, 12 }, level11, level12, null, level14);
+            createExpectedNodes(new int[] { 1, 5, 11, 12 }, level11, level12,
+                new ExpectedNode[0], level14);
         assertRoot(root, createExpectedNodes(new int[] { 0 }, level1));
     }
 
@@ -82,7 +87,8 @@ public class TestNodePreorderIterator {
         ExpectedNode[] level12 = createExpectedNodes(5, 6, 7);
         ExpectedNode[] level14 = createExpectedNodes(10);
         ExpectedNode[] level1 =
-            createExpectedNodes(new int[] { 1, 4, 8, 9 }, level11, level12, null, level14);
+            createExpectedNodes(new int[] { 1, 4, 8, 9 }, level11, level12,
+                new ExpectedNode[0], level14);
         assertRoot(root, createExpectedNodes(new int[] { 0 }, level1));
     }
 
@@ -151,7 +157,7 @@ public class TestNodePreorderIterator {
                 int childIndexOnParent = iter.getChildIndexOnParent();
                 int returnedParents = iter.getReturnedParents();
                 assertEquals(previousChildrenDepth, returnedParents);
-                Node next = iter.next();
+                Node next = Objects.requireNonNull(iter.next(), "hasNext promised a node");
                 assertEquals(computeChildIndexOnParent(next), childIndexOnParent);
                 Assertions.assertNotNull(next);
                 assertEquals(node.getExpectedSerialNr(), next.serialNr());
@@ -188,9 +194,9 @@ public class TestNodePreorderIterator {
         private final int expectedSerialNr;
 
         /**
-         * The expected children.
+         * The expected children; an empty array for nodes without children.
          */
-        private ExpectedNode[] expectedChildren;
+        private ExpectedNode[] expectedChildren = new ExpectedNode[0];
 
         /**
          * Constructor.
@@ -224,7 +230,7 @@ public class TestNodePreorderIterator {
         /**
          * Returns the expected children.
          *
-         * @return The expected children.
+         * @return The expected children; an empty array for nodes without children.
          */
         public ExpectedNode[] getExpectedChildren() {
             return expectedChildren;

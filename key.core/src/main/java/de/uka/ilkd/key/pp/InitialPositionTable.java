@@ -4,10 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.pp;
 
+import java.util.Objects;
+
 import org.key_project.logic.IntIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An InitialPositionTable is a PositionTable that describes the beginning of the element/subelement
@@ -20,6 +25,7 @@ import org.key_project.util.collection.ImmutableList;
  * a sequent are located one level below. In other words the whole sequent is not represented by an
  * empty position list but by the list [0].
  */
+@NullMarked
 public class InitialPositionTable extends PositionTable {
 
     private ImmutableList<Range> updateRanges = ImmutableList.nil();
@@ -43,7 +49,7 @@ public class InitialPositionTable extends PositionTable {
      * @param filter the sequent print filter from that was used to print the sequent
      *
      */
-    public PosInSequent getPosInSequent(int index, SequentPrintFilter filter) {
+    public @Nullable PosInSequent getPosInSequent(int index, SequentPrintFilter filter) {
         if (index < startPos[0] || index >= endPos[0]) {
             return null;
         }
@@ -72,7 +78,8 @@ public class InitialPositionTable extends PositionTable {
         if (posList.isEmpty() || posList.tail().isEmpty()) {
             return PosInSequent.createSequentPos();
         } else {
-            return children[0].getSequentPIS(posList.tail(), filter);
+            return Objects.requireNonNull(children[0], "no position table for the sequent")
+                    .getSequentPIS(posList.tail(), filter);
         }
     }
 
@@ -86,7 +93,7 @@ public class InitialPositionTable extends PositionTable {
      * @param filter the current filter
      * @return the path for the given pio
      */
-    public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
+    public @Nullable ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
             SequentPrintFilter filter) {
         ImmutableList<Integer> p = ImmutableList.nil();
         p = prependPathInFormula(p, pio);
@@ -118,8 +125,10 @@ public class InitialPositionTable extends PositionTable {
      */
     private int indexOfCfma(SequentFormula cfma,
             SequentPrintFilter filter) {
-        ImmutableList<SequentPrintFilterEntry> list =
-            filter.getFilteredAntec().append(filter.getFilteredSucc());
+        ImmutableList<SequentPrintFilterEntry> list = Objects.requireNonNull(
+            filter.getFilteredAntec(), "filter has no filtered antecedent")
+                .append(Objects.requireNonNull(filter.getFilteredSucc(),
+                    "filter has no filtered succedent"));
         int k;
         for (k = 0; !list.isEmpty(); k++, list = list.tail()) {
             if (list.head().getOriginalFormula() == cfma) {

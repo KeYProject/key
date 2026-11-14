@@ -15,6 +15,8 @@ import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Computes the pow function for literals. Computation fails if second argument is negative or
@@ -22,6 +24,7 @@ import org.key_project.logic.Name;
  *
  */
 @TransformerMeta(name = "#pow")
+@NullMarked
 public final class MetaPow extends AbstractTermTransformer {
 
     public MetaPow() {

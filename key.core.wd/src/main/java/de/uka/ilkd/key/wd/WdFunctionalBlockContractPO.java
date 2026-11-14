@@ -26,12 +26,14 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (8/3/25)
  */
+@NullMarked
 public class WdFunctionalBlockContractPO extends FunctionalBlockContractPO {
     /**
      * @param initConfig the initial proof configuration.
@@ -108,12 +110,17 @@ public class WdFunctionalBlockContractPO extends FunctionalBlockContractPO {
      */
     public static JTerm setUpWdGoal(final @Nullable Goal goal, final BlockContract contract,
             final JTerm update,
-            final JTerm anonUpdate, final LocationVariable heap, final Function anonHeap,
+            final JTerm anonUpdate, final LocationVariable heap, final @Nullable Function anonHeap,
             final ImmutableSet<LocationVariable> localIns,
             Services services,
-            AuxiliaryContract.Variables variables, PosInOccurrence occurrence) {
+            AuxiliaryContract.@Nullable Variables variables,
+            @Nullable PosInOccurrence occurrence) {
         // FIXME: Handling of \old-references needs to be investigated,
         // however only completeness is lost, soundness is guaranteed
+        if (variables == null) {
+            throw new NullPointerException(
+                "No auxiliary contract variables for the well-definedness goal.");
+        }
         final BlockWellDefinedness bwd =
             new BlockWellDefinedness(contract, variables, localIns, services);
         ((SpecificationRepositoryWD) services.getSpecificationRepository()).addWdStatement(bwd);
@@ -125,6 +132,10 @@ public class WdFunctionalBlockContractPO extends FunctionalBlockContractPO {
 
         if (goal != null) {
             goal.setBranchLabel(WellDefinednessMacro.WD_BRANCH);
+            if (occurrence == null) {
+                throw new NullPointerException(
+                    "No position of occurrence for the well-definedness goal.");
+            }
             goal.changeFormula(wdBlock, occurrence);
         }
 

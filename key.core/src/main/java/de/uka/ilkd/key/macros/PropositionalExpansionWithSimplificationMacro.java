@@ -6,10 +6,13 @@ package de.uka.ilkd.key.macros;
 
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class PropositionalExpansionWithSimplificationMacro
         extends AbstractPropositionalExpansionMacro {
 

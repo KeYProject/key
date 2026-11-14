@@ -4,7 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.mgt;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class AxiomJustification implements RuleJustification {
 
     public static final AxiomJustification INSTANCE = new AxiomJustification();

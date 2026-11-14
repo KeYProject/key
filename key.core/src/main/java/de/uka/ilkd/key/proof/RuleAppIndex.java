@@ -18,6 +18,7 @@ import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
@@ -25,6 +26,7 @@ import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
 /**
  * manages the possible application of rules (RuleApps)
  */
+@NullMarked
 public final class RuleAppIndex {
 
     private final Goal goal;
@@ -42,7 +44,7 @@ public final class RuleAppIndex {
 
     private final BuiltInRuleAppIndex builtInRuleAppIndex;
 
-    private NewRuleListener ruleListener = null;
+    private @Nullable NewRuleListener ruleListener = null;
 
     private final NewRuleListener newRuleListener = new NewRuleListener() {
         public void ruleAdded(RuleApp taclet, PosInOccurrence pos) {
@@ -248,9 +250,9 @@ public final class RuleAppIndex {
 
     /**
      * returns a list of built-in rule applications applicable for the given goal, user defined
-     * constraint and position
+     * constraint and position (may be {@code null} for positionless rules)
      */
-    public ImmutableList<IBuiltInRuleApp> getBuiltInRules(Goal g, PosInOccurrence pos) {
+    public ImmutableList<IBuiltInRuleApp> getBuiltInRules(Goal g, @Nullable PosInOccurrence pos) {
 
         return builtInRuleAppIndex().getBuiltInRule(g, pos);
     }

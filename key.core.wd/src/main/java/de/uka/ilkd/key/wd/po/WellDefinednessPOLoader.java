@@ -36,6 +36,10 @@ public class WellDefinednessPOLoader implements ProofObligationLoader {
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) {
         String contractName = properties.getString("wd check");
+        if (contractName == null) {
+            throw new NullPointerException(
+                "No contract name ('wd check') in the proof obligation properties.");
+        }
         final Contract contract =
             initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
         if (contract == null) {

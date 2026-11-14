@@ -13,12 +13,15 @@ import de.uka.ilkd.key.pp.IdentitySequentPrintFilter.IdentityFilterEntry;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This filter takes a search string and yields a sequent containing only sequent formulas that
  * match the search.
  *
  * @author jschiffl
  */
+@NullMarked
 public class HideSequentPrintFilter extends SearchSequentPrintFilter {
 
     /**
@@ -27,11 +30,18 @@ public class HideSequentPrintFilter extends SearchSequentPrintFilter {
      * @param regex should the search be treated as regex?
      */
     public HideSequentPrintFilter(SequentViewLogicPrinter lp, boolean regex) {
-        this.lp = lp;
+        super(lp);
         this.regex = regex;
     }
 
     @Override
+    /**
+     * Filters the formatted formulas of the sequent, keeping those matching the search pattern.
+     * <p>
+     * The antecedent and succedent filter lists are re-initialized after the early returns below;
+     * the dereferences of the (nullable) list fields are suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected void filterSequent() {
         Iterator<SequentFormula> it;
 

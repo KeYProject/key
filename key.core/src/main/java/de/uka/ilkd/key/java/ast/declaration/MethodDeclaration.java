@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -21,12 +22,14 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Method declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
+@NullMarked
 public class MethodDeclaration extends JavaDeclaration
         implements MemberDeclaration, TypeReferenceContainer, NamedProgramElement,
         ParameterContainer, Method,
@@ -35,11 +38,11 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * The return type of the method.
      */
-    protected final TypeReference returnType;
+    protected final @Nullable TypeReference returnType;
     /**
      * In case of void return type: comments associated with the method.
      */
-    protected final Comment[] voidComments;
+    protected final Comment @Nullable [] voidComments;
     /**
      * The name of the method.
      */
@@ -52,12 +55,12 @@ public class MethodDeclaration extends JavaDeclaration
      * 'throws' part of the method. Indicates which exceptions the method may throw.
      * May be null.
      */
-    protected final Throws exceptions;
+    protected final @Nullable Throws exceptions;
     /**
      * Body of the method.
      * May be null, in which case the body is referenced in a file using {@link #posInfo}.
      */
-    protected final StatementBlock body;
+    protected final @Nullable StatementBlock body;
     /**
      * JML modifiers of the referenced method. Includes e.g. {@code pure}.
      */
@@ -77,7 +80,8 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public record JMLModifiers(
             boolean pure, boolean strictlyPure, boolean helper,
-            SpecMathMode specMathMode) {
+            // no JML spec math modifier means an absent (null) mode
+            @Nullable SpecMathMode specMathMode) {
     }
 
 
@@ -88,13 +92,46 @@ public class MethodDeclaration extends JavaDeclaration
     protected final boolean parentIsInterfaceDeclaration;
 
 
+    /**
+     * Constructs a method declaration from its attributes.
+     * <p>
+     * The {@link JMLInfoExtractor#parseMethod} call receives {@code this} before the
+     * constructor has finished, leaving the receiver
+     * {@code @UnderInitialization(JavaDeclaration.class)}. The parse only reads the modifiers
+     * (already initialized by {@link JavaDeclaration}'s constructor) and writes the result to
+     * {@link #jmlModifiers}, so the call is safe and the warning is suppressed.
+     *
+     * @param pi
+     *        the position information
+     * @param comments
+     *        the comments
+     * @param modArray
+     *        the modifiers
+     * @param returnType
+     *        the return type, or {@code null} for a void method
+     * @param voidComments
+     *        comments for a void return type, or {@code null}
+     * @param name
+     *        the method name
+     * @param parameters
+     *        the method parameters
+     * @param exceptions
+     *        the {@link Throws} clause, or {@code null}
+     * @param body
+     *        the method body, or {@code null}
+     * @param parentIsInterfaceDeclaration
+     *        whether the parent is an interface declaration
+     * @param attachedJml
+     *        the attached JML constructs
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public MethodDeclaration(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray,
-            TypeReference returnType,
-            Comment[] voidComments, ProgramElementName name,
-            ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
-            StatementBlock body, boolean parentIsInterfaceDeclaration,
+            ImmutableArray<Modifier> modArray,
+            @Nullable TypeReference returnType,
+            Comment @Nullable [] voidComments, ProgramElementName name,
+            ImmutableArray<ParameterDeclaration> parameters, @Nullable Throws exceptions,
+            @Nullable StatementBlock body, boolean parentIsInterfaceDeclaration,
             ImmutableList<TextualJMLConstruct> attachedJml) {
         super(pi, comments, modArray, attachedJml);
         this.returnType = returnType;
@@ -110,6 +147,12 @@ public class MethodDeclaration extends JavaDeclaration
 
     /**
      * Method declaration.
+     * <p>
+     * The {@link JMLInfoExtractor#parseMethod} call receives {@code this} before the
+     * constructor has finished, leaving the receiver
+     * {@code @UnderInitialization(JavaDeclaration.class)}. The parse only reads the modifiers
+     * (already initialized by {@link JavaDeclaration}'s constructor) and writes the result to
+     * {@link #jmlModifiers}, so the call is safe and the warning is suppressed.
      *
      * @param children
      *        an ExtList of children. Must include: a TypeReference (as a reference to the
@@ -123,12 +166,15 @@ public class MethodDeclaration extends JavaDeclaration
      * @param voidComments
      *        in case of void return type: comments associated with the method
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public MethodDeclaration(ExtList children, boolean parentIsInterfaceDeclaration,
-            Comment[] voidComments) {
+            Comment @Nullable [] voidComments) {
         super(children);
-        returnType = children.get(TypeReference.class);
+        returnType = Objects.requireNonNull(children.get(TypeReference.class),
+            "a method declaration requires a return type");
         this.voidComments = voidComments;
-        name = children.get(ProgramElementName.class);
+        name = Objects.requireNonNull(children.get(ProgramElementName.class),
+            "a method declaration requires a name");
         this.parameters = new ImmutableArray<>(children.collect(ParameterDeclaration.class));
         exceptions = children.get(Throws.class);
         body = children.get(StatementBlock.class);
@@ -159,11 +205,11 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public MethodDeclaration(
             Modifier[] modifiers,
-            TypeReference returnType,
+            @Nullable TypeReference returnType,
             ProgramElementName name,
             ParameterDeclaration[] parameters,
-            Throws exceptions,
-            StatementBlock body,
+            @Nullable Throws exceptions,
+            @Nullable StatementBlock body,
             boolean parentIsInterfaceDeclaration) {
         this(modifiers,
             returnType,
@@ -177,6 +223,12 @@ public class MethodDeclaration extends JavaDeclaration
 
     /**
      * Method declaration.
+     * <p>
+     * The {@link JMLInfoExtractor#parseMethod} call receives {@code this} before the
+     * constructor has finished, leaving the receiver
+     * {@code @UnderInitialization(JavaDeclaration.class)}. The parse only reads the modifiers
+     * (already initialized by {@link JavaDeclaration}'s constructor) and writes the result to
+     * {@link #jmlModifiers}, so the call is safe and the warning is suppressed.
      *
      * @param modifiers
      *        a modifier array
@@ -194,13 +246,14 @@ public class MethodDeclaration extends JavaDeclaration
      *        a boolean set true iff
      *        parent is an InterfaceDeclaration
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public MethodDeclaration(
             Modifier[] modifiers,
-            TypeReference returnType,
+            @Nullable TypeReference returnType,
             ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters,
-            Throws exceptions,
-            StatementBlock body,
+            @Nullable Throws exceptions,
+            @Nullable StatementBlock body,
             boolean parentIsInterfaceDeclaration) {
         super(modifiers);
         this.returnType = returnType;
@@ -220,14 +273,12 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
 
-    @NonNull
     @Override
     public SourceElement getFirstElement() {
         return getChildAt(0);
     }
 
 
-    @NonNull
     @Override
     public SourceElement getLastElement() {
         return getChildAt(this.getChildCount() - 1).getLastElement();
@@ -343,7 +394,7 @@ public class MethodDeclaration extends JavaDeclaration
      *
      * @return the type reference.
      */
-    public TypeReference getTypeReference() {
+    public @Nullable TypeReference getTypeReference() {
         return returnType;
     }
 
@@ -354,14 +405,14 @@ public class MethodDeclaration extends JavaDeclaration
      *
      * @return the "void comments"
      */
-    public Comment[] getVoidComments() {
+    public Comment @Nullable [] getVoidComments() {
         return voidComments;
     }
 
 
     @Override
     public final String getName() {
-        return (name == null) ? null : name.toString();
+        return name.toString();
     }
 
 
@@ -376,12 +427,12 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
 
-    public Throws getThrown() {
+    public @Nullable Throws getThrown() {
         return exceptions;
     }
 
 
-    public StatementBlock getBody() {
+    public @Nullable StatementBlock getBody() {
         return body;
     }
 

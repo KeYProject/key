@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -49,8 +50,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     protected final While loop;
 
     protected @Nullable LoopSpecification spec;
-    @Nullable
-    protected final List<LocationVariable> heapContext;
+    protected final @Nullable List<LocationVariable> heapContext;
     private @Nullable ExecutionContext executionContext;
     private @Nullable JTerm guard;
 
@@ -84,7 +84,8 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
             @Nullable List<LocationVariable> heapContext, TermServices services) {
         super(rule, pio, ifInsts);
         assert pio != null;
-        this.loop = (While) JavaTools.getActiveStatement(programTerm().javaBlock());
+        this.loop = (While) JavaTools.getActiveStatement(Objects.requireNonNull(programTerm(),
+            "no program term for loop invariant rule application").javaBlock());
         assert loop != null;
         this.spec = instantiateIndexValues(inv, services);
         this.heapContext = heapContext;
@@ -103,7 +104,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
      *
      * @param services TODO
      */
-    private @Nullable LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
+    private @Nullable LoopSpecification instantiateIndexValues(@Nullable LoopSpecification rawInv,
             TermServices services) {
         if (rawInv == null) {
             return null;
@@ -125,25 +126,36 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         Expression loopIndex =
             skipIndex ? null : (Expression) ((BinaryOperator) guard.getChildAt(0)).getChildAt(0);
         skipIndex = skipIndex || !(loopIndex instanceof ProgramVariable);
-        final JTerm loopIdxVar = skipIndex ? null : tb.var((ProgramVariable) loopIndex);
+        final JTerm loopIdxVar = skipIndex ? null
+                : tb.var((ProgramVariable) Objects.requireNonNull(loopIndex,
+                    "loop index variable expected"));
 
         // try to retrieve a sequence of values
         Statement body = loop.getBody();
         skipValues = !(body instanceof StatementBlock);
-        StatementBlock block = skipValues ? null : ((StatementBlock) body);
         // get the second statement if possible
-        Statement last =
-            (skipValues || block.getStatementCount() < 2) ? null : block.getStatementAt(1);
-        skipValues = skipValues || !JavaAstUtils.isCopyAssignment(last);
+        Statement last = null;
+        if (!skipValues) {
+            StatementBlock block = (StatementBlock) body;
+            if (block.getStatementCount() >= 2) {
+                last = block.getStatementAt(1);
+            } else {
+                skipValues = true;
+            }
+        }
+        skipValues = skipValues || (last != null && !JavaAstUtils.isCopyAssignment(last));
         Assignment assignment = skipValues ? null : ((Assignment) last);
-        ProgramElement lhs = skipValues ? null : assignment.getChildAt(0);
+        ProgramElement lhs = skipValues ? null
+                : Objects.requireNonNull(assignment, "copy assignment expected").getChildAt(0);
         skipValues = skipValues || !(lhs instanceof ProgramVariable);
-        final JTerm valuesVar = skipValues ? null : tb.var((ProgramVariable) lhs);
+        final JTerm valuesVar = skipValues ? null
+                : tb.var((ProgramVariable) Objects.requireNonNull(lhs,
+                    "value assignment variable expected"));
 
         // set up replacement visitors
         final class IndexTermReplacementVisitor implements DefaultVisitor {
 
-            private JTerm result;
+            private @Nullable JTerm result;
 
             @Override
             public void visit(Term visited) {
@@ -152,7 +164,8 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
             }
 
             public JTerm getResult() {
-                return result;
+                return Objects.requireNonNull(result,
+                    "term replacement produced no result");
             }
 
             private @Nullable JTerm replace(JTerm visited) {
@@ -166,7 +179,8 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
                 } else {
                     JTerm[] newSubs = new JTerm[subs.size()];
                     for (int i = 0; i < subs.size(); i++) {
-                        newSubs[i] = replace(subs.get(i));
+                        newSubs[i] = Objects.requireNonNull(replace(subs.get(i)),
+                            "term replacement produced no result");
                     }
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<>(newSubs),
                         visited.boundVars(), visited.getLabels());
@@ -175,7 +189,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         }
         final class ValuesTermReplacementVisitor implements DefaultVisitor {
 
-            private JTerm result;
+            private @Nullable JTerm result;
 
             @Override
             public void visit(Term visited) {
@@ -183,7 +197,8 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
             }
 
             public JTerm getResult() {
-                return result;
+                return Objects.requireNonNull(result,
+                    "term replacement produced no result");
             }
 
             private @Nullable JTerm replace(JTerm visited) {
@@ -197,7 +212,8 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
                 } else {
                     JTerm[] newSubs = new JTerm[subs.size()];
                     for (int i = 0; i < subs.size(); i++) {
-                        newSubs[i] = replace(subs.get(i));
+                        newSubs[i] = Objects.requireNonNull(replace(subs.get(i)),
+                            "term replacement produced no result");
                     }
                     return tb.tf().createTerm(visited.op(), new ImmutableArray<>(newSubs),
                         visited.boundVars(), visited.getLabels());
@@ -270,7 +286,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
                 && (!variantRequired() || variantAvailable());
     }
 
-    public LoopSpecification getSpec() {
+    public @Nullable LoopSpecification getSpec() {
         return spec;
     }
 
@@ -279,26 +295,26 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     }
 
     public boolean invariantAvailable() {
-        boolean result = spec != null && spec.getInternalInvariants() != null;
-        if (result) {
-            Map<LocationVariable, JTerm> invs = spec.getInternalInvariants();
-            Map<LocationVariable, JTerm> freeInvs = spec.getInternalFreeInvariants();
-            result = false;
-            for (LocationVariable heap : heapContext) {
-                if (invs.get(heap) != null || freeInvs.get(heap) != null) {
-                    result = true;
-                    break;
-                }
+        LoopSpecification invariant = spec;
+        if (invariant == null || invariant.getInternalInvariants() == null) {
+            return false;
+        }
+        Map<LocationVariable, JTerm> invs = invariant.getInternalInvariants();
+        Map<LocationVariable, JTerm> freeInvs = invariant.getInternalFreeInvariants();
+        for (LocationVariable heap : Objects.requireNonNull(heapContext,
+            "no heap context for loop invariant rule application")) {
+            if (invs.get(heap) != null || freeInvs.get(heap) != null) {
+                return true;
             }
         }
-        return result;
+        return false;
     }
 
     public boolean isSufficientlyComplete() {
         return pio != null && loop != null;
     }
 
-    public JTerm programTerm() {
+    public @Nullable JTerm programTerm() {
         if (posInOccurrence() != null) {
             return TermBuilder.goBelowUpdates((JTerm) posInOccurrence().subTerm());
         }
@@ -311,7 +327,7 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
             services);
     }
 
-    public LoopSpecification retrieveLoopInvariantFromSpecification(Services services) {
+    public @Nullable LoopSpecification retrieveLoopInvariantFromSpecification(Services services) {
         return services.getSpecificationRepository().getLoopSpec(loop);
     }
 
@@ -328,8 +344,9 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         if (this.loop == inv.getLoop()) {
             this.spec = inv;
         }
-        return new LoopInvariantBuiltInRuleApp<>(builtInRule, pio, ifInsts, inv, heapContext,
-            services);
+        return new LoopInvariantBuiltInRuleApp<>(builtInRule, Objects.requireNonNull(pio,
+            "no position in occurrence for loop invariant rule application"), ifInsts, inv,
+            heapContext, services);
     }
 
 
@@ -348,8 +365,11 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
         }
         final Services services = goal.proof().getServices();
         LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
-        var m = ((JModality) programTerm().op()).<JModality.JavaModalityKind>kind();
-        return new LoopInvariantBuiltInRuleApp<>(builtInRule, pio, ifInsts, inv,
+        var m = ((JModality) Objects.requireNonNull(programTerm(),
+            "no program term for loop invariant rule application")
+                .op()).<JModality.JavaModalityKind>kind();
+        return new LoopInvariantBuiltInRuleApp<>(builtInRule, Objects.requireNonNull(pio,
+            "no position in occurrence for loop invariant rule application"), ifInsts, inv,
             HeapContext.getModifiableHeaps(services, m.transaction()), services);
     }
 
@@ -358,21 +378,22 @@ public class LoopInvariantBuiltInRuleApp<T extends BuiltInRule>
     }
 
     public boolean variantRequired() {
-        return ((JModality) programTerm().op()).<JModality.JavaModalityKind>kind()
-                .terminationSensitive();
+        return ((JModality) Objects.requireNonNull(programTerm(),
+            "no program term for loop invariant rule application")
+                .op()).<JModality.JavaModalityKind>kind().terminationSensitive();
     }
 
     @Override
-    public List<LocationVariable> getHeapContext() {
+    public @Nullable List<LocationVariable> getHeapContext() {
         return heapContext;
     }
 
 
-    public JTerm getGuard() {
+    public @Nullable JTerm getGuard() {
         return guard;
     }
 
-    public ExecutionContext getExecutionContext() {
+    public @Nullable ExecutionContext getExecutionContext() {
         return executionContext;
     }
 }

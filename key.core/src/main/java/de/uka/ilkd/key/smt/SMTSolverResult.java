@@ -4,9 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Encapsulates the result of a single solver.
  */
+@NullMarked
 public class SMTSolverResult {
 
     /**
@@ -93,7 +97,7 @@ public class SMTSolverResult {
     }
 
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof SMTSolverResult ssr)) {
             return false;
         }

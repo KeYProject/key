@@ -6,11 +6,14 @@ package de.uka.ilkd.key.proof.init;
 
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author Alexander Weigl
  * @version 1 (1/1/26)
  */
+@NullMarked
 public interface TacletPOGenerator {
     void generate(AbstractPO abstractPO, InitConfig initConfig, SpecificationRepository specRepo);
 }

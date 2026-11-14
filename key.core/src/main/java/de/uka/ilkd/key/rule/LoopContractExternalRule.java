@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -15,6 +16,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.FunctionalLoopContractPO;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.proof.rules.ComplexJustificationable;
@@ -36,6 +38,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -125,8 +128,8 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
      * @param services services.
      * @return the preconditions.
      */
-    private static JTerm[] createPreconditions(final JTerm selfTerm, final LoopContract contract,
-            final List<LocationVariable> heaps,
+    private static JTerm[] createPreconditions(final @Nullable JTerm selfTerm,
+            final LoopContract contract, final List<LocationVariable> heaps,
             final ImmutableSet<LocationVariable> localInVariables,
             final ConditionsAndClausesBuilder conditionsAndClausesBuilder,
             final Services services) {
@@ -164,7 +167,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
     }
 
     @Override
-    public JTerm getLastFocusTerm() {
+    public @Nullable JTerm getLastFocusTerm() {
         return lastFocusTerm.get();
     }
 
@@ -174,7 +177,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
     }
 
     @Override
-    public Instantiation getLastInstantiation() {
+    public @Nullable Instantiation getLastInstantiation() {
         return lastInstantiation.get();
     }
 
@@ -184,19 +187,26 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
     }
 
     @Override
-    protected void setLastInstantiation(Instantiation lastInstantiation) {
+    protected void setLastInstantiation(@Nullable Instantiation lastInstantiation) {
         this.lastInstantiation.set(lastInstantiation);
     }
 
     @Override
-    public LoopContractExternalBuiltInRuleApp<?> createApp(PosInOccurrence pos,
+    public LoopContractExternalBuiltInRuleApp<?> createApp(@Nullable PosInOccurrence pos,
             TermServices services) {
-        return new LoopContractExternalBuiltInRuleApp<>(this, pos);
+        return new LoopContractExternalBuiltInRuleApp<>(this,
+            Objects.requireNonNull(pos, "rule application needs a position"));
     }
 
     @Override
     public boolean isApplicable(final Goal goal,
-            final PosInOccurrence occurrence) {
+            final @Nullable PosInOccurrence occurrence) {
+        // a {@code null} occurrence is not an occurrence at the top level of the succedent, i.e.
+        // the same outcome {@code occursNotAtTopLevelInSuccedent} computes below; making it
+        // explicit lets the flow analysis refine the occurrence for the subsequent lookups
+        if (occurrence == null) {
+            return false;
+        }
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         } else if (Transformer.inTransformer(occurrence)) {
@@ -221,6 +231,9 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
         }
     }
 
+    // The self term is absent for static methods and {@code setInstantiationSelf} (in the
+    // out-of-scope speclang package) stores it as-is; the conditions builders null-check it.
+    @SuppressWarnings("NullAway")
     @Override
     public ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
@@ -228,16 +241,20 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
         LoopContractExternalBuiltInRuleApp<?> application =
             (LoopContractExternalBuiltInRuleApp<?>) ruleApp;
 
-        final Instantiation instantiation =
-            instantiate((JTerm) application.posInOccurrence().subTerm(), goal);
-        final LoopContract contract = application.getContract();
+        final PosInOccurrence pio = Objects.requireNonNull(application.posInOccurrence(),
+            "loop contract app requires an occurrence");
+        final Instantiation instantiation = Objects.requireNonNull(
+            instantiate((JTerm) pio.subTerm(), goal), "no loop instantiation");
+        final LoopContract contract = Objects.requireNonNull(application.getContract(),
+            "no loop contract set for rule application");
         contract.setInstantiationSelf(instantiation.self());
 
         assert contract.isOnBlock() && contract.getBlock().equals(instantiation.statement())
                 || !contract.isOnBlock() && contract.getLoop().equals(instantiation.statement());
 
         final var services = goal.getOverlayServices();
-        final List<LocationVariable> heaps = application.getHeapContext();
+        final List<LocationVariable> heaps = Objects.requireNonNull(application.getHeapContext(),
+            "no heap context for rule application");
         final ImmutableSet<LocationVariable> localInVariables =
             MiscTools.getLocalIns(instantiation.statement(), services);
         final ImmutableSet<LocationVariable> localOutVariables =
@@ -273,8 +290,11 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule
         configurator.setUpUsageGoal(result.head(), updates,
             ArrayUtil.add(assumptions, freePostcondition));
 
-        final ComplexRuleJustificationBySpec cjust = (ComplexRuleJustificationBySpec) goal.proof()
-                .getInitConfig().getJustifInfo().getJustification(this);
+        final InitConfig initConfig = Objects.requireNonNull(goal.proof().getInitConfig(),
+            "no initial configuration");
+        final ComplexRuleJustificationBySpec cjust = Objects.requireNonNull(
+            (ComplexRuleJustificationBySpec) initConfig.getJustifInfo().getJustification(this),
+            "no rule justification for rule application");
 
         for (Contract c : contract.getFunctionalContracts()) {
             cjust.add(application, new RuleJustificationBySpec(c));

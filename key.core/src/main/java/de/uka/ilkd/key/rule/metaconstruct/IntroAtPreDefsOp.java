@@ -18,6 +18,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.*;
@@ -29,12 +30,16 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Transformer that introduces concrete prestate variables
  */
 @TransformerMeta(name = "#introAtPreDefs")
+@NullMarked
 public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 
     /**
@@ -55,10 +60,13 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final ProgramElement pe = target.javaBlock().program();
         assert pe != null;
 
-        final MethodFrame frame = JavaTools.getInnermostMethodFrame(pe, services);
+        final MethodFrame frame = Objects.requireNonNull(
+            JavaTools.getInnermostMethodFrame(pe, services), "no method frame for " + pe);
 
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT");
         final PrestateVariablesUpdater updater = new PrestateVariablesUpdater(frame, services, tb);
-        updater.addNeededHeaps(services.getTypeConverter().getHeapLDT().getAllHeaps().toList());
+        updater.addNeededHeaps(heapLDT.getAllHeaps().toList());
         updater.start();
 
         return tb.apply(updater.atPreUpdate, target, null);
@@ -77,6 +85,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     public void updateBlockAndLoopContracts(final ImmutableSet<? extends JavaStatement> statements,
             Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, LocationVariable> atPreHeapVars, Services services) {
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT");
         for (JavaStatement statement : statements) {
             ImmutableSet<AuxiliaryContract> contracts = DefaultImmutableSet.nil();
 
@@ -96,7 +106,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 Map<LocationVariable, LocationVariable> nonHeapVars =
                     new LinkedHashMap<>(atPreVars);
                 atPreHeapVars.forEach((key, val) -> nonHeapVars.remove(key));
-                atPreHeapVars.remove(services.getTypeConverter().getHeapLDT().getSavedHeap());
+                atPreHeapVars.remove(heapLDT.getSavedHeap());
 
                 final AuxiliaryContract.Variables variables = contract.getPlaceholderVariables();
                 updateAuxiliaryContract(contract, statement, variables, nonHeapVars, atPreHeapVars,
@@ -117,7 +127,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         /**
          * The Term for {@code this} of the methodframe.
          */
-        private final JTerm selfTerm;
+        private final @Nullable JTerm selfTerm;
         /**
          * A TermBuilder
          */
@@ -144,7 +154,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             super(frame, services);
             this.frame = frame;
             selfTerm = MiscTools.getSelfTerm(frame, services);
-            this.methodName = frame.getProgramMethod().getName();
+            this.methodName = Objects.requireNonNull(frame.getProgramMethod(),
+                "no program method in " + frame).getName();
             this.tb = tb;
             this.atPreUpdate = tb.skip();
         }
@@ -217,12 +228,14 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                 new LinkedHashMap<>();
             Map<LocationVariable, JTerm> newInvariants = new LinkedHashMap<>();
             Map<LocationVariable, JTerm> newFreeInvariants = new LinkedHashMap<>();
-            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                final JTerm term = spec.getInternalModifiable().getOrDefault(
-                    services.getTypeConverter().getHeapLDT().getHeap(), tb.allLocs());
+            final HeapLDT heapLDT = Objects.requireNonNull(
+                services.getTypeConverter().getHeapLDT(), "no heap LDT");
+            for (LocationVariable heap : heapLDT.getAllHeaps()) {
+                final JTerm term = spec.getInternalModifiable().getOrDefault(heapLDT.getHeap(),
+                    tb.allLocs());
                 final JTerm freeTerm = spec.getInternalFreeModifiable().getOrDefault(
-                    services.getTypeConverter().getHeapLDT().getHeap(), tb.strictlyNothing());
-                if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
+                    heapLDT.getHeap(), tb.strictlyNothing());
+                if (heap != heapLDT.getSavedHeap()
                         || !tb.strictlyNothing().equalsModProperty(term,
                             IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     final JTerm m = spec.getModifiable(heap, self, atPres, services);
@@ -237,7 +250,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     }
                     newInfFlowSpecs.put(heap, infFlowSpecs);
                 }
-                if (heap != services.getTypeConverter().getHeapLDT().getSavedHeap()
+                if (heap != heapLDT.getSavedHeap()
                         || !tb.strictlyNothing().equalsModProperty(
                             freeTerm, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                     final JTerm m = spec.getFreeModifiable(heap, selfTerm, atPres, services);
@@ -257,10 +270,13 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             final LoopStatement loop = spec.getLoop();
             ImmutableList<JTerm> newLocalIns = tb.var(MiscTools.getLocalIns(loop, services));
             ImmutableList<JTerm> newLocalOuts = tb.var(MiscTools.getLocalOuts(loop, services));
-            final LoopSpecification newInv = spec.create(loop, frame.getProgramMethod(),
-                frame.getProgramMethod().getContainerType(), newInvariants, newFreeInvariants,
-                newModifiables, newFreeModifiables, newInfFlowSpecs, newVariant, self, newLocalIns,
-                newLocalOuts, atPres);
+            final IProgramMethod method = Objects.requireNonNull(frame.getProgramMethod(),
+                "no program method in " + frame);
+            final LoopSpecification newInv = spec.create(loop, method,
+                Objects.requireNonNull(method.getContainerType(),
+                    "no container type for " + method),
+                newInvariants, newFreeInvariants, newModifiables, newFreeModifiables,
+                newInfFlowSpecs, newVariant, self, newLocalIns, newLocalOuts, atPres);
             services.getSpecificationRepository().addLoopInvariant(newInv);
         }
 
@@ -273,7 +289,9 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                     continue;
                 }
                 final LocationVariable l = tb.locationVariable(var.name() + "Before_" + methodName,
-                    var.getTypeReference(), true);
+                    Objects.requireNonNull(var.getTypeReference(),
+                        "no type reference for " + var),
+                    true);
                 services.getNamespaces().programVariables().addSafely(l);
 
                 final JTerm u = tb.elementary(l, tb.var(var));
@@ -313,13 +331,18 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             Map<LocationVariable, LocationVariable> nonHeapVars = new LinkedHashMap<>(atPreVars);
             atPreHeapVars.forEach((key, val) -> nonHeapVars.remove(key));
             // why does the saved heap get removed here?
-            atPreHeapVars.remove(services.getTypeConverter().getHeapLDT().getSavedHeap());
+            atPreHeapVars.remove(Objects.requireNonNull(
+                services.getTypeConverter().getHeapLDT(), "no heap LDT").getSavedHeap());
 
             updateAuxiliaryContract(contract, statement, variables, nonHeapVars, atPreHeapVars,
                 services);
         }
     }
 
+    // static contracts have no self variable (see
+    // AbstractAuxiliaryContractImpl.getModifiableClause); the interface methods declare a
+    // @NonNull self parameter even though null is handled downstream (read-only code)
+    @SuppressWarnings("NullAway")
     private static void updateAuxiliaryContract(final AuxiliaryContract contract,
             final JavaStatement statement, final AuxiliaryContract.Variables variables,
             final Map<LocationVariable, LocationVariable> nonHeapVars,
@@ -335,7 +358,10 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
         final Map<LocationVariable, JTerm> newModifiableClauses = new LinkedHashMap<>();
         final Map<LocationVariable, JTerm> newFreeModifiableClauses = new LinkedHashMap<>();
 
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT");
+
+        for (LocationVariable heap : heapLDT.getAllHeaps()) {
             // why does the saved heap just get ignored here?
             if (heap.name().equals(HeapLDT.SAVED_HEAP_NAME)) {
                 continue;

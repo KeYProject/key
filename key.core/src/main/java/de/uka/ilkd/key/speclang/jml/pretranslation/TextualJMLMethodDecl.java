@@ -14,10 +14,13 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.StringUtil;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A JML model method declaration in textual form.
  */
+@NullMarked
 public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     private final JmlParser.Method_declarationContext methodDefinition;
 
@@ -71,7 +74,7 @@ public final class TextualJMLMethodDecl extends TextualJMLConstruct {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

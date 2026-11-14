@@ -6,6 +6,7 @@ package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ContextStatementBlock;
@@ -36,6 +37,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,7 +79,8 @@ public class TestTacletParser {
                 }
                 """);
 
-    private Namespace<SchemaVariable> schemaVariableNS;
+    // set in parseDecls() from setUp(); null until then
+    private @Nullable Namespace<SchemaVariable> schemaVariableNS;
     private KeyIO io;
 
     @BeforeEach
@@ -93,7 +96,9 @@ public class TestTacletParser {
     //
 
     private SchemaVariable lookup_schemavar(String name) {
-        return schemaVariableNS.lookup(new Name(name));
+        Namespace<SchemaVariable> ns = Objects
+                .requireNonNull(schemaVariableNS, "the schema namespace must have been parsed");
+        return Objects.requireNonNull(ns.lookup(new Name(name)), "schema variable " + name);
     }
 
 
@@ -101,7 +106,8 @@ public class TestTacletParser {
         KeyIO.Loader l = io.load(s);
         l.loadComplete();
         schemaVariableNS = l.getSchemaNamespace();
-        io.setSchemaNamespace(schemaVariableNS);
+        io.setSchemaNamespace(
+            Objects.requireNonNull(schemaVariableNS, "the schema namespace must be provided"));
     }
 
     public JTerm parseTerm(String s) {
@@ -116,7 +122,8 @@ public class TestTacletParser {
         return new SequentFormula(parseFma(s));
     }
 
-    public Sequent sequent(String a, String s) {
+    // a null antecedent or succedent string denotes that the side of the sequent is empty
+    public Sequent sequent(@Nullable String a, @Nullable String s) {
         var antec = ImmutableList.<SequentFormula>nil();
         var succ = ImmutableList.<SequentFormula>nil();
         if (a != null) {
@@ -551,7 +558,7 @@ public class TestTacletParser {
         return causeOf(t, type) != null;
     }
 
-    private static Throwable causeOf(Throwable t, Class<? extends Throwable> type) {
+    private static @Nullable Throwable causeOf(Throwable t, Class<? extends Throwable> type) {
         for (Throwable c = t; c != null; c = c.getCause()) {
             if (type.isInstance(c)) {
                 return c;

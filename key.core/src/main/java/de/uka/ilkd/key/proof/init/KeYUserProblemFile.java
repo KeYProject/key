@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.UserInputValidator;
@@ -32,6 +33,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -39,8 +41,9 @@ import org.jspecify.annotations.Nullable;
  * Represents an input from a .key user problem file producing an environment as well as a proof
  * obligation.
  */
+@NullMarked
 public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
-    private Sequent problem = null;
+    private @Nullable Sequent problem = null;
 
     // -------------------------------------------------------------------------
     // constructors
@@ -56,7 +59,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param monitor the possibly <tt>null</tt> monitor for progress
      * @param profile the KeY profile under which to load
      */
-    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile) {
+    public KeYUserProblemFile(String name, Path file, @Nullable ProgressMonitor monitor,
+            Profile profile) {
         this(name, file, monitor, profile, false);
     }
 
@@ -69,8 +73,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param profile the KeY profile under which to load
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, Path file, ProgressMonitor monitor, Profile profile,
-            boolean compressed) {
+    public KeYUserProblemFile(String name, Path file, @Nullable ProgressMonitor monitor,
+            Profile profile, boolean compressed) {
         super(name, file, monitor, profile, compressed);
     }
 
@@ -81,11 +85,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @param file the file tp read from
      * @param fileRepo the fileRepo which will store the file
      * @param monitor the possibly <tt>null</tt> monitor for progress
-     * @param profile the KeY profile under which to load
+     * @param profile the KeY profile under which to load, or {@code null} to respect the profile
+     *        declared in the file (see {@link #getProfile()})
      * @param compressed {@code true} iff the file is compressed
      */
-    public KeYUserProblemFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
-            Profile profile, boolean compressed) {
+    public KeYUserProblemFile(String name, Path file, FileRepo fileRepo,
+            @Nullable ProgressMonitor monitor, @Nullable Profile profile, boolean compressed) {
         super(name, file, fileRepo, monitor, profile, compressed);
     }
 
@@ -93,12 +98,21 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     // public interface
     // -------------------------------------------------------------------------
 
+    /**
+     * Reads the key file, its in-code specifications, contracts and rules, accumulating warnings.
+     * <p>
+     * The init config of a fully opened problem file is asserted present below, and the settings
+     * and preference lookups in between do not change it; the dereferences of the (nullable) init
+     * config are suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public ImmutableSet<PositionedString> read() throws ProofInputException {
         if (initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
         }
-        ProofSettings settings = getPreferences();
+        ProofSettings settings = Objects.requireNonNull(getPreferences(),
+            "KeYUserProblemFile: preferences not set.");
         initConfig.setSettings(settings);
 
         ChoiceInformation ci = getParseContext().getChoices();
@@ -110,10 +124,12 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         warnings = warnings.union(super.readExtendedSignature());
 
         // read in-code specifications
+        // A user problem file declares no \include files: pass an empty list (as previously null).
         SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), readClassPath(), readBootClassPath(),
-            getProfile(), null);
-        slEnvInput.setInitConfig(initConfig);
-        warnings = warnings.union(slEnvInput.read());
+            getProfile(), List.of());
+        slEnvInput.setInitConfig(Objects.requireNonNull(initConfig, "InitConfig not set."));
+        warnings = warnings.union(Objects.requireNonNull(slEnvInput.read(),
+            "SLEnvInput returned no warnings."));
 
         // read contracts
         warnings = warnings.union(readContracts());
@@ -157,24 +173,34 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
     }
 
     @Override
-    public String chooseContract() {
+    public @Nullable String chooseContract() {
         return getProblemFinder().getChooseContract();
     }
 
     @Override
-    public Configuration getProofObligation() {
+    public @Nullable Configuration getProofObligation() {
         return getProblemFinder().getProofObligation();
     }
 
+    /**
+     * Builds and returns the proof aggregate for this problem file.
+     * <p>
+     * The init config of a fully opened problem file is asserted present and set before the proof
+     * is constructed; the dereference of the (nullable) init config is suppressed with a scoped
+     * key.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public ProofAggregate getPO() {
         assert problem != null;
         String name = name();
-        ProofSettings settings = getPreferences();
+        ProofSettings settings = Objects.requireNonNull(getPreferences(),
+            "KeYUserProblemFile: preferences not set.");
         initConfig.setSettings(settings);
         return ProofAggregate.createProofAggregate(
-            new Proof(name, problem, getParseContext().getProblemHeader(), initConfig,
-                file.file()),
+            new Proof(name, Objects.requireNonNull(problem, "No problem to prove."),
+                getParseContext().getProblemHeader(),
+                Objects.requireNonNull(initConfig, "InitConfig not set."), file.file()),
             name);
     }
 
@@ -222,7 +248,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
@@ -267,7 +293,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * @return The {@link Profile} defined by the file to load or {@code null} if no {@link Profile}
      *         is defined by the file.
      */
-    private Profile readProfileFromFile() {
+    private @Nullable Profile readProfileFromFile() {
         ProblemInformation pi = getProblemInformation();
         String profileName = pi.getProfile();
         if (profileName != null && !profileName.isEmpty()) {
@@ -287,7 +313,7 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
      * {@inheritDoc}
      */
     @Override
-    public KeYJavaType getContainerType() {
+    public @Nullable KeYJavaType getContainerType() {
         return null;
     }
 }

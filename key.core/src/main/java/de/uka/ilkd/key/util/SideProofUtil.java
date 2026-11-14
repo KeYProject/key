@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.util;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -23,6 +24,10 @@ import org.key_project.logic.Choice;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public final class SideProofUtil {
     /**
      * Forbid instances.
@@ -46,7 +51,8 @@ public final class SideProofUtil {
             final Proof source, final Choice... enableChoices) {
         assert !source.isDisposed();
         // Get required source instances
-        final InitConfig sourceInitConfig = source.getInitConfig();
+        final InitConfig sourceInitConfig =
+            Objects.requireNonNull(source.getInitConfig(), "no init config from " + source);
         final RuleJustificationInfo sourceJustiInfo = sourceInitConfig.getJustifInfo();
         // Create new profile which has separate OneStepSimplifier instance
         JavaProfile profile = new JavaProfile();
@@ -70,7 +76,8 @@ public final class SideProofUtil {
         ProofEnvironment env = new ProofEnvironment(initConfig);
         for (Taclet taclet : initConfig.activatedTaclets()) {
             initConfig.getJustifInfo().addJustification(taclet,
-                sourceJustiInfo.getJustification(taclet));
+                Objects.requireNonNull(sourceJustiInfo.getJustification(taclet),
+                    "no justification for " + taclet));
         }
         for (BuiltInRule rule : initConfig.builtInRules()) {
             RuleJustification origJusti = sourceJustiInfo.getJustification(rule);
@@ -120,7 +127,7 @@ public final class SideProofUtil {
      * @throws ProofInputException Occurred Exception.
      */
     public static ProofStarter createSideProof(ProofEnvironment sideProofEnvironment,
-            Sequent sequentToProve, String proofName) throws ProofInputException {
+            Sequent sequentToProve, @Nullable String proofName) throws ProofInputException {
         // Make sure that valid parameters are given
         // Create ProofStarter
         ProofStarter starter = new ProofStarter(false);

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -14,6 +15,8 @@ import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+
+import org.key_project.prover.sequent.Sequent;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,7 +36,7 @@ class LogicPrinterTest {
         KeyIO io = new KeyIO(services, services.getNamespaces());
         FindTaclet taclet = null;
         try {
-            taclet = (FindTaclet) io
+            taclet = (FindTaclet) Objects.requireNonNull(io
                     .load(
                         """
                                 \\rules { test {
@@ -42,7 +45,8 @@ class LogicPrinterTest {
                                    \\replacewith(\\modality{#allmodal} {}\\endmodality(true))
                                 };}
                                 """)
-                    .loadComplete().get(0);
+                    .loadComplete().get(0),
+                "taclet is present in the test source");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,7 +65,7 @@ class LogicPrinterTest {
         KeyIO io = new KeyIO(services, services.getNamespaces());
         JTerm problem = null;
         try {
-            problem = (JTerm) io
+            KeyIO.Loader loader = io
                     .load(
                         """
                                  \\functions {
@@ -76,8 +80,10 @@ class LogicPrinterTest {
                                  \\problem {
                                       anon(store(h1, o, fld, null), union<Loc>(union<Loc>(allFields(o), singleton<Loc>(pair<Object, Field>(o,fld))), allObjects(fld)), h2) = h3
                                  }
-                                """)
-                    .loadCompleteProblem().getProblem().succedent().getFirst().formula();
+                                """);
+            Sequent seq = Objects.requireNonNull(loader.loadCompleteProblem().getProblem(),
+                "problem is present in the test source");
+            problem = (JTerm) seq.succedent().getFirst().formula();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

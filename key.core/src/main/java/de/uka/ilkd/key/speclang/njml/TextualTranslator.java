@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang.njml;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
@@ -15,6 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec.ClauseHd.INVARIANT;
@@ -34,7 +37,12 @@ import static de.uka.ilkd.key.speclang.njml.Translator.raiseError;
  * into a {@link TextualJMLModifierList} construct,
  * which is then attached to the appropriate element by the {@link JMLTransformer}.
  */
-class TextualTranslator extends JmlParserBaseVisitor<Object> {
+@NullMarked
+// NullAway: the parser visitor must be able to return {@code null} for absent/unmatched
+// constructs, but a @Nullable type argument cannot be expressed because the (generated)
+// JmlParserBaseVisitor's type variable has no @Nullable upper bound
+@SuppressWarnings("NullAway")
+class TextualTranslator extends JmlParserBaseVisitor<@Nullable Object> {
 
     private final boolean attachOriginLabel;
 
@@ -50,7 +58,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
      *        the token
      * @return the modifier
      */
-    public static JMLModifier modifierFromToken(Token token) {
+    public static @Nullable JMLModifier modifierFromToken(@Nullable Token token) {
         if (token == null) {
             return null;
         }
@@ -108,22 +116,24 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitModifier(JmlParser.ModifierContext ctx) {
-        mods = mods.append(modifierFromToken(ctx.mod));
+    public @Nullable Object visitModifier(JmlParser.ModifierContext ctx) {
+        mods = mods.append(Objects.requireNonNull(modifierFromToken(ctx.mod),
+            "unrecognized modifier token"));
         return null;
     }
 
     @Override
-    public Object visitMethodlevel_comment(JmlParser.Methodlevel_commentContext ctx) {
+    public @Nullable Object visitMethodlevel_comment(JmlParser.Methodlevel_commentContext ctx) {
         return super.visitMethodlevel_comment(ctx);
     }
 
     @Override
-    public Object visitSpec_case(JmlParser.Spec_caseContext ctx) {
+    public @Nullable Object visitSpec_case(JmlParser.Spec_caseContext ctx) {
         // read contract modifier and behavior ID
         if (ctx.modifiers() != null) {
             for (JmlParser.ModifierContext mod : ctx.modifiers().modifier()) {
-                mods = mods.append(modifierFromToken(mod.mod));
+                mods = mods.append(Objects.requireNonNull(modifierFromToken(mod.mod),
+                    "unrecognized modifier token"));
             }
         }
         Behavior behaviour = getBehavior(ctx.behavior);
@@ -137,7 +147,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         return null;
     }
 
-    private Behavior getBehavior(Token behavior) {
+    private Behavior getBehavior(@Nullable Token behavior) {
         if (behavior == null) {
             return Behavior.NONE; // lightweight specification
         }
@@ -154,20 +164,20 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitSpec_body(JmlParser.Spec_bodyContext ctx) {
+    public @Nullable Object visitSpec_body(JmlParser.Spec_bodyContext ctx) {
         acceptAll(ctx.a);
         if (ctx.NEST_START() != null) {
             final TextualJMLSpecCase base = methodContract;
             if (ctx.inner != null) {
-                assert base != null;
-                methodContract = base.copy();
+                methodContract = Objects.requireNonNull(base,
+                    "nested spec body without an active method contract").copy();
                 constructs = constructs.append(methodContract);
                 acceptAll(ctx.inner);
             }
 
             for (JmlParser.Spec_bodyContext it : ctx.spec_body()) {
-                assert base != null;
-                methodContract = base.copy();
+                methodContract = Objects.requireNonNull(base,
+                    "nested spec body without an active method contract").copy();
                 constructs = constructs.append(methodContract);
                 accept(it);
             }
@@ -176,7 +186,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Name[] visitTargetHeap(JmlParser.TargetHeapContext ctx) {
+    public Name[] visitTargetHeap(JmlParser.@Nullable TargetHeapContext ctx) {
         if (ctx == null || ctx.SPECIAL_IDENT().isEmpty()) {
             return new Name[] { HeapLDT.BASE_HEAP_NAME };
         }
@@ -189,8 +199,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitEnsures_clause(JmlParser.Ensures_clauseContext ctx) {
-        assert methodContract != null;
+    public @Nullable Object visitEnsures_clause(JmlParser.Ensures_clauseContext ctx) {
+        final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+            "clause used outside of a method contract");
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree = ctx.ENSURES().getText().endsWith("_free");
         final LabeledParserRuleContext ctx2 =
@@ -204,8 +215,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitRequires_clause(JmlParser.Requires_clauseContext ctx) {
-        assert methodContract != null;
+    public @Nullable Object visitRequires_clause(JmlParser.Requires_clauseContext ctx) {
+        final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+            "clause used outside of a method contract");
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         for (Name heap : heaps) {
             final boolean isFree = ctx.REQUIRES().getText().endsWith("_free");
@@ -222,8 +234,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
-        assert methodContract != null;
+    public @Nullable Object visitMeasured_by_clause(JmlParser.Measured_by_clauseContext ctx) {
+        final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+            "clause used outside of a method contract");
         methodContract.addClause(MEASURED_BY,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                 OriginTermLabel.SpecType.MEASURED_BY, attachOriginLabel));
@@ -231,38 +244,39 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitCaptures_clause(JmlParser.Captures_clauseContext ctx) {
+    public @Nullable Object visitCaptures_clause(JmlParser.Captures_clauseContext ctx) {
         raiseError("Captures clauses are not supported by KeY.", ctx);
         return null;
     }
 
     @Override
-    public Object visitDiverges_clause(JmlParser.Diverges_clauseContext ctx) {
-        assert methodContract != null;
+    public @Nullable Object visitDiverges_clause(JmlParser.Diverges_clauseContext ctx) {
+        final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+            "clause used outside of a method contract");
         methodContract.addClause(DIVERGES, ctx);
         return null;
     }
 
     @Override
-    public Object visitWorking_space_clause(JmlParser.Working_space_clauseContext ctx) {
+    public @Nullable Object visitWorking_space_clause(JmlParser.Working_space_clauseContext ctx) {
         raiseError("working space clauses are not supported by KeY.", ctx);
         return null;
     }
 
     @Override
-    public Object visitDuration_clause(JmlParser.Duration_clauseContext ctx) {
+    public @Nullable Object visitDuration_clause(JmlParser.Duration_clauseContext ctx) {
         raiseError("Duration clauses are not supported by KeY.", ctx);
         return null;
     }
 
     @Override
-    public Object visitWhen_clause(JmlParser.When_clauseContext ctx) {
+    public @Nullable Object visitWhen_clause(JmlParser.When_clauseContext ctx) {
         raiseError("When clauses are not supported by KeY.", ctx);
         return null;
     }
 
     @Override
-    public Object visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
+    public @Nullable Object visitAccessible_clause(JmlParser.Accessible_clauseContext ctx) {
         boolean depends = ctx.MEASURED_BY() != null || ctx.COLON() != null;
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final LabeledParserRuleContext ctx2 =
@@ -282,7 +296,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
+    public @Nullable Object visitAssignable_clause(JmlParser.Assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree =
             ctx.ASSIGNABLE() != null && ctx.ASSIGNABLE().getText().endsWith("_free");
@@ -306,7 +320,8 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitLoop_assignable_clause(JmlParser.Loop_assignable_clauseContext ctx) {
+    public @Nullable Object visitLoop_assignable_clause(
+            JmlParser.Loop_assignable_clauseContext ctx) {
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
         final boolean isFree =
             (ctx.LOOP_ASSIGNABLE() != null && ctx.LOOP_ASSIGNABLE().getText().endsWith("_free"))
@@ -328,21 +343,22 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
+    public @Nullable Object visitVariant_function(JmlParser.Variant_functionContext ctx) {
         final LabeledParserRuleContext ctx2 =
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                 OriginTermLabel.SpecType.DECREASES, attachOriginLabel);
         if (loopContract != null) {
             loopContract.setVariant(ctx2);
         } else {
-            assert methodContract != null;
+            final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+                "clause used outside of a method contract");
             methodContract.addClause(DECREASES, ctx2);
         }
         return null;
     }
 
     @Override
-    public Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
+    public @Nullable Object visitInitially_clause(JmlParser.Initially_clauseContext ctx) {
         TextualJMLInitially initially =
             new TextualJMLInitially(mods, new LabeledParserRuleContext(ctx));
         finishConstruct(initially);
@@ -350,7 +366,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
+    public @Nullable Object visitRepresents_clause(JmlParser.Represents_clauseContext ctx) {
         TextualJMLRepresents represents =
             new TextualJMLRepresents(mods, new LabeledParserRuleContext(ctx));
         finishConstruct(represents);
@@ -358,22 +374,24 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitSeparates_clause(JmlParser.Separates_clauseContext ctx) {
-        assert methodContract != null;
+    public @Nullable Object visitSeparates_clause(JmlParser.Separates_clauseContext ctx) {
+        final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+            "clause used outside of a method contract");
         methodContract.addClause(INFORMATION_FLOW, ctx);
         return null;
     }
 
     @Override
-    public Object visitLoop_separates_clause(JmlParser.Loop_separates_clauseContext ctx) {
-        assert loopContract != null;
+    public @Nullable Object visitLoop_separates_clause(JmlParser.Loop_separates_clauseContext ctx) {
+        final TextualJMLLoopSpec loopContract = Objects.requireNonNull(this.loopContract,
+            "clause used outside of a loop contract");
         loopContract.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
             new LabeledParserRuleContext(ctx));
         return null;
     }
 
     @Override
-    public Object visitDetermines_clause(JmlParser.Determines_clauseContext ctx) {
+    public @Nullable Object visitDetermines_clause(JmlParser.Determines_clauseContext ctx) {
         if (methodContract != null) {
             methodContract.addClause(INFORMATION_FLOW, ctx);
         } else if (loopContract != null) {
@@ -384,14 +402,16 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitLoop_determines_clause(JmlParser.Loop_determines_clauseContext ctx) {
+    public @Nullable Object visitLoop_determines_clause(
+            JmlParser.Loop_determines_clauseContext ctx) {
         raiseError("Loop determines clauses are not supported by KeY.", ctx);
         return null;
     }
 
     @Override
-    public Object visitSignals_clause(JmlParser.Signals_clauseContext ctx) {
-        assert methodContract != null;
+    public @Nullable Object visitSignals_clause(JmlParser.Signals_clauseContext ctx) {
+        final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+            "clause used outside of a method contract");
         methodContract.addClause(SIGNALS,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                 OriginTermLabel.SpecType.SIGNALS, attachOriginLabel));
@@ -399,8 +419,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
-        assert methodContract != null;
+    public @Nullable Object visitSignals_only_clause(JmlParser.Signals_only_clauseContext ctx) {
+        final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+            "clause used outside of a method contract");
         methodContract.addClause(SIGNALS_ONLY,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                 OriginTermLabel.SpecType.SIGNALS_ONLY, attachOriginLabel));
@@ -408,8 +429,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
-        assert methodContract != null;
+    public @Nullable Object visitBreaks_clause(JmlParser.Breaks_clauseContext ctx) {
+        final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+            "clause used outside of a method contract");
         methodContract.addClause(BREAKS,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                 OriginTermLabel.SpecType.BREAKS, attachOriginLabel));
@@ -417,8 +439,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
-        assert methodContract != null;
+    public @Nullable Object visitContinues_clause(JmlParser.Continues_clauseContext ctx) {
+        final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+            "clause used outside of a method contract");
         methodContract.addClause(CONTINUES,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                 OriginTermLabel.SpecType.CONTINUES, attachOriginLabel));
@@ -426,8 +449,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
-        assert methodContract != null;
+    public @Nullable Object visitReturns_clause(JmlParser.Returns_clauseContext ctx) {
+        final TextualJMLSpecCase methodContract = Objects.requireNonNull(this.methodContract,
+            "clause used outside of a method contract");
         methodContract.addClause(RETURNS,
             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
                 OriginTermLabel.SpecType.RETURNS, attachOriginLabel));
@@ -435,7 +459,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitName_clause(JmlParser.Name_clauseContext ctx) {
+    public @Nullable Object visitName_clause(JmlParser.Name_clauseContext ctx) {
         raiseError("Name clauses are not supported by KeY.", ctx);
         return null;
     }
@@ -446,8 +470,9 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T accept(ParserRuleContext ctx) {
+    @SuppressWarnings({ "unchecked", "NullAway" })
+    // NullAway: generic helper must be able to return null for absent (nullable) contexts
+    private <T> T accept(@Nullable ParserRuleContext ctx) {
         if (ctx == null) {
             return null;
         }
@@ -455,17 +480,17 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitMethodlevel_element(JmlParser.Methodlevel_elementContext ctx) {
+    public @Nullable Object visitMethodlevel_element(JmlParser.Methodlevel_elementContext ctx) {
         return super.visitMethodlevel_element(ctx);
     }
 
     @Override
-    public Object visitModifiers(JmlParser.ModifiersContext ctx) {
+    public @Nullable Object visitModifiers(JmlParser.ModifiersContext ctx) {
         return super.visitModifiers(ctx);
     }
 
     @Override
-    public Object visitClass_invariant(JmlParser.Class_invariantContext ctx) {
+    public @Nullable Object visitClass_invariant(JmlParser.Class_invariantContext ctx) {
         final boolean isFree = ctx.INVARIANT().getText().endsWith("_free");
         TextualJMLClassInv inv = new TextualJMLClassInv(mods, ctx, isFree);
         finishConstruct(inv);
@@ -473,7 +498,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitClass_axiom(JmlParser.Class_axiomContext ctx) {
+    public @Nullable Object visitClass_axiom(JmlParser.Class_axiomContext ctx) {
         TextualJMLClassAxiom inv =
             new TextualJMLClassAxiom(mods, new LabeledParserRuleContext(ctx));
         finishConstruct(inv);
@@ -482,7 +507,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
+    public @Nullable Object visitField_declaration(JmlParser.Field_declarationContext ctx) {
         assert !mods.isEmpty();
         TextualJMLFieldDecl inv = new TextualJMLFieldDecl(mods, ctx);
         finishConstruct(inv);
@@ -491,21 +516,21 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Object visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
+    public @Nullable Object visitMethod_declaration(JmlParser.Method_declarationContext ctx) {
         TextualJMLMethodDecl decl = new TextualJMLMethodDecl(mods, ctx);
         finishConstruct(decl);
         return null;
     }
 
     @Override
-    public Object visitSet_statement(JmlParser.Set_statementContext ctx) {
+    public @Nullable Object visitSet_statement(JmlParser.Set_statementContext ctx) {
         TextualJMLSetStatement inv = new TextualJMLSetStatement(mods, ctx);
         finishConstruct(inv);
         return null;
     }
 
     @Override
-    public Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
+    public @Nullable Object visitLoop_specification(JmlParser.Loop_specificationContext ctx) {
         loopContract = new TextualJMLLoopSpec(mods);
         methodContract = null;
         super.visitLoop_specification(ctx);
@@ -514,15 +539,16 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitMerge_point_statement(JmlParser.Merge_point_statementContext ctx) {
+    public @Nullable Object visitMerge_point_statement(JmlParser.Merge_point_statementContext ctx) {
         TextualJMLMergePointDecl mergePointDecl = new TextualJMLMergePointDecl(mods, ctx);
         finishConstruct(mergePointDecl);
         return null;
     }
 
     @Override
-    public Object visitLoop_invariant(JmlParser.Loop_invariantContext ctx) {
-        assert loopContract != null;
+    public @Nullable Object visitLoop_invariant(JmlParser.Loop_invariantContext ctx) {
+        final TextualJMLLoopSpec loopContract = Objects.requireNonNull(this.loopContract,
+            "clause used outside of a loop contract");
         final boolean isFree = ctx.LOOP_INVARIANT().getText().endsWith("_free");
         TextualJMLLoopSpec.ClauseHd type = isFree ? INVARIANT_FREE : INVARIANT;
         Name[] heaps = visitTargetHeap(ctx.targetHeap());
@@ -538,7 +564,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
+    public @Nullable Object visitAssume_statement(JmlParser.Assume_statementContext ctx) {
         TextualJMLAssertStatement b =
             new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSUME,
                 new KeyAst.Expression(ctx.expression()));
@@ -548,7 +574,7 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
 
 
     @Override
-    public Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
+    public @Nullable Object visitAssert_statement(JmlParser.Assert_statementContext ctx) {
         TextualJMLAssertStatement b =
             new TextualJMLAssertStatement(TextualJMLAssertStatement.Kind.ASSERT,
                 new KeyAst.Expression(ctx.expression()),
@@ -559,13 +585,14 @@ class TextualTranslator extends JmlParserBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {
+    public @Nullable Object visitBlock_specification(JmlParser.Block_specificationContext ctx) {
         accept(ctx.method_specification());
         return null;
     }
 
     @Override
-    public Object visitBlock_loop_specification(JmlParser.Block_loop_specificationContext ctx) {
+    public @Nullable Object visitBlock_loop_specification(
+            JmlParser.Block_loop_specificationContext ctx) {
         acceptAll(ctx.spec_case());
         for (TextualJMLConstruct construct : constructs) {
             construct.setLoopContract(true);

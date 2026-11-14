@@ -9,7 +9,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -17,6 +19,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author weigl
  */
+@NullMarked
 public abstract class AbstractPropertiesSettings extends AbstractSettings {
 
     private static final String SET_DELIMITER = ",";
@@ -127,14 +130,16 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         });
     }
 
-    protected PropertyEntry<Double> createDoubleProperty(String key, double defValue) {
+    protected PropertyEntry<Double> createDoubleProperty(
+            @UnderInitialization AbstractPropertiesSettings this, String key, double defValue) {
         PropertyEntry<Double> pe = new DefaultPropertyEntry<>(key, defValue, parseDouble,
             (it) -> ((Number) it).doubleValue());
         propertyEntries.add(pe);
         return pe;
     }
 
-    protected PropertyEntry<Integer> createIntegerProperty(String key, int defValue) {
+    protected PropertyEntry<Integer> createIntegerProperty(
+            @UnderInitialization AbstractPropertiesSettings this, String key, int defValue) {
         // A stored numeric value may deserialize as Integer or Long depending on its magnitude and
         // the settings format, so accept any Number rather than assuming a particular boxed type.
         PropertyEntry<Integer> pe = new DefaultPropertyEntry<>(key, defValue, parseInt,
@@ -143,28 +148,32 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
         return pe;
     }
 
-    protected PropertyEntry<Float> createFloatProperty(String key, float defValue) {
+    protected PropertyEntry<Float> createFloatProperty(
+            @UnderInitialization AbstractPropertiesSettings this, String key, float defValue) {
         PropertyEntry<Float> pe = new DefaultPropertyEntry<>(key, defValue, parseFloat,
             (it) -> ((Number) it).floatValue());
         propertyEntries.add(pe);
         return pe;
     }
 
-    protected PropertyEntry<String> createStringProperty(String key, String defValue) {
+    protected PropertyEntry<String> createStringProperty(
+            @UnderInitialization AbstractPropertiesSettings this, String key, String defValue) {
         PropertyEntry<String> pe =
             new DefaultPropertyEntry<>(key, defValue, id -> id, Object::toString);
         propertyEntries.add(pe);
         return pe;
     }
 
-    protected PropertyEntry<Boolean> createBooleanProperty(String key, boolean defValue) {
+    protected PropertyEntry<Boolean> createBooleanProperty(
+            @UnderInitialization AbstractPropertiesSettings this, String key, boolean defValue) {
         PropertyEntry<Boolean> pe =
             new DefaultPropertyEntry<>(key, defValue, parseBoolean, (it) -> (Boolean) it);
         propertyEntries.add(pe);
         return pe;
     }
 
-    protected PropertyEntry<Set<String>> createStringSetProperty(String key, String defValue) {
+    protected PropertyEntry<Set<String>> createStringSetProperty(
+            @UnderInitialization AbstractPropertiesSettings this, String key, String defValue) {
         PropertyEntry<Set<String>> pe = new DefaultPropertyEntry<>(key, parseStringSet(defValue),
             AbstractPropertiesSettings::parseStringSet,
             AbstractPropertiesSettings::stringSetToString,
@@ -180,9 +189,12 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
      * @param defValue a default value
      * @return returns a {@link PropertyEntry}
      */
-    protected PropertyEntry<List<String>> createStringListProperty(@NonNull String key,
+    protected PropertyEntry<List<String>> createStringListProperty(
+            @UnderInitialization AbstractPropertiesSettings this, @NonNull String key,
             @Nullable String defValue) {
-        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key, parseStringList(defValue),
+        PropertyEntry<List<String>> pe = new DefaultPropertyEntry<>(key,
+            parseStringList(Objects.requireNonNull(defValue,
+                "string list property requires a default value")),
             AbstractPropertiesSettings::parseStringList,
             AbstractPropertiesSettings::stringListToString, it -> (List<String>) it);
         propertyEntries.add(pe);
@@ -271,7 +283,18 @@ public abstract class AbstractPropertiesSettings extends AbstractSettings {
             }
         }
 
+        /**
+         * Delegates to the property-specific conversion function injected by the {@code
+         * create*Property} factories. The null semantics live in that function: null passes
+         * through for {@code String}/{@code Boolean}/{@code List} properties (the caller ignores
+         * the {@code null} result) but crashes for numeric/collection ones. This matches main's
+         * behavior exactly; no single annotation can express it uniformly (widening the function
+         * type to {@code Function<@Nullable Object, T>} is rejected against the lambdas that cast
+         * the argument, and guarding the null would turn main's null-tolerant pass-through into a
+         * fatal error).
+         */
         @Override
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
         public T fromObject(@Nullable Object o) {
             return fromObject.apply(o);
         }

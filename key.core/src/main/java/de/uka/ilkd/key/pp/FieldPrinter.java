@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.pp;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -18,12 +19,14 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Common superclass of {@link StorePrinter} and {@link SelectPrinter}.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 class FieldPrinter {
 
     // protected final LogicPrinter lp;
@@ -74,7 +77,10 @@ class FieldPrinter {
      */
     private boolean isCanonicField(JTerm objectTerm, JTerm fieldTerm, JavaInfo javaInfo) {
         Sort sort = objectTerm.sort();
-        KeYJavaType kjt = javaInfo.getKeYJavaType(sort);
+        // The object term always has a Java sort whose KeYJavaType is registered in the services,
+        // so the lookup result is legitimately non-null here.
+        KeYJavaType kjt = Objects.requireNonNull(javaInfo.getKeYJavaType(sort),
+            "no KeYJavaType for " + sort);
         String fieldName = HeapLDT.getPrettyFieldName(fieldTerm.op());
         ProgramVariable pv = javaInfo.getCanonicalFieldProgramVariable(fieldName, kjt);
         if (pv == null) {
@@ -146,7 +152,8 @@ class FieldPrinter {
     }
 
     protected boolean isJavaFieldConstant(JTerm fieldTerm) {
-        return isJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
+        return isJavaFieldConstant(fieldTerm,
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT"), services);
     }
 
     /*
@@ -159,7 +166,8 @@ class FieldPrinter {
                 JavaDLFieldNames.FIELD_PREFIX +
                 JavaDLFieldNames.IMPLICIT_NAME_PREFIX;
         return fieldTerm.op().name().toString().contains(implicitFieldMarker)
-                && isFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT());
+                && isFieldConstant(fieldTerm, Objects.requireNonNull(
+                    services.getTypeConverter().getHeapLDT(), "heap LDT"));
     }
 
     /*
@@ -168,7 +176,9 @@ class FieldPrinter {
     protected boolean isStaticFieldConstant(JTerm fieldTerm) {
         try {
             ProgramVariable pv =
-                getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
+                getJavaFieldConstant(fieldTerm,
+                    Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT"),
+                    services);
             return pv.isStatic();
         } catch (RuntimeException e) {
             return false;
@@ -181,7 +191,9 @@ class FieldPrinter {
     protected boolean isFinalFieldConstant(JTerm fieldTerm) {
         try {
             ProgramVariable pv =
-                getJavaFieldConstant(fieldTerm, services.getTypeConverter().getHeapLDT(), services);
+                getJavaFieldConstant(fieldTerm,
+                    Objects.requireNonNull(services.getTypeConverter().getHeapLDT(), "heap LDT"),
+                    services);
             return pv.isFinal();
         } catch (RuntimeException e) {
             return false;

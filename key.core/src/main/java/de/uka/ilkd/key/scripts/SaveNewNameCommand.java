@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -20,6 +21,8 @@ import de.uka.ilkd.key.scripts.meta.Option;
 import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.op.Function;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 /**
  * Special "Let" usually to be applied immediately after a manual rule application. Saves a new name
@@ -39,21 +42,26 @@ public class SaveNewNameCommand extends AbstractCommand {
     @Override
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
         var params = state().getValueInjector().inject(new Parameters(), arguments);
-        if (!params.abbreviation.startsWith("@")) {
+        final String abbreviation = Objects.requireNonNull(params.abbreviation,
+            "No abbreviation was given");
+        if (!abbreviation.startsWith("@")) {
             throw new ScriptException(
-                "Unexpected parameter to saveNewName, only @var allowed: " + params.abbreviation);
+                "Unexpected parameter to saveNewName, only @var allowed: " + abbreviation);
         }
 
         final AbbrevMap abbrMap = state().getAbbreviations();
-        final String key = params.abbreviation.substring(1);
-        final String stringToMatch = params.matches;
+        final String key = abbreviation.substring(1);
+        final String stringToMatch =
+            Objects.requireNonNull(params.matches, "No match expression was given");
 
         try {
             final Goal goal = state().getFirstOpenAutomaticGoal();
-            final Node node = goal.node().parent();
-            final List<String> matches =
-                node.getNameRecorder().getProposals().stream().map(Name::toString)
-                        .filter(str -> str.matches(stringToMatch)).toList();
+            final Node node =
+                Objects.requireNonNull(goal.node().parent(), "No parent node");
+            final var recorder =
+                Objects.requireNonNull(node.getNameRecorder(), "No name recorder");
+            final List<String> matches = recorder.getProposals().stream().map(Name::toString)
+                    .filter(str -> str.matches(stringToMatch)).toList();
 
             if (matches.size() != 1) {
                 throw new ScriptException(
@@ -61,8 +69,9 @@ public class SaveNewNameCommand extends AbstractCommand {
                         matches.size(), stringToMatch));
             }
 
-            final Named lookupResult =
-                goal.getLocalNamespaces().lookup(new Name(matches.getFirst()));
+            final Named lookupResult = Objects.requireNonNull(
+                goal.getLocalNamespaces().lookup(new Name(matches.getFirst())),
+                "Could not look up the matched name");
 
             assert lookupResult != null;
 
@@ -102,11 +111,11 @@ public class SaveNewNameCommand extends AbstractCommand {
     public static class Parameters {
         @Documentation("The abbreviation to store the new name under, must start with @")
         @Argument
-        public String abbreviation;
+        public @MonotonicNonNull String abbreviation;
 
         @Documentation("A regular expression to match the new name against, must match exactly one name")
         @Option(value = "matches")
-        public String matches;
+        public @MonotonicNonNull String matches;
     }
 
     @Override

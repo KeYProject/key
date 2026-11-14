@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -20,6 +21,9 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.checkerframework.checker.initialization.qual.UnderInitialization;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A shortcut-statement for a method body, i.e. no dynamic dispatching any longer.
@@ -36,6 +40,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  *
  */
+@NullMarked
 public class MethodBodyStatement extends JavaNonTerminalProgramElement
         implements Statement {
 
@@ -43,7 +48,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
      * the variable the result of the method execution is assigned to if the method is declared void
      * or the result not assigned to a variable or field, this value is null.
      */
-    private final IProgramVariable resultVar;
+    private final @Nullable IProgramVariable resultVar;
 
     /**
      * This type reference determines the class where the represented method has to be implemented.
@@ -56,7 +61,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     private final MethodReference methodReference;
 
     /** cache resolved method */
-    private IProgramMethod method;
+    private @Nullable IProgramMethod method;
 
     /**
      * indicates whether this stands for the specification of a method rather than the concrete body
@@ -88,10 +93,12 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     public MethodBodyStatement(ExtList list) {
-        this.bodySource = list.get(TypeReference.class);
+        this.bodySource = Objects.requireNonNull(list.get(TypeReference.class),
+            "method body statement needs a body source type reference");
         this.resultVar = list.get(IProgramVariable.class);
 
-        this.methodReference = list.get(MethodReference.class);
+        this.methodReference = Objects.requireNonNull(list.get(MethodReference.class),
+            "method body statement needs a method reference");
 
         assert methodReference != null : "Missing methodreference";
         assert methodReference.getReferencePrefix() != null
@@ -101,16 +108,36 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         this.useSpecification = false;
     }
 
-    public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification) {
+    public MethodBodyStatement(IProgramMethod method, @Nullable ReferencePrefix newContext,
+            @Nullable IProgramVariable res, ImmutableArray<Expression> args,
+            boolean useSpecification) {
         this(method, newContext, res, args, useSpecification, null);
     }
 
-    public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification,
-            ProgramElement scope) {
+    /**
+     * Constructs a method body statement.
+     *
+     * @param method
+     *        the invoked program method
+     * @param newContext
+     *        the reference the method is invoked on; may be {@code null} only for static methods,
+     *        in which case the container type is used
+     * @param res
+     *        the variable the result is assigned to; may be {@code null} if the method is void or
+     *        the result is not assigned
+     * @param args
+     *        the actual arguments, all program variables
+     * @param useSpecification
+     *        whether to use the specification rather than the concrete body
+     * @param scope
+     *        the enclosing scope, or {@code null}
+     */
+    public MethodBodyStatement(IProgramMethod method, @Nullable ReferencePrefix newContext,
+            @Nullable IProgramVariable res, ImmutableArray<Expression> args,
+            boolean useSpecification, @Nullable ProgramElement scope) {
         this.method = method;
-        this.bodySource = new TypeRef(method.getContainerType());
+        this.bodySource = new TypeRef(Objects.requireNonNull(method.getContainerType(),
+            "a program method must have a container type"));
         this.resultVar = res;
         this.useSpecification = useSpecification;
 
@@ -128,7 +155,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
             new MethodReference(args, method.getProgramElementName(), newContext);
     }
 
-    public MethodBodyStatement(PositionInfo pi, List<Comment> c, IProgramVariable resultVar,
+    public MethodBodyStatement(PositionInfo pi, List<Comment> c,
+            @Nullable IProgramVariable resultVar,
             TypeReference bodySource,
             MethodReference methodReference) {
         super(pi, c);
@@ -140,7 +168,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
 
-    private void checkOnlyProgramVarsAsArguments(ImmutableArray<? extends Expression> arguments) {
+    private void checkOnlyProgramVarsAsArguments(
+            @UnderInitialization MethodBodyStatement this,
+            ImmutableArray<? extends Expression> arguments) {
         for (int i = 0, sz = arguments.size(); i < sz; i++) {
             final Expression argument = arguments.get(i);
             if (!((argument instanceof LocationVariable locVar
@@ -152,13 +182,14 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         }
     }
 
-    public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args) {
+    public MethodBodyStatement(IProgramMethod method, @Nullable ReferencePrefix newContext,
+            @Nullable IProgramVariable res, ImmutableArray<Expression> args) {
         this(method, newContext, res, args, false);
     }
 
-    public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args, ProgramElement scope) {
+    public MethodBodyStatement(IProgramMethod method, @Nullable ReferencePrefix newContext,
+            @Nullable IProgramVariable res, ImmutableArray<Expression> args,
+            ProgramElement scope) {
         this(method, newContext, res, args, false, scope);
     }
 
@@ -171,7 +202,10 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         if (method == null) {
             resolveMethod(services);
         }
-        return method.getBody();
+        return Objects.requireNonNull(
+            Objects.requireNonNull(method, "method body statement did not resolve its method")
+                    .getBody(),
+            "method body statement resolved a method without a body");
     }
 
     /**
@@ -194,7 +228,9 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     public ReferencePrefix getDesignatedContext() {
-        return methodReference.getReferencePrefix();
+        return Objects.requireNonNull(methodReference.getReferencePrefix(),
+            "Method reference of a method body statement needs an "
+                + "explicit reference prefix.");
     }
 
     public ImmutableArray<? extends Expression> getArguments() {
@@ -238,7 +274,8 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         if (method == null) {
             resolveMethod(services);
         }
-        return method.isStatic();
+        return Objects.requireNonNull(method, "method body statement did not resolve its method")
+                .isStatic();
     }
 
 
@@ -253,12 +290,13 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         v.performActionOnMethodBodyStatement(this);
     }
 
-    public IProgramVariable getResultVariable() {
+    public @Nullable IProgramVariable getResultVariable() {
         return resultVar;
     }
 
     public KeYJavaType getBodySource() {
-        return bodySource.getKeYJavaType();
+        return Objects.requireNonNull(bodySource.getKeYJavaType(),
+            "body source type reference must resolve to a KeYJavaType");
     }
 
     public TypeReference getBodySourceAsTypeReference() {
@@ -270,11 +308,13 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         if (method == null) {
             resolveMethod(services);
         }
-        return method;
+        return Objects.requireNonNull(method, "method body statement did not resolve its method");
     }
 
     private void resolveMethod(Services services) {
-        method = services.getJavaInfo().getProgramMethod(getBodySource(), methodReference.getName(),
+        method = services.getJavaInfo().getProgramMethod(getBodySource(),
+            Objects.requireNonNull(methodReference.getName(),
+                "method body statement needs a named method reference"),
             services.getJavaInfo().createSignature(methodReference.getArguments()),
             getBodySource());
     }

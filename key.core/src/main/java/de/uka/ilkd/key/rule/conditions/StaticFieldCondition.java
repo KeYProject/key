@@ -16,6 +16,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This variable condition checks if the instantiation of a schemavariable (of type Field) refers to
  * a Java field declared as "static".
@@ -26,6 +29,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class StaticFieldCondition extends VariableConditionAdapter {
 
     private final SchemaVariable field;
@@ -37,7 +41,8 @@ public class StaticFieldCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            SVInstantiations instMap,
             Services services) {
         final Object o = instMap.getInstantiation(field);
         if (!(o instanceof JTerm f)) {

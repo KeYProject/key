@@ -81,7 +81,7 @@ import com.github.javaparser.resolution.types.ResolvedVoidType;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserFieldDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserVariableDeclaration;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,6 +97,7 @@ import static java.lang.String.format;
  * @author Alexander Weigl
  * @version 1 (05.03.22)
  */
+@NullMarked
 public record JP2KeYConverter(Services services, Namespace<SchemaVariable> schemaVariables) {
 
     public CompilationUnit processCompilationUnit(
@@ -120,12 +121,12 @@ public record JP2KeYConverter(Services services, Namespace<SchemaVariable> schem
 }
 
 
+@NullMarked
 class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private static final Logger LOGGER = LoggerFactory.getLogger(JP2KeYConverter.class);
     private final Services services;
     private final KeYJPMapping mapping;
     private final JP2KeYTypeConverter typeConverter;
-    @NonNull
     private final Namespace<SchemaVariable> schemaVariableNamespace;
     private final ConstantExpressionEvaluator evaluator;
     /**
@@ -137,8 +138,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private final Map<FullVariableDeclarator, ProgramVariable> fieldSpecificationMapping =
         new LinkedHashMap<>();
 
-    JP2KeYVisitor(@NonNull Services services,
-            @NonNull Namespace<SchemaVariable> schemaVariables) {
+    JP2KeYVisitor(Services services, Namespace<SchemaVariable> schemaVariables) {
         this.services = services;
         this.mapping = services.getJavaService().getMapping();
         this.typeConverter = services.getJavaService().getTypeConverter();
@@ -156,7 +156,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             + n.getMetaModel().getTypeName() + ". Please extend the KeY-Java-Hierarchy");
     }
 
-    @NonNull
     private TypeReference requireTypeReference(Type type) {
         return accept(type);
     }
@@ -194,8 +193,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ArrayInitializer ai;
         ImmutableArray<Expression> children;
         if (n.getInitializer().isPresent()) {
-            ai = visitArrayInitializerExpr(n.getInitializer().get(), type.getKeYJavaType());
-            children = null;
+            ai = visitArrayInitializerExpr(n.getInitializer().get(),
+                Objects.requireNonNull(type.getKeYJavaType()));
+            children = new ImmutableArray<>();
         } else {
             ai = null;
             children = map(n.getLevels());
@@ -206,6 +206,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new NewArray(pi, c, children, type, getKeYJavaType(rtype), dimensions, ai);
     }
 
+    /**
+     * Translates the given array-initializer expression into its KeY representation.
+     * <p>
+     * The element type of an array-initializer target is guaranteed to be an array type whose base
+     * type carries a KeY Java type; the dereference of the (nullable) array type's base type is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private ArrayInitializer visitArrayInitializerExpr(ArrayInitializerExpr n, KeYJavaType type) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
@@ -216,7 +224,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 de.uka.ilkd.key.java.ast.abstraction.ArrayType array =
                     ((de.uka.ilkd.key.java.ast.abstraction.ArrayType) type.getJavaType());
                 expr = visitArrayInitializerExpr((ArrayInitializerExpr) node,
-                    array.getBaseType().getKeYJavaType());
+                    Objects.requireNonNull(array.getBaseType().getKeYJavaType()));
             } else {
                 expr = accept(node);
             }
@@ -385,17 +393,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return typeConverter.addReferenceType(ref.asReferenceType());
     }
 
-    @NonNull
-    private <T> T accept(@NonNull Node check) {
+    private <T> T accept(Node check) {
         return Objects.requireNonNull((T) check.accept(this, null));
     }
 
-    @Nullable
-    private <T> T acceptn(@Nullable Node check) {
+    private @Nullable <T> T acceptn(@Nullable Node check) {
         return check != null ? (T) accept(check) : null;
     }
 
-    private boolean parentIsInterface(@NonNull Node n) {
+    private boolean parentIsInterface(Node n) {
         if (n.getParentNode().isPresent()) {
             Node parent = n.getParentNode().get();
             if (parent instanceof ClassOrInterfaceDeclaration) {
@@ -409,7 +415,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return false;
     }
 
-    @NonNull
     private static PositionInfo createPositionInfo(Node node) {
         if (node.getRange().isEmpty()) {
             return PositionInfo.UNDEFINED;
@@ -560,7 +565,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         dist.put(from, 0);
         while (!work.isEmpty()) {
             final Class<?> current = work.removeFirst();
-            final int d = dist.get(current);
+            final int d = Objects.requireNonNull(dist.get(current),
+                "a class on the widening work list has a distance");
             if (current == to) {
                 return d;
             }
@@ -601,8 +607,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new ImmutableArray<>(seq);
     }
 
-    @Nullable
-    private <R> R accepto(Optional<? extends Node> node) {
+    private @Nullable <R> R accepto(Optional<? extends Node> node) {
         return node.<R>map(this::accept).orElse(null);
     }
 
@@ -616,7 +621,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             accept(n.getElseExpr()));
     }
 
+    /**
+     * Converts the given constructor declaration into its KeY representation, linking the created
+     * program method to its containing type.
+     * <p>
+     * Every parsed constructor declaration belongs to a containing class; the dereference of the
+     * (nullable) containing class is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public Object visit(ConstructorDeclaration n, Void arg) {
         boolean isInInterface = parentIsInterface(n);
         PositionInfo pi = createPositionInfo(n);
@@ -663,7 +676,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new Continue(pi, c, name);
     }
 
-    private Label nameToLabel(@Nullable Name name) {
+    private @Nullable Label nameToLabel(@Nullable Name name) {
         if (name == null) {
             return null;
         }
@@ -675,12 +688,17 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new ProgramElementName(str);
     }
 
+    /**
+     * The optional is only present in jump statements with a label, so the result is always
+     * non-null for the callers; the {@link #nameToLabel(Name)} delegate is nullable, hence the
+     * difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     private Label nameToLabel(Optional<Name> label) {
         return nameToLabel(label.orElse(null));
     }
 
-    @Nullable
-    private Label simpleNameToLabel(Optional<SimpleName> label) {
+    private @Nullable Label simpleNameToLabel(Optional<SimpleName> label) {
         return label.map(l -> {
             if (l.asString().startsWith("#")) {
                 return (Label) lookupSchemaVariable(l.asString(), l);
@@ -866,23 +884,36 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new TypeRef(kjt, annots.toImmutableList(), 0);
     }
 
+
+    /**
+     * The {@link KeYTypeConverter} may return {@code null} for unresolved types; the callers only
+     * invoke this for resolved types, so the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     private KeYJavaType getCachedKeYJavaType(ResolvedType rtype) {
         return typeConverter.getKeYJavaType(rtype, true);
     }
 
+    /**
+     * The {@link KeYTypeConverter} may return {@code null} for unresolved types; the callers only
+     * invoke this for resolved types, so the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     private KeYJavaType getKeYJavaType(ResolvedType rtype) {
         return typeConverter.getKeYJavaType(rtype, false);
     }
 
-    private ClassOrInterfaceDeclaration getContainingClass(Node node) {
-        if (node instanceof ClassOrInterfaceDeclaration) {
-            node = node.getParentNode().orElse(null);
+    private @Nullable ClassOrInterfaceDeclaration getContainingClass(Node node) {
+        @Nullable
+        Node parent = node;
+        if (parent instanceof ClassOrInterfaceDeclaration) {
+            parent = parent.getParentNode().orElse(null);
         }
-        while (node != null) {
-            if (node instanceof ClassOrInterfaceDeclaration) {
-                return (ClassOrInterfaceDeclaration) node;
+        while (parent != null) {
+            if (parent instanceof ClassOrInterfaceDeclaration) {
+                return (ClassOrInterfaceDeclaration) parent;
             }
-            node = node.getParentNode().orElse(null);
+            parent = parent.getParentNode().orElse(null);
         }
         return null;
     }
@@ -966,7 +997,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (guard instanceof ProgramSV) {
             forGuard = (ProgramSV) guard;
         } else {
-            forGuard = new Guard(pi, null, (Expression) guard);
+            forGuard = toForGuard(pi, guard);
         }
 
         ILoopInit forInit = null;
@@ -986,6 +1017,17 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         loopSpecs.addAll(getLoopSpec(n)); // loop invariants
         loopSpecs.addAll(getSpec(n)); // loop contracts
         return new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody()), loopSpecs);
+    }
+
+    /**
+     * Builds the guard of a for-statement. The guard expression is null for legacy
+     * {@code for(;;)} loops, which have no compare expression at all; the construction
+     * deliberately carries the null expression, so the check is suppressed with a scoped key.
+     */
+    private static Guard toForGuard(PositionInfo pi, @Nullable Object guard) {
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+        Guard result = new Guard(pi, null, (Expression) guard);
+        return result;
     }
 
     public static List<TextualJMLConstruct> getSpec(Node n) {
@@ -1103,7 +1145,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new MethodReference(pi, c, prefix, name, args);
     }
 
+    /**
+     * Converts the given method declaration into its KeY representation, linking the created
+     * program method to its containing type.
+     * <p>
+     * Every parsed method declaration belongs to a containing class; the dereference of the
+     * (nullable) containing class is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public Object visit(MethodDeclaration n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
@@ -1128,9 +1178,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
         Sort heapSort = heapLDT == null ? JavaDLTheory.ANY : heapLDT.targetSort();
         final KeYJavaType containerType = getKeYJavaType(new ReferenceTypeImpl(containing));
-        // may be null for a void method
-        ProgramMethod method = new ProgramMethod(md, containerType, returnType.getKeYJavaType(), pi,
-            heapSort, heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
+        ProgramMethod method = new ProgramMethod(md, containerType,
+            Objects.requireNonNull(returnType.getKeYJavaType()), pi, heapSort,
+            heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
         return addToMapping(n, method);
     }
 
@@ -1228,11 +1278,20 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (n.getAnonymousClassBody().isPresent()) {
             // TODO: Add pipeline step for anonymous classes
             ImmutableArray<MemberDeclaration> bodies = map(n.getAnonymousClassBody().get());
-            decl = new ClassDeclaration(pi, c, new ImmutableArray<>(), null, null,
-                bodies, true, false, null, null,
-                true, false, true, ImmutableList.of());
+            decl = anonymousClassDeclaration(pi, c, bodies);
         }
         return new New(pi, c, args, type, decl);
+    }
+
+    /**
+     * An anonymous class declaration has neither a name nor a fully qualified name; the null
+     * arguments are deliberate (TypeDeclaration no-arg ctor precedent) and suppressed scoped.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    private static ClassDeclaration anonymousClassDeclaration(PositionInfo pi, List<Comment> c,
+            ImmutableArray<MemberDeclaration> bodies) {
+        return new ClassDeclaration(pi, c, new ImmutableArray<>(), null, null, bodies, true, false,
+            null, null, true, false, true, ImmutableList.of());
     }
 
     @Override
@@ -1261,7 +1320,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         throw new IllegalArgumentException("Unexpected expression type: " + name.getClass());
     }
 
-    @NonNull
     private PackageReference translatePackageReference(Name name) {
         // Translate recursively since PackageReference and Name are ordered differently
         ProgramElementName pen = new ProgramElementName(name.getIdentifier(),
@@ -1278,7 +1336,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new PackageReference(createProgramElementName(name), inner);
     }
 
-    private @NonNull Object getKeYJavaType(ClassOrInterfaceType type) {
+    private Object getKeYJavaType(ClassOrInterfaceType type) {
         if (type.getName().asString().startsWith("#")) {
             return lookupSchemaVariable(type.asString(), type);
         }
@@ -1290,6 +1348,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new TypeRef(name, annots.toImmutableList(), 0, prefix, resolvedType);
     }
 
+    /**
+     * Translates a (catch or method) parameter declaration. Schema parameters (e.g.
+     * {@code catch (#t #v0)}) carry no concrete {@link KeYJavaType} at parse time; main stores
+     * null in the specification and resolves the type at taclet instantiation.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private ParameterDeclaration visitNoMap(Parameter n) {
         ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> modifiers =
             map(n.getModifiers());
@@ -1331,7 +1395,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new TypeRef(getKeYJavaType(n.resolve()), annots.toImmutableList(), 0);
     }
 
+    /**
+     * An unresolved fully-qualified name has no sort; the deliberate null sort argument (see the
+     * TODO below) is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public Object visit(Name n, Void arg) {
         if (n.getIdentifier().startsWith("#")) {
             return lookupSchemaVariable(n.getIdentifier(), n);
@@ -1359,6 +1428,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" }) // javaparser
+                                                                           // GenericVisitor
+                                                                           // contract:
+    // may return null for missing dimensions
     public Object visit(ArrayCreationLevel n, Void arg) {
         return this.<Expression>accepto(n.getDimension());
     }
@@ -1436,8 +1509,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     @Override
     public Object visit(ThisExpr n, Void arg) {
         ReferencePrefix prefix = null;
-        if (n.typeName() != null) {
-            KeYJavaType ty = typeConverter.getKeYJavaType(n.typeName().asString());
+        var typeName = n.typeName();
+        if (typeName != null) {
+            KeYJavaType ty = typeConverter.getKeYJavaType(typeName.asString());
             prefix = new TypeRef(ty);
         }
         return new ThisReference(createPositionInfo(n), createComments(n), prefix);
@@ -1546,8 +1620,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 modifiers.hasModifier(FINAL));
         }
 
-        return addToMapping(v,
-            new VariableSpecification(pi, c, init, pv, 0, type.getKeYJavaType()));
+        // Schema variable declarations (e.g. "#typeof(#nse) #v0 = #nse;") carry no concrete
+        // KeYJavaType at parse time; main stores null here and the type is resolved when the
+        // taclet schema is instantiated. A requireNonNull here breaks all schematic taclets.
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+        VariableSpecification specification =
+            addToMapping(v, new VariableSpecification(pi, c, init, pv, 0, type.getKeYJavaType()));
+        return specification;
     }
 
     /**
@@ -1589,7 +1668,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      *         <code>recoderVarSpec</code>, if the variable is a compile-time constant, and
      *         <code>null</code> otherwise
      */
-    private Literal getCompileTimeConstantInitializer(FullVariableDeclarator spec) {
+    private @Nullable Literal getCompileTimeConstantInitializer(FullVariableDeclarator spec) {
         // Necessary condition: the field is static and final
         if (!spec.isFinal || !spec.isStatic) {
             return null;
@@ -1717,6 +1796,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" }) // javaparser
+                                                                           // GenericVisitor
+                                                                           // contract:
+    // unsupported modifiers yield null
     public Object visit(Modifier n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
@@ -1753,7 +1836,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             param = new CcatchBreakParameterDeclaration(pi, c);
         }
         StatementBlock block = accepto(n.getBlock());
-        return new Ccatch(pi, c, null, param, block);
+        return new Ccatch(pi, c, null, param, Objects.requireNonNull(block));
     }
 
     @Override
@@ -1772,7 +1855,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             param = new CcatchContinueParameterDeclaration(pi, c);
         }
         StatementBlock block = accepto(n.getBlock());
-        return new Ccatch(pi, c, null, param, block);
+        return new Ccatch(pi, c, null, param, Objects.requireNonNull(block));
     }
 
     @Override
@@ -1790,7 +1873,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 new de.uka.ilkd.key.java.ast.declaration.Modifier[0],
                 typeRef, v, false);
         } else {
-            parameter = accept(n.parameter());
+            parameter = accept(Objects.requireNonNull(n.parameter()));
         }
 
         StatementBlock body = n.getBlock().isEmpty()
@@ -1815,7 +1898,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             param = new CcatchReturnParameterDeclaration(pi, c);
         }
         StatementBlock block = accepto(n.getBlock());
-        return new Ccatch(pi, c, null, param, block);
+        return new Ccatch(pi, c, null, param, Objects.requireNonNull(block));
     }
 
     @Override
@@ -1938,9 +2021,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         TypeReference classContext = requireTypeReference(n.getContext());
         ReferencePrefix runtimeInstance = accepto(n.getInstance());
-        IProgramMethod methodContext =
-            resolveMethodSignature(classContext.getKeYJavaType(), n.getSignature(),
-                classContext.getKeYJavaType());
+        KeYJavaType kjt = Objects.requireNonNull(classContext.getKeYJavaType());
+        IProgramMethod methodContext = resolveMethodSignature(kjt, n.getSignature(), kjt);
         if (methodContext == null) {
             return reportError(n, "Failed to resolve method");
         }
@@ -1965,7 +2047,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             // IProgramVariable expr = accept(n.getExpr());
             var loc = new LocationVariable(
                 services.getVariableNamer().getTemporaryNameProposal("x"),
-                services.getNamespaces().sorts().lookup("boolean"));
+                Objects.requireNonNull(services.getNamespaces().sorts().lookup("boolean")));
             TextualJMLMergePointDecl a = n.getData(MarkerStatementHelper.KEY_MERGE_POINT);
             return new MergePointStatement(pi, c, a, loc);
         } else {
@@ -1975,12 +2057,18 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
+    @SuppressWarnings({ "nullness:return.type.incompatible", // new MethodBodyStatement(...) is
+                                                             // @UnderInitialization until fully
+                                                             // initialized; returning it is fine
+        "nullness:argument.type.incompatible" }) // the optional name may be absent, leaving the
+                                                 // result variable legitimately unknown
     public Object visit(KeyMethodBodyStatement n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
 
         MethodReference methodReference = accept(n.getExpr());
         TypeReference bodySource = requireTypeReference(n.getSource());
+        @Nullable
         IProgramVariable resultVar =
             n.getName().map(it -> {
                 // Get a PV where possible, then try SV
@@ -2008,12 +2096,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return reportUnsupportedElement(n);
     }
 
-    @Nullable
-    private IProgramMethod resolveMethodSignature(KeYJavaType type, KeyMethodSignature sig,
+    private @Nullable IProgramMethod resolveMethodSignature(KeYJavaType type,
+            KeyMethodSignature sig,
             KeYJavaType context) {
         final String name = sig.getName().asString();
         final ImmutableArray<TypeReference> params = map(sig.getParamTypes());
-        List<KeYJavaType> paramTypes = params.stream().map(TypeReference::getKeYJavaType).toList();
+        List<KeYJavaType> paramTypes = params.stream().map(TypeReference::getKeYJavaType)
+                .map(Objects::requireNonNull).toList();
         return services.getJavaInfo().getProgramMethod(type, name, paramTypes, context);
     }
 
@@ -2024,7 +2113,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new TransactionStatement(pi, c, n.getType());
     }
 
+    /**
+     * A KeyContextStatementBlock may have no declared execution context at all; the null context
+     * is then carried into ContextStatementBlock, whose consumers interpret the absent case via
+     * the AST-guaranteed default. Scoped suppression of the deliberate null argument.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public Object visit(KeyContextStatementBlock n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
@@ -2069,7 +2164,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return lookupSchemaVariable(n.getText(), n);
     }
 
+    /**
+     * The #enhancedfor-elim and #method-call cases scan the label schema variables for the
+     * optional execution-context/result schema variables; when absent, the deliberately null
+     * program variables are passed to the meta AST nodes, which treat null as "not provided".
+     * Scoped suppression of the deliberate null arguments.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public Object visit(KeyMetaConstruct n, Void arg) {
         final String kind = n.getKind();
         final Class<? extends ProgramTransformer> transformer =
@@ -2360,7 +2462,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return lookupSchemaVariable(name.asString(), name);
     }
 
-    @NonNull
     private SchemaVariable lookupSchemaVariable(String name, Node context) {
         SchemaVariable n = schemaVariableNamespace.lookup(new org.key_project.logic.Name(name));
         if (n != null) {
@@ -2371,10 +2472,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private record FullVariableDeclarator(
-            VariableDeclarator decl, ClassOrInterfaceDeclaration container, boolean isFinal,
-            boolean isStatic, boolean isModel, boolean isGhost) {
+            VariableDeclarator decl, @Nullable ClassOrInterfaceDeclaration container,
+            boolean isFinal, boolean isStatic, boolean isModel, boolean isGhost) {
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (o == null || getClass() != o.getClass())
                 return false;
             FullVariableDeclarator that = (FullVariableDeclarator) o;
@@ -2387,8 +2488,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             if (!generatedEquals) {
                 return false;
             }
-            return container != null ? Objects.equals(container.getFullyQualifiedName(),
-                that.container.getFullyQualifiedName()) : generatedEquals;
+            return container != null
+                    ? that.container != null && Objects.equals(container.getFullyQualifiedName(),
+                        that.container.getFullyQualifiedName())
+                    : generatedEquals;
         }
 
         @Override

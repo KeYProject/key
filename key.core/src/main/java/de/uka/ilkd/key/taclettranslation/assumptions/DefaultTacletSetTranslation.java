@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -29,6 +30,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public final class DefaultTacletSetTranslation
         implements TacletSetTranslation, TranslationListener {
 
@@ -87,7 +92,7 @@ public final class DefaultTacletSetTranslation
 
 
     @Override
-    public ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts) {
+    public ImmutableList<TacletFormula> getTranslation(@Nullable ImmutableSet<Sort> sorts) {
 
         // only translate once.
         if (!translate) {
@@ -110,8 +115,8 @@ public final class DefaultTacletSetTranslation
                         assumptionGenerator.translate(t, sorts, settings.getMaxNumberOfGenerics());
                     translation = translation.append(result);
                 } catch (IllegalTacletException e) {
-                    notTranslated =
-                        notTranslated.append(new AssumptionFormula(t, null, e.getMessage()));
+                    notTranslated = notTranslated.append(
+                        new AssumptionFormula(t, null, String.valueOf(e.getMessage())));
                 }
             } else {
                 throw new RuntimeException("Taclet " + t.name() + " ist not supported");
@@ -158,7 +163,7 @@ public final class DefaultTacletSetTranslation
         StringBuilder toStore = new StringBuilder();
         toStore = new StringBuilder("//" + Calendar.getInstance().getTime() + "\n");
 
-        Path modelDir = services.getJavaModel().getModelDir();
+        Path modelDir = Objects.requireNonNull(services.getJavaModel()).getModelDir();
 
         if (modelDir != null) {
             toStore.append("\\javaSource \"").append(IOUtil.safePath(modelDir)).append("\";\n\n");
@@ -195,7 +200,7 @@ public final class DefaultTacletSetTranslation
         int i = 0;
         for (TacletFormula tf : list) {
             toStore.append("//").append(tf.getTaclet().name()).append("\n");
-            toStore.append(convertTerm(tf.getFormula(services)));
+            toStore.append(convertTerm(Objects.requireNonNull(tf.getFormula(services))));
             if (i != list.size() - 1) {
                 toStore.append("\n\n& //and\n\n");
             }

@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import de.uka.ilkd.key.proof.runallproofs.RunAllProofsTest;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,7 @@ public class ProofCollectionSettings implements Serializable {
     /**
      * File in which statistics are written.
      */
-    private StatisticsFile statisticsFile;
+    private @Nullable StatisticsFile statisticsFile;
 
     /**
      * {@link List} of settings entries that are created from system properties.
@@ -131,7 +132,7 @@ public class ProofCollectionSettings implements Serializable {
      *
      * @see Entry
      */
-    private String get(String key) {
+    private @Nullable String get(String key) {
         return settingsMap.get(key);
     }
 
@@ -192,7 +193,7 @@ public class ProofCollectionSettings implements Serializable {
      *
      * @return <code>null</code> if not set, otherwise the local settings
      */
-    public String getLocalKeYSettings() {
+    public @Nullable String getLocalKeYSettings() {
         return get(LOCAL_SETTINGS_KEY);
     }
 
@@ -212,7 +213,7 @@ public class ProofCollectionSettings implements Serializable {
      * Returns location of statistics file. Can be null. In this case no statistics
      * are saved.
      */
-    public StatisticsFile getStatisticsFile() {
+    public @Nullable StatisticsFile getStatisticsFile() {
         if (statisticsFile == null) {
             // Compute location of statistics file.
             String statisticsFileName = get(STATISTICS_FILE);
@@ -253,7 +254,7 @@ public class ProofCollectionSettings implements Serializable {
      * null, then only test cases whose name is contained in the returned set are
      * enabled.
      */
-    public Set<String> getEnabledTestCaseNames() {
+    public @Nullable Set<String> getEnabledTestCaseNames() {
         String testCases = get("testCases");
         if (testCases == null || testCases.length() == 0) {
             return null;
@@ -313,7 +314,7 @@ public class ProofCollectionSettings implements Serializable {
      *
      * @return <code>null</code> or a list.
      */
-    public List<String> getRunOnlyOn() {
+    public @Nullable List<String> getRunOnlyOn() {
         String runOnly = get(RUN_ONLY_ON);
         if (runOnly == null) {
             return null;
@@ -388,11 +389,11 @@ public class ProofCollectionSettings implements Serializable {
         return "true".equals(get(IGNORE_KEY));
     }
 
-    public String getForkDebugPort() {
+    public @Nullable String getForkDebugPort() {
         return get(FORK_DEBUG_PORT);
     }
 
-    public String getForkMemory() {
+    public @Nullable String getForkMemory() {
         return get(FORK_MEMORY);
     }
 
@@ -400,7 +401,7 @@ public class ProofCollectionSettings implements Serializable {
         return set(FORK_MEMORY, s);
     }
 
-    public String getForkTimeout() {
+    public @Nullable String getForkTimeout() {
         return get(FORK_TIMEOUT_KEY);
     }
 

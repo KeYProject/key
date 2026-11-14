@@ -9,9 +9,13 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 
 import org.key_project.logic.IntIterator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * this class describes the position of a statement in a program.
  */
+@NullMarked
 public class PosInProgram {
 
     /** pos at the beginning of the program */
@@ -138,7 +142,7 @@ public class PosInProgram {
      * compares this PosInProgram with another PosInProgram and returns true if both describe the
      * same position
      */
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }

@@ -12,7 +12,7 @@ import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
-
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class provides static function for constructing AST more efficiently.
@@ -21,6 +21,7 @@ import com.github.javaparser.ast.type.ClassOrInterfaceType;
  * @version 1 (15.04.23)
  */
 
+@NullMarked
 public class AstFactory {
     /**
      * creates the package reference java.lang
@@ -128,6 +129,13 @@ public class AstFactory {
         return new FieldAccessExpr(context, field);
     }
 
+    /**
+     * Marks the given node with a comment naming its originating code location.
+     * <p>
+     * The call stack always contains an element beyond the invoking frame; the dereference of the
+     * (nullable) stack frame is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static <T extends Node> T mark(T node) {
         final var stackTrace = Thread.currentThread().getStackTrace();
         StackTraceElement cur, next = null;

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -20,6 +21,9 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This action is one part of the previous UndoLastStepAction: It undoes the last rule application
  * on the currently selected branch. It now also works on closed branches if the flag
@@ -30,6 +34,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author Pfeifer (enabled goalBack in closed branches)
  */
+@NullMarked
 public final class GoalBackAction extends MainWindowAction {
 
     /**
@@ -73,13 +78,17 @@ public final class GoalBackAction extends MainWindowAction {
                     setEnabled(false);
                 } else {
                     final Node selNode = getMediator().getSelectedNode();
-                    // enable/disable the action (see JavaDoc of class)
-                    setEnabled(selNode != null && !proof.root().leaf()
+                    // enable/disable the action (see JavaDoc of class); the guard stays inside
+                    // the expression, where proof.root() was already evaluated
+                    setEnabled(selNode != null && !Objects.requireNonNull(proof.root(),
+                        "a loaded proof always has a root node").leaf()
                             && !(GeneralSettings.noPruningClosed && selNode.isClosed()));
                 }
             }
 
             @Override
+            @SuppressWarnings("NullAway") // deliberate null event: the listener re-queries the
+                                          // selection model and ignores the event itself
             public void selectedProofChanged(KeYSelectionEvent<Proof> e) {
                 selectedNodeChanged(null);
             }
@@ -99,6 +108,8 @@ public final class GoalBackAction extends MainWindowAction {
             }
 
             @Override
+            @SuppressWarnings("NullAway") // deliberate null event: the listener re-queries the
+                                          // selection model and ignores the event itself
             public void autoModeStopped(ProofEvent e) {
                 getMediator().addKeYSelectionListener(selListener);
                 selListener.selectedNodeChanged(null);
@@ -114,8 +125,10 @@ public final class GoalBackAction extends MainWindowAction {
         String appliedRule = "";
         if (longName && getMediator() != null) {
             final Goal goal = findNewestGoal(getMediator().getSelectedNode());
-            if (goal != null && goal.node() != null && goal.node().parent() != null) {
-                RuleApp app = goal.node().parent().getAppliedRuleApp();
+            Node parentNode = goal != null ? goal.node() : null;
+            parentNode = parentNode != null ? parentNode.parent() : null;
+            if (parentNode != null) {
+                RuleApp app = parentNode.getAppliedRuleApp();
                 if (app != null) {
                     appliedRule = " (" + app.rule().displayName() + ")";
                 }
@@ -153,7 +166,7 @@ public final class GoalBackAction extends MainWindowAction {
      *         open/closedGoals lists. This may be the case if the flag "--no-pruning-closed" is set
      *         (which means that the closedGoals list is empty) and the given subtree is closed.
      */
-    private Goal findNewestGoal(Node subtree) {
+    private @Nullable Goal findNewestGoal(@Nullable Node subtree) {
         if (subtree == null) {
             return null;
         }

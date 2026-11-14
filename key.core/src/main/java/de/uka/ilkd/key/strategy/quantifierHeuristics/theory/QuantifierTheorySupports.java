@@ -6,6 +6,8 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The theories the quantifier heuristic consults, in the order it consults them.
  *
@@ -14,6 +16,7 @@ import java.util.List;
  * outcome where two theories both answer: a literal is decided by the first that reaches a
  * verdict, so equality comes before integer arithmetic, as in the original prover.
  */
+@NullMarked
 public final class QuantifierTheorySupports {
 
     private QuantifierTheorySupports() {}

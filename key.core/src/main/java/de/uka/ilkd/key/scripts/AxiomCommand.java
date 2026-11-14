@@ -5,7 +5,10 @@
 package de.uka.ilkd.key.scripts;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -43,14 +46,19 @@ public class AxiomCommand extends AssumeCommand {
     public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
         var parameter = state().getValueInjector().inject(new FormulaParameter(), args);
 
-        Taclet cut = state().getProof().getEnv()
-                .getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME);
+        ProofEnvironment env = Objects.requireNonNull(state().getProof().getEnv(),
+            "proof environment is null");
+        Taclet cut = Objects.requireNonNull(
+            env.getInitConfigForEnvironment().lookupActiveTaclet(TACLET_NAME),
+            "taclet 'cut' not found");
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
-        app = app.addCheckedInstantiation(sv, parameter.formula, state().getProof().getServices(),
-            true);
-        state().getFirstOpenAutomaticGoal().apply(app);
+        app = app.addCheckedInstantiation(sv,
+            Objects.requireNonNull(parameter.formula, "formula must be given"),
+            state().getProof().getServices(), true);
+        state().getFirstOpenAutomaticGoal()
+                .apply(Objects.requireNonNull(app, "taclet application is null"));
     }
 
     public static class FormulaParameter {

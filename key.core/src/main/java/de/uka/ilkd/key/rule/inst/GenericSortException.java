@@ -10,10 +10,14 @@ package de.uka.ilkd.key.rule.inst;
  */
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This exception thrown if there is no appropriate instantiation of the generic sorts occurring
  * within an "SVInstantiations"-object
  */
+@NullMarked
 public class GenericSortException extends SortException {
 
     /**
@@ -21,7 +25,7 @@ public class GenericSortException extends SortException {
      */
     private static final long serialVersionUID = 1372231759025588273L;
 
-    private ImmutableList<GenericSortCondition> conditions;
+    private @Nullable ImmutableList<GenericSortCondition> conditions;
 
     public GenericSortException(String description,
             ImmutableList<GenericSortCondition> pConditions) {

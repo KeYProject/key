@@ -5,8 +5,10 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.RuleAppIndex;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
@@ -54,15 +56,17 @@ public class UnhideCommand extends AbstractCommand {
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
         var args = state().getValueInjector().inject(new Parameters(), arguments);
         Goal goal = state().getFirstOpenAutomaticGoal();
+        Services services = Objects.requireNonNull(service, "proof services are not set");
+        Sequent sequent = Objects.requireNonNull(args.sequent, "sequent must be given");
 
         Set<Term> antes = new HashSet<>();
-        args.sequent.antecedent().forEach(sf -> antes.add(sf.formula()));
+        sequent.antecedent().forEach(sf -> antes.add(sf.formula()));
 
         Set<Term> succs = new HashSet<>();
-        args.sequent.succedent().forEach(sf -> succs.add(sf.formula()));
+        sequent.succedent().forEach(sf -> succs.add(sf.formula()));
 
         RuleAppIndex index = goal.ruleAppIndex();
-        ImmutableList<NoPosTacletApp> apps = index.getNoFindTaclet(FILTER, service);
+        ImmutableList<NoPosTacletApp> apps = index.getNoFindTaclet(FILTER, services);
 
         for (NoPosTacletApp app : apps) {
             SchemaVariable b = app.instantiations().svIterator().next();

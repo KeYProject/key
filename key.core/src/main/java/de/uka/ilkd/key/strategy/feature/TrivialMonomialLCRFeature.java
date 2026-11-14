@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -15,6 +17,8 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Return zero of the least common reducible of two monomials is so trivial that it is not necessary
@@ -22,6 +26,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * <p>
  * "A critical-pair/completion algorithm for finitely generated ideals in rings"
  */
+@NullMarked
 @StableCost
 public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
     private final ProjectionToTerm<Goal> a, b;
@@ -38,8 +43,10 @@ public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Monomial aMon = Monomial.create(a.toTerm(app, pos, goal, mState), services);
-        final Monomial bMon = Monomial.create(b.toTerm(app, pos, goal, mState), services);
+        final Monomial aMon = Monomial.create(
+            Objects.requireNonNull(a.toTerm(app, pos, goal, mState)), services);
+        final Monomial bMon = Monomial.create(
+            Objects.requireNonNull(b.toTerm(app, pos, goal, mState)), services);
 
         /*
          * final BigInteger ac = aMon.getCoefficient (); final BigInteger bc = bMon.getCoefficient

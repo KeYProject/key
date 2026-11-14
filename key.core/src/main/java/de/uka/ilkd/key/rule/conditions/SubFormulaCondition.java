@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
@@ -14,6 +16,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This variable condition checks if an instantiation for a formula has sub formulas which are
  * formulas. It returns false for an arity equal to zero or no sub formulas. This is needed to
@@ -23,6 +28,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
  * @author Michael Kirsten
  *
  */
+@NullMarked
 public class SubFormulaCondition extends VariableConditionAdapter {
 
     private final FormulaSV a;
@@ -34,12 +40,14 @@ public class SubFormulaCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            SVInstantiations instMap,
             Services services) {
         if (!(var instanceof FormulaSV) || var != this.a) {
             return false;
         }
-        JTerm tInst = (JTerm) instMap.getInstantiation(a);
+        JTerm tInst = Objects.requireNonNull((JTerm) instMap.getInstantiation(a),
+            "no instantiation of " + a);
         if (tInst.arity() == 0) {
             return negated;
         } else {

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -18,6 +20,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
+import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
@@ -30,13 +33,17 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * A RewriteTaclet represents a taclet, whose find can be matched against any term in the sequent no
  * matter where it occurs. The only constraint to be fulfilled is that the term matches the
  * structure described by the term of the find-part.
  */
+@NullMarked
 public class RewriteTaclet extends FindTaclet {
 
     /**
@@ -59,7 +66,7 @@ public class RewriteTaclet extends FindTaclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, JTerm find,
-            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
         this(name, applPart, goalTemplates, ruleSets, attrs, find, prefixMap,
@@ -70,7 +77,7 @@ public class RewriteTaclet extends FindTaclet {
             ImmutableList<TacletGoalTemplate> goalTemplates,
             ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs, JTerm find,
-            ImmutableMap<@NonNull SchemaVariable, TacletPrefix> prefixMap,
+            ImmutableMap<SchemaVariable, TacletPrefix> prefixMap,
             ChoiceExpr choices,
             boolean surviveSymbExec,
             ImmutableSet<TacletAnnotation> tacletAnnotations) {
@@ -80,10 +87,22 @@ public class RewriteTaclet extends FindTaclet {
 
     @Override
     public JTerm find() {
-        return (JTerm) find;
+        SyntaxElement f = find;
+        if (f == null) {
+            throw new IllegalStateException("Rewrite taclet has no find term");
+        }
+        return (JTerm) f;
     }
 
+    /**
+     * The base declaration {@code org.key_project.prover.rules.Taclet} allows invocation of this
+     * construction-time template method while the receiver is still {@code @UnderInitialization}
+     * (it is called from the base constructor); this override's implicit {@code @Initialized}
+     * receiver is the default, and the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.receiver.invalid")
     @Override
+    @EnsuresNonNull("executor")
     protected void createAndInitializeExecutor() {
         this.executor = new RewriteTacletExecutor(this);
     }
@@ -106,8 +125,13 @@ public class RewriteTaclet extends FindTaclet {
      *
      * @return the new instantiations with the additional updates, or <code>null</code>, if program
      *         modalities appear above <code>p_pos</code>
+     *         <p>
+     *         The application restriction of a rewrite taclet is always set, and every collected
+     *         sub-term
+     *         of the position iterator exists; the dereferences are suppressed with a scoped key.
      */
-    public MatchConditions checkPrefix(
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
+    public @Nullable MatchConditions checkPrefix(
             PosInOccurrence p_pos,
             MatchConditions p_mc) {
         // Fast path: for an unrestricted taclet the loop below only vetoes on a Transformer on the
@@ -124,7 +148,8 @@ public class RewriteTaclet extends FindTaclet {
 
         PIOPathIterator it = p_pos.iterator();
         while (it.next() != -1) {
-            final JTerm t = (JTerm) it.getSubTerm();
+            final JTerm t = (JTerm) Objects.requireNonNull(it.getSubTerm(),
+                "path iterator produced no subterm");
             var op = t.op();
             if (op instanceof Transformer) {
                 return null;
@@ -185,7 +210,14 @@ public class RewriteTaclet extends FindTaclet {
         return polarity;
     }
 
+    /**
+     * Appends the textual representation of the rewrite attributes to the given buffer.
+     * <p>
+     * The application restriction of a rewrite taclet is always set; the dereference is
+     * suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected StringBuffer toStringFind(StringBuffer sb) {
         StringBuffer res = super.toStringFind(sb);
         return res.append(applicationRestriction().toString(needsSameUpdateLevel()));
@@ -209,15 +241,17 @@ public class RewriteTaclet extends FindTaclet {
     }
 
     @Override
-    public @NonNull RewriteTaclet setName(@NonNull String s) {
+    public RewriteTaclet setName(String s) {
         final TacletApplPart applPart =
-            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
+            new TacletApplPart(assumesSequent(),
+                Objects.requireNonNull(applicationRestriction(), "applicationRestriction"),
+                varsNew(),
                 varsNotFreeIn(),
                 varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
         return new RewriteTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,
-            (JTerm) find,
+            Objects.requireNonNull((JTerm) find, "find"),
             prefixMap, choices, getSurviveSymbExec(), tacletAnnotations);
     }
 }

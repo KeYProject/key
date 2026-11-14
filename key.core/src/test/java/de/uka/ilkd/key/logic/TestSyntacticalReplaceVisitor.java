@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.label.TermLabelState;
@@ -22,6 +24,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestSyntacticalReplaceVisitor {
 
+    // set in setUp() and reset in tearDown(); null outside of that window
+    @Nullable
     SVInstantiations insts = null;
 
     JTerm rw;
@@ -43,8 +48,10 @@ public class TestSyntacticalReplaceVisitor {
         index = TacletForTests.getRules();
         TermBuilder TB = TacletForTests.services().getTermBuilder();
 
-        RewriteTaclet taclet =
-            (RewriteTaclet) index.lookup("testSyntacticalReplaceVisitor_0").taclet();
+        var tacletApp = Objects
+                .requireNonNull(index.lookup("testSyntacticalReplaceVisitor_0"),
+                    "the taclet must be in the test rules");
+        RewriteTaclet taclet = (RewriteTaclet) tacletApp.taclet();
         rw = ((RewriteTacletGoalTemplate) taclet.goalTemplates().head()).replaceWith();
         var u = (JOperatorSV) rw.varsBoundHere(0).get(0);
 
@@ -74,6 +81,7 @@ public class TestSyntacticalReplaceVisitor {
     }
 
     @AfterEach
+    @SuppressWarnings("NullAway") // deliberate null reset after each test
     public void tearDown() {
         insts = null;
         rw = null;
@@ -83,7 +91,8 @@ public class TestSyntacticalReplaceVisitor {
     @Test
     public void test1() {
         SyntacticalReplaceVisitor srv = new SyntacticalReplaceVisitor(new TermLabelState(), null,
-            null, insts, TacletForTests.createGoal(), null, null);
+            null, Objects.requireNonNull(insts, "set in setUp"), TacletForTests.createGoal(),
+            null, null);
         rw.execPostOrder(srv);
         assertEquals(srv.getTerm(), t_allxpxpx);
     }

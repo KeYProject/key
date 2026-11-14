@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -28,6 +29,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The constructor call meta construct is used to handle a allocation expression like
  * <code>new Class(...)</code>. Thereby it replaces the allocation expression by a method reference
@@ -35,13 +39,14 @@ import org.key_project.util.collection.ImmutableList;
  * normalform.
  */
 @TransformerMeta(name = "#constructorCall")
+@NullMarked
 public class ConstructorCall extends ProgramTransformer {
 
     private static final String CONSTRUCTOR_CALL = "#constructorCall";
 
     // @ invariant (newObjectSV == null) != (newObjectVar == null);
-    private final SchemaVariable newObjectSV;
-    private final ProgramVariable newObjectVar;
+    private final @Nullable SchemaVariable newObjectSV;
+    private final @Nullable ProgramVariable newObjectVar;
 
     /**
      * @param name
@@ -97,7 +102,9 @@ public class ConstructorCall extends ProgramTransformer {
             SVInstantiations svInst) {
 
         final New constructorReference = (New) pe;
-        final KeYJavaType classType = constructorReference.getTypeReference().getKeYJavaType();
+        final KeYJavaType classType = Objects.requireNonNull(
+            constructorReference.getTypeReference().getKeYJavaType(),
+            "no KeYJavaType for type reference " + constructorReference.getTypeReference());
 
         if (!(classType.getJavaType() instanceof ClassDeclaration)) {
             // no implementation available
@@ -117,9 +124,10 @@ public class ConstructorCall extends ProgramTransformer {
             final KeYJavaType classType, SVInstantiations svInst, Services services) {
         assert (newObjectVar == null) != (newObjectSV == null);
 
-        final ProgramVariable newObject = newObjectSV == null
+        final ProgramVariable newObject = Objects.requireNonNull(newObjectSV == null
                 ? newObjectVar
-                : (ProgramVariable) svInst.getInstantiation(newObjectSV);
+                : (ProgramVariable) svInst.getInstantiation(newObjectSV),
+            "no new object variable for " + constructorReference);
         final ExecutionContext ec = svInst.getExecutionContext();
         final ImmutableArray<Expression> arguments = constructorReference.getArguments();
 
@@ -138,13 +146,18 @@ public class ConstructorCall extends ProgramTransformer {
         }
 
         if (j == 1) {
-            Sort s = services.getJavaInfo()
-                    .getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS, classType).sort();
+            final ProgramVariable enclosingThisAttr = Objects.requireNonNull(
+                services.getJavaInfo().getAttribute(PipelineConstants.IMPLICIT_ENCLOSING_THIS,
+                    classType),
+                "no implicit enclosing this attribute for " + classType);
+            Sort s = enclosingThisAttr.sort();
             Expression enclosingThis =
                 (Expression) (constructorReference.getReferencePrefix() instanceof Expression
                         ? constructorReference.getReferencePrefix()
                         : services.getTypeConverter().convertToProgramElement(
-                            services.getTypeConverter().findThisForSort(s, ec)));
+                            Objects.requireNonNull(
+                                services.getTypeConverter().findThisForSort(s, ec),
+                                "no `this` of sort " + s)));
             argumentVariables[argumentVariables.length - 1] =
                 EvaluateArgs.evaluate(enclosingThis, evaluatedArgs, services, ec);
         }
@@ -152,6 +165,9 @@ public class ConstructorCall extends ProgramTransformer {
         // get init method
         // (deliberately using classType itself as the "context type", in order
         // to allow public calls to private init methods)
+        // The 'result' parameter may be null (the factory's javadoc documents this), but the
+        // read-only KeYJavaASTFactory annotates it @NonNull.
+        @SuppressWarnings("NullAway")
         final MethodBodyStatement mbs = KeYJavaASTFactory.methodBody(services.getJavaInfo(), null,
             newObject, classType, PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER,
             argumentVariables);

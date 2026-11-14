@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.rule.executor.javadl.NoFindTacletExecutor;
 
 import org.key_project.logic.ChoiceExpr;
@@ -17,12 +19,15 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Used to implement a Taclet that has no <I>find</I> part. This kind of taclet is not attached to
  * term or formula, but to a complete sequent. A typical representant is the <code>cut</code> rule.
  */
+@NullMarked
 public class NoFindTaclet extends Taclet {
 
     /**
@@ -39,7 +44,16 @@ public class NoFindTaclet extends Taclet {
      * @param prefixMap a ImmutableMap that contains the prefix for each
      *        SchemaVariable in the Taclet
      * @param choices the SetOf<Choices> to which this taclet belongs to
+     *
+     *        <p>
+     *        The {@code find} argument is deliberately {@code null}: this is the canonical
+     *        representation of a taclet without a find part. The superclass stores it in its
+     *        {@code @Nullable find} field and {@code check()} interprets {@code find == null} as
+     *        the no-find case, so the literal is rejected only by the type system, not by the
+     *        callee; the call is therefore suppressed.
+     *        </p>
      */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public NoFindTaclet(Name name, TacletApplPart applPart,
             ImmutableList<TacletGoalTemplate> goalTemplates, ImmutableList<RuleSet> ruleSets,
             TacletAttributes attrs,
@@ -49,7 +63,15 @@ public class NoFindTaclet extends Taclet {
             tacletAnnotations);
     }
 
+    /**
+     * The base declaration {@code org.key_project.prover.rules.Taclet} allows invocation of this
+     * construction-time template method while the receiver is still {@code @UnderInitialization}
+     * (it is called from the base constructor); this override's implicit {@code @Initialized}
+     * receiver is the default, and the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:override.receiver.invalid")
     @Override
+    @EnsuresNonNull("executor")
     protected void createAndInitializeExecutor() {
         executor = new NoFindTacletExecutor(this);
     }
@@ -74,11 +96,14 @@ public class NoFindTaclet extends Taclet {
     }
 
     @Override
-    public @NonNull NoFindTaclet setName(@NonNull String s) {
+    public NoFindTaclet setName(String s) {
+        // A live NoFindTaclet always carries a non-null restriction: construction rejects a
+        // missing or non-\inSequentState restriction for taclets without a find part.
         final TacletApplPart applPart =
-            new TacletApplPart(assumesSequent(), applicationRestriction(), varsNew(),
-                varsNotFreeIn(),
-                varsNewDependingOn(), getVariableConditions());
+            new TacletApplPart(assumesSequent(),
+                Objects.requireNonNull(applicationRestriction(),
+                    "no-find taclets require an \\inSequentState application restriction"),
+                varsNew(), varsNotFreeIn(), varsNewDependingOn(), getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes(displayName(), trigger);
 
         return new NoFindTaclet(new Name(s), applPart, goalTemplates(), getRuleSets(), attrs,

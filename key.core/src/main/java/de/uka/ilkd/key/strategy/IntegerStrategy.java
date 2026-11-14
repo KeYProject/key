@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -41,6 +42,8 @@ import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGe
 import org.key_project.prover.strategy.costbased.termgenerator.SubtermGenerator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /// This strategy implements reasoning for integer arithmetics. In particular,
 /// it supports linear integer arithmetics via Gaussian elimination,
@@ -48,6 +51,7 @@ import org.jspecify.annotations.NonNull;
 /// and Gröbner basis.
 ///
 /// Do not create directly, instead use [IntegerStrategyFactory].
+@NullMarked
 public class IntegerStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
 
     /// Reads better than a bare boolean at the call sites of [#setupMultiplyInequations].
@@ -108,8 +112,9 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         }
 
         stopAtFirstNonCloseableGoal =
-            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                    .equals(StrategyProperties.STOPMODE_NONCLOSE);
+            Objects.requireNonNull(
+                strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY),
+                "no stop mode strategy property").equals(StrategyProperties.STOPMODE_NONCLOSE);
 
         // setup cost computations
         costComputationDispatcher = setupCostComputationF();
@@ -664,7 +669,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         final Term tOne = getServices().getTermBuilder().zTerm("1");
         final TermBuffer one = new TermBuffer() {
             @Override
-            public void setContent(Term term, MutableState mState) {}
+            public void setContent(@Nullable Term term, MutableState mState) {}
 
             @Override
             public @NonNull Term getContent(MutableState mState) {
@@ -682,7 +687,7 @@ public class IntegerStrategy extends AbstractFeatureStrategy implements Componen
         final JTerm tTwo = getServices().getTermBuilder().zTerm("2");
         final TermBuffer two = new TermBuffer() {
             @Override
-            public void setContent(Term term, MutableState mState) {}
+            public void setContent(@Nullable Term term, MutableState mState) {}
 
             @Override
             public @NonNull Term getContent(MutableState mState) {

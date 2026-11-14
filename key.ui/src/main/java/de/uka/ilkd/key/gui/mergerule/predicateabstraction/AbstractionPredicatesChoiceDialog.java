@@ -43,6 +43,8 @@ import org.key_project.logic.Namespace;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +54,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class AbstractionPredicatesChoiceDialog extends JDialog {
     private static final String AVAILABLE_PROGRAM_VARIABLES_DESCR = "Available Program Variables: ";
     private static final long serialVersionUID = 1L;
@@ -65,10 +68,10 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(AbstractionPredicatesChoiceDialog.class);
 
-    private Goal goal = null;
+    private @Nullable Goal goal = null;
 
-    private ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
-    private ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
+    private @Nullable ArrayList<Pair<Sort, Name>> registeredPlaceholders = new ArrayList<>();
+    private @Nullable ArrayList<AbstractionPredicate> registeredPredicates = new ArrayList<>();
     private final ArrayList<AbstractDomainElemChoice> abstrPredicateChoices = new ArrayList<>();
 
     private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
@@ -82,7 +85,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     /**
      * @return The abstraction predicates set by the user. Is null iff the user pressed cancel.
      */
-    private ArrayList<AbstractionPredicate> getRegisteredPredicates() {
+    private @Nullable ArrayList<AbstractionPredicate> getRegisteredPredicates() {
         return registeredPredicates;
     }
 
@@ -118,7 +121,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     /**
      * Constructs a new {@link AbstractionPredicatesChoiceDialog}.
+     * <p>
+     * The dialog configures itself with size, location, close-behavior and content-pane calls
+     * while the receiver is still under initialization (EISOP initialization check); the
+     * effects only take place after construction completes, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private AbstractionPredicatesChoiceDialog() {
         super(MAIN_WINDOW_INSTANCE, DIALOG_TITLE, true);
         setSize(INITIAL_SIZE);
@@ -276,6 +284,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         txtPlaceholderInput.addKeyListener(new KeyAdapter() {
             @Override
+            @SuppressWarnings("NullAway") // the problems renderer appends the message to a
+                                          // StringBuilder, which renders a null message as "null";
+                                          // widening the list element type would ripple
             public void keyReleased(KeyEvent evt) {
                 final String currInput = txtPlaceholderInput.getText();
 
@@ -302,9 +313,19 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 txtPlaceholderInput.setText("");
 
                 final Pair<Sort, Name> parsed = parsePlaceholder(currInput);
-                registeredPlaceholders.add(parsed);
+                ArrayList<Pair<Sort, Name>> placeholders = registeredPlaceholders;
+                if (placeholders == null) {
+                    // placeholders are cleared when the dialog is cancelled
+                    throw new NullPointerException("No registered placeholders available.");
+                }
+                placeholders.add(parsed);
+                Goal currentGoal = goal;
+                if (currentGoal == null) {
+                    // the goal is only absent in test runs without a proof
+                    throw new NullPointerException("No goal available for adding a placeholder.");
+                }
                 final Namespace<IProgramVariable> pvs =
-                    goal.proof().getServices().getNamespaces().programVariables();
+                    currentGoal.proof().getServices().getNamespaces().programVariables();
                 pvs.add(new LocationVariable(new ProgramElementName(parsed.second.toString()),
                     parsed.first));
             }
@@ -317,10 +338,20 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE && !placeholdersLstModel.isEmpty()
                         && selectedIndex >= 0) {
                     placeholdersLstModel.remove(selectedIndex);
-                    final Pair<Sort, Name> removedPlaceholder =
-                        registeredPlaceholders.remove(selectedIndex);
+                    final ArrayList<Pair<Sort, Name>> placeholders = registeredPlaceholders;
+                    if (placeholders == null) {
+                        // placeholders are cleared when the dialog is cancelled
+                        throw new NullPointerException("No registered placeholders available.");
+                    }
+                    final Pair<Sort, Name> removedPlaceholder = placeholders.remove(selectedIndex);
+                    final Goal currentGoal = goal;
+                    if (currentGoal == null) {
+                        // the goal is only absent in test runs without a proof
+                        throw new NullPointerException(
+                            "No goal available for removing a placeholder.");
+                    }
                     final Namespace<IProgramVariable> pvs =
-                        goal.proof().getServices().getNamespaces().programVariables();
+                        currentGoal.proof().getServices().getNamespaces().programVariables();
                     pvs.remove(removedPlaceholder.second);
                 }
             }
@@ -361,6 +392,9 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
         txtAbstrPredInput.addKeyListener(new KeyAdapter() {
             @Override
+            @SuppressWarnings("NullAway") // the problems renderer appends the message to a
+                                          // StringBuilder, which renders a null message as "null";
+                                          // widening the list element type would ripple
             public void keyReleased(KeyEvent evt) {
                 final String currInput = txtAbstrPredInput.getText();
 
@@ -370,11 +404,18 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 }
 
                 try {
+                    // the guards are crash-equivalent: with a null goal (test runs without a
+                    // proof) or after cancellation, the NPE is caught and displayed as before
+                    final Goal currentGoal =
+                        Objects.requireNonNull(goal, "No goal available for parsing.");
                     final AbstractionPredicate pred =
-                        parsePredicate(currInput, goal.getLocalNamespaces());
+                        parsePredicate(currInput, currentGoal.getLocalNamespaces());
                     abstrPredProblemsListData.clear();
 
-                    if (registeredPredicates.contains(pred)) {
+                    final ArrayList<AbstractionPredicate> predicates =
+                        Objects.requireNonNull(registeredPredicates,
+                            "registered predicates are cleared when the dialog is cancelled");
+                    if (predicates.contains(pred)) {
                         abstrPredProblemsListData.add("Predicate is already registered");
                     }
                 } catch (Exception e) {
@@ -392,13 +433,23 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 txtAbstrPredInput.setText("");
 
                 AbstractionPredicate parsed;
+                Goal currentGoal = goal;
+                if (currentGoal == null) {
+                    // the goal is only absent in test runs without a proof
+                    throw new NullPointerException("No goal available for parsing.");
+                }
                 try {
-                    parsed = parsePredicate(currInput, goal.getLocalNamespaces());
+                    parsed = parsePredicate(currInput, currentGoal.getLocalNamespaces());
                 } catch (Exception exc) {
                     throw new RuntimeException(exc);
                 }
 
-                registeredPredicates.add(parsed);
+                ArrayList<AbstractionPredicate> predicates = registeredPredicates;
+                if (predicates == null) {
+                    // predicates are cleared when the dialog is cancelled
+                    throw new NullPointerException("No registered predicates available.");
+                }
+                predicates.add(parsed);
             }
         });
 
@@ -409,7 +460,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
                 if (e.getKeyCode() == KeyEvent.VK_DELETE && !abstrPredListModel.isEmpty()
                         && selectedIndex >= 0) {
                     abstrPredListModel.remove(selectedIndex);
-                    registeredPredicates.remove(selectedIndex);
+                    final ArrayList<AbstractionPredicate> predicates = registeredPredicates;
+                    if (predicates == null) {
+                        // predicates are cleared when the dialog is cancelled
+                        throw new NullPointerException("No registered predicates available.");
+                    }
+                    predicates.remove(selectedIndex);
                 }
             }
         });
@@ -480,7 +536,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @return The parsed placeholder (sort and name).
      */
     private Pair<Sort, Name> parsePlaceholder(String input) {
-        return MergeRuleUtils.parsePlaceholder(input, goal.proof().getServices());
+        Goal currentGoal = goal;
+        if (currentGoal == null) {
+            // placeholders are only parsed while a goal is available
+            throw new NullPointerException("No goal available for parsing.");
+        }
+        return MergeRuleUtils.parsePlaceholder(input, currentGoal.proof().getServices());
     }
 
     /**
@@ -494,8 +555,18 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private AbstractionPredicate parsePredicate(String input, NamespaceSet localNamespaces)
             throws ParserException {
-        return MergeRuleUtils.parsePredicate(input, registeredPlaceholders, localNamespaces,
-            goal.proof().getServices());
+        ArrayList<Pair<Sort, Name>> placeholders = registeredPlaceholders;
+        if (placeholders == null) {
+            // predicates are only parsed while placeholders are available
+            throw new NullPointerException("No registered placeholders available.");
+        }
+        Goal currentGoal = goal;
+        if (currentGoal == null) {
+            // predicates are only parsed while a goal is available
+            throw new NullPointerException("No goal available for parsing.");
+        }
+        return MergeRuleUtils.parsePredicate(input, placeholders, localNamespaces,
+            currentGoal.proof().getServices());
     }
 
     /**
@@ -507,10 +578,6 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private String abstrPredToStringRepr(
             Optional<AbstractPredicateAbstractionDomainElement> domElem) {
-        if (domElem == null) {
-            return "";
-        }
-
         if (!domElem.isPresent()) {
             return "None.";
         }
@@ -545,6 +612,10 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      */
     private String abstrPredToString(AbstractionPredicate pred) {
         final Services services = MainWindow.getInstance().getMediator().getServices();
+        if (services == null) {
+            // predicates are only rendered while services are available
+            throw new NullPointerException("No services available for rendering.");
+        }
         final Pair<LocationVariable, JTerm> predFormWithPh = pred.getPredicateFormWithPlaceholder();
 
         return "(" + predFormWithPh.first + ","
@@ -555,7 +626,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     // /////// STATIC METHODS ////// //
     // ///////////////////////////// //
 
-    private static URL getURLForResourceFile(Class<?> cl, String filename) {
+    private static @Nullable URL getURLForResourceFile(Class<?> cl, String filename) {
         URL url = cl.getResource(filename);
         LOGGER.debug("Load Resource:" + filename + " of class " + cl);
         if (url == null && cl.getSuperclass() != null) {
@@ -570,7 +641,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         }
     }
 
-    private static String readFromURL(URL url) {
+    private static @Nullable String readFromURL(URL url) {
         try (final InputStream is = url.openStream();
                 final Scanner s = new Scanner(is, StandardCharsets.UTF_8)) {
             return s.useDelimiter("\\A").next();
@@ -580,8 +651,17 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
     }
 
     private static String readFromResourceFile(String filename) {
-        return readFromURL(
-            getURLForResourceFile(AbstractionPredicatesChoiceDialog.class, filename));
+        URL url = getURLForResourceFile(AbstractionPredicatesChoiceDialog.class, filename);
+        if (url == null) {
+            // the resources are bundled with the application
+            throw new NullPointerException("Could not find resource " + filename);
+        }
+        String content = readFromURL(url);
+        if (content == null) {
+            // the resources are bundled with the application
+            throw new NullPointerException("Could not read resource " + filename);
+        }
+        return content;
     }
 
     /**
@@ -590,12 +670,12 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @author Dominic Steinhoefel
      */
     static class Result {
-        private final ArrayList<AbstractionPredicate> registeredPredicates;
+        private final @Nullable ArrayList<AbstractionPredicate> registeredPredicates;
         private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
         private final LinkedHashMap<ProgramVariable, AbstractDomainElement> abstractDomElemUserChoices =
             new LinkedHashMap<>();
 
-        public Result(ArrayList<AbstractionPredicate> registeredPredicates,
+        public Result(@Nullable ArrayList<AbstractionPredicate> registeredPredicates,
                 Class<? extends AbstractPredicateAbstractionLattice> latticeType,
                 List<AbstractDomainElemChoice> userChoices) {
             this.registeredPredicates = registeredPredicates;
@@ -612,7 +692,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
         /**
          * @return The abstraction predicates set by the user. Is null iff the user pressed cancel.
          */
-        public ArrayList<AbstractionPredicate> getRegisteredPredicates() {
+        public @Nullable ArrayList<AbstractionPredicate> getRegisteredPredicates() {
             return registeredPredicates;
         }
 
@@ -647,10 +727,19 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
             final Sort s = abstrPredicateChoices.get(row).getProgVar().sort();
 
+            final ArrayList<AbstractionPredicate> predicates = registeredPredicates;
+            if (predicates == null) {
+                // the merge lattice is only built while predicates are registered
+                throw new NullPointerException("No registered predicates available.");
+            }
+            final Services services = MainWindow.getInstance().getMediator().getServices();
+            if (services == null) {
+                // the lattice is only built while services are available
+                throw new NullPointerException("No services available for the domain lattice.");
+            }
             final AbstractDomainLattice lattice =
-                new MergeWithPredicateAbstraction(registeredPredicates, latticeType,
-                    new LinkedHashMap<>()).getAbstractDomainForSort(s,
-                        MainWindow.getInstance().getMediator().getServices());
+                new MergeWithPredicateAbstraction(predicates, latticeType,
+                    new LinkedHashMap<>()).getAbstractDomainForSort(s, services);
 
             // Set all options, including a default one.
 
@@ -765,12 +854,22 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
 
     public static void main(String[] args) {
         final de.uka.ilkd.key.proof.Proof proof = loadProof("firstTouch/01-Agatha/project.key");
+        if (proof == null) {
+            // the example proof is loaded before the dialog starts
+            throw new NullPointerException("Could not load the example proof.");
+        }
 
         final ArrayList<LocationVariable> differingLocVars = new ArrayList<>();
-        differingLocVars.add(new LocationVariable(new ProgramElementName("test"),
-            proof.getServices().getNamespaces().sorts().lookup("int")));
-        differingLocVars.add(new LocationVariable(new ProgramElementName("test1"),
-            proof.getServices().getNamespaces().sorts().lookup("boolean")));
+        Sort intSort = proof.getServices().getNamespaces().sorts().lookup("int");
+        if (intSort == null) {
+            throw new NullPointerException("No sort 'int' in the proof's namespaces.");
+        }
+        Sort booleanSort = proof.getServices().getNamespaces().sorts().lookup("boolean");
+        if (booleanSort == null) {
+            throw new NullPointerException("No sort 'boolean' in the proof's namespaces.");
+        }
+        differingLocVars.add(new LocationVariable(new ProgramElementName("test"), intSort));
+        differingLocVars.add(new LocationVariable(new ProgramElementName("test1"), booleanSort));
 
         final AbstractionPredicatesChoiceDialog dialog = //
             new AbstractionPredicatesChoiceDialog(proof.openGoals().head(), differingLocVars);
@@ -785,7 +884,7 @@ public class AbstractionPredicatesChoiceDialog extends JDialog {
      * @param proofFileName The file name of the proof file to load.
      * @return The loaded proof.
      */
-    static de.uka.ilkd.key.proof.Proof loadProof(String proofFileName) {
+    static de.uka.ilkd.key.proof.@Nullable Proof loadProof(String proofFileName) {
         Path proofFile = Paths.get("examples/", proofFileName);
 
         try {

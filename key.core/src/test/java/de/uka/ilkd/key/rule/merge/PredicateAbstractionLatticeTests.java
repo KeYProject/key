@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule.merge;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
@@ -44,7 +45,9 @@ public class PredicateAbstractionLatticeTests {
         final Proof p = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX, "dummy.key");
         final Services services = p.getServices();
 
-        final Sort intSort = p.getServices().getNamespaces().sorts().lookup("int");
+        final Sort intSort = Objects
+                .requireNonNull(p.getServices().getNamespaces().sorts().lookup("int"),
+                    "the int sort must exist");
         final TermBuilder tb = p.getServices().getTermBuilder();
 
         final AbstractionPredicate gtZero = AbstractionPredicate.create(intSort,
@@ -155,8 +158,10 @@ public class PredicateAbstractionLatticeTests {
         final Services services = p.getServices();
         final TermBuilder tb = services.getTermBuilder();
 
-        final LocationVariable ph = new LocationVariable(new ProgramElementName("ph"),
-            services.getNamespaces().sorts().lookup("int"));
+        final Sort intSort = Objects
+                .requireNonNull(services.getNamespaces().sorts().lookup("int"),
+                    "the int sort must exist");
+        final LocationVariable ph = new LocationVariable(new ProgramElementName("ph"), intSort);
         final AbstractionPredicate pred =
             AbstractionPredicate.create(tb.geq(tb.var(ph), tb.zero()), ph, services);
         final ArrayList<AbstractionPredicate> preds = new ArrayList<>();

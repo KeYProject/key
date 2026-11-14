@@ -4,7 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
@@ -40,25 +43,30 @@ public abstract class AbstractContractRuleApp<T extends BuiltInRule>
         this.instantiation = contract;
     }
 
-    public Contract getInstantiation() {
+    public @Nullable Contract getInstantiation() {
         return instantiation;
     }
 
     public @Nullable AbstractContractRuleApp<T> check(Services services) {
         if (instantiation != null && posInOccurrence() != null) {
             IObserverFunction target = instantiation.getTarget();
-            IObserverFunction observerFunctionAtPos = getObserverFunction(services);
+            IObserverFunction observerFunctionAtPos =
+                Objects.requireNonNull(getObserverFunction(services),
+                    "no observer function for the applied contract rule");
             final SpecificationRepository specRepo = services.getSpecificationRepository();
 
             target = specRepo.unlimitObs(target);
             observerFunctionAtPos = specRepo.unlimitObs(observerFunctionAtPos);
 
             if (!target.equals(observerFunctionAtPos)) {
-
-                if (!specRepo.getOverridingTargets(observerFunctionAtPos.getContainerType(),
-                    observerFunctionAtPos).contains(
-                        new Pair<>(target.getContainerType(),
-                            target))) {
+                final KeYJavaType containerTypeAtPos = Objects.requireNonNull(
+                    observerFunctionAtPos.getContainerType(),
+                    "no container type for the observer function at the position");
+                final KeYJavaType targetContainerType = Objects.requireNonNull(
+                    target.getContainerType(),
+                    "no container type for the target observer function");
+                if (!specRepo.getOverridingTargets(containerTypeAtPos, observerFunctionAtPos)
+                        .contains(new Pair<>(targetContainerType, target))) {
                     return null;
                 }
             }
@@ -76,5 +84,5 @@ public abstract class AbstractContractRuleApp<T extends BuiltInRule>
         return super.complete() && pio != null && instantiation != null;
     }
 
-    public abstract IObserverFunction getObserverFunction(Services services);
+    public abstract @Nullable IObserverFunction getObserverFunction(Services services);
 }

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.informationflow.macros;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.LoopInvExecutionPO;
@@ -17,8 +19,10 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.prover.engine.ProverTaskListener;
@@ -26,8 +30,12 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
+@NullMarked
 public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         implements StartSideProofMacro {
 
@@ -52,9 +60,13 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
-        if (posInOcc == null || goals == null || goals.isEmpty() || goals.head().node() == null
-                || goals.head().node().parent() == null) {
+            @Nullable PosInOccurrence posInOcc) {
+        if (posInOcc == null || goals == null || goals.isEmpty()) {
+            return false;
+        }
+        final Goal goal = goals.head();
+        final Node parent = goal.node().parent();
+        if (parent == null) {
             return false;
         }
 
@@ -64,17 +76,21 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
         }
         final Services services = proof.getServices();
 
-        RuleApp app = goals.head().node().parent().getAppliedRuleApp();
+        RuleApp app = parent.getAppliedRuleApp();
         if (!(app instanceof InfFlowLoopInvariantBuiltInRuleApp loopInvRuleApp)) {
             return false;
         }
-        final LoopSpecification loopInv = loopInvRuleApp.getSpec();
+        final LoopSpecification loopInv =
+            Objects.requireNonNull(loopInvRuleApp.getSpec(), "loop invariant of the rule app");
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
             return false;
         }
-        final ExecutionContext executionContext = loopInvRuleApp.getExecutionContext();
-        final JTerm guardTerm = loopInvRuleApp.getGuard();
+        final ExecutionContext executionContext =
+            Objects.requireNonNull(loopInvRuleApp.getExecutionContext(),
+                "execution context of the rule app");
+        final JTerm guardTerm =
+            Objects.requireNonNull(loopInvRuleApp.getGuard(), "guard term of the rule app");
 
         final InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(loopInv, ifVars.c1,
             ifVars.c2, executionContext, guardTerm, services);
@@ -86,18 +102,37 @@ public class StartAuxiliaryLoopComputationMacro extends AbstractProofMacro
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
-        final var loopInvRuleApp =
-            (InfFlowLoopInvariantBuiltInRuleApp) goals.head().node().parent()
-                    .getAppliedRuleApp();
+        final Node parent = goals.head().node().parent();
+        if (parent == null) {
+            throw new NullPointerException("No parent node of the goal.");
+        }
+        final RuleApp ruleApp = parent.getAppliedRuleApp();
+        if (ruleApp == null) {
+            throw new NullPointerException("No applied rule app on the parent node.");
+        }
+        final var loopInvRuleApp = (InfFlowLoopInvariantBuiltInRuleApp) ruleApp;
 
-        final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
+        final ProofEnvironment env = proof.getEnv();
+        if (env == null) {
+            throw new NullPointerException("No proof environment.");
+        }
+        final InitConfig initConfig = env.getInitConfigForEnvironment();
 
-        final LoopSpecification loopInv = loopInvRuleApp.getSpec();
+        final LoopSpecification loopInv =
+            Objects.requireNonNull(loopInvRuleApp.getSpec(), "loop invariant of the rule app");
         final IFProofObligationVars ifVars = loopInvRuleApp.getInformationFlowProofObligationVars();
-        final ExecutionContext executionContext = loopInvRuleApp.getExecutionContext();
-        final JTerm guardTerm = loopInvRuleApp.getGuard();
+        if (ifVars == null) {
+            throw new NullPointerException("No information flow proof obligation variables for "
+                + "the rule application.");
+        }
+        final ExecutionContext executionContext =
+            Objects.requireNonNull(loopInvRuleApp.getExecutionContext(),
+                "execution context of the rule app");
+        final JTerm guardTerm =
+            Objects.requireNonNull(loopInvRuleApp.getGuard(), "guard term of the rule app");
 
         final LoopInvExecutionPO loopInvExecPO = new LoopInvExecutionPO(initConfig, loopInv,
             ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(), goals.head(), executionContext,

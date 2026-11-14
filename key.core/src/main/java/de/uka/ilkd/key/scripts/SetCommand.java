@@ -8,6 +8,7 @@ package de.uka.ilkd.key.scripts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -54,7 +55,7 @@ public class SetCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst arguments) throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(new Parameters(), arguments);
+        var args = state().getValueInjector().inject(new Parameters(), arguments);
 
         if (args.settings.isEmpty()) {
             throw new IllegalArgumentException(
@@ -65,7 +66,7 @@ public class SetCommand extends AbstractCommand {
         args.settings.remove("steps");
         args.settings.remove("stack");
 
-        final Proof proof = state.getProof();
+        final Proof proof = state().getProof();
 
         StrategyProperties newProps =
             proof.getSettings().getStrategySettings().getActiveStrategyProperties();
@@ -79,12 +80,13 @@ public class SetCommand extends AbstractCommand {
         }
 
         if (args.proofSteps != null) {
-            state.setMaxAutomaticSteps(args.proofSteps);
+            state().setMaxAutomaticSteps(args.proofSteps);
         }
 
         if (args.stackAction != null) {
-            ArrayList<StrategyProperties> stack =
-                state.getUserData().putIfAbsent(USER_DATA_SETTINGS_STACK, ArrayList::new);
+            ArrayList<StrategyProperties> stack = Objects.requireNonNull(
+                state().getUserData().putIfAbsent(USER_DATA_SETTINGS_STACK, ArrayList::new),
+                "Could not obtain the settings stack");
             switch (args.stackAction) {
                 case "push":
                     stack.addLast(newProps.clone());
@@ -92,7 +94,7 @@ public class SetCommand extends AbstractCommand {
                 case "pop":
                     // TODO sensible error if empty
                     var resetProps = stack.removeLast();
-                    updateStrategySettings(state, resetProps);
+                    updateStrategySettings(state(), resetProps);
                     break;
                 default:
                     throw new IllegalArgumentException("stack must be either push or pop.");
@@ -103,14 +105,14 @@ public class SetCommand extends AbstractCommand {
                 throw new IllegalArgumentException(
                     "userData must be of the form key:value. Use userData:\"myKey:myValue\".");
             }
-            state.getUserData().set(new Property<>("user." + kv[0]), kv[1]);
+            state().getUserData().set(new Property<>("user." + kv[0]), kv[1]);
         } else {
             throw new IllegalArgumentException(
                 "You have to set oss, steps, stack, or key(s) and value(s).");
         }
 
         if (args.proofSteps != null) {
-            state.setMaxAutomaticSteps(args.proofSteps);
+            state().setMaxAutomaticSteps(args.proofSteps);
         }
 
         for (var entry : args.settings.entrySet()) {
@@ -123,7 +125,7 @@ public class SetCommand extends AbstractCommand {
             newProps.setProperty(key, value);
         }
 
-        updateStrategySettings(state, newProps);
+        updateStrategySettings(state(), newProps);
     }
 
     /*
@@ -135,7 +137,8 @@ public class SetCommand extends AbstractCommand {
 
     protected static void updateStrategySettings(EngineState state, StrategyProperties p) {
         final Proof proof = state.getProof();
-        final Strategy<Goal> strategy = getStrategy(state, p);
+        final Strategy<Goal> strategy = Objects.requireNonNull(getStrategy(state, p),
+            "No strategy could be found for the given properties");
 
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setStrategy(strategy.name());
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(p);
@@ -146,13 +149,15 @@ public class SetCommand extends AbstractCommand {
         proof.setActiveStrategy(strategy);
     }
 
-    private static Strategy getStrategy(EngineState state, StrategyProperties properties) {
+    private static @Nullable Strategy getStrategy(EngineState state,
+            StrategyProperties properties) {
         final Profile profile = state.getProof().getServices().getProfile();
         final Proof proof = state.getProof();
 
         //
         for (StrategyFactory s : profile.supportedStrategies()) {
-            if (state.getProof().getActiveStrategy().name().equals(s.name())) {
+            if (Objects.requireNonNull(state.getProof().getActiveStrategy(),
+                "No active strategy").name().equals(s.name())) {
                 return s.create(proof, properties);
             }
         }

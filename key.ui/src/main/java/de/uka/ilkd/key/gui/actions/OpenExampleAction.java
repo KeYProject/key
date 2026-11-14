@@ -13,9 +13,13 @@ import de.uka.ilkd.key.gui.KeYFileChooser;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Opens a file dialog allowing to select the example to be loaded
  */
+@NullMarked
 public final class OpenExampleAction extends MainWindowAction {
 
     /**
@@ -30,7 +34,7 @@ public final class OpenExampleAction extends MainWindowAction {
         setTooltip("Browse and load included examples.");
     }
 
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(@Nullable ActionEvent e) {
         Path file = ExampleChooser.showInstance(Main.getExamplesDir());
         if (file != null) {
             KeYFileChooser.getFileChooser("Select file to load").setSelectedFile(file.toFile());

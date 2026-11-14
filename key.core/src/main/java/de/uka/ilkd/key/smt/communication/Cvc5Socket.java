@@ -10,10 +10,13 @@ import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Socket for cvc5 (<a href="https://cvc5.github.io/">...</a>).
  */
+@NullMarked
 public class Cvc5Socket extends AbstractSolverSocket {
 
     /**
@@ -22,7 +25,7 @@ public class Cvc5Socket extends AbstractSolverSocket {
      * @param name the socket's name (usually "CVC5", but other solvers might also use it).
      * @param query the ModelExtractor for model interpretation (currently not used by this socket)
      */
-    public Cvc5Socket(String name, ModelExtractor query) {
+    public Cvc5Socket(String name, @Nullable ModelExtractor query) {
         super(name, query);
     }
 

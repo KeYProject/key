@@ -23,6 +23,8 @@ import de.uka.ilkd.key.util.ProgressMonitor;
 import org.key_project.proofmanagement.io.LogLevel;
 import org.key_project.proofmanagement.io.ProofBundleHandler;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Checks that there exists a proof for every contract.
  * Has to be combined with other checkers to ensure that the proofs are actually replayable
@@ -30,6 +32,7 @@ import org.key_project.proofmanagement.io.ProofBundleHandler;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public class MissingProofsChecker implements Checker {
 
     @Override
@@ -47,6 +50,9 @@ public class MissingProofsChecker implements Checker {
         pi.setFileRepo(new TrivialFileRepo());
 
         SLEnvInput slenv = data.getSlenv();
+        if (slenv == null) {
+            throw new NullPointerException("Source loading did not produce an environment.");
+        }
 
         /*
          * check that for all contracts found in Java source (in directory "src" in bundle)
@@ -75,8 +81,14 @@ public class MissingProofsChecker implements Checker {
         // compare: Is there a proof for every contract?
         for (CheckerData.ProofEntry entry : data.getProofEntries()) {
             Proof p = entry.proof;
+            if (p == null) {
+                throw new NullPointerException("Proof not loaded for proof entry.");
+            }
             SpecificationRepository sr = p.getServices().getSpecificationRepository();
             ContractPO cpo = sr.getPOForProof(p);
+            if (cpo == null) {
+                throw new NullPointerException("No contract PO for proof " + p.name());
+            }
             Contract foundContract = cpo.getContract();
 
             if (foundContract == null) {
@@ -124,7 +136,11 @@ public class MissingProofsChecker implements Checker {
         if (type instanceof TypeDeclaration td) {
             PositionInfo positionInfo = td.getPositionInfo();
             URI uri = positionInfo.getURI().orElseThrow().normalize();
-            URI srcURI = data.getPbh().getPath("src").toAbsolutePath().normalize().toUri();
+            ProofBundleHandler pbh = data.getPbh();
+            if (pbh == null) {
+                throw new NullPointerException("No proof bundle handler set.");
+            }
+            URI srcURI = pbh.getPath("src").toAbsolutePath().normalize().toUri();
 
             // ignore contracts from files not in src path (e.g. from bootclasspath)
             // (this check works independent of number of slashes in URIs)

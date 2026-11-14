@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import de.uka.ilkd.key.java.loader.JavaBuildingExceptions;
@@ -29,6 +30,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -38,6 +40,7 @@ import org.jspecify.annotations.Nullable;
  * @author bruns
  * @since 2.4.0
  */
+@NullMarked
 public final class ExceptionTools {
 
     /**
@@ -56,9 +59,9 @@ public final class ExceptionTools {
      * certain ANTLR exceptions.
      *
      * @param throwable a throwable
-     * @return message for the exception
+     * @return message for the exception, or {@code null} if the throwable has none
      */
-    public static String getMessage(@Nullable Throwable throwable) {
+    public static @Nullable String getMessage(@Nullable Throwable throwable) {
         if (throwable == null) {
             return "";
         } else if (throwable instanceof ParseCancellationException
@@ -115,7 +118,8 @@ public final class ExceptionTools {
             if (e instanceof ProblemLoaderException ple && !ple.getSubExceptions().isEmpty()) {
                 // e.g. a partial proof replay: report every rule application that failed, led by
                 // the summary, instead of only the first.
-                result.add(new PositionedString(ple.getMessage(), safeLocation(ple)));
+                result.add(new PositionedString(Objects.requireNonNull(ple.getMessage(), "message"),
+                    safeLocation(ple)));
                 for (Throwable sub : ple.getSubExceptions()) {
                     result.add(new PositionedString(subErrorText(sub), safeLocation(sub)));
                 }
@@ -137,7 +141,7 @@ public final class ExceptionTools {
             if (e instanceof JavaBuildingExceptions je) {
                 for (JavaBuildingIssue issue : je.getIssues()) {
                     result.add(new PositionedString(issue.getMessage(),
-                        new Location(issue.getPath(), issue.getPosition())));
+                        buildingIssueLocation(issue)));
                 }
                 break;
             }
@@ -151,7 +155,10 @@ public final class ExceptionTools {
         if (result.isEmpty()) {
             // Generic case: a single message. getMessage() already unwraps the common wrappers and
             // produces the friendly text for ANTLR exceptions.
-            result.add(new PositionedString(getMessage(throwable), safeLocation(throwable)));
+            @Nullable
+            String generic = getMessage(throwable);
+            result.add(new PositionedString(generic != null ? generic : throwable.toString(),
+                safeLocation(throwable)));
         }
         result.sort((a, b) -> a.getLocation().compareTo(b.getLocation()));
         return result;
@@ -167,6 +174,16 @@ public final class ExceptionTools {
     }
 
     /**
+     * Location of a Java building issue. The issue may stem from a source without file storage;
+     * the file URI component of {@link Location} tolerates null at runtime (cf.
+     * {@link Location#UNDEFINED} and {@link Location#fromToken}).
+     */
+    @SuppressWarnings("NullAway") // see javadoc: Location.fileUri is null-tolerant at runtime
+    private static Location buildingIssueLocation(JavaBuildingIssue issue) {
+        return new Location(issue.getPath(), issue.getPosition());
+    }
+
+    /**
      * Message for a bundled sub-problem. Prefers the exception's own message (which, for the
      * replay errors, carries the contextual "Line .., goal .., rule .." text); only when it has
      * none do we fall back to {@link #getMessage} (which would otherwise unwrap a
@@ -174,7 +191,8 @@ public final class ExceptionTools {
      */
     private static String subErrorText(Throwable sub) {
         String own = sub.getMessage();
-        return (own != null && !own.isBlank()) ? own : getMessage(sub);
+        return (own != null && !own.isBlank()) ? own
+                : Objects.requireNonNull(getMessage(sub), "message");
     }
 
     public static String getNiceMessage(InputMismatchException ime) {
@@ -333,6 +351,7 @@ public final class ExceptionTools {
      * @param ime the input mismatch exception
      * @return the location to report
      */
+    @SuppressWarnings("NullAway") // Location.fileUri tolerates null (cf. UNDEFINED/fromToken)
     private static @Nullable Location reportLocationFor(InputMismatchException ime) {
         Token offending = ime.getOffendingToken();
         // Single-error path: only redirect to the insertion point when the closing token is the

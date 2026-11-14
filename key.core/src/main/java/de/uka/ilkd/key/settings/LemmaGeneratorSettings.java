@@ -6,6 +6,9 @@ package de.uka.ilkd.key.settings;
 
 import java.util.Properties;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class LemmaGeneratorSettings extends AbstractSettings {
     public static final String CATEGORY = "LemmaGenerator";
     private static final String SHOW_DIALOG_ADDING_AXIOMS =

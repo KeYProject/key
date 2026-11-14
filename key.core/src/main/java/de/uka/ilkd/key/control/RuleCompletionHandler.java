@@ -9,12 +9,16 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.Rule;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Instances of this class are used by an {@link AbstractProofControl} to complete a {@link Rule}
  * completion.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public interface RuleCompletionHandler {
     /**
      * called to complete and apply a taclet instantiations
@@ -35,5 +39,6 @@ public interface RuleCompletionHandler {
      *        automatically
      * @return a complete app or null if no completion was possible
      */
+    @Nullable
     IBuiltInRuleApp completeBuiltInRuleApp(IBuiltInRuleApp app, Goal goal, boolean forced);
 }

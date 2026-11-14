@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.taclettranslation;
 
-
+import java.util.Objects;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
@@ -24,11 +24,14 @@ import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Translates a rewrite taclet to a formula.
  *
  *
  */
+@NullMarked
 public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     static private final int ANTE = 0;
     static private final int SUCC = 1;
@@ -209,7 +212,7 @@ public class DefaultTacletTranslator extends AbstractSkeletonGenerator {
     }
 
     private int getPolarity(RewriteTaclet rwTaclet) {
-        var restr = rwTaclet.applicationRestriction();
+        ApplicationRestriction restr = Objects.requireNonNull(rwTaclet.applicationRestriction());
         if (restr.matches(ApplicationRestriction.ANTECEDENT_POLARITY)) {
             return -1;
         } else if (restr.matches(ApplicationRestriction.SUCCEDENT_POLARITY)) {

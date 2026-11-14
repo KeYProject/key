@@ -16,6 +16,7 @@ import java.util.List;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.*;
 
 import com.github.javaparser.symbolsolver.javaparsermodel.JavaParserFacade;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,7 +159,7 @@ public final class RunAllProofsTestUnit implements Serializable {
      * Temporary directory used by this test unit to store serialized data when running in fork
      * mode.
      */
-    private Path tempDir = null;
+    private @Nullable Path tempDir = null;
 
     public Path getTempDir() throws IOException {
         File runAllProofsTempDir = settings.getTempDir();

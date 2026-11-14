@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
@@ -15,10 +17,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * This variable condition checks if a context is affected by the strictfp modifier
  */
+@NullMarked
 public final class InStrictFp extends VariableConditionAdapter {
 
     private final boolean negated;
@@ -32,7 +38,8 @@ public final class InStrictFp extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            SVInstantiations instMap,
             Services services) {
 
         ExecutionContext ec = instMap.getExecutionContext();
@@ -44,7 +51,8 @@ public final class InStrictFp extends VariableConditionAdapter {
             boolean strictfpClass = true;
 
             try {
-                Type t = ec.getTypeReference().getKeYJavaType().getJavaType();
+                Type t = Objects.requireNonNull(ec.getTypeReference().getKeYJavaType(),
+                    "no KeYJavaType in execution context").getJavaType();
                 if (t instanceof ClassDeclaration) {
                     strictfpClass = ((ClassDeclaration) t).isStrictFp();
                 } else {
@@ -54,7 +62,8 @@ public final class InStrictFp extends VariableConditionAdapter {
                 strictfpClass = false;
             }
 
-            final boolean isInStrictFp = strictfpClass || methodContext.isStrictFp();
+            final boolean isInStrictFp = strictfpClass
+                    || Objects.requireNonNull(methodContext, "no method context").isStrictFp();
             return negated != isInStrictFp;
         }
     }

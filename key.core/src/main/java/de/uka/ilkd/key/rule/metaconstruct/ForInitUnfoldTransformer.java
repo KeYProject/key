@@ -14,6 +14,8 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Pulls the initializor out of a for-loop. Only receives the init as a parameter, not the whole
  * for-loop.
@@ -29,6 +31,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author Benedikt Dreher
  */
 @TransformerMeta(name = "#forInitUnfoldTransformer")
+@NullMarked
 public class ForInitUnfoldTransformer extends ProgramTransformer {
     /**
      * @param loopInit A loop initializer if called for a concrete program.

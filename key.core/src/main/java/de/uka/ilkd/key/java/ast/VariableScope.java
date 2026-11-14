@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The property of a non terminal program element to define a scope for variables. taken from
  * COMPOST and changed to achieve an immutable structure
  */
+@NullMarked
 public interface VariableScope extends ScopeDefiningElement {
 
 }

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -13,9 +15,12 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Feature that returns zero iff one term is smaller than another term in the current term ordering
  */
+@NullMarked
 @StableCost
 public class TermSmallerThanFeature extends SmallerThanFeature {
 
@@ -32,8 +37,8 @@ public class TermSmallerThanFeature extends SmallerThanFeature {
 
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return lessThan(left.toTerm(app, pos, goal, mState),
-            right.toTerm(app, pos, goal, mState),
+        return lessThan(Objects.requireNonNull(left.toTerm(app, pos, goal, mState)),
+            Objects.requireNonNull(right.toTerm(app, pos, goal, mState)),
             pos, goal);
     }
 

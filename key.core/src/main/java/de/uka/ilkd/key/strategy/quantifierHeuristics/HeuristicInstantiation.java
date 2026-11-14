@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -23,7 +24,11 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public class HeuristicInstantiation implements TermGenerator<Goal> {
 
     /** One generator per treatment, so the option costs no allocation per instantiation. */
@@ -53,7 +58,7 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
      * @return the generator
      */
     public static TermGenerator<Goal> forOption(TriggerTreatment treatment) {
-        return GENERATORS.get(treatment);
+        return Objects.requireNonNull(GENERATORS.get(treatment));
     }
 
     @Override
@@ -76,7 +81,7 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
         private final Sort quantifiedVarSort;
         private final Function quantifiedVarSortCast;
 
-        private Term nextInst = null;
+        private @Nullable Term nextInst = null;
         private final TermServices services;
 
         private HIIterator(Iterator<Term> it, QuantifiableVariable var, Services services) {
@@ -109,7 +114,8 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
 
         @Override
         public Term next() {
-            final Term res = nextInst;
+            // hasNext() is the protocol witness that nextInst is non-null.
+            final Term res = Objects.requireNonNull(nextInst);
             nextInst = null;
             findNextInst();
             return res;

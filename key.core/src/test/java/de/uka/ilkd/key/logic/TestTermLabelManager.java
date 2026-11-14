@@ -39,6 +39,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +51,8 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Martin Hentschel
  */
 public class TestTermLabelManager {
-    private static InitConfig CONFIG = null;
+    // lazily loaded by createTestServices(); null until then
+    private static @Nullable InitConfig CONFIG = null;
 
     @Test
     public void testrefactorGoal_childrenAndGrandchildren_allRules() throws ProblemLoaderException {
@@ -223,15 +225,14 @@ public class TestTermLabelManager {
         Rule rule = new DummyRule("rule");
         JTerm taclet = services.getTermBuilder().tt();
         // Create labels
-        ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
-            services, pos, rule, null, null, null, taclet, null);
+        ImmutableArray<TermLabel> labels =
+            instantiateLabelsNoContext(services, pos, rule, taclet);
         assertNotNull(labels);
         assertEquals(1, labels.size());
         assertEquals("UPDATED", labels.get(0).name().toString());
         // Test other not supported rule
         Rule otherRule = new DummyRule("notSupportedRule");
-        labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, otherRule,
-            null, null, null, taclet, null);
+        labels = instantiateLabelsNoContext(services, pos, otherRule, taclet);
         assertNotNull(labels);
         assertEquals(1, labels.size());
         assertEquals("UPDATED", labels.get(0).name().toString());
@@ -250,15 +251,14 @@ public class TestTermLabelManager {
         Rule rule = new DummyRule("rule");
         JTerm taclet = services.getTermBuilder().tt();
         // Create labels
-        ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
-            services, pos, rule, null, null, null, taclet, null);
+        ImmutableArray<TermLabel> labels =
+            instantiateLabelsNoContext(services, pos, rule, taclet);
         assertNotNull(labels);
         assertEquals(1, labels.size());
         assertEquals("UPDATED", labels.get(0).name().toString());
         // Test other not supported rule
         Rule otherRule = new DummyRule("notSupportedRule");
-        labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, otherRule,
-            null, null, null, taclet, null);
+        labels = instantiateLabelsNoContext(services, pos, otherRule, taclet);
         assertNotNull(labels);
         assertEquals(0, labels.size());
     }
@@ -275,8 +275,8 @@ public class TestTermLabelManager {
         Rule rule = new DummyRule("rule");
         JTerm taclet = services.getTermBuilder().tt();
         // Create labels
-        ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
-            services, pos, rule, null, null, null, taclet, null);
+        ImmutableArray<TermLabel> labels =
+            instantiateLabelsNoContext(services, pos, rule, taclet);
         assertNotNull(labels);
         assertEquals(4, labels.size());
         assertEquals("ONE", labels.get(0).name().toString());
@@ -291,8 +291,7 @@ public class TestTermLabelManager {
         assertEquals("THREE", policy.getLog().get(3).name().toString());
         // Test other not supported rule
         Rule otherRule = new DummyRule("notSupportedRule");
-        labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, otherRule,
-            null, null, null, taclet, null);
+        labels = instantiateLabelsNoContext(services, pos, otherRule, taclet);
         assertNotNull(labels);
         assertEquals(4, labels.size());
         assertEquals("ONE", labels.get(0).name().toString());
@@ -323,8 +322,8 @@ public class TestTermLabelManager {
         Rule rule = new DummyRule("rule");
         JTerm taclet = services.getTermBuilder().tt();
         // Create labels
-        ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
-            services, pos, rule, null, null, null, taclet, null);
+        ImmutableArray<TermLabel> labels =
+            instantiateLabelsNoContext(services, pos, rule, taclet);
         assertNotNull(labels);
         assertEquals(4, labels.size());
         assertEquals("ONE", labels.get(0).name().toString());
@@ -339,8 +338,7 @@ public class TestTermLabelManager {
         assertEquals("THREE", policy.getLog().get(3).name().toString());
         // Test other not supported rule
         Rule otherRule = new DummyRule("notSupportedRule");
-        labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, otherRule,
-            null, null, null, taclet, null);
+        labels = instantiateLabelsNoContext(services, pos, otherRule, taclet);
         assertNotNull(labels);
         assertEquals(0, labels.size());
         // Test log
@@ -360,8 +358,8 @@ public class TestTermLabelManager {
         Rule rule = new DummyRule("rule");
         JTerm taclet = services.getTermBuilder().tt();
         // Create labels
-        ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
-            services, pos, rule, null, null, null, taclet, null);
+        ImmutableArray<TermLabel> labels =
+            instantiateLabelsNoContext(services, pos, rule, taclet);
         assertNotNull(labels);
         assertEquals(2, labels.size());
         assertEquals("ONE", labels.get(0).name().toString());
@@ -372,8 +370,7 @@ public class TestTermLabelManager {
         assertEquals("ADD", policy.getLog().get(1).name().toString());
         // Test other not supported rule
         Rule otherRule = new DummyRule("notSupportedRule");
-        labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, otherRule,
-            null, null, null, taclet, null);
+        labels = instantiateLabelsNoContext(services, pos, otherRule, taclet);
         assertNotNull(labels);
         assertEquals(2, labels.size());
         assertEquals("ONE", labels.get(0).name().toString());
@@ -398,8 +395,8 @@ public class TestTermLabelManager {
         Rule rule = new DummyRule("rule");
         JTerm taclet = services.getTermBuilder().tt();
         // Create labels
-        ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
-            services, pos, rule, null, null, null, taclet, null);
+        ImmutableArray<TermLabel> labels =
+            instantiateLabelsNoContext(services, pos, rule, taclet);
         assertNotNull(labels);
         assertEquals(2, labels.size());
         assertEquals("ONE", labels.get(0).name().toString());
@@ -410,8 +407,7 @@ public class TestTermLabelManager {
         assertEquals("ADD", policy.getLog().get(1).name().toString());
         // Test other not supported rule
         Rule otherRule = new DummyRule("notSupportedRule");
-        labels = TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, otherRule,
-            null, null, null, taclet, null);
+        labels = instantiateLabelsNoContext(services, pos, otherRule, taclet);
         assertNotNull(labels);
         assertEquals(0, labels.size());
         // Test log
@@ -431,7 +427,10 @@ public class TestTermLabelManager {
             TB.box(JavaBlock.EMPTY_JAVABLOCK,
                 TB.label(TB.tt(), new ParameterlessTermLabel(new Name("POST")))),
             new ParameterlessTermLabel(new Name("ONE")));
-        LocationVariable heap = services.getTypeConverter().getHeapLDT().getSavedHeap();
+        LocationVariable heap = Objects
+                .requireNonNull(services.getTypeConverter().getHeapLDT(),
+                    "the heap LDT must be available")
+                .getSavedHeap();
         JTerm update = TB.label(TB.elementary(TB.var(heap), TB.var(heap)),
             new ParameterlessTermLabel(new Name("UPDATE")));
         JTerm updateApp = TB.apply(update, modality,
@@ -441,8 +440,8 @@ public class TestTermLabelManager {
         JTerm taclet = TB.tt();
         Rule rule = new DummyRule("rule");
         // Create labels
-        ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
-            services, pos, rule, null, null, null, taclet, null);
+        ImmutableArray<TermLabel> labels =
+            instantiateLabelsNoContext(services, pos, rule, taclet);
         assertNotNull(labels);
         assertEquals(1, labels.size());
         assertEquals("ONE", labels.get(0).name().toString());
@@ -463,8 +462,8 @@ public class TestTermLabelManager {
         JTerm taclet = services.getTermBuilder().tt();
         Rule rule = new DummyRule("rule");
         // Create labels
-        ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
-            services, pos, rule, null, null, null, taclet, null);
+        ImmutableArray<TermLabel> labels =
+            instantiateLabelsNoContext(services, pos, rule, taclet);
         assertNotNull(labels);
         assertEquals(1, labels.size());
         assertEquals("APPLICATION", labels.get(0).name().toString());
@@ -484,8 +483,8 @@ public class TestTermLabelManager {
         Rule rule = new DummyRule("rule");
         JTerm taclet = services.getTermBuilder().label(services.getTermBuilder().tt(),
             new ImmutableArray<>(new ParameterlessTermLabel(new Name("TACLET"))));
-        ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
-            services, pos, rule, null, null, null, taclet, null);
+        ImmutableArray<TermLabel> labels =
+            instantiateLabelsNoContext(services, pos, rule, taclet);
         assertNotNull(labels);
         assertEquals(1, labels.size());
         assertEquals("TACLET", labels.get(0).name().toString());
@@ -496,10 +495,24 @@ public class TestTermLabelManager {
     */
     @Test
     public void testInstantiateLabels_null() {
+        // every parameter is deliberately null: the no-manager path must be a no-op
+        @SuppressWarnings("NullAway")
         ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
             null, null, null, null, null, null, null, null);
         assertNotNull(labels);
         assertTrue(labels.isEmpty());
+    }
+
+    /**
+     * Instantiates the labels without a rule application context: ruleApp, goal, hint and newTerm
+     * are optional for the label policies under test, which never use them, so null is passed
+     * deliberately.
+     */
+    @SuppressWarnings("NullAway")
+    private static ImmutableArray<TermLabel> instantiateLabelsNoContext(Services services,
+            PosInOccurrence pos, Rule rule, JTerm taclet) {
+        return TermLabelManager.instantiateLabels(new TermLabelState(), services, pos, rule, null,
+            null, null, taclet, null);
     }
 
     protected PosInOccurrence createTestPosInOccurrence(
@@ -524,18 +537,27 @@ public class TestTermLabelManager {
     }
 
 
+    // null arguments are passed deliberately: the logging factory must survive them
+    @SuppressWarnings("NullAway")
+    private static TermLabel parseLabelNullArgs(TermLabelManager manager, String name,
+            Services services) throws TermLabelException {
+        return manager.parseLabel(name, null, services);
+    }
+
     @Test
     public void testParseLabel() throws TermLabelException {
         Services services = Assertions.assertDoesNotThrow(
             () -> createTestServices(null, null, null, null, null, null).getServices());
-        TermLabelManager manager = TermLabelManager.getTermLabelManager(services);
+        TermLabelManager manager = Objects
+                .requireNonNull(TermLabelManager.getTermLabelManager(services),
+                    "the services install a term label manager");
         // Test null parameter
-        TermLabel label = manager.parseLabel("ONE", null, services);
+        TermLabel label = parseLabelNullArgs(manager, "ONE", services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("ONE", label.name().toString());
         assertEquals(0, label.getTLChildCount());
         // Test empty parameter
-        label = manager.parseLabel("TWO", null, services);
+        label = parseLabelNullArgs(manager, "TWO", services);
         assertTrue(label instanceof LoggingTermLabel);
         assertEquals("TWO", label.name().toString());
         assertEquals(0, label.getTLChildCount());
@@ -547,7 +569,7 @@ public class TestTermLabelManager {
         assertEquals("Param", label.getTLChild(0));
         // Test unsupported
         try {
-            manager.parseLabel("UNKNOWN", null, services);
+            parseLabelNullArgs(manager, "UNKNOWN", services);
         } catch (TermLabelException e) {
             assertEquals("No TermLabelFactory available for term label name \"UNKNOWN\".",
                 e.getMessage());
@@ -590,10 +612,13 @@ public class TestTermLabelManager {
         assertSame(manager, managerAgain);
     }
 
-    protected InitConfig createTestServices(final TermLabelPolicy applicationTermPolicy,
-            final TermLabelPolicy modalityTermPolicy, final ChildTermLabelPolicy directChildPolicy,
-            final ChildTermLabelPolicy childAndGrandchildPolicy, final TermLabelUpdate update,
-            final TermLabelRefactoring refactoring) throws ProblemLoaderException {
+    // a null policy/update/refactoring means that kind of configuration is not installed
+    protected InitConfig createTestServices(final @Nullable TermLabelPolicy applicationTermPolicy,
+            final @Nullable TermLabelPolicy modalityTermPolicy,
+            final @Nullable ChildTermLabelPolicy directChildPolicy,
+            final @Nullable ChildTermLabelPolicy childAndGrandchildPolicy,
+            final @Nullable TermLabelUpdate update,
+            final @Nullable TermLabelRefactoring refactoring) throws ProblemLoaderException {
         if (CONFIG == null) {
             KeYEnvironment<?> env = null;
             try {
@@ -672,7 +697,8 @@ public class TestTermLabelManager {
                 return result;
             }
         };
-        return CONFIG.copyWithServices(CONFIG.getServices().copy(profile, false));
+        InitConfig config = Objects.requireNonNull(CONFIG, "the test config must be loaded");
+        return config.copyWithServices(config.getServices().copy(profile, false));
     }
 
     private static class LoggingTermLabelRefactoring implements TermLabelRefactoring {
@@ -694,17 +720,18 @@ public class TestTermLabelManager {
 
         @Override
         public RefactoringScope defineRefactoringScope(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence,
-                JTerm applicationTerm, Rule rule,
-                Goal goal, Object hint, JTerm tacletTerm) {
+                @Nullable PosInOccurrence applicationPosInOccurrence,
+                @Nullable JTerm applicationTerm, Rule rule,
+                Goal goal, @Nullable Object hint, @Nullable JTerm tacletTerm) {
             return scope;
         }
 
         @Override
         public void refactorLabels(TermLabelState state, Services services,
-                PosInOccurrence applicationPosInOccurrence,
-                JTerm applicationTerm, Rule rule,
-                Goal goal, Object hint, JTerm tacletTerm, JTerm term, LabelCollection labels) {
+                @Nullable PosInOccurrence applicationPosInOccurrence,
+                @Nullable JTerm applicationTerm, Rule rule,
+                Goal goal, @Nullable Object hint, @Nullable JTerm tacletTerm, JTerm term,
+                LabelCollection labels) {
             List<TermLabel> changedLabels = new LinkedList<>();
             boolean changed = labels.isModified();
             for (TermLabel label : labels.getLabels()) {
@@ -740,9 +767,9 @@ public class TestTermLabelManager {
         @Override
         public void updateLabels(TermLabelState state, Services services,
                 PosInOccurrence applicationPosInOccurrence,
-                JTerm applicationTerm, JTerm modalityTerm,
+                @Nullable JTerm applicationTerm, @Nullable JTerm modalityTerm,
                 org.key_project.prover.rules.Rule rule,
-                RuleApp ruleApp, Object hint, JTerm tacletTerm, JTerm newTerm,
+                RuleApp ruleApp, Object hint, @Nullable JTerm tacletTerm, JTerm newTerm,
                 Set<TermLabel> labels) {
             labels.add(toAdd);
         }
@@ -768,14 +795,15 @@ public class TestTermLabelManager {
         public boolean isRuleApplicationSupported(TermServices services,
                 PosInOccurrence applicationPosInOccurrence,
                 JTerm applicationTerm, Rule rule,
-                Goal goal, Object hint, JTerm tacletTerm, JTerm newTerm) {
+                Goal goal, Object hint, @Nullable JTerm tacletTerm, JTerm newTerm) {
             return true;
         }
 
         @Override
         public boolean addLabel(TermServices services,
                 PosInOccurrence applicationPosInOccurrence,
-                JTerm applicationTerm, Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+                JTerm applicationTerm, Rule rule, Goal goal, Object hint,
+                @Nullable JTerm tacletTerm,
                 JTerm newTerm, JTerm childTerm, TermLabel label) {
             log.add(label);
             return true;
@@ -792,8 +820,8 @@ public class TestTermLabelManager {
         @Override
         public TermLabel keepLabel(TermLabelState state, Services services,
                 PosInOccurrence applicationPosInOccurrence,
-                JTerm applicationTerm, Rule rule,
-                Goal goal, Object hint, JTerm tacletTerm,
+                @Nullable JTerm applicationTerm, Rule rule,
+                @Nullable Goal goal, @Nullable Object hint, @Nullable JTerm tacletTerm,
                 JTerm newTerm, TermLabel label) {
             log.add(label);
             return label;

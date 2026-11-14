@@ -6,6 +6,7 @@ package de.uka.ilkd.key.java;
 
 import java.io.StringReader;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.loader.JavaParserFactory;
 import de.uka.ilkd.key.rule.TacletForTests;
@@ -13,6 +14,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 import com.github.javaparser.ast.AccessSpecifier;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -68,7 +70,7 @@ public class MethodResolutionTest {
         }
     }
 
-    private static JavaParserFactory factory = null;
+    private static @Nullable JavaParserFactory factory = null;
 
     @BeforeAll
     public static void init() {
@@ -81,6 +83,7 @@ public class MethodResolutionTest {
 
     @Test
     public void testShadowingPrivateMethodFromOutsideClass() {
+        Objects.requireNonNull(factory, "initialized in @BeforeAll init()");
         var cuA =
             factory.parseCompilationUnit(new StringReader(CLASSES_A)).getResult().orElseThrow();
         var cuB =

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Collections;
 import javax.swing.*;
@@ -14,6 +15,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl;
 import de.uka.ilkd.key.proof.io.ProblemLoader;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Offers a loading of a single Java file, without considering the folder as part of a classpath.
  *
@@ -21,7 +24,13 @@ import de.uka.ilkd.key.proof.io.ProblemLoader;
  *
  * @see OpenFileAction
  */
+@NullMarked
 public class OpenSingleJavaFileAction extends MainWindowAction {
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public OpenSingleJavaFileAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Open Single Java File...");
@@ -37,14 +46,23 @@ public class OpenSingleJavaFileAction extends MainWindowAction {
         fc.setFileSelectionMode(KeYFileChooser.FILES_ONLY);
         int result = fc.showOpenDialog(mainWindow);
 
-
         if (result == JFileChooser.APPROVE_OPTION) {
-            Path file = fc.getSelectedFile().toPath();
+            File selectedFile = fc.getSelectedFile();
+            if (selectedFile == null) {
+                throw new NullPointerException("No file selected in the file chooser.");
+            }
+            Path file = selectedFile.toPath();
             mainWindow.addRecentFile(file.toAbsolutePath().toString(),
                 null, true, null);
 
             WindowUserInterfaceControl ui = mainWindow.getUserInterface();
-            ProblemLoader pl = ui.getProblemLoader(file, Collections.emptyList(), null,
+            // Deliberate null boot class path: a {@code null} boot class path selects the
+            // default (empty) boot class path per JavaModel semantics, as used by all other
+            // problem-loading entry points; the legacy parameter is annotated @NonNull,
+            // suppressed with a scoped key.
+            @SuppressWarnings("nullness:argument.type.incompatible")
+            Path noBootClassPath = null;
+            ProblemLoader pl = ui.getProblemLoader(file, Collections.emptyList(), noBootClassPath,
                 Collections.emptyList(), ui.getMediator());
             pl.setLoadSingleJavaFile(true);
             pl.runAsynchronously();

@@ -8,9 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Counter;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -29,14 +32,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @author Arne Keller
  */
 class TestCopyingReplayer {
-    public static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final Path testCaseDirectory = Objects
+            .requireNonNull(FindResources.getTestCasesDirectory(), "test cases must be available");
 
     /**
      * Reset all counters associated with this service.
      * Only use this method if the proof is empty!
      */
     public void resetCounters(Proof proof) {
-        if (proof.root().childrenCount() > 0) {
+        final Node root = Objects.requireNonNull(proof.root(), "the proof has a root node");
+        if (root.childrenCount() > 0) {
             throw new IllegalStateException("tried to reset counters on non-empty proof");
         }
 
@@ -69,10 +74,13 @@ class TestCopyingReplayer {
             Proof proof2 = env2.getLoadedProof();
 
             // clear proof2, replay proof1 on top
-            proof2.pruneProof(proof2.root());
+            final Node root1 = Objects.requireNonNull(proof1.root(), "the proof has a root node");
+            final Node root2 = Objects.requireNonNull(proof2.root(), "the proof has a root node");
+            proof2.pruneProof(root2);
             resetCounters(proof2);
-            new CopyingProofReplayer(proof1, proof2).copy(proof1.root(),
-                proof2.getOpenGoal(proof2.root()), new HashSet<>());
+            final Goal openGoal =
+                Objects.requireNonNull(proof2.getOpenGoal(root2), "the root holds an open goal");
+            new CopyingProofReplayer(proof1, proof2).copy(root1, openGoal, new HashSet<>());
 
             assertTrue(proof2.closed());
             Assertions.assertEquals(proof1.countNodes(), proof2.countNodes());

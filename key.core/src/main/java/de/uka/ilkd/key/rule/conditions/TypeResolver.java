@@ -24,12 +24,16 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Several variable conditions deal with types. The type resolver provides a unique interface to
  * access types, e.g. the type of a schemavariable instantiation, the instantiated type of a generic
  * sort or the type an attribute is declared in.
  */
+@NullMarked
 public abstract class TypeResolver {
 
     // -------------------------------------------------------------------------
@@ -56,11 +60,11 @@ public abstract class TypeResolver {
         return new ParametricSortResolver(psi);
     }
 
-    public abstract boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
-            SVInstantiations instMap, TermServices services);
+    public abstract boolean isComplete(@Nullable SchemaVariable sv,
+            @Nullable SyntaxElement instCandidate, SVInstantiations instMap, TermServices services);
 
-    public abstract Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
-            SVInstantiations instMap, Services services);
+    public abstract @Nullable Sort resolveSort(@Nullable SchemaVariable sv,
+            @Nullable SyntaxElement instCandidate, SVInstantiations instMap, Services services);
 
 
     // -------------------------------------------------------------------------
@@ -80,14 +84,16 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
+        public boolean isComplete(@Nullable SchemaVariable sv,
+                @Nullable SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs) != null;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
-                SVInstantiations instMap, Services services) {
+        public @Nullable Sort resolveSort(@Nullable SchemaVariable sv,
+                @Nullable SyntaxElement instCandidate, SVInstantiations instMap,
+                Services services) {
             return instMap.getGenericSortInstantiations().getInstantiation(gs);
         }
 
@@ -106,13 +112,14 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
+        public boolean isComplete(@Nullable SchemaVariable sv,
+                @Nullable SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
             return true;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
+        public Sort resolveSort(@Nullable SchemaVariable sv, @Nullable SyntaxElement instCandidate,
                 SVInstantiations instMap, Services services) {
             return s;
         }
@@ -136,14 +143,16 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
+        public boolean isComplete(@Nullable SchemaVariable sv,
+                @Nullable SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
             return resolveSV == sv || instMap.getInstantiation(resolveSV) != null;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
-                SVInstantiations instMap, Services services) {
+        public @Nullable Sort resolveSort(@Nullable SchemaVariable sv,
+                @Nullable SyntaxElement instCandidate, SVInstantiations instMap,
+                Services services) {
 
             final Sort s;
 
@@ -184,15 +193,17 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
+        public boolean isComplete(@Nullable SchemaVariable sv,
+                @Nullable SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
 
             return sv == memberSV || instMap.getInstantiation(memberSV) != null;
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
-                SVInstantiations instMap, Services services) {
+        public @Nullable Sort resolveSort(@Nullable SchemaVariable sv,
+                @Nullable SyntaxElement instCandidate, SVInstantiations instMap,
+                Services services) {
             final Sort result;
 
             final SyntaxElement inst = (SyntaxElement) (memberSV == sv ? instCandidate
@@ -216,7 +227,15 @@ public abstract class TypeResolver {
             return result;
         }
 
-        private Sort getContainerSort(Operator op, TermServices services) {
+        /**
+         * Determines the sort of the container (array or heap) of the given operator, or
+         * {@code null} if no container is implied.
+         * <p>
+         * The container type of a program variable or observer function is always present; the
+         * dereferences of the (nullable) container types are suppressed with a scoped key.
+         */
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
+        private @Nullable Sort getContainerSort(Operator op, TermServices services) {
             Sort result = null;
             if (op instanceof ProgramVariable) {
                 result = ((ProgramVariable) op).getContainerType().getSort();
@@ -248,14 +267,16 @@ public abstract class TypeResolver {
         }
 
         @Override
-        public boolean isComplete(SchemaVariable sv, SyntaxElement instCandidate,
+        public boolean isComplete(@Nullable SchemaVariable sv,
+                @Nullable SyntaxElement instCandidate,
                 SVInstantiations instMap, TermServices services) {
             return psi.isComplete(instMap);
         }
 
         @Override
-        public Sort resolveSort(SchemaVariable sv, SyntaxElement instCandidate,
-                SVInstantiations instMap, Services services) {
+        public @Nullable Sort resolveSort(@Nullable SchemaVariable sv,
+                @Nullable SyntaxElement instCandidate, SVInstantiations instMap,
+                Services services) {
             return psi.resolveSort(instMap, services);
         }
 

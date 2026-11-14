@@ -50,12 +50,24 @@ public class KeYJavaType implements Type {
         this.sort = Objects.requireNonNull(sort);
     }
 
-    /** creates a new KeYJavaType */
+    /**
+     * Creates a new KeYJavaType from the given sort; the {@link #setSort} call operates on
+     * {@code this} while the receiver is still under initialization (EISOP initialization
+     * check), safe here because it only assigns the freshly-constructed {@code sort} instance
+     * field, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public KeYJavaType(Sort sort) {
         setSort(Objects.requireNonNull(sort));
     }
 
-    /** creates a new KeYJavaType */
+    /**
+     * Creates a new KeYJavaType from the given type; the {@link #setJavaType} call operates on
+     * {@code this} while the receiver is still under initialization (EISOP initialization
+     * check), safe here because it only assigns the freshly-constructed {@code type} instance
+     * field, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public KeYJavaType(Type type) {
         setJavaType(Objects.requireNonNull(type));
     }
@@ -116,22 +128,24 @@ public class KeYJavaType implements Type {
     }
 
     public String getFullName() {
+        Sort sort = getSort();
         return Optional.ofNullable(getJavaType()).map(Type::getFullName)
                 .orElse(
-                    getSort() != null ? getSort().name().toString() : "This should never be seen");
+                    sort != null ? sort.name().toString() : "This should never be seen");
     }
 
     public String getName() {
         if (javaType != null) {
-            return javaType.getName();
+            // any resolved java type carries a name (NamedModelElement.getName() is declared
+            // @Nullable in general, but a non-null javaType always has one)
+            return Objects.requireNonNull(javaType.getName(), "no name for type");
         } else {
-            assert sort != null;
-            return sort.name().toString();
+            return Objects.requireNonNull(sort, "no sort for type").name().toString();
         }
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -152,7 +166,7 @@ public class KeYJavaType implements Type {
     }
 
 
-    public PackageReference createPackagePrefix() {
+    public @Nullable PackageReference createPackagePrefix() {
         PackageReference ref = null;
         String rest = getFullName();
         if (rest.indexOf('.') > 0) {

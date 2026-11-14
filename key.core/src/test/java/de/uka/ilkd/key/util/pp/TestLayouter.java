@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util.pp;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -47,7 +48,7 @@ public class TestLayouter {
 
     class MarkingBackend extends StringBackend<Void> {
         @Override
-        public void mark(Void o) {
+        public void mark(@Nullable Void o) {
             marks[markPtr++] = count();
         }
     }

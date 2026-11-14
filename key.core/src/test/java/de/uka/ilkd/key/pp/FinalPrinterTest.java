@@ -5,11 +5,13 @@
 package de.uka.ilkd.key.pp;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.logic.Choice;
 
@@ -38,6 +40,7 @@ public class FinalPrinterTest {
     }
 
     @AfterAll
+    @SuppressWarnings("NullAway") // io is released after all tests and never read again
     public static void tearDown() {
         io = null;
     }
@@ -52,7 +55,8 @@ public class FinalPrinterTest {
             final<int>(sub, C::#finf); sub.(C::finf)
             """)
     public void testPPWithFinal(String termString, String expected) throws Exception {
-        services.getProof().getSettings().getChoiceSettings()
+        Proof proof = Objects.requireNonNull(services.getProof(), "no proof in services");
+        proof.getSettings().getChoiceSettings()
                 .updateWith(List.of(PrettyPrinterRoundtripTest.WITH_FINAL));
         JTerm term = io.parseExpression(termString);
         System.out.println("Original: " + term);
@@ -71,7 +75,8 @@ public class FinalPrinterTest {
             select<int>(heap, self, C::#finf); self.finf
             """)
     public void testPPWithoutFinal(String termString, String expected) throws Exception {
-        services.getProof().getSettings().getChoiceSettings()
+        Proof proof = Objects.requireNonNull(services.getProof(), "no proof in services");
+        proof.getSettings().getChoiceSettings()
                 .updateWith(List.of(PrettyPrinterRoundtripTest.WITHOUT_FINAL));
         JTerm term = io.parseExpression(termString);
         System.out.println("Original: " + term);

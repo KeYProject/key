@@ -16,15 +16,19 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class is responsible for pruning a proof tree at a certain cutting point. It has been
  * introduced to encapsulate the methods that are needed for pruning. Since the class has
  * influence on the internal state of the proof it should not be moved to a new file, in order
  * to restrict the access to it.
  */
+@NullMarked
 class ProofPruner {
     private final Proof proof;
-    private Node firstLeaf = null;
+    private @Nullable Node firstLeaf = null;
 
     ProofPruner(Proof proof) {
         this.proof = proof;
@@ -35,7 +39,21 @@ class ProofPruner {
      *
      * @param cuttingPoint the node where to prune
      * @return the subtrees whose common root was the given {@code cuttingPoint}
+     *         <p>
+     *         The proof of the pruner, the parent of a visited node above the cut, the first leaf
+     *         and the
+     *         first goal encountered, and the pruned proof's init config are all guaranteed to be
+     *         present
+     *         at the point of use; the dereferences of the corresponding (nullable) values are
+     *         suppressed
+     *         with a scoped key.
+     *         <p>
+     *         The parent's applied rule app may be absent (e.g. for a parent visited right after a
+     *         set-back); as in the pre-nullness code, the possibly-null app is passed through and
+     *         {@link ProofCorrectnessMgt#ruleUnApplied} tolerates it.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     public ImmutableList<Node> prune(final Node cuttingPoint) {
         // special case: prune cached goal = only need to re-open the final node
         ClosedBy cby = cuttingPoint.lookup(ClosedBy.class);
@@ -81,8 +99,12 @@ class ProofPruner {
                 }
             }
 
-            if (initConfig != null && visitedNode.parent() != null) {
-                proof.mgt().ruleUnApplied(visitedNode.parent().getAppliedRuleApp());
+            final Node parent = visitedNode.parent();
+            if (initConfig != null && parent != null) {
+                // A parent may lack an applied rule app (e.g. after a set-back); main passed the
+                // possibly-null app directly and ruleUnApplied tolerates it (set removal is a
+                // no-op for null).
+                proof.mgt().ruleUnApplied(parent.getAppliedRuleApp());
             }
             // Deregister taclets that were locally introduced (e.g. via \addrules) in the pruned
             // subtree. These are stored on the node at which they were introduced, so we must
@@ -116,8 +138,8 @@ class ProofPruner {
         });
 
         // first leaf is closed -> add as goal and reopen
-        final Goal firstGoal =
-            firstLeaf.isClosed() ? proof.getClosedGoal(firstLeaf) : proof.getOpenGoal(firstLeaf);
+        final Goal firstGoal = Objects.requireNonNull(
+            firstLeaf.isClosed() ? proof.getClosedGoal(firstLeaf) : proof.getOpenGoal(firstLeaf));
         assert firstGoal != null;
         if (firstLeaf.isClosed()) {
             proof.reOpenGoal(firstGoal);
@@ -133,25 +155,29 @@ class ProofPruner {
         // Go from the first leaf that has been found to the cutting point. For each node on the
         // path,
         // remove the local rules from firstGoal that have been added by the considered node.
-        proof.traverseFromChildToParent(firstLeaf, cuttingPoint, (proof, visitedNode) -> {
-            for (final NoPosTacletApp app : visitedNode.getLocalIntroducedRules()) {
-                firstGoal.ruleAppIndex().removeNoPosTacletApp(app);
-                proof.getInitConfig().getJustifInfo().removeJustificationFor(app.taclet());
-            }
+        proof.traverseFromChildToParent(Objects.requireNonNull(firstLeaf), cuttingPoint,
+            (proof, visitedNode) -> {
+                for (final NoPosTacletApp app : visitedNode.getLocalIntroducedRules()) {
+                    firstGoal.ruleAppIndex().removeNoPosTacletApp(app);
+                    proof.getInitConfig().getJustifInfo().removeJustificationFor(app.taclet());
+                }
 
-            firstGoal.pruneToParent();
+                firstGoal.pruneToParent();
 
-            // Replay a node's strategy-info undos in REVERSE (LIFO) order. They are absolute
-            // restore-previous operations, so several registered at the same node (e.g. QueryExpand
-            // recording more than one first-seen query while scanning the subterms of one sequent)
-            // must unwind last-in-first-out to reach the pre-node state; forward replay would leave
-            // the map at the second-registered value instead of the original.
-            final List<StrategyInfoUndoMethod> undoMethods =
-                visitedNode.getStrategyInfoUndoMethods();
-            for (int i = undoMethods.size() - 1; i >= 0; i--) {
-                firstGoal.undoStrategyInfoAdd(undoMethods.get(i));
-            }
-        });
+                // Replay a node's strategy-info undos in REVERSE (LIFO) order. They are absolute
+                // restore-previous operations, so several registered at the same node (e.g.
+                // QueryExpand
+                // recording more than one first-seen query while scanning the subterms of one
+                // sequent)
+                // must unwind last-in-first-out to reach the pre-node state; forward replay would
+                // leave
+                // the map at the second-registered value instead of the original.
+                final List<StrategyInfoUndoMethod> undoMethods =
+                    visitedNode.getStrategyInfoUndoMethods();
+                for (int i = undoMethods.size() - 1; i >= 0; i--) {
+                    firstGoal.undoStrategyInfoAdd(undoMethods.get(i));
+                }
+            });
 
 
         // do some cleaning and refreshing: Clearing indices, caches....
@@ -168,6 +194,17 @@ class ProofPruner {
         return subtrees;
     }
 
+    /**
+     * Refreshes the rule-index caches of the given goal, dropping the applied rule of its node.
+     *
+     * @param goal The goal to refresh.
+     * @param node The node whose applied rule is cleared.
+     *        <p>
+     *        Every goal of the pruned proof has a rule-app manager when it is refreshed; the
+     *        dereference
+     *        of the (nullable) rule-app manager is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void refreshGoal(Goal goal, Node node) {
         goal.getRuleAppManager().clearCache();
         goal.ruleAppIndex().clearIndexes();

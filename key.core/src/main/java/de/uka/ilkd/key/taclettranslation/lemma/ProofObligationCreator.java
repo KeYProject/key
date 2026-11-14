@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
@@ -25,12 +26,14 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Creates for a given set of taclets the corresponding set of proof obligation. For more
  * information see public method <code>create(...)</code>.
  *
  */
+@NullMarked
 public class ProofObligationCreator {
 
     private String createName(ProofAggregate[] singleProofs) {
@@ -135,7 +138,7 @@ public class ProofObligationCreator {
             UserDefinedSymbols symbolsForAxioms) {
         LemmaGenerator generator = new GenericRemovingLemmaGenerator();
         TacletFormula tacletFormula = generator.translate(taclet, initConfig.getServices());
-        JTerm formula = tacletFormula.getFormula(initConfig.getServices());
+        JTerm formula = Objects.requireNonNull(tacletFormula.getFormula(initConfig.getServices()));
         String name = "Taclet: " + taclet.name();
 
         UserDefinedSymbols userDefinedSymbols = new UserDefinedSymbols(symbolsForAxioms);

@@ -7,11 +7,15 @@ package de.uka.ilkd.key.gui;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Instances of class implementing this interface are able to complete rule applications. At the
  * moment they are only responsible for built-in rule apps, but they should be generalized to treat
  * taclets as well.
  */
+@NullMarked
 public interface InteractiveRuleApplicationCompletion {
 
     /**
@@ -23,6 +27,7 @@ public interface InteractiveRuleApplicationCompletion {
      *        unique or can be chosen in a reasonable way as if unique
      * @return the completed app or null if completion was not possible
      */
+    @Nullable
     IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced);
 
     /**

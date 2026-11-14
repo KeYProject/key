@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Goal;
 
@@ -23,6 +24,7 @@ import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
@@ -30,6 +32,7 @@ import org.jspecify.annotations.NonNull;
  * <code>TermGenerator</code>. The terms are stored in a <code>TermBuffer</code> one after the other
  * and can subsequently be used to instantiate a rule application
  */
+@NullMarked
 public class ForEachCP implements Feature {
 
     private final TermBuffer<@NonNull Goal> var;
@@ -62,7 +65,8 @@ public class ForEachCP implements Feature {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);
 
-        final BackTrackingManager manager = mState.getBacktrackingManager();
+        final BackTrackingManager manager =
+            Objects.requireNonNull(mState.getBacktrackingManager());
         manager.passChoicePoint(new CP(app, pos, (Goal) goal, mState), this);
 
         final RuleAppCost res;

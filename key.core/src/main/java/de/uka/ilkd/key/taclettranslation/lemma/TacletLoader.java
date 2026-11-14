@@ -8,6 +8,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Proof;
@@ -27,14 +28,19 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public abstract class TacletLoader {
 
-    protected final ProgressMonitor monitor;
-    protected final ProblemInitializerListener listener;
+    protected final @Nullable ProgressMonitor monitor;
+    protected final @Nullable ProblemInitializerListener listener;
     protected final Profile profile;
-    protected ProofEnvironment proofEnvironment;
+    protected @Nullable ProofEnvironment proofEnvironment;
 
-    protected TacletLoader(ProgressMonitor monitor, ProblemInitializerListener listener,
+    protected TacletLoader(@Nullable ProgressMonitor monitor,
+            @Nullable ProblemInitializerListener listener,
             Profile profile) {
         super();
         this.monitor = monitor;
@@ -116,22 +122,24 @@ public abstract class TacletLoader {
     }
 
     public static class TacletFromFileLoader extends TacletLoader {
-        private InitConfig initConfig;
+        private @Nullable InitConfig initConfig;
         private final Path fileForTaclets;
         private final Collection<Path> filesForAxioms;
         private final ProblemInitializer problemInitializer;
 
-        public TacletFromFileLoader(ProgressMonitor pm, ProblemInitializerListener listener,
+        public TacletFromFileLoader(@Nullable ProgressMonitor pm,
+                @Nullable ProblemInitializerListener listener,
                 ProblemInitializer problemInitializer, Path fileForTaclets,
                 Collection<Path> filesForAxioms, InitConfig initConfig) {
-            super(pm, listener, initConfig.getProfile());
+            super(pm, listener, Objects.requireNonNull(initConfig.getProfile()));
             this.fileForTaclets = fileForTaclets;
             this.filesForAxioms = filesForAxioms;
             this.problemInitializer = problemInitializer;
             this.initConfig = initConfig;
         }
 
-        public TacletFromFileLoader(ProgressMonitor pm, ProblemInitializerListener listener,
+        public TacletFromFileLoader(@Nullable ProgressMonitor pm,
+                @Nullable ProblemInitializerListener listener,
                 ProblemInitializer problemInitializer, Profile profile, Path fileForTaclets,
                 Collection<Path> filesForAxioms) {
             super(pm, listener, profile);
@@ -140,8 +148,9 @@ public abstract class TacletLoader {
             this.problemInitializer = problemInitializer;
         }
 
-        public TacletFromFileLoader(TacletFromFileLoader loader, InitConfig initConfig) {
-            this(loader.monitor, loader.listener, makeProblemInitializer(loader, initConfig),
+        public TacletFromFileLoader(TacletFromFileLoader loader, @Nullable InitConfig initConfig) {
+            this(loader.monitor, loader.listener,
+                makeProblemInitializer(loader, Objects.requireNonNull(initConfig)),
                 loader.profile, loader.fileForTaclets, loader.filesForAxioms);
             assert initConfig == null || loader.profile == initConfig.getProfile();
             this.initConfig = initConfig;
@@ -213,7 +222,8 @@ public abstract class TacletLoader {
 
     public static class KeYsTacletsLoader extends TacletLoader {
 
-        public KeYsTacletsLoader(ProgressMonitor monitor, ProblemInitializerListener listener,
+        public KeYsTacletsLoader(@Nullable ProgressMonitor monitor,
+                @Nullable ProblemInitializerListener listener,
                 Profile profile) {
             super(monitor, listener, profile);
         }

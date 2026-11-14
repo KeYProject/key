@@ -6,6 +6,10 @@ package de.uka.ilkd.key.smt;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Simple routine to prettyprint an SMT2 input.
@@ -20,6 +24,7 @@ import java.util.List;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public abstract class SMTBeautifier {
 
     private SMTBeautifier() {
@@ -32,8 +37,8 @@ public abstract class SMTBeautifier {
 
     // An element is either a single string or a list of elements
     private static class Element {
-        private String head;
-        private List<Element> children;
+        private @Nullable String head;
+        private @Nullable List<Element> children;
 
         public int length() {
             int result = 0;
@@ -54,7 +59,8 @@ public abstract class SMTBeautifier {
             if (head != null) {
                 return head;
             } else {
-                return children.toString();
+                // an element without a head always carries children (see parseParen)
+                return Objects.requireNonNull(children, "children").toString();
             }
         }
 
@@ -113,7 +119,7 @@ public abstract class SMTBeautifier {
         return sb.toString();
     }
 
-    private static Element parse(String s, MutableInt pos) {
+    private static @Nullable Element parse(String s, MutableInt pos) {
         while (pos.val < s.length()) {
             switch (s.charAt(pos.val)) {
                 case ' ':
@@ -183,7 +189,9 @@ public abstract class SMTBeautifier {
             StringBuilder sb = new StringBuilder("(");
             boolean oneLine = (element.length() < lineLength) && !element.hasComments();
             boolean first = true;
-            for (Element child : element.children) {
+            // an element without a head always carries children (see parseParen)
+            List<Element> children = Objects.requireNonNull(element.children, "children");
+            for (Element child : children) {
                 if (first) {
                     first = false;
                 } else {

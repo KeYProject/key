@@ -21,13 +21,16 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Used for TESTS ONLY as we allow there to declare program variables global in rule files.
  */
 public class KeYFileForTests extends KeYFile {
 
-    private Namespace<QuantifiableVariable> variables;
-    private Namespace<SchemaVariable> schemaVariables;
+    // set lazily by read(); null until the file has been read
+    private @Nullable Namespace<QuantifiableVariable> variables;
+    private @Nullable Namespace<SchemaVariable> schemaVariables;
 
     /**
      * creates a new representation for a given file by indicating a name and a file representing
@@ -86,11 +89,11 @@ public class KeYFileForTests extends KeYFile {
     // return result;
     // }
 
-    public Namespace<QuantifiableVariable> variables() {
+    public @Nullable Namespace<QuantifiableVariable> variables() {
         return variables;
     }
 
-    public Namespace<SchemaVariable> schemaVariables() {
+    public @Nullable Namespace<SchemaVariable> schemaVariables() {
         return schemaVariables;
     }
 }

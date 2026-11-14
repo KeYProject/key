@@ -20,9 +20,13 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Rosa Abbasi, Jonas Schiffl, Mattias Ulbrich
  */
+@NullMarked
 public class FloatHandler implements SMTHandler {
 
     public static final Type FLOAT = new Type("Float", "f2u", "u2f");
@@ -43,15 +47,15 @@ public class FloatHandler implements SMTHandler {
     private final Map<Operator, String> fpOperators = new HashMap<>();
     private final Set<String> roundingOperators = new HashSet<>();
 
-    private FloatLDT floatLDT;
-    private DoubleLDT doubleLDT;
-    private Services services;
+    private @Nullable FloatLDT floatLDT;
+    private @Nullable DoubleLDT doubleLDT;
+    private @Nullable Services services;
 
     private boolean sqrtNative;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) throws IOException {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
 
         this.services = services;
         floatLDT = services.getTypeConverter().getFloatLDT();
@@ -137,17 +141,25 @@ public class FloatHandler implements SMTHandler {
         // These operators take a round mode argument:
         roundingOperators.addAll(Arrays.asList("fp.add", "fp.mul", "fp.sub", "fp.div", "fp.sqrt"));
 
-        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+        // the master always loads the snippets for every handler
+        masterHandler.addDeclarationsAndAxioms(
+            Objects.requireNonNull(handlerSnippets, "handler snippets"));
     }
 
     @Override
     public boolean canHandle(Operator op) {
+        FloatLDT floatLDT = Objects.requireNonNull(this.floatLDT, "float LDT");
+        DoubleLDT doubleLDT = Objects.requireNonNull(this.doubleLDT, "double LDT");
         return fpOperators.containsKey(op) || op == floatLDT.getFloatSymbol()
                 || op == doubleLDT.getDoubleSymbol();
     }
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+
+        FloatLDT floatLDT = Objects.requireNonNull(this.floatLDT, "float LDT");
+        DoubleLDT doubleLDT = Objects.requireNonNull(this.doubleLDT, "double LDT");
+        Services services = Objects.requireNonNull(this.services, "services");
 
         trans.introduceSymbol("float");
         trans.introduceSymbol("double");
@@ -188,6 +200,8 @@ public class FloatHandler implements SMTHandler {
     }
 
     private Type getType(Sort sort) throws SMTTranslationException {
+        FloatLDT floatLDT = Objects.requireNonNull(this.floatLDT, "float LDT");
+        DoubleLDT doubleLDT = Objects.requireNonNull(this.doubleLDT, "double LDT");
         Type exprType;
         if (sort.equals(floatLDT.targetSort())) {
             exprType = FLOAT;

@@ -4,16 +4,18 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof.proofevent;
 
-
 import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * More specific information about a rule application: the original proof node and the new proof
  * node(s) created by this rule application.
  */
+@NullMarked
 public class RuleAppInfo {
 
     /**

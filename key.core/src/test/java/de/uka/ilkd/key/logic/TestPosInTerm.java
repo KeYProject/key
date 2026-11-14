@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic;
 
+import java.util.Objects;
+
 import org.key_project.logic.PosInTerm;
 
 import org.junit.jupiter.api.Test;
@@ -33,10 +35,11 @@ public class TestPosInTerm {
         assertEquals(8, copy.getIndex());
         assertEquals(1, copy.depth());
 
-        pit = pit.up();
+        // up() returns null only at the top level, which is never reached here
+        pit = Objects.requireNonNull(pit.up(), "position is not at top level");
         assertEquals(copy, pit);
 
-        pit = pit.up();
+        pit = Objects.requireNonNull(pit.up(), "position is not at top level");
         pit = pit.down(15);
         assertEquals(8, copy.getIndex());
         assertEquals(15, pit.getIndex());
@@ -69,7 +72,11 @@ public class TestPosInTerm {
             assertEquals(pos[i], pit.getIndexAt(i));
         }
 
-        pit = pit.up().up().up();
+        // up() returns null only at the top level, and the position has depth 15
+        PosInTerm pitUp1 = Objects.requireNonNull(pit.up(), "position is not at top level");
+        PosInTerm pitUp2 = Objects.requireNonNull(pitUp1.up(), "position is not at top level");
+        PosInTerm pitUp3 = Objects.requireNonNull(pitUp2.up(), "position is not at top level");
+        pit = pitUp3;
         pit = pit.down(10000).down(1000);
 
         // old unchanged

@@ -21,6 +21,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static de.uka.ilkd.key.rule.conditions.DropEffectlessElementariesCondition.*;
@@ -107,7 +108,8 @@ public class TestDropEffectlessElementary {
      * (a full walk of the term and the Java program it contains), then let the helper test the
      * update's LHS variables against them.
      */
-    static JTerm dropEffectlessElementariesFull(JTerm update, JTerm target,
+    // returns null if the update is effectless and thus dropped entirely
+    static @Nullable JTerm dropEffectlessElementariesFull(JTerm update, JTerm target,
             Services services) {
         TermProgramVariableCollector collector = services.getFactory().create(services);
         target.execPostOrder(collector);
@@ -185,7 +187,8 @@ public class TestDropEffectlessElementary {
         assertEquals(TacletForTests.parseTerm("(i = 0)"), applyDrop(term));
     }
 
-    private JTerm applyDrop(JTerm term) {
+    // returns null if the update is effectless and thus dropped entirely
+    private @Nullable JTerm applyDrop(JTerm term) {
 
         JTerm update = term.sub(0);
         JTerm arg = term.sub(1);

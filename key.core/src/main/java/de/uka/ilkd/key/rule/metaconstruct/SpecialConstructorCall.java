@@ -17,6 +17,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The constructor call meta construct is used to handle a allocation expression like
  * <code>new Class(...)</code>. Thereby it replaces the allocation expression by a method reference
@@ -24,6 +26,7 @@ import org.key_project.util.collection.ImmutableList;
  * normalform.
  */
 @TransformerMeta(name = "#specialConstructorCall")
+@NullMarked
 public class SpecialConstructorCall extends ProgramTransformer {
 
     /**

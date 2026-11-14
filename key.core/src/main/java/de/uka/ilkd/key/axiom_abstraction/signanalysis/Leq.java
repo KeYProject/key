@@ -10,11 +10,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The Leq element of the sign lattice, representing all negative numbers and zero.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class Leq extends SignAnalysisDomainElem {
 
     private static final Leq INSTANCE = new Leq();

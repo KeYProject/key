@@ -4,17 +4,23 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.speclang;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A replacement map for terms.
  *
  * @author lanzinger
  */
+@NullMarked
 public class TermReplacementMap extends ReplacementMap<JTerm> {
 
     /**
@@ -32,11 +38,12 @@ public class TermReplacementMap extends ReplacementMap<JTerm> {
      * @param newHeap the heap that should be used
      * @param services services
      */
-    public void replaceHeap(final JTerm newHeap, final Services services) {
+    public void replaceHeap(final @Nullable JTerm newHeap, final Services services) {
         if (newHeap == null) {
             throw new IllegalArgumentException("newHeap can't be null");
         }
-        if (!newHeap.sort().equals(services.getTypeConverter().getHeapLDT().targetSort())) {
+        if (!newHeap.sort().equals(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT").targetSort())) {
             throw new IllegalArgumentException("newHeap has to be a heap");
         }
         put(services.getTermBuilder().getBaseHeap(), newHeap);

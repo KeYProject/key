@@ -5,19 +5,24 @@
 package de.uka.ilkd.key.speclang.translation;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class represents the translation of an expression of an arbitrary specification language,
  * which in the KeY world is either a term or a type.
  */
+@NullMarked
 public final class SLExpression {
-    private final JTerm term;
-    private final KeYJavaType type;
+    private final @Nullable JTerm term;
+    private final @Nullable KeYJavaType type;
     private final boolean isTerm;
 
 
@@ -63,12 +68,12 @@ public final class SLExpression {
     }
 
 
-    public JTerm getTerm() {
+    public @Nullable JTerm getTerm() {
         return term;
     }
 
 
-    public KeYJavaType getType() {
+    public @Nullable KeYJavaType getType() {
         return type;
     }
 
@@ -78,7 +83,7 @@ public final class SLExpression {
         if (isTerm()) {
             return term + "(type: " + type + ")";
         } else {
-            return type.toString();
+            return Objects.requireNonNull(type, "no type").toString();
         }
     }
 }

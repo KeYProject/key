@@ -31,6 +31,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -41,6 +43,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author christoph
  */
+@NullMarked
 public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     @Override
@@ -91,7 +94,7 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     @Override
     protected UseInformationFlowContractMacro.PropExpansionStrategy createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return new UseInformationFlowContractMacro.PropExpansionStrategy(getAdmittedRuleNames());
     }
 
@@ -123,27 +126,29 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
             // int i = 0;
             // while (i < numOfAppliedRules && parent != null) {
             while (parent != null) {
-                if (parent.parent() != null && getAppRuleName(parent).equals(IMP_LEFT_RULENAME)
-                        && getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
-                    String appName = getAppRuleName(parent.parent());
+                Node grandparent = parent.parent();
+                if (grandparent != null
+                        && getAppRuleName(parent).equals(IMP_LEFT_RULENAME)
+                        && getAppRuleName(grandparent).startsWith(INF_FLOW_RULENAME_PREFIX)) {
+                    String appName = getAppRuleName(grandparent);
                     appName = appName.substring(INF_FLOW_RULENAME_PREFIX.length());
                     node.getNodeInfo().setBranchLabel("post " + appName + " (information flow)");
                     parent.child(0).getNodeInfo()
                             .setBranchLabel("pre " + appName + " (information flow)");
-                    node = parent.parent();
+                    node = grandparent;
                     parent = node.parent();
                     // i += 2;
-                } else if (parent.parent() != null
+                } else if (grandparent != null
                         && getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME)
-                        && getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)) {
-                    String appName = getAppRuleName(parent.parent());
+                        && getAppRuleName(grandparent).startsWith(INF_FLOW_RULENAME_PREFIX)) {
+                    String appName = getAppRuleName(grandparent);
                     appName = appName.substring(INF_FLOW_RULENAME_PREFIX.length());
                     node.getNodeInfo().setBranchLabel("post " + appName + " (information flow)");
                     parent.child(1).getNodeInfo()
                             .setBranchLabel("pre " + appName + " (information flow)");
                     parent.child(0).getNodeInfo()
                             .setBranchLabel("pre_A & pre_B " + appName + " (information flow)");
-                    node = parent.parent();
+                    node = grandparent;
                     parent = node.parent();
                     // i += 2;
                 } else {
@@ -158,6 +163,9 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
     private String getAppRuleName(Node parent) {
         RuleApp parentRuleApp = parent.getAppliedRuleApp();
+        if (parentRuleApp == null) {
+            throw new NullPointerException("No applied rule app for the node.");
+        }
         String parentRuleName = parentRuleApp.rule().name().toString();
         return parentRuleName;
     }
@@ -226,14 +234,15 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
             // and
             // - we are in the branch where we have to show the left hand side
             // of the implication
-            if (goal.node().parent() != null && goal.node().parent().parent() != null) {
-                Node parent = goal.node().parent();
+            Node parent = goal.node().parent();
+            final Node grandparent = parent == null ? null : parent.parent();
+            if (parent != null && grandparent != null) {
                 final boolean approved =
                     !(getAppRuleName(parent).equals(IMP_LEFT_RULENAME)
-                            && getAppRuleName(parent.parent()).startsWith(INF_FLOW_RULENAME_PREFIX)
+                            && getAppRuleName(grandparent).startsWith(INF_FLOW_RULENAME_PREFIX)
                             && parent.child(0) == goal.node()
                             || getAppRuleName(parent).equals(DOUBLE_IMP_LEFT_RULENAME)
-                                    && getAppRuleName(parent.parent())
+                                    && getAppRuleName(grandparent)
                                             .startsWith(INF_FLOW_RULENAME_PREFIX)
                                     && parent.child(2) != goal.node());
                 final String name = app.rule().name().toString();

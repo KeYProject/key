@@ -20,6 +20,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Costs for the {@link MergeRule}; cheap if the first statement in the chosen top-level formula is
@@ -27,6 +28,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergeRuleFeature implements Feature {
     public static final Feature INSTANCE = new MergeRuleFeature();
 

@@ -16,12 +16,16 @@ import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The abstract class AlternativeMacro can be used to create compound macros which apply the first
  * applicable macro (similar to a shortcut disjunction) and then it returns.
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public abstract class AlternativeMacro extends AbstractProofMacro {
 
     /**
@@ -29,7 +33,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      *
      * This array is created on demand using {@link #createProofMacroArray()}.
      */
-    private ProofMacro[] proofMacros = null;
+    private ProofMacro @Nullable [] proofMacros = null;
 
     /**
      * Creates the proof macro array.
@@ -50,7 +54,7 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         final List<ProofMacro> macros = getProofMacros();
         for (ProofMacro macro : macros) {
             if (macro.canApplyTo(proof, goals, posInOcc)) {
@@ -70,7 +74,8 @@ public abstract class AlternativeMacro extends AbstractProofMacro {
      */
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
         ProofMacroFinishedInfo info = new ProofMacroFinishedInfo(this, goals);
         for (final ProofMacro macro : getProofMacros()) {

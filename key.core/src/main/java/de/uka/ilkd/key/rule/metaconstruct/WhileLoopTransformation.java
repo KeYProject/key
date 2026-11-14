@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -30,6 +31,8 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * Walks through a java AST in depth-left-fist-order. This walker is used to transform a loop (not
  * only while loops) according to the rules of the dynamic logic.
  */
+@NullMarked
 public class WhileLoopTransformation extends JavaASTVisitor {
     private static final Logger LOGGER = LoggerFactory.getLogger(WhileLoopTransformation.class);
 
@@ -89,7 +93,7 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     /**
      * the result of the transformation
      */
-    protected ProgramElement result = null;
+    protected ProgramElement result;
 
     protected final ArrayDeque<Label> labelStack = new ArrayDeque<>();
 
@@ -103,13 +107,17 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @param innerLabel the ProgramElementName of the inner label
      * @param services services instance
      */
-    public WhileLoopTransformation(ProgramElement root, ProgramElementName outerLabel,
-            ProgramElementName innerLabel, Services services) {
+    // labels stay null when not needed/provided; replacement/result are set by start()
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
+    public WhileLoopTransformation(ProgramElement root, @Nullable ProgramElementName outerLabel,
+            @Nullable ProgramElementName innerLabel, Services services) {
         super(root, services);
-        breakOuterLabel =
-            (outerLabel == null ? null : KeYJavaASTFactory.breakStatement(outerLabel));
-        breakInnerLabel =
-            (innerLabel == null ? null : KeYJavaASTFactory.breakStatement(innerLabel));
+        if (outerLabel != null) {
+            breakOuterLabel = KeYJavaASTFactory.breakStatement(outerLabel);
+        }
+        if (innerLabel != null) {
+            breakInnerLabel = KeYJavaASTFactory.breakStatement(innerLabel);
+        }
         replaceBreakWithNoLabel = 0;
         runMode = TRANSFORMATION;
     }
@@ -121,7 +129,10 @@ public class WhileLoopTransformation extends JavaASTVisitor {
      * @param inst the SVInstantiations if available
      * @param services services instance
      */
-    public WhileLoopTransformation(ProgramElement root, SVInstantiations inst, Services services) {
+    // labels stay null in check mode; replacement/result are set by start()
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
+    public WhileLoopTransformation(ProgramElement root, SVInstantiations inst,
+            Services services) {
         super(root, services);
         instantiations = (inst == null ? SVInstantiations.EMPTY_SVINSTANTIATIONS : inst);
         replaceBreakWithNoLabel = 0;
@@ -142,8 +153,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
     }
 
 
-    private static Statement[] getInnerBlockStatements(IForUpdates updates, Statement body,
-            For remainder, final int updateSize) {
+    private static Statement[] getInnerBlockStatements(@Nullable IForUpdates updates,
+            Statement body, For remainder, final int updateSize) {
         Statement[] innerBlockStatements = new Statement[updateSize + 2];
         innerBlockStatements[0] = body;
         if (updates != null) {
@@ -154,6 +165,13 @@ public class WhileLoopTransformation extends JavaASTVisitor {
         }
         innerBlockStatements[updateSize + 1] = remainder;
         return innerBlockStatements;
+    }
+
+    // the update clause is optional (e.g. for(;;)); forLoop's parameter is over-strict here
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    private static For forLoopWithOptionalUpdates(IGuard guard, @Nullable IForUpdates updates,
+            Statement body) {
+        return KeYJavaASTFactory.forLoop(guard, updates, body);
     }
 
     /**
@@ -372,7 +390,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 // Keep the PositionInfo because it is required for symbolic
                 // execution tree extraction and this assignment is the only
                 // unique representation of the replaced continue
-                addChild(KeYJavaASTFactory.breakStatement(breakInnerLabel.getLabel(),
+                addChild(KeYJavaASTFactory.breakStatement(Objects.requireNonNull(
+                    breakInnerLabel.getLabel(), "no label in " + breakInnerLabel),
                     x.getPositionInfo()));
                 changed();
             }
@@ -480,9 +499,11 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 updates = (IForUpdates) changeList.removeFirst();
             }
             body = (Statement) changeList.removeFirst();
-            For remainder = KeYJavaASTFactory.forLoop(x.getGuard(), unchangedUpdates, x.getBody());
+            For remainder = forLoopWithOptionalUpdates(x.getGuard(), unchangedUpdates,
+                x.getBody());
             if (innerLabelNeeded() && breakInnerLabel != null) {
-                body = KeYJavaASTFactory.labeledStatement(breakInnerLabel.getLabel(), body,
+                body = KeYJavaASTFactory.labeledStatement(Objects.requireNonNull(
+                    breakInnerLabel.getLabel(), "no label in " + breakInnerLabel), body,
                     PositionInfo.UNDEFINED);
             }
             final int updateSize = updates == null ? 0 : updates.size();
@@ -492,13 +513,16 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             final Statement[] outerBlockStatements = new Statement[initSize + 1];
             if (inits != null) {
                 for (int copyStatements = 0; copyStatements < initSize; copyStatements++) {
-                    outerBlockStatements[copyStatements] = inits.getInits().get(copyStatements);
+                    outerBlockStatements[copyStatements] =
+                        Objects.requireNonNull(inits.getInits(), "no loop inits in " + inits)
+                                .get(copyStatements);
                 }
             }
             outerBlockStatements[initSize] =
                 KeYJavaASTFactory.ifThen(guard.getExpression(), innerBlockStatements);
             if (outerLabelNeeded() && breakOuterLabel != null) {
-                addChild(KeYJavaASTFactory.labeledStatement(breakOuterLabel.getLabel(),
+                addChild(KeYJavaASTFactory.labeledStatement(Objects.requireNonNull(
+                    breakOuterLabel.getLabel(), "no label in " + breakOuterLabel),
                     outerBlockStatements, PositionInfo.UNDEFINED));
             } else {
                 addChild(KeYJavaASTFactory.block(outerBlockStatements));
@@ -570,23 +594,30 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             Statement body = (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
 
             // rename all occ. variables in the body (same name but different object)
-            ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(body,
+            ProgVarReplaceVisitor replacer = new ProgVarReplaceVisitor(
+                Objects.requireNonNull(body, "no loop body in " + x),
                 new LinkedHashMap<>(), true, services);
             replacer.start();
             body = (Statement) replacer.result();
 
             if (innerLabelNeeded() && breakInnerLabel != null) {
                 // an unlabeled continue needs to be handled with (replaced)
-                body = KeYJavaASTFactory.labeledStatement(breakInnerLabel.getLabel(), body,
+                body = KeYJavaASTFactory.labeledStatement(Objects.requireNonNull(
+                    breakInnerLabel.getLabel(), "no label in " + breakInnerLabel),
+                    Objects.requireNonNull(body, "no loop body in " + x),
                     PositionInfo.UNDEFINED);
             }
             Then then = null;
-            StatementBlock block = KeYJavaASTFactory.block(body, (Statement) root());
+            StatementBlock block =
+                KeYJavaASTFactory.block(Objects.requireNonNull(body, "no loop body in " + x),
+                    (Statement) root());
             if (outerLabelNeeded() && breakOuterLabel != null) {
                 // an unlabeled break occurs in the
                 // while loop therefore we need a labeled statement
                 then = KeYJavaASTFactory.thenBlock(KeYJavaASTFactory.labeledStatement(
-                    breakOuterLabel.getLabel(), block, PositionInfo.UNDEFINED));
+                    Objects.requireNonNull(breakOuterLabel.getLabel(),
+                        "no label in " + breakOuterLabel),
+                    block, PositionInfo.UNDEFINED));
 
             } else {
                 then = KeYJavaASTFactory.thenBlock(block);
@@ -600,7 +631,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 Expression guard = ((Guard) changeList.removeFirst()).getExpression();
                 Statement body =
                     (Statement) (changeList.isEmpty() ? null : changeList.removeFirst());
-                While newLoop = KeYJavaASTFactory.whileLoop(guard, body, x.getPositionInfo());
+                While newLoop = KeYJavaASTFactory.whileLoop(guard,
+                    Objects.requireNonNull(body, "no loop body in " + x), x.getPositionInfo());
                 services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
 
                 ImmutableSet<LoopContract> lcs =
@@ -632,7 +664,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             Statement unwindedBody = null;
             if (innerLabelNeeded() && breakInnerLabel != null) {
                 // an unlabeled continue needs to be handled with (replaced)
-                unwindedBody = KeYJavaASTFactory.labeledStatement(breakInnerLabel.getLabel(), body,
+                unwindedBody = KeYJavaASTFactory.labeledStatement(Objects.requireNonNull(
+                    breakInnerLabel.getLabel(), "no label in " + breakInnerLabel),
+                    Objects.requireNonNull(body, "no loop body in " + x),
                     PositionInfo.UNDEFINED);
             } else {
                 unwindedBody = body;
@@ -640,13 +674,15 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             Statement resultStatement = null;
             While newLoop = KeYJavaASTFactory.whileLoop(guard, x.getBody(), x.getPositionInfo());
             services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
-            StatementBlock block = KeYJavaASTFactory.block(unwindedBody, newLoop);
+            StatementBlock block = KeYJavaASTFactory.block(
+                Objects.requireNonNull(unwindedBody, "no unwound body"), newLoop);
 
             if (outerLabelNeeded() && breakOuterLabel != null) {
                 // an unlabeled break occurs in the
                 // body therefore we need a labeled statement
-                resultStatement = KeYJavaASTFactory.labeledStatement(breakOuterLabel.getLabel(),
-                    block, PositionInfo.UNDEFINED);
+                resultStatement = KeYJavaASTFactory.labeledStatement(Objects.requireNonNull(
+                    breakOuterLabel.getLabel(), "no label in " + breakOuterLabel), block,
+                    PositionInfo.UNDEFINED);
             } else {
                 resultStatement = block;
             }
@@ -658,7 +694,9 @@ public class WhileLoopTransformation extends JavaASTVisitor {
                 Statement body = changeList.removeFirstOccurrence(Statement.class);
                 Guard g = changeList.removeFirstOccurrence(Guard.class);
                 Expression guard = g == null ? null : g.getExpression();
-                Do newLoop = KeYJavaASTFactory.doLoop(guard, body, x.getPositionInfo());
+                Do newLoop = KeYJavaASTFactory.doLoop(
+                    Objects.requireNonNull(guard, "no guard in " + x),
+                    Objects.requireNonNull(body, "no loop body in " + x), x.getPositionInfo());
                 services.getSpecificationRepository().copyLoopInvariant(x, newLoop);
                 addChild(newLoop);
                 changed();
@@ -710,7 +748,8 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             if (x.getLabel() != null) {
                 l = (Label) changeList.removeFirst();
             }
-            addChild(KeYJavaASTFactory.labeledStatement(changeList, l, x.getPositionInfo()));
+            addChild(KeYJavaASTFactory.labeledStatement(changeList,
+                Objects.requireNonNull(l, "no label in " + x), x.getPositionInfo()));
             changed();
         } else {
             doDefaultAction(x);
@@ -805,11 +844,17 @@ public class WhileLoopTransformation extends JavaASTVisitor {
             if (x.getExpression() != null) {
                 e = (Expression) changeList.removeFirst();
             }
-            addChild(KeYJavaASTFactory.caseBlock(changeList, e, x.getPositionInfo()));
+            addCaseBlock(changeList, e, x.getPositionInfo());
             changed();
         } else {
             doDefaultAction(x);
         }
+    }
+
+    // a default branch has no case expression, but the caseBlock factory demands a non-null one
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    private void addCaseBlock(ExtList changeList, @Nullable Expression e, PositionInfo posInfo) {
+        addChild(KeYJavaASTFactory.caseBlock(changeList, e, posInfo));
     }
 
 

@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.sort.NullSort;
@@ -15,11 +16,15 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * This variable condition checks if a schemavariable is instantiated with a reference or primitive
  * type
  */
+@NullMarked
 public final class TypeCondition extends VariableConditionAdapter {
 
     private final TypeResolver resolver;
@@ -56,14 +61,16 @@ public final class TypeCondition extends VariableConditionAdapter {
 
 
     @Override
-    public boolean check(SchemaVariable p_var, SyntaxElement candidate, SVInstantiations svInst,
+    public boolean check(@Nullable SchemaVariable p_var, @Nullable SyntaxElement candidate,
+            SVInstantiations svInst,
             Services services) {
 
         if (!resolver.isComplete(p_var, candidate, svInst, services)) {
             // instantiation not yet complete
             return true;
         }
-        final Sort s = resolver.resolveSort(p_var, candidate, svInst, services);
+        final Sort s = Objects.requireNonNull(
+            resolver.resolveSort(p_var, candidate, svInst, services), "no sort resolved");
 
         Sort objectSort = services.getJavaInfo().objectSort();
 

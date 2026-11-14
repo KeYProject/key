@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.prover.impl;
 
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.proof.*;
@@ -19,6 +20,7 @@ import org.key_project.prover.engine.impl.DefaultProver;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Richard Bubel
  */
+@NullMarked
 public class ApplyStrategy extends DefaultProver<Proof, Goal> {
     public static final Logger LOGGER = LoggerFactory.getLogger(ApplyStrategy.class);
 
@@ -52,6 +55,13 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
         this.defaultGoalChooser = defaultGoalChooser;
     }
 
+    /**
+     * Initializes this strategy run for the given proof, goal list and bounds.
+     * <p>
+     * The strategy stop condition of the proof's settings is asserted present below; the
+     * dereference of the (nullable) stop condition is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void init(Proof newProof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
         this.proof = newProof;
         maxApplications = maxSteps;
@@ -109,9 +119,9 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
         int maxSteps = stratSet.getMaxSteps();
         long timeout = stratSet.getTimeout();
 
-        boolean stopAtFirstNonCloseableGoal = proof.getSettings().getStrategySettings()
-                .getActiveStrategyProperties().getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
-                .equals(StrategyProperties.STOPMODE_NONCLOSE);
+        boolean stopAtFirstNonCloseableGoal = StrategyProperties.STOPMODE_NONCLOSE.equals(
+            proof.getSettings().getStrategySettings().getActiveStrategyProperties()
+                    .getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY));
         return start(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
     }
 
@@ -130,8 +140,9 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
 
         ProofTreeListener treeListener = prepareStrategy(proof, goals, maxSteps, timeout);
         ApplyStrategyInfo<Proof, Goal> result;
-        try (var ignored =
-            proof.setRuleAppIndexMode(proof.getActiveStrategy().getRuleAppIndexMode())) {
+        try (var ignored = proof.setRuleAppIndexMode(
+            Objects.requireNonNull(proof.getActiveStrategy(), "active strategy")
+                    .getRuleAppIndexMode())) {
             result = executeStrategy(treeListener);
         } catch (Exception e) { // should never be reached
             throw new RuntimeException(e);
@@ -160,26 +171,44 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
         return treeListener;
     }
 
+    /**
+     * Executes the strategy on the proof initialized beforehand.
+     * <p>
+     * The proof of this strategy run is asserted present below; the dereference of the (nullable)
+     * proof is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private ApplyStrategyInfo<Proof, Goal> executeStrategy(ProofTreeListener treeListener) {
         assert proof != null;
+        final Proof proofNonNull = Objects.requireNonNull(proof, "proof");
 
         ProofListener pl = new ProofListener();
-        proof.addRuleAppListener(pl);
+        proofNonNull.addRuleAppListener(pl);
         ApplyStrategyInfo<Proof, Goal> result;
         try {
-            result = doWork(goalChooser, stopCondition);
+            result = doWork(Objects.requireNonNull(goalChooser),
+                Objects.requireNonNull(stopCondition));
         } finally {
-            proof.removeProofTreeListener(treeListener);
-            proof.removeRuleAppListener(pl);
+            proofNonNull.removeProofTreeListener(treeListener);
+            proofNonNull.removeRuleAppListener(pl);
             setAutoModeActive(false);
         }
         return result;
     }
 
+    /**
+     * Finishes the given strategy run by adding its auto-mode time to the proof and notifying the
+     * task listeners.
+     * <p>
+     * The proof of this strategy run is asserted present below; the dereference of the (nullable)
+     * proof is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private void finishStrategy(ApplyStrategyInfo<Proof, Goal> result) {
         assert result != null; // CS
-        proof.addAutoModeTime(result.getTime());
-        fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
+        final Proof proofNonNull = Objects.requireNonNull(proof, "proof");
+        proofNonNull.addAutoModeTime(result.getTime());
+        fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proofNonNull, result.getTime(),
             result.getNumberOfAppliedRuleApps(), result.getNumberOfClosedGoals()));
     }
 
@@ -188,10 +217,12 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
      * defined in the proof's {@link StrategySettings} or the default one of this
      * {@link ApplyStrategy#defaultGoalChooser} otherwise.
      *
-     * @param proof The {@link Proof} for which an {@link GoalChooser} is required.
-     * @return The {@link GoalChooser} to use.
+     * @param proof The {@link Proof} for which an {@link GoalChooser} is required. May be
+     *        {@code null} (a fresh prover that has not run yet, e.g. when {@link #clear()} resets
+     *        it); the default goal chooser is returned in that case.
+     * @return The {@link GoalChooser} to use. Never {@code null}.
      */
-    private GoalChooser<Proof, Goal> getGoalChooserForProof(Proof proof) {
+    private GoalChooser<Proof, Goal> getGoalChooserForProof(@Nullable Proof proof) {
         GoalChooser<Proof, Goal> chooser = null;
         if (proof != null) {
             chooser = proof.getSettings().getStrategySettings().getCustomApplyStrategyGoalChooser();
@@ -199,12 +230,19 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
         return chooser != null ? chooser : defaultGoalChooser;
     }
 
+    /**
+     * Re-scans the built-in rules of the given goal if no rule application was found.
+     * <p>
+     * The goal's rule-app manager always provides the next application after a scan; the
+     * dereference of the (nullable) rule-app manager is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     protected final @Nullable RuleApp updateBuiltInRuleIndex(Goal goal, @Nullable RuleApp app) {
         // Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
         if (app == null) {
             goal.ruleAppIndex().scanBuiltInRules(goal);
-            app = goal.getRuleAppManager().next();
+            app = Objects.requireNonNull(goal.getRuleAppManager(), "rule app manager").next();
         }
         // <-------
         return app;
@@ -214,6 +252,7 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
 
         /** invoked when a rule has been applied */
         @Override
+        @SuppressWarnings("nullness:dereference.of.nullable")
         public void ruleApplied(ProofEvent e) {
             if (!isAutoModeActive()) {
                 return;
@@ -227,7 +266,8 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
                 getGoalChooserForProof(rai.getOriginalNode().proof());
             synchronized (goalChooser) {
                 // reverse just to keep old order
-                goalChooser.updateGoalList(rai.getOriginalNode(), e.getNewGoals().reverse());
+                goalChooser.updateGoalList(rai.getOriginalNode(),
+                    Objects.requireNonNull(e.getNewGoals(), "new goals").reverse());
             }
         }
     }
@@ -240,12 +280,16 @@ public class ApplyStrategy extends DefaultProver<Proof, Goal> {
         this.autoModeActive = autoModeActive;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see de.uka.ilkd.key.prover.ProverCore#clear()
+    /**
+     * Frees the proof of the last strategy run.
+     * <p>
+     * The {@code @MonotonicNonNull} proof field is deliberately reset to {@code null} here to
+     * release the proof reference once a run has ended; the field stays non-null throughout any
+     * active run (it is only null before the first run of this prover or after such a reset).
+     * Resetting it is the canonical monotonic release pattern and is suppressed with a scoped key.
      */
     @Override
+    @SuppressWarnings({ "nullness:assignment.type.incompatible", "NullAway" })
     public void clear() {
         final GoalChooser<Proof, Goal> goalChooser = getGoalChooserForProof(proof);
         proof = null;

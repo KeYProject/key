@@ -16,6 +16,9 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This action is responsible for the invocation of an SMT solver For example the toolbar button is
  * parameterized with an instance of this action
@@ -23,6 +26,7 @@ import de.uka.ilkd.key.smt.SolverTypeCollection;
  * @author ?
  * @author Alicia Appelhagen (move from MainWindow to own class)
  */
+@NullMarked
 public class SMTInvokeAction extends MainWindowAction {
 
     private static final long serialVersionUID = -8176122007799747342L;
@@ -41,6 +45,11 @@ public class SMTInvokeAction extends MainWindowAction {
      * @param solverUnion the solvers/solver types to be started by this action
      * @param mainWindow the main window this action belongs to
      */
+    /**
+     * The action-configuration setter is called on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SMTInvokeAction(SolverTypeCollection solverUnion, MainWindow mainWindow) {
         super(mainWindow);
         this.mediator = mainWindow.getMediator();
@@ -56,9 +65,11 @@ public class SMTInvokeAction extends MainWindowAction {
 
     @Override
     public boolean isEnabled() {
+        KeYMediator m = mediator;
+        Proof proof = m != null ? m.getSelectedProof() : null;
         return super.isEnabled() && solverUnion != SolverTypeCollection.EMPTY_COLLECTION
-                && mediator != null && mediator.getSelectedProof() != null
-                && !mediator.getSelectedProof().closed();
+                && m != null && proof != null
+                && !proof.closed();
     }
 
     @Override
@@ -68,6 +79,12 @@ public class SMTInvokeAction extends MainWindowAction {
             return;
         }
         final Proof proof = mediator.getSelectedProof();
+        if (proof == null) {
+            // The preconditions {@code ensureProofLoaded()} and the non-empty solver union were
+            // already checked above; a missing proof here is a concurrent state change,
+            // crash-equivalent to the previous NPE.
+            throw new NullPointerException("No proof loaded for SMT solving.");
+        }
 
         Thread thread = new Thread(() -> {
 
@@ -91,7 +108,7 @@ public class SMTInvokeAction extends MainWindowAction {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (!(obj instanceof SMTInvokeAction)) {
             return false;
         }

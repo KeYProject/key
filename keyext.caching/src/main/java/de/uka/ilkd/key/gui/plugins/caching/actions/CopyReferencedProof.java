@@ -15,9 +15,11 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.plugins.caching.CachingExtension;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.replay.CopyingProofReplayer;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class CopyReferencedProof extends KeyAction {
     private static final Logger LOGGER = LoggerFactory.getLogger(CopyReferencedProof.class);
 
@@ -70,7 +73,15 @@ public final class CopyReferencedProof extends KeyAction {
     public void actionPerformed(ActionEvent e) {
         for (Node node : nodes) {
             ClosedBy c = node.lookup(ClosedBy.class);
+            if (c == null) {
+                throw new NullPointerException(
+                    "No reference found for node " + node.serialNr() + ".");
+            }
             Goal current = node.proof().getClosedGoal(node);
+            if (current == null) {
+                throw new NullPointerException(
+                    "No closed goal for node " + node.serialNr() + ".");
+            }
             try {
                 mediator.stopInterface(true);
                 new CopyingProofReplayer(c.proof(), node.proof()).copy(c.node(), current,
@@ -82,6 +93,10 @@ public final class CopyReferencedProof extends KeyAction {
             }
         }
         // notify the UI to make sure the task bar button has correct number and enabled state
-        cachingExtension.updateGUIState(mediator.getSelectedProof());
+        Proof selected = mediator.getSelectedProof();
+        if (selected == null) {
+            throw new NullPointerException("No proof selected for UI state update.");
+        }
+        cachingExtension.updateGUIState(selected);
     }
 }

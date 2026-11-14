@@ -39,6 +39,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
 /**
  * EnvInput for standalone specification language front ends.
  */
+@NullMarked
 public final class SLEnvInput extends AbstractEnvInput {
     private static final Logger LOGGER = LoggerFactory.getLogger(SLEnvInput.class);
 
@@ -56,7 +58,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     // -------------------------------------------------------------------------
 
     public SLEnvInput(@Nullable Path javaPath, List<Path> classPath, @Nullable Path bootClassPath,
-            Profile profile, List<Path> includes) {
+            @Nullable Profile profile, List<Path> includes) {
         super(getLanguage() + " specifications", javaPath, classPath, bootClassPath, profile,
             includes);
     }
@@ -134,11 +136,26 @@ public final class SLEnvInput extends AbstractEnvInput {
         return warnings;
     }
 
+    /**
+     * The body of a schematic, abstract, or native method (such as {@code $allocate}) is
+     * {@code null}. The AST walkers tolerate a null root: {@code walk(null)} falls through to
+     * {@code doAction(null)}, whose type tests evaluate to {@code false}, so a bodyless method
+     * contributes no collected elements. This restores the behaviour prior to the nullness
+     * annotations; the violation of the walker's non-null root parameter is scoped to this
+     * method.
+     */
+    @SuppressWarnings({ "nullness:return.type.incompatible", "NullAway" })
+    private static StatementBlock collectorRoot(IProgramMethod pm) {
+        return pm.getBody();
+    }
+
     private void addLoopInvariants(SpecExtractor specExtractor,
             final SpecificationRepository specRepos, final KeYJavaType kjt, final IProgramMethod pm)
             throws ProofInputException {
         // Loop invariants.
-        final JavaASTCollector collector = new JavaASTCollector(pm.getBody(), LoopStatement.class);
+        final JavaASTCollector collector = new JavaASTCollector(
+            collectorRoot(pm),
+            LoopStatement.class);
         collector.start();
         for (ProgramElement loop : collector.getNodes()) {
             LoopSpecification inv = specExtractor.extractLoopInvariant(pm, (LoopStatement) loop);
@@ -153,7 +170,9 @@ public final class SLEnvInput extends AbstractEnvInput {
             throws ProofInputException {
         // Loop contracts on loops.
         // For loop contracts on blocks, see addBlockAndLoopContracts.
-        final JavaASTCollector collector = new JavaASTCollector(pm.getBody(), LoopStatement.class);
+        final JavaASTCollector collector = new JavaASTCollector(
+            collectorRoot(pm),
+            LoopStatement.class);
         collector.start();
 
         for (ProgramElement loop : collector.getNodes()) {
@@ -170,8 +189,9 @@ public final class SLEnvInput extends AbstractEnvInput {
             final SpecificationRepository specRepos, final IProgramMethod pm)
             throws ProofInputException {
         // Block and loop contracts.
-        final JavaASTCollector blockCollector =
-            new JavaASTCollector(pm.getBody(), StatementBlock.class);
+        final JavaASTCollector blockCollector = new JavaASTCollector(
+            collectorRoot(pm),
+            StatementBlock.class);
         blockCollector.start();
         for (ProgramElement block : blockCollector.getNodes()) {
             final ImmutableSet<BlockContract> blockContracts =
@@ -192,10 +212,12 @@ public final class SLEnvInput extends AbstractEnvInput {
 
     private void addMergePointStatements(SpecExtractor specExtractor,
             final SpecificationRepository specRepos, final IProgramMethod pm,
-            final ImmutableList<LocationVariable> methodParameters) throws ProofInputException {
+            final @Nullable ImmutableList<LocationVariable> methodParameters)
+            throws ProofInputException {
         // merge point statements
-        final JavaASTCollector mpsCollector =
-            new JavaASTCollector(pm.getBody(), MergePointStatement.class);
+        final JavaASTCollector mpsCollector = new JavaASTCollector(
+            collectorRoot(pm),
+            MergePointStatement.class);
         mpsCollector.start();
         for (ProgramElement mps : mpsCollector.getNodes()) {
             final ImmutableSet<MergeContract> mergeContracts = specExtractor
@@ -207,8 +229,9 @@ public final class SLEnvInput extends AbstractEnvInput {
     private void addLabeledBlockContracts(SpecExtractor specExtractor,
             final SpecificationRepository specRepos, final IProgramMethod pm)
             throws ProofInputException {
-        final JavaASTCollector labeledCollector =
-            new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+        final JavaASTCollector labeledCollector = new JavaASTCollector(
+            collectorRoot(pm),
+            LabeledStatement.class);
         labeledCollector.start();
         for (ProgramElement labeled : labeledCollector.getNodes()) {
             final ImmutableSet<BlockContract> blockContracts =
@@ -222,8 +245,9 @@ public final class SLEnvInput extends AbstractEnvInput {
     private void addLabeledLoopContracts(SpecExtractor specExtractor,
             final SpecificationRepository specRepos, final IProgramMethod pm)
             throws ProofInputException {
-        final JavaASTCollector labeledCollector =
-            new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+        final JavaASTCollector labeledCollector = new JavaASTCollector(
+            collectorRoot(pm),
+            LabeledStatement.class);
         labeledCollector.start();
         for (ProgramElement labeled : labeledCollector.getNodes()) {
             final ImmutableSet<LoopContract> loopContracts =
@@ -237,8 +261,8 @@ public final class SLEnvInput extends AbstractEnvInput {
     private void transformProgramElements(final IProgramMethod pm) throws ProofInputException {
         Services services = initConfig.getServices();
         JMLSpecFactory jsf = new JMLSpecFactory(services);
-        var walker = new JavaASTWalker(pm.getBody()) {
-            public ProofInputException exception = null;
+        var walker = new JavaASTWalker(collectorRoot(pm)) {
+            public @Nullable ProofInputException exception = null;
 
             @Override
             protected void doAction(final ProgramElement node) {
@@ -310,7 +334,8 @@ public final class SLEnvInput extends AbstractEnvInput {
                 }
                 specRepos.addSpecs(DefaultImmutableSet.fromCollection(methodSpecs));
 
-                Type declaringType = pm.getContainerType().getJavaType();
+                Type declaringType = Objects.requireNonNull(pm.getContainerType(),
+                    "method without container type: " + pm.getName()).getJavaType();
 
                 // Create default contracts for all methods except KeY default methods (like <init>)
                 // and Object methods.
@@ -360,7 +385,12 @@ public final class SLEnvInput extends AbstractEnvInput {
     // -------------------------------------------------------------------------
 
     @Override
-    public ImmutableSet<PositionedString> read() throws ProofInputException {
+    // read() has no specifications to read when JML is disabled (getLanguage() == "no"); null is
+    // returned as the legacy "no input" marker for that mode (KeY's standard setup always enables
+    // JML, so this branch is effectively unreachable in practice). Keep the honest @Nullable rather
+    // than collapsing the explicit null with requireNonNull, which would change this contract.
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
+    public @Nullable ImmutableSet<PositionedString> read() throws ProofInputException {
         if (initConfig == null) {
             throw new IllegalStateException("InitConfig not set.");
         }
@@ -375,7 +405,7 @@ public final class SLEnvInput extends AbstractEnvInput {
     }
 
     @Override
-    public Path getInitialFile() {
+    public @Nullable Path getInitialFile() {
         return null;
     }
 }

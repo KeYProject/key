@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Stream;
 
@@ -35,6 +36,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.assertj.core.api.Assertions;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -68,12 +70,12 @@ public class MasterHandlerTest {
     private static final boolean STRICT_TEST = Boolean.getBoolean("key.newsmt2.stricttests");
     private static final boolean DUMP_SMT = true;
     private static final Logger LOGGER = LoggerFactory.getLogger(MasterHandlerTest.class);
-    private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
+    private static final @Nullable SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
                     && it.getName().equals("Z3 (Legacy Translation)"))
             .findFirst().orElse(null);
 
-    private static List<LoadedTestData> data = null;
+    private static @Nullable List<LoadedTestData> data = null;
 
     public static List<LoadedTestData> data()
             throws IOException, URISyntaxException, ProblemLoaderException {
@@ -159,8 +161,9 @@ public class MasterHandlerTest {
 
             KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
 
-            Proof proof = env.getLoadedProof();
-            Sequent sequent = proof.root().sequent();
+            Proof proof = Objects.requireNonNull(env.getLoadedProof(), "loaded proof");
+            Sequent sequent =
+                Objects.requireNonNull(proof.root(), "root node").sequent();
 
             SMTSettings settings = new DefaultSMTSettings(proof.getSettings().getSMTSettings(),
                 ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(),

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -15,7 +16,9 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
@@ -27,11 +30,14 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Replaces the MethodBodyStatement shortcut with the full body, performs prefix adjustments in the
  * body (execution context).
  */
 @TransformerMeta(name = "#expandMethodBody")
+@NullMarked
 public class ExpandMethodBody extends ProgramTransformer {
 
     public ExpandMethodBody(SchemaVariable sv) {
@@ -52,7 +58,8 @@ public class ExpandMethodBody extends ProgramTransformer {
         IProgramMethod pm = mbs.getProgramMethod(services);
         // mr.method(services, mbs.getBodySource());
 
-        MethodDeclaration methDecl = pm.getMethodDeclaration();
+        MethodDeclaration methDecl = Objects.requireNonNull(pm.getMethodDeclaration(),
+            "no method declaration for " + pm);
 
         StatementBlock result = (StatementBlock) mbs.getBody(services);
         ReferencePrefix newCalled = mbs.getDesignatedContext();
@@ -78,10 +85,11 @@ public class ExpandMethodBody extends ProgramTransformer {
         }
         ProgVarReplaceVisitor paramRepl = new ProgVarReplaceVisitor(result, map, services);
         paramRepl.start();
-        result = (StatementBlock) paramRepl.result();
+        result = (StatementBlock) Objects.requireNonNull(paramRepl.result(),
+            "no expanded method body");
 
         return new ProgramElement[] { KeYJavaASTFactory.methodFrame(mbs.getResultVariable(),
-            KeYJavaASTFactory.executionContext(mbs.getBodySource(), pm, newCalled), result,
+            new ExecutionContext(new TypeRef(mbs.getBodySource()), pm, newCalled), result,
             PositionInfo.UNDEFINED) };
     }
 

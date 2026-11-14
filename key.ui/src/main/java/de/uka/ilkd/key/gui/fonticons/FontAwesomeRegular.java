@@ -6,7 +6,12 @@ package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public enum FontAwesomeRegular implements IconFont {
     ADDRESS_BOOK('\uf2b9'), ADDRESS_CARD('\uf2bb'), ANGRY('\uf556'),
     ARROW_ALT_CIRCLE_DOWN('\uf358'), ARROW_ALT_CIRCLE_LEFT('\uf359'),
@@ -49,7 +54,7 @@ public enum FontAwesomeRegular implements IconFont {
     USER_CIRCLE('\uf2bd'), WINDOW_CLOSE('\uf410'), WINDOW_MAXIMIZE('\uf2d0'),
     WINDOW_MINIMIZE('\uf2d1'), WINDOW_RESTORE('\uf2d2');
 
-    private static Font font;
+    private static @Nullable Font font;
     private final char unicode;
 
     FontAwesomeRegular(char c) {
@@ -59,8 +64,14 @@ public enum FontAwesomeRegular implements IconFont {
     @Override
     public Font getFont() throws IOException, FontFormatException {
         if (font == null) {
-            font = Font.createFont(Font.TRUETYPE_FONT,
-                getClass().getResourceAsStream("/fonts/Font Awesome 6 Free-Regular-400.otf"));
+            InputStream stream =
+                getClass().getResourceAsStream("/fonts/Font Awesome 6 Free-Regular-400.otf");
+            if (stream == null) {
+                // the font is bundled with the application
+                throw new NullPointerException(
+                    "Missing font resource /fonts/Font Awesome 6 Free-Regular-400.otf");
+            }
+            font = Font.createFont(Font.TRUETYPE_FONT, stream);
         }
         return font;
     }

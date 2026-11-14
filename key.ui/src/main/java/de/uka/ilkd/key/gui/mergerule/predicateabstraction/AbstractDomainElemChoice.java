@@ -9,11 +9,14 @@ import java.util.Optional;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionDomainElement;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Model class for the manual choice of an abstract domain element by the user.
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class AbstractDomainElemChoice {
     /**
      * The program variable for which an abstract domain element has been chosen.

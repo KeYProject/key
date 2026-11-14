@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.key_project.isabelletranslation.IsabelleTranslationSettings;
+import org.key_project.isabelletranslation.translation.IllegalFormulaException;
 
 import de.unruh.isabelle.control.Isabelle;
 import de.unruh.isabelle.control.IsabelleMLException;
@@ -20,6 +21,8 @@ import de.unruh.isabelle.pure.Implicits;
 import de.unruh.isabelle.pure.Theory;
 import de.unruh.isabelle.pure.ToplevelState;
 import de.unruh.isabelle.pure.Transition;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import scala.Tuple2;
@@ -32,6 +35,7 @@ import scala.concurrent.duration.Duration;
 /**
  * Implementation of {@link IsabelleSolver} using Sledgehammer.
  */
+@NullMarked
 public class IsabelleSledgehammerSolver implements IsabelleSolver {
     /**
      * Needed for UI
@@ -41,12 +45,12 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     /**
      * The result of this solver.
      */
-    private IsabelleResult result;
+    private @Nullable IsabelleResult result;
 
     /**
      *
      */
-    private IsabelleResource isabelleResource;
+    private @Nullable IsabelleResource isabelleResource;
 
     /**
      * The problem that is related to this solver
@@ -66,23 +70,23 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     /**
      * If there was an exception while executing the solver it is stored in this attribute.
      */
-    private Throwable exception;
+    private @Nullable Throwable exception;
 
     /**
      * The timeout in seconds for this solver run.
      */
     private int timeout;
 
-    private Instant startTime;
+    private @Nullable Instant startTime;
 
-    private java.time.Duration computationTime;
+    private java.time.@Nullable Duration computationTime;
 
     private final IsabelleResourceController resourceController;
 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleSledgehammerSolver.class);
     private final Collection<IsabelleSolverListener> listeners;
-    private String rawOutput;
+    private @Nullable String rawOutput;
 
     public IsabelleSledgehammerSolver(IsabelleProblem problem,
             Collection<IsabelleSolverListener> listeners, int solverIndex,
@@ -112,7 +116,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     }
 
     @Override
-    public Throwable getException() {
+    public @Nullable Throwable getException() {
         return exception;
     }
 
@@ -138,7 +142,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     }
 
     @Override
-    public Instant getStartTime() {
+    public @Nullable Instant getStartTime() {
         return startTime;
     }
 
@@ -159,16 +163,20 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
 
     @Override
     public String getRawSolverOutput() {
-        return rawOutput;
+        String output = rawOutput;
+        if (output == null) {
+            throw new NullPointerException("No raw solver output available yet.");
+        }
+        return output;
     }
 
     @Override
-    public String getRawSolverInput() {
+    public @Nullable String getRawSolverInput() {
         return problem.getTranslation();
     }
 
     @Override
-    public IsabelleResult getFinalResult() {
+    public @Nullable IsabelleResult getFinalResult() {
         return this.result;
     }
 
@@ -177,16 +185,22 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
     public IsabelleResult call() throws InterruptedException {
         // Return error result, if problem does not have a translation
         if (!problem.hasTranslation()) {
-            return handleIsabelleError(problem.getTranslationException());
+            IllegalFormulaException translationException = problem.getTranslationException();
+            if (translationException == null) {
+                throw new NullPointerException("Problem has no translation exception.");
+            }
+            return handleIsabelleError(translationException);
         }
 
         // Ensure there is an active IsabelleInstance
         setSolverState(SolverState.Preparing);
+        IsabelleResource resource;
         try {
-            isabelleResource = resourceController.getIsabelleResource();
+            resource = resourceController.getIsabelleResource();
         } catch (InterruptedException e) {
             return handleInterrupt(e);
         }
+        isabelleResource = resource;
 
         notifyProcessStarted();
         startTime = Instant.now();
@@ -195,7 +209,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
         setSolverState(SolverState.Parsing);
         ToplevelState toplevel;
         try {
-            toplevel = parseTheory(isabelleResource);
+            toplevel = parseTheory(resource);
         } catch (InterruptedException e) {
             return handleInterrupt(e);
         } catch (IsabelleMLException e) {
@@ -206,24 +220,40 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
 
         setSolverState(SolverState.Running);
         try {
-            if (!setFinalResult(sledgehammer(isabelleResource, toplevel))) {
-                return this.result;
+            if (!setFinalResult(sledgehammer(resource, toplevel))) {
+                return requireResult();
             }
         } catch (TimeoutException e) {
             setComputationTime();
-            if (!setFinalResult(IsabelleResult.getTimeoutResult(getComputationTime()))) {
-                return this.result;
+            if (!setFinalResult(IsabelleResult.getTimeoutResult(requireComputationTime()))) {
+                return requireResult();
             }
         } catch (InterruptedException e) {
             return handleInterrupt(e);
         } catch (IsabelleMLException e) {
             return handleIsabelleError(e);
         }
-        LOGGER.info("Sledgehammer result: {}", this.result.getDescription());
+        LOGGER.info("Sledgehammer result: {}", requireResult().getDescription());
         returnResource();
         setSolverState(SolverState.Stopped);
         notifyProcessFinished();
-        return this.result;
+        return requireResult();
+    }
+
+    private IsabelleResult requireResult() {
+        IsabelleResult currentResult = this.result;
+        if (currentResult == null) {
+            throw new NullPointerException("Solver did not yield a result.");
+        }
+        return currentResult;
+    }
+
+    private java.time.Duration requireComputationTime() {
+        java.time.Duration duration = computationTime;
+        if (duration == null) {
+            throw new NullPointerException("Computation time was not set.");
+        }
+        return duration;
     }
 
     /**
@@ -271,8 +301,12 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
                 Implicits.toplevelStateConverter());
 
         java.util.List<Tuple2<Transition, String>> transitionsAndTexts = new ArrayList<>();
+        String translation = getProblem().getTranslation();
+        if (translation == null) {
+            throw new NullPointerException("Problem has no translation.");
+        }
         List<Tuple2<Transition, String>> transitionList =
-            parse_text.apply(thy0, getProblem().getTranslation(), isabelle,
+            parse_text.apply(thy0, translation, isabelle,
                 Implicits.theoryConverter(), de.unruh.isabelle.mlvalue.Implicits.stringConverter())
                     .retrieveNow(
                         new ListConverter<>(new Tuple2Converter<>(Implicits.transitionConverter(),
@@ -381,8 +415,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
         setComputationTime();
         if (successful) {
             String successfulTactic = resultFutureCollect._2()._2().head().split("Try this: ")[1];
-            return IsabelleResult.getSuccessResult(successfulTactic,
-                getComputationTime());
+            return IsabelleResult.getSuccessResult(successfulTactic, requireComputationTime());
         } else {
             return IsabelleResult.getUnknownResult();
         }
@@ -400,7 +433,7 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
         Thread.currentThread().interrupt();
         setSolverState(SolverState.Stopped);
         notifyProcessError(e);
-        return this.result;
+        return requireResult();
     }
 
     /**
@@ -415,17 +448,18 @@ public class IsabelleSledgehammerSolver implements IsabelleSolver {
         returnResource();
         setSolverState(SolverState.Stopped);
         notifyProcessError(e);
-        return this.result;
+        return requireResult();
     }
 
     @Override
-    public java.time.Duration getComputationTime() {
+    public java.time.@Nullable Duration getComputationTime() {
         return computationTime;
     }
 
     private void setComputationTime() {
-        if (getStartTime() != null) {
-            computationTime = java.time.Duration.between(getStartTime(), Instant.now());
+        Instant start = getStartTime();
+        if (start != null) {
+            computationTime = java.time.Duration.between(start, Instant.now());
         }
     }
 

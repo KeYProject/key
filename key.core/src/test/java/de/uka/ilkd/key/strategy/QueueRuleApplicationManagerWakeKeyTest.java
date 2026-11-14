@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -111,7 +112,8 @@ public class QueueRuleApplicationManagerWakeKeyTest {
         assertEquals(1, keys.size(), "expected one precise park key");
         final ParkedBases.WakeKey key = (ParkedBases.WakeKey) keys.get(0);
         assertEquals("ARG_OP", key.kind().toString());
-        final Object datum = key.datum();
+        final Object datum = Objects.requireNonNull(key.datum(),
+            "the ARG_OP key must hold the base function as datum");
         assertTrue(datum instanceof ParametricFunctionDecl,
             "the key must hold the base function, but holds " + datum.getClass().getName());
     }

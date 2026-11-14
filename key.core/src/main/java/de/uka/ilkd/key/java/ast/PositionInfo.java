@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import org.key_project.util.parsing.Position;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
  *
  * 2019-09-10 Wolfram Pfeifer: work with URIs instead of Strings -> more robust, more general
  */
+@NullMarked
 public class PositionInfo {
     /**
      * Unknown URI (enables us to always have a non-null value for fileURI)
@@ -35,13 +36,11 @@ public class PositionInfo {
     /**
      * The start position.
      */
-    @NonNull
     private final Position startPos;
 
     /**
      * The end position.
      */
-    @NonNull
     private final Position endPos;
 
     /**
@@ -85,7 +84,7 @@ public class PositionInfo {
      * @param fileURI
      *        the resource the PositionInfo refers to
      */
-    public PositionInfo(Position startPos, Position endPos, URI fileURI) {
+    public PositionInfo(Position startPos, Position endPos, @Nullable URI fileURI) {
         this.startPos = startPos;
         this.endPos = endPos;
         if (fileURI == null) {
@@ -102,7 +101,7 @@ public class PositionInfo {
      * @param parent
      *        the parent class of this PositionInfo
      */
-    void setParentClassURI(URI parent) {
+    void setParentClassURI(@Nullable URI parent) {
         parentClassURI = (parent == null ? null : parent.normalize());
     }
 
@@ -114,9 +113,10 @@ public class PositionInfo {
      *             resources other than files. Use {@link #getParentClassURI()} instead.
      */
     @Deprecated // only kept for compatibility reasons
-    public String getParentClass() {
-        if (parentClassURI != null && parentClassURI.getScheme().equals("file")) {
-            return Paths.get(parentClassURI).toString();
+    public @Nullable String getParentClass() {
+        URI parent = parentClassURI;
+        if (parent != null && "file".equals(parent.getScheme())) {
+            return Paths.get(parent).toString();
         }
         return null;
     }
@@ -128,9 +128,10 @@ public class PositionInfo {
      *             resources other than files. Use {@link #getURI()} instead.
      */
     @Deprecated // only kept for compatibility reasons
-    public String getFileName() {
-        if (fileURI != null && fileURI.getScheme().equals("file")) {
-            return Paths.get(fileURI).toString();
+    public @Nullable String getFileName() {
+        URI file = fileURI;
+        if (file != null && "file".equals(file.getScheme())) {
+            return Paths.get(file).toString();
         }
         return null;
     }
@@ -166,7 +167,8 @@ public class PositionInfo {
      * @return a new PositionInfo starting at the minimum of the two start positions and ending at
      *         the maximum of the two end positions.
      */
-    public static PositionInfo join(PositionInfo p1, PositionInfo p2) {
+    public static @Nullable PositionInfo join(@Nullable PositionInfo p1,
+            @Nullable PositionInfo p2) {
         if (p1 == null && p2 == null) {
             return null;
         } else if (p1 == null) {

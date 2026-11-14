@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.naming;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
@@ -28,7 +29,8 @@ public class GenerateHiddenProofResource {
         final KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
             key, null, null, null, true);
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             // same steps as TestNamingInvariants.splitAndHide, then apply the hidden taclet
             TestNamingInvariants.splitAndHideForGenerator(proof);
             Goal hideGoal = null;
@@ -37,9 +39,11 @@ public class GenerateHiddenProofResource {
                     hideGoal = g;
                 }
             }
+            final Goal hiddenGoal =
+                Objects.requireNonNull(hideGoal, "splitAndHide must have left a hidden goal");
             final NoPosTacletApp hidden =
-                hideGoal.node().getLocalIntroducedRules().iterator().next();
-            hideGoal.apply(hidden);
+                hiddenGoal.node().getLocalIntroducedRules().iterator().next();
+            hiddenGoal.apply(hidden);
             final Path out = Path.of(System.getProperty("key.naming.generate.out"));
             new ProofSaver(proof, out).save();
             System.out.println("GEN saved to " + out + " hiddenName=" + hidden.taclet().name());

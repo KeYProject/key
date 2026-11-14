@@ -9,12 +9,17 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface IForUpdates extends NonTerminalProgramElement {
 
     int size();
 
     Expression getExpressionAt(int i);
 
+    @Nullable
     ImmutableArray<Expression> getUpdates();
 
 }

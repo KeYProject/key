@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
@@ -17,21 +19,25 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A rule app manager that ensures that rules are only applied to a certain subterm within the proof
  * (within a goal). The real work is delegated to a second manager (delegate pattern), this class
  * only filters rule applications
  */
+@NullMarked
 public class FocussedRuleApplicationManager
         implements DelegationBasedRuleApplicationManager<Goal> {
 
     private final RuleApplicationManager<Goal> delegate;
     public final QueueRuleApplicationManager rootManager;
 
-    private final FormulaTag focussedFormula;
+    private final @Nullable FormulaTag focussedFormula;
     private final PosInOccurrence focussedSubterm;
 
-    private Goal goal;
+    private @Nullable Goal goal;
 
     // Until <code>next</code> was called for the first time only rule
     // applications for the focussed formula are accepted, after that also
@@ -41,8 +47,9 @@ public class FocussedRuleApplicationManager
     // <code>QueueRuleApplicationManager</code>)
     private boolean onlyModifyFocussedFormula;
 
-    private FocussedRuleApplicationManager(RuleApplicationManager<Goal> delegate, Goal goal,
-            FormulaTag focussedFormula,
+    private FocussedRuleApplicationManager(RuleApplicationManager<Goal> delegate,
+            @Nullable Goal goal,
+            @Nullable FormulaTag focussedFormula,
             PosInOccurrence focussedSubterm,
             boolean onlyModifyFocussedFormula) {
         this.delegate = delegate;
@@ -120,7 +127,8 @@ public class FocussedRuleApplicationManager
                  * rule app within the focussed formula, but not within the focussed subterm
                  */
                 return isBelow(focFormula, pos) && !NonDuplicateAppModPositionFeature.INSTANCE
-                        .computeCost(rule, pos, goal, new MutableState())
+                        .computeCost(rule, pos, Objects.requireNonNull(goal, "no goal set"),
+                            new MutableState())
                         .equals(BinaryFeature.TOP_COST);
             } else {
                 return !onlyModifyFocussedFormula;
@@ -149,9 +157,14 @@ public class FocussedRuleApplicationManager
                 && pio2.sequentFormula().equals(pio1.sequentFormula());
     }
 
-    private PosInOccurrence getPIOForFocussedSubterm() {
+    private @Nullable PosInOccurrence getPIOForFocussedSubterm() {
+        // getPosForTag tolerates a null tag (it answers "no such formula"); the tag is only absent
+        // when no formula was found for the focused position at construction, in which case the
+        // filter silently disables. The parameter is still declared @NonNull there.
+        @SuppressWarnings("NullAway")
         final PosInOccurrence formula =
-            goal.getFormulaTagManager().getPosForTag(focussedFormula);
+            Objects.requireNonNull(goal, "no goal set").getFormulaTagManager()
+                    .getPosForTag(focussedFormula);
 
         if (formula == null) {
             return null;

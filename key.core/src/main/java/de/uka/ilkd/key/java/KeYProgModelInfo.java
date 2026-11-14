@@ -45,12 +45,13 @@ import com.github.javaparser.resolution.types.ResolvedType;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.DefaultConstructorDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserAnnotationDeclaration;
 import com.github.javaparser.symbolsolver.javaparsermodel.declarations.JavaParserMethodDeclaration;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+@NullMarked
 public class KeYProgModelInfo {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYProgModelInfo.class);
@@ -111,7 +112,6 @@ public class KeYProgModelInfo {
         return rec2key().keYTypes();
     }
 
-    @NonNull
     private List<ResolvedMethodDeclaration> getAllMethods(KeYJavaType kjt) {
         var type = rec2key().resolveType(kjt);
         if (type.isReferenceType()) {
@@ -311,8 +311,8 @@ public class KeYProgModelInfo {
      * @param signature IList<KeYJavaType> representing the signature of the constructor
      * @return the most specific constructor declared in the given type
      */
-    @Nullable
-    public IProgramMethod getConstructor(KeYJavaType ct, ImmutableList<KeYJavaType> signature,
+    public @Nullable IProgramMethod getConstructor(KeYJavaType ct,
+            ImmutableList<KeYJavaType> signature,
             KeYJavaType context,
             TypeSolver typeSolver) {
         var rt = getJavaParserType(ct).asReferenceType().getTypeDeclaration();
@@ -371,7 +371,7 @@ public class KeYProgModelInfo {
     /**
      * retrieves implicit methods
      */
-    private IProgramMethod getImplicitMethod(KeYJavaType ct, String name) {
+    private @Nullable IProgramMethod getImplicitMethod(KeYJavaType ct, String name) {
         final Map<String, IProgramMethod> m = implicits.get(ct);
         if (m != null) {
             final IProgramMethod pm = m.get(name);
@@ -379,12 +379,14 @@ public class KeYProgModelInfo {
                 return pm;
             }
         }
-        TypeDeclaration cd = (TypeDeclaration) ct.getJavaType();
+        TypeDeclaration cd = (TypeDeclaration) Objects.requireNonNull(ct.getJavaType(),
+            "no Java type for the class declaring the implicit method");
         ImmutableArray<MemberDeclaration> members = cd.getMembers();
         for (int i = 0; i < members.size(); i++) {
             final MemberDeclaration member = members.get(i);
             if (member instanceof IProgramMethod pm
-                    && pm.getMethodDeclaration().getName().equals(name)) {
+                    && Objects.requireNonNull(pm.getMethodDeclaration(),
+                        "no method declaration for the implicit method").getName().equals(name)) {
                 return pm;
             }
         }
@@ -394,7 +396,14 @@ public class KeYProgModelInfo {
 
     // TODO: copied from TransformationPipeLineServices we should have some utility class to avoid
     // copy-and-past
-    public Type getType(ResolvedType type) {
+    /**
+     * The component type of a resolved array type always materializes here: it is either an array
+     * itself, a reference type, or a primitive type, each handled by a branch above, so this
+     * method cannot return {@code null} for it. The {@code @Nullable} return type only reflects
+     * the fall-through for non-Java types.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    public @Nullable Type getType(ResolvedType type) {
         if (type.isArray()) {
             // TODO weigl type.arrayLevel()
             return new com.github.javaparser.ast.type.ArrayType(
@@ -414,7 +423,7 @@ public class KeYProgModelInfo {
 
     // TODO: copied from TransformationPipeLineServices we should have some utility class to avoid
     // copy-and-past
-    public ClassOrInterfaceType getType(String... names) {
+    public @Nullable ClassOrInterfaceType getType(String... names) {
         ClassOrInterfaceType type = null;
         for (String name : names) {
             type = new ClassOrInterfaceType(type, name);
@@ -435,7 +444,7 @@ public class KeYProgModelInfo {
      *         a debug output is written to console).
      */
     public @Nullable IProgramMethod getProgramMethod(
-            @NonNull KeYJavaType ct, String name,
+            KeYJavaType ct, String name,
             Iterable<KeYJavaType> signature, KeYJavaType context) {
 
         if (context.getJavaType() instanceof ArrayType || ct.getJavaType() instanceof ArrayType) {
@@ -525,7 +534,8 @@ public class KeYProgModelInfo {
      */
     private List<Field> getVisibleArrayFields(KeYJavaType arrayType) {
         final ImmutableArray<MemberDeclaration> members =
-            ((ArrayDeclaration) arrayType.getJavaType()).getMembers();
+            ((ArrayDeclaration) Objects.requireNonNull(arrayType.getJavaType(),
+                "no Java type for the array type")).getMembers();
         List<Field> result = new ArrayList<>();
         for (MemberDeclaration member : members) {
             if (member instanceof FieldDeclaration) {

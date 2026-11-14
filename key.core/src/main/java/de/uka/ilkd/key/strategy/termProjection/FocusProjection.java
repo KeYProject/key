@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termProjection;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -13,6 +15,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Projection of a rule application to its focus (the term or formula that the rule operates on,
  * that for taclets is described using <code>\find</code>, and that can be modified by the rule).
@@ -21,6 +25,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 // WeakStable, not Stable: with stepsUpwards > 0 (e.g. FocusProjection.create(1)) this walks up
 // from the find subterm, so it reads the surrounding find formula -- valid only while that
 // formula is unchanged.
+@NullMarked
 @WeakStableCost
 public class FocusProjection implements ProjectionToTerm<Goal> {
 
@@ -43,7 +48,7 @@ public class FocusProjection implements ProjectionToTerm<Goal> {
 
         int n = stepsUpwards;
         while (n-- > 0 && !pos.isTopLevel()) {
-            pos = pos.up();
+            pos = Objects.requireNonNull(pos.up());
         }
 
         return (JTerm) pos.subTerm();

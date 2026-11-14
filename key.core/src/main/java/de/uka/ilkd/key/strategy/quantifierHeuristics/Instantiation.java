@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TriggerSupport;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.QuantifierInstantiationTieBreak;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.tiebreak.QuantifierInstantiationTieBreak.Scorer;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
@@ -28,7 +30,11 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 class Instantiation {
 
 
@@ -46,10 +52,10 @@ class Instantiation {
     private final InstanceTable instances = new InstanceTable();
 
     /** The tie-break scorer, prepared lazily on the first tie-break request and reused. */
-    private QuantifierInstantiationTieBreak.Scorer scorer;
+    private @Nullable Scorer scorer;
 
     /** The strategy the {@link #scorer} was prepared with; a change re-prepares it. */
-    private QuantifierInstantiationTieBreak scorerStrategy;
+    private @Nullable QuantifierInstantiationTieBreak scorerStrategy;
 
     /** the <code>TriggersSet</code> of this <code>allTerm</code> */
     private final TriggersSet triggersSet;
@@ -208,7 +214,7 @@ class Instantiation {
         if (cost == -1) {
             return;
         }
-        instances.record(sub.getSubstitutedTerm(firstVar),
+        instances.record(Objects.requireNonNull(sub.getSubstitutedTerm(firstVar)),
             cost + surcharge(origin, matchedByOwnTerms), origin);
     }
 

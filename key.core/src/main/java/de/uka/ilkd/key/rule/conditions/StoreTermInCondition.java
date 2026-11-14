@@ -15,12 +15,16 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Stores the given {@link JTerm}, after substitution of {@link SchemaVariable}s, into the given
  * {@link SchemaVariable} for later use in other conditions and transformers.
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class StoreTermInCondition implements VariableCondition {
     private final SchemaVariable storeInSV;
     private final JTerm term;
@@ -31,7 +35,7 @@ public class StoreTermInCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable sv, SyntaxElement instCandidate,
+    public MatchResultInfo check(@Nullable SchemaVariable sv, @Nullable SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices services) {
         final var svInst =
             (SVInstantiations) matchCond.getInstantiations();

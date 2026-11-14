@@ -6,6 +6,7 @@ package de.uka.ilkd.key.prover.mt;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -54,12 +55,15 @@ public class GoalSchedulerTest {
             return name;
         }
 
+        // the scheduler never calls proof()/sequent(), so the double may return null
         @Override
+        @SuppressWarnings("NullAway")
         public @Nullable ProofObject<TestGoal> proof() {
             return null;
         }
 
         @Override
+        @SuppressWarnings("NullAway")
         public @Nullable Sequent sequent() {
             return null;
         }
@@ -100,11 +104,13 @@ public class GoalSchedulerTest {
         assertEquals(2, scheduler.availableCount());
         assertFalse(scheduler.isQuiescent());
 
-        TestGoal first = scheduler.claimNext();
+        TestGoal first =
+            Objects.requireNonNull(scheduler.claimNext(), "a goal must be claimable");
         assertEquals(1, scheduler.inFlightCount());
         assertFalse(scheduler.isQuiescent(), "in-flight work means not quiescent");
 
-        TestGoal second = scheduler.claimNext(); // claim the other (order is an impl detail)
+        TestGoal second =
+            Objects.requireNonNull(scheduler.claimNext(), "the other goal must be claimable");
         assertNull(scheduler.claimNext(), "nothing left to claim");
 
         scheduler.complete(first);
@@ -121,7 +127,8 @@ public class GoalSchedulerTest {
         scheduler.offer(g); // same identity, ignored
         assertEquals(1, scheduler.availableCount());
 
-        TestGoal claimed = scheduler.claimNext();
+        TestGoal claimed =
+            Objects.requireNonNull(scheduler.claimNext(), "the goal must be claimable");
         scheduler.offer(claimed); // in flight, must not be re-queued
         assertEquals(0, scheduler.availableCount());
     }

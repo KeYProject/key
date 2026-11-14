@@ -38,6 +38,8 @@ import org.key_project.util.GenerationalCache;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * <p>
  * Instances of this class provides all caches used by an individual {@link Proof} or more precise
@@ -88,6 +90,7 @@ import org.key_project.util.collection.Pair;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class ServiceCaches implements SessionCaches {
     /**
      * The maximal number of index entries in {@link #getTermTacletAppIndexCache()}.

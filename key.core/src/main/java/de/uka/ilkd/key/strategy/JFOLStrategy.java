@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -16,12 +18,15 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /// This strategy extends the classical [FOLStrategy] with heuristics
 /// for quantifier instantiation based on E-matching, which involves
 /// normalization of quantified formulas, as well as term features depending on
 /// integer theory.
 ///
 /// Do not create directly; use [JFOLStrategyFactory] instead.
+@NullMarked
 public class JFOLStrategy extends FOLStrategy {
     public static final Name NAME = new Name("JFOL Strategy");
 
@@ -55,7 +60,7 @@ public class JFOLStrategy extends FOLStrategy {
     @Override
     protected void setupSplitting(RuleSetDispatchFeature d) {
         super.setupSplitting(d);
-        var heapLDT = getServices().getTypeConverter().getHeapLDT();
+        var heapLDT = Objects.requireNonNull(getServices().getTypeConverter().getHeapLDT());
         var vf = new ValueTermFeature(op(heapLDT.getNull()));
         ProjectionToTerm<Goal> cutFormula = instOf("cutFormula");
         bindRuleSet(d, "cut_direct",

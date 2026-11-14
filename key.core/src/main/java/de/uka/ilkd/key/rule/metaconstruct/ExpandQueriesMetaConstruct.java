@@ -17,6 +17,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Uses the class <code>QueryExpand</code> in order to insert query expansions in the term that the
@@ -25,6 +27,7 @@ import org.key_project.logic.Name;
  * @author gladisch
  */
 @TransformerMeta(name = "#ExpandQueries")
+@NullMarked
 public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
 
     public static final String name = "#ExpandQueries";
@@ -56,7 +59,8 @@ public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
 
         final JTerm result;
         final StrategyProperties props =
-            services.getProof().getSettings().getStrategySettings().getActiveStrategyProperties();
+            Objects.requireNonNull(services.getProof(), "no proof available for query expansion")
+                    .getSettings().getStrategySettings().getActiveStrategyProperties();
         final boolean queryTreatmenIsOn =
             Objects.equals(props.getProperty(StrategyProperties.QUERY_OPTIONS_KEY),
                 StrategyProperties.QUERY_ON);

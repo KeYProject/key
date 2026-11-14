@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -103,6 +104,7 @@ public class TestProofTree {
     }
 
     @AfterEach
+    @SuppressWarnings("NullAway") // deliberate null reset of all fields between tests
     public void tearDown() {
         p = null;
         n1 = null;
@@ -119,7 +121,8 @@ public class TestProofTree {
     public void testLeaves() {
 
         // test sanityCheck
-        assertTrue(p.root().sanityCheckDoubleLinks(), "tree should have good sanity");
+        final Node root = Objects.requireNonNull(p.root(), "root must have been set in setUp");
+        assertTrue(root.sanityCheckDoubleLinks(), "tree should have good sanity");
 
         assertEquals(-1, n1.siblingNr(), "Root has sibling nr -1");
         assertEquals(0, n2.siblingNr(), "n2 should have sibling nr 0");
@@ -127,13 +130,13 @@ public class TestProofTree {
         assertEquals(2, n4.siblingNr(), "n4 should have sibling nr 2");
         assertEquals(0, n5.siblingNr(), "n5 should have sibling nr 0");
 
-        Iterator<Node> it = p.root().leavesIterator();
+        Iterator<Node> it = root.leavesIterator();
         int i = 0;
         while (it.hasNext()) {
             assertEquals(it.next().toString(), (new Node[] { n2, n6, n7, n4 })[i].toString());
             i++;
         }
-        it = p.root().childrenIterator();
+        it = root.childrenIterator();
 
         i = 0;
         while (it.hasNext()) {
@@ -146,7 +149,7 @@ public class TestProofTree {
         assertEquals(0, n2.siblingNr(), "n2 should have sibling nr 0");
         assertEquals(1, n4.siblingNr(), "n4 should have sibling nr 1");
 
-        it = p.root().childrenIterator();
+        it = root.childrenIterator();
         i = 0;
         while (it.hasNext()) {
             assertEquals(it.next().toString(), (new Node[] { n2, n4 })[i].toString());
@@ -157,7 +160,7 @@ public class TestProofTree {
         assertEquals(-1, n2.siblingNr(), "n2 is no longer a sibling and should have sibling nr -1");
         assertEquals(0, n4.siblingNr(), "n4 should have sibling nr 0");
 
-        it = p.root().childrenIterator();
+        it = root.childrenIterator();
         i = 0;
         while (it.hasNext()) {
             assertEquals(it.next().toString(), (new Node[] { n4 })[i].toString());

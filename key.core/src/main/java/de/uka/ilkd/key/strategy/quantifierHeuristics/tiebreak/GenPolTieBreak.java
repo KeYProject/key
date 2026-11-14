@@ -8,16 +8,20 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeSet;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Orders tied instantiation candidates primarily by generation, that is by how late the
  * instance's newest skolem constant was introduced on the branch, and breaks a same-generation
  * tie by the proving-polarity occurrence connection of {@link PolarityOccurrenceTieBreak}.
  */
+@NullMarked
 public final class GenPolTieBreak extends PolarityOccurrenceTieBreak {
 
     public static final GenPolTieBreak INSTANCE = new GenPolTieBreak();
@@ -80,7 +84,8 @@ public final class GenPolTieBreak extends PolarityOccurrenceTieBreak {
         }
         final Map<Term, Integer> ranks = new LinkedHashMap<>();
         for (final var e : intro.entrySet()) {
-            ranks.put(e.getKey(), e.getValue() < 0 ? 0 : rankOf.get(e.getValue()));
+            ranks.put(e.getKey(),
+                e.getValue() < 0 ? 0 : Objects.requireNonNull(rankOf.get(e.getValue())));
         }
         return ranks;
     }

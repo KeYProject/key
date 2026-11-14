@@ -10,11 +10,13 @@ import java.util.Map;
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
+@NullMarked
 public final class FontSizeFacade {
     private static final String[] KEYS = { "Button.font", "CheckBox.font",
         "CheckBoxMenuItem.acceleratorFont", "CheckBoxMenuItem.font", "ColorChooser.font",

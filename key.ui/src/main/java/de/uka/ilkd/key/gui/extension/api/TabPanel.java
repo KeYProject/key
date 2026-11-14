@@ -11,12 +11,14 @@ import javax.swing.*;
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.intern.DefaultCDockable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (23.04.19)
  */
+@NullMarked
 public interface TabPanel {
 
     @NonNull

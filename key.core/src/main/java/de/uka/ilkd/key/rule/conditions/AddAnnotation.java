@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -90,7 +91,7 @@ public final class AddAnnotation implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(@Nullable SchemaVariable var,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
             @Nullable SyntaxElement instCandidate,
             @NonNull MatchResultInfo matchCond, @NonNull LogicServices logicServices) {
 
@@ -111,7 +112,10 @@ public final class AddAnnotation implements VariableCondition {
         }
 
         if (inst instanceof ProgramVariable variable) {
-            TypeReference tRef = addAnnotation(variable.getTypeReference(), annotation);
+            TypeReference tRef = addAnnotation(
+                Objects.requireNonNull(variable.getTypeReference(),
+                    "program variable has no type reference"),
+                annotation);
             LocationVariable replacement = newFromTypeRef(
                 variable, (Services) logicServices, tRef);
 
@@ -128,7 +132,7 @@ public final class AddAnnotation implements VariableCondition {
         return matchCond;
     }
 
-    private Annotation build(Services services) {
+    private @Nullable Annotation build(Services services) {
         KeYJavaType annotType = services.getJavaInfo().getTypeByName(annot);
         return annotType == null ? null : new MarkerAnnotation(annotType);
     }
@@ -139,7 +143,7 @@ public final class AddAnnotation implements VariableCondition {
             tRef.getAnnotations().append(annotation),
             tRef.getDimensions(),
             tRef.getReferencePrefix(),
-            tRef.getKeYJavaType());
+            Objects.requireNonNull(tRef.getKeYJavaType(), "no KeYJavaType for " + tRef));
     }
 
     private static LocationVariable newFromTypeRef(ProgramVariable v, Services services,

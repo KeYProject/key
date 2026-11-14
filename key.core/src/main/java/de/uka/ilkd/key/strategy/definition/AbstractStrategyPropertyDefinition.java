@@ -8,6 +8,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Provides the basic function definition of user interface controls to edit a single key-value-pair
  * in {@link StrategyProperties}.
@@ -15,11 +18,12 @@ import org.key_project.util.collection.ImmutableArray;
  * @author Martin Hentschel
  * @see OneOfStrategyPropertyDefinition
  */
+@NullMarked
 public abstract class AbstractStrategyPropertyDefinition {
     /**
      * The key used in KeY's API.
      */
-    private final String apiKey;
+    private final @Nullable String apiKey;
 
     /**
      * The human readable name of the property.
@@ -29,7 +33,7 @@ public abstract class AbstractStrategyPropertyDefinition {
     /**
      * The optional tooltip text which describes this property.
      */
-    private final String tooltip;
+    private final @Nullable String tooltip;
 
     /**
      * Optional children which edits related properties to this. They might be shown different in
@@ -45,8 +49,8 @@ public abstract class AbstractStrategyPropertyDefinition {
      * @param tooltip The optional tooltip text which describes this property.
      * @param subProperties Optional children which edits related properties to this.
      */
-    protected AbstractStrategyPropertyDefinition(String apiKey, String name, String tooltip,
-            AbstractStrategyPropertyDefinition... subProperties) {
+    protected AbstractStrategyPropertyDefinition(@Nullable String apiKey, String name,
+            @Nullable String tooltip, AbstractStrategyPropertyDefinition... subProperties) {
         this.apiKey = apiKey;
         this.name = name;
         this.tooltip = tooltip;
@@ -56,7 +60,7 @@ public abstract class AbstractStrategyPropertyDefinition {
     /**
      * Returns the key used in KeY's API.
      */
-    public String getApiKey() {
+    public @Nullable String getApiKey() {
         return apiKey;
     }
 
@@ -70,7 +74,7 @@ public abstract class AbstractStrategyPropertyDefinition {
     /**
      * Returns the optional tooltip text which describes this property.
      */
-    public String getTooltip() {
+    public @Nullable String getTooltip() {
         return tooltip;
     }
 

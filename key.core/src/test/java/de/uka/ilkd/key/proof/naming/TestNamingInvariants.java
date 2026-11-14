@@ -7,6 +7,7 @@ package de.uka.ilkd.key.proof.naming;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -54,7 +55,8 @@ public class TestNamingInvariants {
     public void skolemNamesAreBranchLocalAndPruneStable() throws Exception {
         final KeYEnvironment<?> env = load("skolemSiblings.key");
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof = Objects.requireNonNull(env.getLoadedProof(),
+                "loaded proof must be present");
             splitAndSkolemize(proof);
 
             final List<String> first = skolemNamesPerGoal(proof, "idx");
@@ -72,7 +74,8 @@ public class TestNamingInvariants {
             }
 
             // prune to root and redo: names must be reproduced exactly (state-derived)
-            proof.pruneProof(proof.root());
+            proof.pruneProof(Objects.requireNonNull(proof.root(),
+                "loaded proof must have a root"));
             splitAndSkolemize(proof);
             final List<String> second = skolemNamesPerGoal(proof, "idx");
             assertEquals(first, second,
@@ -94,7 +97,8 @@ public class TestNamingInvariants {
     public void hiddenFormulaTacletIsGoalLocalAndPruneSafe() throws Exception {
         final KeYEnvironment<?> env = load("hideReinsert.key");
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof = Objects.requireNonNull(env.getLoadedProof(),
+                "loaded proof must be present");
             splitAndHide(proof);
 
             // exactly one open goal performed the hide; find it and its sibling
@@ -117,7 +121,8 @@ public class TestNamingInvariants {
                 "the introduced taclet must not leak to the sibling branch");
 
             // prune the hide away: the goal-local rule must disappear
-            proof.pruneProof(hideGoal.node().parent());
+            proof.pruneProof(Objects.requireNonNull(hideGoal.node().parent(),
+                "hidden goal must not be the root"));
             for (final Goal g : proof.openGoals()) {
                 for (final NoPosTacletApp app : g.node().getLocalIntroducedRules()) {
                     assertFalse(app.taclet().name().toString().equals(introducedName),
@@ -152,7 +157,8 @@ public class TestNamingInvariants {
     public void addedProgramVariableIsGoalLocalAndPruneSafe() throws Exception {
         final KeYEnvironment<?> env = load("skolemSiblings.key");
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof = Objects.requireNonNull(env.getLoadedProof(),
+                "loaded proof must be present");
             applyOnFormula(proof, proof.openGoals().head(), "andRight", 1, false);
             assertEquals(2, proof.openGoals().size());
 
@@ -163,7 +169,9 @@ public class TestNamingInvariants {
             final Name pvName = new Name("harnessPv");
             final LocationVariable pv = new LocationVariable(
                 new de.uka.ilkd.key.logic.ProgramElementName(pvName.toString()),
-                new TypeRef(services.getJavaInfo().getKeYJavaType("int")));
+                new TypeRef(Objects.requireNonNull(
+                    services.getJavaInfo().getKeYJavaType("int"),
+                    "int type must be registered in the services")));
             goal.addProgramVariable(pv);
 
             assertNotNull(goal.getLocalNamespaces().programVariables().lookup(pvName),
@@ -187,7 +195,8 @@ public class TestNamingInvariants {
     public void recordedProposalOverridesGeneratedName() throws Exception {
         final KeYEnvironment<?> env = load("skolemSiblings.key");
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof = Objects.requireNonNull(env.getLoadedProof(),
+                "loaded proof must be present");
             final Services services = proof.getServices();
             final Name recorded = new Name("replayedName");
             services.getNameRecorder()
@@ -214,9 +223,12 @@ public class TestNamingInvariants {
     public void savedProofWithHiddenTacletReplays() throws Exception {
         final KeYEnvironment<?> env = load("insertHidden.proof");
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof = Objects.requireNonNull(env.getLoadedProof(),
+                "loaded proof must be present");
+            final de.uka.ilkd.key.proof.Node root =
+                Objects.requireNonNull(proof.root(), "loaded proof must have a root");
             boolean hiddenApplied = false;
-            final var it = proof.root().subtreeIterator();
+            final var it = root.subtreeIterator();
             while (it.hasNext()) {
                 final var node = it.next();
                 if (node.getAppliedRuleApp() != null && node.getAppliedRuleApp().rule().name()
@@ -263,7 +275,8 @@ public class TestNamingInvariants {
         final String oldThreads = System.getProperty(threads);
         final KeYEnvironment<?> env = load("skolemSiblings.key");
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof = Objects.requireNonNull(env.getLoadedProof(),
+                "loaded proof must be present");
             if (workers == 0) {
                 System.setProperty(prop, "false");
                 splitAndSkolemize(proof);
@@ -308,7 +321,8 @@ public class TestNamingInvariants {
     @Test
     public void mtNoMintSplitGivesEachSiblingItsOwnNamespaces() throws Exception {
         final KeYEnvironment<?> env = load("skolemSiblings.key");
-        final Proof proof = env.getLoadedProof();
+        final Proof proof = Objects.requireNonNull(env.getLoadedProof(),
+            "loaded proof must be present");
         final var scope = ParallelProver.enterMultiThreadedRun(proof);
         try {
             assertTrue(ParallelProver.isMultiThreadedRunActive(proof),
@@ -413,8 +427,9 @@ public class TestNamingInvariants {
      */
     private static void applyOnFormula(Proof proof, Goal goal, String tacletName, int formulaNr,
             boolean inAntec) {
-        final var taclet =
-            proof.getInitConfig().lookupActiveTaclet(new Name(tacletName));
+        final var taclet = Objects.requireNonNull(
+            proof.getInitConfig(), "init config must be present on the proof")
+                .lookupActiveTaclet(new Name(tacletName));
         assertNotNull(taclet, "taclet not found: " + tacletName);
         final int nr = inAntec ? formulaNr
                 : goal.sequent().antecedent().size() + formulaNr;
@@ -423,7 +438,8 @@ public class TestNamingInvariants {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(taclet)
                 .matchFind(pio, proof.getServices());
         assertNotNull(app, tacletName + " must match at the given position");
-        app = app.setPosInOccurrence(pio, proof.getServices());
+        app = Objects.requireNonNull(app.setPosInOccurrence(pio, proof.getServices()),
+            tacletName + " must be applicable at the given position");
         app = app.tryToInstantiate(
             proof.getServices().getOverlay(goal.getLocalNamespaces()));
         assertNotNull(app, tacletName + " must be instantiable");

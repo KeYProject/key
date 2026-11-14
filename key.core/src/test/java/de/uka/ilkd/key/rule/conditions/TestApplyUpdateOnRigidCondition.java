@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -157,16 +159,18 @@ public class TestApplyUpdateOnRigidCondition {
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
         // u uninstantiated
-        mc = cond.check(null, null, mc, TacletForTests.services());
-        assert mc != null;
+        mc = Objects
+                .requireNonNull(cond.check(null, null, mc, TacletForTests.services()),
+                    "the condition check must succeed");
         assertEquals(svInst, mc.getInstantiations());
 
         JTerm update = TacletForTests.parseTerm("{i:=0}0").sub(0);
         svInst = svInst.add(u, update, TacletForTests.services());
         mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
 
-        mc = cond.check(null, null, mc, TacletForTests.services());
-        assert mc != null;
+        mc = Objects
+                .requireNonNull(cond.check(null, null, mc, TacletForTests.services()),
+                    "the condition check must succeed");
         // phi uninstantiated
         assertEquals(svInst, mc.getInstantiations());
     }
@@ -188,8 +192,9 @@ public class TestApplyUpdateOnRigidCondition {
         MatchResultInfo mc = EMPTY_MATCHCONDITIONS.setInstantiations(svInst);
         ApplyUpdateOnRigidCondition cond = new ApplyUpdateOnRigidCondition(u, phi, result);
 
-        mc = cond.check(null, null, mc, TacletForTests.services());
-        assert mc != null;
+        mc = Objects
+                .requireNonNull(cond.check(null, null, mc, TacletForTests.services()),
+                    "the condition check must succeed");
         assertEquals(svInst, mc.getInstantiations());
     }
 
@@ -282,8 +287,11 @@ public class TestApplyUpdateOnRigidCondition {
             return term;
         }
 
-        return ((de.uka.ilkd.key.rule.MatchConditions) mc).getInstantiations()
-                .getTermInstantiation(result, TacletForTests.services());
+        return Objects
+                .requireNonNull(
+                    ((de.uka.ilkd.key.rule.MatchConditions) mc).getInstantiations()
+                            .getTermInstantiation(result, TacletForTests.services()),
+                    "the result schema variable must be instantiated");
     }
 
 }

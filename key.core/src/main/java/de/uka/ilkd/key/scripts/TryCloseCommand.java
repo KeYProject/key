@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.scripts;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -69,9 +71,12 @@ public class TryCloseCommand extends AbstractCommand {
         }
 
         try {
-            macro.applyTo(uiControl, target, null, uiControl);
-            if (args.assertClosed && !target.isClosed()) {
-                throw new ScriptException("Could not close subtree of node " + target.serialNr());
+            final Node t = Objects.requireNonNull(target, "No target node is available");
+            macro.applyTo(
+                Objects.requireNonNull(uiControl, "No user interface control is available"), t,
+                null, uiControl);
+            if (args.assertClosed && !t.isClosed()) {
+                throw new ScriptException("Could not close subtree of node " + t.serialNr());
             }
         } catch (Exception e) {
             throw new ScriptException("tryclose caused an exception: " + e.getMessage(), e);

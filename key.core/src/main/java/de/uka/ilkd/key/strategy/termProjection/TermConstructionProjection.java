@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termProjection;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.proof.Goal;
@@ -15,6 +17,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Term projection for constructing a bigger term from a sequence of direct subterms and an
  * operator.
@@ -22,6 +26,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * NB: this is a rather restricted version of term construction, one can think of also allowing
  * bound variables, etc to be specified
  */
+@NullMarked
 @StableCost
 public class TermConstructionProjection implements ProjectionToTerm<Goal> {
 
@@ -44,9 +49,9 @@ public class TermConstructionProjection implements ProjectionToTerm<Goal> {
     public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final JTerm[] subs = new JTerm[subTerms.length];
         for (int i = 0; i != subTerms.length; ++i) {
-            subs[i] = (JTerm) subTerms[i].toTerm(app, pos, goal, mState);
+            subs[i] = (JTerm) Objects.requireNonNull(subTerms[i].toTerm(app, pos, goal, mState));
         }
-        return goal.proof().getServices().getTermFactory().createTerm(op, subs, null, null);
+        return goal.proof().getServices().getTermFactory().createTerm(op, subs);
     }
 
 }

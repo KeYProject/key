@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
@@ -14,11 +15,14 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A JML depends / accessible clause for a model field in textual form. Note that such clauses for
  * *methods* are part of TextualJMLSpecCase.
  */
+@NullMarked
 public final class TextualJMLDepends extends TextualJMLConstruct {
     private final Map<Name, ImmutableList<LabeledParserRuleContext>> depends =
         new LinkedHashMap<>();
@@ -37,11 +41,12 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
     }
 
     public ImmutableList<LabeledParserRuleContext> getDepends() {
-        return depends.get(HeapLDT.BASE_HEAP_NAME);
+        return Objects.requireNonNull(depends.get(HeapLDT.BASE_HEAP_NAME),
+            "no depends clause for base heap");
     }
 
     public ImmutableList<LabeledParserRuleContext> getDepends(Name hName) {
-        return depends.get(hName);
+        return Objects.requireNonNull(depends.get(hName), "no depends clause for heap " + hName);
     }
 
     @Override
@@ -51,7 +56,7 @@ public final class TextualJMLDepends extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof TextualJMLDepends a)) {
             return false;
         }

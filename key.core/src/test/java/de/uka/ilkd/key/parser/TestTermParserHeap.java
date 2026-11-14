@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.parser;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.JTerm;
 
@@ -48,8 +49,12 @@ public class TestTermParserHeap extends AbstractTestTermParser {
     }
 
     private JTerm getSelectTerm(String sort, JTerm heap, JTerm object, JTerm field) {
-        Sort s = services.getNamespaces().sorts().lookup(sort);
-        Operator op = services.getTypeConverter().getHeapLDT().getSelect(s, services);
+        Sort s = Objects
+                .requireNonNull(services.getNamespaces().sorts().lookup(sort), "sort " + sort);
+        Operator op = Objects
+                .requireNonNull(services.getTypeConverter().getHeapLDT(),
+                    "the heap LDT must be available")
+                .getSelect(s, services);
         JTerm[] params = { heap, object, field };
         return tf.createTerm(op, params);
     }

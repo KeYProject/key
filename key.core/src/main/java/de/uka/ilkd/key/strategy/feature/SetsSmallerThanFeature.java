@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -16,7 +18,10 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public class SetsSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm<Goal> left, right;
@@ -40,8 +45,8 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
-        final Term leftTerm = left.toTerm(app, pos, goal, mState);
-        final Term rightTerm = right.toTerm(app, pos, goal, mState);
+        final Term leftTerm = Objects.requireNonNull(left.toTerm(app, pos, goal, mState));
+        final Term rightTerm = Objects.requireNonNull(right.toTerm(app, pos, goal, mState));
 
         return origLessThan(leftTerm, rightTerm, pos, goal);
     }

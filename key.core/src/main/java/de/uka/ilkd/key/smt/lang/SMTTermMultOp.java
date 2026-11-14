@@ -9,6 +9,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  *
@@ -19,6 +22,7 @@ import java.util.Map;
 // The name of this class become misleading. Now, I am only distinguishing between unary operators,
 // binary operators and multi operators.
 // A more suitable name for this class will be TermMultOp
+@NullMarked
 public class SMTTermMultOp extends SMTTerm {
 
     /*
@@ -146,6 +150,12 @@ public class SMTTermMultOp extends SMTTerm {
     protected List<SMTTerm> subs;
     protected Op operator;
 
+    /**
+     * Storing the under-construction {@code this} as the parent back-pointer of already-constructed
+     * children is inherent to the design; the checker cannot express the circular link, so it is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:initialization.invalid.field.write.initialized")
     public SMTTermMultOp(Op operator, List<SMTTerm> subs) {
         this.operator = operator;
         this.subs = subs;
@@ -361,7 +371,7 @@ public class SMTTermMultOp extends SMTTerm {
     }
 
     @Override
-    public boolean equals(Object term) {
+    public boolean equals(@Nullable Object term) {
 
         if (term == null) {
             return false;

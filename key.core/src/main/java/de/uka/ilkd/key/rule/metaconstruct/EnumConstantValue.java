@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.declaration.EnumClassDeclaration;
@@ -16,6 +18,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * resolve a program variable to an integer literal.
  *
@@ -25,6 +29,7 @@ import org.key_project.logic.op.Operator;
  * @author mulbrich
  */
 @TransformerMeta(name = "#enumconstantvalue")
+@NullMarked
 public final class EnumConstantValue extends AbstractTermTransformer {
 
     public EnumConstantValue() {
@@ -50,7 +55,8 @@ public final class EnumConstantValue extends AbstractTermTransformer {
 
             if (false) {// varname.endsWith(ImplicitFieldAdder.IMPLICIT_NEXT_TO_CREATE)) {//TODO
                 // <nextToCreate>
-                if (pv.getContainerType().getJavaType() instanceof EnumClassDeclaration ecd) {
+                if (Objects.requireNonNull(pv.getContainerType(), "no container type")
+                        .getJavaType() instanceof EnumClassDeclaration ecd) {
                     value = ecd.getNumberOfConstants();
                 } else {
                     throw new IllegalArgumentException(term + " is not in an enum type.");

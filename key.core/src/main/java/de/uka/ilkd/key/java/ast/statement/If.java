@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -12,11 +13,15 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * If.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public class If extends BranchStatement implements ExpressionContainer {
 
     /**
@@ -29,7 +34,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      * Else branch.
      */
 
-    protected final Else elseBranch;
+    protected final @Nullable Else elseBranch;
 
     /**
      * Expression.
@@ -44,15 +49,25 @@ public class If extends BranchStatement implements ExpressionContainer {
      *        the children of this AST element as KeY classes. May contain: Comments, a
      *        Then, an Else, an Expression (as condition of If)
      */
+    /**
+     * The {@link #checkValidity} verification operates on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here because the fields it
+     * reads are assigned just above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public If(ExtList children) {
         super(children);
-        thenBranch = children.get(Then.class);
+        thenBranch = Objects.requireNonNull(children.get(Then.class),
+            "Then-branch of if-statement cannot be null.");
         elseBranch = children.get(Else.class);
-        expression = children.get(Expression.class);
+        expression =
+            Objects.requireNonNull(children.get(Expression.class),
+                "Guard of if-statement cannot be null.");
         checkValidity();
     }
 
-    public If(PositionInfo pi, List<Comment> c, Expression accept, Then then, Else anElse) {
+    public If(PositionInfo pi, List<Comment> c, Expression accept, Then then,
+            @Nullable Else anElse) {
         super(pi, c);
         expression = accept;
         elseBranch = anElse;
@@ -92,8 +107,15 @@ public class If extends BranchStatement implements ExpressionContainer {
      *        a then.
      * @param elseBranch
      *        an else.
+     *
+     *        <p>
+     *        The {@link #checkValidity} verification operates on {@code this} while the receiver is
+     *        still under initialization (EISOP initialization check); safe here because the fields
+     *        it
+     *        reads are assigned just above, suppressed with a scoped key.
      */
-    public If(Expression e, Then thenBranch, Else elseBranch) {
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    public If(Expression e, Then thenBranch, @Nullable Else elseBranch) {
         this.expression = e;
         this.thenBranch = thenBranch;
         this.elseBranch = elseBranch;
@@ -200,7 +222,7 @@ public class If extends BranchStatement implements ExpressionContainer {
      *
      * @return the else.
      */
-    public Else getElse() {
+    public @Nullable Else getElse() {
         return elseBranch;
     }
 

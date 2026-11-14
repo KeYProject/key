@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.sourceview;
 
-
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -12,6 +11,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.*;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This document knows about syntax highlighting.
@@ -25,6 +25,7 @@ import javax.swing.text.*;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class SourceHighlightDocument extends DefaultStyledDocument {
 
     /**
@@ -101,7 +102,13 @@ public class SourceHighlightDocument extends DefaultStyledDocument {
      * Create a new document that uses the given lexer for syntax highlighting.
      *
      * @param lexer the lexer to use
+     *
+     *        <p>
+     *        The document applies editor properties and registers its listener while the
+     *        receiver is still under initialization (EISOP initialization check); both only
+     *        take effect after construction completes, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SourceHighlightDocument(EditorLexer lexer) {
         this.lexer = lexer;
         // workaround for #1641: typing "enter" key shall insert only "\n", even on Windows

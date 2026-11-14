@@ -8,13 +8,25 @@ import javax.swing.JFrame;
 
 import de.uka.ilkd.key.gui.notification.actions.GeneralFailureJTextPaneDisplay;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This task notifies the user about an unexpected error.
  *
  * @author bubel
  */
+@NullMarked
 public class GeneralFailureNotification extends NotificationTask {
 
+    /**
+     * Creates the general-failure notification task.
+     *
+     * <p>
+     * The task registers its notification action while the receiver is still under initialization
+     * (EISOP initialization check); the action only fires once the task is executed after
+     * construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public GeneralFailureNotification(JFrame comp) {
         addNotificationAction(new GeneralFailureJTextPaneDisplay(comp));
     }

@@ -24,6 +24,8 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,7 @@ import static de.uka.ilkd.key.util.UnicodeHelper.*;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class HTMLSyntaxHighlighter {
     private static final Logger LOGGER = LoggerFactory.getLogger(HTMLSyntaxHighlighter.class);
 
@@ -141,7 +144,6 @@ public class HTMLSyntaxHighlighter {
     private static final String SEQUENT_ARROW_REPLACEMENT =
         "<span class=\"sequent_arrow_highlight\">$1</span>";
 
-
     private static final StyleSheet light = new StyleSheet();
     private static final StyleSheet dark = new StyleSheet();
 
@@ -167,7 +169,6 @@ public class HTMLSyntaxHighlighter {
         ColorSettings.define("[sequentView]sequent_arrow_color", "",
             new Color(0x6A, 0x3E, 0x3E),
             new Color(100, 100, 250));
-
 
     static {
         final var lightString = """
@@ -206,7 +207,6 @@ public class HTMLSyntaxHighlighter {
             SEQUENT_ARROW_COLOR.getDarkValue().getRGB() & 0xFFFFFF);
         dark.addRule(darkString);
     }
-
 
     /**
      * Adds CSS rules to the given document.
@@ -364,6 +364,10 @@ public class HTMLSyntaxHighlighter {
         StringBuilder sb = new StringBuilder();
         boolean loopEntered = false;
         for (Object str : strings) {
+            if (str == null) {
+                // the strings to concatenate never contain null entries
+                throw new NullPointerException("No string available.");
+            }
             sb.append(strTransformer.transform(str));
             sb.append(delim);
             loopEntered = true;
@@ -406,7 +410,7 @@ public class HTMLSyntaxHighlighter {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) {
                 return true;
             }

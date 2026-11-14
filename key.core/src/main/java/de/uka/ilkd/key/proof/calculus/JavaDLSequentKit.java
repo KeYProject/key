@@ -10,8 +10,12 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.sequent.SequentKit;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class JavaDLSequentKit extends SequentKit {
-    protected static JavaDLSequentKit INSTANCE = new JavaDLSequentKit();
+    protected static @Nullable JavaDLSequentKit INSTANCE = new JavaDLSequentKit();
 
     public synchronized static JavaDLSequentKit getInstance() {
         if (INSTANCE == null) {

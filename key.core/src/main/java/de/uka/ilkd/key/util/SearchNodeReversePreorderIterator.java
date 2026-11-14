@@ -4,7 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Node;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * <p>
@@ -23,11 +28,12 @@ import de.uka.ilkd.key.proof.Node;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class SearchNodeReversePreorderIterator {
     /**
      * The previous element or {@code null} if no more elements exists.
      */
-    private Node previous;
+    private @Nullable Node previous;
 
     /**
      * Constructor.
@@ -52,7 +58,7 @@ public class SearchNodeReversePreorderIterator {
      *
      * @return The next {@link Node}.
      */
-    public Node previous() {
+    public @Nullable Node previous() {
         Node oldPrevious = previous;
         updatePrevious();
         return oldPrevious;
@@ -62,9 +68,11 @@ public class SearchNodeReversePreorderIterator {
      * Computes the previous element and updates {@link #previous()}.
      */
     protected void updatePrevious() {
-        Node parent = previous.parent();
+        // the iteration protocol guarantees a current node when stepping (hasPrevious checked)
+        Node current = Objects.requireNonNull(previous, "current node");
+        Node parent = current.parent();
         if (parent != null) {
-            int index = parent.getChildNr(previous);
+            int index = parent.getChildNr(current);
             if (index >= 1) {
                 previous = lastLeaf(parent.child(index - 1));
             } else {

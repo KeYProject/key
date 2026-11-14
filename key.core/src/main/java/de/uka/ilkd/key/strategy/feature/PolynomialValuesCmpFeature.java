@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -19,11 +20,15 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Return zero only if the value of one (left) polynomial always will be (less or equal) or (less)
  * than the value of a second (right) polynomial. Both polynomials can optionally be multiplied with
  * some constant before comparison.
  */
+@NullMarked
 @StableCost
 public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
 
@@ -32,11 +37,13 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
         LT, LEQ, EQ, DIVIDES
     }
 
-    private final ProjectionToTerm<Goal> left, right, leftCoeff, rightCoeff;
+    private final ProjectionToTerm<Goal> left, right;
+    private final @Nullable ProjectionToTerm<Goal> leftCoeff, rightCoeff;
     private final Cmp cmp;
 
     private PolynomialValuesCmpFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff, Cmp cmp) {
+            @Nullable ProjectionToTerm<Goal> leftCoeff, @Nullable ProjectionToTerm<Goal> rightCoeff,
+            Cmp cmp) {
         this.left = left;
         this.right = right;
         this.leftCoeff = leftCoeff;
@@ -49,7 +56,8 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
     }
 
     public static Feature lt(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+            @Nullable ProjectionToTerm<Goal> leftCoeff,
+            @Nullable ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.LT);
     }
 
@@ -58,7 +66,8 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
     }
 
     public static Feature leq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+            @Nullable ProjectionToTerm<Goal> leftCoeff,
+            @Nullable ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.LEQ);
     }
 
@@ -67,7 +76,8 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
     }
 
     public static Feature eq(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+            @Nullable ProjectionToTerm<Goal> leftCoeff,
+            @Nullable ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.EQ);
     }
 
@@ -76,7 +86,8 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
     }
 
     public static Feature divides(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            ProjectionToTerm<Goal> leftCoeff, ProjectionToTerm<Goal> rightCoeff) {
+            @Nullable ProjectionToTerm<Goal> leftCoeff,
+            @Nullable ProjectionToTerm<Goal> rightCoeff) {
         return new PolynomialValuesCmpFeature(left, right, leftCoeff, rightCoeff, Cmp.DIVIDES);
     }
 
@@ -110,11 +121,11 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
     }
 
     private Polynomial getPolynomial(ProjectionToTerm<Goal> polyProj,
-            ProjectionToTerm<Goal> coeffProj,
+            @Nullable ProjectionToTerm<Goal> coeffProj,
             TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Polynomial poly =
-            Polynomial.create(polyProj.toTerm(app, pos, goal, mState), services);
+        final Polynomial poly = Polynomial
+                .create(Objects.requireNonNull(polyProj.toTerm(app, pos, goal, mState)), services);
 
         if (coeffProj == null) {
             return poly;

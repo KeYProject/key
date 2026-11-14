@@ -7,10 +7,12 @@ package de.uka.ilkd.key.java.ast.reference;
 import de.uka.ilkd.key.java.ast.NamedProgramElement;
 import de.uka.ilkd.key.java.ast.Reference;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A NameReference references an entity by its explicite name.
  */
 
+@NullMarked
 public interface NameReference extends NamedProgramElement, Reference {
 }

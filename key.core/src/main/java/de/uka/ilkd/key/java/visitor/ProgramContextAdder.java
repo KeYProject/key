@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.rmi.UnexpectedException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -23,10 +24,13 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import org.key_project.logic.IntIterator;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A context given as {@link ContextStatementBlockInstantiation} is wrapped around a given
  * {@link ProgramElement}.
  */
+@NullMarked
 public class ProgramContextAdder {
 
     /**
@@ -66,8 +70,10 @@ public class ProgramContextAdder {
             }
             return body;
         } else {
-            body = wrap((JavaNonTerminalProgramElement) next, putIn, prefixPos, prefixDepth, prefix,
-                suffix);
+            // The exhausted-iterator case returns above; here the iterator still holds an element,
+            // which is exactly the case in which `next` was fetched and is therefore non-null.
+            body = wrap((JavaNonTerminalProgramElement) Objects.requireNonNull(next), putIn,
+                prefixPos, prefixDepth, prefix, suffix);
             if (context instanceof StatementBlock) {
                 return createStatementBlockWrapper((StatementBlock) context, body);
             } else if (context instanceof Try) {

@@ -6,6 +6,9 @@ package de.uka.ilkd.key.pp;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * describes a position in a sequent including the bounds within a string representation of the
  * sequent. In contrast to PosInOccurrence and PosInTerm of package de.uka.ilkd.key.logic, this
@@ -16,12 +19,13 @@ import org.key_project.prover.sequent.PosInOccurrence;
  * information whether the whole constrained formula is referred to or the formula or the
  * constraint.
  */
+@NullMarked
 public class PosInSequent {
-    private Range bounds;
+    private @Nullable Range bounds;
     private final boolean sequent;
-    private PosInOccurrence posInOcc = null;
+    private @Nullable PosInOccurrence posInOcc = null;
 
-    private Range firstJavaStatementRange = null;
+    private @Nullable Range firstJavaStatementRange = null;
 
     /**
      * creates a PosInSequent that points to the whole sequent.
@@ -44,7 +48,7 @@ public class PosInSequent {
 
 
     // use the create... above for getting instances of PosInSequent
-    private PosInSequent(PosInOccurrence posInOcc, boolean sequent) {
+    private PosInSequent(@Nullable PosInOccurrence posInOcc, boolean sequent) {
         this.posInOcc = posInOcc;
         this.sequent = sequent;
     }
@@ -66,7 +70,7 @@ public class PosInSequent {
      *
      * @return start position
      */
-    public Range getBounds() {
+    public @Nullable Range getBounds() {
         return bounds;
     }
 
@@ -86,7 +90,7 @@ public class PosInSequent {
      *
      * @return the range specifying the first statement in the corresponding program
      */
-    public Range getFirstJavaStatementRange() {
+    public @Nullable Range getFirstJavaStatementRange() {
         return firstJavaStatementRange;
     }
 
@@ -95,7 +99,7 @@ public class PosInSequent {
      * returns the PosInOccurrence if the PosInSequent marks a SequentFormula or parts of it, null
      * otherwise.
      */
-    public PosInOccurrence getPosInOccurrence() {
+    public @Nullable PosInOccurrence getPosInOccurrence() {
         return posInOcc;
     }
 

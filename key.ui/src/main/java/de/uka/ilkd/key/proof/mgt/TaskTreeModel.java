@@ -13,7 +13,10 @@ import javax.swing.tree.MutableTreeNode;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class TaskTreeModel extends DefaultTreeModel {
 
     /**
@@ -44,8 +47,14 @@ public class TaskTreeModel extends DefaultTreeModel {
     }
 
     public synchronized void removeTask(TaskTreeNode p) {
+        @Nullable
         Proof[] allProofs = p.allProofs();
-        for (Proof allProof : allProofs) {
+        for (@Nullable
+        Proof allProof : allProofs) {
+            if (allProof == null) {
+                // a task node's proof list never contains null entries
+                throw new NullPointerException("No proof available.");
+            }
             proofToTask.remove(allProof);
             p.decoupleFromEnv();
         }
@@ -61,18 +70,29 @@ public class TaskTreeModel extends DefaultTreeModel {
         }
 
         if (env != null && !env.getProofs().isEmpty()) {
-            env.getProofs().iterator().next().getProofs()[0].mgt().updateProofStatus();
+            Proof firstProof = env.getProofs().iterator().next().getProofs()[0];
+            ProofCorrectnessMgt mgt = firstProof.mgt();
+            if (mgt == null) {
+                // every proof carries its correctness management object
+                throw new NullPointerException("No proof management available.");
+            }
+            mgt.updateProofStatus();
         }
     }
 
     private void updateProofToTask(TaskTreeNode p) {
-        proofToTask.put(p.proof(), p);
+        Proof proof = p.proof();
+        if (proof == null) {
+            // a task node always provides its proof for the lookup table
+            throw new NullPointerException("No proof available.");
+        }
+        proofToTask.put(proof, p);
         for (TaskTreeNode child : p.getChildren()) {
             updateProofToTask(child);
         }
     }
 
-    public synchronized TaskTreeNode getTaskForProof(Proof p) {
+    public synchronized @Nullable TaskTreeNode getTaskForProof(@Nullable Proof p) {
         if (p == null) {
             return null;
         }

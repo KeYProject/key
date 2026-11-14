@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * References are uses of names, variables or members. They can have a name (such as TypeReferences)
@@ -11,5 +12,6 @@ package de.uka.ilkd.key.java.ast;
  * structure
  */
 
+@NullMarked
 public interface Reference extends ProgramElement {
 }

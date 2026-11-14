@@ -6,8 +6,10 @@ package de.uka.ilkd.key.ldt;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.Operator;
@@ -35,6 +37,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -43,6 +46,7 @@ import org.jspecify.annotations.Nullable;
  * LDT functionality, this class is also responsible for creating and managing the constant symbols
  * representing fields.
  */
+@NullMarked
 public final class HeapLDT extends LDT {
 
     public static final Name NAME = new Name("Heap");
@@ -105,7 +109,8 @@ public final class HeapLDT extends LDT {
         final Namespace<@NonNull IProgramVariable> progVars =
             services.getNamespaces().programVariables();
 
-        fieldSort = sorts.lookup(new Name("Field"));
+        fieldSort = Objects.requireNonNull(sorts.lookup(new Name("Field")),
+            "sort/HeapLDT field not found");
         select = addParametricFunction(services, SELECT_NAME.toString());
         finalFunction = addParametricFunction(services, FINAL_NAME.toString());
         store = addFunction(services, STORE_NAME.toString());
@@ -126,12 +131,17 @@ public final class HeapLDT extends LDT {
         reach = addFunction(services, "reach");
         prec = addFunction(services, "prec");
         heaps = ImmutableList.<LocationVariable>nil()
-                .append((LocationVariable) progVars.lookup(BASE_HEAP_NAME))
-                .append((LocationVariable) progVars.lookup(SAVED_HEAP_NAME));
+                .append((LocationVariable) Objects.requireNonNull(progVars.lookup(BASE_HEAP_NAME),
+                    "heap/HeapLDT base heap variable not found"))
+                .append((LocationVariable) Objects.requireNonNull(progVars.lookup(SAVED_HEAP_NAME),
+                    "heap/HeapLDT saved heap variable not found"));
         if (services instanceof Services s) {
             if (s.getProfile() instanceof JavaProfile) {
                 if (((JavaProfile) s.getProfile()).withPermissions()) {
-                    heaps = heaps.append((LocationVariable) progVars.lookup(PERMISSION_HEAP_NAME));
+                    heaps = heaps.append(
+                        (LocationVariable) Objects.requireNonNull(
+                            progVars.lookup(PERMISSION_HEAP_NAME),
+                            "heap/HeapLDT permission heap variable not found"));
                 }
             }
         }
@@ -282,7 +292,7 @@ public final class HeapLDT extends LDT {
      * If the passed operator is an instance of "select", this method returns the sort of the
      * function (identical to its return type); otherwise, returns null.
      */
-    public Sort getSortOfSelect(org.key_project.logic.op.Operator op) {
+    public @Nullable Sort getSortOfSelect(org.key_project.logic.op.Operator op) {
         if (isSelectOp(op)) {
             return ((ParametricFunctionInstance) op).getArgs().head().sort();
         } else {
@@ -398,7 +408,7 @@ public final class HeapLDT extends LDT {
         return heaps;
     }
 
-    public LocationVariable getHeapForName(Name name) {
+    public @Nullable LocationVariable getHeapForName(Name name) {
         for (LocationVariable h : getAllHeaps()) {
             if (h.name().equals(name)) {
                 return h;
@@ -407,7 +417,7 @@ public final class HeapLDT extends LDT {
         return null;
     }
 
-    public LocationVariable getPermissionHeap() {
+    public @Nullable LocationVariable getPermissionHeap() {
         return heaps.size() > 2 ? heaps.tail().tail().head() : null;
     }
 
@@ -452,7 +462,11 @@ public final class HeapLDT extends LDT {
             var firstInstance =
                 services.getNamespaces().parametricFunctions().lookup(nameWithoutFieldPrefix);
             if (firstInstance != null && firstInstance.sort().extendsTrans(fieldSort)) {
-                Sort sortDependingOn = fieldPV.getContainerType().getSort();
+                final KeYJavaType containerType = Objects.requireNonNull(fieldPV.getContainerType(),
+                    "no container type for the field program variable");
+                Sort sortDependingOn =
+                    Objects.requireNonNull(containerType.getSort(),
+                        "no sort for the container type");
                 result = ParametricFunctionInstance.get(firstInstance,
                     ImmutableList.of(new GenericArgument(sortDependingOn)), services);
             } else {
@@ -477,11 +491,14 @@ public final class HeapLDT extends LDT {
                             invariantFieldNames
                                     .contains(fieldPV.getProgramElementName().getProgramName())) {
                         result = new ObserverFunction(kind.toString(), JavaDLTheory.FORMULA,
-                            null, targetSort(), fieldPV.getContainerType(),
+                            null, targetSort(), Objects.requireNonNull(fieldPV.getContainerType(),
+                                "no container type for the field program variable"),
                             fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
                     } else {
                         result = new ObserverFunction(kind.toString(), fieldPV.sort(),
-                            fieldPV.getKeYJavaType(), targetSort(), fieldPV.getContainerType(),
+                            fieldPV.getKeYJavaType(), targetSort(),
+                            Objects.requireNonNull(fieldPV.getContainerType(),
+                                "no container type for the field program variable"),
                             fieldPV.isStatic(), new ImmutableArray<>(), heapCount, 1);
                     }
                 } else {
@@ -536,14 +553,14 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public JTerm translateLiteral(Literal lit, Services services) {
+    public @Nullable JTerm translateLiteral(Literal lit, Services services) {
         assert false;
         return null;
     }
 
 
     @Override
-    public Function getFunctionFor(Operator op, Services serv,
+    public @Nullable Function getFunctionFor(Operator op, Services serv,
             ExecutionContext ec) {
         assert false;
         return null;
@@ -557,7 +574,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op() instanceof ParametricFunctionInstance pfi
                 && pfi.getBase() == (select)) {
             ProgramVariable heap = (ProgramVariable) children.removeFirst();
@@ -582,7 +599,7 @@ public final class HeapLDT extends LDT {
 
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false;
         return null;
     }

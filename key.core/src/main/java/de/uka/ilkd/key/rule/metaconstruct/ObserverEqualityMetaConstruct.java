@@ -5,9 +5,11 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.Collections;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -24,6 +26,8 @@ import de.uka.ilkd.key.speclang.DependencyContract;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NullMarked;
 
 
 /**
@@ -53,6 +57,7 @@ import org.key_project.util.collection.ImmutableSet;
  * @see SameObserverCondition
  */
 @TransformerMeta(name = "#ObserverEquality")
+@NullMarked
 public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
 
     /**
@@ -100,8 +105,9 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
             throw new IllegalArgumentException("\\sameObserver must be true");
         }
 
-        KeYJavaType kjt = obs1.isStatic() ? obs1.getContainerType()
-                : services.getTypeConverter().getKeYJavaType(termExt.sub(1));
+        KeYJavaType kjt = Objects.requireNonNull(obs1.isStatic() ? obs1.getContainerType()
+                : services.getTypeConverter().getKeYJavaType(termExt.sub(1)),
+            "no KeYJavaType for observer " + obs1);
 
         ImmutableSet<Contract> contracts =
             UseDependencyContractRule.getApplicableContracts(services, kjt, obs1);
@@ -126,12 +132,14 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
 
 
         TermBuilder tb = services.getTermBuilder();
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT");
+        LocationVariable baseHeap = heapLDT.getHeap();
 
         LogicVariable varObj = new LogicVariable(new Name("_ov"),
-            services.getJavaInfo().getJavaLangObject().getSort());
-        LogicVariable varFld = new LogicVariable(new Name("_fv"),
-            services.getTypeConverter().getHeapLDT().getFieldSort());
+            Objects.requireNonNull(services.getJavaInfo().getJavaLangObject().getSort(),
+                "no sort for java.lang.Object"));
+        LogicVariable varFld = new LogicVariable(new Name("_fv"), heapLDT.getFieldSort());
 
         JTerm ov = tb.var(varObj);
         JTerm fv = tb.var(varFld);
@@ -140,8 +148,10 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
         int paramOffset = contract.hasSelfVar() ? 2 : 1;
         ImmutableList<JTerm> params = smaller.subs().toImmutableList().skip(paramOffset);
 
-        JTerm mod = contract.getDep(baseHeap, false, smaller.sub(0), smaller.sub(1), params,
-            Collections.emptyMap(), services);
+        JTerm mod = Objects.requireNonNull(
+            contract.getDep(baseHeap, false, smaller.sub(0), smaller.sub(1), params,
+                Collections.emptyMap(), services),
+            "no dependency term for " + contract);
 
         JTerm result = tb.all(varObj,
             tb.all(varFld,
@@ -177,13 +187,17 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
     private JTerm buildConditionPrecondition(JTerm app, DependencyContract contract,
             Services services) {
 
-        LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT");
+        LocationVariable baseHeap = heapLDT.getHeap();
         // static methods do not a self var ==> one argument less to ignore (#1672)
         int paramOffset = contract.hasSelfVar() ? 2 : 1;
         ImmutableList<JTerm> params = app.subs().toImmutableList().skip(paramOffset);
 
-        return contract.getPre(baseHeap, app.sub(0), app.sub(1), params, Collections.emptyMap(),
-            services);
+        return Objects.requireNonNull(
+            contract.getPre(baseHeap, app.sub(0), app.sub(1), params, Collections.emptyMap(),
+                services),
+            "no precondition for " + contract);
     }
 
     /*
@@ -193,7 +207,8 @@ public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
             Services services) {
 
         LogicVariable var = new LogicVariable(new Name("_ov"),
-            services.getJavaInfo().getJavaLangObject().getSort());
+            Objects.requireNonNull(services.getJavaInfo().getJavaLangObject().getSort(),
+                "no sort for java.lang.Object"));
 
         TermBuilder tb = services.getTermBuilder();
 

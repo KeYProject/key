@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -28,6 +30,7 @@ import de.uka.ilkd.key.java.ast.reference.SuperReference;
 import de.uka.ilkd.key.java.ast.reference.ThisReference;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -45,6 +48,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,17 +67,18 @@ import org.slf4j.LoggerFactory;
  * subclassing, so nothing is lost.
  */
 @TransformerMeta(name = "#methodCall")
+@NullMarked
 public final class MethodCall extends ProgramTransformer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MethodCall.class);
 
-    private final SchemaVariable resultVar;
+    private final @Nullable SchemaVariable resultVar;
 
     protected MethodReference methRef;
     private IProgramMethod pm;
-    protected ReferencePrefix newContext;
+    protected @Nullable ReferencePrefix newContext;
     protected ProgramVariable pvar;
-    private final IExecutionContext execContextSV;
-    private ExecutionContext execContext;
+    private final @Nullable IExecutionContext execContextSV;
+    private @Nullable ExecutionContext execContext;
     protected ImmutableArray<Expression> arguments;
     protected KeYJavaType staticPrefixType;
 
@@ -108,7 +114,8 @@ public final class MethodCall extends ProgramTransformer {
      * @param result the SchemaVariable that is used to keep the result
      * @param body the ProgramElement contained by the meta construct
      */
-    public MethodCall(ProgramSV ec, SchemaVariable result, ProgramElement body) {
+    public MethodCall(@Nullable ProgramSV ec, @Nullable SchemaVariable result,
+            ProgramElement body) {
         this(new Name("#methodCall"), ec, result, body);
         if (ec != null && ec.sort() != ProgramSVSort.EXECUTIONCONTEXT) {
             throw new IllegalArgumentException("The execution context of #methodCall must be "
@@ -128,7 +135,12 @@ public final class MethodCall extends ProgramTransformer {
      * @param name Method name.
      * @param ec The Schema Variable.
      */
-    protected MethodCall(Name name, ProgramSV ec, SchemaVariable result, ProgramElement body) {
+    // The scratch fields below (methRef, pm, newContext, pvar, execContext, arguments,
+    // staticPrefixType) are filled by transformImpl before they are read; the fresh per-call
+    // copy (see transform) is never exposed before that.
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
+    protected MethodCall(Name name, @Nullable ProgramSV ec, @Nullable SchemaVariable result,
+            ProgramElement body) {
         super(name, body);
         this.resultVar = result;
         this.execContextSV = ec;
@@ -157,12 +169,18 @@ public final class MethodCall extends ProgramTransformer {
         return result;
     }
 
-    private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix, Services services) {
+    private KeYJavaType getStaticPrefixType(@Nullable ReferencePrefix refPrefix,
+            Services services) {
         if (refPrefix == null
                 || refPrefix instanceof ThisReference && refPrefix.getReferencePrefix() == null) {
-            return execContext.getTypeReference().getKeYJavaType();
+            return Objects.requireNonNull(Objects.requireNonNull(execContext,
+                "no execution context").getTypeReference().getKeYJavaType(),
+                "no KeYJavaType for the context class");
         } else if (refPrefix instanceof ThisReference) {
-            return ((TypeReference) refPrefix.getReferencePrefix()).getKeYJavaType();
+            ReferencePrefix nestedPrefix = Objects.requireNonNull(refPrefix.getReferencePrefix(),
+                "no reference prefix in " + refPrefix);
+            return Objects.requireNonNull(((TypeReference) nestedPrefix).getKeYJavaType(),
+                "no KeYJavaType for " + nestedPrefix);
             // ((ProgramVariable)
             // services.getTypeConverter().convertToLogicElement(refPrefix).op()).getKeYJavaType();
         } else if (refPrefix instanceof TypeRef) {
@@ -172,13 +190,19 @@ public final class MethodCall extends ProgramTransformer {
             }
             return t;
         } else if (refPrefix instanceof ProgramVariable) {
-            return ((ProgramVariable) refPrefix).getKeYJavaType();
+            return Objects.requireNonNull(((ProgramVariable) refPrefix).getKeYJavaType(),
+                "no KeYJavaType for " + refPrefix);
         } else if (refPrefix instanceof FieldReference) {
-            return ((FieldReference) refPrefix).getProgramVariable().getKeYJavaType();
+            return Objects.requireNonNull(
+                ((FieldReference) refPrefix).getProgramVariable().getKeYJavaType(),
+                "no KeYJavaType for " + refPrefix);
         } else if (refPrefix instanceof SuperReference) {
-            KeYJavaType st = services.getJavaInfo()
-                    .getSuperclass(execContext.getTypeReference().getKeYJavaType());
-            return st;
+            ExecutionContext context = Objects.requireNonNull(execContext, "no execution context");
+            KeYJavaType contextType = Objects.requireNonNull(
+                context.getTypeReference().getKeYJavaType(),
+                "no KeYJavaType for the context class");
+            return Objects.requireNonNull(services.getJavaInfo().getSuperclass(contextType),
+                "no superclass for " + contextType);
         } else {
             throw new IllegalArgumentException(
                 "Unsupported method invocation mode\n" + refPrefix.getClass());
@@ -206,19 +230,47 @@ public final class MethodCall extends ProgramTransformer {
                     mr.getMethodSignature(services, execContext), prefixType);
             }
         } else {
-            result = mr.method(services, prefixType, mr.getMethodSignature(services, execContext),
+            result = mr.method(services, prefixType, methodSignatureWithoutContext(mr, services),
                 prefixType);
         }
-        return result;
+        return Objects.requireNonNull(result, "no implementation of " + mr);
     }
 
     private IProgramMethod getSuperMethod(ExecutionContext ex, MethodReference mr,
             Services services) {
-        return mr.method(services, getSuperType(ex, services), ex);
+        return Objects.requireNonNull(mr.method(services, getSuperType(ex, services), ex),
+            "no super method implementation of " + mr);
     }
 
     private KeYJavaType getSuperType(ExecutionContext ex, Services services) {
-        return services.getJavaInfo().getSuperclass(ex.getTypeReference().getKeYJavaType());
+        KeYJavaType contextType = Objects.requireNonNull(
+            ex.getTypeReference().getKeYJavaType(), "no KeYJavaType for the context class");
+        return Objects.requireNonNull(services.getJavaInfo().getSuperclass(contextType),
+            "no superclass for " + contextType);
+    }
+
+    /**
+     * Computes a method signature without an active statement context. A {@code null} context is
+     * legitimate (e.g. for invocations outside a method body); the read-only
+     * {@link MethodReference} declares the parameter @NonNull although it delegates to the
+     * context-tolerant type converter.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    private ImmutableList<KeYJavaType> methodSignatureWithoutContext(MethodReference mr,
+            Services services) {
+        return mr.getMethodSignature(services, null);
+    }
+
+    /**
+     * Builds a method-body statement, tolerating a {@code null} receiver for static invocations.
+     * {@link MethodBodyStatement} then substitutes the method's container type as context. The
+     * read-only factory declares the receiver @NonNull although a static method has no receiver.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    private MethodBodyStatement createMethodBody(ProgramVariable result,
+            @Nullable ReferencePrefix context, IProgramMethod method,
+            ImmutableArray<Expression> args) {
+        return KeYJavaASTFactory.methodBody(result, context, method, args);
     }
 
     /**
@@ -246,47 +298,53 @@ public final class MethodCall extends ProgramTransformer {
             SVInstantiations svInst) {
         LOGGER.trace("#methodCall: called for {}", pe);
         if (resultVar != null) {
-            pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
+            pvar = (ProgramVariable) Objects.requireNonNull(svInst.getInstantiation(resultVar),
+                "no instantiation of " + resultVar);
         }
 
-        execContext =
-            execContextSV == null ? svInst.getContextInstantiation().activeStatementContext()
-                    : (ExecutionContext) svInst.getInstantiation((SchemaVariable) execContextSV);
+        execContext = execContextSV == null
+                ? Objects.requireNonNull(svInst.getContextInstantiation(),
+                    "no context instantiation").activeStatementContext()
+                : (ExecutionContext) svInst.getInstantiation((SchemaVariable) execContextSV);
         methRef = (MethodReference) pe;
 
         ReferencePrefix refPrefix = methRef.getReferencePrefix();
         if (refPrefix == null) {
-            if (execContext.getRuntimeInstance() == null) {
-                refPrefix = execContext.getTypeReference();
+            ExecutionContext currentContext =
+                Objects.requireNonNull(execContext, "no execution context");
+            if (currentContext.getRuntimeInstance() == null) {
+                refPrefix = currentContext.getTypeReference();
             } else {
-                refPrefix = execContext.getRuntimeInstance();
+                refPrefix = currentContext.getRuntimeInstance();
             }
         }
 
         staticPrefixType = getStaticPrefixType(methRef.getReferencePrefix(), services);
-        pm = execContext == null
+        pm = Objects.requireNonNull(execContext == null
                 ? methRef.method(services, staticPrefixType,
-                    methRef.getMethodSignature(services, null), staticPrefixType)
-                : methRef.method(services, staticPrefixType, execContext);
-        if (pm == null) {
-            Debug.fail("methodcall:No implementation available for ", methRef);
-        }
+                    methodSignatureWithoutContext(methRef, services), staticPrefixType)
+                : methRef.method(services, staticPrefixType, execContext),
+            "methodcall:No implementation available for " + methRef);
 
         newContext = methRef.getReferencePrefix();
         if (newContext == null) {
-            JTerm self =
-                services.getTypeConverter().findThisForSort(pm.getContainerType().getSort(),
-                    execContext);
+            JTerm self = services.getTypeConverter().findThisForSort(Objects.requireNonNull(
+                Objects.requireNonNull(pm.getContainerType(), "no container type for " + pm)
+                        .getSort(),
+                "no sort for the container type"), execContext);
             if (self != null) {
-                newContext =
-                    (ReferencePrefix) services.getTypeConverter().convertToProgramElement(self);
+                newContext = (ReferencePrefix) services.getTypeConverter()
+                        .convertToProgramElement(self);
             }
-        } else if (newContext instanceof ThisReference) {
+        } else if (newContext instanceof ThisReference thisRef) {
             newContext = (ReferencePrefix) services.getTypeConverter().convertToProgramElement(
-                services.getTypeConverter().convertToLogicElement(newContext, execContext));
+                services.getTypeConverter().convertToLogicElement(thisRef, execContext));
         } else if (newContext instanceof FieldReference fieldContext) {
             if (fieldContext.referencesOwnInstanceField()) {
-                newContext = fieldContext.setReferencePrefix(execContext.getRuntimeInstance());
+                newContext = fieldContext.setReferencePrefix(Objects.requireNonNull(
+                    Objects.requireNonNull(execContext, "no execution context")
+                            .getRuntimeInstance(),
+                    "no runtime instance in execution context"));
             }
         }
 
@@ -300,7 +358,7 @@ public final class MethodCall extends ProgramTransformer {
         } else if (refPrefix instanceof SuperReference) {
             result = handleSuperReference(services);
         } else { // Instance invocation mode
-            result = handleInstanceInvocation(services, result);
+            result = handleInstanceInvocation(services);
         }
         return new ProgramElement[] {
             KeYJavaASTFactory.insertStatementInBlock(paramDecl, KeYJavaASTFactory.block(result)) };
@@ -311,7 +369,7 @@ public final class MethodCall extends ProgramTransformer {
         LOGGER.trace("#methodCall: invocation of static method detected");
         newContext = null;
         IProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);
-        result = KeYJavaASTFactory.methodBody(pvar, newContext, staticMethod, arguments);
+        result = createMethodBody(pvar, newContext, staticMethod, arguments);
         return result;
     }
 
@@ -319,14 +377,19 @@ public final class MethodCall extends ProgramTransformer {
         Statement result;
         LOGGER.trace(
             "#methodCall: super invocation of method detected." + "Requires static resolving.");
-        IProgramMethod superMethod = getSuperMethod(execContext, methRef, services);
-        result = KeYJavaASTFactory.methodBody(pvar, execContext.getRuntimeInstance(), superMethod,
-            arguments);
+        ExecutionContext ex = Objects.requireNonNull(execContext, "no execution context");
+        IProgramMethod superMethod = getSuperMethod(ex, methRef, services);
+        result = KeYJavaASTFactory.methodBody(pvar,
+            Objects.requireNonNull(ex.getRuntimeInstance(),
+                "no runtime instance in execution context"),
+            superMethod, arguments);
         return result;
     }
 
-    private Statement handleInstanceInvocation(Services services, Statement result) {
-        if (pm.isPrivate() || (methRef.implicit() && methRef.getName()
+    private Statement handleInstanceInvocation(Services services) {
+        Statement result = null;
+        if (pm.isPrivate() || (methRef.implicit() && Objects.requireNonNull(methRef.getName(),
+            "no method name in " + methRef)
                 .equals(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             // private methods or constructor invocations are bound
             // statically
@@ -338,10 +401,13 @@ public final class MethodCall extends ProgramTransformer {
                 + "Requires dynamic resolving.");
             ImmutableList<KeYJavaType> imps =
                 services.getJavaInfo().getKeYProgModelInfo().findImplementations(staticPrefixType,
-                    methRef.getName(), getTypes(arguments, services));
+                    Objects.requireNonNull(methRef.getName(), "no method name in " + methRef),
+                    getTypes(arguments, services));
             if (imps.isEmpty()) {
                 imps = services.getJavaInfo().getKeYProgModelInfo().findImplementations(
-                    pm.getContainerType(), methRef.getName(), getTypes(arguments, services));
+                    Objects.requireNonNull(pm.getContainerType(), "no container type for " + pm),
+                    Objects.requireNonNull(methRef.getName(), "no method name in " + methRef),
+                    getTypes(arguments, services));
             }
             if (imps.isEmpty()) {
                 Type staticPrefix = staticPrefixType.getJavaType();
@@ -356,7 +422,7 @@ public final class MethodCall extends ProgramTransformer {
                 result = makeIfCascade(imps, services);
             }
         }
-        return result;
+        return Objects.requireNonNull(result, "no implementation to dispatch to for " + methRef);
     }
 
     // ***************** Dynamic Binding Construction Utilities ***************
@@ -369,12 +435,13 @@ public final class MethodCall extends ProgramTransformer {
         // bugfix for #1226 (first bugfix was in expand, but moved here and
         // modified it to avoid incompleteness issues)
         if (!meth.isStatic()) {
-
-            final Expression newContextAsExp = (Expression) newContext;
-            ReferencePrefix localContext = newContext;
+            ReferencePrefix localContext = Objects.requireNonNull(newContext,
+                "no invocation target for " + meth);
+            final Expression newContextAsExp = (Expression) localContext;
 
             LocalVariableDeclaration castedThisVar = null;
-            final KeYJavaType targetType = meth.getContainerType();
+            final KeYJavaType targetType = Objects.requireNonNull(meth.getContainerType(),
+                "no container type for " + meth);
             if (newContextAsExp.getKeYJavaType(services, execContext) != targetType) {
                 castedThisVar = KeYJavaASTFactory.declare(
                     new ProgramElementName(services.getTermBuilder().newName("target")),
@@ -390,15 +457,16 @@ public final class MethodCall extends ProgramTransformer {
             }
 
         } else {
-            result = KeYJavaASTFactory.methodBody(pvar, newContext, meth, arguments);
+            result = createMethodBody(pvar, newContext, meth, arguments);
         }
         return result;
 
     }
 
     private Expression makeIOf(Type t) {
-        Debug.assertTrue(newContext != null);
-        return KeYJavaASTFactory.instanceOf((Expression) newContext, (KeYJavaType) t);
+        return KeYJavaASTFactory.instanceOf(
+            (Expression) Objects.requireNonNull(newContext, "no receiver for the dispatch test"),
+            (KeYJavaType) t);
     }
 
     /**
@@ -420,7 +488,8 @@ public final class MethodCall extends ProgramTransformer {
 
     private VariableSpecification[] createParamSpecs(Services services) {
 
-        MethodDeclaration methDecl = pm.getMethodDeclaration();
+        MethodDeclaration methDecl =
+            Objects.requireNonNull(pm.getMethodDeclaration(), "no method declaration for " + pm);
         int params = methDecl.getParameterDeclarationCount();
         VariableSpecification[] varSpecs = new VariableSpecification[params];
         for (int i = 0; i < params; i++) {
@@ -431,7 +500,8 @@ public final class MethodCall extends ProgramTransformer {
 
             final IProgramVariable paramVar = KeYJavaASTFactory.localVariable(services,
                 originalParamVar.getProgramElementName().toString(),
-                originalParamVar.getTypeReference());
+                Objects.requireNonNull(originalParamVar.getTypeReference(),
+                    "no type reference for " + originalParamVar));
 
             // this condition checks whether this is the last formal parameter
             // and is used
@@ -486,7 +556,8 @@ public final class MethodCall extends ProgramTransformer {
      */
     private Expression makeVariableArgument(VariableSpecification originalSpec) {
 
-        int params = pm.getMethodDeclaration().getParameterDeclarationCount();
+        int params = Objects.requireNonNull(pm.getMethodDeclaration(),
+            "no method declaration for " + pm).getParameterDeclarationCount();
         int args = methRef.getArguments().size();
         Expression[] exps = new Expression[args - params + 1];
 
@@ -499,7 +570,8 @@ public final class MethodCall extends ProgramTransformer {
         // for some reason this does not work, but type itself is a KJT ???
         // KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(type);
         KeYJavaType kjt = (KeYJavaType) type;
-        ArrayType arrayTy = (ArrayType) kjt.getJavaType();
+        ArrayType arrayTy =
+            (ArrayType) Objects.requireNonNull(kjt.getJavaType(), "no array type for " + kjt);
 
         TypeReference baseTyRef = arrayTy.getBaseType();
 
@@ -510,12 +582,15 @@ public final class MethodCall extends ProgramTransformer {
     }
 
     private Statement[] createParamAssignments(VariableSpecification[] specs) {
-        MethodDeclaration methDecl = pm.getMethodDeclaration();
+        MethodDeclaration methDecl =
+            Objects.requireNonNull(pm.getMethodDeclaration(), "no method declaration for " + pm);
         Statement[] paramDecl = new Statement[specs.length];
         for (int i = 0; i < specs.length; i++) {
             ParameterDeclaration parDecl = methDecl.getParameterDeclarationAt(i);
             paramDecl[i] = KeYJavaASTFactory.declare(parDecl.getModifiers(),
-                parDecl.getTypeReference(), specs[i]);
+                Objects.requireNonNull(parDecl.getTypeReference(),
+                    "no type reference for " + parDecl),
+                specs[i]);
         }
         return paramDecl;
     }
@@ -543,8 +618,11 @@ public final class MethodCall extends ProgramTransformer {
      * @return true iff exp is assign compatible with type
      */
     private boolean assignmentCompatible(Expression exp, Type type, Services services) {
-        Sort expSort = exp.getKeYJavaType(services, execContext).getSort();
-        Sort typeSort = ((KeYJavaType) type).getSort();
+        KeYJavaType expKjt = Objects.requireNonNull(exp.getKeYJavaType(services, execContext),
+            "no KeYJavaType for " + exp);
+        Sort expSort = Objects.requireNonNull(expKjt.getSort(), "no sort for " + expKjt);
+        Sort typeSort =
+            Objects.requireNonNull(((KeYJavaType) type).getSort(), "no sort for " + type);
         /* was: services.getJavaInfo().getKeYJavaType(type); */
         return expSort.extendsTrans(typeSort);
     }

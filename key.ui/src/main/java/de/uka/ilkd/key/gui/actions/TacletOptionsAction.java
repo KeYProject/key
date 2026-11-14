@@ -12,9 +12,12 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 // This class is not used anymore as taclet options should be set through the general settings
 // dialog
 @Deprecated
+@NullMarked
 public class TacletOptionsAction extends MainWindowAction {
 
     /**
@@ -22,6 +25,14 @@ public class TacletOptionsAction extends MainWindowAction {
      */
     private static final long serialVersionUID = -6813540362001480606L;
 
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public TacletOptionsAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Show Taclet Options");

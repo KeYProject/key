@@ -15,6 +15,8 @@ import de.uka.ilkd.key.proof.init.FunctionalBlockContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is only used to generate a proof obligation for a block (see
  * {@link FunctionalBlockContractPO}.
@@ -23,6 +25,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
  *
  * @author lanzinger
  */
+@NullMarked
 public class FunctionalBlockContract extends FunctionalAuxiliaryContract<BlockContract> {
 
     /**

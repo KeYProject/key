@@ -115,8 +115,7 @@ public final class SemanticsBlastingMacro extends AbstractBlastingMacro {
     }
 
     @Override
-    @Nullable
-    public String getCategory() {
+    public @Nullable String getCategory() {
         return null;
     }
 

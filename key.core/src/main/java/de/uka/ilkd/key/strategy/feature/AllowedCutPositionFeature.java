@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
@@ -16,12 +18,14 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
  * Feature that returns zero iff the application focus of a rule is a potential cut position (taclet
  * cut_direct). For positions that are below quantifiers, the feature generally returns zero.
  */
+@NullMarked
 public class AllowedCutPositionFeature extends BinaryFeature {
 
     public static final Feature INSTANCE = new AllowedCutPositionFeature();
@@ -41,7 +45,7 @@ public class AllowedCutPositionFeature extends BinaryFeature {
 
         while (it.next() != -1) {
             final int child = it.getChild();
-            final var op = it.getSubTerm().op();
+            final var op = Objects.requireNonNull(it.getSubTerm()).op();
 
             if (op == Junctor.NOT) {
                 negated = !negated;

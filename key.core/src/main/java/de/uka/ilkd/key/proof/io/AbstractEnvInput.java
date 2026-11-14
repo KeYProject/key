@@ -9,12 +9,14 @@ import java.util.List;
 
 import de.uka.ilkd.key.proof.init.*;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
 /**
  * A simple EnvInput which includes default rules and a Java path.
  */
+@NullMarked
 public abstract class AbstractEnvInput implements EnvInput {
 
     protected final String name;
@@ -26,18 +28,23 @@ public abstract class AbstractEnvInput implements EnvInput {
 
     protected InitConfig initConfig;
     private boolean ignoreOtherJavaFiles;
-    private Path javaFile;
+    private @Nullable Path javaFile;
 
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
+    /**
+     * The {@link InitConfig} is bound later by the loader via {@link #setInitConfig(InitConfig)}
+     * once the environment is built; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     protected AbstractEnvInput(String name, @Nullable Path javaPath,
             List<Path> classPath,
             @Nullable Path bootClassPath,
             @Nullable Profile profile,
-            List<Path> includes) {
+            @Nullable List<Path> includes) {
         this.name = name;
         this.javaPath = javaPath;
         this.classPath = classPath;
@@ -86,7 +93,7 @@ public abstract class AbstractEnvInput implements EnvInput {
 
 
     @Override
-    public final Path readJavaPath() throws ProofInputException {
+    public final @Nullable Path readJavaPath() throws ProofInputException {
         return javaPath;
     }
 
@@ -98,13 +105,17 @@ public abstract class AbstractEnvInput implements EnvInput {
 
 
     @Override
-    public Path readBootClassPath() {
+    public @Nullable Path readBootClassPath() {
         return bootClassPath;
     }
 
     @Override
     public Profile getProfile() {
-        return profile;
+        Profile result = profile;
+        if (result == null) {
+            throw new IllegalStateException("The input provides no profile");
+        }
+        return result;
     }
 
     public void setIgnoreOtherJavaFiles(boolean ignoreOtherJavaFiles) {
@@ -117,7 +128,7 @@ public abstract class AbstractEnvInput implements EnvInput {
     }
 
     @Override
-    public Path getJavaFile() {
+    public @Nullable Path getJavaFile() {
         return javaFile;
     }
 

@@ -1,0 +1,28 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2,
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+
+package java.util;
+
+import java.util.function.Supplier;
+
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * Re-specification of {@link java.util.Objects#requireNonNull(Object)} for the nullness checker.
+ * The JDK declares the parameter as non-null, which turns the deliberate fail-fast guards used
+ * throughout KeY into spurious errors. A {@code requireNonNull} call on a maybe-null value is an
+ * accepted idiom in this code base: the argument is expected to be non-null in the correct state,
+ * and a null value should abort with {@link NullPointerException} exactly there. The return value
+ * stays non-null, so the checker still refines the expression handed to it.
+ */
+class Objects {
+
+    public static <T> @NonNull T requireNonNull(@Nullable T obj);
+
+    public static <T> @NonNull T requireNonNull(@Nullable T obj, String message);
+
+    public static <T> @NonNull T requireNonNull(@Nullable T obj, Supplier<String> messageSupplier);
+}

@@ -13,6 +13,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import org.jspecify.annotations.NullMarked;
 
 import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 
@@ -48,6 +49,7 @@ import static com.github.javaparser.ast.Modifier.DefaultKeyword.*;
 /// @author mulbrich, drodt
 /// @since 2006-11-18
 /// @version 2026-03-03
+@NullMarked
 public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
     /// name of the static variable of the array holding the names of the constants.
     private static final String ENUM_NAMES = "$enumConstantNames";
@@ -61,6 +63,13 @@ public class EnumClassDeclaration extends ClassOrInterfaceDeclaration {
         enumConstants = new NodeList<>();
     }
 
+    /**
+     * The member-copying setters and helper calls operate on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here because they only
+     * stage the cloned {@link EnumDeclaration} contents into mutable {@link NodeList} fields of
+     * the javaparser super type, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public EnumClassDeclaration(EnumDeclaration ed) {
         this();
 

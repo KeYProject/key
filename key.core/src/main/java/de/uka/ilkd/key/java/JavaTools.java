@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.java;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.Statement;
@@ -20,6 +22,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -28,6 +31,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author bruns
  */
+@NullMarked
 public final class JavaTools {
 
     /**
@@ -80,7 +84,8 @@ public final class JavaTools {
                 stack.push(new ExtList());
                 walk(root());
                 ExtList el = stack.peek();
-                return el.get(ProgramElement.class);
+                return Objects.requireNonNull(el.get(ProgramElement.class),
+                    "no reconstructed element after walking the block");
             }
 
             @Override
@@ -106,9 +111,10 @@ public final class JavaTools {
     /**
      * Returns the innermost method frame of the passed java block
      */
-    public static MethodFrame getInnermostMethodFrame(ProgramElement pe, Services services) {
+    public static @Nullable MethodFrame getInnermostMethodFrame(ProgramElement pe,
+            Services services) {
         final MethodFrame result = new JavaASTVisitor(pe, services) {
-            private MethodFrame res;
+            private @Nullable MethodFrame res;
 
             protected void doDefaultAction(SourceElement node) {
                 if (node instanceof MethodFrame && res == null) {
@@ -116,7 +122,7 @@ public final class JavaTools {
                 }
             }
 
-            public MethodFrame run() {
+            public @Nullable MethodFrame run() {
                 walk(pe);
                 return res;
             }
@@ -128,11 +134,12 @@ public final class JavaTools {
     /**
      * Returns the innermost method frame of the passed java block
      */
-    public static MethodFrame getInnermostMethodFrame(JavaBlock jb, Services services) {
+    public static @Nullable MethodFrame getInnermostMethodFrame(JavaBlock jb, Services services) {
         return getInnermostMethodFrame(jb.program(), services);
     }
 
-    public static ExecutionContext getInnermostExecutionContext(JavaBlock jb, Services services) {
+    public static @Nullable ExecutionContext getInnermostExecutionContext(JavaBlock jb,
+            Services services) {
         final MethodFrame frame = getInnermostMethodFrame(jb, services);
         return frame == null ? null : (ExecutionContext) frame.getExecutionContext();
     }

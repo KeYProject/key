@@ -19,6 +19,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import org.key_project.isabelletranslation.gui.IsabelleProgressModel.ProcessColumn.ProcessData;
 import org.key_project.util.java.SwingUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Adapted version of {@link de.uka.ilkd.key.gui.smt.ProgressDialog} used for SMT.
  */
+@NullMarked
 public class IsabelleProgressDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(IsabelleProgressDialog.class);
 
@@ -38,19 +41,19 @@ public class IsabelleProgressDialog extends JDialog {
      * Button to apply the results of running the Isabelle solvers.
      * May close some open goals if the solvers found proofs.
      */
-    private JButton applyButton;
+    private @Nullable JButton applyButton;
     /**
      * Button to stop the launched Isabelle solvers.
      */
-    private JButton stopButton;
+    private @Nullable JButton stopButton;
     /**
      * Scroll pane listing the open goals and the results of running each Isabelle solver on them.
      */
-    private JScrollPane scrollPane;
+    private @Nullable JScrollPane scrollPane;
     /**
      * Overall progress of the Isabelle solvers (# goals processed / total goals).
      */
-    private JProgressBar progressBar;
+    private @Nullable JProgressBar progressBar;
     private final IsabelleProgressDialogListener listener;
 
     /**
@@ -93,6 +96,13 @@ public class IsabelleProgressDialog extends JDialog {
      * @param progressBarMax the total number of goals
      * @param titles titles of the solver types
      */
+    /**
+     * The dialog-widget calls below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the widgets are created by
+     * the lazy getters before first use and no subclass state is involved, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public IsabelleProgressDialog(IsabelleProgressModel model,
             IsabelleProgressDialogListener listener,
             boolean counterexample, int resolution, int progressBarMax,
@@ -224,15 +234,19 @@ public class IsabelleProgressDialog extends JDialog {
      */
     public void setModus(Modus m) {
         modus = m;
+        JButton stop = stopButton;
+        if (stop == null) {
+            throw new NullPointerException("Stop button was not created.");
+        }
         switch (modus) {
             case SOLVERS_DONE -> {
-                stopButton.setText("Discard");
+                stop.setText("Discard");
                 if (applyButton != null) {
                     applyButton.setEnabled(true);
                 }
             }
             case SOLVERS_RUNNING -> {
-                stopButton.setText("Stop");
+                stop.setText("Stop");
                 if (applyButton != null) {
                     applyButton.setEnabled(false);
                 }
@@ -245,6 +259,7 @@ public class IsabelleProgressDialog extends JDialog {
 /**
  * The table displaying the progress of solver instances
  */
+@NullMarked
 class ProgressTable extends JTable {
     private static final int NUMBER_OF_VISIBLE_ROWS = 8;
 
@@ -260,39 +275,56 @@ class ProgressTable extends JTable {
      * Panel displaying the total progress of all solver instances "x/y instances completed"
      */
     public static class ProgressPanel extends JPanel {
-        private JProgressBar progressBar;
-        private JButton infoButton;
+        private @Nullable JProgressBar progressBar;
+        private @Nullable JButton infoButton;
 
         private JProgressBar getProgressBar() {
             if (progressBar == null) {
-                progressBar = new JProgressBar();
-                int height = getInfoButton().getMaximumSize().height;
-                progressBar.setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
-                progressBar.setString("Test");
-                progressBar.setStringPainted(true);
-                progressBar.setFont(this.getFont());
+                JProgressBar bar = new JProgressBar();
+                progressBar = bar;
+                JButton info = getInfoButton();
+                int height = info.getMaximumSize().height;
+                bar.setMaximumSize(new Dimension(Integer.MAX_VALUE, height));
+                bar.setString("Test");
+                bar.setStringPainted(true);
+                bar.setFont(getFont());
+                return bar;
             }
             return progressBar;
         }
 
         private JButton getInfoButton() {
             if (infoButton == null) {
-                infoButton = new JButton("Info");
-                infoButton.setFont(this.getFont());
+                JButton button = new JButton("Info");
+                infoButton = button;
+                button.setFont(this.getFont());
 
                 Dimension dim = new Dimension();
-                infoButton.setMargin(new Insets(0, 0, 0, 0));
+                button.setMargin(new Insets(0, 0, 0, 0));
 
-                dim.height = this.getFontMetrics(this.getFont()).getHeight() + 2;
+                Font font = this.getFont();
+                if (font == null) {
+                    throw new NullPointerException("No font set on the progress panel.");
+                }
+                dim.height = this.getFontMetrics(font).getHeight() + 2;
                 dim.width = dim.height * 3;
 
-                infoButton.setMinimumSize(dim);
-                infoButton.setPreferredSize(dim);
-                infoButton.setMaximumSize(dim);
+                button.setMinimumSize(dim);
+                button.setPreferredSize(dim);
+                button.setMaximumSize(dim);
+                return button;
             }
             return infoButton;
         }
 
+        /**
+         * The {@code this}-based calls below (layout and lazy widget getters) operate on the
+         * receiver while it is still under initialization (EISOP initialization check); safe here
+         * since the widgets are created by the lazy getters before first use, suppressed with a
+         * scoped key.
+         */
+        @SuppressWarnings({ "nullness:method.invocation.invalid",
+            "nullness:argument.type.incompatible" })
         ProgressPanel() {
             this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             this.add(Box.createVerticalStrut(2));
@@ -313,18 +345,20 @@ class ProgressTable extends JTable {
             getProgressBar().setValue(value);
         }
 
-        public void setText(String text) {
-            getProgressBar().setString(text);
-            getProgressBar().setStringPainted(text != null && !text.isEmpty());
+        public void setText(@Nullable String text) {
+            JProgressBar bar = getProgressBar();
+            bar.setString(text == null ? "" : text);
+            bar.setStringPainted(text != null && !text.isEmpty());
         }
     }
 
 
     private final ProgressPanel progressPanelRenderer = new ProgressPanel();
-    private ProgressPanel progressPanelEditor;
+    private @Nullable ProgressPanel progressPanelEditor;
 
 
     private class ProgressCellEditor extends AbstractCellEditor implements TableCellEditor {
+        private @Nullable Object currentValue;
 
         @Override
         public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected,
@@ -332,6 +366,7 @@ class ProgressTable extends JTable {
             currentEditorCell.x = column;
             currentEditorCell.y = row;
             ProcessData data = (ProcessData) value;
+            currentValue = value;
             prepareProgressPanel(getProgressPanelEditor(), data);
             return getProgressPanelEditor();
         }
@@ -339,19 +374,25 @@ class ProgressTable extends JTable {
 
         @Override
         public Object getCellEditorValue() {
-            return null;
+            Object value = currentValue;
+            if (value == null) {
+                throw new NullPointerException("Cell editor value was never initialized.");
+            }
+            return value;
         }
 
     }
 
 
     private void prepareProgressPanel(ProgressPanel panel, final ProcessData data) {
+        JProgressBar progressBar = panel.getProgressBar();
+        JButton infoButton = panel.getInfoButton();
         panel.setValue(data.getProgress());
         panel.setText(data.getText());
-        panel.infoButton.setEnabled(data.isEditable());
-        panel.progressBar.setBackground(data.getBackgroundColor());
-        panel.progressBar.setForeground(data.getForegroundColor());
-        panel.progressBar.setUI(new BasicProgressBarUI() {
+        infoButton.setEnabled(data.isEditable());
+        progressBar.setBackground(data.getBackgroundColor());
+        progressBar.setForeground(data.getForegroundColor());
+        progressBar.setUI(new BasicProgressBarUI() {
 
 
             @Override
@@ -370,6 +411,14 @@ class ProgressTable extends JTable {
     private final Point currentEditorCell = new Point();
 
 
+    /**
+     * The table-setup calls and the {@code prepareProgressPanel} invocation from the renderer
+     * closure operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the {@link ProgressPanel} fields are assigned
+     * before any of their methods are invoked, and the font defaults are overridden by the
+     * guarded lookup below, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ProgressTable(int resolution, ProgressTableListener listener) {
         TableCellRenderer renderer = (table, value, isSelected, hasFocus, row, column) -> {
             ProcessData data = (ProcessData) value;
@@ -379,15 +428,19 @@ class ProgressTable extends JTable {
         this.setDefaultRenderer(IsabelleProgressModel.ProcessColumn.class, renderer);
         TableCellEditor editor = new ProgressCellEditor();
         this.setDefaultEditor(IsabelleProgressModel.ProcessColumn.class, editor);
-        init(getProgressPanelEditor(), this.getFont(), resolution, listener);
-        init(progressPanelRenderer, this.getFont(), resolution, listener);
+        Font font = this.getFont();
+        if (font == null) {
+            throw new NullPointerException("No font set on the progress table.");
+        }
+        init(getProgressPanelEditor(), font, resolution, listener);
+        init(progressPanelRenderer, font, resolution, listener);
     }
 
     private void init(ProgressPanel panel, Font font, int resolution,
             final ProgressTableListener listener) {
         panel.setFont(font);
-        panel.progressBar.setMaximum(resolution);
-        panel.infoButton.addActionListener(
+        panel.getProgressBar().setMaximum(resolution);
+        panel.getInfoButton().addActionListener(
             e -> listener.infoButtonClicked(currentEditorCell.x - 1, currentEditorCell.y));
     }
 

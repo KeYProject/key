@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
@@ -21,12 +23,17 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
  * ensures that the given instantiation for the schemavariable denotes a static method. For
  * determining the method the callee and the arguments of the method are needed as arguments.
  */
+@NullMarked
 public final class StaticMethodCondition extends VariableConditionAdapter {
 
     private final boolean negation;
@@ -59,7 +66,8 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
 
     @SuppressWarnings("unchecked")
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement subst,
+            SVInstantiations svInst,
             Services services) {
 
         ReferencePrefix rp = (ReferencePrefix) svInst.getInstantiation(caller);
@@ -68,12 +76,16 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
             (ImmutableArray<ProgramElement>) svInst.getInstantiation(args);
 
         if (rp != null && mn != null && ape != null) {
-            ImmutableArray<Expression> ar =
-                toExpArray((ImmutableArray<ProgramElement>) svInst.getInstantiation(args));
+            ImmutableArray<Expression> ar = toExpArray(Objects.requireNonNull(
+                (ImmutableArray<ProgramElement>) svInst.getInstantiation(args),
+                "no instantiation of " + args));
             if (var == args) {
-                ar = toExpArray((ImmutableArray<? extends ProgramElement>) subst);
+                ar = toExpArray(Objects.requireNonNull(
+                    (ImmutableArray<? extends ProgramElement>) subst,
+                    "no instantiation of " + args));
             }
-            ExecutionContext ec = svInst.getContextInstantiation().activeStatementContext();
+            ExecutionContext ec = Objects.requireNonNull(svInst.getContextInstantiation(),
+                "no context instantiation").activeStatementContext();
             MethodReference mr = new MethodReference(ar, mn, rp);
             IProgramMethod method = null;
             KeYJavaType prefixType =
@@ -86,8 +98,11 @@ public final class StaticMethodCondition extends VariableConditionAdapter {
                 // we are only interested in the signature. The method
                 // must be declared in the static context.
             } else { // no execution context
-                method = mr.method(services, prefixType, mr.getMethodSignature(services, ec),
-                    prefixType);
+                // MethodReference#getMethodSignature tolerates a null execution context (used for
+                // the argument types); the parameter is still declared @NonNull there.
+                @SuppressWarnings("NullAway")
+                ImmutableList<KeYJavaType> signature = mr.getMethodSignature(services, ec);
+                method = mr.method(services, prefixType, signature, prefixType);
             }
             if (method == null) {
                 return false;

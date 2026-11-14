@@ -32,6 +32,9 @@ public abstract class AbstractSideProofCounterExampleGenerator
             new Choice("ban", "runtimeExceptions"));
         ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, proofName);
         Proof proof = starter.getProof();
+        if (proof == null) {
+            throw new NullPointerException("Side proof was not created.");
+        }
         OneStepSimplifier.refreshOSS(proof);
         return proof;
     }

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@code Styler} is a part of a strategy to implement a flexible mechanism for the representation
@@ -15,6 +16,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (20.05.19)
  */
+@NullMarked
 public interface Styler<T> {
     /**
      * Set the required style information in {@code current} accordingly to the object given in

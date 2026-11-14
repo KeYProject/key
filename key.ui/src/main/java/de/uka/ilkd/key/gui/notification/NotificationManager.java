@@ -13,12 +13,16 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.proof.ProofEvent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The notificatin manager controls the list of active notification tasks. It receives KeY System
  * events and looks for an appropriate task
  *
  * @author bubel
  */
+@NullMarked
 public class NotificationManager {
 
     /** list of notification tasks */
@@ -49,7 +53,13 @@ public class NotificationManager {
 
     /**
      * creates an instance of the notification manager
+     *
+     * <p>
+     * The manager installs its default notification while the receiver is still under
+     * initialization (EISOP initialization check); the setter only configures the manager and
+     * the notification is dispatched after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public NotificationManager(KeYMediator mediator, JFrame comp) {
         notificationListener = new NotificationListener();
         // This method delegates the request only to the UserInterfaceControl
@@ -85,7 +95,7 @@ public class NotificationManager {
      * @param eventID The {@link NotificationEventID} to remove its {@link NotificationTask}.
      * @return The removed {@link NotificationTask} or {@code null} if none was available.
      */
-    public NotificationTask removeNotificationTask(NotificationEventID eventID) {
+    public @Nullable NotificationTask removeNotificationTask(NotificationEventID eventID) {
         return notificationTasks.remove(eventID);
     }
 

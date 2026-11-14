@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.nparser;
 
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.GenericArgument;
@@ -22,10 +23,13 @@ public class AliasTest {
         var path = Paths.get("../key.ui/examples/standard_key/polymorphic/pseq.key");
         var env = KeYEnvironment.load(path);
 
-        var pSeq = env.getInitConfig().namespaces().parametricSorts().lookup("PSeq");
+        var pSeq = Objects.requireNonNull(
+            env.getInitConfig().namespaces().parametricSorts().lookup("PSeq"),
+            "PSeq must be defined in the pseq.key example");
+        var intSort = Objects.requireNonNull(
+            env.getInitConfig().namespaces().lookupSortOrAlias("int"), "int must be defined");
         var intSeq = ParametricSortInstance.get(pSeq,
-            ImmutableList.of(
-                new GenericArgument(env.getInitConfig().namespaces().lookupSortOrAlias("int"))),
+            ImmutableList.of(new GenericArgument(intSort)),
             env.getServices());
         Assertions.assertEquals(intSeq,
             env.getInitConfig().namespaces().lookupSortOrAlias("IntSeq"));

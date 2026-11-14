@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -19,6 +20,9 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm<Goal> {
     private final ProjectionToTerm<Goal> leftCoefficient, polynomial;
 
@@ -30,8 +34,8 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
 
     @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        final Term coeffT = leftCoefficient.toTerm(app, pos, goal, mState);
-        final Term polyT = polynomial.toTerm(app, pos, goal, mState);
+        final Term coeffT = Objects.requireNonNull(leftCoefficient.toTerm(app, pos, goal, mState));
+        final Term polyT = Objects.requireNonNull(polynomial.toTerm(app, pos, goal, mState));
 
         final Services services = goal.proof().getServices();
         final BigInteger coeff =

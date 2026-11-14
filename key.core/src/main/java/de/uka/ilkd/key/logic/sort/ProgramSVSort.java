@@ -6,6 +6,7 @@ package de.uka.ilkd.key.logic.sort;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
@@ -27,6 +28,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.DefaultImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +39,7 @@ import static de.uka.ilkd.key.java.ast.expression.operator.UnaryOperatorKind.NEG
  * Special "sorts" used for schema variables matching program constructs (class ProgramSV). Not
  * really sorts in the theoretical meaning of the word.
  */
+@NullMarked
 public abstract class ProgramSVSort extends SortImpl {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProgramSVSort.class);
 
@@ -256,6 +260,16 @@ public abstract class ProgramSVSort extends SortImpl {
 
     // --------------------------------------------------------------------------
 
+    /**
+     * Constructor.
+     * <p>
+     * Registers this sort in {@link #NAME2SORT} while the receiver is still
+     * {@code @UnderInitialization}. All registrations happen during class initialization (every
+     * {@code new XSort()} runs in a static field initializer), and any reader of the map triggers
+     * and therefore blocks on the same class initializer, so a half-built sort is never observable;
+     * hence the sanctioned constructor-leak-into-registry suppression.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     protected ProgramSVSort(Name name) {
         super(name, DefaultImmutableSet.nil(), false);
         NAME2SORT.put(name, this);
@@ -265,7 +279,8 @@ public abstract class ProgramSVSort extends SortImpl {
         return true;
     }
 
-    public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+    public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+            Services services) {
         return canStandFor(check, services);
     }
 
@@ -774,7 +789,8 @@ public abstract class ProgramSVSort extends SortImpl {
             if (pm == null) {
                 return false;
             }
-            final MethodDeclaration methodDeclaration = pm.getMethodDeclaration();
+            final MethodDeclaration methodDeclaration = Objects.requireNonNull(
+                pm.getMethodDeclaration(), "method declaration of method body statement");
 
             return !(// pm.isModel() ||
             methodDeclaration.getBody() == null)
@@ -801,8 +817,10 @@ public abstract class ProgramSVSort extends SortImpl {
                  * if (mr.getReferencePrefix() instanceof SuperReference || mr.getReferencePrefix()
                  * instanceof TypeReference) { return false; }
                  */
-                if (mr.getReferencePrefix() != null
-                        && NONSIMPLEEXPRESSION.canStandFor(mr.getReferencePrefix(), services)) {
+                // local variable so the nullness checker refines the result of the guard below
+                // (a re-evaluated call would be assumed nullable again)
+                ReferencePrefix rp = mr.getReferencePrefix();
+                if (rp != null && NONSIMPLEEXPRESSION.canStandFor(rp, services)) {
                     return false;
                 }
                 if (mr.getArguments() == null) {
@@ -868,8 +886,8 @@ public abstract class ProgramSVSort extends SortImpl {
             if (!(check instanceof TypeReference)) {
                 return false;
             }
-            return ((TypeReference) (check)).getKeYJavaType()
-                    .getJavaType() instanceof PrimitiveType;
+            return Objects.requireNonNull(((TypeReference) (check)).getKeYJavaType(),
+                "KeYJavaType of type reference").getJavaType() instanceof PrimitiveType;
         }
 
         @Override
@@ -884,14 +902,14 @@ public abstract class ProgramSVSort extends SortImpl {
      * char, short, int, and long.
      */
     private static final class TypeReferenceNotPrimitiveSort extends ProgramSVSort {
-        private final String matchName;
+        private final @Nullable String matchName;
 
         public TypeReferenceNotPrimitiveSort() {
             super(new Name("NonPrimitiveType"));
             this.matchName = null;
         }
 
-        public TypeReferenceNotPrimitiveSort(String name) {
+        public TypeReferenceNotPrimitiveSort(@Nullable String name) {
             super(new Name("NonPrimitiveType" + (name != null ? "[name=" + name + "]" : "")));
             this.matchName = name;
         }
@@ -901,12 +919,16 @@ public abstract class ProgramSVSort extends SortImpl {
             if (!(check instanceof TypeReference)) {
                 return false;
             }
-            if (((TypeReference) (check)).getKeYJavaType().getJavaType() instanceof PrimitiveType) {
+            final KeYJavaType kjt =
+                Objects.requireNonNull(((TypeReference) (check)).getKeYJavaType(),
+                    "KeYJavaType of type reference");
+            if (kjt.getJavaType() instanceof PrimitiveType) {
                 return false;
             }
             if (matchName != null) {
-                return matchName.equals(
-                    ((TypeReference) (check)).getKeYJavaType().getJavaType().getFullName());
+                final Type javaType =
+                    Objects.requireNonNull(kjt.getJavaType(), "Java type of type reference");
+                return matchName.equals(javaType.getFullName());
             }
             return true;
         }
@@ -943,14 +965,14 @@ public abstract class ProgramSVSort extends SortImpl {
      * It can also be made to match only specific method names defined by the parameter "name".
      */
     private static class MethodNameSort extends ProgramSVSort {
-        private final ProgramElementName methodName;
+        private final @Nullable ProgramElementName methodName;
 
         public MethodNameSort() {
             super(new Name("MethodName"));
             this.methodName = null;
         }
 
-        public MethodNameSort(ProgramElementName name) {
+        public MethodNameSort(@Nullable ProgramElementName name) {
             super(new Name("MethodName" + (name != null ? "[name=" + name + "]" : "")));
             this.methodName = name;
         }
@@ -1001,7 +1023,8 @@ public abstract class ProgramSVSort extends SortImpl {
 
         /* Will only match on String variables */
         @Override
-        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+        public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+                Services services) {
             if (!super.canStandFor(check, ec, services)) {
                 return false;
             }
@@ -1010,7 +1033,11 @@ public abstract class ProgramSVSort extends SortImpl {
             if (check instanceof ProgramVariable) {
                 Namespace<Sort> ns = services.getNamespaces().sorts();
                 Sort stringSort = ns.lookup(new Name("java.lang.String"));
-                return ((ProgramVariable) check).getKeYJavaType().getSort().equals(stringSort);
+                final KeYJavaType kjt = Objects.requireNonNull(
+                    ((ProgramVariable) check).getKeYJavaType(),
+                    "KeYJavaType of string program variable");
+                return Objects.requireNonNull(kjt.getSort(), "sort of string program variable")
+                        .equals(stringSort);
             }
             return false;
         }
@@ -1027,7 +1054,8 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+        public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+                Services services) {
             if (!super.canStandFor(check, ec, services)) {
                 return false;
             }
@@ -1060,7 +1088,8 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+        public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+                Services services) {
             if (!super.canStandFor(check, ec, services)) {
                 return false;
             }
@@ -1091,7 +1120,8 @@ public abstract class ProgramSVSort extends SortImpl {
             this.forbidden_types = forbidden_types;
         }
 
-        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+        public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+                Services services) {
             if (!super.canStandFor(check, ec, services)) {
                 return false;
             }
@@ -1122,7 +1152,8 @@ public abstract class ProgramSVSort extends SortImpl {
         }
 
         @Override
-        public boolean canStandFor(ProgramElement check, ExecutionContext ec, Services services) {
+        public boolean canStandFor(ProgramElement check, @Nullable ExecutionContext ec,
+                Services services) {
             if (!super.canStandFor(check, ec, services)) {
                 return false;
             }
@@ -1291,7 +1322,7 @@ public abstract class ProgramSVSort extends SortImpl {
         return (pe instanceof MethodReference) || (pe instanceof ConstructorReference);
     }
 
-    public ProgramElement getSVWithSort(ExtList l, Class<?> alternative) {
+    public @Nullable ProgramElement getSVWithSort(ExtList l, Class<?> alternative) {
         for (final Object o : l) {
             if (o instanceof ProgramSV psv && (psv.sort() == this)) {
                 return (ProgramElement) o;
@@ -1302,7 +1333,8 @@ public abstract class ProgramSVSort extends SortImpl {
         return null;
     }
 
-    static KeYJavaType getKeYJavaType(ProgramElement pe, ExecutionContext ec, Services services) {
+    static KeYJavaType getKeYJavaType(ProgramElement pe, @Nullable ExecutionContext ec,
+            Services services) {
         return services.getTypeConverter().getKeYJavaType((Expression) pe, ec);
     }
 
@@ -1315,7 +1347,8 @@ public abstract class ProgramSVSort extends SortImpl {
 
         final String elemname;
         if (pe instanceof NamedProgramElement) {
-            elemname = ((NamedProgramElement) pe).getProgramElementName().getProgramName();
+            elemname = Objects.requireNonNull(((NamedProgramElement) pe).getProgramElementName(),
+                "name of named program element").getProgramName();
         } else if (pe instanceof Named) {
             final Name n = ((Named) pe).name();
             if (n instanceof ProgramElementName) {

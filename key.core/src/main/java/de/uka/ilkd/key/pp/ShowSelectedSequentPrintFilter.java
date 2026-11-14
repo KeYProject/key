@@ -8,11 +8,14 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This filter takes a {@link PosInOccurrence} and only shows the sub-formula at that position.
  *
  * @author lanzinger
  */
+@NullMarked
 public class ShowSelectedSequentPrintFilter extends SequentPrintFilter {
 
     /**

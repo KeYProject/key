@@ -6,10 +6,14 @@ package de.uka.ilkd.key.java.ast;
 
 import de.uka.ilkd.key.java.ast.expression.Expression;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Expression container. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public interface ExpressionContainer extends NonTerminalProgramElement {
 
     /**
@@ -28,5 +32,6 @@ public interface ExpressionContainer extends NonTerminalProgramElement {
      *
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
+    @Nullable
     Expression getExpressionAt(int index);
 }

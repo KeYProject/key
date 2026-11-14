@@ -4,12 +4,17 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.pp;
 
+import java.util.Objects;
+
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Identity Filter not doing anything
  */
+@NullMarked
 public class IdentitySequentPrintFilter extends SequentPrintFilter {
 
     /**
@@ -40,7 +45,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredAntec() {
         filterSequent();
-        return antec;
+        return Objects.requireNonNull(antec, "filter has no filtered antecedent");
     }
 
     /**
@@ -51,7 +56,7 @@ public class IdentitySequentPrintFilter extends SequentPrintFilter {
      */
     public ImmutableList<SequentPrintFilterEntry> getFilteredSucc() {
         filterSequent();
-        return succ;
+        return Objects.requireNonNull(succ, "filter has no filtered succedent");
     }
 
     /**

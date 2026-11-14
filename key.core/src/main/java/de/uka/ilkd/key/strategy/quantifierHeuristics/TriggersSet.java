@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -32,9 +33,13 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Selects and stores the triggers for a quantified formula in prenex conjunctive normal form.
  */
+@NullMarked
 public class TriggersSet {
 
     /** The quantified formula in prenex CNF. */
@@ -86,6 +91,13 @@ public class TriggersSet {
      */
     private final List<? extends TriggerSupport> supports;
 
+    /**
+     * The trigger-construction helpers below operate on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here because the fields they
+     * populate are assigned in sequence and only read after construction, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private TriggersSet(JTerm allTerm, Services services, boolean classic) {
         this.allTerm = allTerm;
         this.classic = classic;
@@ -346,7 +358,7 @@ public class TriggersSet {
          * @param services access to the theory operators and term construction
          * @return what the search below {@code term} produced
          */
-        private Search searchTriggers(JTerm term, JTerm enclosing, Collected found,
+        private Search searchTriggers(JTerm term, @Nullable JTerm enclosing, Collected found,
                 Services services) {
             if (!mightContainTriggers(term)) {
                 return Search.OPEN;
@@ -406,7 +418,7 @@ public class TriggersSet {
             final Set<JTerm> result = new LinkedHashSet<>();
             if (i >= possibleSubs.length) {
                 final JTerm combined = services.getTermFactory().createTerm(originalTerm.op(),
-                    chosenSubs, boundVars, null);
+                    new ImmutableArray<>(chosenSubs), boundVars);
                 result.add(combined);
                 return result;
             }
@@ -439,7 +451,7 @@ public class TriggersSet {
          * discards the candidate; otherwise a single {@code PREFER_ENCLOSING} keeps the search
          * going past it.
          */
-        private TriggerSupport.CandidateVerdict verdictOn(JTerm term, JTerm enclosing,
+        private TriggerSupport.CandidateVerdict verdictOn(JTerm term, @Nullable JTerm enclosing,
                 Services services) {
             TriggerSupport.CandidateVerdict combined = TriggerSupport.CandidateVerdict.ACCEPTABLE;
             for (final TriggerSupport support : supports) {
@@ -466,7 +478,7 @@ public class TriggersSet {
          * @param services access to the theory operators and term construction
          * @return what the registration produced for the enclosing term
          */
-        private Search registerCandidate(JTerm term, JTerm enclosing, Collected found,
+        private Search registerCandidate(JTerm term, @Nullable JTerm enclosing, Collected found,
                 Services services) {
             final TriggerSupport.CandidateVerdict verdict = verdictOn(term, enclosing, services);
             if (verdict == TriggerSupport.CandidateVerdict.FORBIDDEN) {
@@ -491,7 +503,8 @@ public class TriggersSet {
                 // The derived triggers of an earlier occurrence are registered once; this
                 // literal counts them as its own, classified against this clause's variables.
                 for (final JTerm derivedTerm : derived) {
-                    found.add(termToTrigger.get(derivedTerm), isElement(derivedTerm));
+                    found.add(Objects.requireNonNull(termToTrigger.get(derivedTerm),
+                        "derived triggers are registered before reuse"), isElement(derivedTerm));
                 }
             }
             // A preferred-enclosing candidate is registered like any other, but leaves the

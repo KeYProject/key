@@ -8,22 +8,26 @@ package de.uka.ilkd.key.rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class OneStepSimplifierRuleApp extends DefaultBuiltInRuleApp {
 
     /**
      * @see #shouldRestrictAssumeInsts()
      */
     private boolean restrictedIfInsts = false;
-    private OneStepSimplifier.Protocol protocol;
+    private OneStepSimplifier.@Nullable Protocol protocol;
 
-    protected OneStepSimplifierRuleApp(BuiltInRule builtInRule, PosInOccurrence pio) {
+    protected OneStepSimplifierRuleApp(BuiltInRule builtInRule, @Nullable PosInOccurrence pio) {
         super(builtInRule, pio);
     }
 
     /**
      * @return the protocol, may be <code>null</code>
      */
-    public OneStepSimplifier.Protocol getProtocol() {
+    public OneStepSimplifier.@Nullable Protocol getProtocol() {
         return protocol;
     }
 

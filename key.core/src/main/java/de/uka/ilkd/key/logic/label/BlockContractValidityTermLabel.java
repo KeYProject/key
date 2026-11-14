@@ -8,12 +8,16 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Label attached to the modality of the validity branch of a block contract.
  *
  * @param exceptionVariable The name of the exception variable to distinguish normal from
  *        exceptional termination.
  */
+@NullMarked
 public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable)
         implements TermLabel {
     /**
@@ -39,7 +43,7 @@ public record BlockContractValidityTermLabel(ProgramVariable exceptionVariable)
      * {@inheritDoc}
      */
     @Override
-    public ProgramVariable getTLChild(int i) {
+    public @Nullable ProgramVariable getTLChild(int i) {
         if (i == 0) {
             return exceptionVariable();
         }

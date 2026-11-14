@@ -16,6 +16,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This SMT translation handler takes care of integer expressions.
  *
@@ -23,6 +26,7 @@ import org.key_project.logic.op.Operator;
  *
  * @author Jonas Schiffl
  */
+@NullMarked
 public class IntegerOpHandler implements SMTHandler {
 
     /** to indicate that an expression holds a value of type Int. */
@@ -35,13 +39,13 @@ public class IntegerOpHandler implements SMTHandler {
 
     private final Map<Operator, String> supportedOperators = new HashMap<>();
     private final Set<Operator> predicateOperators = new HashSet<>();
-    private Function mul;
+    private @Nullable Function mul;
     private boolean limitedToPresbuger;
-    private IntegerLDT integerLDT;
+    private @Nullable IntegerLDT integerLDT;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         supportedOperators.clear();
         this.integerLDT = services.getTypeConverter().getIntegerLDT();
 
@@ -62,13 +66,16 @@ public class IntegerOpHandler implements SMTHandler {
         supportedOperators.put(integerLDT.getGreaterThan(), ">");
         predicateOperators.add(integerLDT.getGreaterThan());
 
-        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+        // the master always loads the snippets for every handler
+        masterHandler.addDeclarationsAndAxioms(
+            Objects.requireNonNull(handlerSnippets, "handler snippets"));
 
         // sort_int is defined here, declare it as already defined
         masterHandler.addKnownSymbol("sort_int");
         masterHandler.addSort(integerLDT.targetSort());
 
-        this.limitedToPresbuger = PROPERTY_PRESBURGER.get(masterHandler.getTranslationState());
+        this.limitedToPresbuger = Objects.requireNonNull(
+            PROPERTY_PRESBURGER.get(masterHandler.getTranslationState()), "presburger property");
     }
 
     @Override
@@ -95,7 +102,7 @@ public class IntegerOpHandler implements SMTHandler {
     }
 
     private boolean isIntLiteral(Term term) {
-        return term.op() == integerLDT.getNumberSymbol();
+        return term.op() == Objects.requireNonNull(integerLDT, "integer LDT").getNumberSymbol();
     }
 
     @Override
@@ -112,7 +119,9 @@ public class IntegerOpHandler implements SMTHandler {
             resultType = INT;
         }
 
-        return new SExpr(smtOp, resultType, children);
+        // canHandle guarantees that op is a supported operator
+        return new SExpr(Objects.requireNonNull(smtOp, "operator not supported"), resultType,
+            children);
     }
 
     /*

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
@@ -32,13 +33,24 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An abstract proof obligation implementing common functionality.
+ *
+ * <p>
+ * The {@link #tb} field is assigned by {@code postInit()} in every subclass before any of the
+ * proof-obligation building steps run (each subclass invokes {@code postInit()} at the very
+ * beginning of its {@code readProblem()}); it is never read before that assignment. It is declared
+ * {@code @Nullable} since it cannot be assigned in the constructor -- the term builder has to be
+ * built from the proof-specific {@link Services} that {@code postInit()} derives. The dereferences
+ * of {@code tb} in these helpers are therefore suppressed with scoped keys.
  */
+@NullMarked
 public abstract class AbstractPO implements IPersistablePO {
 
-    protected TermBuilder tb;
+    protected @Nullable TermBuilder tb;
     protected final InitConfig environmentConfig;
     protected Services environmentServices;
     protected final JavaInfo javaInfo;
@@ -46,10 +58,10 @@ public abstract class AbstractPO implements IPersistablePO {
     protected final SpecificationRepository specRepos;
     protected final String name;
     protected ImmutableSet<NoPosTacletApp> taclets;
-    protected JTerm[] poTerms;
-    protected String[] poNames;
-    private KeyAst.Declarations header;
-    private ProofAggregate proofAggregate;
+    protected @Nullable JTerm[] poTerms;
+    protected @Nullable String[] poNames;
+    private KeyAst.@Nullable Declarations header;
+    private @Nullable ProofAggregate proofAggregate;
 
 
     // fields used by Tarjan Algorithm
@@ -68,6 +80,15 @@ public abstract class AbstractPO implements IPersistablePO {
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
+    /**
+     * The proof-obligation terms are produced by {@code assignPOTerms(JTerm...)} after construction
+     * (and are {@code @Nullable} until then); the difference is suppressed with a scoped key. The
+     * heap LDT of a fully configured {@link InitConfig} is always present (it is part of the JavaDL
+     * theory, see the assertion in {@code ProblemInitializer}); the lookups below and the resulting
+     * assignments into final fields are suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized",
+        "nullness:assignment.type.incompatible" })
     protected AbstractPO(InitConfig initConfig, String name) {
         this.environmentConfig = initConfig;
         this.environmentServices = initConfig.getServices();
@@ -85,8 +106,12 @@ public abstract class AbstractPO implements IPersistablePO {
     private ImmutableSet<ClassAxiom> getAxiomsForObserver(Pair<Sort, IObserverFunction> usedObs,
             ImmutableSet<ClassAxiom> axioms) {
         for (ClassAxiom axiom : axioms) {
-            if (axiom.getTarget() == null || !(axiom.getTarget().equals(usedObs.second)
-                    && usedObs.first.extendsTrans(axiom.getKJT().getSort()))) {
+            final @Nullable IObserverFunction target = axiom.getTarget();
+            final @Nullable Sort axiomSort = axiom.getKJT().getSort();
+            // an axiom without a concrete sort cannot stand in an observer-extension relation, so
+            // it is treated like an axiom without a matching target: not part of the set
+            if (target == null || axiomSort == null || !(target.equals(usedObs.second)
+                    && usedObs.first.extendsTrans(axiomSort))) {
                 axioms = axioms.remove(axiom);
             }
         }
@@ -118,7 +143,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(LocationVariable pv, Services services) {
+    protected final void register(@Nullable LocationVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
@@ -133,7 +158,7 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected final void register(Function f, Services services) {
+    protected final void register(@Nullable Function f, Services services) {
         Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
@@ -148,7 +173,13 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param selfVar The self variable.
      * @return The term representing the general assumption.
      */
-    protected JTerm generateSelfNotNull(IProgramMethod pm, ProgramVariable selfVar) {
+    /**
+     * The {@link #tb} term builder is assigned by {@code postInit()} before this helper is invoked
+     * (see the class level invariant documentation), so its dereference here is suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
+    protected JTerm generateSelfNotNull(IProgramMethod pm, @Nullable ProgramVariable selfVar) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.not(tb.equals(tb.var(selfVar), tb.NULL()));
     }
@@ -162,8 +193,16 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param services The services instance.
      * @return The term representing the general assumption.
      */
+    /**
+     * The accumulator is {@code @Nullable} during the build; the invariants of the method guarantee
+     * a non-null result, so the difference is suppressed with a scoped key. The {@link #tb} term
+     * builder and the heap LDT are guaranteed by the {@code postInit()} contract as documented at
+     * the field declaration, so their dereferences are suppressed with scoped keys too.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible",
+        "nullness:dereference.of.nullable" })
     protected JTerm generateSelfCreated(List<LocationVariable> heaps, IProgramMethod pm,
-            ProgramVariable selfVar, Services services) {
+            @Nullable ProgramVariable selfVar, Services services) {
         if (selfVar == null || pm.isConstructor()) {
             return tb.tt();
         }
@@ -191,7 +230,12 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
-    protected JTerm generateSelfExactType(IProgramMethod pm, ProgramVariable selfVar,
+    /**
+     * The {@link #tb} term builder is assigned by {@code postInit()} before this helper is invoked
+     * (see the field declaration), so its dereference here is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
+    protected JTerm generateSelfExactType(IProgramMethod pm, @Nullable ProgramVariable selfVar,
             KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : generateSelfExactType(pm, tb.var(selfVar), selfKJT);
@@ -205,7 +249,16 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param selfKJT The {@link KeYJavaType} of the self variable.
      * @return The term representing the general assumption.
      */
-    protected JTerm generateSelfExactType(IProgramMethod pm, JTerm selfVar, KeYJavaType selfKJT) {
+    /**
+     * The {@link #tb} term builder is assigned by {@code postInit()} before this helper is invoked
+     * (see the field declaration); the lookups of the self type and its sort below are guaranteed
+     * to be present for the receiver type of a program method. The differences are suppressed with
+     * scoped keys.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible",
+        "nullness:dereference.of.nullable" })
+    protected JTerm generateSelfExactType(IProgramMethod pm, @Nullable JTerm selfVar,
+            KeYJavaType selfKJT) {
         return selfVar == null || pm.isConstructor() ? tb.tt()
                 : tb.exactInstance(selfKJT.getSort(), selfVar);
     }
@@ -247,7 +300,7 @@ public abstract class AbstractPO implements IPersistablePO {
             this.lowLink = lowLink;
         }
 
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (o instanceof Vertex other) {
                 return core.equals(other.core);
             } else {
@@ -286,10 +339,17 @@ public abstract class AbstractPO implements IPersistablePO {
 
     /**
      * adds all taclets for the class axioms accessible and needed by this PO
+     * <p>
+     * The vertex graph is keyed on the pair (sort, target observer) of a class axiom; class axioms
+     * do not have a target (see {@code ClassAxiom#getTarget()}, whose implementation always
+     * returns {@code null}), so the {@link #getVertexFor(Sort, IObserverFunction, ClassAxiom)}
+     * arguments are the (nullable) lookups without an intermediate guard, suppressed with a scoped
+     * key.
      *
      * @param selfKJT the {@link KeYJavaType} for which to collect all accessible class axioms
      * @param proofConfig the {@link InitConfig} of the proof for this PO
      */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private void registerClassAxiomTaclets(KeYJavaType selfKJT, InitConfig proofConfig) {
         final ImmutableSet<ClassAxiom> axioms = selectClassAxioms(selfKJT);
         for (ClassAxiom axiom : axioms) {
@@ -382,7 +442,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param proofConfig the proof configuration
      * @return the created proof
      */
-    protected Proof createProof(String proofName, JTerm poTerm, InitConfig proofConfig) {
+    protected Proof createProof(String proofName, JTerm poTerm, @Nullable InitConfig proofConfig) {
         if (proofConfig == null) {
             proofConfig = environmentConfig.deepCopy();
         }
@@ -396,16 +456,37 @@ public abstract class AbstractPO implements IPersistablePO {
 
 
 
-    protected Proof createProofObject(String proofName, KeyAst.Declarations proofHeader,
+    /**
+     * Creates the {@link Proof} object for a single proof obligation.
+     *
+     * @param proofName the name of the proof
+     * @param proofHeader the user-given declarations from the problem file, or {@code null} if none
+     *        were loaded (the {@link Proof} constructor accepts a nullable problem header)
+     * @param poTerm the proof obligation term
+     * @param proofConfig the init config of the proof
+     * @return the created proof
+     */
+    protected Proof createProofObject(String proofName, KeyAst.@Nullable Declarations proofHeader,
             JTerm poTerm,
             InitConfig proofConfig) {
         return new Proof(proofName, poTerm, proofHeader, proofConfig);
     }
 
 
-    protected abstract InitConfig getCreatedInitConfigForSingleProof();
+    protected abstract @Nullable InitConfig getCreatedInitConfigForSingleProof();
 
     @Override
+    /**
+     * The {@code proofAggregate} field is {@code @Nullable} only because the obligation is built
+     * lazily by {@link #createPOs(String, List, InitConfig, TacletIndex)}; the caller is expected
+     * to invoke that builder first, so the difference is suppressed with a scoped key. Likewise,
+     * the init configuration from {@link #getCreatedInitConfigForSingleProof()} and the goal
+     * lookups on the freshly created proofs are guaranteed by the {@code postInit()} contract
+     * documented at the {@link #tb} field, so their dereferences are suppressed with a scoped key
+     * too.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible",
+        "nullness:dereference.of.nullable" })
     public final ProofAggregate getPO() {
         if (proofAggregate != null) {
             return proofAggregate;
@@ -421,11 +502,24 @@ public abstract class AbstractPO implements IPersistablePO {
             if (i > 0) {
                 ic = ic.deepCopy();
             }
-            proofs[i] = createProof(poNames != null ? poNames[i] : name, poTerms[i], ic);
+            final String poName = poNames != null && poNames[i] != null ? poNames[i] : name;
+            // the PO terms are guaranteed by the {@code assignPOTerms(JTerm...)} contract to be
+            // present and non-null once {@code getPO()} is called; the guard below only documents
+            // that invariant
+            final @Nullable JTerm poTerm = poTerms[i];
+            if (poTerm == null) {
+                throw new IllegalStateException("No proof obligation term for " + poName);
+            }
+            proofs[i] = createProof(poName, poTerm, ic);
             if (taclets != null) {
                 var filteredTaclets = proofs[i].getInitConfig().filterTaclets(taclets);
-                proofs[i].getOpenGoal(proofs[i].root()).indexOfTaclets()
-                        .addTaclets(filteredTaclets);
+                // the root of a freshly created proof is guaranteed to be set by its constructor;
+                // the guard below only documents that invariant
+                final @Nullable Node root = proofs[i].root();
+                if (root != null) {
+                    proofs[i].getOpenGoal(root).indexOfTaclets()
+                            .addTaclets(filteredTaclets);
+                }
             }
         }
 
@@ -463,7 +557,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param properties The properties to read from.
      * @return The name value.
      */
-    public static String getName(Configuration properties) {
+    public static @Nullable String getName(Configuration properties) {
         return properties.getString(PROPERTY_NAME);
     }
 
@@ -471,7 +565,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * {@inheritDoc}
      */
     @Override
-    public KeYJavaType getContainerType() {
+    public @Nullable KeYJavaType getContainerType() {
         return null;
     }
 }

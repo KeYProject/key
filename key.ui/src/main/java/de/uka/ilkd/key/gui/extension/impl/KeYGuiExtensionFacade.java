@@ -25,6 +25,7 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -33,6 +34,7 @@ import org.jspecify.annotations.Nullable;
  * @author Alexander Weigl
  * @version 1 (07.02.19)
  */
+@NullMarked
 public final class KeYGuiExtensionFacade {
     private static final Set<String> forbiddenPlugins = new HashSet<>();
     private static List<Extension<?>> extensions = new LinkedList<>();
@@ -159,7 +161,7 @@ public final class KeYGuiExtensionFacade {
         return defaultMenu;
     }
 
-    private static JMenu findMenu(JPopupMenu menu, Iterator<String> mpath) {
+    private static @Nullable JMenu findMenu(JPopupMenu menu, Iterator<String> mpath) {
         if (mpath.hasNext()) {
             String cur = mpath.next();
             Component[] children = menu.getComponents();
@@ -263,8 +265,13 @@ public final class KeYGuiExtensionFacade {
 
     public static <T> List<Action> getContextMenuItems(ContextMenuKind<T> kind,
             @Nullable T underlyingObject, KeYMediator mediator) {
+        if (underlyingObject == null) {
+            // the registered context menu extensions all act on the requested object; a
+            // position-less request (e.g. no mouse position over the sequent) has no content
+            return Collections.emptyList();
+        }
         return getContextMenuExtensions().stream()
-                .flatMap(it -> it.getContextActions(mediator, kind, underlyingObject).stream())
+                .flatMap(it -> it.<T>getContextActions(mediator, kind, underlyingObject).stream())
                 .collect(Collectors.toList());
     }
 
@@ -276,10 +283,47 @@ public final class KeYGuiExtensionFacade {
         return menu;
     }
 
+    /**
+     * Loads all registered extensions into the extension list.
+     *
+     * <p>
+     * The diamond constructor call {@code new Extension<>(...)} on a
+     * {@code Class<? extends KeYGuiExtension>} identifier crashes this EISOP fork's capture
+     * conversion (BugInCF, reportable only as a top-level error), so the wildcard is erased by
+     * {@link #providerClass(ServiceLoader.Provider)} before the extension handle is built.
+     */
     private static void loadExtensions() {
         extensions = ServiceLoader.load(KeYGuiExtension.class).stream()
-                .map(ServiceLoader.Provider::type).filter(KeYGuiExtensionFacade::isNotForbidden)
-                .distinct().map(Extension::new).sorted().collect(Collectors.toList());
+                .map(KeYGuiExtensionFacade::providerClass)
+                .filter(KeYGuiExtensionFacade::isNotForbidden)
+                .distinct().map(KeYGuiExtensionFacade::toExtension).sorted()
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the concrete class of the given service provider.
+     *
+     * <p>
+     * The wildcard is erased to keep the stream element type free of wildcard captures;
+     * constructing {@code Extension} from a captured {@code Class<? extends KeYGuiExtension>}
+     * crashes the capture conversion of this EISOP fork (BugInCF, reportable only as a top-level
+     * error), while method references on non-wildcard types are inferred soundly. The conversion
+     * is unchecked because the provider is loaded for the {@code KeYGuiExtension} service type.
+     */
+    @SuppressWarnings("unchecked")
+    private static Class<KeYGuiExtension> providerClass(
+            ServiceLoader.Provider<KeYGuiExtension> provider) {
+        return (Class<KeYGuiExtension>) provider.type();
+    }
+
+    /**
+     * Wraps the given extension class into an extension handle.
+     *
+     * @param clazz the extension class
+     * @return the extension handle
+     */
+    private static Extension<KeYGuiExtension> toExtension(Class<KeYGuiExtension> clazz) {
+        return new Extension<>(clazz);
     }
 
     /**
@@ -294,7 +338,17 @@ public final class KeYGuiExtensionFacade {
     }
 
     private static <T> List<T> getExtensionInstances(Class<T> c) {
-        return getExtensionsStream(c).map(Extension::getInstance).collect(Collectors.toList());
+        List<T> result = new ArrayList<>();
+        for (Extension<T> extension : getExtensionsStream(c).collect(Collectors.toList())) {
+            @Nullable
+            T instance = extension.getInstance();
+            if (instance == null) {
+                // a failing reflection-based instantiation contributes no instance
+                continue;
+            }
+            result.add(instance);
+        }
+        return result;
     }
 
     /**
@@ -340,26 +394,42 @@ public final class KeYGuiExtensionFacade {
         return getExtensionInstances(KeYGuiExtension.Startup.class);
     }
 
-
     // region keyboard shortcuts
     public static List<KeYGuiExtension.KeyboardShortcuts> getKeyboardShortcutsExtensions() {
         return getExtensionInstances(KeYGuiExtension.KeyboardShortcuts.class);
     }
 
-    public static Stream<Action> getKeyboardShortcuts(KeYMediator mediator, String componentId,
-            JComponent component) {
+    /**
+     * Returns the keyboard shortcut actions contributed for the given component.
+     *
+     * @param mediator the mediator, or {@code null} when the requesting component was constructed
+     *        before a mediator was available
+     * @param componentId the id of the component requesting the shortcuts
+     * @param component the component requesting the shortcuts
+     * @return the shortcut actions sorted by priority
+     */
+    public static Stream<Action> getKeyboardShortcuts(@Nullable KeYMediator mediator,
+            String componentId, JComponent component) {
         return getKeyboardShortcutsExtensions().stream()
                 .flatMap(it -> it.getShortcuts(mediator, componentId, component).stream())
                 .sorted(new ActionPriorityComparator());
     }
 
     /**
-     * @param mediator
+     * @param mediator the mediator, or {@code null} when the requesting component was constructed
+     *        before a mediator was available
      * @param component
      * @param componentId
+     *
+     *        <p>
+     *        The keyboard values are taken from the {@link Action} value table, whose values the
+     *        checker models as {@code @UnknownInitialization} although they are fully initialized
+     *        when the action is installed; the swing model's non-null parameters are satisfied
+     *        with the values read from the table, suppressed with a scoped key.
      */
-    public static void installKeyboardShortcuts(KeYMediator mediator, JComponent component,
-            String componentId) {
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    public static void installKeyboardShortcuts(@Nullable KeYMediator mediator,
+            JComponent component, String componentId) {
         Stream<Action> provider = getKeyboardShortcuts(mediator, componentId, component);
         provider.forEach(it -> {
             int condition = it.getValue(KeyAction.SHORTCUT_FOCUSED_CONDITION) != null
@@ -398,7 +468,6 @@ public final class KeYGuiExtensionFacade {
                 .collect(Collectors.toList());
     }
     // endregion
-
 
     public static Stream<String> getTermInfoStrings(MainWindow mainWindow, PosInSequent mousePos) {
         return getExtensionInstances(KeYGuiExtension.TermInfo.class).stream()

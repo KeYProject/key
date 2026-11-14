@@ -12,6 +12,8 @@ import org.key_project.prover.rules.matcher.compiler.BinderMatcher;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.matchAndBindVariables;
 
 /**
@@ -21,6 +23,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * {@link MatchConditions#shrinkRenameTable()}. The renaming table is scope-structured (closing
  * pops one scope), so the bound variables themselves are not needed for unbinding.
  */
+@NullMarked
 public final class JavaBinderMatcher implements BinderMatcher {
 
     /** stateless; a single shared instance suffices. */
