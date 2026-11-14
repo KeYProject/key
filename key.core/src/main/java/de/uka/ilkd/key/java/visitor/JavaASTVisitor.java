@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.pattern.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -252,6 +253,26 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnInstanceofPattern(InstanceofPattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnTypePattern(TypePattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnAnyPattern(AnyPattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnRecordPattern(RecordPattern x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnRecordPatternComponent(RecordPatternComponent x) {
         doDefaultAction(x);
     }
 

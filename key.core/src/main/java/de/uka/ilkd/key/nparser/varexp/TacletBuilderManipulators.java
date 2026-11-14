@@ -175,6 +175,10 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder(
             "isBindingExpr", BindingExpressionCond.class, SV);
 
+    public static final TacletBuilderCommand RECORD_PATTERN_INSTANCEOF =
+        new ConstructorBasedBuilder(
+            "isRecordPatternInstanceof", RecordPatternInstanceofCond.class, SV);
+
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
         public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
             super("notFreeIn", argumentsTypes);
@@ -398,7 +402,7 @@ public class TacletBuilderManipulators {
             META_DISJOINT,
             IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP,
             HAS_ANNOTATION, ADD_ANNOTATION, REMOVE_ANNOTATION,
-            BINDING_EXPRESSION_SIMPLE, ABNORMALLY_TERMINATE);
+            BINDING_EXPRESSION_SIMPLE, ABNORMALLY_TERMINATE, RECORD_PATTERN_INSTANCEOF);
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT, GET_INVARIANT, GET_FREE_INVARIANT,
             GET_VARIANT, IS_LABELED);
         loadWithServiceLoader();

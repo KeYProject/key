@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.pattern.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -1384,16 +1385,45 @@ public class PrettyPrinter implements Visitor {
             x.getExpressionAt(0).visit(this);
         }
         layouter.print(" instanceof ");
-        if (x.getTypeReference() != null) {
-            x.getTypeReference().visit(this);
-        }
-        if (x.getPatternVariable() != null) {
-            layouter.print(" ");
-            x.getPatternVariable().visit(this);
-        }
+        x.getPattern().visit(this);
         if (addParentheses) {
             layouter.print(")");
         }
+    }
+
+    @Override
+    public void performActionOnTypePattern(TypePattern x) {
+        x.getTypeReference().visit(this);
+        layouter.print(" ");
+        x.getVariable().visit(this);
+    }
+
+    @Override
+    public void performActionOnAnyPattern(AnyPattern x) {
+        if (x.getVariable() == null) {
+            layouter.print("_");
+            return;
+        }
+        if (x.getTypeReference() != null) {
+            x.getTypeReference().visit(this);
+        } else {
+            layouter.print("var");
+        }
+        layouter.print(" ");
+        x.getVariable().visit(this);
+    }
+
+    @Override
+    public void performActionOnRecordPattern(RecordPattern x) {
+        x.getTypeReference().visit(this);
+        layouter.print("(");
+        writeCommaList(x.getComponents());
+        layouter.print(")");
+    }
+
+    @Override
+    public void performActionOnRecordPatternComponent(RecordPatternComponent x) {
+        x.getPattern().visit(this);
     }
 
     @Override
