@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli.prove;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.ProofStarter;
 
@@ -48,6 +51,10 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The {@code smtCalls}/{@code smtProved} fields of the result records are computed from the
  * finished proof by {@link SmtCounters} ({@code 0}/{@code 0} when SMT is not used, the default).
+ * <p>
+ * The overload taking a {@link ProofOutput} additionally writes the finished proofs to the
+ * requested locations (§3 of the headless interface spec); see {@link #prove(Path, List,
+ * ProofOutput)}.
  */
 public final class HeadlessProver {
 
@@ -121,6 +128,29 @@ public final class HeadlessProver {
      */
     public List<ContractResult> prove(Path problem, List<String> selectors)
             throws ProblemLoaderException, UnknownContractException {
+        return prove(problem, selectors, ProofOutput.none());
+    }
+
+    /**
+     * Loads the given problem file, proves the selected contracts, and writes the finished proofs
+     * to the locations requested by the given {@code output} (§3 of the headless interface spec):
+     * a closed proof is written whenever a location is requested, an unclosed proof only when
+     * {@code output.savePartial()} is set, and nothing at all without a requested location. Each
+     * written file carries the {@code KEY_PROOF_STATUS} marker as its first line.
+     *
+     * @param problem the KeY problem file ({@code .key}) to load
+     * @param selectors the {@code --choose-contract} selector values in command-line order
+     * @param output the requested proof-file output ({@code --proof}/{@code --proof-dir}/
+     *        {@code --save-partial})
+     * @return one {@link ContractResult} per selected contract, in selection order; a written
+     *         proof file is reported via the result's {@code proofFile} field
+     * @throws ProblemLoaderException if the problem file cannot be loaded
+     * @throws UnknownContractException if a selector matches no contract of the problem
+     * @throws ProofOutputConflictException if {@code --proof} is used with several selected
+     *         contracts
+     */
+    public List<ContractResult> prove(Path problem, List<String> selectors, ProofOutput output)
+            throws ProblemLoaderException, UnknownContractException {
         HeadlessRunnerSettings settings = runnerSettings;
         if (settings != null) {
             settings.apply();
@@ -130,9 +160,14 @@ public final class HeadlessProver {
             try {
                 ContractIndex index = ContractIndex.fromEnvironment(environment);
                 List<Contract> selected = select(environment, index, selectors);
+                if (output.proof() != null && selected.size() > 1) {
+                    throw new ProofOutputConflictException("--proof requires exactly one "
+                        + "selected contract, but " + selected.size() + " are selected; use "
+                        + "--proof-dir to save a file per contract");
+                }
                 List<ContractResult> results = new ArrayList<>(selected.size());
-                for (Contract contract : selected) {
-                    results.add(prove(environment, contract));
+                for (int position = 0; position < selected.size(); position++) {
+                    results.add(prove(environment, selected.get(position), position, output));
                 }
                 return results;
             } finally {
@@ -170,6 +205,11 @@ public final class HeadlessProver {
     }
 
     private ContractResult prove(KeYEnvironment<?> environment, Contract contract) {
+        return prove(environment, contract, 0, ProofOutput.none());
+    }
+
+    private ContractResult prove(KeYEnvironment<?> environment, Contract contract, int position,
+            ProofOutput output) {
         long start = System.nanoTime();
         Proof proof = null;
         try {
@@ -186,10 +226,11 @@ public final class HeadlessProver {
             boolean closed = proof.closed() || openGoals == 0;
             ResultStatus status = classifyStatus(closed, timeoutMs, elapsedMs);
             SmtCounters.Counts smt = SmtCounters.of(proof);
+            Path proofFile = saveProofIfRequested(proof, closed, openGoals, position, output);
             LOGGER.debug("Contract '{}' finished after {} ms with {} open goals (status {})",
                 contract.getName(),
                 elapsedMs, openGoals, status);
-            return new ContractResult(contract.getName(), status, openGoals, elapsedMs, null,
+            return new ContractResult(contract.getName(), status, openGoals, elapsedMs, proofFile,
                 smt.smtCalls(), smt.smtProved(), null);
         } catch (Exception e) {
             LOGGER.debug("Proving contract '{}' failed", contract.getName(), e);
@@ -198,6 +239,43 @@ public final class HeadlessProver {
             if (proof != null && !proof.isDisposed()) {
                 proof.dispose();
             }
+        }
+    }
+
+    /**
+     * Writes the finished proof to the requested location per §3 of the headless interface spec:
+     * a closed proof is always written (marker {@code KEY_PROOF_STATUS closed 0}), an unclosed
+     * proof only when {@code --save-partial} was requested (marker
+     * {@code KEY_PROOF_STATUS open <n>}), and nothing when no location was requested.
+     *
+     * @param proof the finished proof to save (not yet disposed)
+     * @param closed whether all goals of the proof are closed
+     * @param openGoals the number of open goals
+     * @param position the 0-based position of the contract within the selection
+     * @param output the requested proof-file output
+     * @return the absolute path of the written file, or {@code null} if nothing was written
+     */
+    private static @Nullable Path saveProofIfRequested(Proof proof, boolean closed, int openGoals,
+            int position, ProofOutput output) {
+        Path target = output.targetFor(position);
+        if (target == null || !(closed || output.savePartial())) {
+            return null;
+        }
+        try {
+            Path parent = target.toAbsolutePath().getParent();
+            if (parent != null && !Files.exists(parent)) {
+                Files.createDirectories(parent);
+            }
+            String error =
+                ProofSaver.saveToFile(target, proof, ProofSaver.marker(closed, openGoals));
+            if (error != null) {
+                LOGGER.warn("Could not save proof to '{}': {}", target, error);
+                return null;
+            }
+            return target.toAbsolutePath().normalize();
+        } catch (IOException e) {
+            LOGGER.warn("Could not save proof to '{}'", target, e);
+            return null;
         }
     }
 
