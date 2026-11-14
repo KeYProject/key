@@ -175,6 +175,9 @@ public class TacletBuilderManipulators {
         new ConstructorBasedBuilder(
             "isBindingExpr", BindingExpressionCond.class, SV);
 
+    public static final TacletBuilderCommand BINDING_LOOP = new ConstructorBasedBuilder(
+        "isBindingLoop", IsBindingLoopCondition.class, SV);
+
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
         public NotFreeInTacletBuilderCommand(@NonNull ArgumentType... argumentsTypes) {
             super("notFreeIn", argumentsTypes);
