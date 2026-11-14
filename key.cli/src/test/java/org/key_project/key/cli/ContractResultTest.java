@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Tests for the {@link ContractResult} record.
@@ -25,10 +27,10 @@ class ContractResultTest {
         assertThat(result.status()).isEqualTo(ResultStatus.OPEN);
         assertThat(result.openGoals()).isEqualTo(3);
         assertThat(result.elapsedMs()).isEqualTo(17);
-        assertThat(result.proofFile()).isEqualTo(proofFile);
+        assertEquals(proofFile, result.proofFile());
         assertThat(result.smtCalls()).isEqualTo(2);
         assertThat(result.smtProved()).isEqualTo(1);
-        assertThat(result.errorMessage()).isEqualTo("oops");
+        assertEquals("oops", result.errorMessage());
     }
 
     @Test
@@ -36,8 +38,8 @@ class ContractResultTest {
         ContractResult result =
             new ContractResult("c1", ResultStatus.CLOSED, 0, 0, null, 0, 0, null);
 
-        assertThat(result.proofFile()).isNull();
-        assertThat(result.errorMessage()).isNull();
+        assertNull(result.proofFile());
+        assertNull(result.errorMessage());
     }
 
     @Test
