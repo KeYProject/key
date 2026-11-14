@@ -778,12 +778,6 @@ public class ConstantStringExpressionEvaluator extends JavaTransformerAbstract {
         }
 
         @Override
-        public void visit(KeyMetaConstructExpression n, Object arg) {
-            super.visit(n, arg);
-            defaultAction(n, arg);
-        }
-
-        @Override
         public void visit(KeyMetaConstruct n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);

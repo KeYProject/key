@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.transformations.pipeline.CreateObjectBuilder;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * If an allocation expression <code>new Class(...)</code> occurs, a new object has to be created,
  * in KeY this is quite similar to take it out of a list of objects and setting the implicit flag
@@ -21,13 +23,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * <code>&lt;createObject&gt;</code> which on its part calls another implicit method
  * <code>lt;prepare&gt;</code> for setting the fields values.
  */
+@TransformerMeta(name = "#createObject")
 public class CreateObject extends ProgramTransformer {
 
     /**
      * @param newExpr The {@link ProgramElement}
      */
     public CreateObject(ProgramElement newExpr) {
-        super("create-object", newExpr);
+        super("#createObject", newExpr);
     }
 
     @Override
@@ -43,5 +46,10 @@ public class CreateObject extends ProgramTransformer {
 
         return new ProgramElement[] { KeYJavaASTFactory.methodCall(classReference,
             CreateObjectBuilder.IMPLICIT_OBJECT_CREATE) };
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return ImmutableList.of(body());
     }
 }

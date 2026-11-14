@@ -13,6 +13,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.sort.Sort;
 
 
+@TransformerMeta(name = "#addCast")
 public final class AddCast extends AbstractTermTransformer {
 
     public AddCast() {

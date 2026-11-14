@@ -13,14 +13,21 @@ import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
 import de.uka.ilkd.key.java.ast.reference.ArrayReference;
+import de.uka.ilkd.key.java.loader.JavaBuildingExceptions;
+import de.uka.ilkd.key.java.loader.JavaBuildingIssue;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
+import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
+import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.rule.tacletbuilder.*;
+import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -52,12 +59,17 @@ public class TestTacletParser {
                   \\program Statement #p1, #s ;\s
                   \\program Expression #e2, #e ;\s
                   \\program SimpleExpression #se ;\s
+                  \\program MethodName #mn ;\s
+                  \\program[list] SimpleExpression #selist ;\s
                   \\program Variable #slhs, #arr, #ar, #ar1 ;\s
                   \\program LoopInit #i ;\s
                   \\program Label #lab, #lb0, #lb1 ;\s
                   \\program Label #inner, #outer ;\s
                   \\program Type #typ ;\s
                   \\program Variable #v0, #v, #v1, #k, #boolv ;\s
+                  \\program ExecutionContext #ex ;\s
+                  \\program SimpleInstanceCreation #n ;\s
+                  \\program ArrayInitializer #arrayinitializer ;\s
                   \\program[list] Catch #cf ;\s
                   \\term s x,x0 ;
                   \\skolemTerm s sk ;
@@ -312,7 +324,7 @@ public class TestTacletParser {
     @Test
     public void testSchemaJava0() {
         parseTaclet("while_right { \\find (\\<{.. while(#e2) {#p1} ...}\\>post)"
-            + "\\replacewith (\\<{.. #unwind-loop (#inner, #outer, while(#e2) {#p1});  ...}\\>post) } ");
+            + "\\replacewith (\\<{.. #unwindLoop (#inner, #outer, while(#e2) {#p1});  ...}\\>post) } ");
 
     }
 
@@ -384,13 +396,169 @@ public class TestTacletParser {
                 eval_order_array_access_right{
                     \\find(\\<{..#v=#ar[#e];...}\\>post)
                     \\varcond(\\newTypeOf(#ar1, #ar),\\newTypeOf(#v0, #e), \\newTypeOf(#k, #e))
-                    \\replacewith(\\<{..for(#k=0;#k<#length-reference(#ar);#k++){#ar1[#k]=#ar[#k];}
+                    \\replacewith(\\<{..for(#k=0;#k<#lengthReference(#ar);#k++){#ar1[#k]=#ar[#k];}
                                         #v0=#e; #v=#ar1[#v0];...}\\>post)
                     \\displayname "eval_order_array_access_right"
                 }
                 """);
     }
 
+    @Test
+    public void testSchemaJavaIsStatic() {
+        FindTaclet taclet = (FindTaclet) parseTaclet(
+            "isstatic_test {\\find(\\<{.. #v0 = #isstatic(#v); ...}\\>true) \\replacewith(true)}");
+        JTerm find = taclet.find();
+        JavaBlock jb = find.javaBlock();
+        ContextStatementBlock ct = (ContextStatementBlock) jb.program();
+        Assignment ca = (Assignment) ct.getChildAt(0);
+        assertInstanceOf(IsStatic.class, ca.getChildAt(1));
+    }
+
+    @Test
+    public void testMethodCallRejectsWrongSortExecutionContext() {
+        // 3-arg form (ProgramSV ec, SchemaVariable result, ProgramElement body): slot 0 is the
+        // execution context. Passing a VARIABLE-sort #v0 there must be rejected at parse time
+        // with a positioned reportError instead of being silently accepted.
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badMethodCall {\\find(\\<{.. #methodCall(#v0, #v, #s); ...}\\>true)"
+                + " \\replacewith(true)}"));
+        assertTrue(hasCause(e, JavaBuildingExceptions.class),
+            "wrong execution-context sort must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testMethodCallRejectsUnsupportedProgramSort() {
+        // Single-ProgramSV form: #p1 has STATEMENT sort, which is neither EXECUTIONCONTEXT nor
+        // VARIABLE, so it must not be silently nulled but rejected at parse time.
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badMethodCall {\\find(\\<{.. #methodCall(#p1, #s); ...}\\>true)"
+                + " \\replacewith(true)}"));
+        assertTrue(hasCause(e, JavaBuildingExceptions.class),
+            "unsupported program sort must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testIsStaticZeroArgsRejected() {
+        // Expression-position transformers take exactly one argument. #isstatic() with zero
+        // arguments must yield a parse error rather than an IndexOutOfBoundsException.
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badIsStatic {\\find(\\<{.. #v0 = #isstatic(); ...}\\>true) \\replacewith(true)}"));
+        assertFalse(hasCause(e, IndexOutOfBoundsException.class),
+            "zero-arg #isstatic must not crash with IndexOutOfBoundsException");
+        assertTrue(hasCause(e, JavaBuildingExceptions.class),
+            "zero-arg #isstatic must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testLengthReferenceTwoArgsRejected() {
+        // Expression-position transformers take exactly one argument. #lengthReference(a, b)
+        // with two arguments must be rejected rather than silently dropping the second.
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badLength {\\find(\\<{.. #v0 = #lengthReference(#ar, #ar1); ...}\\>true)"
+                + " \\replacewith(true)}"));
+        assertTrue(hasCause(e, JavaBuildingExceptions.class),
+            "two-arg #lengthReference must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testMethodCallResultVarRoundtrips() {
+        // The pretty printer must emit every #methodCall schema-variable argument so that a rule
+        // can
+        // be printed and re-parsed (Agent-KeY needs roundtrippable rules). The result variable #v0
+        // must survive a print + re-parse cycle instead of being dropped.
+        FindTaclet original = (FindTaclet) parseTaclet("methodCallRt {\\find(\\<{.. "
+            + "#methodCall(#v0, #se.#mn(#selist)); ...}\\>true) \\replacewith(true)}");
+
+        // the parsed \find contains the MethodCall transformer as its single statement
+        ContextStatementBlock block =
+            (ContextStatementBlock) original.find().javaBlock().program();
+        MethodCall mc = (MethodCall) block.getChildAt(0);
+
+        // serialise exactly the meta-construct, as the pretty printer does during rule output
+        PrettyPrinter pp = PrettyPrinter.purePrinter();
+        pp.printFragment(mc);
+        String printed = pp.result();
+
+        assertTrue(printed.contains("#methodCall(#v0,"),
+            "printed #methodCall must keep its result variable, but was:\n" + printed);
+
+        // the printed fragment must re-parse as a rule holding the same meta-construct
+        Taclet reparsed =
+            parseTaclet("rt2 {\\find(\\<{.. " + printed + "; ...}\\>true) \\replacewith(true)}");
+        assertNotNull(reparsed);
+    }
+
+    @Test
+    public void testMetaConstructErrorCarriesPosition() {
+        // A broken meta-construct must surface a positioned parsing error (a real line/column,
+        // not the -1 that PositionInfo.UNDEFINED corresponds to).
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badIsStatic {\\find(\\<{.. #v0 = #isstatic(); ...}\\>true) \\replacewith(true)}"));
+        JavaBuildingExceptions jbe =
+            (JavaBuildingExceptions) causeOf(e, JavaBuildingExceptions.class);
+        assertNotNull(jbe);
+        JavaBuildingIssue issue = jbe.getIssues().get(0);
+        assertNotEquals(-1, issue.getLine(), "error must carry a real line number");
+        assertNotEquals(-1, issue.getColumn(), "error must carry a real column number");
+    }
+
+    @Test
+    public void testMethodCallRejectsWrongSortResultVariable() {
+        // 3-arg form: slot 1 is the result variable and must be a program variable. A
+        // Statement-sort schema variable there must be rejected at parse time.
+        BuildingException e = assertThrows(BuildingException.class, () -> parseTaclet(
+            "badMethodCallResult {\\find(\\<{.. #methodCall(#ex, #p1, #s); ...}\\>true)"
+                + " \\replacewith(true)}"));
+        assertTrue(hasCause(e, JavaBuildingExceptions.class),
+            "wrong result-variable sort must surface as reportError, but was: " + e.getMessage());
+    }
+
+    @Test
+    public void testMetaConstructArgumentsRoundtrip() {
+        // The pretty printer must emit every schema-variable argument of a meta construct, not
+        // only #methodCall's, so that rules can be printed and re-parsed (Agent-KeY needs
+        // roundtrippable rules).
+        assertMetaConstructRoundtrips("unwindLoopRt",
+            "#unwindLoop(#inner, #outer, while (#e) #s)", "#unwindLoop(#inner,");
+        assertMetaConstructRoundtrips("constructorCallRt",
+            "#constructorCall(#v0, #n)", "#constructorCall(#v0,");
+        assertMetaConstructRoundtrips("initArrayCreationRt",
+            "#initArrayCreation(#v0, #arrayinitializer)", "#initArrayCreation(#v0,");
+    }
+
+    private void assertMetaConstructRoundtrips(String name, String metaConstruct,
+            String expectedPrefix) {
+        FindTaclet original = (FindTaclet) parseTaclet(name + " {\\find(\\<{.. "
+            + metaConstruct + "; ...}\\>true) \\replacewith(true)}");
+        ContextStatementBlock block =
+            (ContextStatementBlock) original.find().javaBlock().program();
+        ProgramTransformer transformer = (ProgramTransformer) block.getChildAt(0);
+
+        PrettyPrinter pp = PrettyPrinter.purePrinter();
+        pp.printFragment(transformer);
+        String printed = pp.result();
+
+        assertTrue(printed.contains(expectedPrefix),
+            "printed meta construct must keep its schema-variable arguments, but was:\n"
+                + printed);
+
+        Taclet reparsed = parseTaclet(
+            name + "Reparsed {\\find(\\<{.. " + printed + "; ...}\\>true) \\replacewith(true)}");
+        assertNotNull(reparsed);
+    }
+
+    private static boolean hasCause(Throwable t, Class<? extends Throwable> type) {
+        return causeOf(t, type) != null;
+    }
+
+    private static Throwable causeOf(Throwable t, Class<? extends Throwable> type) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            if (type.isInstance(c)) {
+                return c;
+            }
+        }
+        return null;
+    }
 
     @Test
     public void testFreeReplacewithVariables() {
@@ -411,7 +579,7 @@ public class TestTacletParser {
         boolean thrown = false;
         try {
             parseTaclet("xyz { find (<{.. int j=0; for(#i;j<9;j++)" + "; ...}>post)"
-                + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});" + "  ...}>post) } ");
+                + "replacewith (<{.. #unwindLoop (while(#e2) {#p1});" + "  ...}>post) } ");
         } catch (RuntimeException e) {
             thrown = true;
         }
@@ -424,7 +592,7 @@ public class TestTacletParser {
         boolean thrown = false;
         try {
             parseTaclet("xyz { find (<{.. int j=0; for(#lab;j<42;j++) ; ...}>post)"
-                + "replacewith (<{.. #unwind-loop (while(#e2) {#p1});  ...}>post) } ");
+                + "replacewith (<{.. #unwindLoop (while(#e2) {#p1});  ...}>post) } ");
         } catch (RuntimeException e) {
             thrown = true;
         }

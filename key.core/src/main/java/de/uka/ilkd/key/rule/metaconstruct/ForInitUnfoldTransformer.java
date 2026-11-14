@@ -12,6 +12,8 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * Pulls the initializor out of a for-loop. Only receives the init as a parameter, not the whole
  * for-loop.
@@ -26,19 +28,20 @@ import de.uka.ilkd.key.util.Debug;
  *
  * @author Benedikt Dreher
  */
+@TransformerMeta(name = "#forInitUnfoldTransformer")
 public class ForInitUnfoldTransformer extends ProgramTransformer {
     /**
      * @param loopInit A loop initializer if called for a concrete program.
      */
     public ForInitUnfoldTransformer(LoopInit loopInit) {
-        super("forInitUnfoldTransformer", loopInit);
+        super("#forInitUnfoldTransformer", loopInit);
     }
 
     /**
      * @param programSV A {@link ProgramSV} if called while parsing a taclet.
      */
     public ForInitUnfoldTransformer(ProgramSV programSV) {
-        super("forInitUnfoldTransformer", programSV);
+        super("#forInitUnfoldTransformer", programSV);
     }
 
     @Override
@@ -54,5 +57,10 @@ public class ForInitUnfoldTransformer extends ProgramTransformer {
         }
 
         return loopInitStatementList;
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return ImmutableList.of(body());
     }
 }

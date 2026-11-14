@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.loader;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.*;
 import java.util.function.Predicate;
@@ -34,7 +36,6 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.rule.metaconstruct.*;
@@ -46,7 +47,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
 import org.key_project.logic.MetaSpace;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
-import org.key_project.logic.op.sv.OperatorSV;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
@@ -453,6 +453,134 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                         .toList())
                 .orElse(Collections.emptyList()));
         return comments;
+    }
+
+    /**
+     * Instantiates a registered transformer by matching one of its public constructors against the
+     * converted meta-construct arguments. See {@link #getMatchingConstructor} for the matching
+     * rules.
+     */
+    private ProgramTransformer instantiate(Class<? extends ProgramTransformer> transformer,
+            List<?> args, Node n) {
+        final Constructor<?> ctor = getMatchingConstructor(transformer, args, n);
+        try {
+            return (ProgramTransformer) ctor.newInstance(args.toArray());
+        } catch (IllegalAccessException | InstantiationException e) {
+            return reportError(n, "Cannot instantiate " + transformer.getSimpleName() + ": " + e);
+        } catch (InvocationTargetException e) {
+            return reportError(n, "Cannot instantiate " + transformer.getSimpleName() + ": "
+                + e.getCause());
+        }
+    }
+
+    /**
+     * Selects the constructor of {@code transformer} that fits {@code args}: it must have the same
+     * arity and every parameter must accept the corresponding argument ({@code null} arguments
+     * match any non-primitive parameter). If several constructors fit, the most specific one wins:
+     * fewer widening steps from the runtime argument types to the parameter types, then more
+     * {@link SchemaVariable} parameters (the taclet-facing constructors), and finally a
+     * deterministic order via the parameter type names.
+     */
+    private Constructor<?> getMatchingConstructor(Class<? extends ProgramTransformer> transformer,
+            List<?> args, Node n) {
+        final List<Constructor<?>> candidates = new ArrayList<>();
+        for (Constructor<?> ctor : transformer.getConstructors()) {
+            final Class<?>[] params = ctor.getParameterTypes();
+            if (params.length != args.size()) {
+                continue;
+            }
+            boolean matches = true;
+            for (int i = 0; i < params.length; i++) {
+                final Object a = args.get(i);
+                if (a != null && !params[i].isInstance(a)) {
+                    matches = false;
+                    break;
+                }
+            }
+            if (matches) {
+                candidates.add(ctor);
+            }
+        }
+        if (candidates.isEmpty()) {
+            return reportError(n, "No constructor of " + transformer.getSimpleName()
+                + " accepts " + args.size() + " meta-construct arguments " + args);
+        }
+        candidates.sort((a, b) -> {
+            // Prefer the taclet-facing constructor, which takes the schema variable(s) directly,
+            // e.g. PostWork(SchemaVariable) over PostWork(ProgramVariable).
+            int cmp = Integer.compare(schemaVariableParams(b), schemaVariableParams(a));
+            if (cmp != 0) {
+                return cmp;
+            }
+            cmp = Integer.compare(wideningSteps(a, args), wideningSteps(b, args));
+            if (cmp != 0) {
+                return cmp;
+            }
+            return Arrays.toString(a.getParameterTypes())
+                    .compareTo(Arrays.toString(b.getParameterTypes()));
+        });
+        return candidates.get(0);
+    }
+
+    /**
+     * @return the number of parameters that accept a {@link SchemaVariable}
+     */
+    private static int schemaVariableParams(Constructor<?> ctor) {
+        return (int) Arrays.stream(ctor.getParameterTypes())
+                .filter(SchemaVariable.class::isAssignableFrom).count();
+    }
+
+    /**
+     * @return the total number of widening steps from the runtime type of each argument to the
+     *         corresponding constructor parameter type
+     */
+    private static int wideningSteps(Constructor<?> ctor, List<?> args) {
+        final Class<?>[] params = ctor.getParameterTypes();
+        int steps = 0;
+        for (int i = 0; i < params.length; i++) {
+            final Object a = args.get(i);
+            if (a != null) {
+                steps += wideningSteps(a.getClass(), params[i]);
+            }
+        }
+        return steps;
+    }
+
+    /**
+     * @return the minimal number of steps from {@code from} to {@code to} in the class/interface
+     *         hierarchy
+     */
+    private static int wideningSteps(Class<?> from, Class<?> to) {
+        if (from == to) {
+            return 0;
+        }
+        final ArrayDeque<Class<?>> work = new ArrayDeque<>();
+        final Map<Class<?>, Integer> dist = new HashMap<>();
+        work.add(from);
+        dist.put(from, 0);
+        while (!work.isEmpty()) {
+            final Class<?> current = work.removeFirst();
+            final int d = dist.get(current);
+            if (current == to) {
+                return d;
+            }
+            for (Class<?> next : supertypes(current)) {
+                if (!dist.containsKey(next)) {
+                    dist.put(next, d + 1);
+                    work.add(next);
+                }
+            }
+        }
+        return Integer.MAX_VALUE; // unreachable: assignability was checked before
+    }
+
+    private static Collection<Class<?>> supertypes(Class<?> c) {
+        final Collection<Class<?>> result = new ArrayList<>();
+        if (c.getSuperclass() != null) {
+            result.add(c.getSuperclass());
+        }
+        Collections.addAll(result, c.getInterfaces());
+        return result;
     }
 
     @SuppressWarnings("unchecked")
@@ -949,6 +1077,19 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         if (n.getNameAsString().startsWith("\\")) {
             return handleSpecialFunctionInvocation(n, n.getNameAsString(), n.getArguments());
+        }
+        // Expression-position transformers have no grammar token; they parse as ordinary method
+        // calls and are resolved through the expression registry. Every registered expression
+        // transformer takes a single argument, so any other arity is rejected by the constructor
+        // matching below (reported as a positioned parse error).
+        final Class<? extends ProgramTransformer> expressionTransformer =
+            ProgramTransformerRegistry.expressionByName(n.getNameAsString());
+        if (expressionTransformer != null) {
+            final List<Object> args = new ArrayList<>(n.getArguments().size());
+            for (var a : n.getArguments()) {
+                args.add(accept(a));
+            }
+            return instantiate(expressionTransformer, args, n);
         }
 
         MethodName name;
@@ -1929,89 +2070,34 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     @Override
-    public Object visit(KeyMetaConstructExpression n, Void arg) {
-        String mcName = n.getText();
-        Expression child = accept(n.getChild());
-        return switch (mcName) {
-            case "#create-object" -> new CreateObject(child);
-            case "#isstatic" -> new IsStatic(child);
-            case "#length-reference" -> new ArrayLength(child);
-            default -> reportError(n, "Program meta construct " + mcName + " unknown.");
-        };
-    }
-
-
-    @Override
     public Object visit(KeyMetaConstruct n, Void arg) {
-        String mcName = n.getKind();
-        final ImmutableArray<SchemaVariable> labels = map(n.getSchemas());
-        return switch (mcName) {
-            case "#switch-to-if" -> new SwitchToIf(accept(n.getChild()));
-            case "#unwind-loop" ->
-                new UnwindLoop(labels.get(0), labels.get(1), accept(n.getChild()));
-            case "#unpack" -> new Unpack(accept(n.getChild()));
-            case "#forInitUnfoldTransformer" ->
-                new ForInitUnfoldTransformer((ProgramSV) accept(n.getChild()));
-            case "#for-to-while" ->
-                new ForToWhile(labels.get(0), labels.get(1), accept(n.getChild()));
-            case "#enhancedfor-elim" -> {
-                EnhancedFor efor = acceptn(n.getChild());
-                if (efor == null) {
-
-                    yield reportError(n,
-                        "#enhancedfor-elim requires an enhanced for loop as argument");
-                }
-
-                ProgramSV execSV = null;
-                for (SchemaVariable programSV : labels) {
-                    if (((OperatorSV) programSV).sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                        execSV = (ProgramSV) programSV;
-                        break;
-                    }
-                }
-                yield new EnhancedForElimination(execSV, efor);
-            }
-            case "#do-break" -> new DoBreak(accept(n.getChild()));
-            case "#expand-method-body" ->
-                new ExpandMethodBody((SchemaVariable) accept(n.getChild()));
-            case "#method-call" -> {
-                ProgramSV execSV = null;
-                ProgramSV returnSV = null;
-                for (int i = 0; i < labels.size(); i++) {
-                    final OperatorSV sv = (OperatorSV) labels.get(i);
-                    if (sv.sort() == ProgramSVSort.VARIABLE) {
-                        returnSV = (ProgramSV) sv;
-                    }
-                    if (sv.sort() == ProgramSVSort.EXECUTIONCONTEXT) {
-                        execSV = (ProgramSV) sv;
-                    }
-                }
-                yield new MethodCall(execSV, returnSV, accept(n.getChild()));
-            }
-            case "#evaluate-arguments" -> new EvaluateArgs(accept(n.getChild()));
-            case "#constructor-call" -> new ConstructorCall(labels.get(0), accept(n.getChild()));
-            case "#special-constructor-call" -> new SpecialConstructorCall(accept(n.getChild()));
-            case "#post-work" -> new PostWork((SchemaVariable) accept(n.getChild()));
-            case "#static-initialisation" -> new StaticInitialisation(accept(n.getChild()));
-            case "#resolve-multiple-var-decl" ->
-                new MultipleVarDecl((SchemaVariable) n.getChild().accept(this, arg));
-            case "#array-post-declaration" ->
-                new ArrayPostDecl((SchemaVariable) n.getChild().accept(this, arg));
-            case "#init-array-creation" ->
-                new InitArrayCreation(labels.get(0), accept(n.getChild()));
-            case "#reattachLoopInvariant" -> new ReattachLoopInvariant(accept(n.getChild()));
-            default -> reportError(n, "Program meta construct " + n.getKind() + " unknown.");
-        };
+        final String kind = n.getKind();
+        final Class<? extends ProgramTransformer> transformer =
+            ProgramTransformerRegistry.byName(kind);
+        if (transformer == null) {
+            return reportError(n, "Program meta construct " + kind + " unknown or unsupported.");
+        }
+        // One child per comma-separated argument: bare schema variables resolve to
+        // SchemaVariables, statements and expressions are converted as usual.
+        final ImmutableArray<Object> converted = map(n.getChildren());
+        final List<Object> args = new ArrayList<>(converted.size());
+        for (Object a : converted) {
+            args.add(a);
+        }
+        return instantiate(transformer, args, n);
     }
 
     @Override
     public Object visit(KeyMetaConstructType n, Void arg) {
-        Expression child = accept(n.getExpr());
-        if ("#typeof".equals(n.getKind())) {
-            return new TypeOf(child);
-        } else {
-            return reportError(n, "Program meta construct " + n.getKind() + " unknown.");
+        final Class<? extends ProgramTransformer> transformer =
+            ProgramTransformerRegistry.expressionByName(n.getKind());
+        if (transformer == null) {
+            return reportError(n,
+                "Program meta construct " + n.getKind() + " unknown or unsupported.");
         }
+        final List<Object> args = new ArrayList<>(1);
+        args.add(accept(n.getExpr()));
+        return instantiate(transformer, args, n);
     }
 
 
