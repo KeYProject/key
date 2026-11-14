@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.nparser.JavaKeYParser;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.parsing.BuildingException;
 
@@ -87,6 +88,12 @@ public class ProblemFinder extends ExpressionBuilder {
                     p.load(new StringReader(value));
                     proofObligation = new Configuration();
                     p.forEach((k, v) -> proofObligation.set(k.toString(), v.toString()));
+                    // A value without a "class" entry is not a serialized proof obligation
+                    // but a plain contract name (headless interface spec §4.2); keep the
+                    // un-mangled name so the loader can resolve it.
+                    if (!proofObligation.exists(IPersistablePO.PROPERTY_CLASS)) {
+                        proofObligation.set("contract", value);
+                    }
                 } catch (IOException e) {
                     throw new BuildingException(ctx,
                         "Could not load the proof obligation given " +

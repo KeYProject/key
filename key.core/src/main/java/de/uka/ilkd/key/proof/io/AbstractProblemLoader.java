@@ -598,6 +598,12 @@ public abstract class AbstractProblemLoader {
 
         String poClass = proofObligation.getString(IPersistablePO.PROPERTY_CLASS);
         if (poClass == null || poClass.isEmpty()) {
+            // A \proofObligation without a serialized PO (no "class" entry) may carry a plain
+            // contract name in the "contract" entry (headless interface spec §4.2, R6/E6).
+            String contractName = proofObligation.getString("contract");
+            if (contractName != null && !contractName.isEmpty()) {
+                return loadByChosenContract(contractName);
+            }
             throw new IOException("Proof obligation class property \""
                 + IPersistablePO.PROPERTY_CLASS + "\" is not defiend or empty.");
         }
