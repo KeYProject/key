@@ -40,6 +40,16 @@ public final class Fixtures {
         return resource("/fixtures/overflow/overflow.key");
     }
 
+    /**
+     * The load file of the known-open three-branch {@code Size} contract: full proof search
+     * closes the valid branch and leaves the two invalid branches open (§6 acceptance F2 and
+     * the {@code --print-open-goals} truncation test). The scripted-proving tests use the
+     * {@code /fixtures/size/} variant, whose proof starts with a single open goal.
+     */
+    public static Path sizeOpenKey() {
+        return resource("/fixtures/size-open/size.key");
+    }
+
     /// The load file carrying a {@code \settings} block selecting {@code intRules:javaSemantics}.
     public static Path loadFileSettingsKey() {
         return resource("/fixtures/index/loadfile-settings.key");
