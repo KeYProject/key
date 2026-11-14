@@ -117,7 +117,7 @@ public class InstanceofPattern extends TypeOperator {
     /**
      * Get the pattern variable bound by this instanceof expression.
      *
-     * @return the VariableSpecification for the pattern variable, or null if no pattern
+     * @return the VariableSpecification for the pattern variable
      */
     public VariableSpecification getPatternVariable() {
         return patternVariable;
