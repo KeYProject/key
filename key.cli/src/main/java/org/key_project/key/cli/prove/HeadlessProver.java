@@ -38,10 +38,21 @@ import org.slf4j.LoggerFactory;
  * Per-contract failures are reported as {@link ResultStatus#ERROR} results (never thrown);
  * failures to load the problem file surface as {@link ProblemLoaderException} and unknown
  * selectors as {@link UnknownContractException}.
+ * <p>
+ * A positive timeout bounds each contract's proof search ({@link ProofStarter#setTimeout(long)});
+ * a search abandoned by the timeout is reported as {@link ResultStatus#TIMED_OUT} (exit code
+ * {@code 2}), while a search that exhausts the strategy without a timeout in effect stays
+ * {@link ResultStatus#OPEN} (exit code {@code 1}).
  */
 public final class HeadlessProver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HeadlessProver.class);
+
+    /**
+     * Value passed to {@link ProofStarter#setTimeout(long)} for {@code --timeout 0}: a non-negative
+     * value enables the stop condition's time limit, while {@code -1} disables it.
+     */
+    private static final long NO_TIMEOUT = -1L;
 
     private final long timeoutMs;
 
@@ -138,19 +149,18 @@ public final class HeadlessProver {
 
             ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
-            if (timeoutMs > 0) {
-                starter.setTimeout(timeoutMs);
-            }
+            starter.setTimeout(timeoutMs > 0 ? timeoutMs : NO_TIMEOUT);
             ProofSearchInformation<Proof, Goal> info = starter.start();
 
-            boolean closed = proof.closed() || proof.openGoals().isEmpty();
+            long elapsedMs = info.getTime();
             int openGoals = proof.openGoals().size();
-            LOGGER.debug("Contract '{}' finished after {} ms with {} open goals",
+            boolean closed = proof.closed() || openGoals == 0;
+            ResultStatus status = classifyStatus(closed, timeoutMs, elapsedMs);
+            LOGGER.debug("Contract '{}' finished after {} ms with {} open goals (status {})",
                 contract.getName(),
-                info.getTime(), openGoals);
-            return new ContractResult(contract.getName(),
-                closed ? ResultStatus.CLOSED : ResultStatus.OPEN, openGoals,
-                elapsedMs(start), null, 0, 0, null);
+                elapsedMs, openGoals, status);
+            return new ContractResult(contract.getName(), status, openGoals, elapsedMs, null,
+                0, 0, null);
         } catch (Exception e) {
             LOGGER.debug("Proving contract '{}' failed", contract.getName(), e);
             return new ContractResult(contract.getName(), ResultStatus.ERROR, 0, elapsedMs(start),
@@ -160,6 +170,29 @@ public final class HeadlessProver {
                 proof.dispose();
             }
         }
+    }
+
+    /**
+     * Classifies the final status of a contract after proof search (§1 of the headless interface
+     * spec): a closed proof is {@link ResultStatus#CLOSED}; an unclosed proof is
+     * {@link ResultStatus#TIMED_OUT} iff the run requested a timeout and the measured search time
+     * reached it, otherwise {@link ResultStatus#OPEN}.
+     * <p>
+     * The stop condition's own message (accessible via {@code ProofSearchInformation.reason()})
+     * does not distinguish a timeout from having reached the maximal number of rule applications,
+     * so the classification relies on the measured elapsed time instead.
+     *
+     * @param closed whether all goals of the proof are closed
+     * @param timeoutMs the requested proof-search timeout in milliseconds ({@code 0} = none)
+     * @param elapsedMs the measured wall-clock time of the proof search in milliseconds
+     * @return the final status of the contract
+     */
+    static ResultStatus classifyStatus(boolean closed, long timeoutMs, long elapsedMs) {
+        if (closed) {
+            return ResultStatus.CLOSED;
+        }
+        return timeoutMs > 0 && elapsedMs >= timeoutMs ? ResultStatus.TIMED_OUT
+                : ResultStatus.OPEN;
     }
 
     private static long elapsedMs(long startNanos) {

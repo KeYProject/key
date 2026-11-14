@@ -49,7 +49,8 @@ public final class ProveCommand implements Callable<Integer> {
 
     @Option(names = "--timeout", paramLabel = "<MS>", defaultValue = "0",
         description = "Per-contract proof search timeout in milliseconds (0 = no timeout). "
-            + "Note: the timed_out result status is not yet determined in this phase.")
+            + "A search abandoned by the timeout is reported with status \"timed_out\" "
+            + "and exit code 2.")
     private long timeout;
 
     @Option(names = "--choose-contract", paramLabel = "<SELECTOR>",
