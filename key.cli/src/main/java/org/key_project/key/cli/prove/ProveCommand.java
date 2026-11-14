@@ -42,6 +42,18 @@ import picocli.CommandLine.Spec;
  * duration of the run (never persisted back into {@code ~/.key}). An unknown key or undocumented
  * value is an input error ({@code KEY_ERROR settings: '...' not understood}, exit {@code 3}).
  * <p>
+ * Proof-file honesty (§3): a proof file is written only where the caller requested one —
+ * {@code --proof <PATH>} for single-contract runs, or {@code --proof-dir
+ *
+<DIR>
+ * } for runs with
+ * several contracts (files {@code <position>.proof}, 0-based selection position). A closed proof
+ * is always written (first line {@code KEY_PROOF_STATUS closed 0}); an unclosed proof is written
+ * only with {@code --save-partial} (first line {@code KEY_PROOF_STATUS open <n>}); without
+ * {@code --proof}/{@code --proof-dir} nothing is written. {@code --proof} with several selected
+ * contracts is an input error (exit {@code 3}). The written file is reported in each result's
+ * {@code proofFile} field (absolute path or {@code null}).
+ * <p>
  * Errors follow §1 of the headless interface spec and are reported as {@link CliError}s: input
  * errors (negative timeout, missing file, unknown contract, unloadable file) exit {@code 3}, and
  * unexpected exceptions while processing a file exit {@code 4}. A file that exists but cannot be
@@ -88,13 +100,32 @@ public final class ProveCommand implements Callable<Integer> {
             + "and KeY defaults.")
     private List<String> strategyOption = List.of();
 
+    @Option(names = "--proof", paramLabel = "<PATH>",
+        description = "Write the saved proof of a single-contract run to this path (§3). The "
+            + "file is written for a closed proof, and for an unclosed proof only with "
+            + "--save-partial. Use --proof-dir for runs with several contracts.")
+    @org.jspecify.annotations.Nullable
+    private Path proof;
+
+    @Option(names = "--proof-dir", paramLabel = "<DIR>",
+        description = "Write the saved proofs of a multi-contract run into this directory as "
+            + "<position>.proof files, one per selected contract in selection order (§3).")
+    @org.jspecify.annotations.Nullable
+    private Path proofDir;
+
+    @Option(names = "--save-partial",
+        description = "Also write the proof file of an unclosed proof (marked "
+            + "'KEY_PROOF_STATUS open <n>') when --proof or --proof-dir is given (§3).")
+    private boolean savePartial;
+
     /**
      * Runs the prove command.
      *
      * @return the exit code, {@code 0} if all contracts closed, otherwise the worst status code
      * @throws CliError an input error (negative timeout, missing file, unknown contract,
-     *         unloadable file) or an internal error; reported by the root command line as a
-     *         {@code KEY_ERROR} line with the corresponding exit code (§1)
+     *         unloadable file, conflicting {@code --proof}/{@code --proof-dir} usage) or an
+     *         internal error; reported by the root command line as a {@code KEY_ERROR} line with
+     *         the corresponding exit code (§1)
      */
     @Override
     public Integer call() throws CliError {
@@ -103,6 +134,9 @@ public final class ProveCommand implements Callable<Integer> {
         }
         if (settingsFile != null && !Files.exists(settingsFile)) {
             throw CliError.input("file not found: " + settingsFile);
+        }
+        if (proof != null && proofDir != null) {
+            throw CliError.input("--proof and --proof-dir are mutually exclusive");
         }
         for (Path file : files) {
             if (!Files.exists(file)) {
@@ -120,16 +154,19 @@ public final class ProveCommand implements Callable<Integer> {
 
         PrintWriter out = spec.commandLine().getOut();
         HeadlessProver prover = new HeadlessProver(timeout, runnerSettings);
+        ProofOutput output = new ProofOutput(proof, proofDir, savePartial);
         List<ContractResult> results = new ArrayList<>();
         for (Path file : files) {
             try {
-                results.addAll(prover.prove(file, chooseContract));
+                results.addAll(prover.prove(file, chooseContract, output));
             } catch (UnknownContractException e) {
                 for (ContractIndex.Row row : e.index().list()) {
                     out.println(ContractIndex.renderLine(row));
                 }
                 out.flush();
                 throw CliError.input("contract '" + e.selector() + "' not found");
+            } catch (ProofOutputConflictException e) {
+                throw CliError.input(errorMessage(e));
             } catch (ProblemLoaderException e) {
                 ContractResult failure = loadFailureResult(file, e);
                 out.println(resultWriter.toJsonLine(failure));
