@@ -20,6 +20,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.key.cli.ContractResult;
+import org.key_project.key.cli.ExitCode;
 import org.key_project.key.cli.ResultStatus;
 import org.key_project.prover.engine.ProofSearchInformation;
 
@@ -163,13 +164,27 @@ public final class HeadlessProver {
                 0, 0, null);
         } catch (Exception e) {
             LOGGER.debug("Proving contract '{}' failed", contract.getName(), e);
-            return new ContractResult(contract.getName(), ResultStatus.ERROR, 0, elapsedMs(start),
-                null, 0, 0, errorMessage(e));
+            return errorResult(contract.getName(), elapsedMs(start), e);
         } finally {
             if (proof != null && !proof.isDisposed()) {
                 proof.dispose();
             }
         }
+    }
+
+    /**
+     * Creates the {@link ResultStatus#ERROR} result for a contract whose proof attempt failed:
+     * the record carries a non-{@code null} {@code errorMessage} and maps to the internal-error
+     * exit code {@code 4} via {@link ExitCode#worstOf}.
+     *
+     * @param contract the canonical name of the contract that failed
+     * @param elapsedMs wall-clock milliseconds spent on the failed attempt
+     * @param failure the exception thrown during the proof attempt
+     * @return the error result for the contract
+     */
+    static ContractResult errorResult(String contract, long elapsedMs, Exception failure) {
+        return new ContractResult(contract, ResultStatus.ERROR, 0, elapsedMs, null, 0, 0,
+            errorMessage(failure));
     }
 
     /**

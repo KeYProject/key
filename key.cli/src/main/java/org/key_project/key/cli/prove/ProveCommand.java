@@ -13,9 +13,11 @@ import java.util.concurrent.Callable;
 
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
+import org.key_project.key.cli.CliError;
 import org.key_project.key.cli.ContractResult;
 import org.key_project.key.cli.ExitCode;
 import org.key_project.key.cli.ResultRecordWriter;
+import org.key_project.key.cli.ResultStatus;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -32,6 +34,12 @@ import picocli.CommandLine.Spec;
  * {@code NAME.#<IDX>}, or an exact canonical name, §4.2); without selectors the load file's
  * {@code \chooseContract}/{@code \proofObligation} directive selects the contract, and without
  * a directive all contracts are proven.
+ * <p>
+ * Errors follow §1 of the headless interface spec and are reported as {@link CliError}s: input
+ * errors (negative timeout, missing file, unknown contract, unloadable file) exit {@code 3}, and
+ * unexpected exceptions while processing a file exit {@code 4}. A file that exists but cannot be
+ * loaded additionally produces one error record (with the file name as its {@code contract} and a
+ * non-{@code null} {@code errorMessage}) before the {@code KEY_ERROR} line is printed.
  */
 @Command(name = "prove", description = "Prove the contracts of the given KeY problem file(s).",
     mixinStandardHelpOptions = true)
@@ -65,23 +73,22 @@ public final class ProveCommand implements Callable<Integer> {
      * Runs the prove command.
      *
      * @return the exit code, {@code 0} if all contracts closed, otherwise the worst status code
+     * @throws CliError an input error (negative timeout, missing file, unknown contract,
+     *         unloadable file) or an internal error; reported by the root command line as a
+     *         {@code KEY_ERROR} line with the corresponding exit code (§1)
      */
     @Override
-    public Integer call() {
-        PrintWriter out = spec.commandLine().getOut();
-        PrintWriter err = spec.commandLine().getErr();
-
+    public Integer call() throws CliError {
         if (timeout < 0) {
-            err.println("KEY_ERROR --timeout must not be negative: " + timeout);
-            return ExitCode.INPUT_ERROR.code();
+            throw CliError.input("--timeout must not be negative: " + timeout);
         }
         for (Path file : files) {
             if (!Files.exists(file)) {
-                err.println("KEY_ERROR file not found: " + file);
-                return ExitCode.INPUT_ERROR.code();
+                throw CliError.input("file not found: " + file);
             }
         }
 
+        PrintWriter out = spec.commandLine().getOut();
         HeadlessProver prover = new HeadlessProver(timeout);
         List<ContractResult> results = new ArrayList<>();
         for (Path file : files) {
@@ -91,15 +98,16 @@ public final class ProveCommand implements Callable<Integer> {
                 for (ContractIndex.Row row : e.index().list()) {
                     out.println(ContractIndex.renderLine(row));
                 }
-                err.println("KEY_ERROR contract '" + e.selector() + "' not found");
-                return ExitCode.INPUT_ERROR.code();
+                out.flush();
+                throw CliError.input("contract '" + e.selector() + "' not found");
             } catch (ProblemLoaderException e) {
-                err.println("KEY_ERROR cannot load '" + file + "': " + e.getMessage());
-                return ExitCode.INPUT_ERROR.code();
+                ContractResult failure = loadFailureResult(file, e);
+                out.println(resultWriter.toJsonLine(failure));
+                out.flush();
+                throw CliError.loadFailure(file, e);
             } catch (RuntimeException e) {
-                err.println("KEY_ERROR internal error while loading '" + file + "': "
-                    + errorMessage(e));
-                return ExitCode.INTERNAL_ERROR.code();
+                throw CliError.internal("internal error while processing '" + file + "': "
+                    + errorMessage(e), e);
             }
         }
 
@@ -107,6 +115,21 @@ public final class ProveCommand implements Callable<Integer> {
             out.println(resultWriter.toJsonLine(result));
         }
         return ExitCode.worstOf(results).code();
+    }
+
+    /**
+     * Creates the error record reported for a file that could not be loaded: the record's
+     * {@code contract} field names the failed input file, and its {@code errorMessage} carries
+     * the loader's failure message.
+     *
+     * @param file the file that could not be loaded
+     * @param failure the loader exception
+     * @return the error record for the failed file
+     */
+    private static ContractResult loadFailureResult(Path file, ProblemLoaderException failure) {
+        String message = failure.getMessage() != null ? failure.getMessage()
+                : failure.getClass().getSimpleName();
+        return new ContractResult(file.toString(), ResultStatus.ERROR, 0, 0, null, 0, 0, message);
     }
 
     private static String errorMessage(Exception e) {

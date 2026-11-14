@@ -136,17 +136,36 @@ public final class Main implements Callable<Integer> {
     }
 
     /**
-     * Remaps unexpected execution exceptions to the internal-error exit code {@code 4}.
+     * Remaps unexpected execution exceptions to a {@code KEY_ERROR} line and the exit code of the
+     * exception: {@link CliError}s exit with their kind's code, everything else as an internal
+     * error.
      */
     private static final class ExecutionExceptionHandler
             implements CommandLine.IExecutionExceptionHandler {
         @Override
         public int handleExecutionException(Exception ex, CommandLine commandLine,
                 ParseResult parseResult) {
-            String message = ex.getMessage() != null ? ex.getMessage()
-                    : ex.getClass().getSimpleName();
-            commandLine.getErr().println("KEY_ERROR internal error: " + message);
-            return ExitCode.INTERNAL_ERROR.code();
+            return Main.handleExecutionException(ex, commandLine.getErr());
         }
+    }
+
+    /**
+     * Prints a {@code KEY_ERROR} line for the given execution-time exception and returns the
+     * process exit code (§1): a {@link CliError} is reported with the message and the exit code
+     * of its kind ({@code 3} for input errors, {@code 4} for internal errors); any other
+     * exception is an internal error with exit code {@code 4}.
+     *
+     * @param ex the exception thrown by the invoked command
+     * @param err the writer the {@code KEY_ERROR} line is printed to (stderr)
+     * @return the process exit code
+     */
+    static int handleExecutionException(Exception ex, PrintWriter err) {
+        if (ex instanceof CliError cliError) {
+            err.println("KEY_ERROR " + cliError.getMessage());
+            return cliError.kind().exitCode().code();
+        }
+        String message = ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName();
+        err.println("KEY_ERROR internal error: " + message);
+        return ExitCode.INTERNAL_ERROR.code();
     }
 }

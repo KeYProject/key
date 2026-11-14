@@ -30,6 +30,11 @@ public final class Fixtures {
         return resource("/fixtures/index/proofobl.key");
     }
 
+    /// A syntactically invalid load file that cannot be loaded.
+    public static Path corruptKey() {
+        return resource("/fixtures/corrupt/corrupt.key");
+    }
+
     public static Path resource(String name) {
         URL url = Fixtures.class.getResource(name);
         if (url == null) {
