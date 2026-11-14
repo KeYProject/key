@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Expression;
@@ -224,7 +225,7 @@ public final class PatternLoopRewriter extends ProgramTransformer {
         var transformation = new WhileLoopTransformation(loop, outer, inner, services);
         transformation.start();
         ProgramElement normalized = transformation.result();
-        While generated = findFirstWhile(normalized);
+        While generated = generatedWhile(normalized);
         if (generated == null) {
             return new ProgramElement[] { normalized };
         }
@@ -243,19 +244,23 @@ public final class PatternLoopRewriter extends ProgramTransformer {
         return result.toArray(ProgramElement[]::new);
     }
 
-    private static While findFirstWhile(ProgramElement element) {
-        if (element instanceof While whileLoop) {
-            return whileLoop;
+    /**
+     * Returns the while generated at the end of the do normalization. Selecting the last statement
+     * of the normalized block avoids picking a nested while from the original do body.
+     */
+    private static While generatedWhile(ProgramElement normalized) {
+        StatementBlock block = null;
+        if (normalized instanceof StatementBlock statementBlock) {
+            block = statementBlock;
+        } else if (normalized instanceof de.uka.ilkd.key.java.ast.statement.LabeledStatement labeled
+                && labeled.getBody() instanceof StatementBlock statementBlock) {
+            block = statementBlock;
         }
-        for (int i = 0; i < element.getChildCount(); i++) {
-            if (element.getChild(i) instanceof ProgramElement child) {
-                While found = findFirstWhile(child);
-                if (found != null) {
-                    return found;
-                }
-            }
+        if (block == null || block.getStatementCount() == 0) {
+            return null;
         }
-        return null;
+        var last = block.getStatementAt(block.getStatementCount() - 1);
+        return last instanceof While whileLoop ? whileLoop : null;
     }
 
     private static boolean afterBindingsUseNoForInitVariables(For loop,

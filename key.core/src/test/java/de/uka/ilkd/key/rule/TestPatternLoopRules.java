@@ -252,6 +252,18 @@ class TestPatternLoopRules {
             printed);
     }
 
+
+    @Test
+    void rewritesDoWithNestedWhileInBody() {
+        Goal goal = applyRule("patternLoopUnfold",
+            "do { while (new String(\"x\") != null) { int x = 1; } }"
+                + " while (new String(\"x\") instanceof String s);");
+        String printed = ProofSaver.printAnything(
+            goal.sequent().succedent().getFirst().formula(), services);
+        assertTrue(printed.contains("java.lang.String s = (String) new String(\"x\")"),
+            printed);
+    }
+
     @Test
     void refreshesGuardBeforeContinue() {
         Goal goal = applyRule("patternLoopUnfold",
