@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.loader;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -38,6 +41,7 @@ import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.proof.io.ConstructNotSupportedException;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
@@ -193,9 +197,20 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ArrayInitializer ai;
         ImmutableList<Expression> children;
         if (n.getInitializer().isPresent()) {
-            ai = visitArrayInitializerExpr(n.getInitializer().get(), type.getKeYJavaType());
+            ArrayInitializerExpr initializer = n.getInitializer().get();
+            if (containsNestedInitializer(initializer)) {
+                throw unsupportedConstruct(n,
+                    "multi-dimensional array initializer (nested '{ ... }' in array creation)");
+            }
+            ai = visitArrayInitializerExpr(initializer, type.getKeYJavaType());
             children = null;
         } else {
+            for (ArrayCreationLevel level : n.getLevels()) {
+                if (level.getDimension().isEmpty()) {
+                    throw unsupportedConstruct(n,
+                        "array creation with a dimension without an explicit size");
+                }
+            }
             ai = null;
             children = map(n.getLevels());
         }
@@ -203,6 +218,63 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         int dimensions = n.getLevels().size();
         ResolvedType rtype = n.calculateResolvedType();
         return new NewArray(pi, c, children, type, getKeYJavaType(rtype), dimensions, ai);
+    }
+
+    /**
+     * Tells whether the given initializer directly contains a nested array initializer, i.e. the
+     * creation of a multi-dimensional array such as {@code new int[][]{{1,2}}}.
+     */
+    private static boolean containsNestedInitializer(ArrayInitializerExpr initializer) {
+        return initializer.getValues().stream().anyMatch(it -> it instanceof ArrayInitializerExpr);
+    }
+
+    /**
+     * Creates the structured "construct not supported" diagnostic for the given array creation,
+     * pointing at its exact source text and 1-based source position.
+     */
+    private static ConstructNotSupportedException unsupportedConstruct(ArrayCreationExpr n,
+            String reason) {
+        Optional<Path> storage = n.findCompilationUnit()
+                .flatMap(com.github.javaparser.ast.CompilationUnit::getStorage)
+                .map(it -> it.getPath());
+        Optional<Range> range = n.getRange();
+        String file =
+            storage.map(Path::toString).orElse(ConstructNotSupportedException.UNKNOWN_FILE);
+        int line = range.map(it -> it.begin.line).orElse(0);
+        int column = range.map(it -> it.begin.column).orElse(0);
+        return new ConstructNotSupportedException(file, line, column, sourceSnippet(n), reason);
+    }
+
+    /**
+     * Returns the exact source text of the given node (sliced from its token range in the
+     * compilation unit's storage), falling back to the node's pretty-printed form when the source
+     * text is not available.
+     */
+    private static String sourceSnippet(Node n) {
+        Optional<Path> storage = n.findCompilationUnit()
+                .flatMap(com.github.javaparser.ast.CompilationUnit::getStorage)
+                .map(it -> it.getPath());
+        Optional<Range> range = n.getRange();
+        if (storage.isPresent() && range.isPresent()) {
+            try {
+                List<String> lines = Files.readAllLines(storage.get());
+                Range r = range.get();
+                StringBuilder sb = new StringBuilder();
+                for (int line = r.begin.line; line <= r.end.line; line++) {
+                    if (line > r.begin.line) {
+                        sb.append('\n');
+                    }
+                    // the token range is 1-based with an exclusive end column
+                    int from = (line == r.begin.line) ? r.begin.column - 1 : 0;
+                    int to = (line == r.end.line) ? r.end.column : lines.get(line - 1).length();
+                    sb.append(lines.get(line - 1).substring(from, to));
+                }
+                return sb.toString();
+            } catch (IOException | IndexOutOfBoundsException e) {
+                // fall through to the pretty-printed form
+            }
+        }
+        return n.toString();
     }
 
     private ArrayInitializer visitArrayInitializerExpr(ArrayInitializerExpr n, KeYJavaType type) {
