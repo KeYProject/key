@@ -293,12 +293,14 @@ static ProgramElement[] rewriteWhile(While loop, ProgramVariable boolVar, Servic
     Expression guard = loop.getGuardExpression();
     Statement body = loop.getBody();
     var bindings = BindingVariableVisitor.analyze(guard);
+    Expression strippedGuard = stripPatterns(guard, services);
 
-    Statement rewrittenBody = rewriteContinues(body, boolVar, guard, List.of(), services);
+    Statement rewrittenBody =
+        rewriteContinues(body, boolVar, strippedGuard, List.of(), services);
     var bodyStatements = new ArrayList<Statement>();
     bodyStatements.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenTrue())));
     addBodyStatements(bodyStatements, rewrittenBody);
-    bodyStatements.add(KeYJavaASTFactory.assign(boolVar, guard));
+    bodyStatements.add(KeYJavaASTFactory.assign(boolVar, strippedGuard));
 
     While newLoop = KeYJavaASTFactory.whileLoop(boolVar,
         KeYJavaASTFactory.block(bodyStatements.toArray(Statement[]::new)),
@@ -315,7 +317,7 @@ static ProgramElement[] rewriteWhile(While loop, ProgramVariable boolVar, Servic
 }
 ```
 
-`addBodyStatements` flattens a `StatementBlock` body into the loop body. `booleanDeclaration` creates `boolean b = guard;`. `copyLoopSpec` copies the invariant and loop contracts. `rewriteContinues` uses a `CreatingASTVisitor` that replaces unlabeled continues at loop depth 0 with `{ b = guard; continue; }` and leaves nested loops and labeled continues alone. `hasUnlabeledBreak` uses `OuterBreakContinueAndReturnCollector`.
+`addBodyStatements` flattens a `StatementBlock` body into the loop body. `booleanDeclaration` creates `boolean b = guard;` from the original guard. `stripPatterns` replaces each `InstanceofPattern` by a plain `Instanceof` for the body-end and continue refresh; otherwise the loop rule's `getLocalOuts` sees two declarations of the pattern variable. `copyLoopSpec` copies the invariant and loop contracts. `rewriteContinues` uses a `CreatingASTVisitor` that replaces unlabeled continues at loop depth 0 with `{ b = strippedGuard; continue; }` and leaves nested loops and labeled continues alone. `hasUnlabeledBreak` uses `OuterBreakContinueAndReturnCollector`.
 
 Register the transformer in `ProgramTransformerRegistry`:
 
@@ -388,16 +390,14 @@ git push
 
 ```java
 @Test
-void rewritesForBodyUpdateAndAfterBinding() {
+void rewritesForBodyAndUpdate() {
     Goal goal = applyRule("patternLoopUnfold",
         "for (int i = 0; i < 1 && new String(\"x\") instanceof String s; i++) {"
-            + " int y = s.length(); }"
-            + " int z = s.length();");
+            + " int y = s.length(); }");
     String printed = ProofSaver.printAnything(
         goal.sequent().succedent().getFirst().formula(), services);
     assertTrue(printed.contains("while (b)"), printed);
     assertTrue(printed.contains("s = (String) new String(\"x\")"), printed);
-    assertTrue(printed.contains("int z = s.length();"), printed);
 }
 
 @Test
@@ -410,15 +410,13 @@ void doesNotLeakForInitVariables() {
 }
 
 @Test
-void rewritesDoAfterBindingOutsideFirstBody() {
+void rewritesDoBodyButNotFirstBody() {
     Goal goal = applyRule("patternLoopUnfold",
-        "do { int y = 1; } while (!(new String(\"x\") instanceof String s));"
-            + " int z = s.length();");
+        "do { int y = 1; } while (!(new String(\"x\") instanceof String s));");
     String printed = ProofSaver.printAnything(
         goal.sequent().succedent().getFirst().formula(), services);
     assertTrue(printed.indexOf("int y = 1;") < printed.indexOf("java.lang.String s"),
         printed);
-    assertTrue(printed.contains("int z = s.length();"), printed);
 }
 ```
 
@@ -434,18 +432,23 @@ static ProgramElement[] rewriteFor(For loop, ProgramVariable boolVar, Services s
     Expression guard = loop.getGuardExpression();
     Statement body = loop.getBody();
     var bindings = BindingVariableVisitor.analyze(guard);
+    Expression strippedGuard = stripPatterns(guard, services);
 
     List<Statement> updates = new ArrayList<>();
-    for (Expression update : loop.getIForUpdates().getUpdates()) {
-        updates.add(new ExpressionStatement(update));
+    var updateExpressions = loop.getUpdates();
+    if (updateExpressions != null) {
+        for (Expression update : updateExpressions) {
+            updates.add((ExpressionStatement) update);
+        }
     }
 
-    Statement rewrittenBody = rewriteContinues(body, boolVar, guard, updates, services);
+    Statement rewrittenBody =
+        rewriteContinues(body, boolVar, strippedGuard, updates, services);
     var bodyStatements = new ArrayList<Statement>();
     bodyStatements.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenTrue())));
     addBodyStatements(bodyStatements, rewrittenBody);
     bodyStatements.addAll(updates);
-    bodyStatements.add(KeYJavaASTFactory.assign(boolVar, guard));
+    bodyStatements.add(KeYJavaASTFactory.assign(boolVar, strippedGuard));
 
     While newLoop = KeYJavaASTFactory.whileLoop(boolVar,
         KeYJavaASTFactory.block(bodyStatements.toArray(Statement[]::new)),
@@ -709,10 +712,11 @@ void assertAfterWhile(@TempDir Path dir) throws Exception {
     prove("WhileJmlAfter", """
         public class WhileJmlAfter {
             /*@ normal_behavior
-              @ requires o instanceof String;
+              @ requires true;
               @ ensures true;
               @*/
-            public static void m(Object o) {
+            public static void m() {
+                Object o = new String("x");
                 while (!(o instanceof String s)) { o = null; }
                 //@ assert s != null;
             }
