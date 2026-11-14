@@ -105,6 +105,23 @@ class ProveCommandSelectionTest {
 
     @Test
     @Timeout(300)
+    void indexTooLargeForAnIntIsAnInputError() {
+        String huge = "99999999999999999999";
+
+        Run bare = run("prove", Fixtures.indexKey().toString(), "--choose-contract", huge);
+        assertThat(bare.exit()).isEqualTo(3);
+        assertThat(bare.err()).contains("KEY_ERROR contract '" + huge + "' not found");
+
+        Run qualified =
+            run("prove", Fixtures.indexKey().toString(), "--choose-contract",
+                ONE_NAME + ".#" + huge);
+        assertThat(qualified.exit()).isEqualTo(3);
+        assertThat(qualified.err())
+                .contains("KEY_ERROR contract '" + ONE_NAME + ".#" + huge + "' not found");
+    }
+
+    @Test
+    @Timeout(300)
     void unknownSelectorPrintsErrorAndFullListing() {
         Run run = run("prove", Fixtures.indexKey().toString(), "--choose-contract", "NoSuch");
 

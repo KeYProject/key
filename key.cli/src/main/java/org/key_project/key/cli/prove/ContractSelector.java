@@ -50,14 +50,33 @@ public final class ContractSelector {
         int qualifier = qualifierPosition(selector);
         if (qualifier >= 0) {
             String name = selector.substring(0, qualifier);
-            int idx = Integer.parseInt(selector.substring(qualifier + 2));
-            return index.byNameAndIdx(name, idx).<List<Contract>>map(List::of).orElse(List.of());
+            int idx = parseIndex(selector, qualifier + 2);
+            return idx < 0 ? List.of()
+                    : index.byNameAndIdx(name, idx).<List<Contract>>map(List::of).orElse(List.of());
         }
         if (isBareIndex(selector)) {
-            return index.byIdx(Integer.parseInt(selector)).<List<Contract>>map(List::of)
-                    .orElse(List.of());
+            int idx = parseIndex(selector, 0);
+            return idx < 0 ? List.of()
+                    : index.byIdx(idx).<List<Contract>>map(List::of).orElse(List.of());
         }
         return index.byNames(selector);
+    }
+
+    /**
+     * Parses the decimal index starting at {@code from}, treating a value that does not fit into an
+     * {@code int} as "no such index" instead of letting {@link NumberFormatException} escape as an
+     * internal error.
+     *
+     * @param selector the selector text to read the digits from
+     * @param from the first digit position inside the selector
+     * @return the parsed index, or {@code -1} if the digits do not denote an index that can exist
+     */
+    private static int parseIndex(String selector, int from) {
+        try {
+            return Integer.parseInt(selector.substring(from));
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     /**
