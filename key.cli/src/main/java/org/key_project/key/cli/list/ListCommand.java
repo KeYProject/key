@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
+import org.key_project.key.cli.CliError;
 import org.key_project.key.cli.ExitCode;
 import org.key_project.key.cli.prove.ContractIndex;
 
@@ -25,7 +26,8 @@ import picocli.CommandLine.Spec;
  * The {@code list} subcommand (§4.3 of the headless interface spec): loads the given KeY problem
  * files and prints one line per contract, {@code <IDX>\t<target>\t<NAME>}, in the stable index
  * order. The subcommand always exits {@code 0} on success and never prints a {@code KEY_RESULT}
- * line.
+ * line. Errors are reported as {@link CliError}s (missing or unloadable file: input error, exit
+ * {@code 3}; unexpected exception: internal error, exit {@code 4}).
  */
 @Command(name = "list",
     description = "List the contracts of the given KeY problem file(s), one tab-separated line "
@@ -44,18 +46,18 @@ public final class ListCommand implements Callable<Integer> {
     /**
      * Lists the contracts of the given files.
      *
-     * @return the exit code, {@code 0} on success, {@code 3} on input errors, {@code 4} on
-     *         internal errors
+     * @return the exit code, {@code 0} on success
+     * @throws CliError an input error (missing file, unloadable file) or an internal error;
+     *         reported by the root command line as a {@code KEY_ERROR} line with the
+     *         corresponding exit code ({@code 3} or {@code 4}, §1)
      */
     @Override
-    public Integer call() {
+    public Integer call() throws CliError {
         PrintWriter out = spec.commandLine().getOut();
-        PrintWriter err = spec.commandLine().getErr();
 
         for (Path file : files) {
             if (!Files.exists(file)) {
-                err.println("KEY_ERROR file not found: " + file);
-                return ExitCode.INPUT_ERROR.code();
+                throw CliError.input("file not found: " + file);
             }
             try {
                 KeYEnvironment<?> environment = KeYEnvironment.load(file);
@@ -68,12 +70,10 @@ public final class ListCommand implements Callable<Integer> {
                     environment.dispose();
                 }
             } catch (ProblemLoaderException e) {
-                err.println("KEY_ERROR cannot load '" + file + "': " + e.getMessage());
-                return ExitCode.INPUT_ERROR.code();
+                throw CliError.loadFailure(file, e);
             } catch (RuntimeException e) {
-                err.println("KEY_ERROR internal error while loading '" + file + "': "
-                    + errorMessage(e));
-                return ExitCode.INTERNAL_ERROR.code();
+                throw CliError.internal("internal error while listing '" + file + "': "
+                    + errorMessage(e), e);
             }
         }
         return ExitCode.CLOSED.code();
