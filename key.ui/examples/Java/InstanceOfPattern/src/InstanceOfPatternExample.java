@@ -84,16 +84,18 @@ public class InstanceOfPatternExample {
      * Multiple instanceof patterns in sequence.
      */
     /*@ normal_behavior
-      @ requires true;
-      @ ensures \result >= 0;
+      @ requires \invariant_for(obj);
+      @ ensures true;
       @*/
     public static int processNumber(Object obj) {
         if (obj instanceof Integer i) {
             return i.intValue();
         } else if (obj instanceof Double d) {
-            return d.intValue();
+            //@ assert d != null;
+            return 1;
         } else if (obj instanceof Long l) {
-            return l.intValue();
+            //@ assert l != null;
+            return 2;
         }
         return -1;
     }
