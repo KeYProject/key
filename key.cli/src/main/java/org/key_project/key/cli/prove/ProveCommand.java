@@ -24,9 +24,14 @@ import picocli.CommandLine.Parameters;
 import picocli.CommandLine.Spec;
 
 /**
- * The {@code prove} subcommand: loads one or more KeY problem files, proves every contract, and
- * prints one {@code KEY_RESULT} line per contract as the last lines of stdout. The process exit
- * code reflects the worst contract status.
+ * The {@code prove} subcommand: loads one or more KeY problem files, proves the selected
+ * contracts, and prints one {@code KEY_RESULT} line per contract as the last lines of stdout.
+ * The process exit code reflects the worst contract status.
+ * <p>
+ * Contracts are selected by repeated {@code --choose-contract} selectors (a bare index,
+ * {@code NAME.#<IDX>}, or an exact canonical name, §4.2); without selectors the load file's
+ * {@code \chooseContract}/{@code \proofObligation} directive selects the contract, and without
+ * a directive all contracts are proven.
  */
 @Command(name = "prove", description = "Prove the contracts of the given KeY problem file(s).",
     mixinStandardHelpOptions = true)
@@ -46,6 +51,14 @@ public final class ProveCommand implements Callable<Integer> {
         description = "Per-contract proof search timeout in milliseconds (0 = no timeout). "
             + "Note: the timed_out result status is not yet determined in this phase.")
     private long timeout;
+
+    @Option(names = "--choose-contract", paramLabel = "<SELECTOR>",
+        description = "Select the contract(s) to prove, repeatable. A selector is a bare index "
+            + "(the ordinal printed by `list`), NAME.#<IDX>, or an exact canonical contract "
+            + "name (all contracts sharing the name are selected). Selection order is the "
+            + "command-line order. Without this option the \\chooseContract/\\proofObligation "
+            + "directive of the load file selects the contract, if present.")
+    private List<String> chooseContract = List.of();
 
     /**
      * Runs the prove command.
@@ -72,7 +85,13 @@ public final class ProveCommand implements Callable<Integer> {
         List<ContractResult> results = new ArrayList<>();
         for (Path file : files) {
             try {
-                results.addAll(prover.proveAll(file));
+                results.addAll(prover.prove(file, chooseContract));
+            } catch (UnknownContractException e) {
+                for (ContractIndex.Row row : e.index().list()) {
+                    out.println(ContractIndex.renderLine(row));
+                }
+                err.println("KEY_ERROR contract '" + e.selector() + "' not found");
+                return ExitCode.INPUT_ERROR.code();
             } catch (ProblemLoaderException e) {
                 err.println("KEY_ERROR cannot load '" + file + "': " + e.getMessage());
                 return ExitCode.INPUT_ERROR.code();
