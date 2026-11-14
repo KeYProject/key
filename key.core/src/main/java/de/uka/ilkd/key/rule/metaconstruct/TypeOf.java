@@ -18,7 +18,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.collection.ImmutableList;
 
-@TransformerMeta(name = "#typeof")
 public class TypeOf extends ProgramTransformer {
 
     /**
@@ -61,10 +60,5 @@ public class TypeOf extends ProgramTransformer {
         }
 
         return new ProgramElement[] { KeYJavaASTFactory.typeRef(kjt, 0, annotations) };
-    }
-
-    @Override
-    public ImmutableList<ProgramElement> getArguments() {
-        return ImmutableList.of(body());
     }
 }

@@ -280,17 +280,8 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnProgramMetaConstruct(ProgramTransformer x) {
         layouter.print(x.name().toString());
         layouter.print("(");
-        // A meta construct may carry schema-variable arguments (e.g. #methodCall(#ex, #v0, body),
-        // #unwindLoop(#inner, #outer, loop)) that are not ProgramElements and are therefore not
-        // exposed through getChildAt. getArguments() returns them in source order before the
-        // encapsulated program element so the printed form can be re-parsed.
-        boolean first = true;
-        for (ProgramElement arg : x.getArguments()) {
-            if (!first) {
-                layouter.print(",").brk();
-            }
-            first = false;
-            arg.visit(this);
+        if (x.getChildAt(0) != null) {
+            x.getChildAt(0).visit(this);
         }
         layouter.print(")");
     }

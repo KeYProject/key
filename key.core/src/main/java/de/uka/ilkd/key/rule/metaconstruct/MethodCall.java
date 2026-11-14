@@ -35,7 +35,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
@@ -61,7 +60,6 @@ import org.slf4j.LoggerFactory;
  * argument sound. Behaviour is varied through the taclet/{@link ProgramElement} arguments, not by
  * subclassing, so nothing is lost.
  */
-@TransformerMeta(name = "#methodCall")
 public final class MethodCall extends ProgramTransformer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MethodCall.class);
 
@@ -86,20 +84,13 @@ public final class MethodCall extends ProgramTransformer {
     }
 
     /**
-     * Creates the methodcall-MetaConstruct with a single optional schema variable. The variable's
-     * program sort decides its role: an execution-context variable is passed as the execution
-     * context, a program variable as the holder of the call's result.
+     * creates the methodcall-MetaConstruct
      *
-     * @param sv the schema variable that is either the execution context or keeps the result
+     * @param result the SchemaVariable that is used to keep the result
      * @param body the ProgramElement contained by the meta construct
      */
-    public MethodCall(ProgramSV sv, ProgramElement body) {
-        this(sv.sort() == ProgramSVSort.EXECUTIONCONTEXT ? sv : null,
-            sv.sort() == ProgramSVSort.VARIABLE ? sv : null, body);
-        if (sv.sort() != ProgramSVSort.EXECUTIONCONTEXT && sv.sort() != ProgramSVSort.VARIABLE) {
-            throw new IllegalArgumentException("A single schema variable of #methodCall must be "
-                + "an execution context or a result variable, but was " + sv.sort() + ".");
-        }
+    public MethodCall(SchemaVariable result, ProgramElement body) {
+        this(null, result, body);
     }
 
     /**
@@ -109,15 +100,7 @@ public final class MethodCall extends ProgramTransformer {
      * @param body the ProgramElement contained by the meta construct
      */
     public MethodCall(ProgramSV ec, SchemaVariable result, ProgramElement body) {
-        this(new Name("#methodCall"), ec, result, body);
-        if (ec != null && ec.sort() != ProgramSVSort.EXECUTIONCONTEXT) {
-            throw new IllegalArgumentException("The execution context of #methodCall must be "
-                + "an execution-context variable, but was " + ec.sort() + ".");
-        }
-        if (result != null && result.sort() != ProgramSVSort.VARIABLE) {
-            throw new IllegalArgumentException("The result variable of #methodCall must be "
-                + "a program-variable schema variable, but was " + result.sort() + ".");
-        }
+        this(new Name("method-call"), ec, result, body);
     }
 
     /**
@@ -132,17 +115,6 @@ public final class MethodCall extends ProgramTransformer {
         super(name, body);
         this.resultVar = result;
         this.execContextSV = ec;
-    }
-
-    @Override
-    public ImmutableList<ProgramElement> getArguments() {
-        final ProgramElement ec = (ProgramElement) execContextSV;
-        final ProgramElement result = (ProgramElement) resultVar;
-        if (ec != null) {
-            return result == null ? ImmutableList.of(ec, body())
-                    : ImmutableList.of(ec, result, body());
-        }
-        return result == null ? ImmutableList.of(body()) : ImmutableList.of(result, body());
     }
 
     /** gets an array of expression and returns a list of types */
@@ -244,7 +216,7 @@ public final class MethodCall extends ProgramTransformer {
 
     private ProgramElement[] transformImpl(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        LOGGER.trace("#methodCall: called for {}", pe);
+        LOGGER.trace("method-call: called for {}", pe);
         if (resultVar != null) {
             pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
         }
@@ -308,7 +280,7 @@ public final class MethodCall extends ProgramTransformer {
 
     private Statement handleStatic(Services services) {
         Statement result;
-        LOGGER.trace("#methodCall: invocation of static method detected");
+        LOGGER.trace("method-call: invocation of static method detected");
         newContext = null;
         IProgramMethod staticMethod = getMethod(staticPrefixType, methRef, services);
         result = KeYJavaASTFactory.methodBody(pvar, newContext, staticMethod, arguments);
@@ -318,7 +290,7 @@ public final class MethodCall extends ProgramTransformer {
     private Statement handleSuperReference(Services services) {
         Statement result;
         LOGGER.trace(
-            "#methodCall: super invocation of method detected." + "Requires static resolving.");
+            "method-call: super invocation of method detected." + "Requires static resolving.");
         IProgramMethod superMethod = getSuperMethod(execContext, methRef, services);
         result = KeYJavaASTFactory.methodBody(pvar, execContext.getRuntimeInstance(), superMethod,
             arguments);
@@ -330,11 +302,11 @@ public final class MethodCall extends ProgramTransformer {
                 .equals(PipelineConstants.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             // private methods or constructor invocations are bound
             // statically
-            LOGGER.trace("#methodCall: invocation of private method detected."
+            LOGGER.trace("method-call: invocation of private method detected."
                 + "Requires static resolving.");
             result = makeMbs(staticPrefixType, services);
         } else {
-            LOGGER.trace("#methodCall: invocation of non-private" + " instance method detected."
+            LOGGER.trace("method-call: invocation of non-private" + " instance method detected."
                 + "Requires dynamic resolving.");
             ImmutableList<KeYJavaType> imps =
                 services.getJavaInfo().getKeYProgModelInfo().findImplementations(staticPrefixType,

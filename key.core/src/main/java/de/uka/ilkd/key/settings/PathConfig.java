@@ -13,8 +13,6 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import de.uka.ilkd.key.util.KeYResourceManager;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,13 +179,32 @@ public final class PathConfig {
 
     // Resolves the path `<key.home>/v<major>.<minor>` and creates it if necessary.
     private static KeyPaths getWritingPaths(Path base) throws IOException {
-        var currentVersion = KeYResourceManager.getManager().getVersion().split("\\.");
+        var currentVersion = readKeyVersion().split("\\.");
         var currentVersionCandidate = "v%s.%s".formatted(currentVersion[0], currentVersion[1]);
         var currentVersionPath = base.resolve(currentVersionCandidate);
         if (!Files.exists(currentVersionPath)) {
             Files.createDirectories(currentVersionPath);
         }
         return new KeyPaths(currentVersionPath);
+    }
+
+    /// Reads the generated <code>de/uka/ilkd/key/util/version</code> resource, falling back to
+    /// <code>x.z.y</code> as {@link de.uka.ilkd.key.util.KeYResourceManager} does. The resource
+    /// is read directly instead of via the resource manager: referencing the manager from
+    /// within this class's static initialization would create a circular class initialization,
+    /// because initializing {@code KeYResourceManager} starts the logging framework, whose
+    /// startup listener initializes this class again.
+    private static String readKeyVersion() {
+        var stream = PathConfig.class.getClassLoader()
+                .getResourceAsStream("de/uka/ilkd/key/util/version");
+        if (stream == null) {
+            return "x.z.y";
+        }
+        try (stream) {
+            return new String(stream.readAllBytes()).trim();
+        } catch (IOException e) {
+            return "x.z.y";
+        }
     }
 
     private static KeyPaths getReadingPath(Path base) {

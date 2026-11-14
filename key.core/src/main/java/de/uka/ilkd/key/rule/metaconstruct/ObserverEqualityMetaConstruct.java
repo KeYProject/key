@@ -52,7 +52,6 @@ import org.key_project.util.collection.ImmutableSet;
  * @see UseDependencyContractRule
  * @see SameObserverCondition
  */
-@TransformerMeta(name = "#ObserverEquality")
 public class ObserverEqualityMetaConstruct extends AbstractTermTransformer {
 
     /**

@@ -10,9 +10,6 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.key_project.util.collection.ImmutableList;
-
-@TransformerMeta(name = "#lengthReference")
 public class ArrayLength extends ProgramTransformer {
 
     /**
@@ -21,7 +18,7 @@ public class ArrayLength extends ProgramTransformer {
      * @param expr the instance of expression contained by the meta construct
      */
     public ArrayLength(Expression expr) {
-        super("#lengthReference", expr);
+        super("#length-reference", expr);
 
     }
 
@@ -30,10 +27,5 @@ public class ArrayLength extends ProgramTransformer {
             SVInstantiations insts) {
         return new ProgramElement[] { KeYJavaASTFactory.fieldReference(services, "length",
             (Expression) pe, insts.getExecutionContext()) };
-    }
-
-    @Override
-    public ImmutableList<ProgramElement> getArguments() {
-        return ImmutableList.of(body());
     }
 }

@@ -52,6 +52,7 @@ import picocli.CommandLine.Parameters;
  */
 @Command(subcommands = { Main.BundleCommand.class, Main.CheckCommand.class,
     Main.MergeCommand.class })
+@SuppressWarnings("CallToPrintStackTrace")
 public final class Main {
     private static final String check_missing_desc = "enables check for unproven contracts";
     private static final String check_settings_desc = "enables check for consistent proof settings";
