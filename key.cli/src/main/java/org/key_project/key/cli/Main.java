@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.key_project.key.cli.list.ListCommand;
 import org.key_project.key.cli.prove.ProveCommand;
 
 import picocli.CommandLine;
@@ -31,7 +32,7 @@ import picocli.CommandLine.Spec;
 @Command(name = "key-cli",
     description = "Headless command-line interface for KeY.",
     mixinStandardHelpOptions = true,
-    subcommands = { ProveCommand.class })
+    subcommands = { ProveCommand.class, ListCommand.class })
 public final class Main implements Callable<Integer> {
 
     @Spec
