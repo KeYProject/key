@@ -18,6 +18,8 @@ import org.key_project.key.cli.ContractResult;
 import org.key_project.key.cli.ExitCode;
 import org.key_project.key.cli.ResultRecordWriter;
 import org.key_project.key.cli.ResultStatus;
+import org.key_project.key.cli.settings.CliSettingsException;
+import org.key_project.key.cli.settings.HeadlessRunnerSettings;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Model.CommandSpec;
@@ -34,6 +36,11 @@ import picocli.CommandLine.Spec;
  * {@code NAME.#<IDX>}, or an exact canonical name, §4.2); without selectors the load file's
  * {@code \chooseContract}/{@code \proofObligation} directive selects the contract, and without
  * a directive all contracts are proven.
+ * <p>
+ * Strategy choices are layered per §5.1: repeated {@code --strategy-option <KEY>=<VALUE>} entries
+ * override {@code --settings-file} entries for the same key, and both are applied only for the
+ * duration of the run (never persisted back into {@code ~/.key}). An unknown key or undocumented
+ * value is an input error ({@code KEY_ERROR settings: '...' not understood}, exit {@code 3}).
  * <p>
  * Errors follow §1 of the headless interface spec and are reported as {@link CliError}s: input
  * errors (negative timeout, missing file, unknown contract, unloadable file) exit {@code 3}, and
@@ -69,6 +76,18 @@ public final class ProveCommand implements Callable<Integer> {
             + "directive of the load file selects the contract, if present.")
     private List<String> chooseContract = List.of();
 
+    @Option(names = "--settings-file", paramLabel = "<PATH>",
+        description = "A §5.2 settings file (flat JSON) whose strategy choices are applied for "
+            + "the run, with --strategy-option taking precedence per key.")
+    @org.jspecify.annotations.Nullable
+    private Path settingsFile;
+
+    @Option(names = "--strategy-option", paramLabel = "<KEY>=<VALUE>",
+        description = "Set a single strategy choice (§5.2 vocabulary), repeatable. An option "
+            + "overrides --settings-file for its key, which overrides the load-file \\settings "
+            + "and KeY defaults.")
+    private List<String> strategyOption = List.of();
+
     /**
      * Runs the prove command.
      *
@@ -82,14 +101,25 @@ public final class ProveCommand implements Callable<Integer> {
         if (timeout < 0) {
             throw CliError.input("--timeout must not be negative: " + timeout);
         }
+        if (settingsFile != null && !Files.exists(settingsFile)) {
+            throw CliError.input("file not found: " + settingsFile);
+        }
         for (Path file : files) {
             if (!Files.exists(file)) {
                 throw CliError.input("file not found: " + file);
             }
         }
 
+        HeadlessRunnerSettings runnerSettings;
+        try {
+            runnerSettings = HeadlessRunnerSettings.from(settingsFile, strategyOption);
+        } catch (CliSettingsException e) {
+            String message = e.getMessage();
+            throw CliError.input(message != null ? message : e.getClass().getSimpleName());
+        }
+
         PrintWriter out = spec.commandLine().getOut();
-        HeadlessProver prover = new HeadlessProver(timeout);
+        HeadlessProver prover = new HeadlessProver(timeout, runnerSettings);
         List<ContractResult> results = new ArrayList<>();
         for (Path file : files) {
             try {

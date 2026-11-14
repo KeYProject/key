@@ -158,7 +158,8 @@ public final class SettingsFileParser {
     }
 
     private static void checkValue(String key, String value, String offendingLine) {
-        if (!ALLOWED.get(key).contains(value)) {
+        Set<String> allowed = ALLOWED.get(key);
+        if (allowed == null || !allowed.contains(value)) {
             throw notUnderstood(offendingLine);
         }
     }

@@ -35,6 +35,26 @@ public final class Fixtures {
         return resource("/fixtures/corrupt/corrupt.key");
     }
 
+    /// The overflow-sensitive contract used to differentiate {@code intRules} settings (E3).
+    public static Path overflowKey() {
+        return resource("/fixtures/overflow/overflow.key");
+    }
+
+    /// The §5.2 example settings file with all twelve keys.
+    public static Path fullSettings() {
+        return resource("/fixtures/settings/full.json");
+    }
+
+    /// A settings file citing an unknown key {@code unsupportedKey}.
+    public static Path unknownKeySettings() {
+        return resource("/fixtures/settings/unknown-key.json");
+    }
+
+    /// A settings file with the value typo {@code intRules:javaSemantic}.
+    public static Path typoSettings() {
+        return resource("/fixtures/settings/typo-value.json");
+    }
+
     public static Path resource(String name) {
         URL url = Fixtures.class.getResource(name);
         if (url == null) {
