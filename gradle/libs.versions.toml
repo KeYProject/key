@@ -19,11 +19,13 @@ jackson = "2.21.8"
 
 # ANTLR
 antlr = "4.13.2"
-stringtemplate = "4.3.4"
+
+# Templating
+freemarker = "2.3.34"
 
 # Java parsing and analysis
 javapoet = "1.13.0"
-jmltk = "1.0.1"
+jmltk = "1.0.0"
 truth = "1.4.5"
 
 # UI and CLI
@@ -63,7 +65,9 @@ jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-dat
 # ANTLR
 antlr4 = { module = "org.antlr:antlr4", version.ref = "antlr" }
 antlr4-runtime = { module = "org.antlr:antlr4-runtime", version.ref = "antlr" }
-stringtemplate = { module = "org.antlr:ST4", version.ref = "stringtemplate" }
+
+# Templating
+freemarker = { module = "org.freemarker:freemarker", version.ref = "freemarker" }
 
 # Java source code processing
 javapoet = { module = "com.squareup:javapoet", version.ref = "javapoet" }

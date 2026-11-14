@@ -14,15 +14,13 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * creates an assignment instantiationOf(#newObjectsV).$initialized = true
  */
-@TransformerMeta(name = "#postWork")
 public class PostWork extends ProgramTransformer {
 
-    private final static String POST_WORK = "#postWork";
+    private final static String POST_WORK = "post-work";
 
     /**
      * Whether this transformer is used schematically (i.e., in taclets).
@@ -59,10 +57,5 @@ public class PostWork extends ProgramTransformer {
             PipelineConstants.IMPLICIT_INITIALIZED, services.getJavaInfo().getJavaLangObject());
         return new ProgramElement[] { KeYJavaASTFactory.assign(
             KeYJavaASTFactory.fieldReference(newObject, initialized), BooleanLiteral.TRUE) };
-    }
-
-    @Override
-    public ImmutableList<ProgramElement> getArguments() {
-        return ImmutableList.of(body());
     }
 }

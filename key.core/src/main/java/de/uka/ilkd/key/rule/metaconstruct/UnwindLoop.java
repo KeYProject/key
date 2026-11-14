@@ -40,7 +40,6 @@ import org.key_project.util.collection.ImmutableList;
  * </pre>
  *
  */
-@TransformerMeta(name = "#unwindLoop")
 public class UnwindLoop extends ProgramTransformer {
 
     /** the outer label that is used to leave the while loop ('l1') */
@@ -56,20 +55,9 @@ public class UnwindLoop extends ProgramTransformer {
      * @param outerLabel The outer label SV
      */
     public UnwindLoop(SchemaVariable innerLabel, SchemaVariable outerLabel, LoopStatement loop) {
-        super("#unwindLoop", loop);
+        super("#unwind-loop", loop);
         this.innerLabel = innerLabel;
         this.outerLabel = outerLabel;
-    }
-
-    @Override
-    public ImmutableList<ProgramElement> getArguments() {
-        final ProgramElement inner = (ProgramElement) innerLabel;
-        final ProgramElement outer = (ProgramElement) outerLabel;
-        if (inner != null) {
-            return outer == null ? ImmutableList.of(inner, body())
-                    : ImmutableList.of(inner, outer, body());
-        }
-        return outer == null ? ImmutableList.of(body()) : ImmutableList.of(outer, body());
     }
 
     @Override

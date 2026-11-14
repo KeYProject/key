@@ -18,18 +18,16 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * Replaces a local variable declaration <code> #t #v[]; </code> with <code>#t[] #v;</code>
  *
  * @author N/A
  */
-@TransformerMeta(name = "#arrayPostDeclaration")
 public class ArrayPostDecl extends ProgramTransformer {
 
     public ArrayPostDecl(SchemaVariable sv) {
-        super(new Name("#arrayPostDeclaration"), (ProgramSV) sv);
+        super(new Name("array-post-declaration"), (ProgramSV) sv);
     }
 
     @Override
@@ -50,9 +48,4 @@ public class ArrayPostDecl extends ProgramTransformer {
             originalTypeReference.getReferencePrefix(), variable.getKeYJavaType()) };
     }
 
-
-    @Override
-    public ImmutableList<ProgramElement> getArguments() {
-        return ImmutableList.of(body());
-    }
 }

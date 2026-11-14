@@ -13,6 +13,7 @@ import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.KeyEscapeExpression;
 import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.key.sv.KeyExpressionSV;
+import com.github.javaparser.ast.key.sv.KeyMetaConstructExpression;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 
@@ -434,6 +435,11 @@ public class ConstantExpressionEvaluator {
         public Object visit(KeyExpressionSV n, Void arg) {
             throw new RuntimeException("unsupported expression");
 
+        }
+
+        @Override
+        public Object visit(KeyMetaConstructExpression n, Void arg) {
+            throw new RuntimeException("unsupported expression");
         }
 
         @Override

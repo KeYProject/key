@@ -33,14 +33,12 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * TODO
  *
  * @author N/A
  */
-@TransformerMeta(name = "#evaluateArguments")
 public class EvaluateArgs extends ProgramTransformer {
 
     /**
@@ -49,7 +47,7 @@ public class EvaluateArgs extends ProgramTransformer {
      * @param pe the instance of expression contained by the meta construct
      */
     public EvaluateArgs(ProgramElement pe) {
-        super("#evaluateArguments", pe);
+        super("#evaluate-arguments", pe);
     }
 
     /**
@@ -132,10 +130,5 @@ public class EvaluateArgs extends ProgramTransformer {
         }
 
         return new ProgramElement[] { KeYJavaASTFactory.block(res) };
-    }
-
-    @Override
-    public ImmutableList<ProgramElement> getArguments() {
-        return ImmutableList.of(body());
     }
 }

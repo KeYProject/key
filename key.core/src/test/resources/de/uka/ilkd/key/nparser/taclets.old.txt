@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sat Nov 14 10:08:32 CET 2026
+# Date: Tue Nov 10 15:31:19 CET 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -1088,7 +1088,7 @@ arrayCreation {
 \varcond(\new(#v0 (program Variable), \typeof(#na (program ArrayCreation))))
 \replacewith(#normal ((modal operator))|{{ ..
   #typeof(#na) #v0;
-  #initArrayCreation(#v0, #na)
+  init-array-creation(#na)
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -1102,7 +1102,7 @@ arrayCreationWithInitializers {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #initArrayCreation(#v0, #arrayinitializer)
+  init-array-creation(#arrayinitializer)
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -1145,7 +1145,7 @@ array_post_declaration {
   #arraypost
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #arrayPostDeclaration(#arraypost)
+  array-post-declaration(#arraypost)
 ... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}
@@ -2512,7 +2512,7 @@ blockBreakLabel {
   }
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #doBreak(#lb0:
+  do-break(#lb0:
   break #lb1;)
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -2959,7 +2959,7 @@ break {
   break #lb1;
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #doBreak(#lb0:
+  do-break(#lb0:
   break #lb1;)
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -6361,9 +6361,7 @@ doWhileUnwind {
 ... }}| (post))
 \varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #unwindLoop(#innerLabel,
-  #outerLabel,
-  do #s
+  #unwind-loop(do #s
   while (#e);)
 ... }}| (post)) 
 \heuristics(simplify_prog)
@@ -7210,7 +7208,7 @@ enhancedfor_iterable {
   for (#ty #id : #e) #stm
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #enhancedforElim(for (#ty #id : #e) #stm)
+  enhancedfor-elim(for (#ty #id : #e) #stm)
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -9988,7 +9986,7 @@ forInitUnfold {
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
   {
-    #forInitUnfoldTransformer(#loopInit)
+    forInitUnfoldTransformer(#loopInit)
     for (; #guard; #forupdates) #s
   }
 ... }}| (post)) 
@@ -10002,7 +10000,7 @@ for_to_while {
 ... }}| (post))
 \varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #forToWhile(#innerLabel, #outerLabel, #forloop)
+  #for-to-while(#forloop)
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -12192,9 +12190,9 @@ instanceCreation {
 ... }}| (post))
 \varcond(\new(#v0 (program Variable), \typeof(#n (program SimpleInstanceCreation))))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #typeof(#v0) #v0 = #createObject(#n);
-  #constructorCall(#v0, #n)
-  #postWork(#v0)
+  #typeof(#v0) #v0 = create-object(#n);
+  constructor-call(#n)
+  post-work(#v0)
 ... }}| (post)) 
 \heuristics(method_expand)
 Choices: programRules:Java}
@@ -12206,9 +12204,9 @@ instanceCreationAssignment {
 ... }}| (post))
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#normal ((modal operator))|{{ ..
-  #typeof(#v0) #v0 = #createObject(#n);
-  #constructorCall(#v0, #n)
-  #postWork(#v0)
+  #typeof(#v0) #v0 = create-object(#n);
+  constructor-call(#n)
+  post-work(#v0)
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(method_expand)
@@ -12220,7 +12218,7 @@ instanceCreationAssignmentUnfoldArguments {
   #lhs = #nsn;
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #evaluateArguments(#lhs = #nsn)
+  #evaluate-arguments(#lhs = #nsn)
 ... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
@@ -12231,7 +12229,7 @@ instanceCreationUnfoldArguments {
   #nsn
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #evaluateArguments(#nsn)
+  #evaluate-arguments(#nsn)
 ... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
@@ -13976,7 +13974,7 @@ loopUnwind {
 ... }}| (post))
 \varcond(\newLabel (#innerLabel (program Label)), \newLabel (#outerLabel (program Label)))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #unwindLoop(#innerLabel, #outerLabel, while (#e) #s)
+  #unwind-loop(while (#e) #s)
 ... }}| (post)) 
 \heuristics(loop_expand)
 Choices: programRules:Java}
@@ -14260,7 +14258,7 @@ methodBodyExpand {
   #mb
 ... }}| (post))
 \replacewith(#introAtPreDefs(#allmodal ((modal operator))|{{ ..
-  #expandMethodBody(#mb)
+  expand-method-body(#mb)
 ... }}| (post))) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -14273,7 +14271,7 @@ methodCall {
 \varcond(\not \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)), \mayExpandMethod(#se (program SimpleExpression), #mn (program MethodName), #selist (program SimpleExpression)))
 \add [equals(#se,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[#allmodal ((modal operator))|{{ ..
-  #methodCall(#se.#mn(#selist))
+  method-call(#se.#mn(#selist))
 ... }}| (post)]) 
 \heuristics(method_expand)
 Choices: (programRules:Java & runtimeExceptions:ban)}
@@ -14357,7 +14355,7 @@ methodCallSuper {
   super.#mn(#elist);
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #methodCall(#ex, super.#mn(#elist))
+  method-call(super.#mn(#elist))
 ... }}| (post)) 
 \heuristics(method_expand, simplify_autoname)
 Choices: programRules:Java}
@@ -14383,7 +14381,7 @@ methodCallUnfoldArguments {
   #nsmr
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #evaluateArguments(#nsmr)
+  #evaluate-arguments(#nsmr)
 ... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
@@ -14411,7 +14409,7 @@ methodCallWithAssignment {
 \add [equals(#se,null)]==>[] \replacewith([]==>[false]) ;
 \replacewith([]==>[#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #methodCall(#v0, #se.#mn(#selist))
+  method-call(#se.#mn(#selist))
   #lhs = #v0;
 ... }}| (post)]) 
 \heuristics(method_expand)
@@ -14425,7 +14423,7 @@ methodCallWithAssignmentSuper {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #methodCall(#ex, #v0, super.#mn(#elist))
+  method-call(super.#mn(#elist))
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(method_expand, simplify_autoname)
@@ -14437,7 +14435,7 @@ methodCallWithAssignmentUnfoldArguments {
   #lhs = #nsmr;
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #evaluateArguments(#lhs = #nsmr)
+  #evaluate-arguments(#lhs = #nsmr)
 ... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
@@ -14464,7 +14462,7 @@ methodCallWithAssignmentWithinClass {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #methodCall(#ex, #v0, #mn(#elist))
+  method-call(#mn(#elist))
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(method_expand)
@@ -14477,7 +14475,7 @@ methodCallWithinClass {
 ... }}| (post))
 \varcond(\mayExpandMethod(null, #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #methodCall(#mn(#elist))
+  method-call(#mn(#elist))
 ... }}| (post)) 
 \heuristics(method_expand)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
@@ -19143,7 +19141,7 @@ special_constructor_call {
   #scr
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #specialConstructorCall(#scr)
+  special-constructor-call(#scr)
 ... }}| (post)) 
 \heuristics(method_expand)
 Choices: programRules:Java}
@@ -19249,7 +19247,7 @@ staticMethodCall {
 ... }}| (post))
 \varcond(\staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #methodCall(#v0, #se.#mn(#elist))
+  method-call(#se.#mn(#elist))
 ... }}| (post)) 
 \heuristics(method_expand)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
@@ -19260,7 +19258,7 @@ staticMethodCallStaticViaTypereference {
   #t.#mn(#elist);
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #methodCall(#t.#mn(#elist))
+  method-call(#t.#mn(#elist))
 ... }}| (post)) 
 \heuristics(method_expand)
 Choices: (programRules:Java & initialisation:disableStaticInitialisation)}
@@ -19273,7 +19271,7 @@ staticMethodCallStaticWithAssignmentViaTypereference {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #methodCall(#v0, #t.#mn(#elist))
+  method-call(#t.#mn(#elist))
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(method_expand)
@@ -19287,7 +19285,7 @@ staticMethodCallWithAssignment {
 \varcond(\new(#v0 (program Variable), \typeof(#lhs (program LeftHandSide))), \staticMethodReference(#se (program SimpleExpression), #mn (program MethodName), #elist (program Expression)))
 \replacewith(#allmodal ((modal operator))|{{ ..
   #typeof(#lhs) #v0;
-  #methodCall(#v0, #se.#mn(#elist))
+  method-call(#se.#mn(#elist))
   #lhs = #v0;
 ... }}| (post)) 
 \heuristics(method_expand)
@@ -19965,7 +19963,7 @@ switch {
   #sw
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #switchToIf(#sw)
+  switch-to-if(#sw)
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -21348,7 +21346,7 @@ variableDeclarationMult {
   #multvardecl
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  #resolveMultipleVarDecl(#multvardecl)
+  multiple-var-decl(#multvardecl)
 ... }}| (post)) 
 \heuristics(simplify_prog_subset, simplify_prog)
 Choices: programRules:Java}

@@ -28,13 +28,11 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.util.collection.ImmutableList;
 
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a
  * switch-case statement.
  */
-@TransformerMeta(name = "#switchToIf")
 public class SwitchToIf extends ProgramTransformer {
 
 
@@ -45,7 +43,7 @@ public class SwitchToIf extends ProgramTransformer {
      *        the Statement contained by the meta construct
      */
     public SwitchToIf(SchemaVariable _switch) {
-        super("#switchToIf", (ProgramSV) _switch);
+        super("switch-to-if", (ProgramSV) _switch);
     }
 
     @Override
@@ -261,9 +259,4 @@ public class SwitchToIf extends ProgramTransformer {
     record ChangeBreakResult(ProgramElement result, boolean noNewBreak) {
     }
 
-
-    @Override
-    public ImmutableList<ProgramElement> getArguments() {
-        return ImmutableList.of(body());
-    }
 }

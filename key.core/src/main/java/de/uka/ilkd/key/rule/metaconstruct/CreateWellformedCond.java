@@ -24,7 +24,6 @@ import org.key_project.logic.op.Operator;
  *
  * @author Dominic Steinhoefel
  */
-@TransformerMeta(name = "#wellFormedCond")
 public final class CreateWellformedCond extends AbstractTermTransformer {
 
     public CreateWellformedCond() {

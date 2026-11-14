@@ -13,7 +13,6 @@ import java.util.Optional;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformerRegistry;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
@@ -99,10 +98,6 @@ public class JavaParserFactory {
         if (config == null) {
             config = new ParserConfiguration();
             config.setStoreTokens(true);
-            // Only the names registered in ProgramTransformerRegistry are recognized as (possibly
-            // supported) #name(...) meta-construct statements; everything else starting with '#'
-            // is parsed as an ordinary method call and resolved as a schema variable.
-            config.setKeyMetaConstructNames(ProgramTransformerRegistry.names());
         }
         config.setLanguageLevel(ParserConfiguration.LanguageLevel.RAW);
         config.getProcessors().add(() -> new Processor() {

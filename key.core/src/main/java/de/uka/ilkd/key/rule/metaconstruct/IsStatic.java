@@ -10,15 +10,12 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.reference.VariableReference;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
-import org.key_project.util.collection.ImmutableList;
-
 /**
  * Creates a true or false literal if the given program element is or is not a static variable
  * reference.
  *
  * @author N/A
  */
-@TransformerMeta(name = "#isstatic")
 public class IsStatic extends ProgramTransformer {
 
     /**
@@ -39,10 +36,5 @@ public class IsStatic extends ProgramTransformer {
             }
         }
         return new ProgramElement[] { KeYJavaASTFactory.falseLiteral() };
-    }
-
-    @Override
-    public ImmutableList<ProgramElement> getArguments() {
-        return ImmutableList.of(body());
     }
 }

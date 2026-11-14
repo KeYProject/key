@@ -64,23 +64,6 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     }
 
     /**
-     * Returns the arguments of this meta construct in source order, i.e. its schema-variable
-     * arguments first (e.g. the labels of {@code #unwindLoop(#inner, #outer, loop)} or the
-     * execution context and result variable of {@code #methodCall(#ex, #v0, body)}), followed by
-     * the encapsulated program element. Meta constructs without additional arguments just return
-     * the encapsulated program element.
-     *
-     * <p>
-     * Meta-construct schema variables are program schema variables ({@link ProgramSV}), which are
-     * {@link ProgramElement}s; they are nevertheless not part of the AST child list returned by
-     * {@link #getChildAt(int)}, which contains only the encapsulated program element. The pretty
-     * printer iterates this list to emit all arguments of a meta construct.
-     *
-     * @return the arguments of this meta construct, ordered as in the source
-     */
-    public abstract ImmutableList<ProgramElement> getArguments();
-
-    /**
      * performs the program transformation needed for symbolic program transformation
      *
      * @param pe the ProgramElement on which the execution is performed

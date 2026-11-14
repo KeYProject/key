@@ -74,7 +74,7 @@ public class MissingProofsChecker implements Checker {
 
         // compare: Is there a proof for every contract?
         for (CheckerData.ProofEntry entry : data.getProofEntries()) {
-            Proof p = entry.proof;
+            Proof p = Objects.requireNonNull(entry.proof);
             SpecificationRepository sr = p.getServices().getSpecificationRepository();
             ContractPO cpo = sr.getPOForProof(p);
             Contract foundContract = cpo.getContract();
@@ -123,8 +123,14 @@ public class MissingProofsChecker implements Checker {
         Type type = c.getKJT().getJavaType();
         if (type instanceof TypeDeclaration td) {
             PositionInfo positionInfo = td.getPositionInfo();
-            URI uri = positionInfo.getURI().orElseThrow().normalize();
-            URI srcURI = data.getPbh().getPath("src").toAbsolutePath().normalize().toUri();
+            URI uri = positionInfo.getURI().orElse(null);
+            if (uri == null) {
+                // no source location: cannot be part of the user-provided sources
+                return true;
+            }
+            uri = uri.normalize();
+            URI srcURI = Objects.requireNonNull(data.getPbh())
+                    .getPath("src").toAbsolutePath().normalize().toUri();
 
             // ignore contracts from files not in src path (e.g. from bootclasspath)
             // (this check works independent of number of slashes in URIs)

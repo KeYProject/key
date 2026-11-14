@@ -68,7 +68,7 @@ public class TestMiscTools {
 
     @Test
     @Disabled("weigl: Disabled b/c failing on Windows Server (Github Action). " +
-        "Failing is not  reproducible on Windows.")
+        "Failing is not reproducible on Windows 10.")
     public void testMakeFilenameRelativeWindows() {
         // run only on Windows systems
         if (File.separatorChar != '\\') {
