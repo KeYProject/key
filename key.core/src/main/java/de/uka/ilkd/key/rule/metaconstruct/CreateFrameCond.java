@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -48,8 +49,10 @@ public final class CreateFrameCond extends AbstractTermTransformer {
         final ProgramVariable permissionsHeapBeforePV = //
             (ProgramVariable) term.sub(3).op();
 
+        final StatementBlock program = svInst.getContextInstantiation() == null ? null
+                : (StatementBlock) svInst.getContextInstantiation().program();
         final LoopSpecification loopSpec = //
-            MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
+            MiscTools.getSpecForTermWithLoopStmt(loopFormula, program, services);
 
         final boolean isTransaction =
             MiscTools.isTransaction(((Modality) loopFormula.op()).kind());

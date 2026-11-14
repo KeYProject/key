@@ -1,18 +1,12 @@
 @javax.annotation.processing.Generated("RecordClassBuilder")
-final /*@ nullable */ class MyRecord extends Record {
+/*@ nullable */ final class MyRecord extends Record {
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
     private final String test;
 
-    /*@ public  normal_behavior 
-      @ requires true;
-      @ ensures test == this.test;
-      @ assignable this.*;
-
-      @*/
     @javax.annotation.processing.Generated("RecordClassBuilder")
     public MyRecord(String test) {
-        //Created by RecordClassBuilder.java:132
+        //Created by RecordClassBuilder.java:110
         this.test = test;
     }
 
@@ -56,7 +50,7 @@ final /*@ nullable */ class MyRecord extends Record {
 
     public void $init(String test) {
         super.$init();
-        //Created by RecordClassBuilder.java:132
+        //Created by RecordClassBuilder.java:110
         this.test = test;
     }
 }

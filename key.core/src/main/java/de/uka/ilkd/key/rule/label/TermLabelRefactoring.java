@@ -78,7 +78,7 @@ public interface TermLabelRefactoring extends RuleSpecificTask {
                     || (rule instanceof CloseAfterMerge
                             && CloseAfterMerge.FINAL_WEAKENING_TERM_HINT.equals(hint))) {
                 ProofOblInput problem =
-                    proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                    proof.getServices().getProofRegistry().getProofOblInput(proof);
                 if (problem instanceof AbstractOperationPO) {
                     return ((AbstractOperationPO) problem).isAddSymbolicExecutionLabel();
                 } else {

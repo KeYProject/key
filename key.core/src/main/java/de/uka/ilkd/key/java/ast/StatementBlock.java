@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.java.ast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import de.uka.ilkd.key.java.ProgramPrefixUtil;
@@ -16,12 +15,14 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NonNull;
@@ -43,25 +44,33 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     @Nullable
     private final MethodFrame innerMostMethodFrame;
-    private final ImmutableList<TextualJMLConstruct> attachedJML;
+
+    /**
+     * The block contracts applying to this block, attached to the node; former
+     * {@code blockContracts} map (keyed by {@code BlockContractKey}).
+     */
+    private ImmutableSet<BlockContract> blockContracts = DefaultImmutableSet.nil();
+
+    /**
+     * The loop contracts applying to the block itself, attached to the node; former
+     * {@code loopContracts} map (keyed by {@code LoopContractKey}).
+     */
+    private ImmutableSet<LoopContract> loopContracts = DefaultImmutableSet.nil();
 
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<? extends Statement> body,
-            ImmutableList<TextualJMLConstruct> attachedJML) {
+            @NonNull ImmutableArray<? extends Statement> body) {
         super(pi, comments);
         this.body = body;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
-        this.attachedJML = attachedJML;
     }
 
     public StatementBlock() {
         body = new ImmutableArray<>();
         prefixLength = 1;
         innerMostMethodFrame = null;
-        attachedJML = ImmutableList.of();
     }
 
 
@@ -77,8 +86,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
-        attachedJML =
-            ImmutableList.fromList(Arrays.asList(children.collect(TextualJMLConstruct.class)));
     }
 
     public StatementBlock(@NonNull ImmutableArray<? extends Statement> as) {
@@ -89,7 +96,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
-        attachedJML = ImmutableList.nil();
     }
 
 
@@ -99,16 +105,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     public StatementBlock(Statement... body) {
         this(new ImmutableArray<>(body));
-    }
-
-    public StatementBlock(PositionInfo pi, List<Comment> c, ImmutableArray<Statement> body,
-            List<TextualJMLConstruct> spec) {
-        this(pi, c, body, ImmutableList.fromList(spec));
-    }
-
-    @Override
-    public ImmutableList<TextualJMLConstruct> getAttachedJml() {
-        return attachedJML;
     }
 
     @Override
@@ -328,5 +324,65 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     @Override
     public PosInProgram getFirstActiveChildPos() {
         return isEmpty() ? PosInProgram.TOP : PosInProgram.ZERO;
+    }
+
+    // ----------------------------------------------------------------------
+    // node-attached (translated) specifications — formerly SpecificationRepository state
+    // ----------------------------------------------------------------------
+
+    /**
+     * Returns the block contracts applying to this block.
+     */
+    public synchronized ImmutableSet<BlockContract> getBlockContracts() {
+        return blockContracts;
+    }
+
+    /**
+     * Replaces the set of block contracts attaching to this block.
+     */
+    public synchronized void setBlockContracts(ImmutableSet<BlockContract> contracts) {
+        this.blockContracts = contracts == null ? DefaultImmutableSet.nil() : contracts;
+    }
+
+    /**
+     * Registers the given block contract on this block.
+     */
+    public synchronized void addBlockContract(BlockContract contract) {
+        this.blockContracts = this.blockContracts.add(contract);
+    }
+
+    /**
+     * Removes the given block contract from this block.
+     */
+    public synchronized void removeBlockContract(BlockContract contract) {
+        this.blockContracts = this.blockContracts.remove(contract);
+    }
+
+    /**
+     * Returns the loop contracts applying to this block.
+     */
+    public synchronized ImmutableSet<LoopContract> getLoopContracts() {
+        return loopContracts;
+    }
+
+    /**
+     * Replaces the set of loop contracts attaching to this block.
+     */
+    public synchronized void setLoopContracts(ImmutableSet<LoopContract> contracts) {
+        this.loopContracts = contracts == null ? DefaultImmutableSet.nil() : contracts;
+    }
+
+    /**
+     * Registers the given loop contract on this block.
+     */
+    public synchronized void addLoopContract(LoopContract contract) {
+        this.loopContracts = this.loopContracts.add(contract);
+    }
+
+    /**
+     * Removes the given loop contract from this block.
+     */
+    public synchronized void removeLoopContract(LoopContract contract) {
+        this.loopContracts = this.loopContracts.remove(contract);
     }
 }

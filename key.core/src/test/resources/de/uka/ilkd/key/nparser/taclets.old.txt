@@ -6663,7 +6663,7 @@ elim_double_block_3 {
   }
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  while (#e) #s
+  #reattachLoopInvariant(while (#e) #s)
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}

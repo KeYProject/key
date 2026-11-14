@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.junit.jupiter.api.Assertions;
@@ -58,6 +59,14 @@ public class ContractLoadingTests {
         Assertions.assertNotNull(proof);
     }
 
+    /**
+     * The fixtures rely on class-level {@code spec_java_math}/{@code spec_bigint_math} JML
+     * pragmas (JMLtk parses them as JML modifiers, KeY maps them to {@code ModifierKind}
+     * {@code JML_SPEC_*}, and {@code JMLInfoExtractor} turns them into the spec math mode),
+     * on model methods with inline {@code spec_*_math} modifiers, and on method-level JML
+     * modifier pragmas. The math mode drives overload resolution of
+     * {@code Test.accept(1 + 2)} between {@code accept(int)} and {@code accept(\bigint)}.
+     */
     @Test
     public void specMathJavaMathTest() throws ProblemLoaderException {
         final Path javaFile =
@@ -74,5 +83,25 @@ public class ContractLoadingTests {
         Assumptions.assumeTrue(Files.exists(javaFile));
         KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
         Assertions.assertFalse(file.getProofContracts().isEmpty());
+    }
+
+    /**
+     * A named spec case in the JMLtk-native form {@code [behavior] <name>:} must carry its name
+     * through to the operation contract: JmlToTextual maps {@code JmlContract.name} to the
+     * TextualJMLSpecCase name, and JMLSpecFactory.generateName uses it as the contract's base
+     * name instead of the generated default.
+     */
+    @Test
+    public void nameClauseCarriesContractName() throws ProblemLoaderException {
+        final Path javaFile =
+            HelperClassForTests.TESTCASE_DIRECTORY.resolve("speclang/njml/NameClause.java");
+        Assumptions.assumeTrue(Files.exists(javaFile));
+        KeYEnvironment<?> file = KeYEnvironment.load(javaFile);
+        Assertions.assertTrue(file.getProofContracts().stream()
+                .filter(FunctionalOperationContract.class::isInstance)
+                .map(FunctionalOperationContract.class::cast)
+                .anyMatch(c -> "CaseA".equals(c.getBaseName())),
+            "expected a functional operation contract with base name 'CaseA', got: "
+                + file.getProofContracts());
     }
 }

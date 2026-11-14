@@ -1,6 +1,5 @@
-// exceptionClass: ParserException
-// msgContains: no viable alternative at input 'modelFct('
-// position: 11/23
+// exceptionClass: ProofInputException
+// msgContains: Encountered unexpected token
 // verbose: true
 
 

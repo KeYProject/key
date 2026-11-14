@@ -61,7 +61,7 @@ public class WdWhileInvariantRule extends WhileInvariantRule {
             } else {
                 self = null;
             }
-            ((SpecificationRepositoryWD) services.getSpecificationRepository()).addWdStatement(lwd);
+            ((ContractRegistryWD) services.getContractRegistry()).addWdStatement(lwd);
             LocationVariable heap = heapContext.getFirst();
             final SequentFormula wdInv = lwd.generateSequent(self, heap, anonHeap, localIns,
                 inst.u(), localAnonUpdate, services);

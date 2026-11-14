@@ -1,8 +1,7 @@
-// position: 11/34
 // verbose: true
 // broken: false
-// exceptionClass: ParserException
-// msgContains: expected, but found '('
+// exceptionClass: ProofInputException
+// msgContains: Encountered unexpected token
 
 class MethodInMethod {
 

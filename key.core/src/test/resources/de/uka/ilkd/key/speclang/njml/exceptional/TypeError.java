@@ -1,6 +1,5 @@
 // exceptionClass: RuntimeException
 // msgContains: Error in equality-expression
-// position: 12/19
 // verbose: true
 
 

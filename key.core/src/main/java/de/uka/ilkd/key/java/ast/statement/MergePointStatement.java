@@ -24,11 +24,11 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
+import de.uka.ilkd.key.speclang.MergeContract;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
 
 /**
  * A statement indicating a merge point.
@@ -41,34 +41,63 @@ public class MergePointStatement extends JavaStatement
     // Those are used for JML to JavaDL conversions
     protected final IProgramVariable identifier;
 
-    private final TextualJMLMergePointDecl context;
+    /**
+     * The merge contracts belonging to this merge point, attached to the node; former
+     * {@code mergeContracts} map.
+     * <p>
+     * Accessors are {@code synchronized}: the former map was a
+     * {@code Collections.synchronizedMap} because the set is mutated by meta-construct
+     * transforms (e.g. {@code IntroAtPreDefsOp}) during the parallel prover's lock-free
+     * {@code computeRuleApp} phase while rule application (e.g. {@code MergeRuleBuiltInRuleApp})
+     * reads it concurrently.
+     */
+    private ImmutableSet<MergeContract> mergeContracts = DefaultImmutableSet.nil();
 
-    @Override
-    public ImmutableList<TextualJMLConstruct> getAttachedJml() {
-        return context == null ? ImmutableList.nil() : ImmutableList.of(context);
+    /**
+     * Returns the merge contracts belonging to this merge point.
+     */
+    public synchronized ImmutableSet<MergeContract> getMergeContracts() {
+        return mergeContracts;
+    }
+
+    /**
+     * Registers the given merge contract on this merge point.
+     */
+    public synchronized void addMergeContract(MergeContract contract) {
+        this.mergeContracts = this.mergeContracts.add(contract);
+    }
+
+    /**
+     * Deletes all merge contracts registered on this merge point.
+     */
+    public synchronized void removeMergeContracts() {
+        this.mergeContracts = DefaultImmutableSet.nil();
+    }
+
+    /**
+     * Atomically replaces the merge contracts registered on this merge point with the given
+     * set. Equivalent to {@link #removeMergeContracts()} followed by adding every contract of
+     * {@code contracts}, but performed under one lock so that concurrent readers (parallel
+     * prover rule application via {@code MergeRuleBuiltInRuleApp}) never observe the
+     * intermediate empty set.
+     */
+    public synchronized void setMergeContracts(ImmutableSet<MergeContract> contracts) {
+        this.mergeContracts = contracts == null ? DefaultImmutableSet.nil() : contracts;
     }
 
     public MergePointStatement(
-            PositionInfo pi, List<Comment> c, TextualJMLMergePointDecl context,
-            IProgramVariable identifier) {
+            PositionInfo pi, List<Comment> c, IProgramVariable identifier) {
         super(pi, c);
         this.identifier = identifier;
-        this.context = context;
     }
 
     public MergePointStatement(IProgramVariable indexPV) {
-        this(null, null, null, indexPV);
+        this(null, null, indexPV);
     }
 
     public MergePointStatement(ExtList children) {
         super(children);
         identifier = Objects.requireNonNull(children.get(IProgramVariable.class));
-        // comments = children.get(Comment[].class);
-        this.context = null;
-    }
-
-    public TextualJMLMergePointDecl getContext() {
-        return context;
     }
 
     /*

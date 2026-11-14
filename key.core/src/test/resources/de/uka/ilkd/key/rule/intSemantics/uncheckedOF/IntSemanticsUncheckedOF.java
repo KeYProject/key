@@ -1,5 +1,5 @@
-/*@ code_bigint_math @*/      // this is ignored by KeY currently, just for documentation
-/*@ spec_bigint_math @*/      // this is the default
+// (former `/*@ code_bigint_math @*/` and `/*@ spec_bigint_math @*/` class-level pragmas
+//  removed: not accepted by JMLtk; the int semantics are set via the .key settings)
 class IntSemanticsUncheckedOF {
 
     // provable with bigint semantics in code and in spec

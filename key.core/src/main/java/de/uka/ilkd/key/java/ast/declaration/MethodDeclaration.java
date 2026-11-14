@@ -14,12 +14,10 @@ import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 
@@ -94,9 +92,8 @@ public class MethodDeclaration extends JavaDeclaration
             TypeReference returnType,
             Comment[] voidComments, ProgramElementName name,
             ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
-            StatementBlock body, boolean parentIsInterfaceDeclaration,
-            ImmutableList<TextualJMLConstruct> attachedJml) {
-        super(pi, comments, modArray, attachedJml);
+            StatementBlock body, boolean parentIsInterfaceDeclaration) {
+        super(pi, comments, modArray);
         this.returnType = returnType;
         this.voidComments = voidComments;
         this.name = name;

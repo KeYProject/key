@@ -9,11 +9,13 @@ import java.util.List;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
+import de.uka.ilkd.key.speclang.LoopContract;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NonNull;
@@ -52,7 +54,18 @@ public abstract class LoopStatement extends JavaStatement
     @NonNull
     protected final Statement body;
 
-    protected final ImmutableList<TextualJMLConstruct> attachedJml;
+    /**
+     * The translated loop invariant, attached directly to this loop node. Used to live in the
+     * {@code SpecificationRepository}'s {@code (loop, line)} map; it is now node-attached so that
+     * the repository can be deleted (see the JMLtk front-end rewrite project).
+     */
+    private @Nullable LoopSpecification loopInvariant;
+
+    /**
+     * The loop contracts applying directly to this loop (as opposed to the {@code StatementBlock}
+     * containing it), attached to the node; former {@code loopContractsOnLoops} map.
+     */
+    private ImmutableSet<LoopContract> loopContracts = DefaultImmutableSet.nil();
 
     /**
      * Loop statement.
@@ -66,7 +79,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body, ExtList comments,
@@ -76,7 +88,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body) {
@@ -84,7 +95,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(Expression guard, @NonNull Statement body, PositionInfo pos) {
@@ -93,7 +103,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = null;
         this.inits = null;
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -119,7 +128,6 @@ public abstract class LoopStatement extends JavaStatement
         }
         this.inits = new LoopInit(inits);
         this.guard = new Guard(guard);
-        this.attachedJml = ImmutableList.nil();
     }
 
     /**
@@ -144,7 +152,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -156,7 +163,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -182,7 +188,6 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableList.nil();
     }
 
 
@@ -204,30 +209,21 @@ public abstract class LoopStatement extends JavaStatement
         this.updates = updates;
         this.inits = inits;
         this.guard = guard;
-        this.attachedJml = ImmutableList.nil();
     }
 
     public LoopStatement(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body,
-            ImmutableList<TextualJMLConstruct> attachedJml) {
+            IForUpdates updates, @NonNull IGuard guard, @NonNull Statement body) {
         super(pi, comments);
         this.inits = inits;
         this.updates = updates;
         this.guard = guard;
         this.body = body;
-        this.attachedJml = attachedJml;
     }
 
     static private ExtList add(ExtList e, Object o) {
         e.add(o);
         return e;
     }
-
-    @Override
-    public ImmutableList<TextualJMLConstruct> getAttachedJml() {
-        return attachedJml;
-    }
-
 
     /**
      * Returns the number of children of this node.
@@ -465,6 +461,105 @@ public abstract class LoopStatement extends JavaStatement
         return super.equals(cmp) && (this.getStartPosition().equals(Position.UNDEFINED)
                 || cmp.getStartPosition().equals(Position.UNDEFINED)
                 || this.getStartPosition().line() == cmp.getStartPosition().line());
+    }
+
+    // ----------------------------------------------------------------------
+    // node-attached (translated) specifications — formerly SpecificationRepository state
+    // ----------------------------------------------------------------------
+
+    /**
+     * Returns the loop invariant attached to this loop, or {@code null} if none.
+     */
+    public synchronized @Nullable LoopSpecification getLoopInvariant() {
+        return loopInvariant;
+    }
+
+    /**
+     * Returns the loop invariant for this loop. If this node itself carries no invariant — as is
+     * the case for loop nodes freshly created by substituting rule pattern templates (see e.g. the
+     * <code>\storeStmtIn</code> variable condition) — it searches the given program for a
+     * structurally equal loop that carries an invariant and returns that one. This reproduces the
+     * structural loop-specification lookup that the former {@code SpecificationRepository}
+     * performed.
+     *
+     * @param program the program to search, typically the program of the goal the loop occurs in;
+     *        a {@code null} value disables the search
+     * @return the loop invariant, or {@code null} if none was found
+     */
+    public @Nullable LoopSpecification getLoopInvariant(Statement program) {
+        final LoopSpecification attached = getLoopInvariant();
+        if (attached != null) {
+            return attached;
+        }
+        if (program instanceof NonTerminalProgramElement nonTerminalProgram) {
+            return findLoopInvariant(nonTerminalProgram);
+        }
+        return null;
+    }
+
+    private @Nullable LoopSpecification findLoopInvariant(NonTerminalProgramElement element) {
+        if (element instanceof LoopStatement loop && loop.getLoopInvariant() != null
+                && loop.equals(this)) {
+            return loop.getLoopInvariant();
+        }
+        for (int i = 0, childCount = element.getChildCount(); i < childCount; i++) {
+            if (element.getChildAt(i) instanceof NonTerminalProgramElement child) {
+                final LoopSpecification spec = findLoopInvariant(child);
+                if (spec != null) {
+                    return spec;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Attaches the given loop invariant to this loop, replacing any previous one.
+     */
+    public synchronized void setLoopInvariant(@Nullable LoopSpecification inv) {
+        this.loopInvariant = inv;
+    }
+
+    /**
+     * Copies the invariant attached to this loop onto <code>to</code>, re-binding it to
+     * <code>to</code>. Does nothing if this loop carries no invariant.
+     *
+     * @param to the loop that receives the invariant.
+     * @see LoopSpecification#setLoop(LoopStatement)
+     */
+    public void copyLoopInvariantTo(LoopStatement to) {
+        LoopSpecification inv = getLoopInvariant();
+        if (inv != null) {
+            to.setLoopInvariant(inv.setLoop(to));
+        }
+    }
+
+    /**
+     * Returns the loop contracts applying to this loop itself.
+     */
+    public synchronized ImmutableSet<LoopContract> getLoopContracts() {
+        return loopContracts;
+    }
+
+    /**
+     * Replaces the set of loop contracts attaching to this loop.
+     */
+    public synchronized void setLoopContracts(ImmutableSet<LoopContract> contracts) {
+        this.loopContracts = contracts == null ? DefaultImmutableSet.nil() : contracts;
+    }
+
+    /**
+     * Registers the given loop contract on this loop.
+     */
+    public synchronized void addLoopContract(LoopContract contract) {
+        this.loopContracts = this.loopContracts.add(contract);
+    }
+
+    /**
+     * Removes the given loop contract from this loop.
+     */
+    public synchronized void removeLoopContract(LoopContract contract) {
+        this.loopContracts = this.loopContracts.remove(contract);
     }
 
 }

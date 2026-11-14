@@ -37,10 +37,10 @@ public class WellDefinednessPOLoader implements ProofObligationLoader {
             Configuration properties) {
         String contractName = properties.getString("wd check");
         final Contract contract =
-            initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
+            initConfig.getServices().getContractRegistry().getContractByName(contractName);
         if (contract == null) {
             LOGGER.error("Contract {} not found.", contractName);
-            var c = initConfig.getServices().getSpecificationRepository();
+            var c = initConfig.getServices().getContractRegistry();
             LOGGER.info("Available contracts: ");
             for (var contr : c.getAllContracts()) {
                 LOGGER.info("Name:{}, Display: {}", contr.getName(), contr.getDisplayName());

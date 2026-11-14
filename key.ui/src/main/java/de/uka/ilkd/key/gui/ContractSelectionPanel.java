@@ -196,7 +196,7 @@ public class ContractSelectionPanel extends JPanel {
     // -------------------------------------------------------------------------
 
     private Proof getClosedProof(Contract c) {
-        ImmutableSet<Proof> proofs = services.getSpecificationRepository().getProofs(c);
+        ImmutableSet<Proof> proofs = services.getProofRegistry().getProofs(c);
 
         for (Proof proof : proofs) {
             if (proof.mgt().getStatus().getProofClosed()) {
@@ -322,7 +322,7 @@ public class ContractSelectionPanel extends JPanel {
                             + "Contract:\n" + contract.getPlainText(services));
                 }
             }
-            return services.getSpecificationRepository().combineOperationContracts(contracts);
+            return services.getContractRegistry().combineOperationContracts(contracts);
         }
     }
 }

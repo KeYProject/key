@@ -11,13 +11,8 @@ import de.uka.ilkd.key.java.loader.JavaParserFactory;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
-import de.uka.ilkd.key.speclang.njml.PreParser;
 
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.parsing.Position;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -26,6 +21,9 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.jml.NodeWithContracts;
+import com.github.javaparser.ast.jml.clauses.JmlContract;
+import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.*;
@@ -34,7 +32,6 @@ import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
 import com.github.javaparser.resolution.types.ResolvedReferenceType;
 import com.github.javaparser.resolution.types.ResolvedType;
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -62,57 +59,6 @@ public class TransformationPipelineServices {
             TransformerCache cache) {
         this.cache = cache;
         this.javaParserFactory = javaParserFactory;
-    }
-
-    static void addSpec(Node nextMember, TextualJMLConstruct specCase) {
-        if (!nextMember.containsData(JMLTransformer.KEY_SPEC_CASE)) {
-            nextMember.setData(JMLTransformer.KEY_SPEC_CASE, new ArrayList<>(4));
-        }
-        List<TextualJMLConstruct> specList = nextMember.getData(JMLTransformer.KEY_SPEC_CASE);
-        specList.add(specCase);
-    }
-
-    static @NonNull PreParser getPreParser() {
-        return new PreParser();
-    }
-
-    static void addClassSpec(TypeDeclaration<?> td, TextualJMLConstruct c) {
-        if (!td.containsData(JMLTransformer.KEY_CLASS_SPEC)) {
-            td.setData(JMLTransformer.KEY_CLASS_SPEC, new ArrayList<>(4));
-        }
-        List<TextualJMLConstruct> specList = td.getData(JMLTransformer.KEY_CLASS_SPEC);
-        specList.add(c);
-    }
-
-    static void addLoopSpec(Node nextMember, TextualJMLLoopSpec spec) {
-        if (!nextMember.containsData(JMLTransformer.KEY_LOOP_SPEC)) {
-            nextMember.setData(JMLTransformer.KEY_LOOP_SPEC, new ArrayList<>(4));
-        }
-        List<TextualJMLLoopSpec> specList = nextMember.getData(JMLTransformer.KEY_LOOP_SPEC);
-        specList.add(spec);
-    }
-
-
-    public static List<TextualJMLLoopSpec> getLoopSpec(Node n) {
-        if (!n.containsData(JMLTransformer.KEY_LOOP_SPEC)) {
-            return Collections.emptyList();
-        }
-        return n.getData(JMLTransformer.KEY_LOOP_SPEC);
-    }
-
-    public static List<TextualJMLConstruct> getClassSpec(Node td) {
-        if (!td.containsData(JMLTransformer.KEY_CLASS_SPEC)) {
-            return Collections.emptyList();
-
-        }
-        return td.getData(JMLTransformer.KEY_CLASS_SPEC);
-    }
-
-    public static List<TextualJMLConstruct> getSpec(Node n) {
-        if (!n.containsData(JMLTransformer.KEY_SPEC_CASE)) {
-            return Collections.emptyList();
-        }
-        return n.getData(JMLTransformer.KEY_SPEC_CASE);
     }
 
     public void addWarning(PositionedString warning) {
@@ -349,31 +295,53 @@ public class TransformationPipelineServices {
         return getParser().parseStatement(code).getResult().orElseThrow();
     }
 
-    public void attachTypeSpec(TypeDeclaration<?> clazz, @Nullable String spec) {
-        if (spec == null)
+    /**
+     * Attaches a specification by parsing the given JML text with JMLtk and attaching the
+     * resulting contracts to the given node (which must be able to carry contracts).
+     */
+    public void attachSpec(NodeWithContracts<?> node, @Nullable String spec) {
+        if (spec == null) {
             return;
-        PreParser pp = getPreParser();
-        ImmutableList<TextualJMLConstruct> specification = pp.parseClassLevel(spec);
-        specification.forEach(it -> addClassSpec(clazz, it));
-    }
-
-    public void attachSpec(Node node, @Nullable String spec) {
-        if (spec == null)
-            return;
-        PreParser pp = getPreParser();
-        ImmutableList<TextualJMLConstruct> specification = pp.parseClassLevel(spec);
-        specification.forEach(it -> addSpec(node, it));
+        }
+        var parser = getParser();
+        var result = parser.parseJmlMethodLevel(spec);
+        result.getProblems().forEach(p -> LOGGER.warn("Could not parse JML '{}': {}", spec,
+            p.getMessage()));
+        result.getResult().ifPresent(root -> root.getChildren().forEach(child -> {
+            if (child instanceof JmlContract contract) {
+                node.addContract(contract);
+            } else {
+                LOGGER.warn("Ignoring non-contract construct {} in generated JML '{}'",
+                    child.getClass().getSimpleName(), spec);
+            }
+        }));
         LOGGER.info("Generated specification {} for {}", spec, node);
     }
 
+    /**
+     * Attaches an assertion (an {@code assert}/{@code assume} statement) by parsing the given JML
+     * text with JMLtk and self-marking the resulting statement.
+     */
     public void attachAssertion(Node node, @Nullable String spec) {
-        if (spec == null)
+        if (spec == null) {
             return;
-        PreParser pp = getPreParser();
-        ImmutableList<TextualJMLConstruct> specification =
-            pp.parseMethodLevel(spec, null, Position.UNDEFINED);
-        TextualJMLAssertStatement expr = (TextualJMLAssertStatement) specification.get(0);
-        node.setData(KEY_ASSERT, expr);
+        }
+        var parser = getParser();
+        var result = parser.parseJmlMethodLevel(spec);
+        result.getProblems().forEach(p -> LOGGER.warn("Could not parse assertion '{}': {}", spec,
+            p.getMessage()));
+        result.getResult().ifPresent(root -> {
+            var stmt = root.getChildren().stream()
+                    .filter(JmlExpressionStmt.class::isInstance)
+                    .map(JmlExpressionStmt.class::cast)
+                    .findFirst()
+                    .orElse(null);
+            if (stmt != null) {
+                node.setData(KEY_ASSERT, stmt);
+            } else {
+                LOGGER.warn("Could not find an assertion statement in '{}'", spec);
+            }
+        });
         LOGGER.info("Generated specification {} for {}", spec, node);
     }
 
