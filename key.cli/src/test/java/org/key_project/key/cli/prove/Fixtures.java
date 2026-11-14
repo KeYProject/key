@@ -40,6 +40,11 @@ public final class Fixtures {
         return resource("/fixtures/overflow/overflow.key");
     }
 
+    /// The load file carrying a {@code \settings} block selecting {@code intRules:javaSemantics}.
+    public static Path loadFileSettingsKey() {
+        return resource("/fixtures/index/loadfile-settings.key");
+    }
+
     /// The §5.2 example settings file with all twelve keys.
     public static Path fullSettings() {
         return resource("/fixtures/settings/full.json");
