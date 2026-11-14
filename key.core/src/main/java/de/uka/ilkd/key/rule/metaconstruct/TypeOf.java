@@ -62,4 +62,9 @@ public class TypeOf extends ProgramTransformer {
 
         return new ProgramElement[] { KeYJavaASTFactory.typeRef(kjt, 0, annotations) };
     }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body());
+    }
 }

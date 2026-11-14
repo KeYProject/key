@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The constructor call meta construct is used to handle a allocation expression like
@@ -55,4 +56,9 @@ public class SpecialConstructorCall extends ProgramTransformer {
             constructorReference.getArguments()) };
     }
 
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body());
+    }
 }

@@ -14,6 +14,8 @@ import de.uka.ilkd.key.java.ast.statement.Break;
 import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * This class performs a labeled break. This means <code>
  *  l1:l2:{l3:{l4:{break l3;}} ...}
@@ -80,5 +82,10 @@ public class DoBreak extends ProgramTransformer {
         }
         return new ProgramElement[] {
             doBreak((NonTerminalProgramElement) pe, breakStmnt.getLabel(), breakStmnt) };
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body());
     }
 }

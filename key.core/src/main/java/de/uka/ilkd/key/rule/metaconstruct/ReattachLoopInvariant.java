@@ -15,6 +15,8 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
+import org.key_project.util.collection.ImmutableList;
+
 /**
  * Construct for re-attaching a loop invariant that otherwise would get lost after a transformation,
  * for instance, the loop scope-based unwinding rule. Copied from the 2015 TimSort tweaks branch (by
@@ -52,5 +54,10 @@ public class ReattachLoopInvariant extends ProgramTransformer {
         }
 
         return new ProgramElement[] { pe };
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body());
     }
 }

@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This class is used to perform program transformations needed for the symbolic execution of a
@@ -260,4 +261,9 @@ public class SwitchToIf extends ProgramTransformer {
     record ChangeBreakResult(ProgramElement result, boolean noNewBreak) {
     }
 
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body());
+    }
 }

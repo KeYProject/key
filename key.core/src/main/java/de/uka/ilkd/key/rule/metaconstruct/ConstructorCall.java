@@ -26,6 +26,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The constructor call meta construct is used to handle a allocation expression like
@@ -51,9 +52,14 @@ public class ConstructorCall extends ProgramTransformer {
      *        The constructor reference.
      */
     protected ConstructorCall(Name name, SchemaVariable newObjectSV, ProgramElement consRef) {
-        super(name, consRef, newObjectSV);
+        super(name, consRef);
         this.newObjectSV = newObjectSV;
         newObjectVar = null;
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body(), newObjectSV);
     }
 
     /**

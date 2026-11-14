@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Replaces the MethodBodyStatement shortcut with the full body, performs prefix adjustments in the
@@ -84,4 +85,9 @@ public class ExpandMethodBody extends ProgramTransformer {
             PositionInfo.UNDEFINED) };
     }
 
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body());
+    }
 }

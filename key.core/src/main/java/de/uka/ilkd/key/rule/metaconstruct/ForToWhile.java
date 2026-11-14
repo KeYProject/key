@@ -73,10 +73,15 @@ public class ForToWhile extends ProgramTransformer {
      * @param outerLabel the label used to handle break (only needed for do-while-loops)
      */
     public ForToWhile(SchemaVariable innerLabel, SchemaVariable outerLabel, Statement loop) {
-        super("#forToWhile", loop, innerLabel, outerLabel);
+        super("#forToWhile", loop);
         this.innerLabel = innerLabel;
         this.outerLabel = outerLabel;
 
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body(), innerLabel, outerLabel);
     }
 
     @Override

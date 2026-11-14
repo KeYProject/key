@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -44,8 +44,6 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     private final Name name;
     /** the encapsulated program element */
     private final ProgramElement body;
-    /** the schema-variable arguments of the meta construct, in source order, never null entries */
-    private final ImmutableList<SchemaVariable> schemaVariables;
 
     /**
      * creates a ProgramTransformer
@@ -54,7 +52,8 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
      * @param body the ProgramElement contained by the meta construct
      */
     protected ProgramTransformer(Name name, ProgramElement body) {
-        this(name, body, new SchemaVariable[0]);
+        this.name = name;
+        this.body = body;
     }
 
     /**
@@ -68,49 +67,44 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     }
 
     /**
-     * creates a ProgramTransformer
+     * Returns the arguments of this meta construct in source order, i.e. its schema-variable
+     * arguments first (e.g. the labels of {@code #unwindLoop(#inner, #outer, loop)} or the
+     * execution context and result variable of {@code #methodCall(#ex, #v0, body)}), followed by
+     * the encapsulated program element. Meta constructs without additional arguments just return
+     * the encapsulated program element.
      *
-     * @param name the String with the name of the meta construct
-     * @param body the ProgramElement contained by the meta construct
-     * @param schemaVariables the additional schema-variable arguments in source order; {@code null}
-     *        entries are ignored
+     * <p>
+     * Meta-construct schema variables are program schema variables ({@link ProgramSV}), which are
+     * {@link ProgramElement}s; they are nevertheless not part of the AST child list returned by
+     * {@link #getChildAt(int)}, which contains only the encapsulated program element. The pretty
+     * printer iterates this list to emit all arguments of a meta construct.
+     *
+     * @return the arguments of this meta construct, ordered as in the source
      */
-    protected ProgramTransformer(String name, ProgramElement body,
-            SchemaVariable... schemaVariables) {
-        this(new Name(name), body, schemaVariables);
-    }
+    public abstract ImmutableList<ProgramElement> getArguments();
 
     /**
-     * creates a ProgramTransformer that additionally carries schema-variable arguments, e.g. the
-     * labels of {@code #unwindLoop(#inner, #outer, loop)} or the execution context and result
-     * variable of {@code #methodCall(#ex, #v0, body)}.
+     * Builds the argument list of a meta construct from its schema-variable arguments (in source
+     * order, {@code null} entries ignored) and its encapsulated program element. Schema variables
+     * are always {@link ProgramSV}s when they are program-meta-construct arguments, and
+     * {@link ProgramSV} is a {@link ProgramElement}.
      *
-     * @param name the Name of the meta construct
-     * @param body the ProgramElement contained by the meta construct
-     * @param schemaVariables the additional schema-variable arguments in source order; {@code null}
-     *        entries are ignored
+     * @param body the encapsulated program element, may be {@code null}
+     * @param schemaVariables the schema-variable arguments in source order
+     * @return the ordered, {@code null}-free argument list
      */
-    protected ProgramTransformer(Name name, ProgramElement body,
+    protected static ImmutableList<ProgramElement> argumentsOf(ProgramElement body,
             SchemaVariable... schemaVariables) {
-        this.name = name;
-        this.body = body;
-        final SchemaVariable[] nonNull =
-            Arrays.stream(schemaVariables).filter(Objects::nonNull).toArray(SchemaVariable[]::new);
-        this.schemaVariables =
-            nonNull.length == 0 ? ImmutableList.nil() : ImmutableList.fromArray(nonNull);
-    }
-
-    /**
-     * Returns the schema-variable arguments of this meta construct in the order they appear in the
-     * source, excluding the encapsulated program element. Schema variables that are not the body
-     * are kept in fields of the concrete transformer and therefore not exposed through
-     * {@link #getChildAt(int)}; the pretty printer reads them from here to emit all arguments of a
-     * meta construct.
-     *
-     * @return the additional schema-variable arguments, ordered as in the source
-     */
-    public ImmutableList<SchemaVariable> schemaVariables() {
-        return schemaVariables;
+        final List<ProgramElement> args = new ArrayList<>(schemaVariables.length + 1);
+        for (SchemaVariable sv : schemaVariables) {
+            if (sv != null) {
+                args.add((ProgramElement) sv);
+            }
+        }
+        if (body != null) {
+            args.add(body);
+        }
+        return ImmutableList.fromList(args);
     }
 
     /**

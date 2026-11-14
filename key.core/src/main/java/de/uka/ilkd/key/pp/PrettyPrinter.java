@@ -282,21 +282,15 @@ public class PrettyPrinter implements Visitor {
         layouter.print("(");
         // A meta construct may carry schema-variable arguments (e.g. #methodCall(#ex, #v0, body),
         // #unwindLoop(#inner, #outer, loop)) that are not ProgramElements and are therefore not
-        // exposed through getChildAt. Emit them in source order before the encapsulated program
-        // element so the printed form can be re-parsed.
+        // exposed through getChildAt. getArguments() returns them in source order before the
+        // encapsulated program element so the printed form can be re-parsed.
         boolean first = true;
-        for (SchemaVariable sv : x.schemaVariables()) {
+        for (ProgramElement arg : x.getArguments()) {
             if (!first) {
                 layouter.print(",").brk();
             }
             first = false;
-            performActionOnSchemaVariable(sv);
-        }
-        if (x.getChildAt(0) != null) {
-            if (!first) {
-                layouter.print(",").brk();
-            }
-            x.getChildAt(0).visit(this);
+            arg.visit(this);
         }
         layouter.print(")");
     }

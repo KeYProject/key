@@ -18,6 +18,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Replaces a declaration of multiple variables by two variable declarations where the first one
@@ -55,4 +56,9 @@ public class MultipleVarDecl extends ProgramTransformer {
             "Meta-construct MultipleVarDecl could " + "not handle program element " + pe);
     }
 
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body());
+    }
 }

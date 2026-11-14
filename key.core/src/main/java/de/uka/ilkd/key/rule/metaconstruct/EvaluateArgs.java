@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * TODO
@@ -131,5 +132,10 @@ public class EvaluateArgs extends ProgramTransformer {
         }
 
         return new ProgramElement[] { KeYJavaASTFactory.block(res) };
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body());
     }
 }
