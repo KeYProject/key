@@ -56,6 +56,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * test-only copies). Loading this file requires the jmlparser to support the
  * {@code #posBinding}/{@code #negBinding} program meta-constructs; until the parser supports them
  * the rule base cannot be loaded and all tests of this class are skipped (see {@link #setUp()}).
+ *
+ * <p>
+ * Each goal is a single active statement (the pattern assignment) so that it sits at the goal's
+ * only reachable active-statement position; the right-hand side is therefore self-contained (no
+ * local declaration precedes it). The {@code #se} rule is exercised with {@code this}, a simple
+ * expression that needs no surrounding scope; the {@code #nse} rules with a {@code new}
+ * expression, which is a non-simple expression.
  */
 class TestPatternAssignmentRules {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestPatternAssignmentRules.class);
@@ -147,6 +154,11 @@ class TestPatternAssignmentRules {
             "Expected exactly one application of " + ruleName + " at " + pos + ", but found:\n"
                 + apps);
         var app = apps.head();
+        // Rules that introduce a fresh variable through a \new condition are only complete once
+        // that fresh variable has been generated; tryToInstantiate performs this step, as the
+        // normal application pipeline (RuleCommand) does.
+        app = app.tryToInstantiate(services);
+        assertNotNull(app, "Rule application of " + ruleName + " could not be completed");
         assertTrue(app.complete(), "Rule application of " + ruleName + " should be complete");
 
         ImmutableList<Goal> goals = app.taclet().getExecutor().apply(goal, app);
@@ -169,64 +181,68 @@ class TestPatternAssignmentRules {
 
     @Test
     void instanceofPatternAssignmentSE() {
-        var goal = applyRule("instanceofPatternAssignmentSE",
-            "Object o; boolean b = o instanceof String s;");
+        var goal =
+            applyRule("instanceofPatternAssignmentSE", "boolean b = this instanceof Object s;");
         // the pattern variable s is dropped, the right hand side becomes a plain instanceof
-        assertSuccedent(goal, "\\<{Object o; boolean b = o instanceof String;}\\> true");
+        assertSuccedent(goal, "\\<{boolean b = this instanceof Object;}\\> true");
     }
 
     @Test
     void instanceofPatternAssignmentNSE() {
         var goal = applyRule("instanceofPatternAssignmentNSE",
-            "Object o; boolean b = (o == null ? o : o) instanceof String s;");
-        assertSuccedent(goal,
-            "\\<{Object o; boolean b = (o == null ? o : o) instanceof String;}\\> true");
+            "boolean b = new String(\"x\") instanceof String s;");
+        assertSuccedent(goal, "\\<{boolean b = new String(\"x\") instanceof String;}\\> true");
     }
 
     @Test
     void andPatternAssignment() {
         var goal = applyRule("andPatternAssignment",
-            "Object o; boolean b = o instanceof String s && o == null;");
+            "boolean b = new String(\"x\") instanceof String s && new String(\"y\") == null;");
         // The guard is evaluated once into a fresh boolean variable; the second operand is
         // evaluated only in the branch where the guard is known to have matched, where the
         // pattern variable s is additionally declared by #posBinding.
         assertSuccedent(goal,
-            "\\<{Object o; boolean b; boolean b_1; { b_1 = o instanceof String s; }"
-                + " if (b_1) { String s = (String) o; b = o == null; } else { b = false; }}\\> true");
+            "\\<{boolean b; boolean b_1; { b_1 = new String(\"x\") instanceof String s; }"
+                + " if (b_1) { java.lang.String s = (String) new String(\"x\");"
+                + " b = new String(\"y\") == null; }"
+                + " else { b = false; }}\\> true");
     }
 
     @Test
     void orPatternAssignment() {
         var goal = applyRule("orPatternAssignment",
-            "Object o; boolean b = o instanceof String s || o == null;");
+            "boolean b = new String(\"x\") instanceof String s || new String(\"y\") == null;");
         // The guard is evaluated once into a fresh boolean variable; the second operand is
         // evaluated only if the guard is false, in which case b is the value of the second
         // operand.
         assertSuccedent(goal,
-            "\\<{Object o; boolean b; boolean b_1; { b_1 = o instanceof String s; }"
-                + " if (b_1) { b = true; } else { b = o == null; }}\\> true");
+            "\\<{boolean b; boolean b_1; { b_1 = new String(\"x\") instanceof String s; }"
+                + " if (b_1) { b = true; } else { b = new String(\"y\") == null; }}\\> true");
     }
 
     @Test
     void notPatternAssignment() {
         var goal = applyRule("notPatternAssignment",
-            "Object o; boolean b = !(o instanceof String s);");
+            "boolean b = !(new String(\"x\") instanceof String s);");
         // The guard is evaluated into a fresh boolean variable and negated; no branch is
         // introduced, hence no pattern variable is declared.
         assertSuccedent(goal,
-            "\\<{Object o; boolean b; boolean b_1; { b_1 = (o instanceof String s); } b = !b_1;}"
-                + "\\> true");
+            "\\<{boolean b; boolean b_1; { b_1 = (new String(\"x\") instanceof String s); }"
+                + " b = !b_1;}\\> true");
     }
 
     @Test
     void conditionalPatternAssignment() {
         var goal = applyRule("conditionalPatternAssignment",
-            "Object o; boolean r = !(o instanceof String s) ? o != null : o == null;");
+            "boolean r = !(new String(\"x\") instanceof String s) ? new String(\"y\") != null"
+                + " : new String(\"z\") == null;");
         // The negated guard binds s only when it evaluates to false, hence s is declared in the
         // else-branch by #negBinding; in the then-branch no pattern variable is bound.
         assertSuccedent(goal,
-            "\\<{Object o; boolean r; boolean b; { b = !(o instanceof String s); }"
-                + " if (b) { r = o != null; } else { String s = (String) o; r = o == null; }}\\>"
-                + " true");
+            "\\<{boolean r; boolean b; { b = !(new String(\"x\") instanceof String s); }"
+                + " if (b) { r = new String(\"y\") != null; }"
+                + " else { java.lang.String s = (String) new String(\"x\");"
+                + " r = new String(\"z\") == null; }}"
+                + "\\> true");
     }
 }
