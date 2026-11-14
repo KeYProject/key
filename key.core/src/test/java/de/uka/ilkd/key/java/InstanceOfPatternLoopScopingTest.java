@@ -42,6 +42,13 @@ class InstanceOfPatternLoopScopingTest {
     }
 
     @Test
+    void exampleProjectLoads() throws Exception {
+        Path project = Path.of("../key.ui/examples/Java/InstanceOfPattern/project.key");
+        KeYEnvironment<?> environment = KeYEnvironment.load(project);
+        environment.dispose();
+    }
+
+    @Test
     void whileBodyBinding(@TempDir Path tempDir) throws Exception {
         prove(tempDir, "WhileBody", """
                 public class WhileBody {

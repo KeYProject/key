@@ -1228,6 +1228,7 @@ public class ProofCollections {
         g.loadable("Java/TextBlockLiterals/project.key");
         g.loadable("Java/Records/Use.key");
         g.loadable("Java/Records/Constructor.key");
+        g.loadable("Java/InstanceOfPattern/project.key");
         g.provable("Java/Annotations/test_annotation.key");
 
         g = c.group("StipuLa");

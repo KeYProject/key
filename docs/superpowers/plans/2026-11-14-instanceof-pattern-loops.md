@@ -815,6 +815,7 @@ git push
 - Modify: `key.core/src/test/resources/de/uka/ilkd/key/nparser/taclets.old.txt`
 - Modify: `key.ui/examples/Java/InstanceOfPattern/src/InstanceOfPatternExample.java`
 - Modify: `key.ui/examples/Java/InstanceOfPattern/README.txt`
+- Modify: `key.core/src/test/java/de/uka/ilkd/key/proof/runallproofs/ProofCollections.java`
 
 **Interfaces:**
 - Consumes: everything from Tasks 1–5.
@@ -860,7 +861,11 @@ public static int afterLoopPattern(Object obj) {
 }
 ```
 
-Add a short README section explaining that `while`/`for` bodies and after-loop `whenFalse` bindings are supported, and that `do` bodies do not see the variable.
+Add a short README section explaining that `while`/`for` bodies and after-loop `whenFalse` bindings are supported, and that `do` bodies do not see the variable. Register the example project in the `JavaFeatures` group of `ProofCollections.automaticJavaDL()`:
+
+```java
+g.loadable("Java/InstanceOfPattern/project.key");
+```
 
 - [ ] **Step 3: Run the targeted suites**
 
