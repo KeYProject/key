@@ -36,6 +36,7 @@ import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -1197,7 +1198,18 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return reportError(type,
                 "A record pattern requires a record type, but " + type + " is not a record");
         }
-        return declaration.getDeclaredFields().stream().filter(field -> !field.isStatic()).toList();
+        return declaration.getDeclaredFields().stream()
+                .filter(field -> !field.isStatic())
+                .filter(field -> !isImplicitField(field.getName()))
+                .toList();
+    }
+
+    /**
+     * Checks whether a field of the normalized record class is an implicit field added by the
+     * transformation pipeline rather than a record component.
+     */
+    private static boolean isImplicitField(String name) {
+        return name.startsWith("<") || name.equals(PipelineConstants.IMPLICIT_ENCLOSING_THIS);
     }
 
     private static boolean isRecord(ResolvedReferenceTypeDeclaration declaration) {
