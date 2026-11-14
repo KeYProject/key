@@ -146,75 +146,91 @@ it only runs after the guard matched.
 
 ### Taclet
 
-Add one rule, `patternLoopUnfold`, to the Java rule file:
+Add two rules to the Java rule file: one for the program block itself and one for
+nested blocks.
 
 ```text
-\find(\modality{#allmodal}{.. { #slist0 #loopStmt #slist } ...}\endmodality (post))
-\varcond(\isBindingLoop(#loopStmt))
-\varcond(\new(#boolv, boolean))
-\varcond(\newLabel(#innerLabel), \newLabel(#outerLabel))
-\replacewith(
-  \modality{#allmodal}{..
-    { #slist0
-      #rewritePatternLoop(#loopStmt, #boolv, #innerLabel, #outerLabel)
-      #slist }
-  ...}\endmodality (post))
-\heuristics(pattern_loop_binding)
-\displayname "patternLoopUnfold"
+patternLoopUnfold {
+  \find(\modality{#allmodal}{ #slist }\endmodality (post))
+  \varcond(\isBindingExpr(#slist))
+  \replacewith(\modality{#allmodal}{ #rewritePatternBlock(#slist) }\endmodality (post))
+  \heuristics(pattern_loop_binding)
+  \displayname "patternLoopUnfold"
+}
+
+patternLoopUnfoldNested {
+  \find(\modality{#allmodal}{.. { #slist } ...}\endmodality (post))
+  \varcond(\isBindingExpr(#slist))
+  \replacewith(
+    \modality{#allmodal}{.. { #rewritePatternBlock(#slist) } ...}\endmodality (post))
+  \heuristics(pattern_loop_binding)
+  \displayname "patternLoopUnfoldNested"
+}
 ```
 
-- `#loopStmt` is a `\program Statement` schema variable. Because it is matched
-  directly as a statement of the block, it is the actual loop object, which makes
-  loop-specification and loop-contract copying reliable.
-- The block pattern makes the rule applicable only to loops that are direct
-  statements of a statement block. Labeled loops and unbraced loop bodies are
-  excluded conservatively.
-- `#boolv` is a fresh boolean program variable created by the taclet's `\new`
-  condition.
-- `#innerLabel` / `#outerLabel` are fresh labels used only by the `do`
-  normalization, which reuses the existing `WhileLoopTransformation` logic.
-- `#rewritePatternLoop` is a program transformer; it returns the statements to splice
-  into the block.
+- `#slist` is the direct statement list of a `StatementBlock`. The root rule matches
+  the program block; the nested rule matches a block statement inside the program.
+  Together they cover loops in the top-level block and loops inside nested blocks.
+- `\isBindingExpr(#slist)` reuses the existing condition. It is extended to accept a
+  loop statement (by inspecting its guard), a `Guard`, and a statement list (true if
+  any direct statement is a loop whose guard binds).
+- Because the rule operates on the actual block list, the loop object is the actual
+  AST node; loop-specification and loop-contract copying is reliable.
+- Labeled loops and unbraced loop bodies are not direct `LoopStatement`s of the list,
+  so they are excluded conservatively.
+- The fresh boolean and the labels for the `do` normalization are created by the
+  transformer, not by `\new`/`\newLabel` taclet conditions. A transformer does not
+  see those fresh instantiations in `SVInstantiations`, so creating them in the
+  transformer is the reliable path.
 
 ### Condition
 
-Add `IsBindingLoopCondition` (registered as `isBindingLoop`). It accepts a `While`,
-`For`, or `Do` whose guard expression satisfies `BindingVariableVisitor.binds`.
+Extend `BindingExpressionCond` (registered as `isBindingExpr`) with three additional
+accepted shapes:
 
-`toString()` must be stable, for example `\isBindingLoop(#loopStmt)`, so the taclet
-oracle does not contain identity hashes.
+- a `LoopStatement` (`while`, `for`, `do`): use its guard expression;
+- a `Guard`: use the wrapped expression;
+- an `ImmutableArray<Statement>`: true if any direct statement is a loop whose guard
+  satisfies `BindingVariableVisitor.binds`.
+
+The existing expression behaviour is unchanged, and `toString()` stays
+`\isBindingExpr(<sv>)`, so the taclet oracle remains stable.
 
 ### Transformer
 
-Add `PatternLoopRewriter` (meta-construct `#rewritePatternLoop`) with arguments
-`(#loopStmt, #boolv, #innerLabel, #outerLabel)`:
+Add `PatternLoopRewriter` (meta-construct `#rewritePatternBlock`) with the single
+argument `#slist`:
 
-1. Read the actual loop and the fresh boolean/labels from the schema
-   instantiations.
-2. Branch on the loop kind:
+1. Read the statement list from the schema instantiation.
+2. Scan it for the first `LoopStatement` whose guard satisfies
+   `BindingVariableVisitor.binds`. Statements before it are copied unchanged.
+3. Create the fresh boolean guard with `TermBuilder.newName("b")` and register it in
+   the program-variable namespace.
+4. Branch on the loop kind:
    - `While`: build the rewrite directly.
    - `For`: emit the for-init declarations as local-variable declaration statements,
      build the init-scoped block, the `while`, and the outer after-loop
      declarations.
-   - `Do`: invoke the existing `WhileLoopTransformation` normalization with the
-     fresh labels, rewrite the generated `while`, and hoist the after-loop
-     declarations outside the normalized block.
-3. Compute `whenTrue` / `whenFalse` with `BindingVariableVisitor.analyze(guard)`.
-4. Rewrite target `continue` statements:
+   - `Do`: invoke the existing `WhileLoopTransformation` normalization with fresh
+     labels created by the transformer, rewrite the generated `while`, and hoist the
+     after-loop declarations outside the normalized block.
+5. Compute `whenTrue` / `whenFalse` with `BindingVariableVisitor.analyze(guard)`.
+6. Rewrite target `continue` statements:
    - only continues at loop depth 0 with no label;
    - replace with `{ <updates if any>; boolv = guard; continue; }`;
    - leave continues of nested loops and labeled continues to outer loops alone;
    - preserve the original `PositionInfo` on the generated continue.
-5. Build the new `while`:
+7. Build the new `while`:
    - body = `whenTrue` declarations, rewritten body, `boolv = guard`;
    - guard = reference to `boolv`;
    - position and comments from the original loop.
-6. Copy the loop specification and loop contracts from the original loop to the new
+8. Copy the loop specification and loop contracts from the original loop to the new
    `while`.
-7. Emit `whenFalse` declarations after the loop iff `whenFalse` is non-empty and the
+9. Emit `whenFalse` declarations after the loop iff `whenFalse` is non-empty and the
    original body contains no unlabeled `break` at loop depth 0.
-8. Return a `ProgramElement[]` so the statements are spliced into the enclosing block,
-   not wrapped in a nested block that would hide the after-loop declarations.
+10. Splice the rewritten statements back into the list and return it. The after-loop
+    declarations stay in the same block list, so they are visible to the statements
+    that follow the loop.
 
 The transformer must not share mutable state between applications.
 
@@ -258,7 +274,8 @@ JML assertion that is accepted at load time can actually be proved.
 Expected touch points:
 
 - `key.core/src/main/resources/de/uka/ilkd/key/proof/rules/javaRules.key`
-  (or `loopRules.key`): new `patternLoopUnfold` rule.
+  (or `loopRules.key`): new `patternLoopUnfold` and `patternLoopUnfoldNested`
+  rules.
 - `key.core/src/main/resources/de/uka/ilkd/key/proof/rules/ruleSetsDeclarations.key`:
   `pattern_loop_binding` rule set.
 - `key.core/src/main/java/de/uka/ilkd/key/strategy/SymExStrategy.java` and
@@ -267,10 +284,8 @@ Expected touch points:
   the transformer.
 - `key.core/src/main/java/de/uka/ilkd/key/rule/metaconstruct/ProgramTransformerRegistry.java`:
   register the transformer.
-- `key.core/src/main/java/de/uka/ilkd/key/rule/conditions/IsBindingLoopCondition.java`:
-  the condition.
-- `key.core/src/main/java/de/uka/ilkd/key/nparser/varexp/TacletBuilderManipulators.java`:
-  register `isBindingLoop`.
+- `key.core/src/main/java/de/uka/ilkd/key/rule/conditions/BindingExpressionCond.java`:
+  accept loop statements, guards, and statement lists.
 - `key.core/src/main/java/de/uka/ilkd/key/speclang/jml/translation/JMLSpecFactory.java`:
   loop visibility.
 - `key.core/src/test/resources/de/uka/ilkd/key/nparser/taclets.old.txt`: oracle.
@@ -300,11 +315,13 @@ already converted and resolved for all three loop kinds.
 
 In the style of `TestPatternIfRules`:
 
-- `patternLoopUnfold` applies to a binding loop.
+- `patternLoopUnfold` applies to a binding loop in the program block.
 - It does not apply to a non-binding loop.
 - It applies exactly once; the rewritten loop is not matched again.
 - A labeled loop and an unbraced loop body are not rewritten.
 - The generated program has the expected shape and declaration placement.
+- A loop inside a nested block is covered by the end-to-end proof; the nested rule
+  becomes applicable once the enclosing block is part of the active program.
 
 ### End-to-end proofs
 

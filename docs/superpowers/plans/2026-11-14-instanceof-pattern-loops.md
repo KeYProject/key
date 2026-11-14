@@ -4,7 +4,7 @@
 
 **Goal:** Add JLS 6.3.2.3–6.3.2.5 flow scoping for `instanceof` pattern variables in `while`, `for`, and `do` statements, including JML visibility.
 
-**Architecture:** One standalone `patternLoopUnfold` taclet rewrites a binding loop before any loop treatment: the guard is hoisted into a fresh boolean, the body gets `#posBinding` and a body-end guard refresh, target `continue`s are rewritten, and `whenFalse` declarations are appended after the loop when no unlabeled break targets it. The rewritten loop guard is a plain variable, so the rule fires exactly once and all existing loop treatments see an ordinary loop.
+**Architecture:** Two standalone `patternLoopUnfold` taclets (root block and nested block) scan a block's direct statements with the existing `isBindingExpr` condition, now extended to accept loop statements and statement lists. A `#rewritePatternBlock` transformer rewrites the first binding loop: it hoists the guard into a fresh boolean, inserts `#posBinding` and a body-end guard refresh, rewrites target `continue`s, and appends `whenFalse` declarations after the loop when no unlabeled break targets it. The rewritten loop guard is a plain variable, so the rule fires exactly once and all existing loop treatments see an ordinary loop.
 
 **Tech Stack:** Java 21, Gradle wrapper, KeY taclets, `ProgramTransformer` meta-constructs, JUnit 5, AssertJ.
 
@@ -32,118 +32,110 @@
 
 ---
 
-### Task 1: `isBindingLoop` condition
+### Task 1: Extend `isBindingExpr` to loop guards and statement lists
 
 **Files:**
-- Create: `key.core/src/main/java/de/uka/ilkd/key/rule/conditions/IsBindingLoopCondition.java`
-- Modify: `key.core/src/main/java/de/uka/ilkd/key/nparser/varexp/TacletBuilderManipulators.java`
-- Test: `key.core/src/test/java/de/uka/ilkd/key/rule/conditions/IsBindingLoopConditionTest.java`
+- Modify: `key.core/src/main/java/de/uka/ilkd/key/rule/conditions/BindingExpressionCond.java`
+- Test: `key.core/src/test/java/de/uka/ilkd/key/rule/conditions/BindingExpressionCondTest.java`
 
 **Interfaces:**
-- Consumes: `BindingVariableVisitor.binds(Expression)`, `While` / `For` / `Do` / `LoopStatement`.
-- Produces: `public final class IsBindingLoopCondition implements VariableCondition`; package-visible `static boolean bindsLoop(Statement statement)`; taclet name `\isBindingLoop(#loopStmt)`.
+- Consumes: `BindingVariableVisitor.binds(Expression)`, `LoopStatement`, `Guard`.
+- Produces: `\isBindingExpr(<sv>)` accepts an expression, a loop statement (inspects its guard), a `Guard`, or an `ImmutableArray<Statement>` (true if a direct statement is a binding loop).
 
 - [ ] **Step 1: Write the failing test**
 
-Create `IsBindingLoopConditionTest` using `HelperClassForTests.createServices()` and `KeyIO` to parse a program and extract its first statement:
+Create `BindingExpressionCondTest` with the fixture from `TestPatternIfRules` (a `JavaProfile` loading `ldtFile` and `javaRules.key`), `KeyIO` parsing, and these cases:
 
 ```java
-private static Statement firstStatement(Services services, String program) {
-    JTerm term = new KeyIO(services, services.getNamespaces())
-        .parseExpression("\\<{" + program + "}\\> true");
-    return term.javaBlock().program().getFirstElement();
+@Test
+void acceptsLoopStatements() {
+    assertTrue(isBinding(firstStatement(
+        "while (new String(\"x\") instanceof String s) { }"), false));
+    assertTrue(isBinding(firstStatement(
+        "for (; new String(\"x\") instanceof String s; ) { }"), false));
+    assertTrue(isBinding(firstStatement(
+        "do { } while (new String(\"x\") instanceof String s);"), false));
 }
 
 @Test
-void detectsBindingWhile() {
-    assertTrue(IsBindingLoopCondition.bindsLoop(firstStatement(services,
-        "while (o instanceof String s) { }")));
+void rejectsPlainLoop() {
+    assertFalse(isBinding(firstStatement(
+        "while (new String(\"x\") != null) { }"), false));
 }
 
 @Test
-void detectsBindingForAndDo() {
-    assertTrue(IsBindingLoopCondition.bindsLoop(firstStatement(services,
-        "for (; o instanceof String s; ) { }")));
-    assertTrue(IsBindingLoopCondition.bindsLoop(firstStatement(services,
-        "do { } while (o instanceof String s);")));
+void acceptsStatementListWithBindingLoop() {
+    var list = new ImmutableArray<>(
+        firstStatement("int x = 0;"),
+        firstStatement("while (new String(\"x\") instanceof String s) { }"));
+    assertTrue(isBinding(list, true));
 }
 
 @Test
-void rejectsPlainGuard() {
-    assertFalse(IsBindingLoopCondition.bindsLoop(firstStatement(services,
-        "while (o != null) { }")));
+void rejectsStatementListWithoutBindingLoop() {
+    var list = new ImmutableArray<>(
+        firstStatement("int x = 0;"),
+        firstStatement("while (new String(\"x\") != null) { }"));
+    assertFalse(isBinding(list, true));
 }
 ```
+
+The helper creates a `ProgramSV` of sort `ProgramSVSort.STATEMENT`, adding it as a list instantiation when `list` is true, wraps it in `MatchConditions`, and calls `new BindingExpressionCond(sv, false).check(...)`.
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.rule.conditions.IsBindingLoopConditionTest" --console=plain`
-Expected: FAIL with `cannot find symbol: class IsBindingLoopCondition`.
+Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.rule.conditions.BindingExpressionCondTest" --console=plain`
+Expected: FAIL for `acceptsLoopStatements` and `acceptsStatementListWithBindingLoop`.
 
-- [ ] **Step 3: Implement the condition and register it**
+- [ ] **Step 3: Implement the unwrapping**
 
-`IsBindingLoopCondition`:
+In `BindingExpressionCond.check`, replace the `instanceof Expression` branch with:
 
 ```java
-package de.uka.ilkd.key.rule.conditions;
+Expression expression = null;
+boolean isBindingExpr = false;
 
-public final class IsBindingLoopCondition implements VariableCondition {
-    private final SchemaVariable loopSV;
+if (condition instanceof Expression e) {
+    expression = e;
+} else if (condition instanceof LoopStatement loop) {
+    expression = loop.getGuardExpression();
+} else if (condition instanceof Guard guard) {
+    expression = guard.getExpression();
+}
 
-    public IsBindingLoopCondition(SchemaVariable loopSV) {
-        this.loopSV = loopSV;
-    }
-
-    static boolean bindsLoop(Statement statement) {
-        return statement instanceof While w
-                && BindingVariableVisitor.binds(w.getGuardExpression())
-            || statement instanceof For f
-                && BindingVariableVisitor.binds(f.getGuardExpression())
-            || statement instanceof Do d
-                && BindingVariableVisitor.binds(d.getGuardExpression());
-    }
-
-    @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
-            MatchResultInfo matchCond, LogicServices services) {
-        var svInst = (SVInstantiations) matchCond.getInstantiations();
-        var statement = (Statement) svInst.getInstantiation(loopSV);
-        return statement != null && bindsLoop(statement) ? matchCond : null;
-    }
-
-    @Override
-    public String toString() {
-        return "\\isBindingLoop(" + loopSV.name() + ")";
+if (expression != null) {
+    isBindingExpr = BindingVariableVisitor.binds(expression);
+} else if (condition instanceof ImmutableArray<?> list) {
+    for (Object element : list) {
+        if (element instanceof LoopStatement loop
+                && BindingVariableVisitor.binds(loop.getGuardExpression())) {
+            isBindingExpr = true;
+            break;
+        }
     }
 }
 ```
 
-Register it in `TacletBuilderManipulators` next to `BINDING_EXPRESSION_SIMPLE`:
-
-```java
-public static final TacletBuilderCommand BINDING_LOOP =
-    new ConstructorBasedBuilder("isBindingLoop", IsBindingLoopCondition.class, SV);
-```
+Keep `toString()` as `\isBindingExpr(<sv>)`.
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.rule.conditions.IsBindingLoopConditionTest" --console=plain`
+Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.rule.conditions.BindingExpressionCondTest" --console=plain`
 Expected: PASS.
 
 - [ ] **Step 5: Format, commit, push**
 
 ```bash
 ./gradlew spotlessApply
-git add key.core/src/main/java/de/uka/ilkd/key/rule/conditions/IsBindingLoopCondition.java \
-        key.core/src/main/java/de/uka/ilkd/key/nparser/varexp/TacletBuilderManipulators.java \
-        key.core/src/test/java/de/uka/ilkd/key/rule/conditions/IsBindingLoopConditionTest.java
-git commit -m "feat: add isBindingLoop taclet condition"
+git add key.core/src/main/java/de/uka/ilkd/key/rule/conditions/BindingExpressionCond.java \
+        key.core/src/test/java/de/uka/ilkd/key/rule/conditions/BindingExpressionCondTest.java
+git commit -m "feat: extend isBindingExpr to loop guards and statement lists"
 git push
 ```
 
 ---
 
-### Task 2: `while` rewrite, `patternLoopUnfold` rule, and priority
+### Task 2: `while` rewrite, block rules, and priority
 
 **Files:**
 - Create: `key.core/src/main/java/de/uka/ilkd/key/rule/metaconstruct/PatternLoopRewriter.java`
@@ -155,28 +147,12 @@ git push
 - Test: `key.core/src/test/java/de/uka/ilkd/key/rule/TestPatternLoopRules.java`
 
 **Interfaces:**
-- Consumes: `IsBindingLoopCondition` from Task 1; `BindingVariableVisitor`, `OuterBreakContinueAndReturnCollector`, `WhileLoopTransformation`, `KeYJavaASTFactory`.
-- Produces: `PatternLoopRewriter(SchemaVariable loopSV, SchemaVariable boolSV, SchemaVariable innerLabelSV, SchemaVariable outerLabelSV)` and `transform(...) -> ProgramElement[]`; taclet `patternLoopUnfold`; rule set `pattern_loop_binding`.
+- Consumes: `isBindingExpr` from Task 1; `BindingVariableVisitor`, `OuterBreakContinueAndReturnCollector`, `KeYJavaASTFactory`.
+- Produces: `PatternLoopRewriter(ProgramElement statementsSV)` and `transform(...) -> ProgramElement[]`; meta-construct `#rewritePatternBlock`; taclets `patternLoopUnfold` (root) and `patternLoopUnfoldNested` (nested); rule set `pattern_loop_binding`.
 
 - [ ] **Step 1: Write the failing rule test**
 
-Copy the fixture and helpers from `TestPatternIfRules` into `TestPatternLoopRules`, changing the rule index to `patternLoopUnfold`. The test profile must load `ruleSetsDeclarations.key` in addition to `javaRules.key` and the LDT file:
-
-```java
-private static final Profile PROFILE = new JavaProfile() {
-    @Override
-    public RuleCollection getStandardRules() {
-        return new RuleCollection(
-            ImmutableList.of(
-                RuleSourceFactory.fromDefaultLocation(RuleSource.ldtFile),
-                RuleSourceFactory.fromDefaultLocation("ruleSetsDeclarations.key"),
-                RuleSourceFactory.fromDefaultLocation("javaRules.key")),
-            ImmutableList.nil());
-    }
-};
-```
-
-Add the applicability and rewrite tests:
+Copy the fixture and helpers from `TestPatternIfRules` into `TestPatternLoopRules`, adding `ruleSetsDeclarations.key` to the profile. Add:
 
 ```java
 @Test
@@ -223,19 +199,15 @@ void suppressesAfterLoopBindingOnBreak() {
         "\\<{boolean b = !(new String(\"x\") instanceof String s);"
             + " while (b) { break; b = !(new String(\"x\") instanceof String s); }}\\> true");
 }
-```
 
-Add a continue test after the first four pass; adjust the printed braces to the actual output:
-
-```java
 @Test
 void refreshesGuardBeforeContinue() {
     Goal goal = applyRule("patternLoopUnfold",
         "while (new String(\"x\") instanceof String s) { continue; }");
     String printed = ProofSaver.printAnything(
         goal.sequent().succedent().getFirst().formula(), services);
-    assertTrue(printed.contains("b = new String(\"x\") instanceof String s; continue;"),
-        printed);
+    assertTrue(printed.matches(
+        "(?s).*b = new String\\(\"x\"\\) instanceof String s;\\s+continue;.*"), printed);
 }
 ```
 
@@ -244,44 +216,73 @@ void refreshesGuardBeforeContinue() {
 Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.rule.TestPatternLoopRules" --console=plain`
 Expected: FAIL because `patternLoopUnfold` is not in the taclet index.
 
-- [ ] **Step 3: Implement the `while` transformer**
+- [ ] **Step 3: Implement the block transformer**
 
 Create `PatternLoopRewriter`:
 
 ```java
-@TransformerMeta(name = "#rewritePatternLoop")
+@TransformerMeta(name = "#rewritePatternBlock")
 public final class PatternLoopRewriter extends ProgramTransformer {
-    private final SchemaVariable loopSV;
-    private final SchemaVariable boolSV;
-    private final SchemaVariable innerLabelSV;
-    private final SchemaVariable outerLabelSV;
+    private final SchemaVariable statementsSV;
 
-    public PatternLoopRewriter(SchemaVariable loopSV, SchemaVariable boolSV,
-            SchemaVariable innerLabelSV, SchemaVariable outerLabelSV) {
-        super("#rewritePatternLoop", loopSV);
-        this.loopSV = loopSV;
-        this.boolSV = boolSV;
-        this.innerLabelSV = innerLabelSV;
-        this.outerLabelSV = outerLabelSV;
+    public PatternLoopRewriter(ProgramElement statementsSV) {
+        super("#rewritePatternBlock", statementsSV);
+        this.statementsSV = (SchemaVariable) statementsSV;
     }
 
     @Override
     public ImmutableList<ProgramElement> getArguments() {
-        return ImmutableList.of(loopSV, boolSV, innerLabelSV, outerLabelSV);
+        return ImmutableList.of((ProgramElement) statementsSV);
     }
 
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        var loop = (Statement) svInst.getInstantiation(loopSV);
-        var boolVar = (ProgramVariable) svInst.getInstantiation(boolSV);
-        return switch (loop) {
-            case While w -> rewriteWhile(w, boolVar, services);
-            case For f -> throw new UnsupportedOperationException("added in Task 3");
-            case Do d -> throw new UnsupportedOperationException("added in Task 3");
-            default -> new ProgramElement[] { loop };
-        };
+        var statements = (ImmutableArray<Statement>) svInst.getInstantiation(statementsSV);
+        var boolVar = freshBoolean(services);
+        var result = new ArrayList<Statement>();
+        boolean rewritten = false;
+        for (Statement statement : statements) {
+            if (!rewritten && statement instanceof LoopStatement loop
+                    && BindingVariableVisitor.binds(loop.getGuardExpression())) {
+                for (ProgramElement element : rewriteLoop(loop, boolVar, services)) {
+                    result.add((Statement) element);
+                }
+                rewritten = true;
+            } else {
+                result.add(statement);
+            }
+        }
+        if (!rewritten) {
+            var unchanged = new ProgramElement[statements.size()];
+            for (int i = 0; i < statements.size(); i++) {
+                unchanged[i] = statements.get(i);
+            }
+            return unchanged;
+        }
+        return result.toArray(ProgramElement[]::new);
     }
+
+    private static ProgramElement[] rewriteLoop(LoopStatement loop, ProgramVariable boolVar,
+            Services services) {
+        if (loop instanceof While whileLoop) {
+            return rewriteWhile(whileLoop, boolVar, services);
+        }
+        throw new UnsupportedOperationException(
+            "Unsupported loop kind in #rewritePatternBlock: " + loop.getClass().getSimpleName());
+    }
+}
+```
+
+Add `freshBoolean`:
+
+```java
+private static ProgramVariable freshBoolean(Services services) {
+    var booleanType = services.getJavaInfo().getKeYJavaType("boolean");
+    var name = new ProgramElementName(services.getTermBuilder().newName("b"));
+    var variable = new LocationVariable(name, new TypeRef(booleanType));
+    services.getNamespaces().programVariables().addSafely(variable);
+    return variable;
 }
 ```
 
@@ -296,7 +297,7 @@ static ProgramElement[] rewriteWhile(While loop, ProgramVariable boolVar, Servic
     Statement rewrittenBody = rewriteContinues(body, boolVar, guard, List.of(), services);
     var bodyStatements = new ArrayList<Statement>();
     bodyStatements.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenTrue())));
-    bodyStatements.add(rewrittenBody);
+    addBodyStatements(bodyStatements, rewrittenBody);
     bodyStatements.add(KeYJavaASTFactory.assign(boolVar, guard));
 
     While newLoop = KeYJavaASTFactory.whileLoop(boolVar,
@@ -305,10 +306,7 @@ static ProgramElement[] rewriteWhile(While loop, ProgramVariable boolVar, Servic
     copyLoopSpec(loop, newLoop, services);
 
     var result = new ArrayList<Statement>();
-    result.add(new LocalVariableDeclaration(
-        new TypeRef(services.getJavaInfo().getKeYJavaType("boolean")),
-        new VariableSpecification(boolVar, guard,
-            services.getJavaInfo().getKeYJavaType("boolean"))));
+    result.add(booleanDeclaration(boolVar, guard, services));
     result.add(newLoop);
     if (!bindings.whenFalse().isEmpty() && !hasUnlabeledBreak(body, services)) {
         result.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenFalse())));
@@ -317,68 +315,7 @@ static ProgramElement[] rewriteWhile(While loop, ProgramVariable boolVar, Servic
 }
 ```
 
-Implement the continue rewriter. It must track loop depth only (not switch depth):
-
-```java
-private static Statement rewriteContinues(Statement body, ProgramVariable boolVar,
-        Expression guard, List<Statement> prefix, Services services) {
-    var rewriter = new CreatingASTVisitor(body, true, services) {
-        private int loopDepth = 0;
-
-        @Override
-        protected void walk(ProgramElement node) {
-            if (node instanceof LoopStatement) {
-                loopDepth++;
-            }
-            super.walk(node);
-            if (node instanceof LoopStatement) {
-                loopDepth--;
-            }
-        }
-
-        @Override
-        public void performActionOnContinue(Continue x) {
-            if (loopDepth == 0 && x.getLabel() == null) {
-                var stats = new ArrayList<Statement>(prefix);
-                stats.add(KeYJavaASTFactory.assign(boolVar, guard));
-                stats.add(new Continue(x.getPositionInfo()));
-                addChild(KeYJavaASTFactory.block(
-                    stats.toArray(Statement[]::new)));
-                changed();
-            } else {
-                doDefaultAction(x);
-            }
-        }
-    };
-    rewriter.start();
-    return (Statement) rewriter.result();
-}
-```
-
-Implement the break check:
-
-```java
-private static boolean hasUnlabeledBreak(Statement body, Services services) {
-    var collector = new OuterBreakContinueAndReturnCollector(body, List.of(), services);
-    collector.collect();
-    return collector.getBreaks().stream().anyMatch(b -> b.getLabel() == null);
-}
-```
-
-Implement loop-spec copying using the existing `WhileLoopTransformation` pattern:
-
-```java
-static void copyLoopSpec(LoopStatement from, While to, Services services) {
-    var repo = services.getSpecificationRepository();
-    repo.copyLoopInvariant(from, to);
-    var contracts = repo.getLoopContracts(from);
-    if (contracts != null) {
-        for (var contract : contracts) {
-            repo.addLoopContract(contract.setLoop(to));
-        }
-    }
-}
-```
+`addBodyStatements` flattens a `StatementBlock` body into the loop body. `booleanDeclaration` creates `boolean b = guard;`. `copyLoopSpec` copies the invariant and loop contracts. `rewriteContinues` uses a `CreatingASTVisitor` that replaces unlabeled continues at loop depth 0 with `{ b = guard; continue; }` and leaves nested loops and labeled continues alone. `hasUnlabeledBreak` uses `OuterBreakContinueAndReturnCollector`.
 
 Register the transformer in `ProgramTransformerRegistry`:
 
@@ -386,43 +323,30 @@ Register the transformer in `ProgramTransformerRegistry`:
 register(byName, PatternLoopRewriter.class);
 ```
 
-- [ ] **Step 4: Add the taclet and priority**
+- [ ] **Step 4: Add the two taclets and priority**
 
-In `javaRules.key`, add `#slist0` and `#loopStmt` to the schema declarations:
-
-```text
-\program [list] Statement #slist, #slist0, #slist1, #slist2, #slist3;
-\program Statement #loopStmt;
-```
-
-Add the rule after the pattern `if` rules:
+In `javaRules.key`, add the root and nested rules:
 
 ```text
 patternLoopUnfold {
-    \find(\modality{#allmodal}{.. { #slist0 #loopStmt #slist } ...}\endmodality (post))
-    \varcond(\isBindingLoop(#loopStmt))
-    \varcond(\new(#boolv, boolean))
-    \varcond(\newLabel(#innerLabel), \newLabel(#outerLabel))
-    \replacewith(
-      \modality{#allmodal}{..
-        { #slist0
-          #rewritePatternLoop(#loopStmt, #boolv, #innerLabel, #outerLabel)
-          #slist }
-      ...}\endmodality (post))
-    \heuristics(pattern_loop_binding)
-    \displayname "patternLoopUnfold"
+  \find(\modality{#allmodal}{ #slist }\endmodality (post))
+  \varcond(\isBindingExpr(#slist))
+  \replacewith(\modality{#allmodal}{ #rewritePatternBlock(#slist) }\endmodality (post))
+  \heuristics(pattern_loop_binding)
+  \displayname "patternLoopUnfold"
+}
+
+patternLoopUnfoldNested {
+  \find(\modality{#allmodal}{.. { #slist } ...}\endmodality (post))
+  \varcond(\isBindingExpr(#slist))
+  \replacewith(
+    \modality{#allmodal}{.. { #rewritePatternBlock(#slist) } ...}\endmodality (post))
+  \heuristics(pattern_loop_binding)
+  \displayname "patternLoopUnfoldNested"
 }
 ```
 
-In `ruleSetsDeclarations.key`, add `pattern_loop_binding;` next to `loop_expand;`.
-
-In `SymExCost`, add:
-
-```java
-static final long PATTERN_LOOP_BINDING = -30_000;
-```
-
-In `SymExStrategy.setupCostComputationF`, add:
+In `ruleSetsDeclarations.key`, add `pattern_loop_binding;` next to `loop_expand;`. In `SymExCost`, add `PATTERN_LOOP_BINDING = -30_000;`. In `SymExStrategy.setupCostComputationF`, add:
 
 ```java
 bindRuleSet(d, "pattern_loop_binding", longConst(PATTERN_LOOP_BINDING));
@@ -431,7 +355,7 @@ bindRuleSet(d, "pattern_loop_binding", longConst(PATTERN_LOOP_BINDING));
 - [ ] **Step 5: Run the rule tests and fix the printed expectations**
 
 Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.rule.TestPatternLoopRules" --console=plain`
-Expected: PASS. If a printer difference appears (braces or the fresh name `b#0`), adjust the expected strings to the actual pretty-printed form; do not change the rule semantics.
+Expected: PASS. Adjust only printed-brace expectations if a printer difference appears.
 
 - [ ] **Step 6: Format, commit, push**
 
@@ -457,8 +381,8 @@ git push
 - Test: `key.core/src/test/java/de/uka/ilkd/key/rule/TestPatternLoopRules.java`
 
 **Interfaces:**
-- Consumes: Task 2's `rewriteWhile`, `rewriteContinues`, `hasUnlabeledBreak`, `copyLoopSpec`.
-- Produces: `rewriteFor(For, ProgramVariable, Services)` and `rewriteDo(Do, ProgramVariable, ProgramElementName, ProgramElementName, Services)`.
+- Consumes: Task 2's `rewriteWhile`, `rewriteContinues`, `hasUnlabeledBreak`, `copyLoopSpec`, `freshBoolean`.
+- Produces: `rewriteFor(For, ProgramVariable, Services)` and `rewriteDo(Do, Services)`; both return `ProgramElement[]` and are dispatched from `rewriteLoop`.
 
 - [ ] **Step 1: Add failing tests for `for` and `do`**
 
@@ -516,11 +440,10 @@ static ProgramElement[] rewriteFor(For loop, ProgramVariable boolVar, Services s
         updates.add(new ExpressionStatement(update));
     }
 
-    Statement rewrittenBody =
-        rewriteContinues(body, boolVar, guard, updates, services);
+    Statement rewrittenBody = rewriteContinues(body, boolVar, guard, updates, services);
     var bodyStatements = new ArrayList<Statement>();
     bodyStatements.addAll(List.of(BindingVariableVisitor.toStatements(bindings.whenTrue())));
-    bodyStatements.add(rewrittenBody);
+    addBodyStatements(bodyStatements, rewrittenBody);
     bodyStatements.addAll(updates);
     bodyStatements.add(KeYJavaASTFactory.assign(boolVar, guard));
 
@@ -533,10 +456,7 @@ static ProgramElement[] rewriteFor(For loop, ProgramVariable boolVar, Services s
     for (var init : loop.getInits().getInits()) {
         initBlock.add((Statement) init);
     }
-    initBlock.add(new LocalVariableDeclaration(
-        new TypeRef(services.getJavaInfo().getKeYJavaType("boolean")),
-        new VariableSpecification(boolVar, guard,
-            services.getJavaInfo().getKeYJavaType("boolean"))));
+    initBlock.add(booleanDeclaration(boolVar, guard, services));
     initBlock.add(newLoop);
 
     var result = new ArrayList<Statement>();
@@ -550,51 +470,30 @@ static ProgramElement[] rewriteFor(For loop, ProgramVariable boolVar, Services s
 }
 ```
 
-Add the init-variable guard:
-
-```java
-private static boolean afterBindingsUseNoForInitVariables(For loop,
-        Map<LocationVariable, Expression> whenFalse, Services services) {
-    var initVars = new LinkedHashSet<LocationVariable>();
-    for (var init : loop.getInits().getInits()) {
-        if (init instanceof LocalVariableDeclaration decl) {
-            for (var spec : decl.getVariables()) {
-                initVars.add((LocationVariable) spec.getProgramVariable());
-            }
-        }
-    }
-    for (Expression expression : whenFalse.values()) {
-        for (LocationVariable read : MiscTools.getLocalIns(expression, services)) {
-            if (initVars.contains(read)) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-```
+Add the init-variable guard using `MiscTools.getLocalIns` on each `whenFalse` expression and the for-init variables.
 
 - [ ] **Step 4: Implement `rewriteDo`**
 
-Reuse the existing `doWhileUnwind` normalization:
+Reuse `WhileLoopTransformation` with fresh labels created by the transformer:
 
 ```java
-static ProgramElement[] rewriteDo(Do loop, ProgramVariable boolVar,
-        ProgramElementName innerLabel, ProgramElementName outerLabel, Services services) {
-    var transformation = new WhileLoopTransformation(loop, outerLabel, innerLabel, services);
+static ProgramElement[] rewriteDo(Do loop, Services services) {
+    var inner = new ProgramElementName(services.getTermBuilder().newName("inner"));
+    var outer = new ProgramElementName(services.getTermBuilder().newName("outer"));
+    var transformation = new WhileLoopTransformation(loop, outer, inner, services);
     transformation.start();
     ProgramElement normalized = transformation.result();
-
     While generated = findFirstWhile(normalized);
     if (generated == null) {
         return new ProgramElement[] { normalized };
     }
+    var boolVar = freshBoolean(services);
     ProgramElement[] rewritten = rewriteWhile(generated, boolVar, services);
+    var replacement = KeYJavaASTFactory.block(rewritten[0], rewritten[1]);
+    ProgramElement newNormalized = new ProgramElementReplacer(normalized, services)
+            .replace(generated, replacement);
     var result = new ArrayList<ProgramElement>();
-    result.add(normalized);
-    // rewritten[0] is the boolean declaration, rewritten[1] is the new while
-    result.add(rewritten[0]);
-    result.add(rewritten[1]);
+    result.add(newNormalized);
     for (int i = 2; i < rewritten.length; i++) {
         result.add(rewritten[i]);
     }
@@ -602,20 +501,7 @@ static ProgramElement[] rewriteDo(Do loop, ProgramVariable boolVar,
 }
 ```
 
-The generated `while` must be replaced inside the normalized block, not appended after it. Use `ProgramElementReplacer` to substitute the generated while with the new declaration + while inside `normalized`, then append only the after-loop declarations:
-
-```java
-var replacement = KeYJavaASTFactory.block(rewritten[0], rewritten[1]);
-ProgramElement newNormalized = new ProgramElementReplacer(normalized, services)
-    .replace(generated, replacement);
-```
-
-`findFirstWhile` walks `getChild(i)` recursively. `beforeLook`:
-- the normalized block contains `firstBody`, then the generated while;
-- replacing the while with `{ boolean b = guard; while (b) {...} }` keeps the first body before the declaration, so the pattern variable is not in scope in the first body;
-- append `rewritten[2..]` after `newNormalized`.
-
-Add the `ProgramElementReplacer` import from `de.uka.ilkd.key.rule.metaconstruct` (same package).
+Update `rewriteLoop` to dispatch `For` and `Do`. `findFirstWhile` walks children and returns the first `While`.
 
 - [ ] **Step 5: Run the tests**
 
@@ -641,9 +527,9 @@ git push
 
 **Interfaces:**
 - Consumes: the production rules and transformer from Tasks 1–3.
-- Produces: proof-level regression coverage for `while`, `for`, `do`, break suppression, and the four loop treatments.
+- Produces: proof-level coverage for `while`, `for`, `do`, break suppression, nested blocks, and the loop treatments.
 
-- [ ] **Step 1: Write the test fixture**
+- [ ] **Step 1: Write the fixture**
 
 Use `KeYEnvironment.load(Path)` and `ProofStarter` like `InstanceOfPatternFlowScopingTest`. Add a helper that selects the loop treatment:
 
@@ -677,7 +563,7 @@ void whileBodyBinding(@TempDir Path dir) throws Exception {
         public class WhileBody {
             /*@ normal_behavior
               @ requires true;
-              @ ensures \result >= 0;
+              @ ensures \\result >= 0;
               @*/
             public static int m(Object o) {
                 int n = 0;
@@ -697,7 +583,7 @@ void whileAfterBinding(@TempDir Path dir) throws Exception {
         public class WhileAfter {
             /*@ normal_behavior
               @ requires o instanceof String;
-              @ ensures \result == ((String) o).length();
+              @ ensures \\result == ((String) o).length();
               @*/
             public static int m(Object o) {
                 while (!(o instanceof String s)) { o = null; }
@@ -708,7 +594,7 @@ void whileAfterBinding(@TempDir Path dir) throws Exception {
 }
 ```
 
-- [ ] **Step 3: Add `for`, `do`, and break cases**
+- [ ] **Step 3: Add `for`, `do`, and nested-block cases**
 
 ```java
 @Test
@@ -717,7 +603,7 @@ void forBodyAndUpdateBinding(@TempDir Path dir) throws Exception {
         public class ForBody {
             /*@ normal_behavior
               @ requires true;
-              @ ensures \result >= 0;
+              @ ensures \\result >= 0;
               @*/
             public static int m(Object o) {
                 int n = 0;
@@ -736,7 +622,7 @@ void doAfterBinding(@TempDir Path dir) throws Exception {
         public class DoAfter {
             /*@ normal_behavior
               @ requires o instanceof String;
-              @ ensures \result == ((String) o).length();
+              @ ensures \\result == ((String) o).length();
               @*/
             public static int m(Object o) {
                 do { o = o; } while (!(o instanceof String s));
@@ -745,9 +631,31 @@ void doAfterBinding(@TempDir Path dir) throws Exception {
         }
         """, StrategyProperties.LOOP_SCOPE_EXPAND);
 }
+
+@Test
+void nestedBlockBinding(@TempDir Path dir) throws Exception {
+    prove("NestedBlock", """
+        public class NestedBlock {
+            /*@ normal_behavior
+              @ requires true;
+              @ ensures \\result >= 0;
+              @*/
+            public static int m(Object o) {
+                int n = 0;
+                if (o != null) {
+                    while (o instanceof String s) {
+                        n += s.length();
+                        o = null;
+                    }
+                }
+                return n;
+            }
+        }
+        """, StrategyProperties.LOOP_SCOPE_EXPAND);
+}
 ```
 
-The break case is a parser/rule-level test: a `break` targeting the loop must suppress the after-loop declaration. Keep it in `TestPatternLoopRules` (Task 2) rather than writing Java source that does not compile.
+The break case stays in `TestPatternLoopRules` (Task 2) because a Java source that uses the variable after a breaking loop does not compile.
 
 - [ ] **Step 4: Run the tests**
 
@@ -822,7 +730,7 @@ Expected: FAIL at load time with `Cannot resolve 's'` for the body assertion.
 
 - [ ] **Step 3: Implement loop visibility**
 
-In `collectLocalVariablesVisibleTo`, add loop handling before the generic `StatementContainer` branch. Use a helper that treats a single-statement body as a one-statement block:
+In `collectLocalVariablesVisibleTo`, add helpers:
 
 ```java
 private ImmutableList<LocationVariable> patternVariables(boolean positive, Expression guard) {
@@ -845,7 +753,7 @@ private ImmutableList<LocationVariable> afterLoopVariables(LoopStatement loop) {
 }
 ```
 
-Add the cases:
+Add the loop cases before the generic `StatementContainer` branch:
 
 ```java
 } else if (s instanceof While w) {
@@ -873,8 +781,7 @@ Add the cases:
 }
 ```
 
-`asContainer(Statement body)` returns `body instanceof StatementContainer c ? c : new StatementBlock(body)`.
-For a `For`, keep the existing init-variable handling before the `s == statement` check. The after-loop variables must be added **after** the `s == statement` check, so a loop invariant does not see its own bindings.
+`asContainer(Statement body)` returns `body instanceof StatementContainer c ? c : new StatementBlock(body)`. For a `For`, keep the existing init-variable handling before the `s == statement` check. Add after-loop variables only after that check, so an invariant does not see its own bindings.
 
 - [ ] **Step 4: Run the JML tests**
 
@@ -904,7 +811,6 @@ git push
 - Modify: `key.core/src/test/resources/de/uka/ilkd/key/nparser/taclets.old.txt`
 - Modify: `key.ui/examples/Java/InstanceOfPattern/src/InstanceOfPatternExample.java`
 - Modify: `key.ui/examples/Java/InstanceOfPattern/README.txt`
-- Modify: `key.core/src/test/java/de/uka/ilkd/key/rule/TestPatternLoopRules.java` (only if the oracle run exposes a missing expectation)
 
 **Interfaces:**
 - Consumes: everything from Tasks 1–5.
@@ -918,7 +824,7 @@ Run the taclet equality test:
 ./gradlew :key.core:test --tests "de.uka.ilkd.key.nparser.TestTacletEquality" --console=plain
 ```
 
-Copy the updated `taclets.old.txt` produced by the test or update it with the new `patternLoopUnfold` entry and the `\isBindingLoop` string. Re-run the test until it passes.
+Copy the updated `taclets.old.txt` produced by the test or update it with the new `patternLoopUnfold` / `patternLoopUnfoldNested` entries. Re-run until it passes.
 
 - [ ] **Step 2: Extend the example project**
 
@@ -991,7 +897,7 @@ Report the branch, the pushed head, the targeted test results, and any remaining
 ## Self-Review Notes
 
 - Spec coverage: Tasks 2–4 cover the rewrite and flow scoping; Task 5 covers JML; Task 6 covers the oracle, examples, and verification.
-- The `while` rewrite is the first deliverable; `for`/`do` follow in Task 3 because they reuse the same transformer helpers.
-- The after-loop declarations are always outside the init/normalized block, so they are visible to the statements after the loop.
-- The guard is a plain boolean in every rewritten loop, so `patternLoopUnfold` cannot fire again and no marker flag is needed.
+- The root and nested rules both use the existing `isBindingExpr` condition, extended to loop statements and statement lists.
+- The after-loop declarations are spliced into the same block list, so they are visible to the statements after the loop.
+- The guard is a plain boolean in every rewritten loop, so the rewrite cannot fire again and no marker flag is needed.
 - The break predicate is the same in the transformer and in `JMLSpecFactory`.
