@@ -296,6 +296,8 @@ Expected touch points:
 - `key.core/src/test/resources/de/uka/ilkd/key/nparser/taclets.old.txt`: oracle.
 - New tests listed below.
 - `key.ui/examples/Java/InstanceOfPattern/`: loop examples in the sample project.
+- `key.core/src/test/java/de/uka/ilkd/key/proof/runallproofs/ProofCollections.java`:
+  register the example project as loadable in the `JavaFeatures` group.
 
 No changes are expected in `JP2KeYConverter`; loop guards and body references are
 already converted and resolved for all three loop kinds.
