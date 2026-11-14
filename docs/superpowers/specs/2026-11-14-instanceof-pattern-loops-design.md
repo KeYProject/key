@@ -221,7 +221,12 @@ argument `#slist`:
    - leave continues of nested loops and labeled continues to outer loops alone;
    - preserve the original `PositionInfo` on the generated continue.
 7. Build the new `while`:
-   - body = `whenTrue` declarations, rewritten body, `boolv = guard`;
+   - body = `whenTrue` declarations, rewritten body, `boolv = strippedGuard`;
+   - `strippedGuard` replaces every `InstanceofPattern` by a plain `Instanceof`; it
+     is used for the body-end refresh and the continue refresh so the loop rule's
+     `getLocalOuts` does not see a second declaration of the pattern variable;
+   - the initial `boolean boolv = guard;` keeps the original guard, whose pattern
+     assignment rules are already supported;
    - guard = reference to `boolv`;
    - position and comments from the original loop.
 8. Copy the loop specification and loop contracts from the original loop to the new
