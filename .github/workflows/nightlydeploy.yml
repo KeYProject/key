@@ -63,10 +63,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # key-*-exe.jar matches both the fat jar (key-*-exe.jar) and the
-          # slim jar (key-*-slim-exe.jar) built by :key.ui:shadowJar / :key.ui:slimJar.
           gh release create --generate-notes --title "Nightly Release" \
-             --prerelease --notes-start-tag KEY-3.0.0-rc \
+             --prerelease --notes-start-tag KeY-3.0.0 \
              nightly key.ui/build/libs/key-*-exe.jar key-javadoc.tar.xz
 
 
