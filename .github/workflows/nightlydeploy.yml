@@ -9,8 +9,11 @@ permissions:
   contents: write
   id-token: write
 
+# The documentation generation for varconds and proof script commands
+# extracts `///` markdown javadocs via therapi, which requires JDK 23+.
+# `--release=21` is still set!
 env:
-  JAVA_VERSION: 21
+  JAVA_VERSION: 25
 
 
 jobs:
@@ -29,7 +32,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Build with Gradle
-        run: ./gradlew --parallel assemble javadoc alldoc
+        run: ./gradlew --parallel assemble javadoc alldoc :key.core:generateVarcondDoc :key.core:generateScriptDoc
 
       - name: Upload ShadowJars (fat and slim)
         uses: actions/upload-artifact@v7
@@ -39,6 +42,14 @@ jobs:
           # (key-*-slim-exe.jar) of key.ui, plus any other module artifacts
           path: "*/build/libs/*-exe.jar"
           retention-days: 1
+
+      - name: Upload varcond and proof script documentation
+        uses: actions/upload-artifact@v7
+        with:
+          name: varcond-script-docs
+          path: "key.core/build/docs/keydocs/*"
+          retention-days: 30
+          compression-level: '9'
 
       - name: Package
         run: tar cvf key-javadoc.tar.xz build/docs/javadoc

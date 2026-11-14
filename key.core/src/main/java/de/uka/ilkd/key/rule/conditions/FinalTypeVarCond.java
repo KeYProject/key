@@ -30,6 +30,12 @@ public final class FinalTypeVarCond extends VariableConditionAdapter {
     private final TypeResolver resolver;
     private final boolean negated;
 
+    /**
+     * Instantiates a new final-type condition.
+     *
+     * @param tr the type resolver for the type to check
+     * @param negation whether the condition is negated ({@code \not isFinal})
+     */
     public FinalTypeVarCond(TypeResolver tr, boolean negation) {
         this.resolver = tr;
         this.negated = negation;

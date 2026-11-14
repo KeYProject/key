@@ -35,6 +35,14 @@ public class HasLoopInvariantCondition implements VariableCondition {
     private final ProgramSV loopStmtSV;
     private final SchemaVariable modalitySV;
 
+    /**
+     * Instantiates a new has-loop-invariant condition.
+     *
+     * @param loopStmtSV the program schema variable which must be instantiated with a loop
+     *        statement
+     * @param modalitySV the schema variable for the modality kind determining the applicable heap
+     *        context
+     */
     public HasLoopInvariantCondition(ProgramSV loopStmtSV, SchemaVariable modalitySV) {
         this.loopStmtSV = loopStmtSV;
         this.modalitySV = modalitySV;

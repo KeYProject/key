@@ -17,12 +17,28 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.instantiation.SVInstantiations;
 
 
+/**
+ * A variable condition for the taclet construct {@code \isObserver}, checking that a term schema
+ * variable is instantiated with an observer function and that the heap argument of the observer is
+ * the given heap term. If the heap schema variable is not yet instantiated, it is bound to the
+ * observer's heap argument.
+ *
+ * @author Michael Kirsten
+ */
 public final class ObserverCondition implements VariableCondition {
 
     private final TermSV obs;
     private final TermSV heap;
 
 
+    /**
+     * Instantiates a new observer condition.
+     *
+     * @param obs the term schema variable which must be instantiated with an observer function
+     *        application (an {@link IObserverFunction})
+     * @param heap the term schema variable for the heap on which the observer is evaluated; it is
+     *        automatically instantiated with the observer's heap argument if not yet instantiated
+     */
     public ObserverCondition(TermSV obs, TermSV heap) {
         this.obs = obs;
         this.heap = heap;
