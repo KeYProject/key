@@ -48,8 +48,8 @@ public class RecordClassBuilder extends JavaTransformerAbstract {
         ClassOrInterfaceDeclaration clazz = new ClassOrInterfaceDeclaration();
         clazz.setModifiers(recordDeclaration.getModifiers());
         clazz.addModifier(FINAL);
-        if (clazz.isNestedType() || clazz.isLocalClassDeclaration()) {
-            clazz.addModifier(STATIC); // do not have a pointer to the outer this.
+        if (!recordDeclaration.isTopLevelType()) {
+            clazz.addModifier(STATIC); // records are implicitly static, see JLS 8.10
         }
         clazz.setName(recordDeclaration.getName());
         clazz.addExtendedType(java.lang.Record.class);
