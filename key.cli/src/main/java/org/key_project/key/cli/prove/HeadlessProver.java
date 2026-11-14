@@ -44,6 +44,9 @@ import org.slf4j.LoggerFactory;
  * a search abandoned by the timeout is reported as {@link ResultStatus#TIMED_OUT} (exit code
  * {@code 2}), while a search that exhausts the strategy without a timeout in effect stays
  * {@link ResultStatus#OPEN} (exit code {@code 1}).
+ * <p>
+ * The {@code smtCalls}/{@code smtProved} fields of the result records are computed from the
+ * finished proof by {@link SmtCounters} ({@code 0}/{@code 0} when SMT is not used, the default).
  */
 public final class HeadlessProver {
 
@@ -157,11 +160,12 @@ public final class HeadlessProver {
             int openGoals = proof.openGoals().size();
             boolean closed = proof.closed() || openGoals == 0;
             ResultStatus status = classifyStatus(closed, timeoutMs, elapsedMs);
+            SmtCounters.Counts smt = SmtCounters.of(proof);
             LOGGER.debug("Contract '{}' finished after {} ms with {} open goals (status {})",
                 contract.getName(),
                 elapsedMs, openGoals, status);
             return new ContractResult(contract.getName(), status, openGoals, elapsedMs, null,
-                0, 0, null);
+                smt.smtCalls(), smt.smtProved(), null);
         } catch (Exception e) {
             LOGGER.debug("Proving contract '{}' failed", contract.getName(), e);
             return errorResult(contract.getName(), elapsedMs(start), e);

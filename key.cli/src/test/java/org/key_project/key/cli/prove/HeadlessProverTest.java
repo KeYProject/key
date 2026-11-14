@@ -62,6 +62,12 @@ class HeadlessProverTest {
         assertThat(open.elapsedMs()).isGreaterThanOrEqualTo(0);
         assertNull(open.errorMessage());
 
+        // SMT is disabled by default, so both SMT counters are 0
+        for (ContractResult result : results) {
+            assertThat(result.smtCalls()).isZero();
+            assertThat(result.smtProved()).isZero();
+        }
+
         // each contract renders exactly one KEY_RESULT line
         ResultRecordWriter writer = new ResultRecordWriter();
         for (ContractResult result : results) {
