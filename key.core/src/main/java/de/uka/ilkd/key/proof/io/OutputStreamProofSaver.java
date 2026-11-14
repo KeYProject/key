@@ -89,6 +89,12 @@ public class OutputStreamProofSaver {
      */
     protected final boolean saveProofSteps;
 
+    /**
+     * Optional header line written before the proof content (e.g. a status marker). If
+     * {@code null}, no header line is written.
+     */
+    protected @Nullable String headerLine = null;
+
 
     public OutputStreamProofSaver(Proof proof) {
         this(proof, KeYConstants.INTERNAL_VERSION);
@@ -111,6 +117,20 @@ public class OutputStreamProofSaver {
         this.proof = proof;
         this.internalVersion = internalVersion;
         this.saveProofSteps = saveProofSteps;
+    }
+
+    /**
+     * Create a new OutputStreamProofSaver that writes an optional header line first.
+     *
+     * @param proof the proof to save
+     * @param internalVersion currently running KeY version
+     * @param saveProofSteps whether to save the performed proof steps
+     * @param headerLine optional first line to write before the proof content, or {@code null}
+     */
+    public OutputStreamProofSaver(Proof proof, String internalVersion, boolean saveProofSteps,
+            @Nullable String headerLine) {
+        this(proof, internalVersion, saveProofSteps);
+        this.headerLine = headerLine;
     }
 
     /**
@@ -152,6 +172,11 @@ public class OutputStreamProofSaver {
             final ProofOblInput po =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
             LogicPrinter printer = createLogicPrinter(proof.getServices(), false);
+
+            // optional status marker header line
+            if (headerLine != null) {
+                ps.println(headerLine);
+            }
 
             // profile
             ps.println(writeProfile(proof.getServices().getProfile()));
