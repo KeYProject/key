@@ -71,6 +71,7 @@ public final class ProgramTransformerRegistry {
         register(byName, PositiveBindingsOfExpr.class);
         register(byName, NegativeBindingsOfExpr.class);
         register(byName, BlockBody.class);
+        register(byName, PatternLoopRewriter.class);
         BY_NAME = DefaultImmutableMap.fromMap(byName);
         NAMES = Collections.unmodifiableSet(new LinkedHashSet<>(byName.keySet()));
 
