@@ -21,7 +21,7 @@ import de.uka.ilkd.key.speclang.Contract;
  * </ul>
  * The selection order is the order in which the selectors were given.
  */
-final class ContractSelector {
+public final class ContractSelector {
     private ContractSelector() {
     }
 
@@ -33,7 +33,7 @@ final class ContractSelector {
      * @return the selected contracts in selection order (one entry per matched row)
      * @throws UnknownContractException if any selector matches no contract
      */
-    static List<Contract> resolve(ContractIndex index, List<String> selectors)
+    public static List<Contract> resolve(ContractIndex index, List<String> selectors)
             throws UnknownContractException {
         List<Contract> selected = new ArrayList<>();
         for (String selector : selectors) {
