@@ -28,6 +28,9 @@ import picocli.CommandLine.Spec;
  * order. The subcommand always exits {@code 0} on success and never prints a {@code KEY_RESULT}
  * line. Errors are reported as {@link CliError}s (missing or unloadable file: input error, exit
  * {@code 3}; unexpected exception: internal error, exit {@code 4}).
+ * <p>
+ * With several files the index restarts at {@code 0} for each file, so {@code <IDX>} addresses a
+ * row within its own file's listing.
  */
 @Command(name = "list",
     description = "List the contracts of the given KeY problem file(s), one tab-separated line "
