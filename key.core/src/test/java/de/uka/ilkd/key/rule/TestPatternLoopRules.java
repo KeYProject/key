@@ -221,6 +221,37 @@ class TestPatternLoopRules {
                 + " while (b) { break; b = !(new String(\"x\") instanceof String s); }}\\> true");
     }
 
+
+    @Test
+    void rewritesForBodyAndUpdate() {
+        Goal goal = applyRule("patternLoopUnfold",
+            "for (int i = 0; i < 1 && new String(\"x\") instanceof String s; i++) {"
+                + " int y = s.length(); }");
+        String printed = ProofSaver.printAnything(
+            goal.sequent().succedent().getFirst().formula(), services);
+        assertTrue(printed.contains("while (b)"), printed);
+        assertTrue(printed.contains("s = (String) new String(\"x\")"), printed);
+    }
+
+    @Test
+    void doesNotLeakForInitVariables() {
+        Goal goal = applyRule("patternLoopUnfold",
+            "for (int i = 0; i < 1 && new String(\"x\") instanceof String s; i++) { }");
+        String printed = ProofSaver.printAnything(
+            goal.sequent().succedent().getFirst().formula(), services);
+        assertTrue(printed.contains("int i = 0;"), printed);
+    }
+
+    @Test
+    void rewritesDoBodyButNotFirstBody() {
+        Goal goal = applyRule("patternLoopUnfold",
+            "do { int y = 1; } while (!(new String(\"x\") instanceof String s));");
+        String printed = ProofSaver.printAnything(
+            goal.sequent().succedent().getFirst().formula(), services);
+        assertTrue(printed.indexOf("int y = 1;") < printed.indexOf("java.lang.String s"),
+            printed);
+    }
+
     @Test
     void refreshesGuardBeforeContinue() {
         Goal goal = applyRule("patternLoopUnfold",
