@@ -11,6 +11,7 @@ import de.uka.ilkd.key.settings.PathConfig;
 
 import org.key_project.key.cli.list.ListCommand;
 import org.key_project.key.cli.prove.ProveCommand;
+import org.key_project.key.cli.replay.ReplayCommand;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -32,7 +33,7 @@ import picocli.CommandLine.Spec;
 @Command(name = "key-cli",
     description = "Headless command-line interface for KeY.",
     mixinStandardHelpOptions = true,
-    subcommands = { ProveCommand.class, ListCommand.class })
+    subcommands = { ProveCommand.class, ListCommand.class, ReplayCommand.class })
 public final class Main implements Callable<Integer> {
 
     @Spec

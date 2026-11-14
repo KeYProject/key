@@ -186,13 +186,36 @@ public final class ParsingFacade {
      * @return the parsed file AST
      */
     public static KeyAst.File parseFile(CharStream stream) {
-        int markerLineLength = leadingMarkerLineLength(stream);
-        if (markerLineLength > 0) {
-            String rest = stream.getText(Interval.of(markerLineLength, stream.size() - 1));
-            stream = CharStreams.fromString(rest, stream.getSourceName());
-            return parseFile(stream, 2);
+        if (leadingMarkerLineLength(stream) > 0) {
+            // the marker line counts as line 1: token line numbers keep referring to the
+            // original file
+            return parseFile(withoutStatusMarker(stream), 2);
         }
         return parseFile(stream, 1);
+    }
+
+    /**
+     * Returns a char stream over the content of the given stream without a leading
+     * {@code KEY_PROOF_STATUS} marker line (§3 of the headless interface spec). If the first
+     * line of the given stream does not start with the marker prefix, the given stream is
+     * returned unchanged.
+     * <p>
+     * Every consumer that derives a char stream from the same file must apply this method, so
+     * that the token positions of an AST produced by {@link #parseFile(CharStream)} (which
+     * skips the marker line) remain valid for re-reading the file, e.g. when replaying a saved
+     * proof from the {@code \proof} token's position.
+     *
+     * @param stream the stream to inspect
+     * @return a stream over the file content without the marker line
+     */
+    public static CharStream withoutStatusMarker(CharStream stream) {
+        int markerLineLength = leadingMarkerLineLength(stream);
+        if (markerLineLength <= 0) {
+            return stream;
+        }
+        return CharStreams.fromString(
+            stream.getText(Interval.of(markerLineLength, stream.size() - 1)),
+            stream.getSourceName());
     }
 
     private static KeyAst.File parseFile(CharStream stream, int firstLine) {

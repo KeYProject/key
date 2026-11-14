@@ -210,7 +210,9 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         KeyAst.File ctx = getParseContext();
         Token token = ctx.findProof();
         if (token != null) {
-            CharStream stream = file.getCharStream();
+            // the parse context was built from a stream without a leading status marker line
+            // (§3), so re-read the file through the same view to keep the token positions valid
+            CharStream stream = ParsingFacade.withoutStatusMarker(file.getCharStream());
             // also pass the file to be able to produce exceptions with locations
             try {
                 ProofReplayer.run(token, stream, prl, file.url().toURI());
