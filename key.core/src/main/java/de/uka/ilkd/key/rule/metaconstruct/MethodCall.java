@@ -129,9 +129,14 @@ public final class MethodCall extends ProgramTransformer {
      * @param ec The Schema Variable.
      */
     protected MethodCall(Name name, ProgramSV ec, SchemaVariable result, ProgramElement body) {
-        super(name, body, ec, result);
+        super(name, body);
         this.resultVar = result;
         this.execContextSV = ec;
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return argumentsOf(body(), (SchemaVariable) execContextSV, resultVar);
     }
 
     /** gets an array of expression and returns a list of types */
