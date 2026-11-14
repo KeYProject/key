@@ -36,20 +36,17 @@ What This Example Shows
 3. Multiple instanceof patterns (processNumber method)
    - Chained instanceof checks with different types
    
-4. Pattern variables in complex expressions (compareIfBothStrings)
-   - Multiple pattern variables bound in the same branch
-   - Combined with && operator
-   
-5. Traditional vs pattern matching comparison (traditionalVsPattern)
+4. Traditional vs pattern matching comparison (traditionalVsPattern)
    - Shows both styles work correctly together
 
 Key Taclets
 -----------
-The following taclets in genericRules.key handle pattern matching:
+The following taclets in javaRules.key handle pattern matching:
 
-- instanceof_pattern_if_split: Splits if-statements and binds the pattern variable
-- instanceof_pattern_negated_if: Handles negated instanceof by swapping branches  
-- instanceof_pattern_cast_elimination: Eliminates redundant casts after instanceof
+- ifUnfoldPattern: Splits if-statements and binds the pattern variable
+- ifElseUnfoldPattern: Handles if/else statements and binds pattern variables in both branches
+- ifUnfoldPatternUnreachable: Declares pattern variables after an if whose then branch cannot complete normally
+- instanceofPatternAssignmentSE/NSE: Removes the binding from a plain instanceof assignment
 
 Loading This Example
 --------------------
