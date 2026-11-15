@@ -4,11 +4,18 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.statement.EnhancedFor;
+import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.ImmutableList;
@@ -94,9 +101,46 @@ public class ForToWhile extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
 
+        LoopSpecification sourceInvariant = null;
+        ProgramVariable arraySource = null;
+        Map<String, ProgramVariable> targetVariables = new LinkedHashMap<>();
+        if (svInst.getContextInstantiation() != null
+                && svInst.getContextInstantiation().activeStatementContext() != null) {
+            if (svInst.getContextInstantiation().program() != null) {
+                var prog = svInst.getContextInstantiation().program();
+                var cols = new JavaASTCollector(prog, ProgramVariable.class);
+                cols.start();
+                for (var node : cols.getNodes()) {
+                    var pv = (ProgramVariable) node;
+                    targetVariables.put(pv.name().toString(), pv);
+                }
+            }
+            var method =
+                svInst.getContextInstantiation().activeStatementContext().getMethodContext();
+            if (method != null && method.getBody() != null) {
+                var collector = new JavaASTCollector(method.getBody(), EnhancedFor.class);
+                collector.start();
+                for (var node : collector.getNodes()) {
+                    var inv = ((EnhancedFor) node).getLoopInvariant();
+                    if (inv != null) {
+                        if (sourceInvariant != null) {
+                            sourceInvariant = null;
+                            break;
+                        }
+                        sourceInvariant = inv;
+                    }
+                }
+            }
+        }
+        if (sourceInvariant != null
+                && sourceInvariant.getLoop() instanceof EnhancedFor ef
+                && ef.getGuardExpression() instanceof ProgramVariable pv) {
+            arraySource = pv;
+        }
         WhileLoopTransformation w = new ForToWhileTransformation(pe,
             (ProgramElementName) svInst.getInstantiation(outerLabel),
-            (ProgramElementName) svInst.getInstantiation(innerLabel), services);
+            (ProgramElementName) svInst.getInstantiation(innerLabel), services, sourceInvariant,
+            targetVariables, arraySource);
 
         w.start();
         return new ProgramElement[] { w.result() };

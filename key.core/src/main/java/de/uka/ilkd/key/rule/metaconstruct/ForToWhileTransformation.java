@@ -4,18 +4,23 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.ast.statement.For;
 import de.uka.ilkd.key.java.ast.statement.Guard;
 import de.uka.ilkd.key.java.ast.statement.IForUpdates;
 import de.uka.ilkd.key.java.ast.statement.ILoopInit;
 import de.uka.ilkd.key.java.ast.statement.While;
+import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.util.ExtList;
@@ -36,14 +41,49 @@ import org.key_project.util.ExtList;
 
 public class ForToWhileTransformation extends WhileLoopTransformation {
 
+    private final LoopSpecification sourceInvariant;
+    private final Map<String, ProgramVariable> targetVariables;
+    private final ProgramVariable arraySource;
+
     public ForToWhileTransformation(ProgramElement root, ProgramElementName outerLabel,
-            ProgramElementName innerLabel, Services services) {
+            ProgramElementName innerLabel, Services services, LoopSpecification sourceInvariant,
+            Map<String, ProgramVariable> targetVariables, ProgramVariable arraySource) {
         super(root, outerLabel, innerLabel, services);
+        this.sourceInvariant = sourceInvariant;
+        this.targetVariables = targetVariables;
+        this.arraySource = arraySource;
     }
 
     /**
      * change the for-loop to a while loop with inits and updates.
      */
+    private static ProgramVariable findArrayVariable(For x) {
+        if (x.getGuardExpression() != null) {
+            var collector = new JavaASTCollector(x.getGuardExpression(), ProgramVariable.class);
+            collector.start();
+            for (var node : collector.getNodes()) {
+                var pv = (ProgramVariable) node;
+                if (pv.name().toString().startsWith("arr")) {
+                    return pv;
+                }
+            }
+        }
+        return null;
+    }
+
+    private ProgramVariable resolve(ProgramVariable source, ProgramVariable arrayVar) {
+        if (source == arraySource
+                || (arraySource != null && source.name().toString()
+                        .equals("_" + arraySource.name()))) {
+            return arrayVar;
+        }
+        ProgramVariable target = targetVariables.get(source.name().toString());
+        if (target == null) {
+            target = targetVariables.get("_" + source.name());
+        }
+        return target;
+    }
+
     public void performActionOnFor(For x) {
         ExtList changeList = stack.peek();
 
@@ -115,7 +155,24 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
 
             // copy loop invariant to the created while loop
             LoopSpecification li = x.getLoopInvariant();
+            if (li == null) {
+                li = sourceInvariant;
+            }
             if (li != null) {
+                ProgramVariable indexVar = null;
+                var initializers = x.getInitializers();
+                if (initializers != null && !initializers.isEmpty()
+                        && initializers.get(0) instanceof LocalVariableDeclaration lvd
+                        && !lvd.getVariables().isEmpty()) {
+                    indexVar = (ProgramVariable) lvd.getVariables().get(0).getProgramVariable();
+                }
+                if (indexVar != null) {
+                    li = EnhancedForElimination.instantiateIndexValues(li, indexVar,
+                        java.util.Optional.empty(), services);
+                }
+                ProgramVariable arrVar = findArrayVariable(x);
+                li = EnhancedForElimination.remapVariables(li,
+                    p -> resolve(p, arrVar), services);
                 li = li.setLoop((While) outerBlockStatements[initSize]);
                 ((While) outerBlockStatements[initSize]).setLoopInvariant(li);
             }

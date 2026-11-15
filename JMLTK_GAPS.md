@@ -759,6 +759,31 @@ Both forms are parsed:
   (re-prove `perm.key` and re-record), or repair the drift at its source
   (whichever of the §4/§5/§17/§18-style shape differences feeds these goals).
 
+## 22. `javadl` enhanced-for proofs lose their loop invariant  — ✔ RESOLVED
+
+- Fixtures: `testRunAllFunProofs` group `javadl`,
+  `standard_key/java_dl/java5/for_Array.key`, `for_Iterable.key`,
+  `for_ReferenceArray.key`.
+- **Symptom:** `for_Array` stopped after 49 nodes with one open goal; the
+  invariant rule never saw the source invariant. `for_Iterable` and
+  `for_ReferenceArray` failed similarly.
+- **Cause:** after moving loop specifications from the repository to the loop
+  AST nodes, the program copies built while instantiating the enhanced-for and
+  `for_to_while` rules did not carry the specification. The `For` passed to
+  `for_to_while` no longer had an invariant, and the invariant recovered from
+  the enclosing method still used the original method variables (`a`, `s`)
+  whereas the running program uses the parameter copy (`_a`) and copied locals.
+- **Fix:** the enhanced-for elimination recovers the still-attached invariant
+  from the enclosing method body (no central registry) and the
+  `for_to_while` transformation receives the source invariant together with
+  the current program's variable map. It instantiates `\index` with the
+  generated while index and rewrites the invariant, free invariant,
+  `modifiable`, and variant terms to the current program variables. The
+  iterable branch applies the same variable remapping after replacing
+  `\values`.
+- **Result:** the three examples close with 331/164/301 nodes (upstream:
+  333/164/303); `vararg.key` remains green.
+
 ## Appendix A — how to re-measure
 
 Measured with the standard suite commits/config used for the PR:
