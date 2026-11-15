@@ -5,7 +5,6 @@
 package org.key_project.key.cli.settings;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -85,15 +84,15 @@ public final class SettingsFileParser {
      *
      * @param file the settings file to read (UTF-8)
      * @return the parsed {@code category -> "category:value"} entries
-     * @throws CliSettingsException if the file contains an unknown key or an undocumented value
-     * @throws UncheckedIOException if the file cannot be read
+     * @throws CliSettingsException if the file cannot be read, contains an unknown key, or holds
+     *         an undocumented value
      */
     public Map<String, String> parse(Path file) {
         String content;
         try {
             content = Files.readString(file, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new UncheckedIOException("cannot read settings file: " + file, e);
+            throw new CliSettingsException("cannot read settings file: " + file);
         }
         return parse(content);
     }

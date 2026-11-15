@@ -84,6 +84,20 @@ class ProveCommandSettingsTest {
 
     @Test
     @Timeout(120)
+    void unreadableSettingsFileIsAnInputError() {
+        // a directory exists but cannot be read as a settings file
+        String directory = Fixtures.indexKey().getParent().toString();
+
+        Run run = run("prove", Fixtures.indexKey().toString(), "--settings-file", directory);
+
+        assertThat(run.exit()).isEqualTo(3);
+        assertThat(run.err()).contains("KEY_ERROR");
+        assertThat(run.err()).contains("cannot read settings file");
+        assertThat(run.resultLines()).isEmpty();
+    }
+
+    @Test
+    @Timeout(120)
     void strategyOptionWithoutEqualsIsAnInputError() {
         Run run = run("prove", Fixtures.indexKey().toString(), "--strategy-option", "intRules");
 
