@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.key_project.key.cli.Log;
 import org.key_project.key.cli.Main;
+import org.key_project.key.cli.ResultRecordWriter;
 import org.key_project.key.cli.Verbosity;
 import org.key_project.key.cli.prove.Fixtures;
 
@@ -83,8 +84,10 @@ class ScriptCommandTest {
         assertThat(goalPaths(run.out())).isNotEmpty()
                 .allMatch(path -> path.matches("[1-9][0-9.]*"));
 
-        // the last line is the final marker and reflects the true open-goal count
-        assertThat(lastLine(run.out())).isEqualTo("SCRIPT FINAL open " + counts.get(1));
+        // the last line is the §2 record; SCRIPT FINAL precedes it and reflects the true count
+        assertThat(lastLine(run.out())).startsWith(ResultRecordWriter.PREFIX);
+        assertThat(secondToLastLine(run.out())).isEqualTo("SCRIPT FINAL open " + counts.get(1));
+        assertResultRecord(run, "open");
     }
 
     @Test
@@ -97,7 +100,8 @@ class ScriptCommandTest {
         assertThat(run.exit()).isEqualTo(1);
         assertThat(run.out()).doesNotContain("SCRIPT OK");
         assertThat(run.out()).contains("SCRIPT FAIL frobnicate Unknown command 'frobnicate'");
-        assertThat(lastLine(run.out())).startsWith("SCRIPT FINAL open ");
+        assertThat(run.out()).contains("SCRIPT FINAL open ");
+        assertResultRecord(run, "open");
     }
 
     @Test
@@ -111,7 +115,8 @@ class ScriptCommandTest {
         assertThat(run.exit()).isZero();
         assertThat(run.out()).contains("SCRIPT OK auto 1000");
         assertThat(run.out()).contains("SCRIPT OK assert-closed");
-        assertThat(lastLine(run.out())).isEqualTo("SCRIPT FINAL closed");
+        assertThat(run.out()).contains("SCRIPT FINAL closed");
+        assertResultRecord(run, "closed", 0);
     }
 
     @Test
@@ -123,7 +128,8 @@ class ScriptCommandTest {
 
         assertThat(run.exit()).isEqualTo(1);
         assertThat(run.out()).contains("SCRIPT FAIL assert-closed");
-        assertThat(lastLine(run.out())).isEqualTo("SCRIPT FINAL open 1");
+        assertThat(run.out()).contains("SCRIPT FINAL open 1");
+        assertResultRecord(run, "open", 1);
     }
 
     @Test
@@ -136,6 +142,7 @@ class ScriptCommandTest {
         assertThat(run.exit()).isEqualTo(2);
         assertThat(run.out()).contains("SCRIPT FAIL auto 100000 timed out after");
         assertThat(run.out()).contains("SCRIPT FINAL open ");
+        assertResultRecord(run, "timed_out");
     }
 
     @Test
@@ -196,6 +203,33 @@ class ScriptCommandTest {
     private static String lastLine(String out) {
         List<String> lines = out.lines().toList();
         return lines.get(lines.size() - 1);
+    }
+
+    private static String secondToLastLine(String out) {
+        List<String> lines = out.lines().toList();
+        return lines.get(lines.size() - 2);
+    }
+
+    /**
+     * Asserts the §2 contract of the run: exactly one {@code KEY_RESULT} line, as the last line of
+     * stdout, carrying the expected {@code status}.
+     */
+    private static void assertResultRecord(Run run, String status) {
+        List<String> records = resultRecords(run.out());
+        assertThat(records).as("stdout: %s", run.out()).hasSize(1);
+        assertThat(lastLine(run.out())).isEqualTo(records.get(0));
+        assertThat(records.get(0)).startsWith(ResultRecordWriter.PREFIX)
+                .contains("\"status\":\"" + status + "\"");
+    }
+
+    private static void assertResultRecord(Run run, String status, int openGoals) {
+        assertResultRecord(run, status);
+        assertThat(resultRecords(run.out()).get(0)).as("stdout: %s", run.out())
+                .contains("\"openGoals\":" + openGoals);
+    }
+
+    private static List<String> resultRecords(String out) {
+        return out.lines().filter(line -> line.startsWith(ResultRecordWriter.PREFIX)).toList();
     }
 
     private record Run(int exit, String out, String err) {
