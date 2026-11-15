@@ -36,6 +36,11 @@ public final class Fixtures {
         return resource("/fixtures/corrupt/corrupt.key");
     }
 
+    /// A load file whose Java source declares no JML contract at all (empty selection).
+    public static Path noContractsKey() {
+        return resource("/fixtures/nocontracts/noContracts.key");
+    }
+
     /// The overflow-sensitive contract used to differentiate {@code intRules} settings (E3).
     public static Path overflowKey() {
         return resource("/fixtures/overflow/overflow.key");

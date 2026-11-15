@@ -56,7 +56,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The overload taking a {@link ProofOutput} additionally writes the finished proofs to the
  * requested locations (§3 of the headless interface spec); see {@link #prove(Path, List,
- * ProofOutput)}.
+ * ProofOutput)}. A requested location that cannot be written is an input error ({@code
+ * KEY_ERROR cannot write proof '...'}, exit {@code 3}) rather than a silent success.
  */
 public final class HeadlessProver {
 
@@ -163,6 +164,7 @@ public final class HeadlessProver {
      * @throws UnknownContractException if a selector matches no contract of the problem
      * @throws ProofOutputConflictException if {@code --proof} is used with several selected
      *         contracts
+     * @throws CliError an input error if a requested proof file cannot be written
      */
     public List<ContractResult> prove(Path problem, List<String> selectors, ProofOutput output)
             throws ProblemLoaderException, UnknownContractException {
@@ -272,6 +274,9 @@ public final class HeadlessProver {
                 elapsedMs, openGoals, status);
             return new ContractResult(contract.getName(), status, openGoals, elapsedMs, proofFile,
                 smt.smtCalls(), smt.smtProved(), null);
+        } catch (CliError e) {
+            // a requested proof file could not be written: an input error, not a contract failure
+            throw e;
         } catch (Exception e) {
             LOGGER.debug("Proving contract '{}' failed", contract.getName(), e);
             return errorResult(contract.getName(), elapsedMs(start), e);
@@ -294,6 +299,7 @@ public final class HeadlessProver {
      * @param position the 0-based position of the contract within the selection
      * @param output the requested proof-file output
      * @return the absolute path of the written file, or {@code null} if nothing was written
+     * @throws CliError an input error if a location was requested and the file cannot be written
      */
     private static @Nullable Path saveProofIfRequested(Proof proof, boolean closed, int openGoals,
             int position, ProofOutput output) {
@@ -303,20 +309,38 @@ public final class HeadlessProver {
         }
         try {
             Path parent = target.toAbsolutePath().getParent();
+            if (parent != null && Files.isRegularFile(parent)) {
+                throw CliError.input(
+                    "cannot write proof '" + target + "': '" + parent + "' is not a directory");
+            }
             if (parent != null && !Files.exists(parent)) {
                 Files.createDirectories(parent);
             }
             String error =
                 ProofSaver.saveToFile(target, proof, ProofSaver.marker(closed, openGoals));
             if (error != null) {
-                LOGGER.warn("Could not save proof to '{}': {}", target, error);
-                return null;
+                throw CliError.input("cannot write proof '" + target + "': " + singleLine(error));
             }
             return target.toAbsolutePath().normalize();
         } catch (IOException e) {
-            LOGGER.warn("Could not save proof to '{}'", target, e);
-            return null;
+            throw CliError.input("cannot write proof '" + target + "': " + reason(e));
         }
+    }
+
+    /**
+     * Renders an exception's reason on a single line: the message if present, the class name
+     * otherwise, with all whitespace runs collapsed so the {@code KEY_ERROR} line stays one line.
+     *
+     * @param e the exception to describe
+     * @return the single-line reason
+     */
+    private static String reason(Exception e) {
+        String message = e.getMessage();
+        return message != null ? singleLine(message) : e.getClass().getSimpleName();
+    }
+
+    private static String singleLine(String text) {
+        return text.replaceAll("\\s+", " ").trim();
     }
 
     /**

@@ -21,9 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for the CLI-level error classification (§1): input errors (unknown option, missing file,
- * corrupt load file, unknown contract) exit {@code 3} with a {@code KEY_ERROR} line on stderr,
- * while an unloadable load file additionally emits an error record whose {@code errorMessage} is
- * non-{@code null}.
+ * corrupt load file, unknown contract, a run without any contract) exit {@code 3} with a
+ * {@code KEY_ERROR} line on stderr, while an unloadable load file additionally emits an error
+ * record whose {@code errorMessage} is non-{@code null}.
  */
 class ProveCommandErrorTest {
 
@@ -85,6 +85,16 @@ class ProveCommandErrorTest {
 
         assertThat(run.exit()).isEqualTo(3);
         assertThat(run.err()).contains("KEY_ERROR contract 'NoSuchContract' not found");
+        assertThat(run.resultLines()).isEmpty();
+    }
+
+    @Test
+    @Timeout(300)
+    void runWithoutAnyContractIsAnInputError() {
+        Run run = run("prove", Fixtures.noContractsKey().toString());
+
+        assertThat(run.exit()).isEqualTo(3);
+        assertThat(run.err()).contains("KEY_ERROR no contracts found in");
         assertThat(run.resultLines()).isEmpty();
     }
 

@@ -182,6 +182,58 @@ class OpenGoalPrintTest {
 
     @Test
     @Timeout(300)
+    void attachedMaxValueIsAccepted() {
+        Run result = run("prove", "--print-open-goals=1", Fixtures.sizeOpenKey().toString(),
+            "--choose-contract", SIZE);
+
+        assertThat(result.exit()).isEqualTo(1);
+        String section = openGoalSection(result.out());
+        assertThat(section).startsWith("OPEN-GOAL-COUNT 2\n");
+        assertThat(goalBlocks(section)).hasSize(1);
+    }
+
+    @Test
+    @Timeout(120)
+    void nonIntegerAttachedValueIsAnInputError() {
+        Run result = run("prove", "--print-open-goals=abc", Fixtures.sizeOpenKey().toString(),
+            "--choose-contract", SIZE);
+
+        assertThat(result.exit()).isEqualTo(3);
+        assertThat(result.err()).contains("KEY_ERROR");
+        assertThat(result.err()).contains("--print-open-goals");
+        assertThat(result.out()).doesNotContain("OPEN-GOAL-COUNT");
+    }
+
+    @Test
+    @Timeout(300)
+    void bareFlagBeforeTheLoadFileKeepsTheFilePositional() {
+        // `--print-open-goals spec.key`: the file must not be parsed as MAX
+        Run result = run("prove", "--print-open-goals", Fixtures.sizeOpenKey().toString(),
+            "--choose-contract", SIZE);
+
+        assertThat(result.exit()).isEqualTo(1);
+        assertThat(result.err()).doesNotContain("KEY_ERROR");
+        String section = openGoalSection(result.out());
+        assertThat(section).startsWith("OPEN-GOAL-COUNT 2\n");
+        assertThat(goalBlocks(section)).hasSize(2);
+        assertThat(lastLine(result.out())).startsWith("KEY_RESULT ");
+    }
+
+    @Test
+    @Timeout(300)
+    void maxBeforeTheLoadFileTruncatesToThatManyBlocks() {
+        Run result = run("prove", "--print-open-goals", "1", Fixtures.sizeOpenKey().toString(),
+            "--choose-contract", SIZE);
+
+        assertThat(result.exit()).isEqualTo(1);
+        assertThat(result.err()).doesNotContain("KEY_ERROR");
+        String section = openGoalSection(result.out());
+        assertThat(section).startsWith("OPEN-GOAL-COUNT 2\n");
+        assertThat(goalBlocks(section)).hasSize(1);
+    }
+
+    @Test
+    @Timeout(300)
     void noTruncateFormulasTwoRunsByteIdentical() {
         String[] args = { "prove", Fixtures.sizeOpenKey().toString(), "--choose-contract", SIZE,
             "--print-open-goals", "0", "--no-truncate-formulas" };
