@@ -108,6 +108,17 @@ class ReplayCommandTest {
     }
 
     @Test
+    @Timeout(300)
+    void oversizedOpenMarkerIsReportedAsMalformed() throws Exception {
+        Path proof = rewriteFirstLine(saveClosedProof(), "KEY_PROOF_STATUS open 99999999999");
+
+        Run run = run("replay", proof.toString());
+
+        assertThat(run.exit()).isEqualTo(3);
+        assertThat(run.lastLine()).startsWith("REPLAY incompatible malformed status marker");
+    }
+
+    @Test
     void corruptFileIsIncompatible() throws Exception {
         Path proof = tmp.resolve("garbage.proof");
         Files.writeString(proof, "this is not a KeY proof file\n");
