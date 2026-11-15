@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli.settings;
 
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -103,13 +104,13 @@ class SettingsFileParserTest {
         String json = """
                 {
                   "intRules": "intRules:arithmeticSemanticsIgnoringOF",
-                  "integerSimplificationRules": "integerSimplificationRules:standard",
-                  "javaLoopTreatment": "-javaLoopTreatment",
-                  "assertions": "assertions:off",
-                  "runtimeExceptions": "runtimeExceptions:allow",
+                  "integerSimplificationRules": "integerSimplificationRules:minimal",
+                  "javaLoopTreatment": "javaLoopTreatment:teaching",
+                  "assertions": "assertions:on",
+                  "runtimeExceptions": "runtimeExceptions:ignore",
                   "bigint": "bigint:off",
-                  "programRules": "programRules:JavaCard",
-                  "methodExpansion": "methodExpansion:full",
+                  "programRules": "programRules:None",
+                  "methodExpansion": "methodExpansion:noRestriction",
                   "Strings": "Strings:off",
                   "sequences": "sequences:off",
                   "reach": "reach:off",
@@ -118,6 +119,26 @@ class SettingsFileParserTest {
                 """;
 
         assertThat(parser.parse(json)).hasSize(12);
+    }
+
+    @Test
+    void removedLegacyValuesAreRejected() {
+        for (String value : List.of("javaLoopTreatment:default", "javaLoopTreatment:expand",
+            "integerSimplificationRules:standard", "integerSimplificationRules:recursive",
+            "programRules:JavaCard")) {
+            String key = value.substring(0, value.indexOf(':'));
+            assertThatThrownBy(() -> parser.parse("{\"" + key + "\": \"" + value + "\"}"))
+                    .as(value)
+                    .isInstanceOf(CliSettingsException.class)
+                    .hasMessageContaining("not understood");
+        }
+    }
+
+    @Test
+    void methodExpansionFullShorthandIsAccepted() {
+        Map<String, String> settings =
+            parser.parse("{\"methodExpansion\": \"methodExpansion:full\"}");
+        assertThat(settings).containsEntry("methodExpansion", "methodExpansion:full");
     }
 
     @Test

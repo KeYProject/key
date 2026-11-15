@@ -61,6 +61,28 @@ class ProveCommandSettingsTest {
     }
 
     @Test
+    @Timeout(300)
+    void legacyValueKeYDoesNotDeclareIsAnInputError() {
+        Run run = run("prove", Fixtures.indexKey().toString(),
+            "--strategy-option", "javaLoopTreatment=javaLoopTreatment:default");
+
+        assertThat(run.exit()).isEqualTo(3);
+        assertThat(run.err()).contains("KEY_ERROR settings:");
+        assertThat(run.err()).contains("javaLoopTreatment:default");
+        assertThat(run.resultLines()).isEmpty();
+    }
+
+    @Test
+    @Timeout(300)
+    void methodExpansionFullShorthandIsAccepted() {
+        Run run = run("prove", Fixtures.indexKey().toString(), "--choose-contract", "0",
+            "--strategy-option", "methodExpansion=methodExpansion:full");
+
+        assertThat(run.exit()).isZero();
+        assertThat(run.resultLines()).hasSize(1);
+    }
+
+    @Test
     @Timeout(120)
     void strategyOptionWithoutEqualsIsAnInputError() {
         Run run = run("prove", Fixtures.indexKey().toString(), "--strategy-option", "intRules");

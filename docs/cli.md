@@ -171,14 +171,14 @@ byte-reproducible across hosts and leave the real `~/.key` untouched.
 
 ```json
 {
-  "intRules": "intRules:arithmeticSemanticsIgnoringOF|intRules:javaSemantics|intRules:checked|intRules:unchecked",
-  "integerSimplificationRules": "integerSimplificationRules:standard|integerSimplificationRules:full|integerSimplificationRules:recursive",
-  "javaLoopTreatment": "javaLoopTreatment:default|javaLoopTreatment:efficient|javaLoopTreatment:expand|-javaLoopTreatment",
-  "assertions": "assertions:off|assertions:safe",
-  "runtimeExceptions": "runtimeExceptions:ban|runtimeExceptions:allow",
+  "intRules": "intRules:arithmeticSemanticsIgnoringOF|intRules:arithmeticSemanticsCheckingOF|intRules:javaSemantics|intRules:checked|intRules:unchecked",
+  "integerSimplificationRules": "integerSimplificationRules:full|integerSimplificationRules:minimal",
+  "javaLoopTreatment": "javaLoopTreatment:efficient|javaLoopTreatment:teaching",
+  "assertions": "assertions:safe|assertions:on|assertions:off",
+  "runtimeExceptions": "runtimeExceptions:ban|runtimeExceptions:allow|runtimeExceptions:ignore",
   "bigint": "bigint:on|bigint:off",
-  "programRules": "programRules:Java|programRules:JavaCard",
-  "methodExpansion": "methodExpansion:modularOnly|methodExpansion:full",
+  "programRules": "programRules:Java|programRules:None",
+  "methodExpansion": "methodExpansion:modularOnly|methodExpansion:noRestriction|methodExpansion:full",
   "Strings": "Strings:on|Strings:off",
   "sequences": "sequences:on|sequences:off",
   "reach": "reach:on|reach:off",
@@ -186,8 +186,12 @@ byte-reproducible across hosts and leave the real `~/.key` untouched.
 }
 ```
 
-Each value is one of the comma-form strings shown (the `key:category` strings that appear in
-KeY proof headers). `--strategy-option <KEY>=<VALUE>` uses the same vocabulary.
+The values are the choice names KeY declares in its rule options; a value KeY does not declare is
+rejected instead of being silently replaced by a default choice. Three historical shorthands are
+kept for convenience and normalized to the declared names: `intRules:checked` →
+`intRules:arithmeticSemanticsCheckingOF`, `intRules:unchecked` →
+`intRules:arithmeticSemanticsIgnoringOF`, `methodExpansion:full` →
+`methodExpansion:noRestriction`. `--strategy-option <KEY>=<VALUE>` uses the same vocabulary.
 
 ### 5.3 Failure semantics
 

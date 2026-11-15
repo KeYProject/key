@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -30,12 +32,11 @@ import org.jspecify.annotations.Nullable;
  * global choices exactly as it found them (the canonical capture/restore pattern used throughout
  * KeY — cf. {@code HelperClassForTests.restoreTacletOptions}).
  * <p>
- * All §5.2 values are validated against the documented vocabulary by {@link SettingsFileParser}.
- * The
- * documented {@code intRules:checked}/{@code intRules:unchecked} shorthands are normalized to the
- * real KeY choice names ({@code intRules:arithmeticSemanticsCheckingOF} /
- * {@code intRules:arithmeticSemanticsIgnoringOF}) so that the two options actually differ; every
- * other documented value is passed through verbatim (harmless when KeY does not know it).
+ * Values are checked twice: {@link SettingsFileParser} accepts only the documented vocabulary, and
+ * {@link #validate()} (called after the problem is loaded) rejects any value the loaded KeY does
+ * not declare, so the silent substitution KeY performs for unknown choice names cannot hide a
+ * typo (§5.3). The historical {@code intRules:checked}/{@code intRules:unchecked} and
+ * {@code methodExpansion:full} shorthands are normalized to the real KeY choice names.
  */
 public final class HeadlessRunnerSettings implements AutoCloseable {
 
@@ -147,11 +148,13 @@ public final class HeadlessRunnerSettings implements AutoCloseable {
     }
 
     /**
-     * Normalizes the documented {@code intRules:checked}/{@code intRules:unchecked} shorthands to
-     * the real KeY choice names; every other documented value is passed through unchanged.
+     * Normalizes the retained historical shorthands to the real KeY choice names: the documented
+     * {@code intRules:checked}/{@code intRules:unchecked} and {@code methodExpansion:full} are
+     * mapped to the names KeY 3 declares; every other accepted value is already a declared choice
+     * name and is passed through unchanged.
      *
      * @param category the §5.2 choice category
-     * @param value the documented §5.2 value
+     * @param value the accepted §5.2 value
      * @return the actual choice name KeY understands
      */
     static String normalize(String category, String value) {
@@ -162,6 +165,46 @@ public final class HeadlessRunnerSettings implements AutoCloseable {
                 default -> value;
             };
         }
+        if ("methodExpansion".equals(category) && "methodExpansion:full".equals(value)) {
+            return "methodExpansion:noRestriction";
+        }
         return value;
+    }
+
+    /**
+     * Verifies that every requested choice is declared by the loaded environment, so a value KeY
+     * would otherwise substitute silently becomes an input error (§5.3). Must be called after the
+     * problem is loaded (the declared choices come from the loaded rule declarations).
+     *
+     * @throws CliSettingsException if a requested {@code category:value} is not declared
+     */
+    public void validate() throws CliSettingsException {
+        validate(ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getChoices());
+    }
+
+    /**
+     * Verifies the requested choices against the given declared choices.
+     *
+     * @param declared the declared choice names per category (from
+     *        {@link ChoiceSettings#getChoices()})
+     * @throws CliSettingsException if a requested {@code category:value} is not declared
+     */
+    void validate(Map<String, Set<String>> declared) throws CliSettingsException {
+        for (Map.Entry<String, String> entry : choices.entrySet()) {
+            String category = entry.getKey();
+            String full = entry.getValue();
+            Set<String> values = declared.get(category);
+            if (values == null || !values.contains(full)) {
+                throw new CliSettingsException("settings: '" + full + "' not understood for '"
+                    + category + "'; declared values: " + declaredHint(values));
+            }
+        }
+    }
+
+    private static String declaredHint(@Nullable Set<String> values) {
+        if (values == null || values.isEmpty()) {
+            return "(no such choice category in this KeY version)";
+        }
+        return values.stream().sorted().collect(Collectors.joining(", "));
     }
 }
