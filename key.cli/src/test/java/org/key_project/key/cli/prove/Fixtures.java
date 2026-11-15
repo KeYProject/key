@@ -96,6 +96,24 @@ public final class Fixtures {
         return List.of(bucketStarKey(), unsizedNewKey(), initNewKey());
     }
 
+    /// One §8 bad-construct fixture: its load file and the expected exact snippet.
+    public record BadConstruct(Path key, String snippet) {
+    }
+
+    /**
+     * All §8 bad-construct fixtures with their expected exact snippets (one per construct
+     * listed in the spec).
+     *
+     * @return the three fixtures: {@code bucketData[*][*]}, {@code new int[n][]},
+     *         {@code new int[][]{{1,2}}}
+     */
+    public static List<BadConstruct> badConstructs() {
+        return List.of(
+            new BadConstruct(bucketStarKey(), "bucketData[*][*]"),
+            new BadConstruct(unsizedNewKey(), "new int[n][]"),
+            new BadConstruct(initNewKey(), "new int[][]{{1,2}}"));
+    }
+
     public static Path resource(String name) {
         URL url = Fixtures.class.getResource(name);
         if (url == null) {
