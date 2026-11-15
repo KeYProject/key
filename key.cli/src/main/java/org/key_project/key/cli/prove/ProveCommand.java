@@ -197,6 +197,8 @@ public final class ProveCommand implements Callable<Integer> {
                 out.println(resultWriter.toJsonLine(failure));
                 out.flush();
                 throw CliError.loadFailure(file, e);
+            } catch (CliError e) {
+                throw e;
             } catch (RuntimeException e) {
                 throw CliError.internal("internal error while processing '" + file + "': "
                     + errorMessage(e), e);

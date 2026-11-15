@@ -22,9 +22,11 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.key_project.key.cli.CliError;
 import org.key_project.key.cli.ContractResult;
 import org.key_project.key.cli.ExitCode;
 import org.key_project.key.cli.ResultStatus;
+import org.key_project.key.cli.settings.CliSettingsException;
 import org.key_project.key.cli.settings.HeadlessRunnerSettings;
 import org.key_project.prover.engine.ProofSearchInformation;
 
@@ -171,6 +173,7 @@ public final class HeadlessProver {
         try {
             KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(problem);
             try {
+                validateSettings(settings);
                 ContractIndex index = ContractIndex.fromEnvironment(environment);
                 List<Contract> selected = select(environment, index, selectors);
                 if (output.proof() != null && selected.size() > 1) {
@@ -190,6 +193,27 @@ public final class HeadlessProver {
             if (settings != null) {
                 settings.close();
             }
+        }
+    }
+
+    /**
+     * Verifies the requested strategy choices against the choice declarations of the loaded
+     * problem: a value KeY does not declare would otherwise be replaced by a default choice
+     * silently (§5.3 of the headless interface spec).
+     *
+     * @param settings the run settings, or {@code null} if none were given
+     * @throws CliError an input error naming the offending {@code category:value}
+     */
+    private static void validateSettings(@Nullable HeadlessRunnerSettings settings)
+            throws CliError {
+        if (settings == null) {
+            return;
+        }
+        try {
+            settings.validate();
+        } catch (CliSettingsException e) {
+            String message = e.getMessage();
+            throw CliError.input(message != null ? message : e.getClass().getSimpleName());
         }
     }
 

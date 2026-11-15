@@ -7,6 +7,7 @@ package org.key_project.key.cli.settings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -79,11 +80,46 @@ class HeadlessRunnerSettingsTest {
     }
 
     @Test
-    void undocumentedButValidValuePassesThroughVerbatim() {
-        Map<String, String> merged = HeadlessRunnerSettings.layer(Map.of(),
-            List.of("programRules=programRules:JavaCard"));
+    void valueKeYDoesNotDeclareIsRejected() {
+        assertThatThrownBy(() -> HeadlessRunnerSettings.layer(Map.of(),
+            List.of("programRules=programRules:JavaCard")))
+                .isInstanceOf(CliSettingsException.class)
+                .hasMessageContaining("not understood");
+    }
 
-        assertThat(merged).containsEntry("programRules", "programRules:JavaCard");
+    @Test
+    void realDeclaredValuePassesThroughVerbatim() {
+        Map<String, String> merged = HeadlessRunnerSettings.layer(Map.of(),
+            List.of("programRules=programRules:None"));
+
+        assertThat(merged).containsEntry("programRules", "programRules:None");
+    }
+
+    @Test
+    void methodExpansionFullIsNormalizedToNoRestriction() {
+        Map<String, String> merged = HeadlessRunnerSettings.layer(Map.of(),
+            List.of("methodExpansion=methodExpansion:full"));
+
+        assertThat(merged).containsEntry("methodExpansion", "methodExpansion:noRestriction");
+    }
+
+    @Test
+    void validateRejectsAChoiceTheLoadedKeYDoesNotDeclare() {
+        HeadlessRunnerSettings settings =
+            HeadlessRunnerSettings.from(null, List.of("bigint=bigint:on"));
+
+        assertThatThrownBy(() -> settings.validate(Map.of("bigint", Set.of("bigint:off"))))
+                .isInstanceOf(CliSettingsException.class)
+                .hasMessageContaining("not understood")
+                .hasMessageContaining("bigint:off");
+    }
+
+    @Test
+    void validateAcceptsADeclaredChoice() {
+        HeadlessRunnerSettings settings =
+            HeadlessRunnerSettings.from(null, List.of("bigint=bigint:on"));
+
+        settings.validate(Map.of("bigint", Set.of("bigint:on", "bigint:off")));
     }
 
     @Test

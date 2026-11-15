@@ -31,39 +31,41 @@ import java.util.Set;
 public final class SettingsFileParser {
 
     /**
-     * The documented §5.2 keys and, for each, the documented alternative values. These are exactly
-     * the strings that appear in KeY proof headers; they are accepted verbatim, even where the
-     * real KeY choice name differs (see {@link HeadlessRunnerSettings}).
+     * The documented §5.2 keys and, for each, the accepted values. The values are the choice names
+     * that KeY actually declares in {@code optionsDeclarations.key}, plus the retained historical
+     * shorthands {@code intRules:checked}/{@code intRules:unchecked}/{@code methodExpansion:full}
+     * that {@link HeadlessRunnerSettings#normalize} maps to the real names.
      */
     private static final Map<String, Set<String>> ALLOWED = Map.ofEntries(
         Map.entry("intRules", Set.of(
             "intRules:arithmeticSemanticsIgnoringOF",
+            "intRules:arithmeticSemanticsCheckingOF",
             "intRules:javaSemantics",
             "intRules:checked",
             "intRules:unchecked")),
         Map.entry("integerSimplificationRules", Set.of(
-            "integerSimplificationRules:standard",
             "integerSimplificationRules:full",
-            "integerSimplificationRules:recursive")),
+            "integerSimplificationRules:minimal")),
         Map.entry("javaLoopTreatment", Set.of(
-            "javaLoopTreatment:default",
             "javaLoopTreatment:efficient",
-            "javaLoopTreatment:expand",
-            "-javaLoopTreatment")),
+            "javaLoopTreatment:teaching")),
         Map.entry("assertions", Set.of(
-            "assertions:off",
-            "assertions:safe")),
+            "assertions:safe",
+            "assertions:on",
+            "assertions:off")),
         Map.entry("runtimeExceptions", Set.of(
             "runtimeExceptions:ban",
-            "runtimeExceptions:allow")),
+            "runtimeExceptions:allow",
+            "runtimeExceptions:ignore")),
         Map.entry("bigint", Set.of(
             "bigint:on",
             "bigint:off")),
         Map.entry("programRules", Set.of(
             "programRules:Java",
-            "programRules:JavaCard")),
+            "programRules:None")),
         Map.entry("methodExpansion", Set.of(
             "methodExpansion:modularOnly",
+            "methodExpansion:noRestriction",
             "methodExpansion:full")),
         Map.entry("Strings", Set.of(
             "Strings:on",

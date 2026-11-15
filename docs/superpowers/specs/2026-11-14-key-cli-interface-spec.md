@@ -163,20 +163,26 @@ JSON object; ONLY the named keys are meaningful; a value for any key is one of t
 
 ```json
 {
-  "intRules": "intRules:arithmeticSemanticsIgnoringOF|intRules:javaSemantics|intRules:checked|intRules:unchecked",
-  "integerSimplificationRules": "integerSimplificationRules:standard|integerSimplificationRules:full|integerSimplificationRules:recursive",
-  "javaLoopTreatment": "javaLoopTreatment:default|javaLoopTreatment:efficient|javaLoopTreatment:expand|-javaLoopTreatment",
-  "assertions": "assertions:off|assertions:safe",
-  "runtimeExceptions": "runtimeExceptions:ban|runtimeExceptions:allow",
+  "intRules": "intRules:arithmeticSemanticsIgnoringOF|intRules:arithmeticSemanticsCheckingOF|intRules:javaSemantics|intRules:checked|intRules:unchecked",
+  "integerSimplificationRules": "integerSimplificationRules:full|integerSimplificationRules:minimal",
+  "javaLoopTreatment": "javaLoopTreatment:efficient|javaLoopTreatment:teaching",
+  "assertions": "assertions:safe|assertions:on|assertions:off",
+  "runtimeExceptions": "runtimeExceptions:ban|runtimeExceptions:allow|runtimeExceptions:ignore",
   "bigint": "bigint:on|bigint:off",
-  "programRules": "programRules:Java|programRules:JavaCard",
-  "methodExpansion": "methodExpansion:modularOnly|methodExpansion:full",
+  "programRules": "programRules:Java|programRules:None",
+  "methodExpansion": "methodExpansion:modularOnly|methodExpansion:noRestriction|methodExpansion:full",
   "Strings": "Strings:on|Strings:off",
   "sequences": "sequences:on|sequences:off",
   "reach": "reach:on|reach:off",
   "permissions": "permissions:on|permissions:off"
 }
 ```
+
+The values are the choice names KeY declares in `optionsDeclarations.key`; a value KeY does not
+declare MUST be rejected (a silently substituted choice would make the run's settings a lie).
+The shorthands `intRules:checked` → `intRules:arithmeticSemanticsCheckingOF`,
+`intRules:unchecked` → `intRules:arithmeticSemanticsIgnoringOF`, and `methodExpansion:full` →
+`methodExpansion:noRestriction` are accepted and normalized.
 
 ### 5.3 Failure semantics
 
