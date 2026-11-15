@@ -18,7 +18,6 @@ import org.key_project.key.cli.ResultRecordWriter;
 import org.key_project.key.cli.Verbosity;
 import org.key_project.key.cli.prove.Fixtures;
 
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -36,10 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * {@code prove --choose-contract '<NAME>' <file>}, and {@code --list-contracts} becomes
  * {@code list <file>}.
  * <p>
- * Rows 7–9 depend on Phase 5/6 features ({@code --proof}, {@code --save-partial},
- * {@code --print-open-goals}, the {@code replay} subcommand) that are not part of this branch
- * yet; they are guarded by capability probes against the {@code --help} output and become
- * active after the Phase 5/6 cherry-pick.
+ * Rows 7–9 exercise the Phase 5/6 features ({@code --proof}, {@code --save-partial},
+ * {@code --print-open-goals}, the {@code replay} subcommand); all ten rows are active.
  */
 class AcceptanceMatrixTest {
 
@@ -60,12 +57,6 @@ class AcceptanceMatrixTest {
     private static Path base;
     @SuppressWarnings("nullness:initialization.static.field.uninitialized")
     private static Path home;
-    /// cached output of `key-cli prove --help`
-    @SuppressWarnings("nullness:initialization.static.field.uninitialized")
-    private static String proveHelp;
-    /// cached output of `key-cli --help`
-    @SuppressWarnings("nullness:initialization.static.field.uninitialized")
-    private static String rootHelp;
 
     @BeforeAll
     @Timeout(300)
@@ -75,22 +66,6 @@ class AcceptanceMatrixTest {
         base = Files.createTempDirectory("key-cli-acceptance");
         home = base.resolve("home");
         Files.createDirectories(home);
-        // capability probes: the --help runs do not initialize KeY, so they are cheap
-        proveHelp = run("prove", "--help").outText();
-        rootHelp = run("--help").outText();
-    }
-
-    /**
-     * Tells whether the {@code prove} subcommand supports the given option (probed once from
-     * its {@code --help} output; used to guard the Phase 5/6 rows).
-     */
-    private static boolean proveSupports(String option) {
-        return proveHelp.contains(option);
-    }
-
-    /** Tells whether the {@code replay} subcommand exists (Phase 5/6 feature). */
-    private static boolean hasReplaySubcommand() {
-        return rootHelp.contains("replay");
     }
 
     /**
@@ -213,8 +188,6 @@ class AcceptanceMatrixTest {
     @Test
     @Timeout(600)
     void row7_printOpenGoals() throws IOException {
-        Assumptions.assumeTrue(proveSupports("--print-open-goals"),
-            "enabled after Phase 6 cherry-pick");
         Run run = run("prove", "--print-open-goals", "5", "--choose-contract", TWO_NAME,
             Fixtures.indexKey().toString());
 
@@ -234,8 +207,6 @@ class AcceptanceMatrixTest {
     @Test
     @Timeout(900)
     void row8_replayClosedProof() throws IOException {
-        Assumptions.assumeTrue(proveSupports("--proof") && hasReplaySubcommand(),
-            "enabled after Phase 5/6 cherry-pick");
         Path proof = Files.createTempDirectory("key-cli-acceptance-row8").resolve("closed.proof");
         Run prove = run("prove", "--proof", proof.toString(), "--choose-contract", ONE_NAME,
             Fixtures.indexKey().toString());
@@ -254,8 +225,6 @@ class AcceptanceMatrixTest {
     @Test
     @Timeout(900)
     void row9_replayPartialProof() throws IOException {
-        Assumptions.assumeTrue(proveSupports("--save-partial") && hasReplaySubcommand(),
-            "enabled after Phase 5/6 cherry-pick");
         Path proof = Files.createTempDirectory("key-cli-acceptance-row9").resolve("partial.proof");
         Run prove = run("prove", "--save-partial", "--proof", proof.toString(),
             "--choose-contract", TWO_NAME, Fixtures.indexKey().toString());
