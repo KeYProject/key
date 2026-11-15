@@ -36,8 +36,11 @@ import picocli.CommandLine.Spec;
 
 /**
  * The {@code prove} subcommand: loads one or more KeY problem files, proves the selected
- * contracts, and prints one {@code KEY_RESULT} line per contract as the last lines of stdout.
- * The process exit code reflects the worst contract status.
+ * contracts, and prints one {@code KEY_RESULT} line per contract. Each file's records are
+ * printed as soon as that file's contracts have finished, in file order and, within a file,
+ * selection order, so a run aborted by a later file leaves the completed files' records on
+ * stdout; for a completed run the records are the last lines of stdout. The process exit code
+ * reflects the worst contract status.
  * <p>
  * Contracts are selected by repeated {@code --choose-contract} selectors (a bare index,
  * {@code NAME.#<IDX>}, or an exact canonical name, §4.2); without selectors the load file's
@@ -213,8 +216,9 @@ public final class ProveCommand implements Callable<Integer> {
         }
         List<ContractResult> results = new ArrayList<>();
         for (Path file : files) {
+            List<ContractResult> fileResults;
             try {
-                results.addAll(prover.prove(file, chooseContract, output));
+                fileResults = prover.prove(file, chooseContract, output);
             } catch (UnknownContractException e) {
                 for (ContractIndex.Row row : e.index().list()) {
                     out.println(ContractIndex.renderLine(row));
@@ -239,15 +243,18 @@ public final class ProveCommand implements Callable<Integer> {
                 throw CliError.internal("internal error while processing '" + file + "': "
                     + errorMessage(e), e);
             }
+            results.addAll(fileResults);
+            // stream this file's records as soon as it finished: if a later file fails, the
+            // completed files' records are already on stdout (§2)
+            for (ContractResult result : fileResults) {
+                out.println(resultWriter.toJsonLine(result));
+            }
         }
         if (results.isEmpty()) {
             // §1: exit 0 means "one or more contracts, all closed"
             throw CliError.input("no contracts found in " + fileList());
         }
 
-        for (ContractResult result : results) {
-            out.println(resultWriter.toJsonLine(result));
-        }
         return ExitCode.worstOf(results).code();
     }
 

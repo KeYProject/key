@@ -67,8 +67,14 @@ Exact schema:
 | `smtProved` | int | goals proved via SMT (0 unless SMT enabled) |
 | `errorMessage` | string \| null | human-readable message; non-null iff `status=="error"` |
 
-- Multiple selected contracts produce **one line per contract**, in selection order; the `KEY_RESULT`
-  lines are the last N lines of stdout.
+- Multiple selected contracts produce **one line per contract**. Within one load file the lines
+  follow the selection order (§4.2); for a run over several load files, each file's
+  `KEY_RESULT` lines are printed as soon as that file's contracts have finished (in
+  command-line file order, then selection order within a file) and are never delayed until all
+  files completed. For a completed run the `KEY_RESULT` lines are the last N lines of stdout; a
+  run aborted by a file that cannot be loaded, or whose obligation cannot be created (§8),
+  leaves the completed files' lines on stdout, followed by that file's `error` record as the
+  last stdout line.
 - If no contract was selected (listing mode, §4), no `KEY_RESULT` line is printed.
 
 Acceptance B1: `bash -c '(printf "0\n" | java -jar key.jar --auto --timeout=30000 T.key) | tail -n 1'`
