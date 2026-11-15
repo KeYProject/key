@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
  * goals in the tree (pruning of closed branches is disabled by default) and therefore cannot rely
  * on {@link Proof#closedGoals()}, which stays empty in that case.
  */
-final class SmtCounters {
+public final class SmtCounters {
 
     private SmtCounters() {
     }
@@ -52,7 +52,7 @@ final class SmtCounters {
      * @param proof the finished proof
      * @return the SMT counters
      */
-    static Counts of(Proof proof) {
+    public static Counts of(Proof proof) {
         return count(proof.getStatistics().smtSolverApps, closingRuleAppsOfClosedGoals(proof));
     }
 

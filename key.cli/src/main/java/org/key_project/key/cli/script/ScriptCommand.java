@@ -22,8 +22,11 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.key.cli.CliError;
+import org.key_project.key.cli.ContractResult;
+import org.key_project.key.cli.ResultRecordWriter;
 import org.key_project.key.cli.prove.ContractIndex;
 import org.key_project.key.cli.prove.ContractSelector;
+import org.key_project.key.cli.prove.SmtCounters;
 import org.key_project.key.cli.prove.UnknownContractException;
 
 import org.jspecify.annotations.Nullable;
@@ -41,8 +44,10 @@ import picocli.CommandLine.Spec;
  * {@code apply <rule-name> [at <position-path>] [for <term>]}, {@code auto [<limit>]},
  * {@code assert-closed} or {@code print-open-goals}. Empty lines and lines starting with
  * {@code #} are ignored. Each executed line is acknowledged as {@code SCRIPT OK <line>} or
- * {@code SCRIPT FAIL <line> <reason>}, and the last line of stdout is
- * {@code SCRIPT FINAL closed} (exit {@code 0}) or {@code SCRIPT FINAL open <n>} (exit {@code 1}).
+ * {@code SCRIPT FAIL <line> <reason>}, the second-to-last line of stdout is
+ * {@code SCRIPT FINAL closed} or {@code SCRIPT FINAL open <n>}, and the last line is exactly one
+ * §2 {@code KEY_RESULT} record carrying the outcome of the run (exit {@code 0} closed, {@code 1}
+ * open, {@code 2} timed out).
  * <p>
  * The obligation is chosen by §4: repeated {@code --choose-contract} selectors, otherwise the load
  * file's {@code \chooseContract}/{@code \proofObligation} directive, otherwise all contracts of
@@ -70,7 +75,8 @@ public final class ScriptCommand implements Callable<Integer> {
     private Path scriptFile;
 
     @Option(names = "--timeout", paramLabel = "<MS>", defaultValue = "0",
-        description = "Per-command proof-search timeout in milliseconds (0 = no timeout).")
+        description = "Per-command proof-search timeout in milliseconds (0 = no timeout). "
+            + "A command cut short by the timeout fails and the run exits 2.")
     private long timeout;
 
     @Option(names = "--choose-contract", paramLabel = "<SELECTOR>",
@@ -79,11 +85,15 @@ public final class ScriptCommand implements Callable<Integer> {
             + "contract.")
     private List<String> chooseContract = List.of();
 
+    private final ResultRecordWriter resultWriter = new ResultRecordWriter();
+
     /**
-     * Loads the problem, selects the obligation, executes the script and returns its exit code.
+     * Loads the problem, selects the obligation, executes the script, prints the §2 result
+     * record and returns the exit code.
      *
-     * @return {@code 0} if the proof is closed at the end of the script, {@code 1} if goals remain
-     *         open
+     * @return the §1 exit code: {@code 0} if the proof is closed at the end of the script,
+     *         {@code 2} if the proof search was abandoned because of the timeout, {@code 1} if
+     *         goals remain open
      * @throws CliError an input error (negative timeout, missing file, unknown or ambiguous
      *         contract, unreadable script, unloadable problem) or an internal error (§1)
      */
@@ -105,7 +115,9 @@ public final class ScriptCommand implements Callable<Integer> {
                 try {
                     ScriptInterpreter interpreter =
                         new ScriptInterpreter(proof, environment.getUi(), timeout, out);
-                    return interpreter.execute(lines);
+                    int exit = interpreter.execute(lines);
+                    printResult(out, contract, proof, interpreter);
+                    return exit;
                 } finally {
                     if (!proof.isDisposed()) {
                         proof.dispose();
@@ -124,6 +136,26 @@ public final class ScriptCommand implements Callable<Integer> {
             throw CliError.internal("internal error while running the script: "
                 + errorMessage(e), e);
         }
+    }
+
+    /**
+     * Prints the §2 {@code KEY_RESULT} record of the run as the last stdout line. The record is
+     * built while the proof is still alive, because the open-goal count and the SMT counters read
+     * the proof tree.
+     *
+     * @param out the writer that receives the record
+     * @param contract the obligation the script ran against
+     * @param proof the finished proof, not yet disposed
+     * @param interpreter the interpreter that executed the script
+     */
+    private void printResult(PrintWriter out, Contract contract, Proof proof,
+            ScriptInterpreter interpreter) {
+        SmtCounters.Counts smt = SmtCounters.of(proof);
+        ContractResult result = new ContractResult(contract.getName(), interpreter.status(),
+            proof.openGoals().size(), interpreter.elapsedMs(), null, smt.smtCalls(),
+            smt.smtProved(), null);
+        out.println(resultWriter.toJsonLine(result));
+        out.flush();
     }
 
     private static void requireFile(Path file) throws CliError {
