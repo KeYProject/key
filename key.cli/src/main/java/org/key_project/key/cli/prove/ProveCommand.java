@@ -226,7 +226,7 @@ public final class ProveCommand implements Callable<Integer> {
                 out.flush();
                 throw CliError.input("contract '" + e.selector() + "' not found");
             } catch (ProofOutputConflictException e) {
-                throw CliError.input(errorMessage(e));
+                throw CliError.input(CliError.errorMessage(e));
             } catch (ObligationCreationException e) {
                 // input error (§1 exit 3): the failed contract is reported as an error record
                 out.println(resultWriter.toJsonLine(e.record()));
@@ -241,7 +241,7 @@ public final class ProveCommand implements Callable<Integer> {
                 throw e;
             } catch (RuntimeException e) {
                 throw CliError.internal("internal error while processing '" + file + "': "
-                    + errorMessage(e), e);
+                    + CliError.errorMessage(e), e);
             }
             results.addAll(fileResults);
             // stream this file's records as soon as it finished: if a later file fails, the
@@ -265,10 +265,6 @@ public final class ProveCommand implements Callable<Integer> {
      */
     private String fileList() {
         return String.join(", ", files.stream().map(Path::toString).toList());
-    }
-
-    private static String errorMessage(Exception e) {
-        return e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
     }
 
     /**
