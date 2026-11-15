@@ -112,7 +112,8 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
   - **§21 committed-proof replay drift (1)**: `reload_examples`
     (`heap/permutedSum/perm.proof`, tracked; loads but 6 replay errors:
     stored rule position no longer fits + `One Step Simplification`
-    reconstruction).
+    reconstruction) — **fixed 2026-11-15** by re-recording the proof
+    (`bfa9004580`).
   - **proofs that no longer close — spec/sequent-shape drift (14)**:
     `newBook` (ArrayList.add/remFirst), `comprehensions` (sum0–3, segsum —
     §5 family), `blockContracts` (Simple__addAbsoluteValues), `list_ghost`
@@ -218,6 +219,11 @@ the rebase handles them:
   `JmlClauseKeyword.ASSIGNABLE_FREE`, so §20 is **fixed**: KeY handles
   `ASSIGNABLE_FREE` on method and loop contracts. Re-tested `javadl`:
   all `jml-free` files load; only the known `for_*` doesn't-close drift remains.
+- [x] **§21 fixed** (`bfa9004580`): `heap/permutedSum/perm.proof` was
+  re-recorded under the JMLtk front-end. Rechecked in isolation:
+  `KeYEnvironment.load(perm.proof).getReplayResult()` → `Proof replayed
+  successfully.`, **0 errors** (was 6: stored positions / One Step
+  Simplification). The `reload_examples` group is green.
 - [x] **Gap-status corrections (2026-11-15):** §17 root-caused and fixed
   (`JmlFacade.positionedString` forwards the JMLtk node's URI+line to every
   re-parse); §19's original behavior verified (pre-takeover `_redundantly` was
@@ -253,6 +259,7 @@ they do **not** run in the CI key.core job). No new reds vs. the recorded baseli
 | §20 `assignable_free` — `gen._javadl#test{ensuresFree,loopInvFree}` | 2 | **fixed** 2026-11-15 (jmltk build 4 adds `ASSIGNABLE_FREE`; KeY maps it on method/loop contracts — JMLTK_GAPS §20) |
 | §18 quicksort load — `gen._quicksort` | 5 | **fixed** 2026-11-15 (jmltk snapshot `1.2.1-20261115.031329-3` + KeY proof-serializer; JMLTK_GAPS §18) |
 | §17 origin file/line / save→reload — `gen._list_seq#SimplifiedLinkedList.remove`, `gen._other`, `gen._reload_examples` | 3 | **fixed** 2026-11-15 (position propagation via `JmlFacade.positionedString`; legacy `[no file]` stays parseable; JMLTK_GAPS §17) |
+| §21 `perm.proof` replay — `gen._reload_examples` | 1 | **fixed** 2026-11-15 (`perm.proof` re-recorded under the JMLtk front-end, `bfa9004580`; replay 0 errors — JMLTK_GAPS §21) |
 | OOM `Java heap space` — `gen._performance` ×7, `gen._performancePOConstruction` ×3, `ConcurrentMatchingStressTest#prop_split`, `gen._updateSimplificationPerformance` | 12 | environmental: one shared 4g worker across the whole suite; passes with a fresh worker / CI memory |
 | doesn't-close drift — `gen._WeideEtAl#AddAndMultiply_add`, `gen._javaCard` ×3, `gen._javadl#testfor_{Array,Iterable,ReferenceArray}` | 7 | **A/B-verified pre-existing at `cfece36950`** (identical failures in a pristine worktree without the uncommitted fix); `gen._blockContracts#Simple__addAbsoluteValues` was §11 and is **fixed** by `acbe6aa3d2` |
 | `JMLParserExceptionTest` ×2 | 2 | **fixed** 2026-11-15 (targeted snapshot messages, see §6); §11 MT also fixed (`acbe6aa3d2`) — key.core reds 0 |

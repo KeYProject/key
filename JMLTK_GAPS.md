@@ -94,7 +94,7 @@ JMLtk front-end shipped in PR #3997.
 | 18 | DL-typed ghost locals with initializer | `//@ ghost \seq x = \dl_array2seq(a);` | `key.ui/examples/heap/quicksort/{sort,split}{,-jmlscript}.key` | ✔ RESOLVED (2026-11-15, jmltk PR #99 / snapshot `1.2.1-20261115.031329-3`; `MtScriptStressTest` 2/2 — see §18) |
 | 19 | `ensures_redundantly` clause kind | `@ ensures_redundantly e;` | `key.ui/examples/heap/SmansEtAl/src/Iterator.java:11` | ✔ RESOLVED (2026-11-15: translated exactly like `ensures`, matching the pre-takeover lexer where `_redundantly` was part of the token — see §19) |
 | 20 | `assignable_free` clause body | `@ assignable_free \nothing;` / `@ assignable_free field;` | `key.ui/examples/standard_key/java_dl/jml-free/{AssignableFree,AssignableLoopFree}.java` | ✔ RESOLVED (2026-11-15, jmltk build 4 adds `ASSIGNABLE_FREE`; KeY maps it on method and loop contracts — see §20) |
-| 21 | committed `.proof` replay drift | `heap/permutedSum/perm.proof` | the tracked proof (155 tracked `.proof` files total; this one fails) | ✘ OPEN (replay errors: rule position no longer fits, built-in reconstruction fails) |
+| 21 | committed `.proof` replay drift | `heap/permutedSum/perm.proof` | the tracked proof (155 tracked `.proof` files total) | ✔ RESOLVED (2026-11-15: re-recorded under the JMLtk front-end, `bfa9004580`; replay 0 errors — see §21) |
 
 ---
 
@@ -728,12 +728,17 @@ Both forms are parsed:
   clause grammar/`JmlClauseKeyword` (mirrors `assignable`); KeY translates the
   new `ASSIGNABLE_FREE` kind on method and loop contracts.
 
-## 21. committed `perm.proof` no longer replays  — ✘ OPEN (replay drift)
+## 21. committed `perm.proof` no longer replays  — ✔ RESOLVED (2026-11-15, re-recorded)
 
 - Fixture: `key.ui/examples/heap/permutedSum/perm.proof` (tracked; 1 of the
   155 tracked `.proof` files under `key.ui/examples`), group
   `reload_examples` (`TestProperty.LOADABLE`).
-- **Symptom:** the proof **loads** (environment-level load succeeds) but the
+- **RESOLVED (2026-11-15):** `perm.proof` was re-recorded under the JMLtk
+  front-end (`bfa9004580`). Rechecked in isolation:
+  `KeYEnvironment.load(perm.proof).getReplayResult()` reports status
+  `Proof replayed successfully.` with **0 errors**, and the RunAll
+  `reload_examples` group is green.
+- **Historical symptom:** the proof **loads** (environment-level load succeeds) but the
   recorded replay reports **6 errors** → `replayResult.hasErrors()` → group
   fails. Error mix (reproduced locally at branch tip):
   - `IntermediateProofReplayer$TacletAppConstructionException: Could not
