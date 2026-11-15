@@ -19,6 +19,8 @@ import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.scripts.ScriptException;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.key_project.key.cli.ExitCode;
+import org.key_project.key.cli.ResultStatus;
 import org.key_project.key.cli.prove.OpenGoalPrinter;
 import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.util.collection.ImmutableList;
@@ -52,6 +54,11 @@ import org.slf4j.LoggerFactory;
  * The {@code print-open-goals} command prints the §6 layout
  * ({@code OPEN-GOAL-COUNT <N>} followed by {@code GOAL <id> <position-path>} blocks) through
  * {@link OpenGoalPrinter}, the same renderer {@code prove --print-open-goals} uses.
+ * <p>
+ * With a per-command timeout ({@code --timeout}), a strategy command that the timeout cuts short
+ * before the proof is closed fails as {@code SCRIPT FAIL <line> timed out after <ms> ms}, and
+ * {@link #finish()} then returns exit code {@code 2} (§1: abandoned due to timeout, no decision)
+ * while still printing {@code SCRIPT FINAL open <n>}.
  */
 public final class ScriptInterpreter {
 
@@ -77,7 +84,7 @@ public final class ScriptInterpreter {
      * exists only in the trivial proof state where it is also the only goal, so {@code 1} can
      * never denote a child node at the same time.
      */
-    private static final String ROOT_POSITION = "1";
+    private static final String ROOT_POSITION = OpenGoalPrinter.ROOT_POSITION;
 
     private static final String POSITION_PATTERN = "[1-9][0-9]*(\\.[1-9][0-9]*)*";
 
@@ -100,6 +107,8 @@ public final class ScriptInterpreter {
     private int appliedRuleApplications;
 
     private long elapsedMs;
+
+    private boolean timedOut;
 
     /**
      * Creates an interpreter for the given proof.
@@ -127,7 +136,8 @@ public final class ScriptInterpreter {
      * Executes the given script lines in order and prints the final marker.
      *
      * @param lines the script source, one entry per line
-     * @return {@code 0} if the proof is closed at the end, {@code 1} otherwise
+     * @return the §1 exit code: {@code 0} if the proof is closed at the end, {@code 2} if it was
+     *         abandoned because of the timeout, {@code 1} otherwise
      */
     public int execute(List<String> lines) {
         for (String line : lines) {
@@ -168,14 +178,31 @@ public final class ScriptInterpreter {
     /**
      * Prints the final marker for the current proof state and returns the exit code.
      *
-     * @return {@code 0} if the proof is closed, {@code 1} if goals remain open
+     * @return the §1 exit code: {@code 0} if the proof is closed, {@code 2} if the search timed
+     *         out without closing the proof, {@code 1} if goals remain open
      */
     public int finish() {
         int openGoals = proof.openGoals().size();
         boolean closed = proof.closed() || openGoals == 0;
         out.println(closed ? FINAL_CLOSED : FINAL_OPEN_PREFIX + openGoals);
         out.flush();
-        return closed ? 0 : 1;
+        return ExitCode.fromStatus(status()).code();
+    }
+
+    /**
+     * Returns the final outcome of the script as classified by §1 of the headless interface spec:
+     * {@link ResultStatus#CLOSED} if no goal remains open, otherwise
+     * {@link ResultStatus#TIMED_OUT} if a strategy command was cut short by the timeout and
+     * {@link ResultStatus#OPEN} if the search stopped for any other reason (for example the
+     * maximal number of rule applications).
+     *
+     * @return the status for the §2 {@code KEY_RESULT} record and the §1 exit code
+     */
+    public ResultStatus status() {
+        if (proof.closed() || proof.openGoals().isEmpty()) {
+            return ResultStatus.CLOSED;
+        }
+        return timedOut ? ResultStatus.TIMED_OUT : ResultStatus.OPEN;
     }
 
     /**
@@ -314,6 +341,10 @@ public final class ScriptInterpreter {
         elapsedMs += info.getTime();
         if (selectedGoal != null && selectedGoal.node().isClosed()) {
             selectedGoal = null;
+        }
+        if (timeoutMs > 0 && !proof.closed() && info.getTime() >= timeoutMs) {
+            timedOut = true;
+            throw new ScriptException("timed out after " + info.getTime() + " ms");
         }
     }
 

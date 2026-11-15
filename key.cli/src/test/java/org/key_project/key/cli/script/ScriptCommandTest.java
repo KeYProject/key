@@ -127,6 +127,18 @@ class ScriptCommandTest {
     }
 
     @Test
+    @Timeout(300)
+    void timeoutFailsTheStrategyLineAndExitsTimedOut() throws IOException {
+        Path script = script("auto 100000");
+
+        Run run = run("script", "--timeout", "50", sizeKey(), script.toString());
+
+        assertThat(run.exit()).isEqualTo(2);
+        assertThat(run.out()).contains("SCRIPT FAIL auto 100000 timed out after");
+        assertThat(run.out()).contains("SCRIPT FINAL open ");
+    }
+
+    @Test
     @Timeout(600)
     void missingScriptFileExitsWithInputError() {
         Run run = run("script", sizeKey(), tempDir.resolve("does-not-exist.script").toString());
