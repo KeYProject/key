@@ -167,7 +167,9 @@ public final class Main implements Callable<Integer> {
      */
     static int handleExecutionException(Exception ex, PrintWriter err) {
         if (ex instanceof CliError cliError) {
-            err.println("KEY_ERROR " + CliError.oneLine(cliError.getMessage()));
+            String message = cliError.getMessage();
+            String line = message != null ? message : cliError.getClass().getSimpleName();
+            err.println("KEY_ERROR " + CliError.oneLine(line));
             return cliError.kind().exitCode().code();
         }
         String message =
