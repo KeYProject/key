@@ -36,10 +36,14 @@ exit is `4`.
 
 ## 2. Result record (`KEY_RESULT`)
 
-In any proving subcommand, one line per proven contract is written to **stdout**, and the
-`KEY_RESULT` lines are the **last N lines** of stdout (no other line of stdout may start with
-the prefix). The line is the literal 11-character prefix `KEY_RESULT ` followed by a single
-JSON object, terminated by `\n`:
+In any proving subcommand, one line per proven contract is written to **stdout** (no other line
+of stdout may start with the prefix). `prove` prints each file's records as soon as that file's
+contracts have finished — command-line file order, then selection order within a file — so a run
+aborted by a file that cannot be loaded, or whose obligation cannot be created (§8), leaves the
+completed files' records on stdout, followed by that file's `error` record as the last stdout
+line; for a completed run the `KEY_RESULT` lines are the **last N lines** of stdout. The line is
+the literal 11-character prefix `KEY_RESULT ` followed by a single JSON object, terminated by
+`\n`:
 
 ```
 KEY_RESULT {"version":1,"contract":"edu.kit.quickheap.QuickHeap[edu.kit.quickheap.QuickHeap::partition([I,int,int,[I)].JML normal_behavior operation contract.0","status":"closed","openGoals":0,"elapsedMs":1234,"proofFile":null,"smtCalls":0,"smtProved":0,"errorMessage":null}
