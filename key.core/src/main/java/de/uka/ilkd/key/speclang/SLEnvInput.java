@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaService;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
@@ -166,14 +167,49 @@ public final class SLEnvInput extends AbstractEnvInput {
         }
     }
 
+    /**
+     * Collects the blocks that are the (possibly label-chained) direct body of a labeled
+     * statement. Their contracts must be extracted with the label list, because the labels
+     * determine the break/continue flags; {@link #addLabeledBlockContracts} and
+     * {@link #addLabeledLoopContracts} handle those blocks.
+     *
+     * @param pm the method whose body is searched.
+     * @return the directly labeled blocks.
+     */
+    private static Set<StatementBlock> directlyLabeledBlocks(final IProgramMethod pm) {
+        final JavaASTCollector labeledCollector =
+            new JavaASTCollector(pm.getBody(), LabeledStatement.class);
+        labeledCollector.start();
+        // StatementBlock.equals is structural, so use identity here: two distinct blocks with
+        // equal bodies must not be conflated.
+        final Set<StatementBlock> result =
+            Collections.newSetFromMap(new IdentityHashMap<>());
+        for (ProgramElement labeled : labeledCollector.getNodes()) {
+            Statement body = ((LabeledStatement) labeled).getBody();
+            while (body instanceof LabeledStatement current) {
+                body = current.getBody();
+            }
+            if (body instanceof StatementBlock block) {
+                result.add(block);
+            }
+        }
+        return result;
+    }
+
     private void addBlockAndLoopContracts(SpecExtractor specExtractor,
             final ContractRegistry specRepos, final IProgramMethod pm)
             throws ProofInputException {
         // Block and loop contracts.
+        final Set<StatementBlock> labeledBlocks = directlyLabeledBlocks(pm);
         final JavaASTCollector blockCollector =
             new JavaASTCollector(pm.getBody(), StatementBlock.class);
         blockCollector.start();
         for (ProgramElement block : blockCollector.getNodes()) {
+            if (labeledBlocks.contains(block)) {
+                // Extracted by addLabeledBlockContracts/addLabeledLoopContracts with the label
+                // list; extracting it here as well would attach a second, unlabeled contract.
+                continue;
+            }
             final ImmutableSet<BlockContract> blockContracts =
                 specExtractor.extractBlockContracts(pm, (StatementBlock) block);
 
