@@ -15,6 +15,9 @@ dependencies {
 
     // logging implementation used by slf4j
     implementation(libs.logback.classic)
+
+    // SMT solver settings shared with the key.core SMT tests (SMTTestSettings)
+    testImplementation(testFixtures(project(":key.core")))
 }
 
 application {
