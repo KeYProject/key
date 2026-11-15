@@ -268,6 +268,7 @@ All Must-fail conditions print, on stderr, a line starting with the literal `KEY
 
 - `KEY_ERROR <file>:<line>:<col>: construct '<SNIPPET>' not supported: <REASON>` — construct/parse problems, exit `3`.
 - `KEY_WARN <message>` — non-fatal, exit per §1.
+- An input error that fails after the run has started — a file that exists but cannot be loaded, or a selected obligation KeY cannot turn into a proof (`ProofInputException`) — exits `3` and, before the `KEY_ERROR` line, prints one §2 `KEY_RESULT` record with `"status":"error"` and a non-`null` `errorMessage` (the `contract` field carries the file name or the canonical contract name), identically in `prove` and `script`. The run aborts: no further contracts are proven.
 
 Inputs that MUST produce `KEY_ERROR` (not an NPE) with `<SNIPPET>` filled:
 1. `assignable bucketData[*][*];` → snippet `bucketData[*][*]`.

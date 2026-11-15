@@ -20,7 +20,6 @@ import org.key_project.key.cli.CliError;
 import org.key_project.key.cli.ContractResult;
 import org.key_project.key.cli.ExitCode;
 import org.key_project.key.cli.ResultRecordWriter;
-import org.key_project.key.cli.ResultStatus;
 import org.key_project.key.cli.settings.CliSettingsException;
 import org.key_project.key.cli.settings.HeadlessRunnerSettings;
 
@@ -76,11 +75,13 @@ import picocli.CommandLine.Spec;
  * {@code --print-open-goals=<MAX>} is also accepted and must be an integer.
  * <p>
  * Errors follow §1 of the headless interface spec and are reported as {@link CliError}s: input
- * errors (negative timeout, missing file, unknown contract, unloadable file, no contracts found,
- * unwritable proof file) exit {@code 3}, and unexpected exceptions while processing a file exit
- * {@code 4}. A file that exists but cannot be loaded additionally produces one error record (with
- * the file name as its {@code contract} and a non-{@code null} {@code errorMessage}) before the
- * {@code KEY_ERROR} line is printed. A run that selects no contract at all is an input error,
+ * errors (negative timeout, missing file, unknown contract, unloadable file, an obligation that
+ * cannot be created, no contracts found, unwritable proof file) exit {@code 3}, and unexpected
+ * exceptions while processing a file exit {@code 4}. A file that exists but cannot be loaded — or
+ * a contract whose proof obligation cannot be created — additionally produces one error record
+ * (with the file name or the contract name as its {@code contract} and a non-{@code null}
+ * {@code errorMessage}) before the {@code KEY_ERROR} line is printed, and the run aborts: the
+ * remaining contracts are not proven. A run that selects no contract at all is an input error,
  * since §1 reserves exit {@code 0} for a run with at least one contract, all closed.
  */
 @Command(name = "prove", description = "Prove the contracts of the given KeY problem file(s).",
@@ -222,9 +223,13 @@ public final class ProveCommand implements Callable<Integer> {
                 throw CliError.input("contract '" + e.selector() + "' not found");
             } catch (ProofOutputConflictException e) {
                 throw CliError.input(errorMessage(e));
+            } catch (ObligationCreationException e) {
+                // input error (§1 exit 3): the failed contract is reported as an error record
+                out.println(resultWriter.toJsonLine(e.record()));
+                out.flush();
+                throw e.cliError();
             } catch (ProblemLoaderException e) {
-                ContractResult failure = loadFailureResult(file, e);
-                out.println(resultWriter.toJsonLine(failure));
+                out.println(resultWriter.toJsonLine(CliError.loadFailureRecord(file, e)));
                 out.flush();
                 throw CliError.loadFailure(file, e);
             } catch (CliError e) {
@@ -253,20 +258,6 @@ public final class ProveCommand implements Callable<Integer> {
      */
     private String fileList() {
         return String.join(", ", files.stream().map(Path::toString).toList());
-    }
-
-    /**
-     * Creates the error record reported for a file that could not be loaded: the record's
-     * {@code contract} field names the failed input file, and its {@code errorMessage} carries
-     * the loader's failure message.
-     *
-     * @param file the file that could not be loaded
-     * @param failure the loader exception
-     * @return the error record for the failed file
-     */
-    private static ContractResult loadFailureResult(Path file, ProblemLoaderException failure) {
-        return new ContractResult(file.toString(), ResultStatus.ERROR, 0, 0, null, 0, 0,
-            CliError.loadFailureMessage(file, failure));
     }
 
     private static String errorMessage(Exception e) {

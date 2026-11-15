@@ -16,7 +16,6 @@ import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
@@ -26,6 +25,8 @@ import org.key_project.key.cli.ContractResult;
 import org.key_project.key.cli.ResultRecordWriter;
 import org.key_project.key.cli.prove.ContractIndex;
 import org.key_project.key.cli.prove.ContractSelector;
+import org.key_project.key.cli.prove.HeadlessProver;
+import org.key_project.key.cli.prove.ObligationCreationException;
 import org.key_project.key.cli.prove.SmtCounters;
 import org.key_project.key.cli.prove.UnknownContractException;
 import org.key_project.key.cli.settings.CliSettingsException;
@@ -55,6 +56,12 @@ import picocli.CommandLine.Spec;
  * file's {@code \chooseContract}/{@code \proofObligation} directive, otherwise all contracts of
  * the problem. A script can only be applied to a single obligation, so a selection that does not
  * resolve to exactly one contract is an input error (exit {@code 3}).
+ * <p>
+ * A load file that exists but cannot be loaded, or a selected obligation whose proof cannot be
+ * created ({@link org.key_project.key.cli.prove.ObligationCreationException}), is an input error
+ * (exit {@code 3}) reported the same way as by {@code prove}: one {@code "status":"error"} record
+ * (with the file name or the contract name as its {@code contract} and a non-{@code null}
+ * {@code errorMessage}) as the last stdout line, then the {@code KEY_ERROR} line on stderr.
  * <p>
  * {@code --timeout <MS>} bounds each strategy command ({@code proceed}/{@code auto}) of the
  * script.
@@ -136,7 +143,7 @@ public final class ScriptCommand implements Callable<Integer> {
             try {
                 validateSettings(runnerSettings);
                 Contract contract = selectSingleObligation(environment);
-                Proof proof = createProof(environment, contract);
+                Proof proof = HeadlessProver.createProof(environment, contract);
                 try {
                     ScriptInterpreter interpreter =
                         new ScriptInterpreter(contract, proof, environment.getUi(), timeout, out);
@@ -153,7 +160,14 @@ public final class ScriptCommand implements Callable<Integer> {
             }
         } catch (UnknownContractException e) {
             throw CliError.input(errorMessage(e));
+        } catch (ObligationCreationException e) {
+            // input error (§1 exit 3): the failed obligation is reported as an error record
+            out.println(resultWriter.toJsonLine(e.record()));
+            out.flush();
+            throw e.cliError();
         } catch (ProblemLoaderException e) {
+            out.println(resultWriter.toJsonLine(CliError.loadFailureRecord(loadFile, e)));
+            out.flush();
             throw CliError.loadFailure(loadFile, e);
         } catch (CliError e) {
             throw e;
@@ -221,25 +235,6 @@ public final class ScriptCommand implements Callable<Integer> {
     private static void requireFile(Path file) throws CliError {
         if (!Files.exists(file)) {
             throw CliError.input("file not found: " + file);
-        }
-    }
-
-    /**
-     * Creates the proof of the selected obligation.
-     *
-     * @param environment the loaded environment
-     * @param contract the selected obligation
-     * @return the proof to execute the script against
-     * @throws CliError if the proof obligation cannot be created (input error)
-     */
-    private static Proof createProof(KeYEnvironment<?> environment, Contract contract)
-            throws CliError {
-        try {
-            ContractPO obligation = contract.createProofObl(environment.getInitConfig());
-            return environment.createProof(obligation);
-        } catch (ProofInputException e) {
-            throw CliError.input("cannot create the proof obligation for '" + contract.getName()
-                + "': " + errorMessage(e));
         }
     }
 

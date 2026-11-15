@@ -161,6 +161,24 @@ class ScriptCommandTest {
 
     @Test
     @Timeout(600)
+    void corruptLoadFileIsAnInputErrorWithKeyErrorAndErrorRecord() throws IOException {
+        Path script = script("# the load file cannot be parsed");
+        Run run = run("script", Fixtures.corruptKey().toString(), script.toString());
+
+        assertThat(run.exit()).isEqualTo(3);
+        assertThat(run.err()).contains("KEY_ERROR");
+        assertThat(run.out()).doesNotContain("SCRIPT");
+        // the failed file is reported as an error record, like `prove` does
+        List<String> records = resultRecords(run.out());
+        assertThat(records).as("stdout: %s", run.out()).hasSize(1);
+        assertThat(lastLine(run.out())).isEqualTo(records.get(0));
+        assertThat(records.get(0)).contains("\"status\":\"error\"")
+                .contains("corrupt")
+                .containsPattern("\"errorMessage\":\"[^\"]+\"");
+    }
+
+    @Test
+    @Timeout(600)
     void scriptRequiresExactlyOneSelectedObligation() throws IOException {
         // index.key has two contracts; without a selector the script obligation is ambiguous
         Path script = script("# no commands");
