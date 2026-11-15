@@ -18,6 +18,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
+import org.key_project.key.cli.CliError;
 import org.key_project.key.cli.ExitCode;
 
 import org.slf4j.Logger;
@@ -190,7 +191,7 @@ public final class ReplayCommand implements Callable<Integer> {
         List<Throwable> errors = result.getErrorList();
         if (errors != null && !errors.isEmpty()) {
             Throwable first = errors.get(0);
-            return oneLine("proof replay failed: "
+            return CliError.oneLine("proof replay failed: "
                 + (first.getMessage() != null ? first.getMessage()
                         : first.getClass()
                                 .getSimpleName()));
@@ -199,17 +200,8 @@ public final class ReplayCommand implements Callable<Integer> {
     }
 
     private static String errorMessage(Exception e) {
-        return oneLine(e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
-    }
-
-    /**
-     * The protocol prints exactly one line, so any newlines in the reason are flattened.
-     *
-     * @param message the raw reason
-     * @return the reason as a single line
-     */
-    private static String oneLine(String message) {
-        return message.replaceAll("[\\r\\n]+", " ").trim();
+        return CliError
+                .oneLine(e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
     }
 
     /**

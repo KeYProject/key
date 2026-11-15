@@ -50,6 +50,19 @@ class ProveCommandErrorTest {
 
     @Test
     @Timeout(120)
+    void javaSyntaxErrorReportsTheParsePosition() {
+        Run run = run("prove", Fixtures.syntaxErrorJava().toString());
+
+        assertThat(run.exit()).isEqualTo(3);
+        // the loader summary ("Load failed") must not hide the parser's file:line:col reason
+        assertThat(run.err()).contains("KEY_ERROR");
+        assertThat(run.err()).containsPattern("Bad\\.java:2[/:]\\d+");
+        assertThat(run.resultLines()).hasSize(1);
+        assertThat(run.resultLines().get(0)).containsPattern("Bad\\.java:2[/:]\\d+");
+    }
+
+    @Test
+    @Timeout(120)
     void unknownOptionIsAnInputError() {
         Run run = run("prove", Fixtures.indexKey().toString(), "--definitely-not-an-option");
 

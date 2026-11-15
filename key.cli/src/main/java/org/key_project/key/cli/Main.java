@@ -158,7 +158,8 @@ public final class Main implements Callable<Integer> {
      * Prints a {@code KEY_ERROR} line for the given execution-time exception and returns the
      * process exit code (§1): a {@link CliError} is reported with the message and the exit code
      * of its kind ({@code 3} for input errors, {@code 4} for internal errors); any other
-     * exception is an internal error with exit code {@code 4}.
+     * exception is an internal error with exit code {@code 4}. The message is flattened to a
+     * single line because consumers read the protocol line by line (§2).
      *
      * @param ex the exception thrown by the invoked command
      * @param err the writer the {@code KEY_ERROR} line is printed to (stderr)
@@ -166,11 +167,12 @@ public final class Main implements Callable<Integer> {
      */
     static int handleExecutionException(Exception ex, PrintWriter err) {
         if (ex instanceof CliError cliError) {
-            err.println("KEY_ERROR " + cliError.getMessage());
+            err.println("KEY_ERROR " + CliError.oneLine(cliError.getMessage()));
             return cliError.kind().exitCode().code();
         }
-        String message = ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName();
-        err.println("KEY_ERROR internal error: " + message);
+        String message =
+            ex.getMessage() != null ? ex.getMessage() : ex.getClass().getSimpleName();
+        err.println("KEY_ERROR internal error: " + CliError.oneLine(message));
         return ExitCode.INTERNAL_ERROR.code();
     }
 }

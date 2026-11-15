@@ -19,6 +19,7 @@ import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.scripts.ScriptException;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.key_project.key.cli.CliError;
 import org.key_project.key.cli.ExitCode;
 import org.key_project.key.cli.ResultStatus;
 import org.key_project.key.cli.prove.OpenGoalPrinter;
@@ -417,6 +418,7 @@ public final class ScriptInterpreter {
 
     private static String reason(Exception e) {
         String message = e.getMessage();
-        return message != null && !message.isBlank() ? message : e.getClass().getSimpleName();
+        return message != null && !message.isBlank() ? CliError.oneLine(message)
+                : e.getClass().getSimpleName();
     }
 }

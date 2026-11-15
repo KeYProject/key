@@ -126,16 +126,15 @@ public final class CliError extends RuntimeException {
         if (constructError != null) {
             return input(constructError.formattedMessage(), constructError);
         }
-        String message = "cannot load '" + file + "': "
-            + (cause.getMessage() != null ? cause.getMessage()
-                    : cause.getClass().getSimpleName());
+        String message = "cannot load '" + file + "': " + loadFailureReason(cause);
         return isInternalCause(cause) ? internal(message, cause) : input(message, cause);
     }
 
     /**
      * Returns the message reported for a failure to load a problem file: the structured
      * construct diagnostic (see {@link #loadFailure(Path, Throwable)}) when the cause chain
-     * carries a {@link ConstructNotSupportedException}, and the loader summary otherwise.
+     * carries a {@link ConstructNotSupportedException}, and the most informative available
+     * reason otherwise (see {@link #loadFailureReason(Throwable)}).
      *
      * @param file the problem file that could not be loaded
      * @param cause the loader exception
@@ -147,8 +146,43 @@ public final class CliError extends RuntimeException {
         if (constructError != null) {
             return constructError.formattedMessage();
         }
-        return "cannot load '" + file + "': "
-            + (cause.getMessage() != null ? cause.getMessage() : cause.getClass().getSimpleName());
+        return "cannot load '" + file + "': " + loadFailureReason(cause);
+    }
+
+    /**
+     * Selects the most informative single-line reason from a loader exception's cause chain.
+     * <p>
+     * The loader's own message is a constant summary (currently {@code "Load failed"}), while the
+     * actionable diagnostic — often with file, line and column — is carried by a deeper cause.
+     * This method therefore prefers the first non-blank message that differs from the top-level
+     * one, falls back to the top-level message, and finally to the exception's simple class name.
+     * Newlines are collapsed because the result is emitted on a line-oriented protocol.
+     *
+     * @param cause the loader exception
+     * @return the flattened reason
+     */
+    private static String loadFailureReason(Throwable cause) {
+        String summary = cause.getMessage();
+        Set<Throwable> seen = Collections.newSetFromMap(new IdentityHashMap<>());
+        for (Throwable c = cause; c != null && seen.add(c); c = c.getCause()) {
+            String message = c.getMessage();
+            if (message != null && !message.isBlank() && !message.equals(summary)) {
+                return oneLine(message);
+            }
+        }
+        return summary != null && !summary.isBlank() ? oneLine(summary)
+                : cause.getClass().getSimpleName();
+    }
+
+    /**
+     * Collapses a possibly multi-line message into a single line with collapsed whitespace, as
+     * required by the line-oriented protocol (§2 of the headless interface spec).
+     *
+     * @param message the message to flatten
+     * @return the message without line breaks or leading/trailing whitespace
+     */
+    public static String oneLine(String message) {
+        return message.strip().replaceAll("\\s+", " ");
     }
 
     /**
