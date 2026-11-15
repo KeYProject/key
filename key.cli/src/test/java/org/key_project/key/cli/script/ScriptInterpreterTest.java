@@ -6,6 +6,7 @@ package org.key_project.key.cli.script;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -49,6 +50,29 @@ class ScriptInterpreterTest {
 
                 assertThat(interpreter.appliedRuleApplications()).isBetween(1, 5);
                 assertThat(proof.closed()).isFalse();
+            } finally {
+                proof.dispose();
+            }
+        }
+    }
+
+    @Test
+    @Timeout(600)
+    void printOpenGoalsOnFreshProofPrintsTheRootPositionPath() throws Exception {
+        StringWriter out = new StringWriter();
+        try (KeYEnvironment<DefaultUserInterfaceControl> env = loadSize()) {
+            Proof proof = createProof(env);
+            try {
+                ScriptInterpreter interpreter = interpreter(proof, env, out);
+
+                assertThat(interpreter.executeLine("print-open-goals")).isTrue();
+
+                List<String> goalLines = out.toString().lines()
+                        .filter(line -> line.startsWith("GOAL ")).toList();
+                assertThat(goalLines).isNotEmpty();
+                assertThat(goalLines.get(0)).isEqualTo("GOAL 0 1");
+                assertThat(goalLines)
+                        .allMatch(line -> line.matches("GOAL [0-9]+ [1-9][0-9.]*"));
             } finally {
                 proof.dispose();
             }
