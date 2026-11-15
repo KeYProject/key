@@ -47,6 +47,24 @@ class MainErrorHandlingTest {
     }
 
     @Test
+    void multiLineCliErrorMessageIsFlattenedToOneLine() {
+        int code = Main.handleExecutionException(CliError.input("bad input:\n  detail here"),
+            new PrintWriter(err));
+
+        assertThat(code).isEqualTo(ExitCode.INPUT_ERROR.code());
+        assertThat(err.toString()).isEqualTo("KEY_ERROR bad input: detail here\n");
+    }
+
+    @Test
+    void multiLineUnexpectedMessageIsFlattenedToOneLine() {
+        int code = Main.handleExecutionException(new RuntimeException("boom\n   at frame"),
+            new PrintWriter(err));
+
+        assertThat(code).isEqualTo(ExitCode.INTERNAL_ERROR.code());
+        assertThat(err.toString()).isEqualTo("KEY_ERROR internal error: boom at frame\n");
+    }
+
+    @Test
     void unexpectedExceptionWithoutMessageUsesTheExceptionName() {
         int code =
             Main.handleExecutionException(new NullPointerException(), new PrintWriter(err));

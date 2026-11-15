@@ -69,6 +69,42 @@ class CliErrorTest {
     }
 
     @Test
+    void oneLineCollapsesWhitespaceAndLineBreaks() {
+        assertThat(CliError.oneLine("  failed:\n  line 2\tat  ")).isEqualTo("failed: line 2 at");
+    }
+
+    @Test
+    void loadFailurePrefersTheInformativeCauseOverTheLoaderSummary() {
+        RuntimeException cause =
+            new IllegalStateException("Failed to parse Bad.java:2/27: syntax error");
+        CliError error =
+            CliError.loadFailure(Path.of("Bad.java"), new RuntimeException("Load failed", cause));
+
+        assertThat(requireMessage(error))
+                .isEqualTo("cannot load 'Bad.java': Failed to parse Bad.java:2/27: syntax error");
+    }
+
+    @Test
+    void loadFailureFlattensAMultiLineCauseToOneLine() {
+        RuntimeException cause =
+            new IllegalStateException("Error occurred:\nBad.java:2/27: (line 2,col 27) boom");
+        CliError error =
+            CliError.loadFailure(Path.of("Bad.java"), new RuntimeException("Load failed", cause));
+
+        assertThat(requireMessage(error))
+                .isEqualTo(
+                    "cannot load 'Bad.java': Error occurred: Bad.java:2/27: (line 2,col 27) boom");
+    }
+
+    @Test
+    void loadFailureWithoutAnyCauseMessageKeepsTheLoaderSummary() {
+        CliError error = CliError.loadFailure(Path.of("bad.key"),
+            new RuntimeException("Load failed", new IllegalArgumentException()));
+
+        assertThat(requireMessage(error)).isEqualTo("cannot load 'bad.key': Load failed");
+    }
+
+    @Test
     void isInternalCauseIgnoresUnrelatedCycles() {
         IllegalStateException cause = new IllegalStateException("loop");
         IllegalStateException cause2 = new IllegalStateException("loop2", cause);

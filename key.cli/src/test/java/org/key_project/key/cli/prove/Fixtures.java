@@ -36,6 +36,11 @@ public final class Fixtures {
         return resource("/fixtures/corrupt/corrupt.key");
     }
 
+    /// A Java source with a syntax error whose parse diagnostic carries the source position.
+    public static Path syntaxErrorJava() {
+        return resource("/fixtures/syntaxerror/Bad.java");
+    }
+
     /// A load file whose Java source declares no JML contract at all (empty selection).
     public static Path noContractsKey() {
         return resource("/fixtures/nocontracts/noContracts.key");
