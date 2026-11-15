@@ -66,7 +66,7 @@ class BadConstructDiagnosticsTest {
         assertThat(keyErrorLines).hasSize(1);
         assertThat(keyErrorLines.get(0))
                 .matches(
-                    "KEY_ERROR .+[\\/]acceptance[\\/]bucket-star[\\/]Bad\\.java:5:22: construct "
+                    "KEY_ERROR .+[\\\\/]acceptance[\\\\/]bucket-star[\\\\/]Bad\\.java:5:22: construct "
                         + "'bucketData\\[\\*\\]\\[\\*\\]' not supported: .+");
         assertThat(run.err()).doesNotContain("NullPointerException", "ClassCastException",
             "at de.uka");
@@ -102,7 +102,7 @@ class BadConstructDiagnosticsTest {
                 .filter(line -> line.startsWith("KEY_ERROR")).toList();
         assertThat(keyErrorLines).as("stderr: %s", run.err()).hasSize(1);
         assertThat(keyErrorLines.get(0))
-                .matches("KEY_ERROR .+[\\/]acceptance[\\/]" + fixtureDir + "[\\/]Bad\\.java:"
+                .matches("KEY_ERROR .+[\\\\/]acceptance[\\\\/]" + fixtureDir + "[\\\\/]Bad\\.java:"
                     + lineCol + ": construct '" + snippetToRegex(snippet) + "' not supported: .+");
         // no crash: never an NPE/CCE or a stack trace on stderr
         assertThat(run.err()).doesNotContain("NullPointerException", "ClassCastException",
