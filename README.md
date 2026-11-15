@@ -47,15 +47,35 @@ Additional and optional components are in `keyext.*/` folders. The file `build.g
 describing the dependencies and common build tasks for all subprojects.
 
 `key.util`, `key.core` and `key.ui` are the base for the product "KeY Prover". Special care is needed
-if you plan to make changes here.
+if you plan to make changes here. `key.ui.fx` is the JavaFX re-implementation of the user
+interface and the **default entry point** of the application
+(see [key.ui.fx/README.md](key.ui.fx/README.md)); the legacy Swing UI in `key.ui` stays
+available until its retirement decision ([key.ui.fx/SWING-RETIREMENT.md](key.ui.fx/SWING-RETIREMENT.md)).
 
 
 ## Compile and Run KeY
 
 Assuming you are in the directory of this README file, you can create a runnable and deployable version with one of these commands:
 
-1. With `./gradlew key.ui:run` you can run the user interface of KeY directly from the repository. 
-   Use `./gradlew key.ui:run --args='--experimental'` to enable experimental features.
+1. The JavaFX UI is the default way to run KeY's user interface directly from the repository:
+   ```sh
+   ./gradlew :key.ui.fx:run
+   ```
+   This starts `de.uka.ilkd.key.core.fx.MainEx`. Use `./gradlew :key.ui.fx:runExperimental`
+   to enable experimental features. The `key.fx.*` demo/verification system properties,
+   the headless run recipe and the full documentation of the FX UI are in
+   [key.ui.fx/README.md](key.ui.fx/README.md).
+
+   The legacy Swing UI remains available (documented as *legacy*) until its retirement
+   decision ([key.ui.fx/SWING-RETIREMENT.md](key.ui.fx/SWING-RETIREMENT.md)):
+   ```sh
+   ./gradlew key.ui:run --args='--experimental'
+   ```
+   Generic `-DmainClass` ergonomics: the root project's `execute`/`executeInTests` tasks run
+   any main class, e.g. `-DmainClass=de.uka.ilkd.key.core.fx.MainEx ./gradlew :key.ui.fx:execute`
+   (FX) or `-DmainClass=de.uka.ilkd.key.core.Main ./gradlew :key.ui:execute` (legacy Swing).
+   The dedicated `run` tasks are preferred: they set `key.examples.dir` and (for `key.ui.fx`)
+   forward the whitelisted `key.fx.*` properties.
 
 2. Use `./gradlew classes` to compile KeY, which includes running JavaCC and Antlr.
    Likewise, use `./gradlew testClasses` if you also want to compile the JUnit test classes.
@@ -81,6 +101,9 @@ Assuming you are in the directory of this README file, you can create a runnable
    ```
    The file is generated in `key.ui/build/libs/key-*-slim-exe.jar`.
    Both jars are also built as part of `./gradlew assemble`.
+   Note: these tasks package the **legacy Swing** product. The JavaFX UI currently runs via
+   `./gradlew :key.ui.fx:run`; its jlink/jpackage packaging is a later milestone (see the
+   packaging note in [key.ui.fx/README.md](key.ui.fx/README.md)).
 
 5. A distribution is build with
    ```sh

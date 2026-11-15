@@ -1,0 +1,29 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2,
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+
+plugins {
+    // JavaFX is not bundled with the JDK; this plugin resolves the matching
+    // platform-specific runtime artifacts (see gradle/libs.versions.toml).
+    alias(libs.plugins.openjfx)
+}
+
+description = "JavaFX port of the keyext.proofmanagement extension (MP9.6)"
+
+javafx {
+    version = libs.versions.javafx.get()
+    modules = ['javafx.base', 'javafx.controls', 'javafx.graphics']
+}
+
+dependencies {
+    implementation project(":key.ui.fx")
+    implementation project(":keyext.proofmanagement")
+    // REQUIRED for the FX compile classpath: the SPI types (MainWindowF, KeYMediatorF, ...) are
+    // annotated with JSpecify type annotations referencing key.core types (e.g. a @Nullable
+    // KeYEnvironment<DefaultUserInterfaceControl> field), so javac must find `key.core` when it
+    // loads those class files — `key.ui.fx` / `keyext.proofmanagement` declare it as
+    // `implementation`, which does not leak onto this module's compile classpath. The runtime
+    // classpath is unaffected (key.core is already transitively present at runtime).
+    implementation project(":key.core")
+}
