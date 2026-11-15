@@ -40,7 +40,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * was wrong): the strategy unrolls the restored label suffix and drives through the loop. A
  * <em>bounded</em> backward loop therefore closes under auto mode exactly like the forward
  * {@code goto_} loops of {@code golden/Max.java} close via {@link GotoSpliceRule}
- * ({@link #boundedDoWhileLoopTerminatesMainLineUnderAuto}); the unrolling mechanics are pinned shape-wise
+ * ({@link #boundedDoWhileLoopTerminatesMainLineUnderAuto}); the unrolling mechanics are pinned
+ * shape-wise
  * in {@link #restoreRuleUnrollsTheLabelSuffixOnTheLiveLoop}.</li>
  * <li>For {@code Sum}/{@code Restore} — loops whose termination bound is not statically
  * reachable — auto mode does <em>not</em> get stuck on the jump: it consumes the program and
