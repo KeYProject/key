@@ -121,6 +121,16 @@ public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel>
                     matchEnd(tokenizer, str);
 
                     return new FileOrigin(specType, Paths.get(filename).toUri(), line);
+                } else if (token.equals("[no")) {
+                    // FileOrigin with a null URI renders as "<specType> @ [no file]" (the line
+                    // is intentionally not printed). Accept that rendering so that saved proofs
+                    // containing such origins can be reloaded.
+                    if (!"file]".equals(tokenizer.nextToken())) {
+                        throw new IllegalArgumentException();
+                    }
+                    matchEnd(tokenizer, str);
+
+                    return new FileOrigin(specType, null, 0);
                 } else if (token.equals("node")) {
                     int number = Integer.parseInt(tokenizer.nextToken());
 

@@ -199,6 +199,16 @@ the rebase handles them:
   skips directly labeled blocks, leaving them to the labeled pass. Also fixes
   RunAll `blockContracts#Simple__addAbsoluteValues`. Expected key.core reds at
   the tip are now **0**.
+- [x] **Quicksort fixed against the refreshed snapshot
+  `1.2.1-20261115.031329-3`** (jmltk PR #99, `8f9ab4462`): the grouped
+  `//@ ghost \seq …` + `assert … \by { … }` comment now parses as method-level
+  JML. Two KeY-side follow-ups were needed: `JP2KeYConverter.toProofScript`
+  serializes the typed proof AST directly (jmltk prints multi-command `case`
+  branches with braces, which KeY's grammar rejects), and
+  `OriginTermLabelFactory` accepts `[no file]` origins so saved proofs reload
+  (§17). `MtScriptStressTest` 2/2 green (script closes single-/multi-core;
+  saved multi-core proof reloads closed). This clears the RunAll `quicksort`
+  group and `testMtStress`.
 - [x] Gates re-run at the rebase tip: `MergeRuleTests` +
   `PredicateAbstractionLatticeTests` + `MtMergePointTest`,
   `ParallelProverDeterminismTest`, full `speclang.*`
@@ -225,8 +235,8 @@ they do **not** run in the CI key.core job). No new reds vs. the recorded baseli
 |---|---|---|
 | §19 `ensures_redundantly` — `gen._SmansEtAl` whole group | 31 | recorded load-time gap (JMLTK_GAPS §19) |
 | §20 `assignable_free` — `gen._javadl#test{ensuresFree,loopInvFree}` | 2 | recorded load-time gap (JMLTK_GAPS §20) |
-| §18 quicksort load — `gen._quicksort` | 5 | recorded load-time gap (JMLTK_GAPS §18) |
-| §17 `[no file]` origin / save→reload — `gen._list_seq#SimplifiedLinkedList.remove`, `gen._other`, `gen._reload_examples` | 3 | recorded (JMLTK_GAPS §17) |
+| §18 quicksort load — `gen._quicksort` | 5 | **fixed** 2026-11-15 (jmltk snapshot `1.2.1-20261115.031329-3` + KeY proof-serializer; JMLTK_GAPS §18) |
+| §17 `[no file]` origin / save→reload — `gen._list_seq#SimplifiedLinkedList.remove`, `gen._other`, `gen._reload_examples` | 3 | **reload fixed** 2026-11-15 (`parseOrigin` accepts `[no file]`; JMLTK_GAPS §17); display remains cosmetic |
 | OOM `Java heap space` — `gen._performance` ×7, `gen._performancePOConstruction` ×3, `ConcurrentMatchingStressTest#prop_split`, `gen._updateSimplificationPerformance` | 12 | environmental: one shared 4g worker across the whole suite; passes with a fresh worker / CI memory |
 | doesn't-close drift — `gen._WeideEtAl#AddAndMultiply_add`, `gen._javaCard` ×3, `gen._javadl#testfor_{Array,Iterable,ReferenceArray}` | 7 | **A/B-verified pre-existing at `cfece36950`** (identical failures in a pristine worktree without the uncommitted fix); `gen._blockContracts#Simple__addAbsoluteValues` was §11 and is **fixed** by `acbe6aa3d2` |
 | `JMLParserExceptionTest` ×2 | 2 | **fixed** 2026-11-15 (targeted snapshot messages, see §6); §11 MT also fixed (`acbe6aa3d2`) — key.core reds 0 |

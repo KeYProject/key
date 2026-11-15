@@ -32,4 +32,13 @@ class OriginTermLabelTest {
         assertNotNull(label, "No parser error, but also no label.");
         assertEquals(OriginTermLabel.SpecType.USER_INTERACTION, label.getOrigin().specType);
     }
+
+    @Test
+    public void testNoFileOriginRoundTrips() {
+        OriginTermLabelFactory factory = new OriginTermLabelFactory();
+        OriginTermLabel label = assertDoesNotThrow(() -> factory.parseInstance(
+            Arrays.asList("requires @ [no file]", "[]"), HelperClassForTests.createServices()));
+        assertEquals(OriginTermLabel.SpecType.REQUIRES, label.getOrigin().specType);
+        assertEquals("requires @ [no file]", label.getOrigin().toString());
+    }
 }

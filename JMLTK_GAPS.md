@@ -89,8 +89,8 @@ JMLtk front-end shipped in PR #3997.
 | 14 | datagroup / monitor clauses | `monitors_for`, `readable_if`, `writable_if`, `in_group`, `maps_into` | `exceptional/{Datagroup,MonitorsFor,ReadableIf,WritableIf,InGroup,MapsInto}.java` | ✔ RESOLVED (loud guard, no spurious fields) |
 | 15 | `\strictly_nothing`, `\nothing`, `\everything` | — | `LocsetClauseTranslationTest` | ✔ RESOLVED (measured 2026-11-10: names re-lex to the special tokens; residual: method-level `accessible` is a JMLtk-upstream gap, fallback mitigates) |
 | 16 | assert label *after* `assert` | `//@ assert LAB: e;` | — | ✘ OPEN (only JML-standard `LAB: assert e;`) |
-| 17 | origin-label file info for re-parsed JML | `Precondition @ [no file]` | any JMLtk-converted spec (assert/assume/set, contract clauses, fallback) | ✘ OPEN (**save→reload blocker** — `[no file]` origins are not re-parseable; RunAll `other`, `list_seq`) |
-| 18 | DL-typed ghost locals with initializer | `//@ ghost \seq x = \dl_array2seq(a);` | `key.ui/examples/heap/quicksort/{sort,split}{,-jmlscript}.key` | ✘ OPEN (load failure — JMLtk reads `ghost` as field-level; pre-existing at 1.1.0 **and** 1.2.1) |
+| 17 | origin-label file info for re-parsed JML | `Precondition @ [no file]` | any JMLtk-converted spec (assert/assume/set, contract clauses, fallback) | ✔ RESOLVED (2026-11-15, reload: `parseOrigin` accepts the `[no file]` rendering; display still cosmetic — see §17) |
+| 18 | DL-typed ghost locals with initializer | `//@ ghost \seq x = \dl_array2seq(a);` | `key.ui/examples/heap/quicksort/{sort,split}{,-jmlscript}.key` | ✔ RESOLVED (2026-11-15, jmltk PR #99 / snapshot `1.2.1-20261115.031329-3`; `MtScriptStressTest` 2/2 — see §18) |
 | 19 | `ensures_redundantly` clause kind | `@ ensures_redundantly e;` | `key.ui/examples/heap/SmansEtAl/src/Iterator.java:11` | ✘ OPEN (load failure — JMLtk accepts it, KeY `JmlParser.g4` has no production) |
 | 20 | `assignable_free` clause body | `@ assignable_free \nothing;` / `@ assignable_free field;` | `key.ui/examples/standard_key/java_dl/jml-free/{AssignableFree,AssignableLoopFree}.java` | ✘ OPEN (load failure — `UnsolvedSymbolException` on the clause keyword) |
 | 21 | committed `.proof` replay drift | `heap/permutedSum/perm.proof` | the tracked proof (155 tracked `.proof` files total; this one fails) | ✘ OPEN (replay errors: rule position no longer fits, built-in reconstruction fails) |
@@ -535,7 +535,7 @@ fallback. Tracked as a JMLtk-upstream grammar gap, not a branch defect.
 //@ LAB: assert e;    // JML-standard prefix form — the only one JMLtk accepts
 ```
 
-## 17. `[no file]` in origin term labels  — ✘ OPEN (save→reload blocker, display otherwise cosmetic)
+## 17. `[no file]` in origin term labels  — ✔ RESOLVED (reload; display follow-up)
 
 - **Symptom (display):** origin labels on JML terms re-parsed from the JMLtk AST render
   as e.g. `Precondition @ [no file]` instead of the pre-takeover
@@ -574,9 +574,16 @@ fallback. Tracked as a JMLtk-upstream grammar gap, not a branch defect.
     included — the failing origins are `requires` clauses of operation
     contracts) fails to reload; this is a branch-side round-trip bug, not a
     defect of the recorded recordings.
-- **Fix options:** (a) propagate the JMLtk node's position to the re-parse
-  (URI via `CompilationUnit.getStorage().getPath()` + line/column) so origins
-  carry a real file — fixes display *and* round-trip; (b) make
+- **RESOLVED (2026-11-15):** option (b) — `OriginTermLabelFactory.parseOrigin`
+  now accepts `<specType> @ [no file]` and maps it to
+  `FileOrigin(specType, null, 0)`. Saved proofs carrying null-URI origins
+  reload again; `OriginTermLabelTest#testNoFileOriginRoundTrips` locks the
+  render/parse symmetry. The display remains `[no file]` (cosmetic); option (a)
+  (propagating the real URI) is still a quality improvement but no longer a
+  reload blocker.
+- **Fix options (recorded):** (a) propagate the JMLtk node's position to the
+  re-parse (URI via `CompilationUnit.getStorage().getPath()` + line/column) so
+  origins carry a real file — fixes display *and* round-trip; (b) make
   `parseOrigin` accept the `[no file]` rendering (map it to a null-URI
   `FileOrigin`); (c) render null-URI origins as `(implicit)`.
   Documented but not fixed at `53dcefd914`; re-confirmed open at the
@@ -584,7 +591,7 @@ fallback. Tracked as a JMLtk-upstream grammar gap, not a branch defect.
   A/B against `origin/main`; the 3 RAP load failures in the full local run
   are the same signature).
 
-## 18. DL-typed ghost locals with initializer (quicksort)  — ✘ OPEN (load failure, pre-existing)
+## 18. DL-typed ghost locals with initializer (quicksort)  — ✔ RESOLVED (2026-11-15)
 
 ```java
 //@ ghost \seq seq3 = \dl_array2seq(array);
@@ -613,7 +620,22 @@ fallback. Tracked as a JMLtk-upstream grammar gap, not a branch defect.
   integration jobs were not part of the local Appendix-A baseline.
 - **CI impact:** `testMtStress` (`MtScriptStressTest` ×2) and the `quicksort`
   group of `testRunAllFunProofs`.
-- **Fix options:** fix upstream in JMLtk (a `ghost` local with a DL
+- **RESOLVED (2026-11-15) — upstream fix + two KeY-side follow-ups:**
+  - **jmltk PR #99** (`8f9ab4462`; snapshot `1.2.1-20261115.031329-3`) makes the
+    grouped ghost-local + proof-script comment parse as method-level JML: the
+    ghost becomes a `JmlGhostStmt` and the scripts become typed
+    `JmlProofStmt`s. The misleading class-level diagnostic is gone.
+  - `JP2KeYConverter.toProofScript` now serializes the `JmlProofStmt` AST
+    directly instead of using `Node.toString()`: jmltk's pretty printer wraps a
+    multi-command `case` branch in `{ … }`, which KeY's proof-script grammar
+    does not accept (the source `Quicksort.java` has no braces there).
+  - `OriginTermLabelFactory` accepts the `[no file]` origin rendering (§17), so
+    the multi-core proof saved by the stress test reloads closed.
+  `MtScriptStressTest` is **2/2 green**: `sort.script` closes under the
+  single-core and 8-worker provers, and the saved multi-core proof reloads as a
+  closed single-core proof. This also clears the `quicksort` group load failure
+  in `testRunAllFunProofs`.
+- **Fix options (recorded):** fix upstream in JMLtk (a `ghost` local with a DL
   type/initializer must parse as a statement, not a class-level field); or
   rewrite the example source; or (KeY-side) tolerate this specific hard problem
   and convert the statement-position `JmlFieldDeclaration` back into a ghost

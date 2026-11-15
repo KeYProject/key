@@ -66,6 +66,10 @@ import com.github.javaparser.ast.jml.body.JmlClassLevelDeclaration;
 import com.github.javaparser.ast.jml.body.JmlFieldDeclaration;
 import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
 import com.github.javaparser.ast.jml.doc.JmlDocStmt;
+import com.github.javaparser.ast.jml.proof.JmlProofArg;
+import com.github.javaparser.ast.jml.proof.JmlProofCaseStmt;
+import com.github.javaparser.ast.jml.proof.JmlProofCmdStmt;
+import com.github.javaparser.ast.jml.proof.JmlProofObtainStmt;
 import com.github.javaparser.ast.jml.proof.JmlProofStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
@@ -968,9 +972,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      * against KeY's own JML grammar, or returns {@code null} if the statement carries no script.
      * <p>
      * JMLtk stores the script as a {@link NodeList} of {@link JmlProofStmt}s; the text is
-     * reconstructed from their rendering so that the downstream proof-script machinery
-     * ({@link de.uka.ilkd.key.macros.ApplyScriptsMacro}) can process it. A script JMLtk was able to
-     * parse but KeY cannot is rejected loudly instead of being silently dropped.
+     * reconstructed from the AST by {@link #appendProofStatement} so that the downstream
+     * proof-script machinery ({@link de.uka.ilkd.key.macros.ApplyScriptsMacro}) can process it. A
+     * script JMLtk was able to parse but KeY cannot is rejected loudly instead of being silently
+     * dropped.
      */
     private static KeyAst.@Nullable JMLProofScript toProofScript(JmlExpressionStmt stmt) {
         var script = stmt.getScript();
@@ -979,7 +984,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
         StringBuilder text = new StringBuilder("\\by { ");
         for (JmlProofStmt proofStmt : script.get()) {
-            text.append(proofStmt).append(' ');
+            appendProofStatement(text, proofStmt);
+            text.append(' ');
         }
         text.append('}');
         JmlLexer lexer = JmlFacade.createLexer(text.toString());
@@ -988,6 +994,62 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         var ctx = parser.assertionProof();
         parser.getErrorReporter().throwException();
         return KeyAst.JMLProofScript.fromContext(ctx);
+    }
+
+    /**
+     * Serializes one JMLtk proof-script statement into KeY's proof-script syntax. We do not use
+     * {@code Node.toString()} here: JMLtk's pretty printer wraps the commands of a
+     * {@code case}/{@code default} branch in braces when there is more than one, which KeY's
+     * grammar does not accept (the original {@code Quicksort.java} has no such braces either).
+     */
+    private static void appendProofStatement(StringBuilder text, JmlProofStmt stmt) {
+        if (stmt instanceof JmlProofCmdStmt cmd) {
+            text.append(cmd.getName());
+            for (JmlProofArg arg : cmd.getArgs()) {
+                text.append(' ');
+                arg.getLabel().ifPresent(label -> text.append(label).append(": "));
+                text.append(arg.getExpr());
+            }
+            appendProofSuffix(text, cmd.getSuffix());
+        } else if (stmt instanceof JmlProofObtainStmt obtain) {
+            text.append("obtain ").append(obtain.getType()).append(' ').append(obtain.getVar());
+            if (obtain.getKind() != null) {
+                text.append(' ').append(obtain.getKind().jmlSymbol());
+                obtain.getValue().ifPresent(value -> text.append(' ').append(value));
+            }
+            appendProofSuffix(text, obtain.getSuffix());
+        } else if (stmt instanceof JmlProofCaseStmt caseStmt) {
+            caseStmt.getLabel().ifPresentOrElse(
+                label -> text.append("case ").append(label).append(": "),
+                () -> text.append("case: "));
+            for (JmlProofStmt command : caseStmt.getCommands()) {
+                appendProofStatement(text, command);
+                text.append(' ');
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported JML proof statement: " + stmt);
+        }
+    }
+
+    /**
+     * Serializes the {@code ;}/{@code \by …} suffix of a proof command. A single case branch is
+     * always wrapped in braces, because {@code \by case …} is not valid proof-script syntax.
+     */
+    private static void appendProofSuffix(StringBuilder text, List<JmlProofStmt> suffix) {
+        boolean hasCase = suffix.stream().anyMatch(JmlProofCaseStmt.class::isInstance);
+        if (suffix.isEmpty()) {
+            text.append(';');
+        } else if (suffix.size() == 1 && !hasCase) {
+            text.append("\\by ");
+            appendProofStatement(text, suffix.getFirst());
+        } else {
+            text.append("\\by { ");
+            for (JmlProofStmt proofStmt : suffix) {
+                appendProofStatement(text, proofStmt);
+                text.append(' ');
+            }
+            text.append('}');
+        }
     }
 
     /**
