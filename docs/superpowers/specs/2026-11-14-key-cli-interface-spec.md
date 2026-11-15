@@ -210,7 +210,7 @@ Acceptance E3: `--strategy-option intRules=intRules:unchecked` on an overflow-se
 
 ## 6. Open-goal inspection
 
-`--print-open-goals [<MAX>]` (default `MAX=10`, `MAX=0` = unlimited): prints, after proof search, the open goals on stdout, one section per selected contract in selection order, formatted exactly:
+`--print-open-goals [<MAX>]` (default `MAX=10`, `MAX=0` = unlimited): prints, after proof search, the open goals on stdout, one section per selected contract, in file order and, within a file, selection order, before that file's §2 `KEY_RESULT` lines, formatted exactly:
 
 ```
 CONTRACT <NAME>
