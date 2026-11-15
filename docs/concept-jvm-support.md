@@ -674,6 +674,16 @@ A closed proof of the transpiled method's contract establishes, modulo:
 | Rule | `GotoSpliceRule`/`GotoRestoreRule`/`IfLiteralRule` unit tests incl. negative cases (missing label → loud abort) | `key.jvm/src/test` |
 | Regression | RunAllProofs proof collection once stable | `key.ui/examples` |
 
+**Proof tests assert program semantics, not pretty-printed program text.** A proof loads
+`\javaSource "."`, and `Files.walk` discovers the compilation units in filesystem order. If a
+type reference such as `jvm.Local` is converted before the declaration unit has been processed,
+the `KeYJavaType` still has no `JavaType`, so `TypeRef(KeYJavaType)` falls back to the sort name
+(`jvm.Local`) as its element name and the pretty printer adds the package prefix a second time
+(`jvm.jvm.Local.goto_(8);`). The AST and the proof are unaffected — the difference shows up on
+Ubuntu CI runners versus Windows/Linux tmpfs while wiring `key.jvm` into the test matrix. Proof
+tests therefore check the AST via the rule helpers (`GotoSupport.isGotoCall`,
+`GotoSupport.labelOf` in `LoopProofTest`) instead of matching printed program text.
+
 ## 9. Milestones
 
 | Milestone | Scope | Acceptance criteria | Est. |

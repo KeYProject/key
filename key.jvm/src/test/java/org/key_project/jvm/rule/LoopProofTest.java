@@ -111,6 +111,19 @@ class LoopProofTest {
      * re-enters the L8 suffix without the label guard — one semantic unrolling. (The proof
      * itself stays open on the §9.1(2) createdness residuals, see
      * {@link #boundedDoWhileLoopTerminatesMainLineUnderAuto}.)
+     * <p>
+     * The premise is checked through {@link GotoSupport#isGotoCall} and
+     * {@link GotoSupport#labelOf}, not by matching the printed program text.
+     * {@code \javaSource "."}
+     * is discovered by {@code Files.walk}, whose order is filesystem-dependent. If the
+     * {@code Three.java} unit is converted before {@code jvm/Local.java}, the
+     * {@code jvm.Local} type reference is created while the class declaration has not been
+     * registered yet: the {@code KeYJavaType} has no {@code JavaType}, so
+     * {@code TypeRef(KeYJavaType)} falls back to the sort name ({@code jvm.Local}) as element name
+     * and the pretty printer adds the package prefix again, printing
+     * {@code jvm.jvm.Local.goto_(8);}. The AST and the proof are identical either way (Ubuntu CI
+     * hit the second rendering while Windows and tmpfs directories hit the first), so a textual
+     * assertion would be a filesystem-order test, not a rule test.
      */
     @Test
     void restoreRuleUnrollsTheLabelSuffixOnTheLiveLoop() throws Exception {
