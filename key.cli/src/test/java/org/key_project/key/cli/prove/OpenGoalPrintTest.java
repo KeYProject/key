@@ -29,9 +29,14 @@ import static org.assertj.core.api.Assertions.assertThat;
  * <li>{@code --print-open-goals 1} on a contract with two open goals prints one GOAL block
  * while {@code OPEN-GOAL-COUNT} keeps the true total.</li>
  * <li>Determinism (F1) also holds with {@code --no-truncate-formulas}.</li>
+ * <li>Every open-goal section is preceded by a {@code CONTRACT <NAME>} label line; a run over
+ * several contracts prints one labeled section per contract in selection order (a closed
+ * contract contributes a section with {@code OPEN-GOAL-COUNT 0}).</li>
  * </ul>
  */
 class OpenGoalPrintTest {
+
+    private static final String ONE = "C[C::one()].JML normal_behavior operation contract.0";
 
     private static final String TWO = "C[C::two()].JML normal_behavior operation contract.0";
 
@@ -64,12 +69,12 @@ class OpenGoalPrintTest {
     }
 
     /**
-     * Extracts the open-goal section of a stdout capture: from the first
-     * {@code OPEN-GOAL-COUNT} line up to the line before the first {@code KEY_RESULT} line
+     * Extracts the open-goal output of a stdout capture: from the first
+     * {@code CONTRACT} label line up to the line before the first {@code KEY_RESULT} line
      * (inclusive of the terminating blank line).
      */
     static String openGoalSection(String out) {
-        int start = out.indexOf("OPEN-GOAL-COUNT ");
+        int start = out.indexOf("CONTRACT ");
         if (start < 0) {
             return "";
         }
@@ -141,7 +146,7 @@ class OpenGoalPrintTest {
         assertThat(second.exit()).isEqualTo(1);
         String section = openGoalSection(first.out());
         assertThat(section).isNotEmpty();
-        assertThat(section).startsWith("OPEN-GOAL-COUNT 1\n");
+        assertThat(section).startsWith("CONTRACT " + TWO + "\nOPEN-GOAL-COUNT 1\n");
         assertThat(section).isEqualTo(openGoalSection(second.out()));
         List<String> blocks = goalBlocks(section);
         assertThat(blocks).hasSize(1);
@@ -158,7 +163,7 @@ class OpenGoalPrintTest {
 
         assertThat(result.exit()).isEqualTo(1);
         String section = openGoalSection(result.out());
-        assertThat(section).startsWith("OPEN-GOAL-COUNT 2\n");
+        assertThat(section).startsWith("CONTRACT " + SIZE + "\nOPEN-GOAL-COUNT 2\n");
         List<String> blocks = goalBlocks(section);
         assertThat(blocks).hasSize(2);
         checkBlock(blocks.get(0), 0);
@@ -174,7 +179,7 @@ class OpenGoalPrintTest {
 
         assertThat(result.exit()).isEqualTo(1);
         String section = openGoalSection(result.out());
-        assertThat(section).startsWith("OPEN-GOAL-COUNT 2\n");
+        assertThat(section).startsWith("CONTRACT " + SIZE + "\nOPEN-GOAL-COUNT 2\n");
         List<String> blocks = goalBlocks(section);
         assertThat(blocks).hasSize(1);
         checkBlock(blocks.get(0), 0);
@@ -188,7 +193,7 @@ class OpenGoalPrintTest {
 
         assertThat(result.exit()).isEqualTo(1);
         String section = openGoalSection(result.out());
-        assertThat(section).startsWith("OPEN-GOAL-COUNT 2\n");
+        assertThat(section).startsWith("CONTRACT " + SIZE + "\nOPEN-GOAL-COUNT 2\n");
         assertThat(goalBlocks(section)).hasSize(1);
     }
 
@@ -214,7 +219,7 @@ class OpenGoalPrintTest {
         assertThat(result.exit()).isEqualTo(1);
         assertThat(result.err()).doesNotContain("KEY_ERROR");
         String section = openGoalSection(result.out());
-        assertThat(section).startsWith("OPEN-GOAL-COUNT 2\n");
+        assertThat(section).startsWith("CONTRACT " + SIZE + "\nOPEN-GOAL-COUNT 2\n");
         assertThat(goalBlocks(section)).hasSize(2);
         assertThat(lastLine(result.out())).startsWith("KEY_RESULT ");
     }
@@ -228,7 +233,7 @@ class OpenGoalPrintTest {
         assertThat(result.exit()).isEqualTo(1);
         assertThat(result.err()).doesNotContain("KEY_ERROR");
         String section = openGoalSection(result.out());
-        assertThat(section).startsWith("OPEN-GOAL-COUNT 2\n");
+        assertThat(section).startsWith("CONTRACT " + SIZE + "\nOPEN-GOAL-COUNT 2\n");
         assertThat(goalBlocks(section)).hasSize(1);
     }
 
@@ -242,8 +247,26 @@ class OpenGoalPrintTest {
 
         assertThat(first.exit()).isEqualTo(1);
         String section = openGoalSection(first.out());
-        assertThat(section).startsWith("OPEN-GOAL-COUNT 2\n");
+        assertThat(section).startsWith("CONTRACT " + SIZE + "\nOPEN-GOAL-COUNT 2\n");
         assertThat(goalBlocks(section)).hasSize(2);
         assertThat(section).isEqualTo(openGoalSection(second.out()));
+    }
+
+    @Test
+    @Timeout(300)
+    void multiContractRunPrintsOneLabeledSectionPerContractInSelectionOrder() {
+        // no selector: both contracts of the index fixture are proven in index order
+        // (one() closed, two() open)
+        Run result = run("prove", Fixtures.indexKey().toString(), "--print-open-goals");
+
+        assertThat(result.exit()).isEqualTo(1);
+        String section = openGoalSection(result.out());
+        assertThat(section).startsWith(
+            "CONTRACT " + ONE + "\nOPEN-GOAL-COUNT 0\nCONTRACT " + TWO
+                + "\nOPEN-GOAL-COUNT 1\n");
+        List<String> blocks = goalBlocks(section);
+        assertThat(blocks).hasSize(1);
+        checkBlock(blocks.get(0), 0);
+        assertThat(lastLine(result.out())).startsWith("KEY_RESULT ");
     }
 }

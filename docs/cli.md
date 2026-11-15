@@ -221,9 +221,11 @@ proven.
 ## 6. Open-goal inspection
 
 `prove --print-open-goals [<MAX>]` (default `MAX=10`; `MAX=0` = unlimited) prints, after
-proof search and before the `KEY_RESULT` line, the open goals on stdout:
+proof search and before the `KEY_RESULT` lines, the open goals on stdout — one section per
+selected contract, in selection order:
 
 ```
+CONTRACT <NAME>
 OPEN-GOAL-COUNT <N>
 GOAL <id> <position-path>
   <antecedent-term>
@@ -231,6 +233,11 @@ GOAL <id> <position-path>
 
 ```
 
+- `CONTRACT <NAME>` names the contract the section describes (§4.1 canonical name); a closed
+  contract contributes `CONTRACT <NAME>` and `OPEN-GOAL-COUNT 0` with no `GOAL` blocks. The
+  `script` subcommand's `print-open-goals` command prints the same layout with the same label,
+  so its output is byte-identical to the `prove --print-open-goals 0` section for the same
+  contract.
 - `<id>` is an integer ≥ 0; `<position-path>` is the dot-separated int KeY position path
   (matching `^[1-9][0-9.]*$`), usable by the §7.1 `at <position-path>` anchor. The proof root
   itself prints as `1` (it is the only goal that can be open before any rule has been applied).

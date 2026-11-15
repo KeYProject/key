@@ -67,8 +67,9 @@ import picocli.CommandLine.Spec;
  * or {@code null}).
  * <p>
  * With {@code --print-open-goals [MAX]} (§6), the open goals of each contract are printed after
- * proof search and before its {@code KEY_RESULT} line: an {@code OPEN-GOAL-COUNT} line with the
- * true total followed by up to {@code MAX} {@code GOAL} blocks (default {@code 10},
+ * proof search and before the {@code KEY_RESULT} lines, one section per contract in selection
+ * order: a {@code CONTRACT <NAME>} label line, an {@code OPEN-GOAL-COUNT} line with the true
+ * total, followed by up to {@code MAX} {@code GOAL} blocks (default {@code 10},
  * {@code 0} = unlimited); {@code --no-truncate-formulas} disables the length truncation of
  * printed formulas. {@code MAX} is optional and bound only to a following integer literal, so
  * {@code --print-open-goals spec.key} keeps {@code spec.key} as a load file; the attached form
@@ -146,11 +147,12 @@ public final class ProveCommand implements Callable<Integer> {
     @Option(names = "--print-open-goals", arity = "0..1", fallbackValue = "10",
         paramLabel = "[<MAX>]", parameterConsumer = OpenGoalsParameterHandler.class,
         preprocessor = OpenGoalsParameterHandler.class,
-        description = "After proof search, print the open goals to stdout: an OPEN-GOAL-COUNT "
-            + "line (always the true total) followed by up to MAX GOAL blocks with their "
-            + "position paths (0 = unlimited, default 10). The value is optional: a following "
-            + "integer is taken as MAX, so `--print-open-goals spec.key` treats spec.key as a "
-            + "load file.")
+        description = "After proof search, print the open goals to stdout: one section per "
+            + "selected contract, each starting with a CONTRACT <name> label line, then an "
+            + "OPEN-GOAL-COUNT line (always the true total) followed by up to MAX GOAL blocks "
+            + "with their position paths (0 = unlimited, default 10). The value is optional: a "
+            + "following integer is taken as MAX, so `--print-open-goals spec.key` treats "
+            + "spec.key as a load file.")
     private @org.jspecify.annotations.Nullable Integer printOpenGoals;
 
     @Option(names = "--no-truncate-formulas",

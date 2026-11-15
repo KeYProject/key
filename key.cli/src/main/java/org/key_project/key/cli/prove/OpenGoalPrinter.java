@@ -13,6 +13,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.logic.Term;
 
@@ -20,6 +21,7 @@ import org.key_project.logic.Term;
  * Prints the open goals of a proof in the §6 open-goal layout of the headless interface spec:
  *
  * <pre>
+ * CONTRACT &lt;NAME&gt;
  * OPEN-GOAL-COUNT &lt;N&gt;
  * GOAL &lt;id&gt; &lt;position-path&gt;
  *   &lt;antecedent-term&gt;
@@ -27,7 +29,9 @@ import org.key_project.logic.Term;
  *
  * </pre>
  *
- * The {@code OPEN-GOAL-COUNT} line always carries the true total number of open goals; {@code MAX}
+ * The {@code CONTRACT} label line names the contract the proof was created for; a run over
+ * several contracts prints one such section per contract, in selection order. The
+ * {@code OPEN-GOAL-COUNT} line always carries the true total number of open goals; {@code MAX}
  * only bounds the number of printed {@code GOAL} blocks ({@code 0} = no bound). Each formula is
  * printed on its own line (embedded line breaks are escaped as literal {@code \n}); by default a
  * formula longer than {@link #DEFAULT_MAX_TERM_LENGTH} characters is truncated with a {@code ...}
@@ -81,13 +85,16 @@ public final class OpenGoalPrinter {
     }
 
     /**
-     * Prints the open goals of the proof: an {@code OPEN-GOAL-COUNT} line with the true total,
-     * followed by at most {@code maxGoals} {@code GOAL} blocks ({@code 0} = no bound), each
-     * terminated by a blank line.
+     * Prints the open goals of the proof: a {@code CONTRACT <name>} label line, an
+     * {@code OPEN-GOAL-COUNT} line with the true total, followed by at most {@code maxGoals}
+     * {@code GOAL} blocks ({@code 0} = no bound), each terminated by a blank line.
      *
+     * @param contract the contract the proof was created for (its canonical name is printed as
+     *        the section label)
      * @param proof the proof whose open goals are printed
      */
-    public void print(Proof proof) {
+    public void print(Contract contract, Proof proof) {
+        out.println("CONTRACT " + contract.getName());
         List<Goal> goals = new ArrayList<>();
         for (Goal goal : proof.openGoals()) {
             goals.add(goal);

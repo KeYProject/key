@@ -264,7 +264,7 @@ public final class HeadlessProver {
             int openGoals = proof.openGoals().size();
             boolean closed = proof.closed() || openGoals == 0;
             if (openGoalPrinter != null) {
-                openGoalPrinter.print(proof);
+                openGoalPrinter.print(contract, proof);
             }
             ResultStatus status = classifyStatus(closed, timeoutMs, elapsedMs);
             SmtCounters.Counts smt = SmtCounters.of(proof);
