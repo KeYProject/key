@@ -168,6 +168,42 @@ class ScriptCommandTest {
         assertThat(run.out()).doesNotContain("SCRIPT");
     }
 
+    @Test
+    @Timeout(600)
+    void strategyOptionAppliesToTheScriptRun() throws IOException {
+        Path script = script("print-open-goals");
+        Run run = run("script", sizeKey(), script.toString(),
+            "--strategy-option", "methodExpansion=methodExpansion:full");
+
+        assertThat(run.exit()).isEqualTo(1);
+        assertThat(run.err()).doesNotContain("KEY_ERROR");
+        assertResultRecord(run, "open");
+    }
+
+    @Test
+    @Timeout(600)
+    void unknownStrategyOptionIsAnInputError() throws IOException {
+        Path script = script("# the settings are rejected before the script runs");
+        Run run = run("script", sizeKey(), script.toString(),
+            "--strategy-option", "intRules=intRules:javaSemantic");
+
+        assertThat(run.exit()).isEqualTo(3);
+        assertThat(run.err()).contains("KEY_ERROR settings:");
+        assertThat(run.out()).doesNotContain("SCRIPT");
+    }
+
+    @Test
+    @Timeout(600)
+    void missingSettingsFileIsAnInputError() throws IOException {
+        Path script = script("# the settings are rejected before the script runs");
+        String missing = tempDir.resolve("nowhere.json").toString();
+        Run run = run("script", sizeKey(), script.toString(), "--settings-file", missing);
+
+        assertThat(run.exit()).isEqualTo(3);
+        assertThat(run.err()).contains("KEY_ERROR").contains(missing);
+        assertThat(run.out()).doesNotContain("SCRIPT");
+    }
+
     private Path script(String... lines) throws IOException {
         Path script = tempDir.resolve("proof.script");
         Files.write(script, List.of(lines));

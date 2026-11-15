@@ -28,6 +28,8 @@ import org.key_project.key.cli.prove.ContractIndex;
 import org.key_project.key.cli.prove.ContractSelector;
 import org.key_project.key.cli.prove.SmtCounters;
 import org.key_project.key.cli.prove.UnknownContractException;
+import org.key_project.key.cli.settings.CliSettingsException;
+import org.key_project.key.cli.settings.HeadlessRunnerSettings;
 
 import org.jspecify.annotations.Nullable;
 import picocli.CommandLine.Command;
@@ -55,7 +57,13 @@ import picocli.CommandLine.Spec;
  * resolve to exactly one contract is an input error (exit {@code 3}).
  * <p>
  * {@code --timeout <MS>} bounds each strategy command ({@code proceed}/{@code auto}) of the
- * script. {@code --config-dir} is handled by {@link org.key_project.key.cli.Main}'s pre-scan.
+ * script.
+ * <p>
+ * Strategy choices are layered per §5.1 exactly as in {@code prove}: repeated
+ * {@code --strategy-option <KEY>=<VALUE>} entries override {@code --settings-file} entries for the
+ * same key, and both are applied only for the duration of the run. An unknown key or undocumented
+ * value is an input error (exit {@code 3}). {@code --config-dir} is handled by
+ * {@link org.key_project.key.cli.Main}'s pre-scan.
  */
 @Command(name = "script",
     description = "Execute a §7.1 proof script against one obligation of a KeY problem file.",
@@ -85,6 +93,18 @@ public final class ScriptCommand implements Callable<Integer> {
             + "contract.")
     private List<String> chooseContract = List.of();
 
+    @Option(names = "--settings-file", paramLabel = "<PATH>",
+        description = "A §5.2 settings file (flat JSON) whose strategy choices are applied for "
+            + "the run, with --strategy-option taking precedence per key.")
+    @Nullable
+    private Path settingsFile;
+
+    @Option(names = "--strategy-option", paramLabel = "<KEY>=<VALUE>",
+        description = "Set a single strategy choice (§5.2 vocabulary), repeatable. An option "
+            + "overrides --settings-file for its key, which overrides the load-file \\settings "
+            + "and KeY defaults.")
+    private List<String> strategyOption = List.of();
+
     private final ResultRecordWriter resultWriter = new ResultRecordWriter();
 
     /**
@@ -105,11 +125,14 @@ public final class ScriptCommand implements Callable<Integer> {
         requireFile(loadFile);
         requireFile(scriptFile);
         List<String> lines = readScript();
+        HeadlessRunnerSettings runnerSettings = runnerSettings();
 
         PrintWriter out = spec.commandLine().getOut();
+        runnerSettings.apply();
         try {
             KeYEnvironment<DefaultUserInterfaceControl> environment = KeYEnvironment.load(loadFile);
             try {
+                validateSettings(runnerSettings);
                 Contract contract = selectSingleObligation(environment);
                 Proof proof = createProof(environment, contract);
                 try {
@@ -135,6 +158,41 @@ public final class ScriptCommand implements Callable<Integer> {
         } catch (RuntimeException e) {
             throw CliError.internal("internal error while running the script: "
                 + errorMessage(e), e);
+        } finally {
+            runnerSettings.close();
+        }
+    }
+
+    /**
+     * Assembles the §5.1 strategy settings of the run from {@code --settings-file} and
+     * {@code --strategy-option}.
+     *
+     * @return the run settings, never {@code null} (empty if no option was given)
+     * @throws CliError an input error if the settings file cannot be read or an option is not
+     *         understood
+     */
+    private HeadlessRunnerSettings runnerSettings() throws CliError {
+        try {
+            return HeadlessRunnerSettings.from(settingsFile, strategyOption);
+        } catch (CliSettingsException e) {
+            String message = e.getMessage();
+            throw CliError.input(message != null ? message : e.getClass().getSimpleName());
+        }
+    }
+
+    /**
+     * Verifies the requested strategy choices against the choice declarations of the loaded
+     * problem (§5.3 of the headless interface spec).
+     *
+     * @param settings the run settings
+     * @throws CliError an input error naming the offending {@code category:value}
+     */
+    private static void validateSettings(HeadlessRunnerSettings settings) throws CliError {
+        try {
+            settings.validate();
+        } catch (CliSettingsException e) {
+            String message = e.getMessage();
+            throw CliError.input(message != null ? message : e.getClass().getSimpleName());
         }
     }
 
