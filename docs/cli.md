@@ -225,8 +225,8 @@ proven.
 ## 6. Open-goal inspection
 
 `prove --print-open-goals [<MAX>]` (default `MAX=10`; `MAX=0` = unlimited) prints, after
-proof search and before the `KEY_RESULT` lines, the open goals on stdout — one section per
-selected contract, in selection order:
+proof search and before that file's `KEY_RESULT` lines, the open goals on stdout — one section
+per selected contract, in file order and, within a file, selection order:
 
 ```
 CONTRACT <NAME>
@@ -333,7 +333,8 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
 - `KEY_ERROR contract '<NAME>' not found` — unknown `--choose-contract` selector (exit `3`).
   `prove` prints the §4.3 listing to **stdout** before this error so the caller can see the
   available selectors; a failing `prove` run therefore has listing lines on stdout and no
-  `KEY_RESULT`. `script` prints only the error.
+  `KEY_RESULT` for the failed file (a multi-file run that fails this way keeps the completed
+  files' `KEY_RESULT` lines before the listing). `script` prints only the error.
 - `KEY_ERROR cannot load '<FILE>': <REASON>` — the input could not be loaded (exit `3`).
   `<REASON>` is the most informative message of the loader's cause chain, so a parse error
   carries its position (e.g. `… Bad.java:2/27: (line 2,col 27) Java syntax error: …`),
