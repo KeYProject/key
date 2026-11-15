@@ -75,11 +75,11 @@ public class SMTProofApplyUserActionF extends UserActionF {
         // Swing SolverListener.applyResults (SolverListener.java:209-221): the goal closing runs
         // with the interface frozen (stopInterface/startInterface); the FX counterpart is the
         // WP-1 auto-mode seam, and the default selection happens on unfreezing
-        mediator.initiateAutoMode(proof, true, false);
+        mediator.initiateAutoMode(proof, true);
         try {
             applyResults();
         } finally {
-            mediator.finishAutoMode(proof, true, true, null);
+            mediator.finishAutoMode(proof, true, null);
         }
     }
 

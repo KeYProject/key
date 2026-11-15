@@ -25,11 +25,11 @@ import org.slf4j.LoggerFactory;
  * {@code DISPOSE_REOPEN}).
  * <p>
  * The copy runs inside the mediator's auto-mode context (Swing parity,
- * CachingExtension.java:312-319: {@code mediator.initiateAutoMode(newProof, true, false)} around
- * the copy and {@code mediator.finishAutoMode(newProof, true, true, () -> {})} in the finally —
+ * CachingExtension.java:311-319: {@code mediator.initiateAutoMode(newProof, true)} around the
+ * copy and {@code mediator.finishAutoMode(newProof, true, () -> {})} in the finally —
  * RESOLVED WP-4, KNOWN-SIMPLIFIED {@code CopyBeforeDisposeF.java:25}): the WP-1 seam publishes
- * the observable auto-mode state (the FX interface freeze) and flips the rule app index for the
- * duration of the copy. The resolver is only invoked directly when no mediator is available
+ * the observable auto-mode state (the FX interface freeze) for the duration of the copy. The
+ * resolver is only invoked directly when no mediator is available
  * (toolkit-free environments).
  *
  * @author Arne Keller (Swing original)
@@ -71,7 +71,7 @@ final class CopyBeforeDisposeF implements ProofDisposedListener {
             try {
                 KeYMediatorF m = mediator;
                 if (m != null) {
-                    m.initiateAutoMode(newProof, true, false);
+                    m.initiateAutoMode(newProof, true);
                 }
                 CopyReferenceResolver.copyCachedGoals(newProof, referencedProof, null, null);
             } catch (RuntimeException ex) {
@@ -81,9 +81,9 @@ final class CopyBeforeDisposeF implements ProofDisposedListener {
             } finally {
                 KeYMediatorF m = mediator;
                 if (m != null) {
-                    // Swing: finishAutoMode(newProof, true, true, () -> {}) — switch the rule
-                    // app index back to interactive use and do not select a different node
-                    m.finishAutoMode(newProof, true, true, () -> {
+                    // Swing: finishAutoMode(newProof, true, () -> {}) — unfreeze the
+                    // interface and do not select a different node
+                    m.finishAutoMode(newProof, true, () -> {
                     });
                 }
             }

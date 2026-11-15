@@ -29,9 +29,9 @@ import org.jspecify.annotations.Nullable;
  * <p>
  * The auto-mode shell is the Swing {@code CEWorker.start/done} parity
  * (CounterExampleAction.java:169-191): {@link #call()} performs
- * {@code mediator.initiateAutoMode(proof, true, false)} before the search and the terminal-state
- * hooks (the FX-thread counterparts of the Swing {@code done()}) perform
- * {@code mediator.finishAutoMode(proof, true, true, null)} — also after a stop/failure, so the
+ * {@code mediator.initiateAutoMode(proof, true)} before the search and the terminal-state hooks
+ * (the FX-thread counterparts of the Swing {@code done()}) perform
+ * {@code mediator.finishAutoMode(proof, true, null)} — also after a stop/failure, so the
  * interface never stays frozen.
  */
 @NullMarked
@@ -76,7 +76,7 @@ final class CounterExampleTaskF extends Task<Void> {
         // Swing CEWorker.start(): initiateAutoMode before the search (CounterExampleAction
         // .java:169-172; there on the EDT, here at the beginning of the worker body — the FX
         // mediator's seam only flips flags and publishes the observable property).
-        mediator.initiateAutoMode(proof, true, false);
+        mediator.initiateAutoMode(proof, true);
         TestgenReflectionF.searchCounterExample(ui, proof, sequent, sink, launcher,
             // Swing CEWorker.createSolverListener (CounterExampleAction.java:186-188): the
             // SolverListener for the settings + side proof of the search
@@ -101,12 +101,12 @@ final class CounterExampleTaskF extends Task<Void> {
     }
 
     /**
-     * Swing CEWorker.done(): {@code finishAutoMode(oldProof, true, true, null)}
+     * Swing CEWorker.done(): {@code finishAutoMode(oldProof, true, null)}
      * (CounterExampleAction.java:174-176) — runs on the FX thread (the state-change hooks), also
      * after a stop or failure.
      */
     private void finishAutoMode() {
-        mediator.finishAutoMode(proof, true, true, null);
+        mediator.finishAutoMode(proof, true, null);
     }
 
     /**

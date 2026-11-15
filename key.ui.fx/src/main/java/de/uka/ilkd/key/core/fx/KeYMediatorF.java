@@ -322,8 +322,9 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
     /**
      * WP-1 — performs the standard preparations for starting an auto mode run on the given
      * (possibly foreign) proof (Swing {@code KeYMediator.initiateAutoMode},
-     * KeYMediator.java:535-540): freezes the interface and marks the auto mode active
-     * ({@code fullStop}), flips the rule app index to the requested mode.
+     * KeYMediator.java:519-521): freezes the interface and marks the auto mode active
+     * ({@code fullStop}). The prover sets the rule app index mode of its run itself (see
+     * {@link Proof#getRuleAppIndexMode()}).
      * <p>
      * Swing {@code stopInterface(fullStop)} disables the UI via
      * {@code ui.notifyAutoModeBeingStarted()} and sets {@code inAutoMode}; in the FX UI both the
@@ -337,34 +338,26 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
      *
      * @param proof the {@link Proof} to be worked on (may differ from the selected proof)
      * @param fullStop if a full freeze of the interface is requested
-     * @param interactive whether the needed taclet index is for interactive or automatic use
-     *        (normally {@code false})
      */
-    public void initiateAutoMode(Proof proof, boolean fullStop, boolean interactive) {
+    public void initiateAutoMode(Proof proof, boolean fullStop) {
         if (fullStop) {
             inAutoMode = true;
             publishAutoModeRunning(true);
         }
-        setInteractive(interactive);
     }
 
     /**
      * WP-1 — performs the standard preparations for finishing an auto mode run on the given
      * (possibly foreign) proof (Swing {@code KeYMediator.finishAutoMode}, KeYMediator.java
-     * :550-566): flips the rule app index back, unfreezes the interface ({@code fullStop}) and
-     * selects a node/proof by running the given selector (the default selection when
-     * {@code selection} is {@code null}).
+     * :537-549): unfreezes the interface ({@code fullStop}) and selects a node/proof by running
+     * the given selector (the default selection when {@code selection} is {@code null}).
      *
      * @param proof the {@link Proof} that was worked on
      * @param fullStop if a full unfreeze of the interface is requested
-     * @param interactive whether the needed taclet index is for interactive or automatic use
-     *        (normally {@code true})
      * @param selection a runnable that selects the correct node after unfreezing the interface,
      *        may be {@code null}
      */
-    public void finishAutoMode(Proof proof, boolean fullStop, boolean interactive,
-            @Nullable Runnable selection) {
-        setInteractive(interactive);
+    public void finishAutoMode(Proof proof, boolean fullStop, @Nullable Runnable selection) {
         if (fullStop) {
             inAutoMode = false;
             publishAutoModeRunning(false);
@@ -373,23 +366,6 @@ public final class KeYMediatorF implements KeYSelectionModel.ProofBinder {
             keySelectionModel.defaultSelection();
         } else {
             selection.run();
-        }
-    }
-
-    /**
-     * Swing {@code KeYMediator.setInteractive} (KeYMediator.java:476-484): switches the rule
-     * app index of the selected proof between interactive and automatic use.
-     *
-     * @param b {@code true} to switch to interactive mode
-     */
-    public void setInteractive(boolean b) {
-        Proof selectedProof = getSelectedProof();
-        if (selectedProof != null) {
-            if (b) {
-                selectedProof.setRuleAppIndexToInteractiveMode();
-            } else {
-                selectedProof.setRuleAppIndexToAutoMode();
-            }
         }
     }
 

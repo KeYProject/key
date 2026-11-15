@@ -244,13 +244,13 @@ class KeYMediatorFSeamsTest {
         // well, so finishAutoMode's default selection has a proof to work on.
         mediator.getSelectionModel().setSelectedProof(proof);
 
-        mediator.initiateAutoMode(proof, true, false);
+        mediator.initiateAutoMode(proof, true);
         assertTrue(mediator.isInAutoMode(),
             "initiateAutoMode(fullStop=true) must mark the auto mode active");
         assertTrue(mediator.autoModeRunningProperty().get(),
             "the observable property must be published (the FX UI freeze/disable channel)");
 
-        mediator.finishAutoMode(proof, true, true, null);
+        mediator.finishAutoMode(proof, true, null);
         assertFalse(mediator.isInAutoMode(),
             "finishAutoMode(fullStop=true) must clear the auto mode state");
         assertFalse(mediator.autoModeRunningProperty().get(),
@@ -260,11 +260,11 @@ class KeYMediatorFSeamsTest {
     @Test
     void autoModeContextWithoutFullStopDoesNotTouchTheState() {
         mediator.getSelectionModel().setSelectedProof(proof);
-        mediator.initiateAutoMode(proof, false, false);
+        mediator.initiateAutoMode(proof, false);
         assertFalse(mediator.isInAutoMode(),
             "initiateAutoMode(fullStop=false) must not set the auto mode flag (Swing "
                 + "stopInterface sets inAutoMode only for a full stop)");
-        mediator.finishAutoMode(proof, false, true, null);
+        mediator.finishAutoMode(proof, false, null);
         assertFalse(mediator.isInAutoMode(),
             "finishAutoMode(fullStop=false) must not clear an untouched state");
     }
@@ -273,7 +273,7 @@ class KeYMediatorFSeamsTest {
     void autoModeContextRunsTheCustomSelection() {
         mediator.getSelectionModel().setSelectedProof(proof);
         List<Proof> selections = new ArrayList<>();
-        mediator.finishAutoMode(proof, true, true, () -> selections.add(proof));
+        mediator.finishAutoMode(proof, true, () -> selections.add(proof));
         assertEquals(1, selections.size(),
             "finishAutoMode must run the given selection instead of the default selection");
     }
@@ -281,7 +281,7 @@ class KeYMediatorFSeamsTest {
     @Test
     void autoModeContextDefaultSelectionSelectsTheLoadedProof() {
         mediator.getSelectionModel().setSelectedProof(proof);
-        mediator.finishAutoMode(proof, true, true, null);
+        mediator.finishAutoMode(proof, true, null);
         assertSame(proof, mediator.getSelectedProof(),
             "finishAutoMode(selection=null) must perform the default selection");
     }

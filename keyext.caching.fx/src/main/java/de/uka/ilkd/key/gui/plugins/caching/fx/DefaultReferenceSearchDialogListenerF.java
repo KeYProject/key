@@ -57,7 +57,7 @@ final class DefaultReferenceSearchDialogListenerF implements ReferenceSearchDial
         Proof p = mediator.getSelectedProof();
         new Thread(() -> {
             try {
-                mediator.initiateAutoMode(p, true, false);
+                mediator.initiateAutoMode(p, true);
                 CopyReferenceResolver.copyCachedGoals(p, null,
                     total -> FxUtil.runLater(() -> dialog.setMaximum(total)),
                     () -> FxUtil.runLater(() -> {
@@ -70,7 +70,7 @@ final class DefaultReferenceSearchDialogListenerF implements ReferenceSearchDial
                 LOGGER.error("failed to copy cache ", e);
                 IssueDialogF.showExceptionDialog(owner, new CachingException(e));
             } finally {
-                mediator.finishAutoMode(p, true, false, () -> {
+                mediator.finishAutoMode(p, true, () -> {
                     mediator.getSelectionModel().setSelectedNode(p.root());
                 });
             }

@@ -22,10 +22,10 @@ import org.jspecify.annotations.NullMarked;
  * {@code TestGenResultsDialogF}.
  * <p>
  * The auto-mode shell is the Swing {@code TGWorker.start/done} parity (TGWorker.java:42-47,
- * :57-62): {@link #call()} performs {@code mediator.initiateAutoMode(proof, true, false)} before
- * the generation (the Swing {@code start()} does it before {@code execute()}) and the
- * terminal-state hooks (the FX-thread counterparts of the Swing {@code done()}) perform
- * {@code mediator.finishAutoMode(proof, true, true, null)} — also after a stop/failure, so the
+ * :57-62): {@link #call()} performs {@code mediator.initiateAutoMode(proof, true)} before the
+ * generation (the Swing {@code start()} does it before {@code execute()}) and the terminal-state
+ * hooks (the FX-thread counterparts of the Swing {@code done()}) perform
+ * {@code mediator.finishAutoMode(proof, true, null)} — also after a stop/failure, so the
  * interface never stays frozen. The cooperative stop is the Swing {@code interruptionPerformed}
  * parity (TGWorker.java:66-71): the stop flag is visible to the pipeline between the phases, the
  * {@code SolverLauncher} handle (obtained through {@code launcherRef} — the Swing
@@ -65,7 +65,7 @@ final class TestGenerationTaskF extends Task<Void> {
         // Swing TGWorker.start(): initiateAutoMode before the run (there on the EDT, here at the
         // beginning of the worker body — the FX mediator's seam only flips flags and publishes
         // the observable property, which the listeners marshal to the FX thread).
-        mediator.initiateAutoMode(proof, true, false);
+        mediator.initiateAutoMode(proof, true);
         TestgenReflectionF.generateTestcases(ui, proof, this::isStopRequested, sink, launcher);
         return null;
     }
@@ -90,11 +90,11 @@ final class TestGenerationTaskF extends Task<Void> {
     }
 
     /**
-     * Swing TGWorker.done(): {@code finishAutoMode(originalProof, true, true, null)} — runs on
+     * Swing TGWorker.done(): {@code finishAutoMode(originalProof, true, null)} — runs on
      * the FX thread (the state-change hooks), also after a stop or failure.
      */
     private void finishAutoMode() {
-        mediator.finishAutoMode(proof, true, true, null);
+        mediator.finishAutoMode(proof, true, null);
     }
 
     /**
