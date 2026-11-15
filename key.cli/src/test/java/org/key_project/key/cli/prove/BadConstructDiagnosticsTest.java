@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli.prove;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
 import org.key_project.key.cli.Log;
 import org.key_project.key.cli.Main;
+import org.key_project.key.cli.ProtocolWriter;
 import org.key_project.key.cli.ResultRecordWriter;
 import org.key_project.key.cli.Verbosity;
 
@@ -65,8 +65,9 @@ class BadConstructDiagnosticsTest {
                 .filter(line -> line.startsWith("KEY_ERROR")).toList();
         assertThat(keyErrorLines).hasSize(1);
         assertThat(keyErrorLines.get(0))
-                .matches("KEY_ERROR .*/acceptance/bucket-star/Bad\\.java:5:22: construct "
-                    + "'bucketData\\[\\*\\]\\[\\*\\]' not supported: .+");
+                .matches(
+                    "KEY_ERROR .+[\\/]acceptance[\\/]bucket-star[\\/]Bad\\.java:5:22: construct "
+                        + "'bucketData\\[\\*\\]\\[\\*\\]' not supported: .+");
         assertThat(run.err()).doesNotContain("NullPointerException", "ClassCastException",
             "at de.uka");
         assertThat(run.resultLines()).isEmpty();
@@ -101,8 +102,8 @@ class BadConstructDiagnosticsTest {
                 .filter(line -> line.startsWith("KEY_ERROR")).toList();
         assertThat(keyErrorLines).as("stderr: %s", run.err()).hasSize(1);
         assertThat(keyErrorLines.get(0))
-                .matches("KEY_ERROR .*/acceptance/" + fixtureDir + "/Bad\\.java:" + lineCol
-                    + ": construct '" + snippetToRegex(snippet) + "' not supported: .+");
+                .matches("KEY_ERROR .+[\\/]acceptance[\\/]" + fixtureDir + "[\\/]Bad\\.java:"
+                    + lineCol + ": construct '" + snippetToRegex(snippet) + "' not supported: .+");
         // no crash: never an NPE/CCE or a stack trace on stderr
         assertThat(run.err()).doesNotContain("NullPointerException", "ClassCastException",
             "at de.uka");
@@ -131,8 +132,8 @@ class BadConstructDiagnosticsTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
         int exit = cli.execute(args);
         return new Run(exit, out.toString(), err.toString());
     }
