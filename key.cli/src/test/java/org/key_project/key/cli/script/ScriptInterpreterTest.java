@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli.script;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
@@ -14,6 +13,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.Contract;
 
 import org.key_project.key.cli.Log;
+import org.key_project.key.cli.ProtocolWriter;
 import org.key_project.key.cli.Verbosity;
 import org.key_project.key.cli.prove.ContractIndex;
 import org.key_project.key.cli.prove.Fixtures;
@@ -108,7 +108,7 @@ class ScriptInterpreterTest {
 
     private static ScriptInterpreter interpreter(Proof proof,
             KeYEnvironment<DefaultUserInterfaceControl> env, StringWriter out) {
-        return new ScriptInterpreter(proof, env.getUi(), 0, new PrintWriter(out));
+        return new ScriptInterpreter(proof, env.getUi(), 0, new ProtocolWriter(out));
     }
 
     private static KeYEnvironment<DefaultUserInterfaceControl> loadSize() throws Exception {

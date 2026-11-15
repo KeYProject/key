@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli.prove;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.key_project.key.cli.Main;
+import org.key_project.key.cli.ProtocolWriter;
 import org.key_project.key.cli.ResultRecordWriter;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -32,8 +32,8 @@ class ProveCommandTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
 
         // the fixture contains one closed and one open contract
         int exit = cli.execute("prove", Fixtures.indexKey().toString());
@@ -56,8 +56,8 @@ class ProveCommandTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
 
         int exit = cli.execute("prove", "/nonexistent/does-not-exist.key");
 
@@ -72,8 +72,8 @@ class ProveCommandTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
 
         int exit = cli.execute("prove", "--definitely-not-an-option");
 
@@ -87,8 +87,8 @@ class ProveCommandTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
 
         int exit = cli.execute("prove");
 
@@ -102,8 +102,8 @@ class ProveCommandTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
 
         int exit = cli.execute();
 

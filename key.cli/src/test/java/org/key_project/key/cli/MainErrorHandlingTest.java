@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,8 @@ class MainErrorHandlingTest {
 
     @Test
     void inputCliErrorPrintsKeyErrorAndExits3() {
-        int code = Main.handleExecutionException(CliError.input("bad input"), new PrintWriter(err));
+        int code =
+            Main.handleExecutionException(CliError.input("bad input"), new ProtocolWriter(err));
 
         assertThat(code).isEqualTo(ExitCode.INPUT_ERROR.code());
         assertThat(err.toString()).contains("KEY_ERROR bad input");
@@ -31,7 +31,7 @@ class MainErrorHandlingTest {
     @Test
     void internalCliErrorPrintsKeyErrorAndExits4() {
         int code = Main.handleExecutionException(
-            CliError.internal("processing crashed"), new PrintWriter(err));
+            CliError.internal("processing crashed"), new ProtocolWriter(err));
 
         assertThat(code).isEqualTo(ExitCode.INTERNAL_ERROR.code());
         assertThat(err.toString()).contains("KEY_ERROR processing crashed");
@@ -40,7 +40,7 @@ class MainErrorHandlingTest {
     @Test
     void unexpectedExceptionIsAnInternalError() {
         int code =
-            Main.handleExecutionException(new RuntimeException("boom"), new PrintWriter(err));
+            Main.handleExecutionException(new RuntimeException("boom"), new ProtocolWriter(err));
 
         assertThat(code).isEqualTo(ExitCode.INTERNAL_ERROR.code());
         assertThat(err.toString()).contains("KEY_ERROR internal error: boom");
@@ -49,7 +49,7 @@ class MainErrorHandlingTest {
     @Test
     void multiLineCliErrorMessageIsFlattenedToOneLine() {
         int code = Main.handleExecutionException(CliError.input("bad input:\n  detail here"),
-            new PrintWriter(err));
+            new ProtocolWriter(err));
 
         assertThat(code).isEqualTo(ExitCode.INPUT_ERROR.code());
         assertThat(err.toString()).isEqualTo("KEY_ERROR bad input: detail here\n");
@@ -58,7 +58,7 @@ class MainErrorHandlingTest {
     @Test
     void multiLineUnexpectedMessageIsFlattenedToOneLine() {
         int code = Main.handleExecutionException(new RuntimeException("boom\n   at frame"),
-            new PrintWriter(err));
+            new ProtocolWriter(err));
 
         assertThat(code).isEqualTo(ExitCode.INTERNAL_ERROR.code());
         assertThat(err.toString()).isEqualTo("KEY_ERROR internal error: boom at frame\n");
@@ -67,7 +67,7 @@ class MainErrorHandlingTest {
     @Test
     void unexpectedExceptionWithoutMessageUsesTheExceptionName() {
         int code =
-            Main.handleExecutionException(new NullPointerException(), new PrintWriter(err));
+            Main.handleExecutionException(new NullPointerException(), new ProtocolWriter(err));
 
         assertThat(code).isEqualTo(ExitCode.INTERNAL_ERROR.code());
         assertThat(err.toString()).contains("KEY_ERROR internal error: NullPointerException");

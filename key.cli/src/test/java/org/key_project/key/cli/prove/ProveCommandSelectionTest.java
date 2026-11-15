@@ -4,12 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli.prove;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 
 import org.key_project.key.cli.Log;
 import org.key_project.key.cli.Main;
+import org.key_project.key.cli.ProtocolWriter;
 import org.key_project.key.cli.ResultRecordWriter;
 import org.key_project.key.cli.Verbosity;
 
@@ -158,8 +158,8 @@ class ProveCommandSelectionTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
         int exit = cli.execute(args);
         return new Run(exit, out.toString(), err.toString());
     }
