@@ -307,8 +307,11 @@ public final class HeadlessProver {
         if (target == null || !(closed || output.savePartial())) {
             return null;
         }
+        // always save via an absolute path: ProofSaver derives the base directory for the relative
+        // paths in the saved file from the target's parent, which is null for a bare file name
+        Path absolute = target.toAbsolutePath().normalize();
         try {
-            Path parent = target.toAbsolutePath().getParent();
+            Path parent = absolute.getParent();
             if (parent != null && Files.isRegularFile(parent)) {
                 throw CliError.input(
                     "cannot write proof '" + target + "': '" + parent + "' is not a directory");
@@ -317,11 +320,12 @@ public final class HeadlessProver {
                 Files.createDirectories(parent);
             }
             String error =
-                ProofSaver.saveToFile(target, proof, ProofSaver.marker(closed, openGoals));
+                ProofSaver.saveToFile(absolute, proof, ProofSaver.marker(closed, openGoals));
             if (error != null) {
-                throw CliError.input("cannot write proof '" + target + "': " + singleLine(error));
+                throw CliError
+                        .input("cannot write proof '" + target + "': " + CliError.oneLine(error));
             }
-            return target.toAbsolutePath().normalize();
+            return absolute;
         } catch (IOException e) {
             throw CliError.input("cannot write proof '" + target + "': " + reason(e));
         }
@@ -336,11 +340,7 @@ public final class HeadlessProver {
      */
     private static String reason(Exception e) {
         String message = e.getMessage();
-        return message != null ? singleLine(message) : e.getClass().getSimpleName();
-    }
-
-    private static String singleLine(String text) {
-        return text.replaceAll("\\s+", " ").trim();
+        return message != null ? CliError.oneLine(message) : e.getClass().getSimpleName();
     }
 
     /**

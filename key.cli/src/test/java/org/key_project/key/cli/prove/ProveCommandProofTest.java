@@ -9,6 +9,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.UUID;
 
 import org.key_project.key.cli.Log;
 import org.key_project.key.cli.Main;
@@ -72,6 +73,26 @@ class ProveCommandProofTest {
         assertThat(run.resultLines().get(0))
                 .contains(
                     "\"proofFile\":\"" + proof.toAbsolutePath().normalize().toString() + "\"");
+    }
+
+    @Test
+    @Timeout(300)
+    void proofWithBareRelativePathIsWritten() throws Exception {
+        // a single-segment relative path has no parent directory: the saver must still work
+        Path relative = Path.of("key-cli-relative-" + UUID.randomUUID() + ".proof");
+        try {
+            Run run = run("prove", Fixtures.indexKey().toString(), "--choose-contract", ONE_NAME,
+                "--proof", relative.toString());
+
+            assertThat(run.exit()).isZero();
+            assertThat(run.err()).doesNotContain("KEY_ERROR");
+            assertThat(Files.readAllLines(relative).get(0)).isEqualTo("KEY_PROOF_STATUS closed 0");
+            assertThat(Files.readString(relative)).contains("\\proof");
+            assertThat(run.resultLines().get(0)).contains(
+                "\"proofFile\":\"" + relative.toAbsolutePath().normalize() + "\"");
+        } finally {
+            Files.deleteIfExists(relative);
+        }
     }
 
     @Test
