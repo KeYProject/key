@@ -27,22 +27,6 @@
     -key-linked: #1a73e8;
     -key-interactive: #b06000;
     -key-border: #d0d0d0;
-
-    /*
-     * Configurable colors shared with the Swing UI (colors.json); the file keys are mapped to
-     * these properties by ColorSettingsF.CSS_VARIABLES and the defaults are the light defaults
-     * of the Swing ColorSettings. The sequent prop-logic default is the plain text color
-     * (black in the Swing UI).
-     */
-    -key-settings-error: #c86464;
-    -key-hl-java: #7f0055;
-    -key-hl-comment: #3f7f5f;
-    -key-hl-jml: #0000c0;
-    -key-hl-jml-keyword: #0000f0;
-    -key-sequent-hl-prop: -key-text;
-    -key-sequent-hl-dyn: #0000d0;
-    -key-sequent-hl-progvar: #6a3e3e;
-    -key-sequent-hl-arrow: #6a3e3e;
     /* configurable highlight colors (ColorSettingsF.CSS_VARIABLES): the values below are the
        light-theme defaults; user overrides from colors.json are applied inline on scene roots */
     -key-hl-java: #7f0055;
@@ -517,31 +501,6 @@
 }
 
 /* ------------------------------------------------------------------
- * proof diff frame (M5, Swing ProofDiffFrame)
- * The diff area is a StyleClassedTextArea; deleted/inserted text carries
- * the Swing span background colors (#ff8080 / #80ff80) as RichTextFX
- * -rtfx-background-color on the styled text segments.
- * ------------------------------------------------------------------ */
-.proof-diff-area {
-    -fx-background-color: -key-surface;
-}
-
-.diff-delete {
-    -rtfx-background-color: #ff8080;
-    -fx-fill: -key-text;
-}
-
-.diff-insert {
-    -rtfx-background-color: #80ff80;
-    -fx-fill: -key-text;
-}
-
-.diff-help-heading {
-    -fx-font-weight: bold;
-    -fx-underline: true;
-}
-
-/* ------------------------------------------------------------------
  * M4 file/proof dialogs (ExampleChooserF, ProofSelectionDialogF):
  * section headings replace the Swing TitledBorder labels
  * ------------------------------------------------------------------ */
@@ -641,8 +600,6 @@
  * The diff area is a StyleClassedTextArea; deleted/inserted text carries
  * the Swing span background colors (#ff8080 / #80ff80) as RichTextFX
  * -rtfx-background-color on the styled text segments.
- * M4 file/proof dialogs (ExampleChooserF, ProofSelectionDialogF):
- * section headings replace the Swing TitledBorder labels
  * ------------------------------------------------------------------ */
 .proof-diff-area {
     -fx-background-color: -key-surface;
@@ -658,16 +615,9 @@
     -fx-fill: -key-text;
 }
 
-
 .diff-help-heading {
     -fx-font-weight: bold;
     -fx-underline: true;
-}
-
-.dialog-section-title {
-    -fx-font-weight: bold;
-    -fx-underline: true;
-    -fx-text-fill: -key-text-secondary;
 }
 
 /* update highlights of the printed update operators (M2, Swing
@@ -701,17 +651,6 @@
     -fx-padding: 1;
 }
 
-/* proof-closed notification dialog (port of the Swing ProofClosedJTextPaneDisplay dialog) */
-.notification-dialog {
-    -fx-background-color: -key-background;
-}
-
-.notification-dialog-header {
-    -fx-font-size: 1.1em;
-    -fx-text-fill: -key-text;
-    -fx-padding: 0 0 4 0;
-}
-
 /* notification framework proof-closed dialog (Swing ProofClosedJTextPaneDisplay ->
  * ShowProofStatistics.Window port; FX ProofClosedDialogF) */
 .notification-dialog {
@@ -725,8 +664,10 @@
 }
 
 .notification-dialog-header {
+    -fx-font-size: 1.1em;
     -fx-text-fill: -key-success;
     -fx-font-weight: bold;
+    -fx-padding: 0 0 4 0;
 }
 
 /* ---------------------------------------------------------------------

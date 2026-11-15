@@ -159,7 +159,6 @@ import de.uka.ilkd.key.gui.fx.soundiness.SoundinessDialogF;
 import de.uka.ilkd.key.gui.fx.sourceview.SourceViewF;
 import de.uka.ilkd.key.gui.fx.strategy.StrategySelectionViewF;
 import de.uka.ilkd.key.gui.fx.tasktree.TaskTreeF;
-import de.uka.ilkd.key.gui.fx.tacletmatch.TacletMatchVerifyF;
 import de.uka.ilkd.key.gui.fx.theme.Theme;
 import de.uka.ilkd.key.gui.fx.theme.ThemeManager;
 import de.uka.ilkd.key.java.Services;
@@ -950,21 +949,6 @@ public final class MainWindowF {
      */
     public KeYSelectionModel getSelectionModel() {
         return selectionModel;
-    }
-
-    /**
-     * @return the mediator of the window (Swing {@code MainWindow.getMediator()}); used by
-     *         secondary windows like the proof diff frame
-     */
-    public KeYMediatorF getMediator() {
-        return mediator;
-    }
-
-    /**
-     * @return the stage of this window (the owner of secondary windows)
-     */
-    public Stage getStage() {
-        return stage;
     }
 
     /**
@@ -2297,13 +2281,6 @@ public final class MainWindowF {
     }
 
     /**
-     * @return the mediator of the main window (Swing {@code MainWindow.getMediator})
-     */
-    public KeYMediatorF getMediator() {
-        return mediator;
-    }
-
-    /**
      * D37 (P3c): sets the status line text and shows the progress bar for a task with the given
      * workload (Swing {@code MainWindow.setStatusLine(String, int)} →
      * {@code MainStatusLine.setProgressBarMaximum}: a negative maximum switches the bar to
@@ -2852,6 +2829,7 @@ public final class MainWindowF {
     }
 
     /**
+     * /**
      * slicing (WP-6): dispatches the proof-slicing self test ({@code key.fx.verify.slicing}) to
      * the {@code SlicingVerifyF} harness of the {@code keyext.slicing.fx} extension module,
      * which is not a compile dependency of key.ui.fx (the dependency direction is reversed) —

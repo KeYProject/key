@@ -19,13 +19,13 @@ marked `OPEN (unverified)` rather than assumed fixed.
 | Component (audit report) | Behaviors | Audit verdict | Resolution since | Current status |
 |---|---|---|---|---|
 | mainwindow | 62 | 13 PORTED / 24 PARTIAL / **17 MISSING** / 6 KNOWN-DEF | window shell, menu/toolbar/status parity, docking, drawers (MP1–MP10) | mostly resolved; open items below |
-| prooftree | 53 | 20 / 8 / **13 MISSING** / 5 KNOWN-DEF | core tree faithful; heatmap etc. deferred | heatmap/NodeInfoVisualizer/branch editing still OPEN |
-| sequent | 45 | 14 / 10 / **15 MISSING** / 4 KNOWN-DEF | term context menu + taclet application + search (MP8) | context menu RESOLVED; remaining items below |
+| prooftree | 53 | 20 / 8 / **13 MISSING** / 5 KNOWN-DEF | core tree faithful; P3a sweep items, WP-10 click-target + Apply-Strategy, WP-2 heatmap/NodeInfoVisualizer/branch editing | RESOLVED (remaining gaps documented in KNOWN-SIMPLIFIED) |
+| sequent | 45 | 14 / 10 / **15 MISSING** / 4 KNOWN-DEF | term context menu + taclet application + search (MP8); multi-selection highlight + reprint persistence (WP-3) | context menu RESOLVED; user-selection highlight + reprint persistence RESOLVED (WP-3 `key.fx.verify.sequent`); remaining items below |
 | interactive-completion | 25 | 0 / 0 / **20 MISSING** | `WindowUserInterfaceControlF` seam + tacletmatch + join/merge | RESOLVED (was the top P0; evidence uicontrol + tacletmatch 9/9) |
 | goallist-strategy-info | 37 | goal list at parity; strategy preset UI missing; info view re-designed | strategy preset combo / stash UI ported (WP-3: the Swing `StrategySelectionView.createDefaultPanel` [⚙][combo][Apply] row with Defaults + built-ins + user presets, save/stash/rename/delete over `StrategyPresetsSettings`, Apply writes maxSteps + properties like Swing :572-585; `key.fx.verify.goallist` preset round trip PASS) | stats staleness KNOWN-DEFERRED (deliberate): `InfoViewF` observes `selectedProofChanged` only (`InfoViewF.java:94-99`) — the statistics go stale after interactive rule applications until the next proof change/auto-mode stop (Swing `InfoView.java:83-111` refreshes on node changes too); per-feature deferral, outside the WP-1…WP-10 scope |
 | source-search-filechooser | 74 | 30 / 5 / **28 MISSING** | search bars + loading-options dialog ported | source-view interaction (symbex highlights, cross-highlight) KNOWN-DEFERRED (deliberate, documented at `SourceViewF.java:64-66/:110/:237` — the tab-per-file UI, the proof-node ↔ source-line symbex highlights and the sequent-hover origin cross-highlight stay deferred; per-feature deferral, outside the WP-1…WP-10 scope) |
 | menus-actions | 57 leaves | ~25 MISSING | menu parity 5/5 (File 16 / Proof 24 / Options 12 / View 7 / About 5) plus automation submenu | RESOLVED at surface level; a few behaviours below |
-| settings-config | 117 | 83 / 8 / 11 MISSING / 13 KNOWN-DEF | settings framework + providers + colors mechanics + search | theme persistence OPEN; color definitions + SMT run UI RESOLVED (P1) |
+| settings-config | 117 | 83 / 8 / 11 MISSING / 13 KNOWN-DEF | settings framework + providers + colors mechanics + search; theme persistence (WP-3: `ThemeManager` persists the choice to the user preference node, restore at startup, `key.fx.theme` stays the one-off override; `key.fx.verify.themepersist` save/restore round trip PASS) | color definitions + SMT run UI RESOLVED (P1); theme persistence RESOLVED (WP-3) |
 | unported-dialogs | 18 | 13 MISSING / 2 PARTIAL | proofmgmt, tacletmatch, IssueDialog, notification, Loaded Proofs | RESOLVED where noted below; join/mergerule/lemmatagenerator/etc. track their MP9.x modules |
 
 ## P0 sign-off (the audit's "prover workflow critical" list)
@@ -47,7 +47,7 @@ P0 bugs from the audit:
 |---|---|
 | FX search stale on node switch | **RESOLVED** (search re-runs on reprint; sequent-leftovers milestone `18df960b35`) |
 | Proof-tree context menu acts on the selection, not the clicked node | **RESOLVED** (WP-10: the context-request handler resolves the clicked row from the event-target `TreeCell` — the FX counterpart of Swing's `JTree.getPathForLocation` — and selects it like Swing `setSelectionPath`; the clicked node, not the previous selection, becomes `ProofTreeContext.invokedNode`; `key.fx.verify.prooftree` PASS "popup on clicked node, parkedSelection=true") |
-| View-menu Pretty Print / Unicode inert placeholders | `OPEN` (placeholders remain) |
+| View-menu Pretty Print / Unicode inert placeholders | **RESOLVED** (WP-3: the items were already wired to the ViewSettings + NotationInfo statics + `refreshPrettyViews` since MP3a — the real gap found and fixed was the *initial* sequent printer, built from a bare `new NotationInfo()` that printed plain syntax regardless of the settings; the shared `createPrinter` now refreshes from the ViewSettings like Swing's mediator-owned NotationInfo; `key.fx.verify.menuparity` PrettyUnicode leg fires the real CheckMenuItems and asserts the settings mirroring, the Unicode disable binding and the visible effect — `PASS - pretty[true->true] unicodeEffect=true`; the demo sequent has no arithmetic, so its pretty/default notation is identical and the visible effect is asserted through the state-aware unicode toggle) |
 | Recent-file clicks drop stored profile / single-java options | **RESOLVED** (P1: `openProofFile` registers the loading options with the entry like Swing `WindowUserInterfaceControl.loadProblem`; the recent-files menu restores profile (resolved via `DefaultProfileResolver`) / additional options / single-java like Swing `RecentFileAction`, `key.fx.verify.loadingexit` round trip PASS) |
 | Shortcut-default mismatches (`KeyStrokeManagerF`: tree search, sequent search, macro defaults) | **RESOLVED** (P1: the defaults match the Swing table now — macros and PrettyPrint/Unicode/ProofManagement/tree-search on Ctrl+Shift, sequent search on Ctrl+F instead of the bare F that hijacked typing; stale persisted old defaults heal on load; `key.fx.verify.shortcuts` PASS) |
 | Dead registered bindings (Ctrl+C term copy, F3/Shift+F3, Ctrl+K/Ctrl+J, Goal Back/Prune) | **RESOLVED** (P1: Ctrl+C copies the term under the mouse via the sequent view handler + the term-menu copy item carries the accelerator; term-menu global macro items carry their accelerators and the view-level macro keys run at the last clicked position (Swing `MacroKeyBinding`); F3/Shift+F3, Ctrl+K/Ctrl+J, Goal Back/Prune wired and covered by `key.fx.verify.shortcuts`) |
@@ -72,15 +72,20 @@ P0 bugs from the audit:
 
 ## P2 sign-off
 
-Heatmap overlay (settings+toggle only, ledger `HeatmapF`), NodeInfoVisualizer, branch-label F2
-editing, info-view node-change refresh, notification framework depth, docking title
+Heatmap overlay (RESOLVED via WP-2 — the heat overlay is ported onto `SequentViewF` in the
+Swing-faithful scope: the Swing original `SequentView.updateHeatMapHighlights` renders into the
+sequent views only, never the proof tree), NodeInfoVisualizer + the proof-tree renderer surface
+and branch-label F2 editing (RESOLVED via WP-2, see carried-forward item 2),
+info-view node-change refresh, notification framework depth, docking title
 actions/layout slots/maximize (partially done — `key.fx.verify.docking` PASS; title actions
 exist as `DockTitleActionF`), join+mergerule dialogs (track MP9.x modules), lemmatagenerator
 (`key.fx.verify.lemmaorigin` PASS for the generator path), soundiness (`key.fx.verify.soundiness`
 PASS), originlabels (lemmaorigin), plugins, profileloading (RESOLVED), help windows
 (`key.fx.verify.help` PASS), theme persistence (color definitions RESOLVED via P1
-`key.fx.verify.colors`), feature
-flags + parallel prover (`ParallelProverStatusIndicatorF` partial), settings dump, modal
+`key.fx.verify.colors`; the persistence itself RESOLVED via WP-3, item 9 below), feature
+flags + parallel prover (`ParallelProverStatusIndicatorF` RESOLVED via WP-3 — the SC/MT toggle
+button with the worker-count context menu, `key.fx.verify.extensions` proverMode leg PASS;
+KNOWN-SIMPLIFIED row RESOLVED), settings dump, modal
 grey-out, proof-disposal clearing (auto saver handles the disposal part), tab icons/titles,
 file-chooser bookmarks. Each is either documented in the KNOWN-SIMPLIFIED ledger or listed above
 as open.
@@ -93,25 +98,43 @@ as open.
    during auto mode anyway, the automation macro items must stay clickable to stop a run, and
    the status bar must stay live for the progress display) — KNOWN-SIMPLIFIED.
 2. Proof-tree: Apply Strategy on clicked node, Prune-at-node in the popup (both RESOLVED via
-   WP-10 `key.fx.verify.prooftree`), renderer surface
-   (tooltips, goal icons, linked/cache marks, notes, branch-label F2 editing), NodeInfoVisualizer.
-3. Sequent: multi-select highlight + reprint persistence, drag & drop, inner-node highlights +
+   WP-10 `key.fx.verify.prooftree`), renderer surface, NodeInfoVisualizer, branch-label F2
+   editing — RESOLVED (WP-2): the renderer surface is ported (leaf goal icons — closed goal,
+   cached-closed, linked, interactive, open — as FontAwesome glyph stand-ins for the Swing
+   key-hole gifs, non-leaf marker icons in the Swing priority window/notes/useless/interactive/
+   script, the branch linked-folder icon, tooltip notes + useless-analysis lines, and the
+   `NodeInfoVisualizerListenerF` attachment that re-renders on register/unregister like Swing's
+   `nodeInfoVisListener`); branch-label F2 editing is ported with the Swing
+   `DefaultTreeCellEditor.isCellEditable` gate (only branch entries whose node has a parent —
+   the root branch is denied) and the commit seam mirroring
+   `GUIProofTreeModel.valueForPathChanged → GUIBranchNode.setLabel → NodeInfo.setBranchLabel`
+   plus the full rebuild; the heatmap heat overlay renders into the sequent view (the Swing
+   original touches the sequent views only). Documented deviations: the Swing key-hole gif
+   images have no FontAwesome glyph equivalents (state colors stay on the text classes, icons
+   use the neutral `key-icon` fill), and `key.fx.verify.prooftree` asserts the surface —
+   `branchEdit rootEditable=false labelEdit=PASS leafIcons=3 nodeInfoVisualizer=PASS PASS`
+   (`/tmp/opencode/wp2/prooftree-agatha3.log`) and the heatmap leg
+   `sfAge=1 sfNewest=5 termsAge=6 termsNewest=3 off=0 PASS` (`/tmp/opencode/wp2/heatmap1.log`).
+3. Sequent: multi-select highlight + reprint persistence (RESOLVED via WP-3
+   `key.fx.verify.sequent`), drag & drop, inner-node highlights +
    taclet info pane, source cross-highlight.
 4. Source view: symbex line highlights, click-to-jump into the proof tree, hover
    cursor/line highlight, multi-file tabs, branch status bar.
-5. Menus/actions: Pretty Print / Unicode wiring, term labels, tooltip toggles, selection
+5. Menus/actions: Pretty Print / Unicode wiring (RESOLVED via WP-3 — see the P0 row;
+   `key.fx.verify.menuparity` PrettyUnicode PASS), term labels, tooltip toggles, selection
    Back/Forward bindings (RESOLVED via WP-10 `key.fx.verify.selectionhistory`), Edit Last File,
    Load User Taclets + Prove submenu, Run All Proofs
    (dialogs exist for several), EnableWhenProofLoaded analogue, toolbars 9 remaining buttons.
 6. Keyboard: shortcut-default regressions; dead bindings audit (RESOLVED via P1
    `key.fx.verify.shortcuts`; the Swing-persisted `keystrokes.json` stays the source of truth
    for user overrides).
-7. Options dialogs: strategy preset UI, HeatmapOptionsDialog (SMT run UI RESOLVED via P1
+7. Options dialogs: strategy preset UI (RESOLVED via WP-3 — the strategy tab's [⚙][combo][Apply]
+   row + `key.fx.verify.goallist` PASS), HeatmapOptionsDialog (SMT run UI RESOLVED via P1
    `key.fx.verify.smt`).
 8. Exit flow: close-request + confirmExit + layout persistence on close (RESOLVED via P1
    `key.fx.verify.loadingexit`; the Swing `fireShutDown` event now fires through the WP-1
    `GUIListenerF` registry seam — `MainWindowF.java:3721` RESOLVED).
-9. Colors/theme: all 51 Swing-parity color property definitions RESOLVED (P1 `key.fx.verify.colors` PASS); theme persistence remains.
+9. Colors/theme: all 51 Swing-parity color property definitions RESOLVED (P1 `key.fx.verify.colors` PASS); theme persistence RESOLVED (WP-3: `ThemeManager` persists to the user preference node, `key.fx.verify.themepersist` save/restore round trip PASS — save `applied=DARK persisted=DARK`, restore `restored=DARK persisted=DARK reset=LIGHT`).
 10. Notification framework depth: proof-closed/exception dialogs beyond toasts are in
     (`IssueDialogF`); the `NotificationTask`/action framework remains partial.
 11. Docking: remaining title actions, layout-slot keys F10–F12 (named slots exist).

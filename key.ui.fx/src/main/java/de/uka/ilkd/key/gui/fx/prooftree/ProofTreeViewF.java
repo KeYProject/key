@@ -102,9 +102,8 @@ import org.slf4j.LoggerFactory;
  * cycle through the matches and select them in the selection model; the field gets an alert
  * styling while there is no match. Open with {@code Ctrl+Shift+F}, close with {@code Escape}.
  * <p>
- * Deliberately deferred to later M2/M3 chunks: the further filters ({@code
- * HIDE_CLOSED_SUBTREES}, {@code HIDE_INTERACTIVE_GOALS}), heatmap, notes/tooltips of the rich
- * Swing renderer, one-step-simplifier protocol children, lazy population for very large proofs
+ * Deliberately deferred to later chunks: heatmap, notes/tooltips of the rich
+ * Swing renderer, lazy population for very large proofs
  * (currently built eagerly), and incremental per-event tree model updates (live updates currently
  * coalesce into a full rebuild).
  */
@@ -435,7 +434,6 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
 
     /** the node the popup was invoked on (Swing {@code ProofTreeContext.invokedNode}) */
     private Node popupNode;
-    private Menu strategyMacrosMenu;
 
     /**
      * C23 (WP-10): the subtree node count captured before the apply-strategy self test started
@@ -1819,31 +1817,6 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
         FeatureSettings.onAndActivate(ProofMacroMenuF.PROOF_SCRIPTS_FEATURE,
             active -> FxUtil.runLater(this::populateStrategyMacros));
         return menu;
-    }
-
-    /**
-     * C24 (P4): the PROOF_TREE extension contributions spliced at the end of the popup — the
-     * items of {@code KeYGuiExtensionFacadeF.getProofTreeContextItems} for the clicked node
-     * behind a separator (Swing {@code ProofTreePopupFactory.create},
-     * ProofTreePopupFactory.java:152-154: {@code menu.addSeparator(); addContextMenuItems(
-     * ContextMenuKind.PROOF_TREE, menu, context.invokedNode, context.mediator);} followed by
-     * dropping the separator when nothing was contributed). Rebuilt on every showing since the
-     * clicked node changes; the section always stays the tail of the menu.
-     */
-    private void refreshPopupExtensions() {
-        contextMenu.getItems().removeAll(popupExtensionItems);
-        popupExtensionItems.clear();
-        if (mediator == null) {
-            return;
-        }
-        List<MenuItem> items =
-            KeYGuiExtensionFacadeF.getProofTreeContextItems(mediator, popupNode);
-        if (items.isEmpty()) {
-            return; // no separator without contributions (Swing drops it too)
-        }
-        popupExtensionItems.add(new SeparatorMenuItem());
-        popupExtensionItems.addAll(items);
-        contextMenu.getItems().addAll(popupExtensionItems);
     }
 
     /**
@@ -3365,6 +3338,10 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             if (empty || item == null) {
                 setText(null);
                 setTooltip(null);
+                // clear the inline styles and the icon of a reused cell (the WP-5 stylers may
+                // have styled / the WP-2 renderer surface may have iconized the entry that was
+                // shown before)
+                setStyle(null);
                 setGraphic(null);
                 return;
             }
@@ -3375,6 +3352,18 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             if (matched) {
                 getStyleClass().add("proof-tree-match");
             }
+            // WP-5: the extension stylers (Swing renderer stylers parity) accumulate their
+            // border/background colors and tooltip title; the css is applied inline and wins
+            // over the theme's goal-state classes, like the Swing renderer's last-writer style
+            Style style = null;
+            if (!cellStylers.isEmpty()) {
+                style = new Style();
+                for (CellStyler styler : cellStylers) {
+                    styler.style(style, item);
+                }
+            }
+            String css = style == null ? "" : style.css();
+            setStyle(css.isEmpty() ? null : css);
             // WP-2 (renderer surface): the goal-state and marker icons of the Swing renderer
             // (ProofTreeView.renderLeaf/renderBranch/renderNonLeaf, ProofTreeView.java:1280-1424)
             setGraphic(markerIcon(item));
@@ -3382,10 +3371,16 @@ public class ProofTreeViewF extends BorderPane implements AutoModeListener {
             // Tooltips in Proof Tree" (Swing ProofTreeView.getToolTipText,
             // ProofTreeView.java:195-217 renders no tooltip unless isShowProofTreeTooltips()).
             // The cell re-consults the flag on every updateItem; the View-menu toggle triggers a
-            // refresh() (MainWindowF.buildViewMenu) so the change applies immediately.
+            // refresh() (MainWindowF.buildViewMenu) so the change applies immediately. Minimal
+            // fidelity: the Swing renderer builds a rich styled tooltip (rule name, position in
+            // occurrence, notes, rendered by ProofTreeView.renderTooltip :1202-1219); the FX cell
+            // shows the WP-2 renderer-surface text (notes, useless analysis) — or the title a
+            // styler set (WP-5, Swing Style.tooltip parity).
             if (ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings()
                     .isShowProofTreeTooltips()) {
-                setTooltip(new Tooltip(tooltipText(item)));
+                setTooltip(new Tooltip(
+                    style != null && style.getTooltipTitle() != null ? style.getTooltipTitle()
+                            : tooltipText(item)));
             } else {
                 setTooltip(null);
             }
