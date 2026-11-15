@@ -20,12 +20,16 @@ import org.jspecify.annotations.Nullable;
  * Computes the SMT counters of the {@code KEY_RESULT} record (§2 of the headless interface spec)
  * from a finished proof:
  * <ul>
- * <li>{@code smtCalls} is the number of SMT rule applications recorded by the proof statistics
- * ({@link de.uka.ilkd.key.proof.Statistics#smtSolverApps}); an SMT rule app is committed only when
- * the solver proved the sequent, so this is the number of SMT solver invocations on the proof.
+ * <li>{@code smtCalls} is the number of sequents the proof closed by an SMT rule application,
+ * taken from the proof statistics
+ * ({@link de.uka.ilkd.key.proof.Statistics#smtSolverApps}).
  * <li>{@code smtProved} counts the closed goals whose node carries an SMT rule app, i.e. the goals
  * closed by SMT.
  * </ul>
+ * Because an SMT rule app is committed only when the solver proved the sequent, {@code smtCalls}
+ * is <em>not</em> the total number of SMT solver invocations: a solver run that reports a
+ * counterexample or gives up is not counted. Consequently both counters agree in a finished proof
+ * (every closed goal carrying an SMT rule app was counted by the statistics, and vice versa).
  * Both counters are {@code 0} when SMT is not used (the default).
  * <p>
  * The counters are computed by walking the finished proof tree, because headless runs keep closed
@@ -40,8 +44,11 @@ public final class SmtCounters {
     /**
      * The SMT counters of one result record.
      *
-     * @param smtCalls the number of SMT solver invocations ({@code 0} unless SMT is enabled)
-     * @param smtProved the number of goals proved via SMT ({@code 0} unless SMT is enabled)
+     * @param smtCalls the number of sequents closed by an SMT rule application (KeY's
+     *        {@code smtSolverApps} statistic), not the total number of solver invocations
+     *        ({@code 0} unless SMT is enabled)
+     * @param smtProved the number of closed goals whose closing rule app is an SMT rule app,
+     *        equal to {@code smtCalls} in a finished proof ({@code 0} unless SMT is enabled)
      */
     public record Counts(int smtCalls, int smtProved) {
     }
@@ -62,7 +69,8 @@ public final class SmtCounters {
      * SMT counters. A closed goal counts as proved via SMT iff its closing rule app is an
      * {@link SMTRuleApp}.
      *
-     * @param smtCalls the number of SMT solver invocations recorded by the proof statistics
+     * @param smtCalls the number of sequents closed by an SMT rule application, as recorded by
+     *        {@code Statistics.smtSolverApps}
      * @param closingRuleApps the closing rule app of each closed goal ({@code null} for a closed
      *        goal without a rule app, e.g. the root goal of a trivially closed proof)
      * @return the SMT counters

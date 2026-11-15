@@ -57,8 +57,8 @@ KEY_RESULT {"version":1,"contract":"edu.kit.quickheap.QuickHeap[edu.kit.quickhea
 | `openGoals` | int | number of open goals at termination; `0` iff `status=="closed"` |
 | `elapsedMs` | int | wall-clock milliseconds of proof search for this contract |
 | `proofFile` | string \| null | absolute path of the written proof file, or `null` (see §3) |
-| `smtCalls` | int | SMT solver invocations (0 unless an SMT rule is enabled) |
-| `smtProved` | int | goals proved via SMT (0 unless an SMT rule is enabled) |
+| `smtCalls` | int | number of sequents closed by an SMT rule application — KeY's `smtSolverApps` proof statistic (0 unless an SMT rule is enabled). Not a count of all SMT solver invocations: a solver run that does not prove its sequent is not counted |
+| `smtProved` | int | goals proved via SMT, i.e. closed goals whose closing rule application is an SMT rule app (0 unless an SMT rule is enabled); equals `smtCalls` in a finished proof |
 | `errorMessage` | string \| null | human-readable message; non-null iff `status=="error"` |
 
 Listing (`list`) prints no `KEY_RESULT` line. For a file that cannot be loaded, one `error`
