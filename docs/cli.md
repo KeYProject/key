@@ -66,7 +66,9 @@ diagnostic of §8).
 
 - **Default**: no `.proof` file is written anywhere unless requested via `--proof` or
   `--proof-dir`.
-- `--proof <PATH>`: writes the proof of the (single selected) contract to `PATH`.
+- `--proof <PATH>`: writes the proof of the (single selected) contract to `PATH`. Relative
+  paths are resolved against the working directory (a bare file name works); the
+  `proofFile` field of §2 always reports the absolute, normalized path.
 - `--proof-dir <DIR>`: writes one `<position>.proof` per selected contract (0-based selection
   position).
 - Proof output requires a **single load file**: `--proof`/`--proof-dir` together with more than
@@ -163,8 +165,9 @@ plus the full listing on stdout, and exits `3`.
 4. KeY defaults.
 
 For the same key, a `--strategy-option` overrides the `--settings-file` entry, which
-overrides the load-file `\settings` block. Settings are applied **only for the duration of
-the run** and are never persisted back into `~/.key` (or `--config-dir`), except into files
+overrides the load-file `\settings` block. Both flags exist on every subcommand that drives
+proof search (`prove` and `script`). Settings are applied **only for the duration of the
+run** and are never persisted back into `~/.key` (or `--config-dir`), except into files
 the caller explicitly requested.
 
 `--config-dir <DIR>` (root option, also accepted as `--config-dir=<DIR>`, scanned from any
@@ -240,11 +243,14 @@ GOAL <id> <position-path>
 
 ```
 key-cli script <load-file> <script-file> [--choose-contract <SELECTOR>] [--timeout <MS>]
+                  [--settings-file <PATH>] [--strategy-option <KEY>=<VALUE>]...
 ```
 
 The script file is line-oriented UTF-8; lines starting with `#` (and blank lines) are
 ignored. The script applies to the single obligation selected via §4.2 (the selection must
-resolve to exactly one contract). Grammar:
+resolve to exactly one contract). `--settings-file` and `--strategy-option` take the §5
+choices into effect for the scripted run with the same precedence, so a scripted run is as
+reproducible as a `prove` run. Grammar:
 
 ```
 script      := { line }
@@ -310,6 +316,13 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
   former `NullPointerException`/`ClassCastException` crashes; the same structured message
   is also carried in the `errorMessage` of the `error` result record.
 - `KEY_ERROR contract '<NAME>' not found` — unknown `--choose-contract` selector (exit `3`).
+  `prove` prints the §4.3 listing to **stdout** before this error so the caller can see the
+  available selectors; a failing `prove` run therefore has listing lines on stdout and no
+  `KEY_RESULT`. `script` prints only the error.
+- `KEY_ERROR cannot load '<FILE>': <REASON>` — the input could not be loaded (exit `3`).
+  `<REASON>` is the most informative message of the loader's cause chain, so a parse error
+  carries its position (e.g. `… Bad.java:2/27: (line 2,col 27) Java syntax error: …`),
+  not just the loader's summary.
 - `KEY_ERROR no contracts found in <FILE>` — the run selected no contract at all (a `prove` run
   that proves nothing must not report success; exit `3`).
 - `KEY_ERROR cannot write proof '<PATH>': <REASON>` — the requested proof file cannot be written
@@ -319,6 +332,8 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
 - `KEY_ERROR file not found: <PATH>` — missing input or settings file (exit `3`).
 - `KEY_ERROR <usage message>` — unknown option, missing argument, … (exit `3`).
 - `KEY_ERROR internal error: <message>` — an unexpected exception (exit `4`).
+- Every `KEY_ERROR`, `KEY_WARN`, `REPLAY …` and `SCRIPT …` line is **one line**: line breaks
+  and whitespace runs inside a message are collapsed so line-oriented consumers are safe.
 - `KEY_WARN <message>` — §8's non-fatal warning channel. Reserved: no current code path emits
   it; non-fatal conditions that a driver must see are reported as `KEY_ERROR` with the exit code
   the contract assigns to them.
@@ -376,6 +391,8 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
 | `script` | `<load-file> <script-file>` | run the §7.1 script against one obligation; prints `SCRIPT …` lines then one `KEY_RESULT` |
 | `script` | `--choose-contract <SELECTOR>` | the single obligation (selection must resolve to exactly one contract) |
 | `script` | `--timeout <MS>` | per-command proof-search timeout, `0` = none (default); expiry fails that line and exits `2` |
+| `script` | `--settings-file <PATH>` | §5.2 settings file applied to the scripted run |
+| `script` | `--strategy-option <KEY>=<VALUE>` | single strategy choice, repeatable, overrides the settings file |
 | `replay` | `<proof-file>` | re-check the §3 proof file |
 | `replay` | `--contract <NAME>` | restrict the re-check to one contract |
 | all | `--help` | usage text |
