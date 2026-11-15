@@ -36,6 +36,23 @@ public final class Fixtures {
         return resource("/fixtures/corrupt/corrupt.key");
     }
 
+    /**
+     * The load file of a pure first-order problem that an SMT solver proves: the initial proof
+     * goal is {@code x = x} for an integer constant {@code x}, so no symbolic execution step is
+     * needed before the solver runs.
+     */
+    public static Path smtValidKey() {
+        return resource("/fixtures/smt/valid.key");
+    }
+
+    /**
+     * The load file of a pure first-order problem that is not valid: the initial proof goal is
+     * {@code x = 0} for an integer constant {@code x}, so no SMT solver can close it.
+     */
+    public static Path smtInvalidKey() {
+        return resource("/fixtures/smt/invalid.key");
+    }
+
     /// A Java source with a syntax error whose parse diagnostic carries the source position.
     public static Path syntaxErrorJava() {
         return resource("/fixtures/syntaxerror/Bad.java");
