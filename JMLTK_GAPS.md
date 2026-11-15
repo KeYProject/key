@@ -93,7 +93,7 @@ JMLtk front-end shipped in PR #3997.
 | 17 | origin-label file info for re-parsed JML | `Precondition @ [no file]` | any JMLtk-converted spec (assert/assume/set, contract clauses, fallback) | ✔ RESOLVED (2026-11-15, root cause: `JmlFacade.positionedString` propagates the JMLtk node's URI+line to every re-parse; origins now render as `ensures @ file Foo.java @ line N`. Legacy `[no file]` remains parseable for old proofs — see §17) |
 | 18 | DL-typed ghost locals with initializer | `//@ ghost \seq x = \dl_array2seq(a);` | `key.ui/examples/heap/quicksort/{sort,split}{,-jmlscript}.key` | ✔ RESOLVED (2026-11-15, jmltk PR #99 / snapshot `1.2.1-20261115.031329-3`; `MtScriptStressTest` 2/2 — see §18) |
 | 19 | `ensures_redundantly` clause kind | `@ ensures_redundantly e;` | `key.ui/examples/heap/SmansEtAl/src/Iterator.java:11` | ✔ RESOLVED (2026-11-15: translated exactly like `ensures`, matching the pre-takeover lexer where `_redundantly` was part of the token — see §19) |
-| 20 | `assignable_free` clause body | `@ assignable_free \nothing;` / `@ assignable_free field;` | `key.ui/examples/standard_key/java_dl/jml-free/{AssignableFree,AssignableLoopFree}.java` | ✘ OPEN — upstream reproducer in `jmltk` branch `weigl/assignable-free` (`AssignableFreeClauseTest`); JMLtk silently turns the clause into a bogus `FieldDeclaration type=assignable_free` |
+| 20 | `assignable_free` clause body | `@ assignable_free \nothing;` / `@ assignable_free field;` | `key.ui/examples/standard_key/java_dl/jml-free/{AssignableFree,AssignableLoopFree}.java` | ✔ RESOLVED (2026-11-15, jmltk build 4 adds `ASSIGNABLE_FREE`; KeY maps it on method and loop contracts — see §20) |
 | 21 | committed `.proof` replay drift | `heap/permutedSum/perm.proof` | the tracked proof (155 tracked `.proof` files total; this one fails) | ✘ OPEN (replay errors: rule position no longer fits, built-in reconstruction fails) |
 
 ---
@@ -682,7 +682,7 @@ Both forms are parsed:
   `ArrayList_add.key` (SmansEtAl) loads again.
 - **CI impact:** clears the `testRunAllFunProofs` `SmansEtAl` load failure.
 
-## 20. `assignable_free` clause body  — ✘ OPEN (load failure, symbol resolution)
+## 20. `assignable_free` clause body  — ✔ RESOLVED (2026-11-15, jmltk build 4)
 
 ```java
 @ assignable_free \nothing;
@@ -691,7 +691,18 @@ Both forms are parsed:
 - Fixtures: `key.ui/examples/standard_key/java_dl/jml-free/AssignableLoopFree.java:14,22`
   (and `AssignableFree.java` in the same directory); group = the 13 `.key`
   files of `key.ui/examples/standard_key/java_dl/jml-free/`.
-- **Symptom:** load fails with
+- **RESOLVED (2026-11-15):** jmltk build `1.2.1-20261115045514-4` adds
+  `JmlClauseKeyword.ASSIGNABLE_FREE` (the jmltk PR #100 reproducer merged as
+  `e1dad353f`); the parser now emits a normal `JmlMultiExprClause` instead of a
+  bogus field. KeY maps it to `TextualJMLSpecCase.ClauseHd.ASSIGNABLE_FREE`
+  (and `TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE` for loop contracts),
+  parsing the text with KeY's `assignable_clause`/`loop_assignable_clause`
+  (the KeY lexer's `Pfree` suffix already accepts `assignable_free`).
+  Re-tested locally: the `javadl` group now loads all `jml-free` files
+  (`assignableFree*`, `loopInvFree`, `ensuresFree`); only the known
+  doesn't-close drift (`for_Array`, `for_Iterable`, `for_ReferenceArray`)
+  remains.
+- **Historical symptom:** load failed with
   `UnsolvedSymbolException{context='null', name='assignable_free'}` thrown
   from `JP2KeYConverter`'s `ClassOrInterfaceType` handling
   (`getKeYJavaType` → `type.resolve()`, `JP2KeYConverter.java:1268`, via
@@ -708,16 +719,14 @@ Both forms are parsed:
   fallback.
 - **Reproducer (jmltk):** branch `weigl/assignable-free` (from `origin/main`),
   `AssignableFreeClauseTest#assignableFreeInMethodContractIsNotAMisplacedField`.
-  The test is intentionally red: it asserts that `assignable_free` is either
-  represented as a JML clause or rejected loudly, and that it never becomes a
-  `FieldDeclaration`.
-- **CI impact:** `testRunAllFunProofs` group `javadl` (whole group).
-- **Fix options:** upstream — add `assignable_free` to the JMLtk clause
-  grammar/`JmlClauseKind` (the correct fix, mirrors `assignable`); at minimum
-  reject the unknown clause loudly instead of fabricating a field. KeY-side,
-  the converter could skip symbol resolution for clause-keyword positions, but
-  that only hides the missing clause (and still loses `assignable_free`
-  semantics).
+  It asserted that `assignable_free` is either represented as a JML clause or
+  rejected loudly, and that it never becomes a `FieldDeclaration`; merged as
+  jmltk PR #100.
+- **CI impact:** `testRunAllFunProofs` group `javadl` now loads; the remaining
+  group failures are the known `for_*` doesn't-close drift, not a load error.
+- **Fix (implemented upstream):** `assignable_free` was added to the JMLtk
+  clause grammar/`JmlClauseKeyword` (mirrors `assignable`); KeY translates the
+  new `ASSIGNABLE_FREE` kind on method and loop contracts.
 
 ## 21. committed `perm.proof` no longer replays  — ✘ OPEN (replay drift)
 

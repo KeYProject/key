@@ -36,14 +36,14 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.SimpleName;
-import com.github.javaparser.ast.jml.body.JmlBodyClauseKind;
+import com.github.javaparser.ast.jml.body.JmlBodyClauseKeyword;
 import com.github.javaparser.ast.jml.body.JmlClassAccessibleDeclaration;
 import com.github.javaparser.ast.jml.body.JmlClassExprDeclaration;
 import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
 import com.github.javaparser.ast.jml.body.JmlRepresentsDeclaration;
 import com.github.javaparser.ast.jml.clauses.ContractType;
 import com.github.javaparser.ast.jml.clauses.JmlClause;
-import com.github.javaparser.ast.jml.clauses.JmlClauseKind;
+import com.github.javaparser.ast.jml.clauses.JmlClauseKeyword;
 import com.github.javaparser.ast.jml.clauses.JmlContract;
 import com.github.javaparser.ast.jml.clauses.JmlInfFlowClause;
 import com.github.javaparser.ast.jml.clauses.JmlLabeledClause;
@@ -64,6 +64,7 @@ import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Cla
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.SIGNALS_ONLY;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ACCESSIBLE;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ASSIGNABLE;
+import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ASSIGNABLE_FREE;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ENSURES;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.ENSURES_FREE;
 import static de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.ClauseHd.REQUIRES;
@@ -149,16 +150,16 @@ public final class JmlToTextual {
     }
 
     public static TextualJMLClassInv toClassInv(JmlClassExprDeclaration decl) {
-        checkKind(decl, JmlBodyClauseKind.INVARIANT, JmlBodyClauseKind.INVARIANT_FREE);
+        checkKind(decl, JmlBodyClauseKeyword.INVARIANT, JmlBodyClauseKeyword.INVARIANT_FREE);
         JmlSideEffectChecker.check(decl);
-        boolean free = decl.getKind() == JmlBodyClauseKind.INVARIANT_FREE;
+        boolean free = decl.getKind().getValue() == JmlBodyClauseKeyword.INVARIANT_FREE;
         var ctx = parse(JmlParser::class_invariant,
             (free ? "invariant_free " : "invariant ") + decl.getInvariant() + ";", decl);
         return new TextualJMLClassInv(mapModifiers(decl.getModifiers()), ctx, free);
     }
 
     public static TextualJMLInitially toInitially(JmlClassExprDeclaration decl) {
-        checkKind(decl, JmlBodyClauseKind.INITIALLY);
+        checkKind(decl, JmlBodyClauseKeyword.INITIALLY);
         JmlSideEffectChecker.check(decl);
         var ctx =
             parse(JmlParser::initially_clause, "initially " + decl.getInvariant() + ";", decl);
@@ -167,7 +168,7 @@ public final class JmlToTextual {
     }
 
     public static TextualJMLClassAxiom toClassAxiom(JmlClassExprDeclaration decl) {
-        if (decl.getKind() != JmlBodyClauseKind.AXIOM) {
+        if (decl.getKind().getValue() != JmlBodyClauseKeyword.AXIOM) {
             throw new IllegalArgumentException(
                 "Unsupported class level construct kind: " + decl.getKind());
         }
@@ -238,10 +239,14 @@ public final class JmlToTextual {
     }
 
     /**
-     * Maps a JMLtk behavior onto KeY's {@link Behavior}.
+     * Maps a JMLtk contract behavior onto KeY's {@link Behavior}.
      */
-    public static Behavior mapBehavior(com.github.javaparser.ast.stmt.Behavior behavior) {
-        return switch (behavior) {
+    public static Behavior mapBehavior(
+            com.github.javaparser.ast.jml.clauses.JmlContractBehavior behavior) {
+        if (behavior == null || behavior.getValue() == null) {
+            return Behavior.NONE;
+        }
+        return switch (behavior.getValue()) {
             case NONE -> Behavior.NONE;
             case BEHAVIOR -> Behavior.BEHAVIOR;
             case NORMAL -> Behavior.NORMAL_BEHAVIOR;
@@ -262,7 +267,7 @@ public final class JmlToTextual {
     private static TextualJMLSpecCase toSpecCase(JmlContract contract) {
         JmlSideEffectChecker.check(contract);
         TextualJMLSpecCase specCase = new TextualJMLSpecCase(mapModifiers(contract.getModifiers()),
-            mapBehavior(contract.getBehavior()));
+            contract.getBehavior().map(JmlToTextual::mapBehavior).orElse(Behavior.NONE));
         contract.getName().ifPresent(n -> specCase.addName(n.getIdentifier()));
         if (contract.getType() == ContractType.LOOP) {
             specCase.setLoopContract(true);
@@ -308,11 +313,11 @@ public final class JmlToTextual {
     private static void handleSimpleClause(TextualJMLSpecCase specCase, JmlSimpleExprClause clause,
             boolean loopContract) {
         String expr = clause.getExpression().toString();
-        switch (clause.getKind()) {
+        switch (clause.getKind().getValue()) {
             case REQUIRES, REQUIRES_FREE, REQUIRES_REDUNDANTLY -> {
                 // The pre-takeover lexer accepted the `_redundantly` suffix as part of the
                 // REQUIRES token, so it was translated exactly like a plain requires clause.
-                boolean free = clause.getKind() == JmlClauseKind.REQUIRES_FREE;
+                boolean free = clause.getKind().getValue() == JmlClauseKeyword.REQUIRES_FREE;
                 List<String> heaps = heaps(clause.getHeaps());
                 var ctx = parse(JmlParser::requires_clause,
                     (free ? "requires_free" : "requires") + heapsText(heaps) + " " + expr + ";",
@@ -324,7 +329,7 @@ public final class JmlToTextual {
             case ENSURES, ENSURES_FREE, ENSURES_REDUNDANTLY -> {
                 // See the REQUIRES case: `ensures_redundantly` was parsed as a plain ensures
                 // clause by the pre-takeover front-end.
-                boolean free = clause.getKind() == JmlClauseKind.ENSURES_FREE;
+                boolean free = clause.getKind().getValue() == JmlClauseKeyword.ENSURES_FREE;
                 List<String> heaps = heaps(clause.getHeaps());
                 var ctx = parse(JmlParser::ensures_clause,
                     (free ? "ensures_free" : "ensures") + heapsText(heaps) + " " + expr + ";",
@@ -360,7 +365,7 @@ public final class JmlToTextual {
     private static void handleMultiClause(TextualJMLSpecCase specCase, JmlMultiExprClause clause,
             boolean loopContract) {
         String exprs = exprList(clause.getExpressions());
-        switch (clause.getKind()) {
+        switch (clause.getKind().getValue()) {
             case ASSIGNABLE, ASSIGNABLE_REDUNDANTLY, MODIFIABLE, MODIFIABLE_REDUNDANTLY, MODIFIES,
                     MODIFIES_REDUNDANTLY -> {
                 List<String> heaps = heaps(clause.getHeaps());
@@ -368,6 +373,13 @@ public final class JmlToTextual {
                     "assignable" + heapsText(heaps) + " " + exprs + ";", clause);
                 addHeapClause(specCase, ASSIGNABLE, heaps, ctx,
                     OriginTermLabel.SpecType.ASSIGNABLE);
+            }
+            case ASSIGNABLE_FREE -> {
+                List<String> heaps = heaps(clause.getHeaps());
+                var ctx = parse(JmlParser::assignable_clause,
+                    "assignable_free" + heapsText(heaps) + " " + exprs + ";", clause);
+                addHeapClause(specCase, ASSIGNABLE_FREE, heaps, ctx,
+                    OriginTermLabel.SpecType.ASSIGNABLE_FREE);
             }
             case ACCESSIBLE, CALLABLE, CALLABLE_REDUNDANTLY -> {
                 List<String> heaps = heaps(clause.getHeaps());
@@ -395,7 +407,7 @@ public final class JmlToTextual {
     private static void handleLabeledClause(TextualJMLSpecCase specCase, JmlLabeledClause clause) {
         String label = clause.getLabel().map(SimpleName::getIdentifier).orElse(" ");
         String expr = clause.getExpr() == null ? "" : " " + clause.getExpr();
-        switch (clause.getKind()) {
+        switch (clause.getKind().getValue()) {
             case BREAKS, BREAKS_REDUNDANTLY -> {
                 var ctx = parse(JmlParser::breaks_clause,
                     "breaks (" + label.trim() + ")" + expr + ";", clause);
@@ -445,7 +457,7 @@ public final class JmlToTextual {
     private static void handleInfFlowClause(TextualJMLSpecCase specCase, JmlInfFlowClause clause,
             boolean loopContract) {
         String text = infFlowText(clause);
-        switch (clause.getKind()) {
+        switch (clause.getKind().getValue()) {
             case SEPARATES -> {
                 var ctx = parse(JmlParser::separates_clause, text, clause);
                 specCase.addClause(INFORMATION_FLOW, new LabeledParserRuleContext(ctx));
@@ -481,7 +493,7 @@ public final class JmlToTextual {
      */
     private static String infFlowText(JmlInfFlowClause clause) {
         StringBuilder text = new StringBuilder();
-        switch (clause.getKind()) {
+        switch (clause.getKind().getValue()) {
             case DETERMINES -> text.append("determines ").append(infFlowList(clause.getBy()))
                     .append(" \\by ").append(infFlowBy(clause));
             case SEPARATES -> text.append("separates ").append(infFlowList(clause.getBy()));
@@ -546,7 +558,7 @@ public final class JmlToTextual {
 
     private static void handleLoopSpecClause(TextualJMLLoopSpec loopSpec, JmlClause clause) {
         if (clause instanceof JmlSimpleExprClause simple) {
-            switch (simple.getKind()) {
+            switch (simple.getKind().getValue()) {
                 case LOOP_INVARIANT, LOOP_INVARIANT_REDUNDANTLY, MAINTAINING,
                         MAINTAINING_REDUNDANTLY, INVARIANT, INVARIANT_REDUNDANTLY -> {
                     boolean free = false;
@@ -583,7 +595,7 @@ public final class JmlToTextual {
                     "Unsupported loop specification clause kind: " + simple.getKind());
             }
         } else if (clause instanceof JmlMultiExprClause multi) {
-            switch (multi.getKind()) {
+            switch (multi.getKind().getValue()) {
                 case ASSIGNABLE, ASSIGNABLE_REDUNDANTLY, MODIFIABLE, MODIFIABLE_REDUNDANTLY,
                         MODIFIES, MODIFIES_REDUNDANTLY -> {
                     List<String> heaps = heaps(multi.getHeaps());
@@ -596,12 +608,23 @@ public final class JmlToTextual {
                                 OriginTermLabel.SpecType.ASSIGNABLE, true));
                     }
                 }
+                case ASSIGNABLE_FREE -> {
+                    List<String> heaps = heaps(multi.getHeaps());
+                    String exprs = exprList(multi.getExpressions());
+                    var ctx = parse(JmlParser::loop_assignable_clause,
+                        "loop_assignable_free" + heapsText(heaps) + " " + exprs + ";", clause);
+                    for (String heap : heaps) {
+                        loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.ASSIGNABLE_FREE,
+                            new Name(heap), LabeledParserRuleContext.createLabeledParserRuleContext(
+                                ctx, OriginTermLabel.SpecType.ASSIGNABLE_FREE, true));
+                    }
+                }
                 default -> throw new IllegalArgumentException(
                     "Unsupported loop specification clause kind: " + multi.getKind());
             }
         } else if (clause instanceof JmlInfFlowClause infFlow) {
             String text = infFlowText(infFlow);
-            switch (infFlow.getKind()) {
+            switch (infFlow.getKind().getValue()) {
                 case DETERMINES -> {
                     var ctx = parse(JmlParser::determines_clause, text, clause);
                     loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
@@ -662,9 +685,9 @@ public final class JmlToTextual {
         return ctx;
     }
 
-    private static void checkKind(JmlClassExprDeclaration decl, JmlBodyClauseKind... kinds) {
-        for (JmlBodyClauseKind kind : kinds) {
-            if (decl.getKind() == kind) {
+    private static void checkKind(JmlClassExprDeclaration decl, JmlBodyClauseKeyword... kinds) {
+        for (JmlBodyClauseKeyword kind : kinds) {
+            if (decl.getKind().getValue() == kind) {
                 return;
             }
         }

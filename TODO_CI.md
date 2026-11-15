@@ -209,6 +209,15 @@ the rebase handles them:
   (§17). `MtScriptStressTest` 2/2 green (script closes single-/multi-core;
   saved multi-core proof reloads closed). This clears the RunAll `quicksort`
   group and `testMtStress`.
+- [x] **jmltk build 4 API migration** (`1.2.1-20261115045514-4`): the clause/behavior
+  kinds are now keyword nodes (`JmlClauseKind` wraps `JmlClauseKeyword`,
+  `JmlBodyClauseKind` wraps `JmlBodyClauseKeyword`, and
+  `JmlContract.getBehavior()` returns `Optional<JmlContractBehavior>`).
+  `JmlToTextual`/`JMLSpecExtractor` compare `getValue()` and map
+  `JmlContractBehavior`; `JMLSpecFactory` is unchanged. The build also adds
+  `JmlClauseKeyword.ASSIGNABLE_FREE`, so §20 is **fixed**: KeY handles
+  `ASSIGNABLE_FREE` on method and loop contracts. Re-tested `javadl`:
+  all `jml-free` files load; only the known `for_*` doesn't-close drift remains.
 - [x] **Gap-status corrections (2026-11-15):** §17 root-caused and fixed
   (`JmlFacade.positionedString` forwards the JMLtk node's URI+line to every
   re-parse); §19's original behavior verified (pre-takeover `_redundantly` was
@@ -241,7 +250,7 @@ they do **not** run in the CI key.core job). No new reds vs. the recorded baseli
 | Group | Count | Status |
 |---|---|---|
 | §19 `ensures_redundantly` — `gen._SmansEtAl` whole group | 31 | **fixed** 2026-11-15 (translated like `ensures`, matching the pre-takeover lexer; JMLTK_GAPS §19) |
-| §20 `assignable_free` — `gen._javadl#test{ensuresFree,loopInvFree}` | 2 | recorded upstream load-time gap (JMLTK_GAPS §20); reproducer in jmltk branch `weigl/assignable-free` |
+| §20 `assignable_free` — `gen._javadl#test{ensuresFree,loopInvFree}` | 2 | **fixed** 2026-11-15 (jmltk build 4 adds `ASSIGNABLE_FREE`; KeY maps it on method/loop contracts — JMLTK_GAPS §20) |
 | §18 quicksort load — `gen._quicksort` | 5 | **fixed** 2026-11-15 (jmltk snapshot `1.2.1-20261115.031329-3` + KeY proof-serializer; JMLTK_GAPS §18) |
 | §17 origin file/line / save→reload — `gen._list_seq#SimplifiedLinkedList.remove`, `gen._other`, `gen._reload_examples` | 3 | **fixed** 2026-11-15 (position propagation via `JmlFacade.positionedString`; legacy `[no file]` stays parseable; JMLTK_GAPS §17) |
 | OOM `Java heap space` — `gen._performance` ×7, `gen._performancePOConstruction` ×3, `ConcurrentMatchingStressTest#prop_split`, `gen._updateSimplificationPerformance` | 12 | environmental: one shared 4g worker across the whole suite; passes with a fresh worker / CI memory |

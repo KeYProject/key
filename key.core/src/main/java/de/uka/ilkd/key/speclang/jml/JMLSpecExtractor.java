@@ -221,7 +221,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             for (BodyDeclaration<?> member : jmlType.getMembers()) {
                 try {
                     if (member instanceof JmlClassExprDeclaration decl) {
-                        switch (decl.getKind()) {
+                        switch (decl.getKind().getValue()) {
                             case INVARIANT, INVARIANT_FREE -> result =
                                 result.add(jsf.createJMLClassInvariant(kjt, decl));
                             case INITIALLY -> result =
