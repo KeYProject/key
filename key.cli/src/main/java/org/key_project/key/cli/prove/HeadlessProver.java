@@ -16,6 +16,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
@@ -252,8 +253,7 @@ public final class HeadlessProver {
         long start = System.nanoTime();
         Proof proof = null;
         try {
-            ContractPO obligation = contract.createProofObl(environment.getInitConfig());
-            proof = environment.createProof(obligation);
+            proof = createProof(environment, contract);
 
             ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
@@ -274,6 +274,9 @@ public final class HeadlessProver {
                 elapsedMs, openGoals, status);
             return new ContractResult(contract.getName(), status, openGoals, elapsedMs, proofFile,
                 smt.smtCalls(), smt.smtProved(), null);
+        } catch (ObligationCreationException e) {
+            // an input error (§1 exit 3): the caller reports the record and aborts the run
+            throw e;
         } catch (CliError e) {
             // a requested proof file could not be written: an input error, not a contract failure
             throw e;
@@ -284,6 +287,26 @@ public final class HeadlessProver {
             if (proof != null && !proof.isDisposed()) {
                 proof.dispose();
             }
+        }
+    }
+
+    /**
+     * Creates the proof of the given contract. Shared by the {@code prove} and {@code script}
+     * subcommands so both classify a failure identically: a {@link ProofInputException} is an
+     * input error (§1 exit 3) attributable to the load file's obligation, reported via
+     * {@link ObligationCreationException} — not a per-contract internal error.
+     *
+     * @param environment the loaded environment
+     * @param contract the obligation to create the proof for
+     * @return the proof to prove or to script against
+     * @throws ObligationCreationException if KeY cannot build the proof obligation
+     */
+    public static Proof createProof(KeYEnvironment<?> environment, Contract contract) {
+        try {
+            ContractPO obligation = contract.createProofObl(environment.getInitConfig());
+            return environment.createProof(obligation);
+        } catch (ProofInputException e) {
+            throw new ObligationCreationException(contract.getName(), e);
         }
     }
 

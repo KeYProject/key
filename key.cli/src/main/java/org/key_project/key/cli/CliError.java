@@ -131,6 +131,22 @@ public final class CliError extends RuntimeException {
     }
 
     /**
+     * Creates the error record reported for a file that could not be loaded: the record's
+     * {@code contract} field names the failed input file, and its {@code errorMessage} carries
+     * the loader's failure message (see {@link #loadFailureMessage(Path, Throwable)}). Both the
+     * {@code prove} and the {@code script} subcommand print this record before the
+     * {@code KEY_ERROR} line of {@link #loadFailure(Path, Throwable)}.
+     *
+     * @param file the file that could not be loaded
+     * @param cause the loader exception
+     * @return the error record for the failed file
+     */
+    public static ContractResult loadFailureRecord(Path file, Throwable cause) {
+        return new ContractResult(file.toString(), ResultStatus.ERROR, 0, 0, null, 0, 0,
+            loadFailureMessage(file, cause));
+    }
+
+    /**
      * Returns the message reported for a failure to load a problem file: the structured
      * construct diagnostic (see {@link #loadFailure(Path, Throwable)}) when the cause chain
      * carries a {@link ConstructNotSupportedException}, and the most informative available

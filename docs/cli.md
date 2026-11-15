@@ -333,7 +333,12 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
 - `KEY_ERROR cannot load '<FILE>': <REASON>` — the input could not be loaded (exit `3`).
   `<REASON>` is the most informative message of the loader's cause chain, so a parse error
   carries its position (e.g. `… Bad.java:2/27: (line 2,col 27) Java syntax error: …`),
-  not just the loader's summary.
+  not just the loader's summary. Both `prove` and `script` print one `error` result record
+  (with the file name as its `contract`) before this line, and the run aborts.
+- `KEY_ERROR cannot create the proof obligation for '<NAME>': <REASON>` — the load file loaded,
+  but KeY cannot turn the selected contract into a proof (exit `3`). Both `prove` and `script`
+  print one `error` result record (with the contract name as its `contract`) before this line,
+  and the run aborts: no further contracts are proven.
 - `KEY_ERROR no contracts found in <FILE>` — the run selected no contract at all (a `prove` run
   that proves nothing must not report success; exit `3`).
 - `KEY_ERROR cannot write proof '<PATH>': <REASON>` — the requested proof file cannot be written
