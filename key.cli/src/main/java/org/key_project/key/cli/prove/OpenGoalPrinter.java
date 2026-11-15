@@ -42,6 +42,13 @@ public final class OpenGoalPrinter {
     /** The default maximum length (in characters) of one printed formula before truncation. */
     public static final int DEFAULT_MAX_TERM_LENGTH = 200;
 
+    /**
+     * The position path of the proof root, which is also the §7.1 {@code at} anchor of the root
+     * goal: the root can only be an open goal in the trivial proof state where it has no children,
+     * so {@code 1} can never denote a child node at the same time.
+     */
+    public static final String ROOT_POSITION = "1";
+
     private final PrintWriter out;
 
     private final int maxGoals;
@@ -94,7 +101,7 @@ public final class OpenGoalPrinter {
 
     private void printGoal(Goal goal, int id, Proof proof) {
         String path = positionPath(goal.node(), proof.root());
-        out.println(path.isEmpty() ? "GOAL " + id : "GOAL " + id + " " + path);
+        out.println("GOAL " + id + " " + path);
         for (var sf : goal.sequent().antecedent()) {
             out.println("  " + renderTerm(sf.formula(), proof));
         }
@@ -115,21 +122,28 @@ public final class OpenGoalPrinter {
 
     /**
      * Computes the position path of a goal node: the 1-based child indices from the proof root
-     * to the node, dot-separated (for example {@code 1.2.1}). The path of the root itself is the
-     * empty string. For every non-root goal the path matches {@code ^[1-9][0-9.]*$}; it is the
-     * path usable by the §7.1 {@code at <position-path>} anchor.
+     * to the node, dot-separated (for example {@code 1.2.1}). The path of the root itself is
+     * {@code 1}, matching the {@code ROOT_POSITION} anchor of the §7.1 {@code at <position-path>}
+     * command: a node with children can never be an open goal, so {@code 1} is unambiguous.
+     * <p>
+     * Every returned path therefore matches {@code ^[1-9][0-9.]*$} (acceptance F2).
      *
      * @param node the goal node
      * @param root the root node of the goal's proof
-     * @return the dot-separated position path, or the empty string for the root
+     * @return the dot-separated position path ({@code 1} for the root)
+     * @throws IllegalArgumentException if {@code node} is not a descendant of {@code root}
      */
     public static String positionPath(Node node, Node root) {
+        if (node == root) {
+            return ROOT_POSITION;
+        }
         StringBuilder sb = new StringBuilder();
         Node cur = node;
         while (cur != root) {
             Node parent = cur.parent();
             if (parent == null) {
-                return "";
+                throw new IllegalArgumentException(
+                    "node is not part of the proof of the given root");
             }
             sb.insert(0, (parent.getChildNr(cur) + 1) + (sb.isEmpty() ? "" : "."));
             cur = parent;
