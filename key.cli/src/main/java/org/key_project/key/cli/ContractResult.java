@@ -14,8 +14,9 @@ import org.jspecify.annotations.Nullable;
  *
  * @param contract the canonical contract name that was proven
  * @param status the final outcome of this contract
- * @param openGoals number of open goals at termination; {@code 0} iff the status is
- *        {@link ResultStatus#CLOSED}
+ * @param openGoals number of goals still open at termination: {@code 0} when the status is
+ *        {@link ResultStatus#CLOSED} or {@link ResultStatus#ERROR}, and at least {@code 1} when
+ *        it is {@link ResultStatus#OPEN} or {@link ResultStatus#TIMED_OUT}
  * @param elapsedMs wall-clock milliseconds spent in proof search for this contract
  * @param proofFile absolute path of the written proof file, or {@code null}
  * @param smtCalls number of SMT solver invocations ({@code 0} unless SMT is enabled)

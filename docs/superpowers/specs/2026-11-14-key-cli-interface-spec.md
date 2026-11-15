@@ -157,6 +157,8 @@ Acceptance D2: selecting by `--choose-contract "<NAME>"` proves the same obligat
 
 `--config-dir <DIR>`: makes KeY read/write ALL user-persistence from `<DIR>` instead of `~/.key`; defaults still apply inside. Runs with `--config-dir` must be byte-reproducible across hosts.
 
+§5.1 sources 1 and 2 are available on every subcommand that drives proof search (`prove` and `script`); the section is not scoped to `prove`.
+
 ### 5.2 Settings file format (exact)
 
 JSON object; ONLY the named keys are meaningful; a value for any key is one of the comma-form strings that appear in current proof headers. Required schema (keys in any order):
@@ -232,6 +234,7 @@ cmd         := "proceed"                          // one auto-strategy step
 ```
 - `position` := the `<position-path>` from §6.
 - A script applies to the currently selected/loaded obligation (chosen via §4).
+- The §5 settings sources (`--settings-file`, `--strategy-option`) apply to `script` as well as to `prove`, with the same precedence and duration; a scripted run must be as reproducible as a `prove` run.
 - Execution: lines executed in order against the *single* open goal designated by the last `GOAL` in the previous `print-open-goals`, or by `at` anchors. Result of each command line printed to stdout as `SCRIPT OK <line>` or `SCRIPT FAIL <line> <reason>`.
 - At end, `assert-closed` prints `SCRIPT FINAL closed` (exit 0) or `SCRIPT FINAL open <n>` (exit 1). If the script has no `assert-closed`, outcome comes from the §2 record.
 
