@@ -84,6 +84,13 @@ subprojects {
         maven { url = "https://central.sonatype.com/repository/maven-snapshots/" }
     }
 
+    configurations.configureEach {
+        // jmltk is consumed as a moving SNAPSHOT. Re-check its metadata on every build so CI
+        // never keeps proving against an older snapshot than the one that contains the current
+        // front-end fixes (e.g. multi-heap clause qualifiers).
+        resolutionStrategy.cacheChangingModulesFor 0, "seconds"
+    }
+
     dependencies {
         implementation(libs.slf4j.api)
         testImplementation(libs.logback.classic)

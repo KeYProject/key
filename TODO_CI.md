@@ -94,8 +94,8 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
   - **§4 comma `represents` — RESOLVED by the `\locset(…)` adoption
     (`20d361fa85`)**: the 5 load-failing groups are fixed — `funOfIF` (8/8)
     and `simple_info_flow` (2/2) now **pass**; `simpleTests` 27/28, `list`
-    25/29, `javaCard` 2/5 load but have doesn't-close proofs (listed under
-    the drift family below).
+    25/29; `javaCard` now has all five proofs closing (multi-heap qualifier
+    fix in the republished 2026-11-15 snapshot, JMLTK_GAPS §23).
   - **§18 ghost locals → LOAD failure (1)**: `quicksort`.
   - **§17 `[no file]` origin save→reload round-trip → RELOAD failure (2)**:
     `other` (`verifyThis26_01_hIndex/update.key.proof`), `list_seq`
@@ -126,7 +126,8 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
     `simpleTests` (selection_sort — open goal carries the §17
     `[loop_invariant @ [no file]]` origin label), `list`
     (ArrayList_concatenate/contains_dep/enlarge, LinkedList_get_normal),
-    `javaCard` (setArray1/setArray2, arrayFillNonAtomic). These need
+    `javaCard` (setArray1/setArray2, arrayFillNonAtomic — **fixed** by the
+    republished 2026-11-15 snapshot, JMLTK_GAPS §23). These need
     per-proof debugging (which shape difference feeds the open goals) — not
     a single root cause.
   Inf classification (9 local at `20d361fa85`; CI pending, 10 expected =
@@ -245,7 +246,7 @@ the rebase handles them:
 | `keyext.slicing` | **17/17 green** (was 5 red) |
 | `keyext.caching` | **0 failures** (was 1: `TestReferenceSearcher` = the `relax.proof` gap, JMLTK_GAPS §10, fixed 2026-11-10); `ProofCachingSingleRunTest` green |
 | `key.core` | 11 → 8 → 6 → 3 at 2026-11-11 → **0 at the 2026-11-15 rebase tip** (§11 MT fixed by `acbe6aa3d2`; the 2 `JMLParserExceptionTest` cases fixed by the snapshot's targeted messages — see §6); the §10 relax replays ×2 fixed 2026-11-10 (`#reattachLoopInvariant` in `elim_double_block_3`, JMLTK_GAPS §10); the §5 `\sum` ×2 + the `selection_sort` drift ×1 turned green in the full local run of 2026-11-11 — JMLTK_GAPS §5 re-verified **RESOLVED** 2026-11-11 (`\bsum` term byte-identical to `origin/main`, whole Fun `comprehensions` group closes, restored by the jmltk `1.2.1-SNAPSHOT` line); the 4 §4 store-ref reds cleared by the `\locset(…)` adoption (`20d361fa85`) |
-| integration | triaged at `4b62b1d6fa`, re-measured at `20d361fa85` (local corpus run): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = the 2 recorded remaining reds (`selection_sort` drift, `sum1` §5) via the curated small-MT collections — **2026-11-11: both reds now close in the fresh key.core gates** (`ScDeterminismTest` 14/0 incl. `selection_sort` + `sum1`, JMLTK_GAPS §5 RESOLVED), so Mt2w/4w is expected green at the new tip (re-measure pending); `testMtStress` = quicksort load gap (JMLTK_GAPS §18) — **fixed 2026-11-15**, `MtScriptStressTest` 2/2; `testRunAllFunProofs` = **20 red groups**, all classified (§18 ×1, §17-reload ×2, §19 ×1, §20 ×1, §21 ×1, doesn't-close ×14 — the 5 §4 load-failing groups now load: `funOfIF` + `simple_info_flow` pass, `simpleTests`/`list`/`javaCard` resurface with doesn't-close proofs); `testRunAllInfProofs` = **9 local** (10 expected in CI = local + the flaky `SimpleEvoting_fullmacro`) — `NewObjects` passes; doesn't-close ×9 — **all PR-induced** (main is green) |
+| integration | triaged at `4b62b1d6fa`, re-measured at `20d361fa85` (local corpus run): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = the 2 recorded remaining reds (`selection_sort` drift, `sum1` §5) via the curated small-MT collections — **2026-11-11: both reds now close in the fresh key.core gates** (`ScDeterminismTest` 14/0 incl. `selection_sort` + `sum1`, JMLTK_GAPS §5 RESOLVED), so Mt2w/4w is expected green at the new tip (re-measure pending); `testMtStress` = quicksort load gap (JMLTK_GAPS §18) — **fixed 2026-11-15**, `MtScriptStressTest` 2/2; `testRunAllFunProofs` = the `javadl` and `javaCard` groups are green at the 2026-11-15 tip (JMLTK_GAPS §22/§23); the remaining known Fun groups are `VSTTE10` and `WeideEtAl`; `testRunAllInfProofs` = **9 local** (10 expected in CI = local + the flaky `SimpleEvoting_fullmacro`) — `NewObjects` passes; doesn't-close ×9 — **all PR-induced** (main is green) |
 
 ## Local full-suite triage (2026-11-11, `:key.core:test --continue`, 4644 tests / 69 failures / 70 skipped)
 
@@ -261,7 +262,7 @@ they do **not** run in the CI key.core job). No new reds vs. the recorded baseli
 | §17 origin file/line / save→reload — `gen._list_seq#SimplifiedLinkedList.remove`, `gen._other`, `gen._reload_examples` | 3 | **fixed** 2026-11-15 (position propagation via `JmlFacade.positionedString`; legacy `[no file]` stays parseable; JMLTK_GAPS §17) |
 | §21 `perm.proof` replay — `gen._reload_examples` | 1 | **fixed** 2026-11-15 (`perm.proof` re-recorded under the JMLtk front-end, `bfa9004580`; replay 0 errors — JMLTK_GAPS §21) |
 | OOM `Java heap space` — `gen._performance` ×7, `gen._performancePOConstruction` ×3, `ConcurrentMatchingStressTest#prop_split`, `gen._updateSimplificationPerformance` | 12 | environmental: one shared 4g worker across the whole suite; passes with a fresh worker / CI memory |
-| doesn't-close drift — `gen._WeideEtAl#AddAndMultiply_add`, `gen._javaCard` ×3, `gen._javadl#testfor_{Array,Iterable,ReferenceArray}` | 7 | **A/B-verified pre-existing at `cfece36950`** (identical failures in a pristine worktree without the uncommitted fix); `gen._blockContracts#Simple__addAbsoluteValues` was §11 and is **fixed** by `acbe6aa3d2` |
+| doesn't-close drift — `gen._WeideEtAl#AddAndMultiply_add` | 1 | `gen._javaCard` ×3 fixed by the republished 2026-11-15 snapshot (JMLTK_GAPS §23); `gen._javadl#testfor_*` ×3 fixed by `ddc3920e35` (JMLTK_GAPS §22); `gen._blockContracts#Simple__addAbsoluteValues` was §11 and is fixed by `acbe6aa3d2` |
 | `JMLParserExceptionTest` ×2 | 2 | **fixed** 2026-11-15 (targeted snapshot messages, see §6); §11 MT also fixed (`acbe6aa3d2`) — key.core reds 0 |
 | `JmlScriptTest#ObtainWithUpdates` | 1 | flaky auto-proof — see below |
 | `TestTacletEquality[719]` (`elim_double_block_3`) | 1 | fixed in this batch (golden `taclets.old.txt` updated for the new taclet rendering; 2137/2137 green) |

@@ -95,6 +95,8 @@ JMLtk front-end shipped in PR #3997.
 | 19 | `ensures_redundantly` clause kind | `@ ensures_redundantly e;` | `key.ui/examples/heap/SmansEtAl/src/Iterator.java:11` | ✔ RESOLVED (2026-11-15: translated exactly like `ensures`, matching the pre-takeover lexer where `_redundantly` was part of the token — see §19) |
 | 20 | `assignable_free` clause body | `@ assignable_free \nothing;` / `@ assignable_free field;` | `key.ui/examples/standard_key/java_dl/jml-free/{AssignableFree,AssignableLoopFree}.java` | ✔ RESOLVED (2026-11-15, jmltk build 4 adds `ASSIGNABLE_FREE`; KeY maps it on method and loop contracts — see §20) |
 | 21 | committed `.proof` replay drift | `heap/permutedSum/perm.proof` | the tracked proof (155 tracked `.proof` files total) | ✔ RESOLVED (2026-11-15: re-recorded under the JMLtk front-end, `bfa9004580`; replay 0 errors — see §21) |
+| 22 | enhanced-for loop invariant lost across program copies | `for (int i : a)` with a `\index` invariant | `standard_key/java_dl/java5/{for_Array,for_Iterable,for_ReferenceArray}.key` | ✔ RESOLVED (`ddc3920e35`: recover the source spec and remap it to the current program variables through `for_to_while`; 331/164/301 nodes — see §22) |
+| 23 | multiple heap qualifiers per clause | `assignable<heap><savedHeap> …`, `requires<savedHeap> …` | `heap/javacard/{updateBalance0,updateBalance1,setArray1,setArray2,arrayFillNonAtomic}.key` | ✔ RESOLVED (2026-11-15, republished `1.2.1-SNAPSHOT`; all five proofs close with main's node counts — see §23) |
 
 ---
 
@@ -783,6 +785,26 @@ Both forms are parsed:
   `\values`.
 - **Result:** the three examples close with 331/164/301 nodes (upstream:
   333/164/303); `vararg.key` remains green.
+
+## 23. multiple heap qualifiers per JML clause  — ✔ RESOLVED (2026-11-15, republished `1.2.1-SNAPSHOT`)
+
+- Fixtures: `heap/javacard/updateBalance0.key`, `updateBalance1.key`,
+  `setArray1.key`, `setArray2.key`, `arrayFillNonAtomic.key`; sources
+  `heap/javacard/src/javacard/framework/{OwnerPIN,PIN,Util}.java`.
+- **Syntax:** a clause may carry several heap qualifiers, e.g.
+  `assignable<heap><savedHeap> validatedRep;`,
+  `requires<savedHeap> …;`, `loop_invariant<savedHeap> …`.
+- **Before:** JMLtk's grammar used `(heaps=JmlHeaps())*`, which reassigned
+  the heap list on every match instead of appending. Only the last qualifier
+  survived; `assignable<heap><savedHeap>` arrived in KeY as `savedHeap`
+  only, producing a wrong frame (`allLocs`). Three of the five javaCard
+  proofs (`setArray1`, `setArray2`, `arrayFillNonAtomic`) then failed to
+  close (the other two passed).
+- **Resolution:** fixed upstream in the republished `1.2.1-SNAPSHOT`
+  (2026-11-15). No KeY-side workaround is needed. Verified with a refreshed
+  dependency snapshot: all five proofs close with the same node counts as
+  `origin/main` (`updateBalance0` 344, `updateBalance1` 314, `setArray1`
+  516, `setArray2` 567, `arrayFillNonAtomic` 2626).
 
 ## Appendix A — how to re-measure
 
