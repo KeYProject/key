@@ -52,7 +52,10 @@ import org.slf4j.LoggerFactory;
  * {@link ResultStatus#OPEN} (exit code {@code 1}).
  * <p>
  * The {@code smtCalls}/{@code smtProved} fields of the result records are computed from the
- * finished proof by {@link SmtCounters} ({@code 0}/{@code 0} when SMT is not used, the default).
+ * finished proof by {@link SmtCounters}: {@code smtCalls} is KeY's {@code smtSolverApps} proof
+ * statistic (sequents closed by an SMT rule application, not the total number of solver
+ * invocations) and {@code smtProved} counts the goals closed by SMT; both are
+ * {@code 0} when SMT is not used (the default).
  * <p>
  * The overload taking a {@link ProofOutput} additionally writes the finished proofs to the
  * requested locations (§3 of the headless interface spec); see {@link #prove(Path, List,

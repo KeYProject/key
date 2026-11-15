@@ -63,8 +63,8 @@ Exact schema:
 | `openGoals` | int | number of open goals at termination; `0` iff `status=="closed"` |
 | `elapsedMs` | int | wall clock ms of proof search for this contract |
 | `proofFile` | string \| null | absolute path of the written proof file, or `null`; see §3 |
-| `smtCalls` | int | SMT solver invocations (0 unless SMT enabled, §7) |
-| `smtProved` | int | goals proved via SMT (0 unless SMT enabled) |
+| `smtCalls` | int | number of sequents the proof closed by an SMT rule application, i.e. KeY's `Statistics.smtSolverApps` statistic (0 unless SMT is enabled). This is **not** the total number of SMT solver invocations: a solver run that does not prove its sequent is never committed and therefore not counted |
+| `smtProved` | int | number of closed goals whose closing rule application is an SMT rule application (0 unless SMT is enabled); equals `smtCalls` in a finished proof |
 | `errorMessage` | string \| null | human-readable message; non-null iff `status=="error"` |
 
 - Multiple selected contracts produce **one line per contract**. Within one load file the lines

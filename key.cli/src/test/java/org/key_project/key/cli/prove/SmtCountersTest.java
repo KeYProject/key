@@ -26,8 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Unit tests for the SMT counter helper: {@code smtProved} counts the closed goals whose closing
- * rule application is an SMT rule app, and {@code smtCalls} is taken over from the proof
- * statistics.
+ * rule application is an SMT rule app, and {@code smtCalls} is taken over from KeY's
+ * {@code smtSolverApps} proof statistic, i.e. it counts the sequents closed by an SMT rule
+ * application rather than all solver invocations.
  */
 class SmtCountersTest {
 

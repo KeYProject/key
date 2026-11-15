@@ -19,8 +19,11 @@ import org.jspecify.annotations.Nullable;
  *        it is {@link ResultStatus#OPEN} or {@link ResultStatus#TIMED_OUT}
  * @param elapsedMs wall-clock milliseconds spent in proof search for this contract
  * @param proofFile absolute path of the written proof file, or {@code null}
- * @param smtCalls number of SMT solver invocations ({@code 0} unless SMT is enabled)
- * @param smtProved number of goals proved via SMT ({@code 0} unless SMT is enabled)
+ * @param smtCalls number of sequents closed by an SMT rule application (KeY's
+ *        {@code smtSolverApps} statistic, not a count of all solver invocations); {@code 0}
+ *        unless SMT is enabled
+ * @param smtProved number of goals proved via SMT, equal to {@code smtCalls} in a finished proof;
+ *        {@code 0} unless SMT is enabled
  * @param errorMessage human-readable error message, non-{@code null} iff the status is
  *        {@link ResultStatus#ERROR}
  */
