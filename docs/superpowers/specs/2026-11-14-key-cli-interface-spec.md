@@ -126,13 +126,18 @@ Canonical examples that MUST be selectable, verbatim:
 <IDX>\t<FQCC>::<METHOD>\t<NAME>
 ```
 
-- `<IDX>` is the ordinal that legacy `--auto` stdin selection uses (kept for compatibility).
+- `<IDX>` is the 0-based position of the row in the listing order, i.e. contracts sorted by
+  their §4.1 canonical name. That order is deterministic and byte-identical across runs and
+  hosts (§10). It is deliberately *not* the legacy `--auto` interactive numbering, which follows
+  the loader's class-registration order and is file-system-dependent for problems with several
+  classes (`Files.walk`, unsorted); legacy stdin selection takes its number from that prompt's
+  own display, and §4.2 NAME selection is the portable way to address a contract.
 - `<FQCC>::<METHOD>` is the "Method:" line text KeY currently prints.
 - `<NAME>` is the §4.1 canonical name.
 - Example first lines for the current project:
 ```
-0	edu.kit.quickheap.QuickHeap::QuickHeap	edu.kit.quickheap.QuickHeap[edu.kit.quickheap.QuickHeap::QuickHeap(long)].JML normal_behavior operation contract.0
-1	edu.kit.quickheap.QuickHeap::QuickHeap	edu.kit.quickheap.QuickHeap[edu.kit.quickheap.QuickHeap::QuickHeap()].JML normal_behavior operation contract.0
+0	edu.kit.quickheap.QuickHeap::QuickHeap	edu.kit.quickheap.QuickHeap[edu.kit.quickheap.QuickHeap::QuickHeap()].JML normal_behavior operation contract.0
+1	edu.kit.quickheap.QuickHeap::QuickHeap	edu.kit.quickheap.QuickHeap[edu.kit.quickheap.QuickHeap::QuickHeap(long)].JML normal_behavior operation contract.0
 ```
 - `--list-contracts` exits `0`, prints no `KEY_RESULT` line, and must be stable across runs with identical inputs and settings (§6).
 
@@ -313,7 +318,7 @@ closed_flag=$([ "$status" = closed ] && [ -s "${PROOF:-none}" ] && echo 1 || ech
 ## 10. Stability and documentation requirements
 
 - §1–§9 features are documented in the official KeY docs: exact flag names, exact JSON schema, exact exit-code table.
-- `--list-contracts` ordering: for identical input files, identical settings, identical binary ⇒ byte-identical output (test E2). Document at least 10 examples of JML/source changes that MAY reorder it and state that scripts must use §4.2 selection, never ordinals (§4.3 keeps ordinals only for legacy `--auto`).
+- `--list-contracts` ordering: for identical input files, identical settings, identical binary ⇒ byte-identical output (test E2). Document at least 10 examples of JML/source changes that MAY reorder it and state that scripts must use §4.2 selection, never ordinals (§4.3 ordinals are a stable name-sorted row position, not the legacy `--auto` numbering).
 
 ## 11. Out of scope (unchanged)
 
