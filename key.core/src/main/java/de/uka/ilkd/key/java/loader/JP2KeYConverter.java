@@ -945,7 +945,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 JmlSideEffectChecker.check(n.getExpression());
                 // Re-parse the JML expression text against KeY's own JML grammar so that the
                 // JML term translation (JMLSpecFactory) can process it.
-                JmlLexer lexer = JmlFacade.createLexer(n.getExpression().toString());
+                JmlLexer lexer = JmlFacade
+                        .createLexer(JmlFacade.positionedString(n, n.getExpression().toString()));
                 lexer._mode = JmlLexer.expr;
                 JmlParser parser = JmlFacade.createParser(lexer);
                 var exprCtx = parser.expressionEOF();
@@ -958,7 +959,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             }
             case JmlStmtKind.SET -> {
                 JmlParser parser = JmlFacade.createParser(JmlFacade.createLexer(
-                    "set " + n.getExpression() + ";"));
+                    JmlFacade.positionedString(n, "set " + n.getExpression() + ";")));
                 var ctx = parser.set_statement();
                 parser.getErrorReporter().throwException();
                 yield new SetStatement(new KeyAst.SetStatementContext(ctx), pi);
@@ -988,7 +989,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             text.append(' ');
         }
         text.append('}');
-        JmlLexer lexer = JmlFacade.createLexer(text.toString());
+        JmlLexer lexer = JmlFacade.createLexer(JmlFacade.positionedString(stmt, text.toString()));
         lexer._mode = JmlLexer.expr;
         JmlParser parser = JmlFacade.createParser(lexer);
         var ctx = parser.assertionProof();

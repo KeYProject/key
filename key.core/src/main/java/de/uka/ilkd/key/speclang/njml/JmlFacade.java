@@ -6,12 +6,16 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Path;
 
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.parsing.SyntaxErrorReporter;
 
+import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -79,6 +83,28 @@ public final class JmlFacade {
      */
     public static @NonNull JmlLexer createLexer(@NonNull String content) {
         return createLexer(CharStreams.fromString(content));
+    }
+
+    /**
+     * Creates a {@link PositionedString} for a JML text derived from the given AST node. The
+     * node's source file and start position are preserved so that origin term labels produced by
+     * the re-parse point at the real file/line instead of rendering as {@code [no file]}.
+     *
+     * @param node the node the text was derived from.
+     * @param text the JML text to re-parse.
+     * @return the positioned text.
+     */
+    public static @NonNull PositionedString positionedString(@NonNull Node node,
+            @NonNull String text) {
+        URI uri = node.findCompilationUnit()
+                .flatMap(CompilationUnit::getStorage)
+                .map(CompilationUnit.Storage::getPath)
+                .map(Path::toUri)
+                .orElse(null);
+        Position position = node.getRange()
+                .map(r -> Position.newOneBased(r.begin.line, r.begin.column))
+                .orElse(Position.UNDEFINED);
+        return new PositionedString(text, new Location(uri, position));
     }
 
     /**

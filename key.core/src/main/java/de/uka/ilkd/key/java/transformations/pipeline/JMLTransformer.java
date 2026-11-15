@@ -17,6 +17,7 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.CallableDeclaration;
@@ -371,7 +372,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
             return List.of();
         }
         List<ParserRuleContext> elements =
-            parseMethodlevelElements(joined.toString());
+            parseMethodlevelElements(docStmt, joined.toString());
         if (!elements.isEmpty()) {
             return elements;
         }
@@ -379,7 +380,7 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         for (JmlDoc doc : docStmt.getJmlComments()) {
             String content = normalizeJmlDocContent(doc);
             if (!content.isBlank()) {
-                result.addAll(parseMethodlevelElements(content));
+                result.addAll(parseMethodlevelElements(doc, content));
             }
         }
         return result;
@@ -391,9 +392,11 @@ public final class JMLTransformer extends JavaTransformerAbstract {
      * {@code loop_invariant} clauses) are skipped: they have no KeY statement counterpart here
      * and are dropped, as they were before this fallback existed.
      */
-    private static List<ParserRuleContext> parseMethodlevelElements(String content) {
+    private static List<ParserRuleContext> parseMethodlevelElements(Node origin, String content) {
         try {
-            var parser = JmlFacade.createParser(JmlFacade.createLexer(content));
+            var parser = JmlFacade
+                    .createParser(
+                        JmlFacade.createLexer(JmlFacade.positionedString(origin, content)));
             var ctx = parser.methodlevel_comment();
             parser.getErrorReporter().throwException();
             List<ParserRuleContext> elements = new ArrayList<>();

@@ -1597,7 +1597,8 @@ public class JMLSpecFactory {
             final MergePointStatement mps, final JmlMergePointStmt mergePointStmt)
             throws SLTranslationException {
         final JmlParser.Merge_point_statementContext ctx =
-            JmlFacade.createParser(JmlFacade.createLexer(mergePointText(mergePointStmt)))
+            JmlFacade.createParser(JmlFacade.createLexer(
+                JmlFacade.positionedString(mergePointStmt, mergePointText(mergePointStmt))))
                     .merge_point_statement();
         return createJMLMergeContracts(method, mps, ctx, Location.UNDEFINED);
     }

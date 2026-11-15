@@ -31,6 +31,7 @@ import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
@@ -152,14 +153,15 @@ public final class JmlToTextual {
         JmlSideEffectChecker.check(decl);
         boolean free = decl.getKind() == JmlBodyClauseKind.INVARIANT_FREE;
         var ctx = parse(JmlParser::class_invariant,
-            (free ? "invariant_free " : "invariant ") + decl.getInvariant() + ";");
+            (free ? "invariant_free " : "invariant ") + decl.getInvariant() + ";", decl);
         return new TextualJMLClassInv(mapModifiers(decl.getModifiers()), ctx, free);
     }
 
     public static TextualJMLInitially toInitially(JmlClassExprDeclaration decl) {
         checkKind(decl, JmlBodyClauseKind.INITIALLY);
         JmlSideEffectChecker.check(decl);
-        var ctx = parse(JmlParser::initially_clause, "initially " + decl.getInvariant() + ";");
+        var ctx =
+            parse(JmlParser::initially_clause, "initially " + decl.getInvariant() + ";", decl);
         return new TextualJMLInitially(mapModifiers(decl.getModifiers()),
             new LabeledParserRuleContext(ctx));
     }
@@ -170,7 +172,7 @@ public final class JmlToTextual {
                 "Unsupported class level construct kind: " + decl.getKind());
         }
         JmlSideEffectChecker.check(decl);
-        var ctx = parse(JmlParser::class_axiom, "axiom " + decl.getInvariant() + ";");
+        var ctx = parse(JmlParser::class_axiom, "axiom " + decl.getInvariant() + ";", decl);
         return new TextualJMLClassAxiom(mapModifiers(decl.getModifiers()),
             new LabeledParserRuleContext(ctx));
     }
@@ -178,7 +180,7 @@ public final class JmlToTextual {
     public static TextualJMLRepresents toRepresents(JmlRepresentsDeclaration decl) {
         JmlSideEffectChecker.check(decl);
         var ctx = parse(JmlParser::represents_clause,
-            "represents " + decl.getName() + " = " + decl.getExpr() + ";");
+            "represents " + decl.getName() + " = " + decl.getExpr() + ";", decl);
         return new TextualJMLRepresents(mapModifiers(decl.getModifiers()),
             new LabeledParserRuleContext(ctx));
     }
@@ -192,7 +194,7 @@ public final class JmlToTextual {
             text.append(" \\measured_by ").append(decl.getMeasuredBy().get());
         }
         text.append(';');
-        var ctx = parse(JmlParser::accessible_clause, text.toString());
+        var ctx = parse(JmlParser::accessible_clause, text.toString(), decl);
         return new TextualJMLDepends(mapModifiers(decl.getModifiers()),
             new Name[] { HeapLDT.BASE_HEAP_NAME }, new LabeledParserRuleContext(ctx));
     }
@@ -213,7 +215,7 @@ public final class JmlToTextual {
         } else {
             text.append(';');
         }
-        var ctx = parse(JmlParser::method_declaration, text.toString());
+        var ctx = parse(JmlParser::method_declaration, text.toString(), decl);
         return new TextualJMLMethodDecl(mapModifiers(m.getModifiers()), ctx);
     }
 
@@ -307,32 +309,38 @@ public final class JmlToTextual {
             boolean loopContract) {
         String expr = clause.getExpression().toString();
         switch (clause.getKind()) {
-            case REQUIRES, REQUIRES_FREE -> {
+            case REQUIRES, REQUIRES_FREE, REQUIRES_REDUNDANTLY -> {
+                // The pre-takeover lexer accepted the `_redundantly` suffix as part of the
+                // REQUIRES token, so it was translated exactly like a plain requires clause.
                 boolean free = clause.getKind() == JmlClauseKind.REQUIRES_FREE;
                 List<String> heaps = heaps(clause.getHeaps());
                 var ctx = parse(JmlParser::requires_clause,
-                    (free ? "requires_free" : "requires") + heapsText(heaps) + " " + expr + ";");
+                    (free ? "requires_free" : "requires") + heapsText(heaps) + " " + expr + ";",
+                    clause);
                 addHeapClause(specCase, free ? REQUIRES_FREE : REQUIRES, heaps, ctx,
                     free ? OriginTermLabel.SpecType.REQUIRES_FREE
                             : OriginTermLabel.SpecType.REQUIRES);
             }
-            case ENSURES, ENSURES_FREE -> {
+            case ENSURES, ENSURES_FREE, ENSURES_REDUNDANTLY -> {
+                // See the REQUIRES case: `ensures_redundantly` was parsed as a plain ensures
+                // clause by the pre-takeover front-end.
                 boolean free = clause.getKind() == JmlClauseKind.ENSURES_FREE;
                 List<String> heaps = heaps(clause.getHeaps());
                 var ctx = parse(JmlParser::ensures_clause,
-                    (free ? "ensures_free" : "ensures") + heapsText(heaps) + " " + expr + ";");
+                    (free ? "ensures_free" : "ensures") + heapsText(heaps) + " " + expr + ";",
+                    clause);
                 addHeapClause(specCase, free ? ENSURES_FREE : ENSURES, heaps, ctx,
                     free ? OriginTermLabel.SpecType.ENSURES_FREE
                             : OriginTermLabel.SpecType.ENSURES);
             }
             case DECREASES, DECREASING -> {
-                var ctx = parse(JmlParser::variant_function, "decreasing " + expr + ";");
+                var ctx = parse(JmlParser::variant_function, "decreasing " + expr + ";", clause);
                 specCase.addClause(DECREASES, LabeledParserRuleContext
                         .createLabeledParserRuleContext(ctx, OriginTermLabel.SpecType.DECREASES,
                             true));
             }
             case RETURNS, RETURNS_REDUNDANTLY -> {
-                var ctx = parse(JmlParser::returns_clause, "returns " + expr + ";");
+                var ctx = parse(JmlParser::returns_clause, "returns " + expr + ";", clause);
                 specCase.addClause(RETURNS, LabeledParserRuleContext
                         .createLabeledParserRuleContext(ctx, OriginTermLabel.SpecType.RETURNS,
                             true));
@@ -357,25 +365,26 @@ public final class JmlToTextual {
                     MODIFIES_REDUNDANTLY -> {
                 List<String> heaps = heaps(clause.getHeaps());
                 var ctx = parse(JmlParser::assignable_clause,
-                    "assignable" + heapsText(heaps) + " " + exprs + ";");
+                    "assignable" + heapsText(heaps) + " " + exprs + ";", clause);
                 addHeapClause(specCase, ASSIGNABLE, heaps, ctx,
                     OriginTermLabel.SpecType.ASSIGNABLE);
             }
             case ACCESSIBLE, CALLABLE, CALLABLE_REDUNDANTLY -> {
                 List<String> heaps = heaps(clause.getHeaps());
                 var ctx = parse(JmlParser::accessible_clause,
-                    "accessible" + heapsText(heaps) + " " + exprs + ";");
+                    "accessible" + heapsText(heaps) + " " + exprs + ";", clause);
                 addHeapClause(specCase, ACCESSIBLE, heaps, ctx,
                     OriginTermLabel.SpecType.ACCESSIBLE);
             }
             case MEASURED_BY -> {
-                var ctx = parse(JmlParser::measured_by_clause, "measured_by " + exprs + ";");
+                var ctx =
+                    parse(JmlParser::measured_by_clause, "measured_by " + exprs + ";", clause);
                 specCase.addClause(MEASURED_BY, LabeledParserRuleContext
                         .createLabeledParserRuleContext(ctx, OriginTermLabel.SpecType.MEASURED_BY,
                             true));
             }
             case DIVERGES, DIVERGES_REDUNDANTLY -> {
-                var ctx = parse(JmlParser::diverges_clause, "diverges " + exprs + ";");
+                var ctx = parse(JmlParser::diverges_clause, "diverges " + exprs + ";", clause);
                 specCase.addClause(DIVERGES, new LabeledParserRuleContext(ctx));
             }
             default -> throw new IllegalArgumentException(
@@ -389,7 +398,7 @@ public final class JmlToTextual {
         switch (clause.getKind()) {
             case BREAKS, BREAKS_REDUNDANTLY -> {
                 var ctx = parse(JmlParser::breaks_clause,
-                    "breaks (" + label.trim() + ")" + expr + ";");
+                    "breaks (" + label.trim() + ")" + expr + ";", clause);
                 specCase.addClause(
                     de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.BREAKS,
                     LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
@@ -397,7 +406,7 @@ public final class JmlToTextual {
             }
             case CONTINUES, CONTINUES_REDUNDANTLY -> {
                 var ctx = parse(JmlParser::continues_clause,
-                    "continues (" + label.trim() + ")" + expr + ";");
+                    "continues (" + label.trim() + ")" + expr + ";", clause);
                 specCase.addClause(
                     de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase.Clause.CONTINUES,
                     LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
@@ -418,7 +427,8 @@ public final class JmlToTextual {
                 : param.getType() + " " + param.getName();
         var ctx = parse(JmlParser::signals_clause,
             "signals (" + head + ")" +
-                (clause.getExpression() == null ? "" : " " + clause.getExpression()) + ";");
+                (clause.getExpression() == null ? "" : " " + clause.getExpression()) + ";",
+            clause);
         specCase.addClause(SIGNALS, LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
             OriginTermLabel.SpecType.SIGNALS, true));
     }
@@ -427,7 +437,7 @@ public final class JmlToTextual {
             JmlSignalsOnlyClause clause) {
         String types = clause.getTypes().stream().map(t -> t.asString())
                 .collect(java.util.stream.Collectors.joining(", "));
-        var ctx = parse(JmlParser::signals_only_clause, "signals_only " + types + ";");
+        var ctx = parse(JmlParser::signals_only_clause, "signals_only " + types + ";", clause);
         specCase.addClause(SIGNALS_ONLY, LabeledParserRuleContext
                 .createLabeledParserRuleContext(ctx, OriginTermLabel.SpecType.SIGNALS_ONLY, true));
     }
@@ -437,19 +447,19 @@ public final class JmlToTextual {
         String text = infFlowText(clause);
         switch (clause.getKind()) {
             case SEPARATES -> {
-                var ctx = parse(JmlParser::separates_clause, text);
+                var ctx = parse(JmlParser::separates_clause, text, clause);
                 specCase.addClause(INFORMATION_FLOW, new LabeledParserRuleContext(ctx));
             }
             case LOOP_SEPARATES -> {
-                var ctx = parse(JmlParser::loop_separates_clause, text);
+                var ctx = parse(JmlParser::loop_separates_clause, text, clause);
                 specCase.addClause(INFORMATION_FLOW, new LabeledParserRuleContext(ctx));
             }
             case DETERMINES -> {
-                var ctx = parse(JmlParser::determines_clause, text);
+                var ctx = parse(JmlParser::determines_clause, text, clause);
                 specCase.addClause(INFORMATION_FLOW, new LabeledParserRuleContext(ctx));
             }
             case LOOP_DETERMINES -> {
-                var ctx = parse(JmlParser::loop_determines_clause, text);
+                var ctx = parse(JmlParser::loop_determines_clause, text, clause);
                 specCase.addClause(INFORMATION_FLOW, new LabeledParserRuleContext(ctx));
             }
             default -> throw new IllegalArgumentException(
@@ -542,7 +552,8 @@ public final class JmlToTextual {
                     boolean free = false;
                     List<String> heaps = heaps(simple.getHeaps());
                     var ctx = parse(JmlParser::loop_invariant,
-                        "loop_invariant" + heapsText(heaps) + " " + simple.getExpression() + ";");
+                        "loop_invariant" + heapsText(heaps) + " " + simple.getExpression() + ";",
+                        clause);
                     for (String heap : heaps) {
                         loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INVARIANT, new Name(heap),
                             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
@@ -553,7 +564,8 @@ public final class JmlToTextual {
                     List<String> heaps = heaps(simple.getHeaps());
                     var ctx = parse(JmlParser::loop_invariant,
                         "loop_invariant_free" + heapsText(heaps) + " " + simple.getExpression()
-                            + ";");
+                            + ";",
+                        clause);
                     for (String heap : heaps) {
                         loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INVARIANT_FREE,
                             new Name(heap), LabeledParserRuleContext.createLabeledParserRuleContext(
@@ -562,7 +574,7 @@ public final class JmlToTextual {
                 }
                 case DECREASES, DECREASING, DECREASES_REDUNDANTLY -> {
                     var ctx = parse(JmlParser::variant_function,
-                        "decreasing " + simple.getExpression() + ";");
+                        "decreasing " + simple.getExpression() + ";", clause);
                     loopSpec.setVariant(LabeledParserRuleContext
                             .createLabeledParserRuleContext(ctx, OriginTermLabel.SpecType.DECREASES,
                                 true));
@@ -577,7 +589,7 @@ public final class JmlToTextual {
                     List<String> heaps = heaps(multi.getHeaps());
                     String exprs = exprList(multi.getExpressions());
                     var ctx = parse(JmlParser::loop_assignable_clause,
-                        "loop_assignable" + heapsText(heaps) + " " + exprs + ";");
+                        "loop_assignable" + heapsText(heaps) + " " + exprs + ";", clause);
                     for (String heap : heaps) {
                         loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.ASSIGNABLE, new Name(heap),
                             LabeledParserRuleContext.createLabeledParserRuleContext(ctx,
@@ -591,22 +603,22 @@ public final class JmlToTextual {
             String text = infFlowText(infFlow);
             switch (infFlow.getKind()) {
                 case DETERMINES -> {
-                    var ctx = parse(JmlParser::determines_clause, text);
+                    var ctx = parse(JmlParser::determines_clause, text, clause);
                     loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
                         HeapLDT.BASE_HEAP_NAME, new LabeledParserRuleContext(ctx));
                 }
                 case LOOP_DETERMINES -> {
-                    var ctx = parse(JmlParser::loop_determines_clause, text);
+                    var ctx = parse(JmlParser::loop_determines_clause, text, clause);
                     loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
                         HeapLDT.BASE_HEAP_NAME, new LabeledParserRuleContext(ctx));
                 }
                 case SEPARATES -> {
-                    var ctx = parse(JmlParser::separates_clause, text);
+                    var ctx = parse(JmlParser::separates_clause, text, clause);
                     loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
                         new LabeledParserRuleContext(ctx));
                 }
                 case LOOP_SEPARATES -> {
-                    var ctx = parse(JmlParser::loop_separates_clause, text);
+                    var ctx = parse(JmlParser::loop_separates_clause, text, clause);
                     loopSpec.addClause(TextualJMLLoopSpec.ClauseHd.INFORMATION_FLOW,
                         new LabeledParserRuleContext(ctx));
                 }
@@ -628,7 +640,20 @@ public final class JmlToTextual {
     }
 
     /**
-     * Parses the given text with the given requested rule of KeY's JML parser.
+     * Parses the given text with the given requested rule of KeY's JML parser, preserving the
+     * origin (file/line) of the AST node the text was derived from.
+     */
+    private static <R extends ParserRuleContext> R parse(RuleParser<R> rule, String text,
+            Node origin) {
+        JmlParser parser = JmlFacade.createParser(JmlFacade.createLexer(
+            JmlFacade.positionedString(origin, text)));
+        R ctx = rule.parse(parser);
+        parser.getErrorReporter().throwException();
+        return ctx;
+    }
+
+    /**
+     * Parses synthetic JML text that has no source node (e.g. generated default clauses).
      */
     private static <R extends ParserRuleContext> R parse(RuleParser<R> rule, String text) {
         JmlParser parser = JmlFacade.createParser(JmlFacade.createLexer(text));

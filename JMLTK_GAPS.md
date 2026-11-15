@@ -65,6 +65,7 @@ JMLtk front-end shipped in PR #3997.
 | ✔ **RESOLVED** | handled on the KeY side of the branch (fallback / guard / converter) |
 | ✘ **OPEN** | a real remaining gap on the branch at HEAD |
 | ⚠ **KeY-SIDE** | parses fine in JMLtk — the failure is in KeY's own name resolution / semantics layer, not JMLtk |
+| ⚠ **ACCEPTED** | documented upstream gap accepted for this PR; not scheduled for a fix |
 | ⚠ **REGRESSION** | red at HEAD and **not part of the recorded baseline** (uncovered while writing this file) |
 
 ---
@@ -84,15 +85,15 @@ JMLtk front-end shipped in PR #3997.
 | 9 | labeled `break`/`continue` proofs | — | `LoopScopeInvRuleTests` bench | ✔ RESOLVED (loop-invariant fix `6a07c20e63`) |
 | 10 | `relax.proof` scripted-proof replay | — | `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof` | ✔ RESOLVED (2026-11-10: loop invariant lost in `elim_double_block_3` rebuild; fixed via `#reattachLoopInvariant` — see §10) |
 | 11 | block-contract combination | — | `Simple__addAbsoluteValues.key`, `ParallelProverDeterminismTest` | ✔ RESOLVED (2026-11-15, `acbe6aa3d2`: labeled blocks were extracted twice, with and without labels; see §11) |
-| 12 | absent clause keywords | `when`, `duration`, `working_space`, `captures`, and the legacy clause-name `name "..."` | — | ⚠ mostly OPEN — `name` replaced by the native `[behavior] <name>:` prefix (✔ RESOLVED) |
-| 13 | pragma-statements | `//@ nowarn;`, `//@ debug;` | `exceptional/NowarnDebug.java`, `exceptional/NowarnDebugInMethod.java` | ⚠ pinned: class level loud (`ProofInputException`), method level dropped (fallback) |
+| 12 | absent clause keywords | `when`, `duration`, `working_space`, `captures`, and the legacy clause-name `name "..."` | — | ⚠ **ACCEPTED** — `working_space`/`captures` are upstream-only gaps (`when`/`duration` were already unsupported by KeY); `name` replaced by the native `[behavior] <name>:` prefix (✔ RESOLVED) |
+| 13 | pragma-statements | `//@ nowarn;`, `//@ debug;` | `exceptional/NowarnDebug.java`, `exceptional/NowarnDebugInMethod.java` | ⚠ **ACCEPTED** — class level loud (`ProofInputException`), method level dropped (fallback); behavior pinned, no upstream fix scheduled |
 | 14 | datagroup / monitor clauses | `monitors_for`, `readable_if`, `writable_if`, `in_group`, `maps_into` | `exceptional/{Datagroup,MonitorsFor,ReadableIf,WritableIf,InGroup,MapsInto}.java` | ✔ RESOLVED (loud guard, no spurious fields) |
 | 15 | `\strictly_nothing`, `\nothing`, `\everything` | — | `LocsetClauseTranslationTest` | ✔ RESOLVED (measured 2026-11-10: names re-lex to the special tokens; residual: method-level `accessible` is a JMLtk-upstream gap, fallback mitigates) |
-| 16 | assert label *after* `assert` | `//@ assert LAB: e;` | — | ✘ OPEN (only JML-standard `LAB: assert e;`) |
-| 17 | origin-label file info for re-parsed JML | `Precondition @ [no file]` | any JMLtk-converted spec (assert/assume/set, contract clauses, fallback) | ✔ RESOLVED (2026-11-15, reload: `parseOrigin` accepts the `[no file]` rendering; display still cosmetic — see §17) |
+| 16 | assert label *after* `assert` | `//@ assert LAB: e;` | `JmlLabeledAssertTest` (jmltk) | ✔ RESOLVED (JMLtk stores it in `JmlExpressionStmt.getLabel()`; both `assert LAB: e;` and `LAB: assert e;` are covered — see §16) |
+| 17 | origin-label file info for re-parsed JML | `Precondition @ [no file]` | any JMLtk-converted spec (assert/assume/set, contract clauses, fallback) | ✔ RESOLVED (2026-11-15, root cause: `JmlFacade.positionedString` propagates the JMLtk node's URI+line to every re-parse; origins now render as `ensures @ file Foo.java @ line N`. Legacy `[no file]` remains parseable for old proofs — see §17) |
 | 18 | DL-typed ghost locals with initializer | `//@ ghost \seq x = \dl_array2seq(a);` | `key.ui/examples/heap/quicksort/{sort,split}{,-jmlscript}.key` | ✔ RESOLVED (2026-11-15, jmltk PR #99 / snapshot `1.2.1-20261115.031329-3`; `MtScriptStressTest` 2/2 — see §18) |
-| 19 | `ensures_redundantly` clause kind | `@ ensures_redundantly e;` | `key.ui/examples/heap/SmansEtAl/src/Iterator.java:11` | ✘ OPEN (load failure — JMLtk accepts it, KeY `JmlParser.g4` has no production) |
-| 20 | `assignable_free` clause body | `@ assignable_free \nothing;` / `@ assignable_free field;` | `key.ui/examples/standard_key/java_dl/jml-free/{AssignableFree,AssignableLoopFree}.java` | ✘ OPEN (load failure — `UnsolvedSymbolException` on the clause keyword) |
+| 19 | `ensures_redundantly` clause kind | `@ ensures_redundantly e;` | `key.ui/examples/heap/SmansEtAl/src/Iterator.java:11` | ✔ RESOLVED (2026-11-15: translated exactly like `ensures`, matching the pre-takeover lexer where `_redundantly` was part of the token — see §19) |
+| 20 | `assignable_free` clause body | `@ assignable_free \nothing;` / `@ assignable_free field;` | `key.ui/examples/standard_key/java_dl/jml-free/{AssignableFree,AssignableLoopFree}.java` | ✘ OPEN — upstream reproducer in `jmltk` branch `weigl/assignable-free` (`AssignableFreeClauseTest`); JMLtk silently turns the clause into a bogus `FieldDeclaration type=assignable_free` |
 | 21 | committed `.proof` replay drift | `heap/permutedSum/perm.proof` | the tracked proof (155 tracked `.proof` files total; this one fails) | ✘ OPEN (replay errors: rule position no longer fits, built-in reconstruction fails) |
 
 ---
@@ -475,7 +476,7 @@ public class Test { … }
 (KeY's own `JmlParser.g4` had rules for all of these; see `JML_MAPPING.md`
 Part C/D. Gaps first reported there are re-listed here with their status.)
 
-### 12. clause keywords `when`, `duration`, `working_space`, `captures`, and legacy `name "..."`  — ⚠ mostly OPEN
+### 12. clause keywords `when`, `duration`, `working_space`, `captures`, and legacy `name "..."`  — ⚠ ACCEPTED (upstream)
 `when`/`duration` were already rejected by KeY's own `TextualTranslator`
 ("not supported by KeY"), so the real losses are `working_space` and
 `captures`. The clause-name (`name "..."`) is **replaced, not lost**: named
@@ -488,7 +489,7 @@ name (fixture `testcase/speclang/njml/NameClause.java`, test
 is still rejected loudly by `JmlDocRemoval` with a migration hint, because a
 silent drop would weaken the specification.
 
-### 13. pragma-statements `//@ nowarn;`, `//@ debug;`  — ⚠ pinned (level-dependent)
+### 13. pragma-statements `//@ nowarn;`, `//@ debug;`  — ⚠ ACCEPTED (pinned level-dependent)
 Tokens absent from JMLtk. At class level the unparseable comment surfaces loudly as a
 `ProofInputException` ("Encountered unexpected token"); at method level the leftover falls back to
 KeY's own grammar (`nowarn_pragma`/`debug_statement`) and unparseable leftovers are dropped
@@ -529,13 +530,19 @@ status quo is: class-level `accessible` is JMLtk-native (via
 `JmlToTextual.toDepends`), method-level `accessible` goes through the
 fallback. Tracked as a JMLtk-upstream grammar gap, not a branch defect.
 
-### 16. assert label after `assert`  — ✘ OPEN
+### 16. assert label after `assert`  — ✔ RESOLVED (JMLtk)
+
+Both forms are parsed:
+
 ```java
-//@ assert LAB: e;    // KeY form — rejected
-//@ LAB: assert e;    // JML-standard prefix form — the only one JMLtk accepts
+//@ assert LAB: e;    // KeY form — label stored in JmlExpressionStmt.getLabel()
+//@ LAB: assert e;    // JML-standard prefix form — parsed as JmlLabelStmt
 ```
 
-## 17. `[no file]` in origin term labels  — ✔ RESOLVED (reload; display follow-up)
+`JmlLabeledAssertTest` (jmltk) pins the postfix form, the prefix form, labels on
+`assume`/`set`, and a scripted `assert LAB: e \by { … }`.
+
+## 17. origin-label file info for re-parsed JML  — ✔ RESOLVED (2026-11-15, root cause: position propagation)
 
 - **Symptom (display):** origin labels on JML terms re-parsed from the JMLtk AST render
   as e.g. `Precondition @ [no file]` instead of the pre-takeover
@@ -574,22 +581,31 @@ fallback. Tracked as a JMLtk-upstream grammar gap, not a branch defect.
     included — the failing origins are `requires` clauses of operation
     contracts) fails to reload; this is a branch-side round-trip bug, not a
     defect of the recorded recordings.
-- **RESOLVED (2026-11-15):** option (b) — `OriginTermLabelFactory.parseOrigin`
-  now accepts `<specType> @ [no file]` and maps it to
-  `FileOrigin(specType, null, 0)`. Saved proofs carrying null-URI origins
-  reload again; `OriginTermLabelTest#testNoFileOriginRoundTrips` locks the
-  render/parse symmetry. The display remains `[no file]` (cosmetic); option (a)
-  (propagating the real URI) is still a quality improvement but no longer a
-  reload blocker.
+- **Root cause (fixed 2026-11-15):** the re-parse sites discarded the JMLtk
+  node's position by calling `JmlFacade.createLexer(String)`
+  (`CharStreams.fromString`), so the lexer had no URI and started at line 1.
+  The positional information *is* present and preserved in the AST classes
+  (`Node.getRange()` + `CompilationUnit.getStorage()`); it simply was not
+  forwarded.
+- **Fix:** new `JmlFacade.positionedString(Node, String)` builds a
+  `PositionedString` from the node's source URI and 1-based start line/column.
+  All re-parse sites now pass the originating node: `JmlToTextual.parse(...)`
+  (contract clauses and class-level declarations), `JP2KeYConverter`
+  (`assert`/`assume` expressions, `set`, proof scripts), `JMLTransformer`'s
+  `JmlDocStmt` fallback, and `JMLSpecFactory`'s merge-point re-serialization.
+  Origins now render as e.g. `ensures @ file ArrayList.java @ line 16`
+  (verified on the SmansEtAl fixture).
+- **Backward compatibility:** `OriginTermLabelFactory.parseOrigin` still
+  accepts the legacy `<specType> @ [no file]` rendering (mapped to
+  `FileOrigin(specType, null, 0)`), so proofs saved before this fix reload.
+  `OriginTermLabelTest#testNoFileOriginRoundTrips` and
+  `JmlFacadeTest#positionedStringPreservesSourceAndLine` pin both directions.
 - **Fix options (recorded):** (a) propagate the JMLtk node's position to the
   re-parse (URI via `CompilationUnit.getStorage().getPath()` + line/column) so
   origins carry a real file — fixes display *and* round-trip; (b) make
   `parseOrigin` accept the `[no file]` rendering (map it to a null-URI
   `FileOrigin`); (c) render null-URI origins as `(implicit)`.
-  Documented but not fixed at `53dcefd914`; re-confirmed open at the
-  2026-11-11 re-measurement (`[no file]` origins present in the §5 goal
-  A/B against `origin/main`; the 3 RAP load failures in the full local run
-  are the same signature).
+  Option (a) is implemented; (b) is kept for old proofs.
 
 ## 18. DL-typed ghost locals with initializer (quicksort)  — ✔ RESOLVED (2026-11-15)
 
@@ -643,30 +659,28 @@ fallback. Tracked as a JMLtk-upstream grammar gap, not a branch defect.
 
 ---
 
-## 19. `ensures_redundantly` clause kind  — ✘ OPEN (load failure, JMLtk accepts, KeY grammar lacks it)
+## 19. `ensures_redundantly` clause kind  — ✔ RESOLVED (2026-11-15)
 
 ```java
 @ ensures_redundantly l.footprint == \old(l.footprint);
 ```
 - Fixture: `key.ui/examples/heap/SmansEtAl/src/Iterator.java:11`.
-- **Symptom:** loading any `.key` file in the `SmansEtAl` group fails —
-  whole-group load failure in `testRunAllFunProofs` (group `SmansEtAl`).
-- **Root cause:** `ensures_redundantly` is a standard-JML clause; JMLtk
-  parses it into a typed clause of kind `ENSURES_REDUNDANTLY`. KeY's
-  `JmlParser.g4` (the grammar `JmlToTextual` re-serializes against) has
-  **no production** for this clause kind (0 occurrences), so
-  `JmlToTextual`'s kind dispatch falls through to
-  `throw new …("Unsupported clause kind: ENSURES_REDUNDANTLY " + clause)`
-  (`JmlToTextual.java:348/382`). Before the takeover the same source parsed
-  with KeY's old JML front-end (which tolerated/ignored the clause); the
-  re-serialization design exposes the missing production as a hard error.
-- **CI impact:** `testRunAllFunProofs` group `SmansEtAl` (Fun corpus red on
-  the branch, green on `main` — PR-induced).
-- **Fix options:** add an `ensures_redundantly` production to `JmlParser.g4`
-  and translate it like `ensures` (the "redundantly" modifier is a
-  soundness hint, not extra semantics — verify against the JML reference
-  before dropping the qualifier); or reject the clause kind explicitly with
-  a targeted message.
+- **Original behavior (verified):** the pre-takeover `JmlLexer.g4` declared
+  `ENSURES: ('ensures' | 'post') (Pfree|Pred)` with
+  `fragment Pred: '_redundantly'?`, so `ensures_redundantly` lexed as a plain
+  `ENSURES` token and was translated exactly like `ensures`.
+  `requires_redundantly` worked the same way via `REQUIRES`.
+- **Root cause:** JMLtk models the suffix as a distinct clause kind
+  (`ENSURES_REDUNDANTLY`/`REQUIRES_REDUNDANTLY`), and
+  `JmlToTextual.handleSimpleClause` only listed `ENSURES`/`ENSURES_FREE`
+  (resp. `REQUIRES`/`REQUIRES_FREE`), so the dispatch threw
+  `Unsupported clause kind: ENSURES_REDUNDANTLY`.
+- **Fix (matching the original behavior, no warning needed):**
+  `JmlToTextual` now maps `ENSURES_REDUNDANTLY` and `REQUIRES_REDUNDANTLY` to
+  the plain clause path. The `_redundantly` suffix is a soundness hint, not
+  extra semantics; dropping it preserves the pre-takeover translation.
+  `ArrayList_add.key` (SmansEtAl) loads again.
+- **CI impact:** clears the `testRunAllFunProofs` `SmansEtAl` load failure.
 
 ## 20. `assignable_free` clause body  — ✘ OPEN (load failure, symbol resolution)
 
@@ -682,19 +696,28 @@ fallback. Tracked as a JMLtk-upstream grammar gap, not a branch defect.
   from `JP2KeYConverter`'s `ClassOrInterfaceType` handling
   (`getKeYJavaType` → `type.resolve()`, `JP2KeYConverter.java:1268`, via
   `visit(ClassOrInterfaceType)` at `:449`).
-- **Root cause:** JMLtk parses the KeY-specific `assignable_free <expr>`
-  clause and exposes the clause keyword position as a Java type node in the
-  AST; the converter runs the javaparser symbol resolver on it, which
-  cannot resolve `assignable_free` (it is a clause keyword, not a type).
-  KeY's own re-parse path for `assignable_free` exists (`JMLSpecFactory`
-  re-parses `assignable_free \nothing;` with `JmlFacade.parseClause`), so
-  the clause is expressible in `JmlParser.g4` — the crash happens before
-  that path, during Java-AST conversion.
+- **Root cause (upstream JMLtk):** JMLtk has no `assignable_free` clause
+  keyword at all. In a **method contract** it recovers silently by treating
+  `assignable_free field;` as a Java field declaration: the parse is
+  *successful*, the clause is dropped, and a bogus
+  `FieldDeclaration(type=assignable_free, vars=[field])` is inserted into the
+  class body. KeY's converter then visits that field, resolves the "type"
+  `assignable_free` and aborts with `UnsolvedSymbolException`. In a **loop
+  contract** the same clause is rejected loudly (`Encountered unexpected
+  token: "assignable_free"`), because the loop-clause rule has no class-level
+  fallback.
+- **Reproducer (jmltk):** branch `weigl/assignable-free` (from `origin/main`),
+  `AssignableFreeClauseTest#assignableFreeInMethodContractIsNotAMisplacedField`.
+  The test is intentionally red: it asserts that `assignable_free` is either
+  represented as a JML clause or rejected loudly, and that it never becomes a
+  `FieldDeclaration`.
 - **CI impact:** `testRunAllFunProofs` group `javadl` (whole group).
-- **Fix options:** in the converter, do not symbol-resolve clause-keyword
-  positions (skip resolution for JML clause nodes), or convert the
-  `assignable_free` clause via its typed JML node before the generic
-  type-visitor reaches it.
+- **Fix options:** upstream — add `assignable_free` to the JMLtk clause
+  grammar/`JmlClauseKind` (the correct fix, mirrors `assignable`); at minimum
+  reject the unknown clause loudly instead of fabricating a field. KeY-side,
+  the converter could skip symbol resolution for clause-keyword positions, but
+  that only hides the missing clause (and still loses `assignable_free`
+  semantics).
 
 ## 21. committed `perm.proof` no longer replays  — ✘ OPEN (replay drift)
 

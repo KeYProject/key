@@ -209,6 +209,13 @@ the rebase handles them:
   (§17). `MtScriptStressTest` 2/2 green (script closes single-/multi-core;
   saved multi-core proof reloads closed). This clears the RunAll `quicksort`
   group and `testMtStress`.
+- [x] **Gap-status corrections (2026-11-15):** §17 root-caused and fixed
+  (`JmlFacade.positionedString` forwards the JMLtk node's URI+line to every
+  re-parse); §19's original behavior verified (pre-takeover `_redundantly` was
+  part of the `ENSURES`/`REQUIRES` token, so it is translated like the plain
+  clause); §16 was already supported by JMLtk (`JmlLabeledAssertTest`);
+  §12/§13 reclassified as **accepted** gaps; §20 has a prepared reproducer in
+  jmltk branch `weigl/assignable-free`.
 - [x] Gates re-run at the rebase tip: `MergeRuleTests` +
   `PredicateAbstractionLatticeTests` + `MtMergePointTest`,
   `ParallelProverDeterminismTest`, full `speclang.*`
@@ -223,7 +230,7 @@ the rebase handles them:
 | `keyext.slicing` | **17/17 green** (was 5 red) |
 | `keyext.caching` | **0 failures** (was 1: `TestReferenceSearcher` = the `relax.proof` gap, JMLTK_GAPS §10, fixed 2026-11-10); `ProofCachingSingleRunTest` green |
 | `key.core` | 11 → 8 → 6 → 3 at 2026-11-11 → **0 at the 2026-11-15 rebase tip** (§11 MT fixed by `acbe6aa3d2`; the 2 `JMLParserExceptionTest` cases fixed by the snapshot's targeted messages — see §6); the §10 relax replays ×2 fixed 2026-11-10 (`#reattachLoopInvariant` in `elim_double_block_3`, JMLTK_GAPS §10); the §5 `\sum` ×2 + the `selection_sort` drift ×1 turned green in the full local run of 2026-11-11 — JMLTK_GAPS §5 re-verified **RESOLVED** 2026-11-11 (`\bsum` term byte-identical to `origin/main`, whole Fun `comprehensions` group closes, restored by the jmltk `1.2.1-SNAPSHOT` line); the 4 §4 store-ref reds cleared by the `\locset(…)` adoption (`20d361fa85`) |
-| integration | triaged at `4b62b1d6fa`, re-measured at `20d361fa85` (local corpus run): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = the 2 recorded remaining reds (`selection_sort` drift, `sum1` §5) via the curated small-MT collections — **2026-11-11: both reds now close in the fresh key.core gates** (`ScDeterminismTest` 14/0 incl. `selection_sort` + `sum1`, JMLTK_GAPS §5 RESOLVED), so Mt2w/4w is expected green at the new tip (re-measure pending); `testMtStress` = quicksort load gap (JMLTK_GAPS §18); `testRunAllFunProofs` = **20 red groups**, all classified (§18 ×1, §17-reload ×2, §19 ×1, §20 ×1, §21 ×1, doesn't-close ×14 — the 5 §4 load-failing groups now load: `funOfIF` + `simple_info_flow` pass, `simpleTests`/`list`/`javaCard` resurface with doesn't-close proofs); `testRunAllInfProofs` = **9 local** (10 expected in CI = local + the flaky `SimpleEvoting_fullmacro`) — `NewObjects` passes; doesn't-close ×9 — **all PR-induced** (main is green) |
+| integration | triaged at `4b62b1d6fa`, re-measured at `20d361fa85` (local corpus run): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = the 2 recorded remaining reds (`selection_sort` drift, `sum1` §5) via the curated small-MT collections — **2026-11-11: both reds now close in the fresh key.core gates** (`ScDeterminismTest` 14/0 incl. `selection_sort` + `sum1`, JMLTK_GAPS §5 RESOLVED), so Mt2w/4w is expected green at the new tip (re-measure pending); `testMtStress` = quicksort load gap (JMLTK_GAPS §18) — **fixed 2026-11-15**, `MtScriptStressTest` 2/2; `testRunAllFunProofs` = **20 red groups**, all classified (§18 ×1, §17-reload ×2, §19 ×1, §20 ×1, §21 ×1, doesn't-close ×14 — the 5 §4 load-failing groups now load: `funOfIF` + `simple_info_flow` pass, `simpleTests`/`list`/`javaCard` resurface with doesn't-close proofs); `testRunAllInfProofs` = **9 local** (10 expected in CI = local + the flaky `SimpleEvoting_fullmacro`) — `NewObjects` passes; doesn't-close ×9 — **all PR-induced** (main is green) |
 
 ## Local full-suite triage (2026-11-11, `:key.core:test --continue`, 4644 tests / 69 failures / 70 skipped)
 
@@ -233,10 +240,10 @@ they do **not** run in the CI key.core job). No new reds vs. the recorded baseli
 
 | Group | Count | Status |
 |---|---|---|
-| §19 `ensures_redundantly` — `gen._SmansEtAl` whole group | 31 | recorded load-time gap (JMLTK_GAPS §19) |
-| §20 `assignable_free` — `gen._javadl#test{ensuresFree,loopInvFree}` | 2 | recorded load-time gap (JMLTK_GAPS §20) |
+| §19 `ensures_redundantly` — `gen._SmansEtAl` whole group | 31 | **fixed** 2026-11-15 (translated like `ensures`, matching the pre-takeover lexer; JMLTK_GAPS §19) |
+| §20 `assignable_free` — `gen._javadl#test{ensuresFree,loopInvFree}` | 2 | recorded upstream load-time gap (JMLTK_GAPS §20); reproducer in jmltk branch `weigl/assignable-free` |
 | §18 quicksort load — `gen._quicksort` | 5 | **fixed** 2026-11-15 (jmltk snapshot `1.2.1-20261115.031329-3` + KeY proof-serializer; JMLTK_GAPS §18) |
-| §17 `[no file]` origin / save→reload — `gen._list_seq#SimplifiedLinkedList.remove`, `gen._other`, `gen._reload_examples` | 3 | **reload fixed** 2026-11-15 (`parseOrigin` accepts `[no file]`; JMLTK_GAPS §17); display remains cosmetic |
+| §17 origin file/line / save→reload — `gen._list_seq#SimplifiedLinkedList.remove`, `gen._other`, `gen._reload_examples` | 3 | **fixed** 2026-11-15 (position propagation via `JmlFacade.positionedString`; legacy `[no file]` stays parseable; JMLTK_GAPS §17) |
 | OOM `Java heap space` — `gen._performance` ×7, `gen._performancePOConstruction` ×3, `ConcurrentMatchingStressTest#prop_split`, `gen._updateSimplificationPerformance` | 12 | environmental: one shared 4g worker across the whole suite; passes with a fresh worker / CI memory |
 | doesn't-close drift — `gen._WeideEtAl#AddAndMultiply_add`, `gen._javaCard` ×3, `gen._javadl#testfor_{Array,Iterable,ReferenceArray}` | 7 | **A/B-verified pre-existing at `cfece36950`** (identical failures in a pristine worktree without the uncommitted fix); `gen._blockContracts#Simple__addAbsoluteValues` was §11 and is **fixed** by `acbe6aa3d2` |
 | `JMLParserExceptionTest` ×2 | 2 | **fixed** 2026-11-15 (targeted snapshot messages, see §6); §11 MT also fixed (`acbe6aa3d2`) — key.core reds 0 |
