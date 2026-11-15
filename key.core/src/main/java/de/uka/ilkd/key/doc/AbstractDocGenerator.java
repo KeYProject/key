@@ -198,4 +198,3 @@ final class JsonWriter {
         sb.append("  ".repeat(depth));
     }
 }
-
