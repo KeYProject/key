@@ -133,7 +133,11 @@ the contract; without a directive, all contracts are proven.
 <IDX>\t<FQCC>::<METHOD>\t<NAME>
 ```
 
-- `<IDX>` — the ordinal (kept for legacy `--auto` stdin selection compatibility).
+- `<IDX>` — the 0-based position of the row in the listing (contracts sorted by canonical
+  name), deterministic across runs and hosts. This is *not* the legacy `--auto` prompt's
+  numbering, which follows the loader's class-registration order and is file-system-dependent
+  for multi-class problems; legacy stdin selection takes its number from that prompt's own
+  display, and NAME selection (§4.2) is the portable way to address a contract.
 - `<FQCC>::<METHOD>` — the "Method:" line text KeY prints, e.g. `C::one`.
 - `<NAME>` — the §4.1 canonical name.
 
@@ -344,7 +348,9 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
   every platform; for identical input files, identical settings, and the
   identical binary, `list` (and `--print-open-goals` output) is byte-identical across runs
   and across hosts. The contract index is sorted by canonical contract name, and
-  `--config-dir`/temp-home isolation removes any dependence on local state.
+  `--config-dir`/temp-home isolation removes any dependence on local state. The legacy
+  `--auto` prompt numbers contracts by loader registration order instead, which is
+  file-system-dependent for multi-class problems; `<IDX>` here therefore does not track it.
 - **Ordinals are not stable identifiers**: `<IDX>` in the listing may move between versions
   of the *same* interface whenever the set of canonical names changes. At least the
   following JML/source changes MAY reorder or change the listing:
