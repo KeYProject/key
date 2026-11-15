@@ -17,6 +17,7 @@ import de.uka.ilkd.key.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
 import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.scripts.ScriptException;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.key.cli.CliError;
@@ -52,9 +53,11 @@ import org.slf4j.LoggerFactory;
  * goal was designated yet, the strategy runs on all open goals and {@code apply} uses the first
  * open automatic goal.
  * <p>
- * The {@code print-open-goals} command prints the §6 layout
- * ({@code OPEN-GOAL-COUNT <N>} followed by {@code GOAL <id> <position-path>} blocks) through
- * {@link OpenGoalPrinter}, the same renderer {@code prove --print-open-goals} uses.
+ * The {@code print-open-goals} command prints the §6 layout (a {@code CONTRACT <NAME>} label
+ * line, {@code OPEN-GOAL-COUNT <N>} and {@code GOAL <id> <position-path>} blocks) through
+ * {@link OpenGoalPrinter}, the same renderer {@code prove --print-open-goals} uses, so its
+ * output is byte-identical to the open-goal section of a {@code prove} run over the same
+ * contract.
  * <p>
  * With a per-command timeout ({@code --timeout}), a strategy command that the timeout cuts short
  * before the proof is closed fails as {@code SCRIPT FAIL <line> timed out after <ms> ms}, and
@@ -91,6 +94,8 @@ public final class ScriptInterpreter {
 
     private static final String RULE_COMMAND = "rule";
 
+    private final Contract contract;
+
     private final Proof proof;
 
     private final AbstractUserInterfaceControl uiControl;
@@ -114,14 +119,17 @@ public final class ScriptInterpreter {
     /**
      * Creates an interpreter for the given proof.
      *
+     * @param contract the obligation the script is executed against (its canonical name labels
+     *        the {@code print-open-goals} output, §6)
      * @param proof the proof the script is executed against
      * @param uiControl the user-interface control handed to the proof-script commands
      * @param timeoutMs the per-command proof-search timeout in milliseconds ({@code 0} = none)
-     * @param out the writer that receives the {@code SCRIPT ...}, {@code GOAL ...} and
-     *        {@code OPEN-GOAL-COUNT ...} lines
+     * @param out the writer that receives the {@code SCRIPT ...}, {@code CONTRACT ...},
+     *        {@code GOAL ...} and {@code OPEN-GOAL-COUNT ...} lines
      */
-    public ScriptInterpreter(Proof proof, AbstractUserInterfaceControl uiControl, long timeoutMs,
-            PrintWriter out) {
+    public ScriptInterpreter(Contract contract, Proof proof,
+            AbstractUserInterfaceControl uiControl, long timeoutMs, PrintWriter out) {
+        this.contract = contract;
         this.proof = proof;
         this.uiControl = uiControl;
         this.timeoutMs = Math.max(0, timeoutMs);
@@ -401,11 +409,12 @@ public final class ScriptInterpreter {
     /**
      * Prints the §6 open-goal layout for the current proof state and designates the last printed
      * goal as the target of the following commands. The layout is rendered by
-     * {@link OpenGoalPrinter}, so {@code script print-open-goals} is byte-identical to
-     * {@code prove --print-open-goals 0}.
+     * {@link OpenGoalPrinter} with the obligation's contract label, so
+     * {@code script print-open-goals} is byte-identical to {@code prove --print-open-goals 0}
+     * for the same contract.
      */
     private void printOpenGoals() {
-        new OpenGoalPrinter(out, 0, true).print(proof);
+        new OpenGoalPrinter(out, 0, true).print(contract, proof);
         ImmutableList<Goal> goals = proof.openGoals();
         selectedGoal = goals.isEmpty() ? null : goals.get(goals.size() - 1);
     }

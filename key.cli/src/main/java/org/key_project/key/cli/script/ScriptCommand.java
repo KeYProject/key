@@ -139,7 +139,7 @@ public final class ScriptCommand implements Callable<Integer> {
                 Proof proof = createProof(environment, contract);
                 try {
                     ScriptInterpreter interpreter =
-                        new ScriptInterpreter(proof, environment.getUi(), timeout, out);
+                        new ScriptInterpreter(contract, proof, environment.getUi(), timeout, out);
                     int exit = interpreter.execute(lines);
                     printResult(out, contract, proof, interpreter);
                     return exit;

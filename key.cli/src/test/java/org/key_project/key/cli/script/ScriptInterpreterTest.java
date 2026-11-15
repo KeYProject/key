@@ -44,7 +44,7 @@ class ScriptInterpreterTest {
         try (KeYEnvironment<DefaultUserInterfaceControl> env = loadSize()) {
             Proof proof = createProof(env);
             try {
-                ScriptInterpreter interpreter = interpreter(proof, env, out);
+                ScriptInterpreter interpreter = interpreter(sizeContract(env), proof, env, out);
 
                 assertThat(interpreter.executeLine("auto 5")).isTrue();
 
@@ -63,10 +63,13 @@ class ScriptInterpreterTest {
         try (KeYEnvironment<DefaultUserInterfaceControl> env = loadSize()) {
             Proof proof = createProof(env);
             try {
-                ScriptInterpreter interpreter = interpreter(proof, env, out);
+                ScriptInterpreter interpreter = interpreter(sizeContract(env), proof, env, out);
 
                 assertThat(interpreter.executeLine("print-open-goals")).isTrue();
 
+                List<String> contractLines = out.toString().lines()
+                        .filter(line -> line.startsWith("CONTRACT ")).toList();
+                assertThat(contractLines).containsExactly("CONTRACT " + SIZE_NAME);
                 List<String> goalLines = out.toString().lines()
                         .filter(line -> line.startsWith("GOAL ")).toList();
                 assertThat(goalLines).isNotEmpty();
@@ -86,7 +89,7 @@ class ScriptInterpreterTest {
         try (KeYEnvironment<DefaultUserInterfaceControl> env = loadSize()) {
             Proof proof = createProof(env);
             try {
-                ScriptInterpreter interpreter = interpreter(proof, env, out);
+                ScriptInterpreter interpreter = interpreter(sizeContract(env), proof, env, out);
 
                 assertThat(interpreter.executeLine("proceed")).isTrue();
                 assertThat(interpreter.executeLine("print-open-goals")).isTrue();
@@ -106,19 +109,22 @@ class ScriptInterpreterTest {
         }
     }
 
-    private static ScriptInterpreter interpreter(Proof proof,
+    private static ScriptInterpreter interpreter(Contract contract, Proof proof,
             KeYEnvironment<DefaultUserInterfaceControl> env, StringWriter out) {
-        return new ScriptInterpreter(proof, env.getUi(), 0, new ProtocolWriter(out));
+        return new ScriptInterpreter(contract, proof, env.getUi(), 0, new ProtocolWriter(out));
     }
 
     private static KeYEnvironment<DefaultUserInterfaceControl> loadSize() throws Exception {
         return KeYEnvironment.load(Fixtures.resource("/fixtures/size/size.key"));
     }
 
+    private static Contract sizeContract(KeYEnvironment<DefaultUserInterfaceControl> env) {
+        return ContractIndex.fromEnvironment(env).byName(SIZE_NAME).orElseThrow();
+    }
+
     private static Proof createProof(KeYEnvironment<DefaultUserInterfaceControl> env)
             throws Exception {
-        Contract contract = ContractIndex.fromEnvironment(env).byName(SIZE_NAME).orElseThrow();
-        return env.createProof(contract.createProofObl(env.getInitConfig()));
+        return env.createProof(sizeContract(env).createProofObl(env.getInitConfig()));
     }
 
     private static String lastGoalPath(String out) {

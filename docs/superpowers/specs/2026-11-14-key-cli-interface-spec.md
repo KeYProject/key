@@ -204,9 +204,10 @@ Acceptance E3: `--strategy-option intRules=intRules:unchecked` on an overflow-se
 
 ## 6. Open-goal inspection
 
-`--print-open-goals [<MAX>]` (default `MAX=10`, `MAX=0` = unlimited): prints, after proof search, the open goals on stdout, formatted exactly:
+`--print-open-goals [<MAX>]` (default `MAX=10`, `MAX=0` = unlimited): prints, after proof search, the open goals on stdout, one section per selected contract in selection order, formatted exactly:
 
 ```
+CONTRACT <NAME>
 OPEN-GOAL-COUNT <N>
 GOAL <id> <position-path>
   <antecedent-term>
@@ -214,6 +215,8 @@ GOAL <id> <position-path>
 <blank line>
 ```
 
+- `<NAME>` is the §4.1 canonical name of the contract the section describes; a closed contract contributes `CONTRACT <NAME>` and `OPEN-GOAL-COUNT 0` with no GOAL blocks.
+- The `print-open-goals` command of §7.1 prints the same layout (with the same `CONTRACT` label), so its output is byte-identical to the section a `prove --print-open-goals 0` run prints for the same contract.
 - `<id>` integer ≥ 0; `<position-path>` a KeY position path string (dot-separated ints), the one usable by §7 `at <position-path>`.
 - Terms rendered in KeY printer syntax; each formula on its own line (no wrapping); a line with `\n`-escapes.
 - `MAX` truncates the number of GOAL blocks to `MAX`; `OPEN-GOAL-COUNT` always prints the true total.
