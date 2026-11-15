@@ -67,6 +67,13 @@ diagnostic of §8).
 - **Default**: no `.proof` file is written anywhere unless requested via `--proof` or
   `--proof-dir`.
 - `--proof <PATH>`: writes the proof of the (single selected) contract to `PATH`.
+- `--proof-dir <DIR>`: writes one `<position>.proof` per selected contract (0-based selection
+  position).
+- Proof output requires a **single load file**: `--proof`/`--proof-dir` together with more than
+  one position argument is an input error (exit `3`), because the per-file numbering would make
+  two files overwrite each other. Run one file per invocation.
+- A requested path that cannot be written is an input error
+  (`KEY_ERROR cannot write proof '<path>': <reason>`, exit `3`), never a silent success.
 - `--save-partial`: an unclosed proof is then also saved to the requested location.
 - Every written proof file starts with a status marker line:
 
@@ -303,6 +310,10 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
   former `NullPointerException`/`ClassCastException` crashes; the same structured message
   is also carried in the `errorMessage` of the `error` result record.
 - `KEY_ERROR contract '<NAME>' not found` — unknown `--choose-contract` selector (exit `3`).
+- `KEY_ERROR no contracts found in <FILE>` — the run selected no contract at all (a `prove` run
+  that proves nothing must not report success; exit `3`).
+- `KEY_ERROR cannot write proof '<PATH>': <REASON>` — the requested proof file cannot be written
+  (exit `3`).
 - `KEY_ERROR settings: '<LINE>' not understood` — unknown settings key or undocumented
   value (exit `3`).
 - `KEY_ERROR file not found: <PATH>` — missing input or settings file (exit `3`).
@@ -314,7 +325,8 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
 
 ## 9. Determinism and stability
 
-- **Byte-identical output**: for identical input files, identical settings, and the
+- **Byte-identical output**: every protocol line ends with a single `\n` (never `\r\n`) on
+  every platform; for identical input files, identical settings, and the
   identical binary, `list` (and `--print-open-goals` output) is byte-identical across runs
   and across hosts. The contract index is sorted by canonical contract name, and
   `--config-dir`/temp-home isolation removes any dependence on local state.
@@ -355,10 +367,10 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
 | `prove` | `--choose-contract <SELECTOR>` | select contracts, repeatable (bare index, `NAME.#<IDX>`, or NAME) |
 | `prove` | `--settings-file <PATH>` | §5.2 settings file |
 | `prove` | `--strategy-option <KEY>=<VALUE>` | single strategy choice, repeatable, overrides the settings file |
-| `prove` | `--print-open-goals [<MAX>]` | print open goals after search (`MAX` default `10`, `0` = unlimited) |
+| `prove` | `--print-open-goals [<MAX>]` | print open goals after search (`MAX` default `10`, `0` = unlimited); a following positional file stays positional (a bare flag means `MAX=10`, a numeric next argument is the `MAX`) |
 | `prove` | `--no-truncate-formulas` | disable long-formula truncation in the goal printout |
-| `prove` | `--proof <PATH>` | write the proof of the single selected contract to `PATH` |
-| `prove` | `--proof-dir <DIR>` | for multi-contract runs, write the proofs into `DIR` as `<position>.proof` (0-based selection position) |
+| `prove` | `--proof <PATH>` | write the proof of the single selected contract to `PATH` (single load file) |
+| `prove` | `--proof-dir <DIR>` | for multi-contract runs, write the proofs into `DIR` as `<position>.proof` (0-based selection position, single load file) |
 | `prove` | `--save-partial` | also save an unclosed proof to the requested location |
 | `list` | `<files>` (1+) | print the §4.3 listing, exit `0`, no `KEY_RESULT` |
 | `script` | `<load-file> <script-file>` | run the §7.1 script against one obligation; prints `SCRIPT …` lines then one `KEY_RESULT` |

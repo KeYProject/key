@@ -77,6 +77,8 @@ public final class Main implements Callable<Integer> {
      */
     public static CommandLine createCommandLine() {
         return new CommandLine(new Main())
+                .setOut(new ProtocolWriter(System.out))
+                .setErr(new ProtocolWriter(System.err))
                 .setParameterExceptionHandler(new ParameterExceptionHandler())
                 .setExecutionExceptionHandler(new ExecutionExceptionHandler());
     }
