@@ -1,10 +1,11 @@
 # KeY Headless Command-Line Interface
 
-This is the official documentation of the headless (script/agent-friendly) command-line
-interface of KeY. It covers the exact flag names, the machine-readable result protocol, the
-exit-code contract, and the diagnostic formats that scripts and LLM agents can implement
-against with zero ambiguity. The normative source is
-[`docs/superpowers/specs/2026-11-14-key-cli-interface-spec.md`](superpowers/specs/2026-11-14-key-cli-interface-spec.md).
+This is the documentation of the headless (script/agent-friendly) command-line interface of KeY.
+It covers the exact flag names, the machine-readable result protocol, the exit-code contract,
+and the diagnostic formats that scripts and LLM agents can implement against with zero
+ambiguity. The normative interface contract lives next to this file in the repository at
+[`superpowers/specs/2026-11-14-key-cli-interface-spec.md`](superpowers/specs/2026-11-14-key-cli-interface-spec.md);
+where this page and the contract disagree, the contract wins and the page is a bug.
 
 The interface is implemented by the `key.cli` module, entry point
 `org.key_project.key.cli.Main`. Run the subcommands of
@@ -213,7 +214,8 @@ GOAL <id> <position-path>
 ```
 
 - `<id>` is an integer ≥ 0; `<position-path>` is the dot-separated int KeY position path
-  (matching `^[1-9][0-9.]*$`), usable by the §7.1 `at <position-path>` anchor.
+  (matching `^[1-9][0-9.]*$`), usable by the §7.1 `at <position-path>` anchor. The proof root
+  itself prints as `1` (it is the only goal that can be open before any rule has been applied).
 - `OPEN-GOAL-COUNT` always prints the **true** total; `MAX` only bounds the number of
   printed `GOAL` blocks.
 - Each formula is printed on its own line (embedded line breaks escaped as literal `\n`).
@@ -293,7 +295,9 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
 - `KEY_ERROR file not found: <PATH>` — missing input or settings file (exit `3`).
 - `KEY_ERROR <usage message>` — unknown option, missing argument, … (exit `3`).
 - `KEY_ERROR internal error: <message>` — an unexpected exception (exit `4`).
-- `KEY_WARN <message>` — non-fatal warning; the exit code follows §1.
+- `KEY_WARN <message>` — §8's non-fatal warning channel. Reserved: no current code path emits
+  it; non-fatal conditions that a driver must see are reported as `KEY_ERROR` with the exit code
+  the contract assigns to them.
 
 ## 9. Determinism and stability
 
@@ -341,7 +345,7 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
 | `prove` | `--print-open-goals [<MAX>]` | print open goals after search (`MAX` default `10`, `0` = unlimited) |
 | `prove` | `--no-truncate-formulas` | disable long-formula truncation in the goal printout |
 | `prove` | `--proof <PATH>` | write the proof of the single selected contract to `PATH` |
-| `prove` | `--proof-dir <DIR>` | for multi-contract runs, write the proofs into `DIR` as `<contract-index>.proof` |
+| `prove` | `--proof-dir <DIR>` | for multi-contract runs, write the proofs into `DIR` as `<position>.proof` (0-based selection position) |
 | `prove` | `--save-partial` | also save an unclosed proof to the requested location |
 | `list` | `<files>` (1+) | print the §4.3 listing, exit `0`, no `KEY_RESULT` |
 | `script` | `<load-file> <script-file>` | run the §7.1 script against one obligation |
