@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli.prove;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +12,7 @@ import java.util.UUID;
 
 import org.key_project.key.cli.Log;
 import org.key_project.key.cli.Main;
+import org.key_project.key.cli.ProtocolWriter;
 import org.key_project.key.cli.ResultRecordWriter;
 import org.key_project.key.cli.Verbosity;
 
@@ -37,6 +37,7 @@ class ProveCommandProofTest {
     private static final String TWO_NAME = "C[C::two()].JML normal_behavior operation contract.0";
 
     @TempDir
+    @SuppressWarnings("initialization.field.uninitialized") // JUnit injects the temp dir
     Path tmp;
 
     @BeforeAll
@@ -72,7 +73,7 @@ class ProveCommandProofTest {
         assertThat(openGoals).isGreaterThanOrEqualTo(1);
         assertThat(run.resultLines().get(0))
                 .contains(
-                    "\"proofFile\":\"" + proof.toAbsolutePath().normalize().toString() + "\"");
+                    "\"proofFile\":\"" + jsonPath(proof.toAbsolutePath().normalize()) + "\"");
     }
 
     @Test
@@ -88,8 +89,9 @@ class ProveCommandProofTest {
             assertThat(run.err()).doesNotContain("KEY_ERROR");
             assertThat(Files.readAllLines(relative).get(0)).isEqualTo("KEY_PROOF_STATUS closed 0");
             assertThat(Files.readString(relative)).contains("\\proof");
-            assertThat(run.resultLines().get(0)).contains(
-                "\"proofFile\":\"" + relative.toAbsolutePath().normalize() + "\"");
+            assertThat(run.resultLines().get(0))
+                    .contains("\"proofFile\":\"" + jsonPath(relative.toAbsolutePath().normalize())
+                        + "\"");
         } finally {
             Files.deleteIfExists(relative);
         }
@@ -111,7 +113,7 @@ class ProveCommandProofTest {
         assertThat(count).isEqualTo(1);
         assertThat(run.resultLines().get(0))
                 .contains(
-                    "\"proofFile\":\"" + proof.toAbsolutePath().normalize().toString() + "\"");
+                    "\"proofFile\":\"" + jsonPath(proof.toAbsolutePath().normalize()) + "\"");
     }
 
     @Test
@@ -210,13 +212,11 @@ class ProveCommandProofTest {
                 .isEqualTo("KEY_PROOF_STATUS closed 0");
         assertThat(run.resultLines()).hasSize(2);
         assertThat(run.resultLines().get(0))
-                .contains("\"proofFile\":\"" + dir.resolve("0.proof")
-                        .toAbsolutePath().normalize().toString()
-                    + "\"");
+                .contains("\"proofFile\":\""
+                    + jsonPath(dir.resolve("0.proof").toAbsolutePath().normalize()) + "\"");
         assertThat(run.resultLines().get(1))
-                .contains("\"proofFile\":\"" + dir.resolve("1.proof")
-                        .toAbsolutePath().normalize().toString()
-                    + "\"");
+                .contains("\"proofFile\":\""
+                    + jsonPath(dir.resolve("1.proof").toAbsolutePath().normalize()) + "\"");
     }
 
     private record Run(int exit, String out, String err) {
@@ -225,12 +225,17 @@ class ProveCommandProofTest {
         }
     }
 
+    /// The path as rendered in the JSON result record, i.e. with backslashes and quotes escaped.
+    private static String jsonPath(Path path) {
+        return path.toString().replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
     private static Run run(String... args) {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
         int exit = cli.execute(args);
         return new Run(exit, out.toString(), err.toString());
     }

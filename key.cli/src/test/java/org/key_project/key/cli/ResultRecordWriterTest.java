@@ -7,6 +7,8 @@ package org.key_project.key.cli;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -80,7 +82,10 @@ class ResultRecordWriterTest {
         assertThat(line).contains("\"errorMessage\":null");
     }
 
+    // a path with a quote is impossible to construct on Windows; the escaping itself is
+    // covered by escapesQuotesBackslashesAndControlCharacters on every platform
     @Test
+    @EnabledOnOs({ OS.LINUX, OS.MAC })
     void proofFileIsRenderedAsEscapedString() {
         Path proofFile = Path.of("/tmp/out dir/a\"b.proof");
         ContractResult result =

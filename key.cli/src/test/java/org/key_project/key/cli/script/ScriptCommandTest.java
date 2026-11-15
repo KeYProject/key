@@ -5,17 +5,18 @@
 package org.key_project.key.cli.script;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.key_project.key.cli.Log;
 import org.key_project.key.cli.Main;
+import org.key_project.key.cli.ProtocolWriter;
 import org.key_project.key.cli.ResultRecordWriter;
 import org.key_project.key.cli.Verbosity;
 import org.key_project.key.cli.prove.Fixtures;
@@ -39,6 +40,7 @@ class ScriptCommandTest {
     private static final Pattern COUNT_LINE = Pattern.compile("^OPEN-GOAL-COUNT ([0-9]+)$");
 
     @TempDir
+    @SuppressWarnings("initialization.field.uninitialized") // JUnit injects the temp dir
     Path tempDir;
 
     @BeforeAll
@@ -137,7 +139,9 @@ class ScriptCommandTest {
     void timeoutFailsTheStrategyLineAndExitsTimedOut() throws IOException {
         Path script = script("auto 100000");
 
-        Run run = run("script", "--timeout", "50", sizeKey(), script.toString());
+        // 1 ms: the search cannot reach its fixed point within the deadline on any machine,
+        // so the timeout fires deterministically instead of racing with the search
+        Run run = run("script", "--timeout", "1", sizeKey(), script.toString());
 
         assertThat(run.exit()).isEqualTo(2);
         assertThat(run.out()).contains("SCRIPT FAIL auto 100000 timed out after");
@@ -219,7 +223,7 @@ class ScriptCommandTest {
         for (String line : out.lines().toList()) {
             Matcher matcher = COUNT_LINE.matcher(line);
             if (matcher.matches()) {
-                counts.add(Integer.parseInt(matcher.group(1)));
+                counts.add(Integer.parseInt(Objects.requireNonNull(matcher.group(1))));
             }
         }
         return counts;
@@ -230,7 +234,7 @@ class ScriptCommandTest {
         for (String line : out.lines().toList()) {
             Matcher matcher = GOAL_LINE.matcher(line);
             if (matcher.matches()) {
-                paths.add(matcher.group(1));
+                paths.add(Objects.requireNonNull(matcher.group(1)));
             }
         }
         return paths;
@@ -275,8 +279,8 @@ class ScriptCommandTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
         int exit = cli.execute(args);
         return new Run(exit, out.toString(), err.toString());
     }

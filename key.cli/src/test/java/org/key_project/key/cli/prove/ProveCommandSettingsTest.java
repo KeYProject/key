@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli.prove;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -14,6 +14,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import org.key_project.key.cli.ContractResult;
 import org.key_project.key.cli.Log;
 import org.key_project.key.cli.Main;
+import org.key_project.key.cli.ProtocolWriter;
 import org.key_project.key.cli.ResultRecordWriter;
 import org.key_project.key.cli.ResultStatus;
 import org.key_project.key.cli.Verbosity;
@@ -86,7 +87,7 @@ class ProveCommandSettingsTest {
     @Timeout(120)
     void unreadableSettingsFileIsAnInputError() {
         // a directory exists but cannot be read as a settings file
-        String directory = Fixtures.indexKey().getParent().toString();
+        String directory = Objects.requireNonNull(Fixtures.indexKey().getParent()).toString();
 
         Run run = run("prove", Fixtures.indexKey().toString(), "--settings-file", directory);
 
@@ -190,8 +191,8 @@ class ProveCommandSettingsTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
         int exit = cli.execute(args);
         return new Run(exit, out.toString(), err.toString());
     }
