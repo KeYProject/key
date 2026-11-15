@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.key.cli.list;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.key_project.key.cli.Log;
 import org.key_project.key.cli.Main;
+import org.key_project.key.cli.ProtocolWriter;
 import org.key_project.key.cli.Verbosity;
 import org.key_project.key.cli.prove.Fixtures;
 
@@ -71,8 +71,8 @@ class ListCommandTest {
         StringWriter out = new StringWriter();
         StringWriter err = new StringWriter();
         var cli = Main.createCommandLine();
-        cli.setOut(new PrintWriter(out));
-        cli.setErr(new PrintWriter(err));
+        cli.setOut(new ProtocolWriter(out));
+        cli.setErr(new ProtocolWriter(err));
         int exit = cli.execute(args);
         return new Run(exit, out.toString(), err.toString());
     }
