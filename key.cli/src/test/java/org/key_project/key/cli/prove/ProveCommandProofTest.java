@@ -27,7 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * spec): a proof file is written only where the caller requested one ({@code --proof} or
  * {@code --proof-dir}), always for a closed proof (marker {@code KEY_PROOF_STATUS closed 0}) and
  * for an unclosed proof only with {@code --save-partial} (marker
- * {@code KEY_PROOF_STATUS open <n>}).
+ * {@code KEY_PROOF_STATUS open <n>}). An unwritable requested path, and proof output together
+ * with several load files, are input errors (exit {@code 3}).
  */
 class ProveCommandProofTest {
 
@@ -114,6 +115,48 @@ class ProveCommandProofTest {
 
         assertThat(run.exit()).isEqualTo(3);
         assertThat(run.err()).contains("KEY_ERROR");
+        assertThat(run.resultLines()).isEmpty();
+    }
+
+    @Test
+    @Timeout(300)
+    void unwritableProofPathIsAnInputError() throws Exception {
+        // a regular file where the parent directory of the proof should be
+        Path blocker = tmp.resolve("blocked");
+        Files.writeString(blocker, "not a directory");
+        Path proof = blocker.resolve("x.proof");
+
+        Run run = run("prove", Fixtures.indexKey().toString(), "--choose-contract", ONE_NAME,
+            "--proof", proof.toString());
+
+        assertThat(run.exit()).isEqualTo(3);
+        assertThat(run.err()).contains("cannot write proof");
+        // the run must not report a success record while the requested proof is missing
+        assertThat(run.resultLines()).isEmpty();
+        assertThat(run.out()).doesNotContain("\"status\":\"closed\"");
+    }
+
+    @Test
+    @Timeout(300)
+    void proofWithTwoLoadFilesIsAnInputError() {
+        Run run = run("prove", Fixtures.indexKey().toString(), Fixtures.overflowKey().toString(),
+            "--proof", tmp.resolve("x.proof").toString());
+
+        assertThat(run.exit()).isEqualTo(3);
+        assertThat(run.err()).contains("KEY_ERROR");
+        assertThat(run.err()).contains("single load file");
+        assertThat(run.resultLines()).isEmpty();
+    }
+
+    @Test
+    @Timeout(300)
+    void proofDirWithTwoLoadFilesIsAnInputError() {
+        Run run = run("prove", Fixtures.indexKey().toString(), Fixtures.indexKey().toString(),
+            "--proof-dir", tmp.resolve("dir").toString());
+
+        assertThat(run.exit()).isEqualTo(3);
+        assertThat(run.err()).contains("KEY_ERROR");
+        assertThat(run.err()).contains("single load file");
         assertThat(run.resultLines()).isEmpty();
     }
 
