@@ -76,10 +76,12 @@ public final class ScriptCommand implements Callable<Integer> {
 
     @Parameters(index = "0", paramLabel = "<load-file>",
         description = "The KeY problem file (.key) or Java source to load.")
+    @SuppressWarnings("initialization.field.uninitialized")
     private Path loadFile;
 
     @Parameters(index = "1", paramLabel = "<script-file>",
         description = "The line-oriented §7.1 script file to execute (UTF-8).")
+    @SuppressWarnings("initialization.field.uninitialized")
     private Path scriptFile;
 
     @Option(names = "--timeout", paramLabel = "<MS>", defaultValue = "0",
@@ -150,7 +152,7 @@ public final class ScriptCommand implements Callable<Integer> {
                 environment.dispose();
             }
         } catch (UnknownContractException e) {
-            throw CliError.input(e.getMessage());
+            throw CliError.input(errorMessage(e));
         } catch (ProblemLoaderException e) {
             throw CliError.loadFailure(loadFile, e);
         } catch (CliError e) {
