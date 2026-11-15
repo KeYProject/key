@@ -10,7 +10,7 @@ Main is green; the PR is `BEHIND` main (#4019, #4022, #4023 not yet included).
 | `ScDeterminismTest#singleCoreProofIsReproducible` ×7 ([6]–[10],[12],[14]) | comma-separated store-ref `represents` + `\sum`-proof fidelity — **updated 2026-11-09 (`20d361fa85`): ×2** ([7] `selection_sort` = doesn't-close drift, was a §4 load fail; [10] `sum1` = §5); the §4 load failures cleared by the `\locset(…)` adoption — **2026-11-11: ×0** (full local `:key.core:test` run: `ScDeterminismTest` 14/0 — both reds now green under the current jmltk `1.2.1-SNAPSHOT`) |
 | `RealProofMtEquivalenceTest[3]` | same family (`sum0`) — **2026-11-11: green** (`RealProofMtEquivalenceTest` 8/0 in the same full local run) |
 | `LoopScopeInvRuleTests#testDoAutomaticProofOfBenchmarkWithLabeledBreaksAndContinues` | labeled `break`/`continue` proofs |
-| `ParallelProverDeterminismTest#sequentialAndOneWorkerProofsAreIdentical` | pre-existing block-contract combination bug ("flags have to have the same size") |
+| `ParallelProverDeterminismTest#sequentialAndOneWorkerProofsAreIdentical` | block-contract combination bug ("flags have to have the same size") — **FIXED 2026-11-15** (`acbe6aa3d2`): a labeled block's contract was extracted twice, with and without labels; §11 |
 | `TestCopyingReplayer#testJavaProof`, `TestEqualsModProofIrrelevancy#testJavaProof` | the 2 recorded replayer failures — **FIXED 2026-11-10** (the `relax.proof` replay lost the node-attached loop invariant in the `elim_double_block_3` rebuild; fixed via `#reattachLoopInvariant` — JMLTK_GAPS §10) |
 | `JMLParserExceptionTest` ×2 (`MethodInMethod`, `ModelFieldinMethod`) | known: JMLtk rejects `model` decl in method body; KeY expects legacy message. A/B-verified pre-existing under 1.1.0- **and** 1.2.1-SNAPSHOT — **FIXED 2026-11-15**: the republished snapshot emits targeted messages (`Model method/field … is not allowed within methods`); the fixtures' `msgContains` were updated (§6) |
 
@@ -191,8 +191,17 @@ the rebase handles them:
   `MethodInMethod`/`ModelFieldinMethod` fixtures' `msgContains` updated to
   `Model method/field … is not allowed within methods`; `JMLParserExceptionTest`
   now green (no longer part of the expected red count).
+- [x] **`ParallelProverDeterminismTest` fixed** (`acbe6aa3d2`): a contract on a
+  labeled block was extracted twice (plain `StatementBlock` pass without labels
+  and `LabeledStatement` pass with labels), producing one contract without and
+  one with break/continue flags → "flags have to have the same size" in
+  `BlockContractImpl.Combinator`. `SLEnvInput.addBlockAndLoopContracts` now
+  skips directly labeled blocks, leaving them to the labeled pass. Also fixes
+  RunAll `blockContracts#Simple__addAbsoluteValues`. Expected key.core reds at
+  the tip are now **0**.
 - [x] Gates re-run at the rebase tip: `MergeRuleTests` +
-  `PredicateAbstractionLatticeTests` + `MtMergePointTest`, full `speclang.*`
+  `PredicateAbstractionLatticeTests` + `MtMergePointTest`,
+  `ParallelProverDeterminismTest`, full `speclang.*`
   slice (304 tests, 10 skipped, 0 failures), `KeyJavaPipelineTest` 142/0,
   `testClasses`, `spotlessCheck`, `-DENABLE_NULLNESS=true compileTestJava` —
   all green.
@@ -203,7 +212,7 @@ the rebase handles them:
 |---|---|
 | `keyext.slicing` | **17/17 green** (was 5 red) |
 | `keyext.caching` | **0 failures** (was 1: `TestReferenceSearcher` = the `relax.proof` gap, JMLTK_GAPS §10, fixed 2026-11-10); `ProofCachingSingleRunTest` green |
-| `key.core` | 11 → 8 → 6 → **3 expected at the new tip (2026-11-11), all recorded** (§11 MT ×1 + the 2 known `JMLParserExceptionTest` cases); the §10 relax replays ×2 fixed 2026-11-10 (`#reattachLoopInvariant` in `elim_double_block_3`, JMLTK_GAPS §10); the §5 `\sum` ×2 + the `selection_sort` drift ×1 turned green in the full local run of 2026-11-11 — JMLTK_GAPS §5 re-verified **RESOLVED** 2026-11-11 (`\bsum` term byte-identical to `origin/main`, whole Fun `comprehensions` group closes, restored by the jmltk `1.2.1-SNAPSHOT` line); the 4 §4 store-ref reds cleared by the `\locset(…)` adoption (`20d361fa85`) |
+| `key.core` | 11 → 8 → 6 → 3 at 2026-11-11 → **0 at the 2026-11-15 rebase tip** (§11 MT fixed by `acbe6aa3d2`; the 2 `JMLParserExceptionTest` cases fixed by the snapshot's targeted messages — see §6); the §10 relax replays ×2 fixed 2026-11-10 (`#reattachLoopInvariant` in `elim_double_block_3`, JMLTK_GAPS §10); the §5 `\sum` ×2 + the `selection_sort` drift ×1 turned green in the full local run of 2026-11-11 — JMLTK_GAPS §5 re-verified **RESOLVED** 2026-11-11 (`\bsum` term byte-identical to `origin/main`, whole Fun `comprehensions` group closes, restored by the jmltk `1.2.1-SNAPSHOT` line); the 4 §4 store-ref reds cleared by the `\locset(…)` adoption (`20d361fa85`) |
 | integration | triaged at `4b62b1d6fa`, re-measured at `20d361fa85` (local corpus run): `testRunAllWdProofs` **green** (was red); `testMt2w/4w` = the 2 recorded remaining reds (`selection_sort` drift, `sum1` §5) via the curated small-MT collections — **2026-11-11: both reds now close in the fresh key.core gates** (`ScDeterminismTest` 14/0 incl. `selection_sort` + `sum1`, JMLTK_GAPS §5 RESOLVED), so Mt2w/4w is expected green at the new tip (re-measure pending); `testMtStress` = quicksort load gap (JMLTK_GAPS §18); `testRunAllFunProofs` = **20 red groups**, all classified (§18 ×1, §17-reload ×2, §19 ×1, §20 ×1, §21 ×1, doesn't-close ×14 — the 5 §4 load-failing groups now load: `funOfIF` + `simple_info_flow` pass, `simpleTests`/`list`/`javaCard` resurface with doesn't-close proofs); `testRunAllInfProofs` = **9 local** (10 expected in CI = local + the flaky `SimpleEvoting_fullmacro`) — `NewObjects` passes; doesn't-close ×9 — **all PR-induced** (main is green) |
 
 ## Local full-suite triage (2026-11-11, `:key.core:test --continue`, 4644 tests / 69 failures / 70 skipped)
@@ -219,8 +228,8 @@ they do **not** run in the CI key.core job). No new reds vs. the recorded baseli
 | §18 quicksort load — `gen._quicksort` | 5 | recorded load-time gap (JMLTK_GAPS §18) |
 | §17 `[no file]` origin / save→reload — `gen._list_seq#SimplifiedLinkedList.remove`, `gen._other`, `gen._reload_examples` | 3 | recorded (JMLTK_GAPS §17) |
 | OOM `Java heap space` — `gen._performance` ×7, `gen._performancePOConstruction` ×3, `ConcurrentMatchingStressTest#prop_split`, `gen._updateSimplificationPerformance` | 12 | environmental: one shared 4g worker across the whole suite; passes with a fresh worker / CI memory |
-| doesn't-close drift — `gen._WeideEtAl#AddAndMultiply_add`, `gen._blockContracts#Simple__addAbsoluteValues`, `gen._javaCard` ×3, `gen._javadl#testfor_{Array,Iterable,ReferenceArray}` | 8 | **A/B-verified pre-existing at `cfece36950`** (identical failures in a pristine worktree without the uncommitted fix) |
-| §11 MT + `JMLParserExceptionTest` ×2 | 3 | the remaining expected CI reds |
+| doesn't-close drift — `gen._WeideEtAl#AddAndMultiply_add`, `gen._javaCard` ×3, `gen._javadl#testfor_{Array,Iterable,ReferenceArray}` | 7 | **A/B-verified pre-existing at `cfece36950`** (identical failures in a pristine worktree without the uncommitted fix); `gen._blockContracts#Simple__addAbsoluteValues` was §11 and is **fixed** by `acbe6aa3d2` |
+| `JMLParserExceptionTest` ×2 | 2 | **fixed** 2026-11-15 (targeted snapshot messages, see §6); §11 MT also fixed (`acbe6aa3d2`) — key.core reds 0 |
 | `JmlScriptTest#ObtainWithUpdates` | 1 | flaky auto-proof — see below |
 | `TestTacletEquality[719]` (`elim_double_block_3`) | 1 | fixed in this batch (golden `taclets.old.txt` updated for the new taclet rendering; 2137/2137 green) |
 | `ScratchStrictNothingTest` ×3 | 3 | own diagnostic scratch tests, deleted in this batch |

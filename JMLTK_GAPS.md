@@ -52,7 +52,8 @@ JMLtk front-end shipped in PR #3997.
   `ast.key.KeyMergePointStmt` (§1) and rejects `model` declarations in method
   bodies with targeted messages (the two `JMLParserExceptionTest` cases now
   pass after updating their expected message, so the expected key.core red
-  count drops from 3 to 1, leaving only §11). `MergeRuleTests`/`PredicateAbstractionLatticeTests`/
+  count drops from 3 to 0; §11 (block-contract combination) is fixed by the
+  same rebase — see §11). `MergeRuleTests`/`PredicateAbstractionLatticeTests`/
   `MtMergePointTest`, the whole `speclang.*` slice and `KeyJavaPipelineTest`
   are green again.
 - Every entry has a fixture path so it can be re-verified.
@@ -82,7 +83,7 @@ JMLtk front-end shipped in PR #3997.
 | 8 | `ensures \result = max;` (single `=`) | — | `exceptional/WrongEquals.java` | ✔ RESOLVED (guarded via `JmlSideEffectChecker`) |
 | 9 | labeled `break`/`continue` proofs | — | `LoopScopeInvRuleTests` bench | ✔ RESOLVED (loop-invariant fix `6a07c20e63`) |
 | 10 | `relax.proof` scripted-proof replay | — | `key.ui/examples/heap/verifyThis15_1_RelaxedPrefix/relax.proof` | ✔ RESOLVED (2026-11-10: loop invariant lost in `elim_double_block_3` rebuild; fixed via `#reattachLoopInvariant` — see §10) |
-| 11 | block-contract combination | — | `ParallelProverDeterminismTest` | ✘ OPEN — non-JML real KeY bug (pre-existing) |
+| 11 | block-contract combination | — | `Simple__addAbsoluteValues.key`, `ParallelProverDeterminismTest` | ✔ RESOLVED (2026-11-15, `acbe6aa3d2`: labeled blocks were extracted twice, with and without labels; see §11) |
 | 12 | absent clause keywords | `when`, `duration`, `working_space`, `captures`, and the legacy clause-name `name "..."` | — | ⚠ mostly OPEN — `name` replaced by the native `[behavior] <name>:` prefix (✔ RESOLVED) |
 | 13 | pragma-statements | `//@ nowarn;`, `//@ debug;` | `exceptional/NowarnDebug.java`, `exceptional/NowarnDebugInMethod.java` | ⚠ pinned: class level loud (`ProofInputException`), method level dropped (fallback) |
 | 14 | datagroup / monitor clauses | `monitors_for`, `readable_if`, `writable_if`, `in_group`, `maps_into` | `exceptional/{Datagroup,MonitorsFor,ReadableIf,WritableIf,InGroup,MapsInto}.java` | ✔ RESOLVED (loud guard, no spurious fields) |
@@ -449,14 +450,25 @@ public class Test { … }
   `JmlQuantifiedExpr`) — 116 errors per `relax.proof` load; the `Jmlish`
   parent is now skipped silently.
 
-## 11. block-contract combination  — ✘ OPEN, non-JML (pre-existing KeY bug)
+## 11. block-contract combination  — ✔ RESOLVED (2026-11-15, `acbe6aa3d2`)
 
-- Test: `ParallelProverDeterminismTest.sequentialAndOneWorkerProofsAreIdentical`.
-- `IllegalArgumentException: flags have to have the same size` in
-  `ReplacementMap.replaceFlags` via block-contract combine. Verified identical
-  at the recorded Phase-3-era heads — **not** a JMLtk parse gap, but a real KeY
-  bug worth a follow-up issue. Listed for completeness (was row (i) of the
-  recorded triage).
+- Tests: `ParallelProverDeterminismTest.sequentialAndOneWorkerProofsAreIdentical`,
+  RunAll `blockContracts#Simple__addAbsoluteValues`.
+- **Symptom:** `IllegalArgumentException: flags have to have the same size` in
+  `ReplacementMap.replaceFlags` while combining block contracts.
+- **Root cause (exposed by the JMLtk front-end, not a JMLtk parse gap):** a
+  contract on a *labeled* block was extracted twice — once by the
+  `StatementBlock` pass without labels and once by the `LabeledStatement` pass
+  with the label list. JMLtk attaches the `JmlContract` to the `BlockStmt`, so
+  both passes found it. The unlabeled copy has no `break`/`continue` flags,
+  the labeled copy does, and `BlockContractImpl.Combinator` rejects the
+  mismatch. The earlier “pre-existing” classification was an artifact of the
+  old front-end attaching the contract to a different node.
+- **Fix:** `SLEnvInput.addBlockAndLoopContracts` skips directly labeled blocks;
+  `addLabeledBlockContracts`/`addLabeledLoopContracts` are the only pass for
+  them (identity-based set, because `StatementBlock.equals` is structural).
+  `Simple__addAbsoluteValues` now has one labeled contract per block and both
+  the determinism test and the RunAll `blockContracts` group are green.
 
 ## 12.–16. JMLtk grammar tokens that are simply absent
 
