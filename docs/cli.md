@@ -261,8 +261,17 @@ SCRIPT FAIL <line> <reason>
 ```
 
 At the end, `assert-closed` prints `SCRIPT FINAL closed` (exit `0`) or
-`SCRIPT FINAL open <n>` (exit `1`); without `assert-closed`, the outcome comes from the
-`KEY_RESULT` record (exit per §1).
+`SCRIPT FINAL open <n>` (exit `1`); a command cut short by `--timeout` prints
+`SCRIPT FAIL <line> timed out after <ms> ms`, the final line stays `SCRIPT FINAL open <n>`,
+and the run exits `2` (`timed_out`, §1). Every script run ends with exactly one §2 record:
+
+```
+SCRIPT FINAL open 1
+KEY_RESULT {"version":1,"contract":"…","status":"open","openGoals":1,"elapsedMs":405,"proofFile":null,"smtCalls":0,"smtProved":0,"errorMessage":null}
+```
+
+`KEY_RESULT` is the last line of stdout for `script` too, so a driver that only implements
+§2 can consume the outcome without parsing `SCRIPT` lines.
 
 ### 7.2 `replay` subcommand
 
@@ -352,9 +361,9 @@ All must-fail conditions print, on stderr, a line starting with the literal `KEY
 | `prove` | `--proof-dir <DIR>` | for multi-contract runs, write the proofs into `DIR` as `<position>.proof` (0-based selection position) |
 | `prove` | `--save-partial` | also save an unclosed proof to the requested location |
 | `list` | `<files>` (1+) | print the §4.3 listing, exit `0`, no `KEY_RESULT` |
-| `script` | `<load-file> <script-file>` | run the §7.1 script against one obligation |
+| `script` | `<load-file> <script-file>` | run the §7.1 script against one obligation; prints `SCRIPT …` lines then one `KEY_RESULT` |
 | `script` | `--choose-contract <SELECTOR>` | the single obligation (selection must resolve to exactly one contract) |
-| `script` | `--timeout <MS>` | per-command proof-search timeout, `0` = none (default) |
+| `script` | `--timeout <MS>` | per-command proof-search timeout, `0` = none (default); expiry fails that line and exits `2` |
 | `replay` | `<proof-file>` | re-check the §3 proof file |
 | `replay` | `--contract <NAME>` | restrict the re-check to one contract |
 | all | `--help` | usage text |
