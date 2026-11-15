@@ -243,7 +243,12 @@ public final class ReplayCommand implements Callable<Integer> {
             if (l.startsWith(ProofSaver.KEY_PROOF_STATUS_OPEN_PREFIX)) {
                 String rest = l.substring(ProofSaver.KEY_PROOF_STATUS_OPEN_PREFIX.length());
                 if (!rest.isEmpty() && rest.chars().allMatch(Character::isDigit)) {
-                    return new StatusMarker(line, false, Integer.parseInt(rest), false);
+                    try {
+                        return new StatusMarker(line, false, Integer.parseInt(rest), false);
+                    } catch (NumberFormatException e) {
+                        // a value beyond the int range: still a malformed marker, not a crash
+                        LOGGER.debug("Status marker goal count out of range: {}", rest, e);
+                    }
                 }
             }
             return new StatusMarker(line, false, null, true);
