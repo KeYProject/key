@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -21,8 +19,8 @@ import de.uka.ilkd.key.scripts.ScriptCommandAst;
 import de.uka.ilkd.key.scripts.ScriptException;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.key_project.key.cli.prove.OpenGoalPrinter;
 import org.key_project.prover.engine.ProofSearchInformation;
-import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
@@ -51,9 +49,9 @@ import org.slf4j.LoggerFactory;
  * goal was designated yet, the strategy runs on all open goals and {@code apply} uses the first
  * open automatic goal.
  * <p>
- * The {@code print-open-goals} command uses a self-contained renderer for the §6 layout
- * ({@code OPEN-GOAL-COUNT <N>} followed by {@code GOAL <id> <position-path>} blocks with
- * two-space-indented antecedent terms, an {@code ==>} succedent line and a trailing blank line).
+ * The {@code print-open-goals} command prints the §6 layout
+ * ({@code OPEN-GOAL-COUNT <N>} followed by {@code GOAL <id> <position-path>} blocks) through
+ * {@link OpenGoalPrinter}, the same renderer {@code prove --print-open-goals} uses.
  */
 public final class ScriptInterpreter {
 
@@ -369,57 +367,15 @@ public final class ScriptInterpreter {
     }
 
     /**
-     * Returns the §6 position path of the given node: the dot-separated 1-based child indices
-     * from the proof root down to the node.
-     */
-    private String positionPath(Node node) {
-        if (node == proof.root()) {
-            return ROOT_POSITION;
-        }
-        StringBuilder path = new StringBuilder();
-        Node current = node;
-        while (current != proof.root()) {
-            Node parent = current.parent();
-            if (parent == null) {
-                return ROOT_POSITION;
-            }
-            path.insert(0, (parent.getChildNr(current) + 1) + (path.isEmpty() ? "" : "."));
-            current = parent;
-        }
-        return path.toString();
-    }
-
-    /**
      * Prints the §6 open-goal layout for the current proof state and designates the last printed
-     * goal as the target of the following commands.
+     * goal as the target of the following commands. The layout is rendered by
+     * {@link OpenGoalPrinter}, so {@code script print-open-goals} is byte-identical to
+     * {@code prove --print-open-goals 0}.
      */
     private void printOpenGoals() {
+        new OpenGoalPrinter(out, 0, true).print(proof);
         ImmutableList<Goal> goals = proof.openGoals();
-        out.println(COUNT_PREFIX + goals.size());
-        int id = 0;
-        for (Goal goal : goals) {
-            out.println("GOAL " + id + " " + positionPath(goal.node()));
-            for (SequentFormula formula : goal.sequent().antecedent()) {
-                out.println("  " + print(formula));
-            }
-            boolean firstSuccedent = true;
-            for (SequentFormula formula : goal.sequent().succedent()) {
-                out.println((firstSuccedent ? "  ==> " : "  ") + print(formula));
-                firstSuccedent = false;
-            }
-            if (firstSuccedent) {
-                out.println("  ==>");
-            }
-            out.println();
-            id++;
-        }
         selectedGoal = goals.isEmpty() ? null : goals.get(goals.size() - 1);
-    }
-
-    private String print(SequentFormula formula) {
-        String term = LogicPrinter.quickPrintTerm((JTerm) formula.formula(), proof.getServices());
-        // §6: each formula occupies exactly one line, embedded line breaks are escaped
-        return term.replace("\n", "\\n");
     }
 
     private boolean fail(String command, String reason) {
