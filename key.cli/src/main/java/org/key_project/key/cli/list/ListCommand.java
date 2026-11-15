@@ -76,13 +76,9 @@ public final class ListCommand implements Callable<Integer> {
                 throw CliError.loadFailure(file, e);
             } catch (RuntimeException e) {
                 throw CliError.internal("internal error while listing '" + file + "': "
-                    + errorMessage(e), e);
+                    + CliError.errorMessage(e), e);
             }
         }
         return ExitCode.CLOSED.code();
-    }
-
-    private static String errorMessage(Exception e) {
-        return e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
     }
 }

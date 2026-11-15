@@ -15,8 +15,6 @@ import java.util.concurrent.Callable;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.speclang.Contract;
 
@@ -27,6 +25,7 @@ import org.key_project.key.cli.prove.ContractIndex;
 import org.key_project.key.cli.prove.ContractSelector;
 import org.key_project.key.cli.prove.HeadlessProver;
 import org.key_project.key.cli.prove.ObligationCreationException;
+import org.key_project.key.cli.prove.ObligationSelection;
 import org.key_project.key.cli.prove.SmtCounters;
 import org.key_project.key.cli.prove.UnknownContractException;
 import org.key_project.key.cli.settings.CliSettingsException;
@@ -159,7 +158,7 @@ public final class ScriptCommand implements Callable<Integer> {
                 environment.dispose();
             }
         } catch (UnknownContractException e) {
-            throw CliError.input(errorMessage(e));
+            throw CliError.input(CliError.errorMessage(e));
         } catch (ObligationCreationException e) {
             // input error (§1 exit 3): the failed obligation is reported as an error record
             out.println(resultWriter.toJsonLine(e.record()));
@@ -173,7 +172,7 @@ public final class ScriptCommand implements Callable<Integer> {
             throw e;
         } catch (RuntimeException e) {
             throw CliError.internal("internal error while running the script: "
-                + errorMessage(e), e);
+                + CliError.errorMessage(e), e);
         } finally {
             runnerSettings.close();
         }
@@ -242,7 +241,8 @@ public final class ScriptCommand implements Callable<Integer> {
         try {
             return Files.readAllLines(scriptFile, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw CliError.input("cannot read script '" + scriptFile + "': " + errorMessage(e));
+            throw CliError
+                    .input("cannot read script '" + scriptFile + "': " + CliError.errorMessage(e));
         }
     }
 
@@ -259,36 +259,12 @@ public final class ScriptCommand implements Callable<Integer> {
             throws UnknownContractException {
         ContractIndex index = ContractIndex.fromEnvironment(environment);
         List<Contract> selected = chooseContract.isEmpty()
-                ? defaultSelection(environment, index)
+                ? ObligationSelection.defaultSelection(environment, index)
                 : ContractSelector.resolve(index, chooseContract);
         if (selected.size() != 1) {
             throw CliError.input("script requires exactly one selected obligation, but "
                 + selected.size() + " were selected (use --choose-contract)");
         }
         return selected.get(0);
-    }
-
-    /**
-     * Returns the contracts selected by the load file's {@code \chooseContract}/
-     * {@code \proofObligation} directive, or all contracts of the problem if it selects none.
-     */
-    private static List<Contract> defaultSelection(KeYEnvironment<?> environment,
-            ContractIndex index) {
-        Contract loadFileContract = loadFileContract(environment);
-        return loadFileContract != null ? List.of(loadFileContract) : index.contracts();
-    }
-
-    private static @Nullable Contract loadFileContract(KeYEnvironment<?> environment) {
-        Proof loaded = environment.getLoadedProof();
-        if (loaded == null) {
-            return null;
-        }
-        ProofOblInput po =
-            environment.getServices().getSpecificationRepository().getProofOblInput(loaded);
-        return po instanceof ContractPO contractPO ? contractPO.getContract() : null;
-    }
-
-    private static String errorMessage(Exception e) {
-        return e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
     }
 }

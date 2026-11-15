@@ -166,6 +166,21 @@ public final class CliError extends RuntimeException {
     }
 
     /**
+     * Returns a description of an exception for a {@code KEY_ERROR} line or an error record's
+     * {@code errorMessage} field: the exception's message if present, otherwise its simple class
+     * name.
+     * <p>
+     * The message is not flattened; wrap the result in {@link #oneLine(String)} when the
+     * description is emitted on the line-oriented protocol (§2 of the headless interface spec).
+     *
+     * @param e the exception to describe
+     * @return the exception's message, or its simple class name if it has none
+     */
+    public static String errorMessage(Exception e) {
+        return e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+    }
+
+    /**
      * Selects the most informative single-line reason from a loader exception's cause chain.
      * <p>
      * The loader's own message is a constant summary (currently {@code "Load failed"}), while the

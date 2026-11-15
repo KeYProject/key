@@ -74,6 +74,17 @@ class CliErrorTest {
     }
 
     @Test
+    void errorMessageReturnsTheMessageWhenPresent() {
+        assertThat(CliError.errorMessage(new IllegalStateException("boom"))).isEqualTo("boom");
+    }
+
+    @Test
+    void errorMessageFallsBackToTheSimpleClassNameWithoutAMessage() {
+        assertThat(CliError.errorMessage(new IllegalStateException()))
+                .isEqualTo(IllegalStateException.class.getSimpleName());
+    }
+
+    @Test
     void loadFailurePrefersTheInformativeCauseOverTheLoaderSummary() {
         RuntimeException cause =
             new IllegalStateException("Failed to parse Bad.java:2/27: syntax error");

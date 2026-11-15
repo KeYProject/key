@@ -87,7 +87,8 @@ public final class ReplayCommand implements Callable<Integer> {
         } catch (Exception e) {
             // §7.2: every load or replay failure is an incompatible proof (exit 3)
             LOGGER.debug("Replaying '{}' failed", proofFile, e);
-            out.println("REPLAY incompatible " + errorMessage(e));
+            out.println(
+                "REPLAY incompatible " + CliError.oneLine(CliError.errorMessage(e)));
             return ExitCode.INPUT_ERROR.code();
         }
     }
@@ -197,11 +198,6 @@ public final class ReplayCommand implements Callable<Integer> {
                                 .getSimpleName()));
         }
         return "proof replay failed";
-    }
-
-    private static String errorMessage(Exception e) {
-        return CliError
-                .oneLine(e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName());
     }
 
     /**

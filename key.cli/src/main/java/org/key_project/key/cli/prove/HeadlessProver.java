@@ -17,7 +17,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.speclang.Contract;
@@ -222,26 +221,8 @@ public final class HeadlessProver {
 
     private static List<Contract> select(KeYEnvironment<?> environment, ContractIndex index,
             List<String> selectors) throws UnknownContractException {
-        if (!selectors.isEmpty()) {
-            return ContractSelector.resolve(index, selectors);
-        }
-        Contract loadFileContract = loadFileContract(environment);
-        return loadFileContract != null ? List.of(loadFileContract) : index.contracts();
-    }
-
-    /**
-     * Returns the contract selected by a {@code \chooseContract}/{@code \proofObligation}
-     * directive of the loaded problem, or {@code null} if the load file does not select a
-     * contract (e.g. it defines a plain {@code \problem}).
-     */
-    private static @Nullable Contract loadFileContract(KeYEnvironment<?> environment) {
-        Proof loaded = environment.getLoadedProof();
-        if (loaded == null) {
-            return null;
-        }
-        ProofOblInput po =
-            environment.getServices().getSpecificationRepository().getProofOblInput(loaded);
-        return po instanceof ContractPO contractPO ? contractPO.getContract() : null;
+        return selectors.isEmpty() ? ObligationSelection.defaultSelection(environment, index)
+                : ContractSelector.resolve(index, selectors);
     }
 
     private ContractResult prove(KeYEnvironment<?> environment, Contract contract) {
@@ -378,7 +359,7 @@ public final class HeadlessProver {
      */
     static ContractResult errorResult(String contract, long elapsedMs, Exception failure) {
         return new ContractResult(contract, ResultStatus.ERROR, 0, elapsedMs, null, 0, 0,
-            errorMessage(failure));
+            CliError.errorMessage(failure));
     }
 
     /**
@@ -406,9 +387,5 @@ public final class HeadlessProver {
 
     private static long elapsedMs(long startNanos) {
         return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
-    }
-
-    private static String errorMessage(Exception e) {
-        return e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
     }
 }
