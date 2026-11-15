@@ -24,8 +24,8 @@ probe).
 
 | File | What it produces |
 |---|---|
-| JMLtk `JmlProcessor` (via `JavaParserFactory`, `setProcessJml(true)`) | the **single** JML parser: attaches `JmlContract` (via `NodeWithContracts`), `JmlClassLevelDeclaration` members, `JmlMethodDeclaration`/`JmlFieldDeclaration` wrappers, and `JmlExpressionStmt`/`JmlGhostStmt`/`KeyMergePointStmt` statements directly to the Java AST |
-| `java/transformations/pipeline/JMLTransformer.java` | re-processes method bodies: unwraps `JmlMethodDeclaration`/`JmlFieldDeclaration` into their contained declarations (remembered via the `KEY_JML_WRAPPER` data key), self-marks JML statements (`KEY_ASSERT`/`KEY_ASSIGN`/`KEY_MERGE_POINT`) |
+| JMLtk `JmlProcessor` (via `JavaParserFactory`, `setProcessJml(true)`) | the **single** JML parser: attaches `JmlContract` (via `NodeWithContracts`), `JmlClassLevelDeclaration` members, `JmlMethodDeclaration`/`JmlFieldDeclaration` wrappers, and `JmlExpressionStmt`/`JmlGhostStmt`/`JmlMergePointStmt` statements directly to the Java AST. Since the 2026-11-15 `1.2.1-SNAPSHOT`, the raw-Java `merge_point(expr);` spelling is a plain `MethodCallExpr` (`KeyMergePointStmt` was removed) |
+| `java/transformations/pipeline/JMLTransformer.java` | re-processes method bodies: unwraps `JmlMethodDeclaration`/`JmlFieldDeclaration` into their contained declarations (remembered via the `KEY_JML_WRAPPER` data key), self-marks JML statements (`KEY_ASSERT`/`KEY_ASSIGN`) |
 | `speclang/jml/translation/JmlToTextual.java` | produces the `TextualJML*` **semantics** layer: re-serializes each JMLtk clause/declaration and re-parses it with KeY's `JmlParser.g4` rules for `Translator`/`JmlTermFactory` |
 
 ### A.2 Carriers between JMLtk AST and KeY AST
@@ -33,7 +33,7 @@ probe).
 | File | Role |
 |---|---|
 | `java/KeYJPMapping.java` (`registerReverse`, `nodeFromKeY`) | the **only** bridge: `JP2KeYConverter` registers KeY `TypeDeclaration` → JMLtk `JmlTypeDeclaration` and KeY method/ctor → contract carrier; the extractor resolves the JMLtk nodes back from the KeY AST. No `attachedJml`, no `JmlSpec` |
-| `java/loader/JP2KeYConverter.java` | converts the Java declarations (skipping pure class-level JML spec members); `JmlExpressionStmt` → `JmlAssert`/`SetStatement` and `KeyMergePointStmt` → `MergePointStatement` via KeY-grammar re-parse; keeps model/ghost wrappers reachable as the contract carrier |
+| `java/loader/JP2KeYConverter.java` | converts the Java declarations (skipping pure class-level JML spec members); `JmlExpressionStmt` → `JmlAssert`/`SetStatement`; `JmlMergePointStmt` and the raw-Java `merge_point(expr);` form (a `MethodCallExpr` since the 2026-11-15 snapshot) → `MergePointStatement`; keeps model/ghost wrappers reachable as the contract carrier |
 
 ### A.3 KeY AST nodes with JML
 
@@ -44,7 +44,7 @@ and is reached via the reverse mapping / the nodes' own position in it.
 
 | File | Consumes |
 |---|---|
-| `speclang/jml/JMLSpecExtractor.java` | resolves the JMLtk type/method via `KeYJPMapping.nodeFromKeY` and reads the specs off it: class level (`JmlClassExprDeclaration` → invariant/axiom/initially, `JmlRepresentsDeclaration`, `JmlClassAccessibleDeclaration`), method level (contract carrier; model methods via `JmlToTextual.toMethodDecl(wrapper).getMethodDefinition()`), blocks/loops (attached `JmlContract`, `extractLoopInvariant` scans for `LOOP_INV`), merge points (carrier is `KeyMergePointStmt`) |
+| `speclang/jml/JMLSpecExtractor.java` | resolves the JMLtk type/method via `KeYJPMapping.nodeFromKeY` and reads the specs off it: class level (`JmlClassExprDeclaration` → invariant/axiom/initially, `JmlRepresentsDeclaration`, `JmlClassAccessibleDeclaration`), method level (contract carrier; model methods via `JmlToTextual.toMethodDecl(wrapper).getMethodDefinition()`), blocks/loops (attached `JmlContract`, `extractLoopInvariant` scans for `LOOP_INV`), merge points (carrier is `JmlMergePointStmt`, or the leftover `JmlDocStmt` marked with `KEY_JML_FALLBACK` for the legacy comment form) |
 | `speclang/jml/translation/JMLSpecFactory.java` | the semantic core. Direct-class overloads (`createJMLOperationContracts(pm, JmlContract, ParserRuleContext modelMethodDefinition, boolean addInvariant)`, `createJMLModelMethodContracts(pm, ParserRuleContext modelMethodDefinition, boolean addInvariant)`, …) build `Contract`/`ClassInvariant`/`ClassAxiom`/`InitiallyClause`/`LoopSpecification`/`Represents`… via `JmlToTextual` → `JmlIO`/`Translator`/`JmlTermFactory`. `JmlFacade.parseClause("assignable \\nothing;")` synthesizes defaults |
 | `speclang/jml/JMLInfoExtractor.java` | reads `JMLModifiers`-relevant modifiers off the JMLtk nodes (pure, model, helper, specMathMode, nullableByDefault) |
 | `java/ast/statement/JmlAssert.java`, `rule/JmlAssertRule.java` | `JmlAssert` (built by the converter from `JmlExpressionStmt`) + `KeyAst.JMLProofScript` + label → KeY proof rules |
@@ -77,7 +77,7 @@ and is reached via the reverse mapping / the nodes' own position in it.
 | `TextualJMLLoopSpec` | `JmlContract` with `ContractType.LOOP_INV` attached to `WhileStmt`/`ForStmt`/`EnhancedForStmt` (loop_invariant(_free) → `JmlSimpleExprClause`, decreases → `JmlSimpleExprClause`, assignable → `JmlMultiExprClause`, loop_determines/loop_separates → info-flow) | verified on `WhileStmt` and `ForStmt` |
 | `TextualJMLAssertStatement` (assert/assume + optional label + proof script) | `stmt.JmlExpressionStmt` for `assert`/`assume`/`hence_by`/`assert_redundantly`; standalone label as `stmt.JmlLabelStmt` (JML standard prefix form `/*@ L1: assert e; @*/`) | **Gap** (deferred): KeY's inline label `assert LAB: e` and the KeY `BY …` assertion proof (`KeyAst.JMLProofScript`) are not in JMLtk's statement grammar; upstream support planned (see Part D.3) |
 | `TextualJMLSetStatement` | `stmt.JmlExpressionStmt` (set → `JmlExpressionStmt` with SET keyword) | verified |
-| `TextualJMLMergePointDecl` | `com.github.javaparser.ast.key.KeyMergePointStmt` (`merge_point ( expr ) ;` as a **plain Java statement**, not a JML comment) | JMLtk parses the raw-Java form; `JP2KeYConverter` translates it back into KeY's `//@ merge_point …` statement (KeY-authored files keep the comment form). JMLtk ships a full `ast.key` package (`KeyExecStmt`, `KeyMarkerStatement`, `KeyCcatch*`, `KeyLoopScopeBlockStmt`, `KeyMethodBodyStatement`, `KeyMethodSignature`, `KeyEscapeExpression`, `KeyPassiveExpression`, …) for KeY's DSL statements |
+| `TextualJMLMergePointDecl` | comment form: `com.github.javaparser.ast.jml.stmt.JmlMergePointStmt` (typed `\by`/`\lattice`/`\predicate` metadata), legacy `merge_proc`/`merge_params` form as a leftover `JmlDocStmt`; raw-Java `merge_point ( expr ) ;` is a plain `MethodCallExpr` since the 2026-11-15 `1.2.1-SNAPSHOT` (the old `ast.key.KeyMergePointStmt` was removed) | JMLtk parses the raw-Java and typed comment forms; `JP2KeYConverter` translates both into KeY's `MergePointStatement` (`visit(ExpressionStmt)` for the raw call, `visit(JmlMergePointStmt)` for the typed node), and the legacy comment form via the `KEY_JML_FALLBACK` re-parse. JMLtk still ships the rest of the `ast.key` package (`KeyExecStmt`, `KeyMarkerStatement`, `KeyCcatch*`, `KeyLoopScopeBlockStmt`, `KeyMethodBodyStatement`, `KeyMethodSignature`, `KeyEscapeExpression`, `KeyPassiveExpression`, …) for KeY's DSL statements |
 | `LabeledParserRuleContext` (ANTLR ctx + origin term labels) | no JMLtk counterpart needed — replaced by the JML AST node + a thin KeY carrier (node + `OriginTermLabel`/location), or read from `Node.getRange()` | position mapping JMLtk `TokenRange` → KeY `Location` is a Phase-2 task |
 | `jml/pretranslation/` package (`Behavior`, `JMLModifier`, all `TextualJML*`) | delete | replaced by `ast.jml` + `ast.key` |
 
@@ -114,14 +114,14 @@ absent.
 
 ## Part D — Verified gap list (published snapshot, live probes)
 
-1. **`merge_point`**: JMLtk parses it only as the raw-Java statement
-   `merge_point ( expr ) ;` (`ast.key.KeyMergePointStmt`), not from inside a
-   JML comment. **Resolution:** in the new pipeline, `KeyMergePointStmt` is
-   translated in `JP2KeYConverter` back into KeY's merge-point statement,
-   i.e. the `//@ merge_point …` form KeY files are authored in
-   (`MergePointStatement` + its JML marker text). So the comment-form
-   incompatibility is neutralized on the KeY side — KeY files keep
-   `//@ merge_point`, JMLtk just delivers it as the raw statement node.
+1. **`merge_point`**: JMLtk never parses it from inside a JML comment in the
+   legacy form; the 2026-11-15 `1.2.1-SNAPSHOT` also removed the raw-Java
+   `ast.key.KeyMergePointStmt` (the raw form is now a plain `MethodCallExpr`).
+   **Resolution:** in the new pipeline, `JP2KeYConverter.visit(ExpressionStmt)`
+   turns the raw `merge_point(expr);` call into a `MergePointStatement`, and
+   the typed/legacy comment forms go through `visit(JmlMergePointStmt)` /
+   `KEY_JML_FALLBACK`. KeY files keep `//@ merge_point`, so the
+   comment-form incompatibility is neutralized on the KeY side.
 2. **Assert labels**: KeY `//@ assert LAB: e;` (label after `assert`, per
    `JmlParser.g4` `assert_statement`) rejected; JMLtk only supports the JML
    standard prefix-label form `//@ LAB: assert e;` (`JmlLabelStmt` +

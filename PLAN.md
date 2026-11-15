@@ -66,7 +66,7 @@ statement texts the same way (`JmlFacade`).
            blocks, loop statements), JmlClassExprDeclaration/
            JmlRepresentsDeclaration/JmlClassAccessibleDeclaration class
            members, JmlMethodDeclaration/JmlFieldDeclaration wrappers,
-           JmlExpressionStmt/JmlGhostStmt/KeyMergePointStmt statements
+           JmlExpressionStmt/JmlGhostStmt/JmlMergePointStmt statements
       └─ KeYJavaPipeline (transformations)
           └─ JMLTransformer     ─ re-processes method bodies and unwraps the
                                   wrappers: JmlMethodDeclaration/
@@ -76,14 +76,16 @@ statement texts the same way (`JmlFacade`).
                                   and the wrapper is remembered on the inner
                                   node via the KEY_JML_WRAPPER data key;
                                   self-marks JML statements (KEY_ASSERT/
-                                  KEY_ASSIGN on JmlExpressionStmt,
-                                  KEY_MERGE_POINT on KeyMergePointStmt)
+                                  KEY_ASSIGN on JmlExpressionStmt)
           └─ JmlDocRemoval       ─ strips remaining JmlDoc nodes afterwards
       └─ JP2KeYConverter         ─ converts the Java declarations. Pure
                                   class-level JML specs stay on the JMLtk type
                                   (no attachedJml, no JmlSpec anywhere);
                                   JmlExpressionStmt → JmlAssert/SetStatement;
-                                  KeyMergePointStmt → MergePointStatement;
+                                  JmlMergePointStmt → MergePointStatement
+                                  (the raw-Java `merge_point(expr);` spelling,
+                                  which JMLtk ≥1.2.1 parses as MethodCallExpr,
+                                  is restored in visit(ExpressionStmt));
                                   createComments returns emptyList();
                                   registers the KeY→JMLtk reverse mappings:
                                   type → JmlTypeDeclaration, KeY method/ctor →
@@ -432,11 +434,14 @@ Fixtures: `key.core/src/test/resources/de/uka/ilkd/key/speclang/` (incl.
    → **Resolved — neither shipped.** There is no carrier between the ASTs; the
    KeY↔JMLtk reverse mapping (`KeYJPMapping.registerReverse`) is the bridge and
    specs are read straight from the JMLtk nodes (§2.2).
-3. `merge_point`: JMLtk parses only the raw-Java `merge_point ( expr );`
-   (`ast.key.KeyMergePointStmt`); KeY files author it as `//@ merge_point …`.
-   Resolution: `JP2KeYConverter` translates `KeyMergePointStmt` back into the
-   KeY merge-point statement (`//@ merge_point` form) — comment-form
-   incompatibility neutralized on the KeY side.
+3. `merge_point`: the raw-Java statement `merge_point ( expr );` was
+   `ast.key.KeyMergePointStmt` up to jmltk 1.2.1-SNAPSHOT (2026-11-07); the
+   republished snapshot removed the class and made `merge_point` contextual,
+   so it now parses as a plain `MethodCallExpr`. KeY files author it as
+   `//@ merge_point …`. Resolution: `JP2KeYConverter.visit(ExpressionStmt)`
+   restores the raw-Java form to a KeY `MergePointStatement`, and
+   `visit(JmlMergePointStmt)` handles the typed comment form — the
+   incompatibility is neutralized on the KeY side.
 4. Assert labels + proof scripts: JMLtk supports only JML-standard prefix
    labels (`//@ L1: assert e;`), not KeY's `assert LAB: e`, and has no
    `BY …` assertion-proof syntax. **Deferred: upstream JMLtk grammar support

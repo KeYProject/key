@@ -47,6 +47,14 @@ JMLtk front-end shipped in PR #3997.
   same run (generated RAP tests); the doesn't-close drift group is
   A/B-verified identical at `cfece36950`. Full per-failure breakdown:
   `TODO_CI.md`, "Local full-suite triage (2026-11-11)".
+- Re-checked at the rebase tip (2026-11-15) against the **republished**
+  `1.2.1-SNAPSHOT` (built from jmltk `49c108584`): the snapshot removed
+  `ast.key.KeyMergePointStmt` (§1) and rejects `model` declarations in method
+  bodies with targeted messages (the two `JMLParserExceptionTest` cases now
+  pass after updating their expected message, so the expected key.core red
+  count drops from 3 to 1, leaving only §11). `MergeRuleTests`/`PredicateAbstractionLatticeTests`/
+  `MtMergePointTest`, the whole `speclang.*` slice and `KeyJavaPipelineTest`
+  are green again.
 - Every entry has a fixture path so it can be re-verified.
 
 ## Status legend
@@ -102,6 +110,17 @@ JMLtk front-end shipped in PR #3997.
 - **After (JMLtk 1.1.0):** the comment form does not exist in JMLtk's grammar at
   all — only the raw Java statement `merge_point(expr);` (`KeyMergePointStmt`).
   See `JML_MAPPING.md` §Part D.1.
+- **JMLtk 1.2.1-SNAPSHOT of 2026-11-15 — `KeyMergePointStmt` removed:** the
+  moving snapshot deleted `ast.key.KeyMergePointStmt` entirely and made
+  `merge_point` a contextual keyword, so `merge_point(expr);` outside a JML
+  comment now parses as an ordinary `MethodCallExpr`. KeY restores the
+  statement semantics in `JP2KeYConverter.visit(ExpressionStmt)` (an unscoped
+  one-argument call named `merge_point` becomes a `MergePointStatement`), which
+  is what keeps the `deleteMergePoint` taclet in `javaRules.key` indexable.
+  The JML comment form `//@ merge_point (expr);` is additionally accepted by
+  KeY's own `JmlParser.g4` (`merge_point_statement` now takes an optional
+  parenthesized expression). The typed comment form (below) is unchanged and
+  still delivered as `JmlMergePointStmt`.
 - **Status (1.1.0):** both forms work. The raw `KeyMergePointStmt` is translated
   back to KeY's `MergePointStatement` in `JP2KeYConverter`, and leftover
   unhandled `//@` comments are re-parsed with KeY's `JmlParser` and attached via

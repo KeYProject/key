@@ -12,7 +12,7 @@ Main is green; the PR is `BEHIND` main (#4019, #4022, #4023 not yet included).
 | `LoopScopeInvRuleTests#testDoAutomaticProofOfBenchmarkWithLabeledBreaksAndContinues` | labeled `break`/`continue` proofs |
 | `ParallelProverDeterminismTest#sequentialAndOneWorkerProofsAreIdentical` | pre-existing block-contract combination bug ("flags have to have the same size") |
 | `TestCopyingReplayer#testJavaProof`, `TestEqualsModProofIrrelevancy#testJavaProof` | the 2 recorded replayer failures — **FIXED 2026-11-10** (the `relax.proof` replay lost the node-attached loop invariant in the `elim_double_block_3` rebuild; fixed via `#reattachLoopInvariant` — JMLTK_GAPS §10) |
-| `JMLParserExceptionTest` ×2 (`MethodInMethod`, `ModelFieldinMethod`) | known: JMLtk rejects `model` decl in method body; KeY expects legacy message. A/B-verified pre-existing under 1.1.0- **and** 1.2.1-SNAPSHOT |
+| `JMLParserExceptionTest` ×2 (`MethodInMethod`, `ModelFieldinMethod`) | known: JMLtk rejects `model` decl in method body; KeY expects legacy message. A/B-verified pre-existing under 1.1.0- **and** 1.2.1-SNAPSHOT — **FIXED 2026-11-15**: the republished snapshot emits targeted messages (`Model method/field … is not allowed within methods`); the fixtures' `msgContains` were updated (§6) |
 
 - [ ] Action: none beyond the PR's gap triage (documented OPEN gaps)
 
@@ -166,6 +166,36 @@ pass; the 6 `ReplayErrorDumpTest` scratch dumps were deleted, 23 → 17).
   `arrayMax.key`, `polishFlagSort.key`, all the loop-invariant regression),
   **no new failures**; `KeyJavaPipelineTest` 142/0 (goldens unchanged).
 - [x] Commit the bump + handler together (`53dcefd914`)
+
+## 6. Republished `1.2.1-SNAPSHOT` (2026-11-15) — rebase follow-up
+
+The `1.2.1-SNAPSHOT` published on 2026-11-15 (jmltk commit `49c108584`) is
+**not** the 2026-11-07 jar the branch was developed against. Changes and how
+the rebase handles them:
+
+- [x] **`ast.key.KeyMergePointStmt` removed**; `merge_point` is now a
+  contextual keyword, so the raw-Java `merge_point(expr);` form parses as a
+  plain `MethodCallExpr` (only `merge_point;`, `\by`, `\lattice`, `\predicate`
+  comment forms stay special). Consequence: the `deleteMergePoint` taclet's
+  find pattern was indexed under the wrong statement class, so the merge rule
+  became inapplicable and the stored merge proofs stopped closing.
+  **FIXED** in `JP2KeYConverter.visit(ExpressionStmt)` (unscoped one-argument
+  `merge_point` call → `MergePointStatement`), which restores both the taclet
+  indexing and the old ProofJava semantics. The converter's dead
+  `KeyMergePointStmt` handler and the `KEY_MERGE_POINT`/`KIND_MERGE_POINT`
+  markers are removed.
+- [x] **`merge_point ( expr );` in the comment form** is now accepted by KeY's
+  own `JmlParser.g4` (`merge_point_statement` takes an optional parenthesized
+  expression), so pretty-printed/recorded program text round-trips.
+- [x] **Targeted diagnostics for `model` declarations in method bodies**:
+  `MethodInMethod`/`ModelFieldinMethod` fixtures' `msgContains` updated to
+  `Model method/field … is not allowed within methods`; `JMLParserExceptionTest`
+  now green (no longer part of the expected red count).
+- [x] Gates re-run at the rebase tip: `MergeRuleTests` +
+  `PredicateAbstractionLatticeTests` + `MtMergePointTest`, full `speclang.*`
+  slice (304 tests, 10 skipped, 0 failures), `KeyJavaPipelineTest` 142/0,
+  `testClasses`, `spotlessCheck`, `-DENABLE_NULLNESS=true compileTestJava` —
+  all green.
 
 ## Final state at branch tip `53dcefd914`
 
