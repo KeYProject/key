@@ -7,6 +7,7 @@ package org.key_project.jvm.rule;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -24,6 +25,7 @@ import org.key_project.logic.op.Modality;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -126,9 +128,14 @@ class LoopProofTest {
             }
             assertThat(restoreNode).as("the backward goto_(8) must have been restored").isNotNull();
 
-            assertThat(activeOfSequent(restoreNode.sequent()))
-                    .as("the restore premise has the backward goto_ active")
-                    .startsWith("jvm.Local.goto_(8)");
+            SourceElement active = Objects.requireNonNull(
+                activeOfSequent(restoreNode.sequent()),
+                "the restore premise must carry a modality");
+            assertThat(GotoSupport.isGotoCall(active))
+                    .as("the restore premise has the backward goto_ active, but was: %s", active)
+                    .isTrue();
+            assertThat(GotoSupport.labelOf(active))
+                    .as("the restore premise jumps back to the loop head").isEqualTo("L8");
             var postIt = restoreNode.childrenIterator();
             assertThat(postIt).isNotNull();
             assertThat(postIt.hasNext()).isTrue();
@@ -258,16 +265,20 @@ class LoopProofTest {
         return false;
     }
 
-    /** The active statement of the first succedent modality, or "{@code (no modality)}". */
-    private static String activeOfSequent(org.key_project.prover.sequent.Sequent seq) {
+    /**
+     * The active statement of the first succedent modality, or {@code null} if the sequent has no
+     * modality. Returned as the AST element (not as printed text) so that the assertions do not
+     * depend on order-dependent pretty-printing of unresolved type references.
+     */
+    private static @Nullable SourceElement activeOfSequent(
+            org.key_project.prover.sequent.Sequent seq) {
         for (SequentFormula sf : seq.succedent()) {
             JTerm t = unwrapUpdate((JTerm) sf.formula());
             if (t.op() instanceof Modality) {
-                SourceElement a = JavaTools.getActiveStatement(t.javaBlock());
-                return String.valueOf(a);
+                return JavaTools.getActiveStatement(t.javaBlock());
             }
         }
-        return "(no modality)";
+        return null;
     }
 
     private static JTerm unwrapUpdate(JTerm t) {
