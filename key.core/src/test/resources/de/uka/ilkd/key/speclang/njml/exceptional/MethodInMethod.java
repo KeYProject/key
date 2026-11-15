@@ -1,7 +1,7 @@
 // verbose: true
 // broken: false
 // exceptionClass: ProofInputException
-// msgContains: Encountered unexpected token
+// msgContains: Model method modelMethod is not allowed within methods
 
 class MethodInMethod {
 

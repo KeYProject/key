@@ -724,12 +724,6 @@ public class ConstantStringExpressionEvaluator extends JavaTransformerAbstract {
         }
 
         @Override
-        public void visit(KeyMergePointStmt n, Object arg) {
-            super.visit(n, arg);
-            defaultAction(n, arg);
-        }
-
-        @Override
         public void visit(KeyMethodBodyStatement n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);

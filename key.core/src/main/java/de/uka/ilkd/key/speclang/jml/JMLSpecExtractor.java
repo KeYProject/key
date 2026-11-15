@@ -56,7 +56,6 @@ import com.github.javaparser.ast.jml.clauses.ContractType;
 import com.github.javaparser.ast.jml.clauses.JmlContract;
 import com.github.javaparser.ast.jml.doc.JmlDocStmt;
 import com.github.javaparser.ast.jml.stmt.JmlMergePointStmt;
-import com.github.javaparser.ast.key.KeyMergePointStmt;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.Nullable;
 
@@ -387,14 +386,12 @@ public final class JMLSpecExtractor implements SpecExtractor {
     public ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
             MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException {
-        // Resolve the JMLtk KeyMergePointStmt through the mapping: it carries the merge point
-        // expression from which the textual merge contract is re-derived. For merge points that
+        // Resolve the JMLtk JmlMergePointStmt through the mapping: it carries the merge point
+        // metadata from which the textual merge contract is re-derived. For merge points that
         // JMLtk left unparsed, the JMLTransformer fallback re-parsed the comment with KeY's own
         // JML grammar and attached the parse tree to the leftover JmlDocStmt.
         Node jmlNode = mapping().nodeFromKeY(mps);
-        if (jmlNode instanceof KeyMergePointStmt kms) {
-            return jsf.createJMLMergeContracts(method, mps, kms);
-        } else if (jmlNode instanceof JmlMergePointStmt jms) {
+        if (jmlNode instanceof JmlMergePointStmt jms) {
             return jsf.createJMLMergeContracts(method, mps, jms);
         } else if (jmlNode instanceof JmlDocStmt jds
                 && jds.containsData(MarkerStatementHelper.KEY_JML_FALLBACK)) {

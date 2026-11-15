@@ -1,7 +1,7 @@
 // verbose: true
 // broken: false
 // exceptionClass: ProofInputException
-// msgContains: Encountered unexpected token
+// msgContains: Model field modelMethod is not allowed within methods
 
 class ModelFieldinMethod {
 
@@ -13,5 +13,3 @@ class ModelFieldinMethod {
     }
 }
 
-
-// Minssing position information :(

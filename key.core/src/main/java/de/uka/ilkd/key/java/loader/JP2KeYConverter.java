@@ -781,8 +781,21 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ExpressionStmt n, Void arg) {
-
-        return accept(n.getExpression());
+        var expression = n.getExpression();
+        // JMLtk 1.2.1 no longer produces a dedicated statement node for the ProofJava form
+        // `merge_point (<expr>);` (it became a contextual keyword), so it parses as an ordinary
+        // method call. Restore KeY's merge point statement semantics for that spelling; the
+        // taclet snippets in javaRules.key rely on the statement type for indexing.
+        if (expression instanceof MethodCallExpr call
+                && call.getScope().isEmpty()
+                && "merge_point".equals(call.getNameAsString())
+                && call.getArguments().size() == 1) {
+            PositionInfo pi = createPositionInfo(n);
+            List<Comment> c = createComments(n);
+            IProgramVariable loc = (IProgramVariable) accept(call.getArgument(0));
+            return new MergePointStatement(pi, c, loc);
+        }
+        return accept(expression);
     }
 
     private static FieldSpecification findArrayLength(ArrayDeclaration type) {
@@ -994,9 +1007,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        if (element instanceof JmlParser.Merge_point_statementContext mergePoint) {
-            // Same translation as for a JMLtk KeyMergePointStmt: the concrete merge procedure
-            // and parameters are re-derived by the JMLSpecExtractor from the parse tree.
+        if (element instanceof JmlParser.Merge_point_statementContext) {
+            // The concrete merge procedure and parameters are re-derived by the
+            // JMLSpecExtractor from the parse tree.
             var loc = new LocationVariable(
                 services.getVariableNamer().getTemporaryNameProposal("x"),
                 services.getNamespaces().sorts().lookup("boolean"));
@@ -2086,31 +2099,14 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new LoopScopeBlock(pi, c, indexPV, body, null, 0);
     }
 
-    @Override
-    public Object visit(KeyMergePointStmt n, Void arg) {
-        var pi = createPositionInfo(n);
-        List<Comment> c = createComments(n);
-
-        if (n.containsData(MarkerStatementHelper.KEY_MERGE_POINT)) {
-            // IProgramVariable expr = accept(n.getExpr());
-            var loc = new LocationVariable(
-                services.getVariableNamer().getTemporaryNameProposal("x"),
-                services.getNamespaces().sorts().lookup("boolean"));
-            return addToMapping(n, new MergePointStatement(pi, c, loc));
-        } else {
-            IProgramVariable expr = accept(n.getExpr());
-            return new MergePointStatement(pi, c, expr);
-        }
-    }
-
     /**
-     * Translates the JMLtk 1.2.1 typed merge point statement, which the front-end produces for
-     * the comment form ({@code //@ merge_point ...}). Unlike the raw {@code KeyMergePointStmt}
-     * it carries no executable expression (only optional merge procedure / lattice / predicate
-     * metadata plus JML key tags), so it is translated exactly like the re-parsed fallback form:
-     * a {@link MergePointStatement} holding a temporary boolean location variable. The concrete
-     * merge procedure and parameters are re-derived by the {@code JMLSpecExtractor} from the node
-     * (see {@code JMLSpecFactory#createJMLMergeContracts}).
+     * Translates the JMLtk typed merge point statement, which the front-end produces for the
+     * comment form ({@code //@ merge_point ...}). It carries no executable expression (only
+     * optional merge procedure / lattice / predicate metadata plus JML key tags), so it is
+     * translated exactly like the re-parsed fallback form: a {@link MergePointStatement} holding
+     * a temporary boolean location variable. The concrete merge procedure and parameters are
+     * re-derived by the {@code JMLSpecExtractor} from the node (see
+     * {@code JMLSpecFactory#createJMLMergeContracts}).
      */
     @Override
     public Object visit(JmlMergePointStmt n, Void arg) {

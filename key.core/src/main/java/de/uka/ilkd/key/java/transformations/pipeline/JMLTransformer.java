@@ -34,7 +34,6 @@ import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
 import com.github.javaparser.ast.jml.stmt.JmlGhostStmt;
 import com.github.javaparser.ast.key.KeyLoopScopeBlockStmt;
-import com.github.javaparser.ast.key.KeyMergePointStmt;
 import com.github.javaparser.ast.nodeTypes.NodeWithBody;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
@@ -49,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_ASSERT;
 import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_ASSIGN;
 import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_JML_FALLBACK;
-import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_MERGE_POINT;
 
 /// JMLTransformer translates the JML annotation comments into the JML AST that is attached to
 /// the Java AST nodes.
@@ -60,7 +58,7 @@ import static de.uka.ilkd.key.java.transformations.MarkerStatementHelper.KEY_MER
 /// only needs to
 ///
 /// * re-process the bodies of (model) methods for method level JML statements,
-/// * self-mark JML statements (`JmlExpressionStmt`, `KeyMergePointStmt`, `JmlGhostStmt`)
+/// * self-mark JML statements (`JmlExpressionStmt`, `JmlGhostStmt`)
 /// so that the [de.uka.ilkd.key.java.loader.JP2KeYConverter] can recognize them.
 ///
 /// The JMLtk wrapper declarations (`JmlMethodDeclaration`, `JmlFieldDeclaration`) and the class
@@ -283,8 +281,6 @@ public final class JMLTransformer extends JavaTransformerAbstract {
                 ghost.replace(ghostStatement);
             } else if (inner instanceof JmlExpressionStmt expr) {
                 markExpressionStatement(expr);
-            } else if (inner instanceof KeyMergePointStmt mergePoint) {
-                mergePoint.setData(KEY_MERGE_POINT, mergePoint);
             } else if (inner instanceof JmlDocStmt docStmt) {
                 transformFallbackJmlDocStmt(block, stmt, docStmt);
             }
@@ -450,7 +446,6 @@ public final class JMLTransformer extends JavaTransformerAbstract {
         }
         String pkg = s.getClass().getPackageName();
         return pkg.startsWith("com.github.javaparser.ast.jml.stmt")
-                || s instanceof KeyMergePointStmt
                 || s instanceof KeyLoopScopeBlockStmt;
     }
 
