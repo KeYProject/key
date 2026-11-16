@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This variable condition checks if an instantiation for term labels contains a specific term
@@ -36,8 +36,8 @@ public class TermLabelCondition extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
             Services services) {
-        assert instMap.getInstantiation(l) instanceof ImmutableArray<?>;
-        ImmutableArray<?> tInsts = (ImmutableArray<?>) instMap.getInstantiation(l);
+        assert instMap.getInstantiation(l) instanceof ImmutableList<?>;
+        ImmutableList<?> tInsts = (ImmutableList<?>) instMap.getInstantiation(l);
         boolean hasLabel = hasLabel(tInsts, ln);
         return negated != hasLabel;
     }
@@ -49,7 +49,7 @@ public class TermLabelCondition extends VariableConditionAdapter {
      * @param name name of the label specified in this condition
      * @return true if label matches, false if not
      */
-    static boolean hasLabel(ImmutableArray<?> labels, Name name) {
+    static boolean hasLabel(ImmutableList<?> labels, Name name) {
         boolean found = false;
         for (Object o : labels) {
             assert o instanceof TermLabel;

@@ -26,7 +26,6 @@ import org.key_project.logic.sort.AbstractSort;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.StringUtil;
@@ -140,7 +139,7 @@ public class TermWithHoles {
         GenericParameter p = new GenericParameter(g, GenericParameter.Variance.INVARIANT);
         final var decl = new ParametricFunctionDecl(HOLE_SORT_DEP_NAME,
             ImmutableList.singleton(p),
-            new ImmutableArray<>(),
+            ImmutableList.of(),
             g, null, false, false, false);
         ns.parametricFunctions().addSafely(decl);
         return ns;

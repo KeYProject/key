@@ -20,7 +20,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
@@ -30,8 +29,6 @@ import org.jspecify.annotations.Nullable;
 /**
  * Statement block. taken from COMPOST and changed to achieve an immutable structure
  */
-@SuppressWarnings("deprecation") // statement body/prefix API is bound to the deprecated
-                                 // ImmutableArray
 public class StatementBlock extends JavaStatement implements StatementContainer,
         TypeDeclarationContainer, VariableScope, TypeScope, ProgramPrefix {
 
@@ -39,7 +36,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * Body.
      */
     @NonNull
-    private final ImmutableArray<? extends Statement> body;
+    private final ImmutableList<? extends Statement> body;
 
     private final int prefixLength;
 
@@ -49,7 +46,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<? extends Statement> body,
+            @NonNull ImmutableList<? extends Statement> body,
             ImmutableList<TextualJMLConstruct> attachedJML) {
         super(pi, comments);
         this.body = body;
@@ -60,7 +57,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     public StatementBlock() {
-        body = new ImmutableArray<>();
+        body = ImmutableList.of();
         prefixLength = 1;
         innerMostMethodFrame = null;
         attachedJML = ImmutableList.of();
@@ -75,7 +72,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      */
     public StatementBlock(ExtList children) {
         super(children);
-        body = new ImmutableArray<>(children.collect(Statement.class));
+        body = ImmutableList.of(children.collect(Statement.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -83,7 +80,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             ImmutableList.fromList(Arrays.asList(children.collect(TextualJMLConstruct.class)));
     }
 
-    public StatementBlock(@NonNull ImmutableArray<? extends Statement> as) {
+    public StatementBlock(@NonNull ImmutableList<? extends Statement> as) {
         super((PositionInfo) null, null);
         // check for non-null elements (bug fix)
         Debug.assertDeepNonNull(as, "statement block contructor");
@@ -96,14 +93,14 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
 
     public StatementBlock(Statement as) {
-        this(new ImmutableArray<>(as));
+        this(ImmutableList.of(as));
     }
 
     public StatementBlock(Statement... body) {
-        this(new ImmutableArray<>(body));
+        this(ImmutableList.of(body));
     }
 
-    public StatementBlock(PositionInfo pi, List<Comment> c, ImmutableArray<Statement> body,
+    public StatementBlock(PositionInfo pi, List<Comment> c, ImmutableList<Statement> body,
             List<TextualJMLConstruct> spec) {
         this(pi, c, body, ImmutableList.fromList(spec));
     }
@@ -145,8 +142,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     /**
      * computes the prefix elements for the given array of statment block
      */
-    public static ImmutableArray<ProgramPrefix> computePrefixElements(
-            ImmutableArray<? extends Statement> b,
+    public static ImmutableList<ProgramPrefix> computePrefixElements(
+            ImmutableList<? extends Statement> b,
             ProgramPrefix current) {
         final ArrayList<ProgramPrefix> prefix = new ArrayList<>();
         prefix.add(current);
@@ -156,7 +153,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             prefix.add(current);
         }
 
-        return new ImmutableArray<>(prefix);
+        return ImmutableList.fromList(prefix);
     }
 
 
@@ -166,7 +163,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * @return the statement array wrapper.
      */
     @NonNull
-    public ImmutableArray<? extends Statement> getBody() {
+    public ImmutableList<? extends Statement> getBody() {
         return body;
     }
 
@@ -323,7 +320,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+    public ImmutableList<ProgramPrefix> getPrefixElements() {
         return computePrefixElements(body, this);
     }
 

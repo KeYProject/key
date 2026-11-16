@@ -14,7 +14,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.MiscTools;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -137,11 +136,11 @@ public final class JMLInfoExtractor {
     /**
      * Extracts the list of comments for a given field. The comments should usually be modifiers.
      */
-    private static ImmutableArray<Modifier> extractFieldModifiers(String fieldName,
+    private static ImmutableList<Modifier> extractFieldModifiers(String fieldName,
             TypeDeclaration td) {
         for (final MemberDeclaration decl : td.getMembers()) {
             if (decl instanceof FieldDeclaration tmp) {
-                ImmutableArray<FieldSpecification> aofs = tmp.getFieldSpecifications();
+                ImmutableList<FieldSpecification> aofs = tmp.getFieldSpecifications();
                 for (var aof : aofs) {
                     if (aof.getProgramName().equals(fieldName)) {
                         return tmp.getModifiers();
@@ -149,7 +148,7 @@ public final class JMLInfoExtractor {
                 }
             }
         }
-        return new ImmutableArray<>();
+        return ImmutableList.of();
     }
 
     // -------------------------------------------------------------------------

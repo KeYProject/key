@@ -11,7 +11,7 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -27,7 +27,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
 
     private final KeYJavaType container;
     private final boolean isStatic;
-    private final ImmutableArray<KeYJavaType> paramTypes;
+    private final ImmutableList<KeYJavaType> paramTypes;
     private final KeYJavaType type;
     private final int heapCount;
     private final int stateCount;
@@ -38,7 +38,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     // -------------------------------------------------------------------------
 
     public ObserverFunction(String baseName, Sort sort, KeYJavaType type, Sort heapSort,
-            KeYJavaType container, boolean isStatic, ImmutableArray<KeYJavaType> paramTypes,
+            KeYJavaType container, boolean isStatic, ImmutableList<KeYJavaType> paramTypes,
             int heapCount, int stateCount) {
         super(createName(baseName, Objects.requireNonNull(container)), sort,
             getArgSorts(heapSort, container, isStatic, paramTypes, heapCount, stateCount));
@@ -62,7 +62,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
     // -------------------------------------------------------------------------
 
     private static Sort[] getArgSorts(Sort heapSort, KeYJavaType container, boolean isStatic,
-            ImmutableArray<KeYJavaType> paramTypes, int heapCount, int stateCount) {
+            ImmutableList<KeYJavaType> paramTypes, int heapCount, int stateCount) {
         final int arity = paramTypes.size() + stateCount * heapCount + (isStatic ? 0 : 1);
 
         final Sort[] result = new Sort[arity];
@@ -166,7 +166,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
      * @see de.uka.ilkd.key.logic.op.IObserverFunction#getParamTypes()
      */
     @Override
-    public final ImmutableArray<KeYJavaType> getParamTypes() {
+    public final ImmutableList<KeYJavaType> getParamTypes() {
         return paramTypes;
     }
 }

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Type operator.
@@ -73,7 +73,7 @@ public abstract class TypeOperator extends Operator implements TypeReferenceCont
         typeReference = null;
     }
 
-    public TypeOperator(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> arguments,
+    public TypeOperator(PositionInfo pi, List<Comment> c, ImmutableList<Expression> arguments,
             TypeReference type) {
         super(pi, c, arguments);
         typeReference = type;

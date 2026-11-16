@@ -24,7 +24,7 @@ import de.uka.ilkd.key.pp.PrettyPrinter;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -40,7 +40,7 @@ public class LogicFunctionalOperator extends Operator
 
     public LogicFunctionalOperator(PositionInfo pi, List<Comment> comments, LogicFunction function,
             Expression... args) {
-        super(pi, comments, new ImmutableArray<>(args));
+        super(pi, comments, ImmutableList.of(args));
         this.function = Objects.requireNonNull(function);
     }
 
@@ -50,7 +50,7 @@ public class LogicFunctionalOperator extends Operator
     }
 
     public LogicFunctionalOperator(PositionInfo pi, List<Comment> c, LogicFunction fn,
-            ImmutableArray<Expression> args) {
+            ImmutableList<Expression> args) {
         super(pi, c, args);
         this.function = Objects.requireNonNull(fn);
     }

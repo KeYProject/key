@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Default.
@@ -24,7 +24,7 @@ public class Default extends BranchImp {
     /**
      * Body.
      */
-    protected final ImmutableArray<Statement> body;
+    protected final ImmutableList<Statement> body;
 
     /**
      * Default.
@@ -41,7 +41,7 @@ public class Default extends BranchImp {
      */
 
     public Default(Statement[] body) {
-        this.body = new ImmutableArray<>(body);
+        this.body = ImmutableList.of(body);
     }
 
     /**
@@ -53,10 +53,10 @@ public class Default extends BranchImp {
      */
     public Default(ExtList children) {
         super(children);
-        this.body = new ImmutableArray<>(children.collect(Statement.class));
+        this.body = ImmutableList.of(children.collect(Statement.class));
     }
 
-    public Default(ImmutableArray<Statement> body, PositionInfo pi, List<Comment> comments) {
+    public Default(ImmutableList<Statement> body, PositionInfo pi, List<Comment> comments) {
         super(pi, comments);
         this.body = body;
     }
@@ -123,7 +123,7 @@ public class Default extends BranchImp {
      * The body may be empty (null), to define a fall-through. Attaching an {@link EmptyStatement}
      * would create a single ";".
      */
-    public ImmutableArray<Statement> getBody() {
+    public ImmutableList<Statement> getBody() {
         return body;
     }
 

@@ -262,14 +262,13 @@ public abstract class TacletApp implements ITacletApp {
     /**
      * returns true iff the instantiation of a bound SchemaVariable contains the given Logicvariable
      *
-     * @param boundVars ImmutableArray<QuantifiableVariable> with the bound SchemaVariables
+     * @param boundVars ImmutableList<QuantifiableVariable> with the bound SchemaVariables
      * @param x the LogicVariable that is looked for
      * @param insts the SVInstantiations where to get the necessary instantiations of the bound
      *        SchemaVariables
      * @return true iff the instantiation of a Bound Schemavariable contains the given Logicvariable
      */
-    @SuppressWarnings("deprecation") // bound-schema-variable matching uses deprecated API elements
-    private static boolean contains(ImmutableArray<QuantifiableVariable> boundVars,
+    private static boolean contains(ImmutableList<QuantifiableVariable> boundVars,
             LogicVariable x,
             SVInstantiations insts) {
         for (int i = 0; i < boundVars.size(); i++) {
@@ -953,12 +952,11 @@ public abstract class TacletApp implements ITacletApp {
      *        program model
      * @return a list of tacletapps with the found if formula instantiations
      */
-    @SuppressWarnings("deprecation") // assume-formula instantiations reference deprecated elements
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
             ImmutableList<SequentFormula> ruleSuccTail,
             ImmutableList<SequentFormula> ruleAntecTail,
-            ImmutableArray<AssumesFormulaInstantiation> instSucc,
-            ImmutableArray<AssumesFormulaInstantiation> instAntec,
+            ImmutableList<AssumesFormulaInstantiation> instSucc,
+            ImmutableList<AssumesFormulaInstantiation> instAntec,
             ImmutableList<AssumesFormulaInstantiation> instAlreadyMatched,
             MatchResultInfo matchCond,
             Services services) {

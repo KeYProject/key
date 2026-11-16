@@ -26,7 +26,7 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.slf4j.Logger;
@@ -627,7 +627,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             for (int j = 0; j < f.arity(); j++) {
                 if (f.bindVarsAt(j)) {
                     Iterator<QuantifiableVariable> iter = t.sub(j).freeVars().iterator();
-                    ImmutableArray<QuantifiableVariable> bv = t.boundVars();
+                    ImmutableList<QuantifiableVariable> bv = t.boundVars();
                     while (iter.hasNext()) {
                         QuantifiableVariable q = iter.next();
                         boolean isBound = false;
@@ -701,7 +701,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             for (int j = 0; j < t.op().arity(); j++) {
                 if (t.op().bindVarsAt(j)) {
                     Iterator<QuantifiableVariable> iter = t.sub(j).freeVars().iterator();
-                    ImmutableArray<QuantifiableVariable> bv = t.boundVars();
+                    ImmutableList<QuantifiableVariable> bv = t.boundVars();
                     while (iter.hasNext()) {
                         QuantifiableVariable q = iter.next();
                         boolean isBound = false;
@@ -1555,7 +1555,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 return this.translateTermIte(term, quantifiedVars, services);
             }
         } else if (op == Quantifier.ALL) {
-            ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
+            ImmutableList<QuantifiableVariable> vars = term.varsBoundHere(0);
             Debug.assertTrue(vars.size() == 1);
 
             quantifiedVars.add(vars.get(0));
@@ -1578,7 +1578,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             return this.translateLogicalAll(qv, sort, form);
 
         } else if (op == Quantifier.EX) {
-            ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
+            ImmutableList<QuantifiableVariable> vars = term.varsBoundHere(0);
             Debug.assertTrue(vars.size() == 1);
 
             quantifiedVars.add(vars.get(0));
@@ -1806,7 +1806,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsBindingUninterpretedPredicate(JTerm term, Function fun,
-            List<QuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableList<JTerm> subs,
             Services services) throws IllegalFormulaException {
 
         ArrayList<StringBuilder> subterms = new ArrayList<>();
@@ -1851,7 +1851,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 if (fun.bindVarsAt(i)) {
                     Iterator<QuantifiableVariable> iter = term.sub(i).freeVars().iterator();
                     // do not add those bound by the top level operator
-                    ImmutableArray<QuantifiableVariable> qv = term.boundVars();
+                    ImmutableList<QuantifiableVariable> qv = term.boundVars();
                     while (iter.hasNext()) {
                         QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
@@ -1885,7 +1885,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 if (fun.bindVarsAt(j)) {
                     Iterator<QuantifiableVariable> iter = term.sub(j).freeVars().iterator();
                     // do not add those bound by the top level operator
-                    ImmutableArray<QuantifiableVariable> qv = term.boundVars();
+                    ImmutableList<QuantifiableVariable> qv = term.boundVars();
                     while (iter.hasNext()) {
                         QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
@@ -1918,7 +1918,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @throws IllegalFormulaException
      */
     private StringBuilder translateAsBindingUninterpretedFunction(JTerm term, Function fun,
-            List<QuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableList<JTerm> subs,
             Services services) throws IllegalFormulaException {
 
         ArrayList<StringBuilder> subterms = new ArrayList<>();
@@ -1962,7 +1962,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 if (fun.bindVarsAt(i)) {
                     Iterator<QuantifiableVariable> iter = term.sub(i).freeVars().iterator();
                     // do not add those bound by the top level operator
-                    ImmutableArray<QuantifiableVariable> qv = term.boundVars();
+                    ImmutableList<QuantifiableVariable> qv = term.boundVars();
                     while (iter.hasNext()) {
                         QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
@@ -1996,7 +1996,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 if (fun.bindVarsAt(j)) {
                     Iterator<QuantifiableVariable> iter = term.sub(j).freeVars().iterator();
                     // do not add those bound by the top level operator
-                    ImmutableArray<QuantifiableVariable> qv = term.boundVars();
+                    ImmutableList<QuantifiableVariable> qv = term.boundVars();
                     while (iter.hasNext()) {
                         QuantifiableVariable fv = iter.next();
                         boolean isBound = false;
@@ -2018,7 +2018,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     }
 
     private StringBuilder translateAsUninterpretedFunction(Function fun,
-            List<QuantifiableVariable> quantifiedVars, ImmutableArray<JTerm> subs,
+            List<QuantifiableVariable> quantifiedVars, ImmutableList<JTerm> subs,
             Services services) throws IllegalFormulaException {
         // an uninterpreted function. just
         // translate it as such

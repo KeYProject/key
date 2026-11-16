@@ -14,7 +14,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Local variable declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -27,7 +27,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * Var specs.
      */
 
-    protected final ImmutableArray<VariableSpecification> varSpecs;
+    protected final ImmutableList<VariableSpecification> varSpecs;
 
     /**
      * Local variable declaration.
@@ -52,7 +52,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(Modifier[] mods, TypeReference typeRef,
             VariableSpecification[] vars) {
         super(mods, typeRef, false);
-        this.varSpecs = new ImmutableArray<>(vars);
+        this.varSpecs = ImmutableList.of(vars);
     }
 
     /**
@@ -64,7 +64,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      *        the variable specification
      */
     public LocalVariableDeclaration(TypeReference typeRef, VariableSpecification var) {
-        this(new ImmutableArray<>(new Modifier[0]), typeRef, var);
+        this(ImmutableList.of(new Modifier[0]), typeRef, var);
     }
 
 
@@ -78,10 +78,10 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * @param var
      *        a variable specification .
      */
-    public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
+    public LocalVariableDeclaration(ImmutableList<Modifier> mods, TypeReference typeRef,
             VariableSpecification var) {
         super(mods, typeRef, false);
-        this.varSpecs = new ImmutableArray<>(var);
+        this.varSpecs = ImmutableList.of(var);
     }
 
     /**
@@ -94,16 +94,16 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * @param vars
      *        a variable specification array.
      */
-    public LocalVariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
+    public LocalVariableDeclaration(ImmutableList<Modifier> mods, TypeReference typeRef,
             VariableSpecification[] vars) {
         super(mods, typeRef, false);
-        this.varSpecs = new ImmutableArray<>(vars);
+        this.varSpecs = ImmutableList.of(vars);
     }
 
     public LocalVariableDeclaration(PositionInfo pi, List<Comment> comments,
-            ImmutableArray<Modifier> mods,
+            ImmutableList<Modifier> mods,
             TypeReference type, boolean parentIsInterface,
-            ImmutableArray<VariableSpecification> vars) {
+            ImmutableList<VariableSpecification> vars) {
         super(pi, comments, mods, type, parentIsInterface);
         this.varSpecs = vars;
     }
@@ -121,21 +121,21 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(ExtList children) {
         super(children, false);
 
-        this.varSpecs = new ImmutableArray<>(
+        this.varSpecs = ImmutableList.of(
             children.collect(VariableSpecification.class));
     }
 
     /**
      * This method is identical to {@link #getVariables()}.
      */
-    public ImmutableArray<VariableSpecification> getVariableSpecifications() {
+    public ImmutableList<VariableSpecification> getVariableSpecifications() {
         return varSpecs;
     }
 
     /**
      * This method is identical to {@link #getVariableSpecifications()}.
      */
-    public ImmutableArray<VariableSpecification> getVariables() {
+    public ImmutableList<VariableSpecification> getVariables() {
         return varSpecs;
     }
 

@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -24,8 +23,8 @@ import org.key_project.util.collection.ImmutableList;
 
 public class For extends LoopStatement implements VariableScope {
 
-    private static final ImmutableArray<VariableSpecification> EMPTY_VARSPECS =
-        new ImmutableArray<>(new VariableSpecification[0]);
+    private static final ImmutableList<VariableSpecification> EMPTY_VARSPECS =
+        ImmutableList.of(new VariableSpecification[0]);
 
     /**
      * For. Used for the Recoder2KeY transformation
@@ -80,7 +79,7 @@ public class For extends LoopStatement implements VariableScope {
         return true;
     }
 
-    public ImmutableArray<VariableSpecification> getVariablesInScope() {
+    public ImmutableList<VariableSpecification> getVariablesInScope() {
         if (inits != null) {
             LoopInitializer li = inits.getInits().get(0);
             if (li instanceof LocalVariableDeclaration) {
@@ -94,7 +93,7 @@ public class For extends LoopStatement implements VariableScope {
         if (inits != null) {
             LoopInitializer li = inits.getInits().get(0);
             if (li instanceof LocalVariableDeclaration) {
-                ImmutableArray<VariableSpecification> vars =
+                ImmutableList<VariableSpecification> vars =
                     ((LocalVariableDeclaration) li).getVariables();
                 for (int i = 0, s = vars.size(); i < s; i += 1) {
                     VariableSpecification v = vars.get(i);

@@ -15,7 +15,7 @@ import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggerUtils;
 
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 /**
@@ -215,7 +215,7 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
         if (subs == null) {
             return term;
         }
-        return services.getTermFactory().createTerm(term.op(), new ImmutableArray<>(subs),
+        return services.getTermFactory().createTerm(term.op(), ImmutableList.of(subs),
             term.boundVars(), null);
     }
 }

@@ -18,7 +18,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 
 /**
@@ -102,12 +102,12 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification) {
+            IProgramVariable res, ImmutableList<Expression> args, boolean useSpecification) {
         this(method, newContext, res, args, useSpecification, null);
     }
 
     public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args, boolean useSpecification,
+            IProgramVariable res, ImmutableList<Expression> args, boolean useSpecification,
             ProgramElement scope) {
         this.method = method;
         this.bodySource = new TypeRef(method.getContainerType());
@@ -140,7 +140,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
 
-    private void checkOnlyProgramVarsAsArguments(ImmutableArray<? extends Expression> arguments) {
+    private void checkOnlyProgramVarsAsArguments(ImmutableList<? extends Expression> arguments) {
         for (int i = 0, sz = arguments.size(); i < sz; i++) {
             final Expression argument = arguments.get(i);
             if (!((argument instanceof LocationVariable locVar
@@ -153,12 +153,12 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
     }
 
     public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args) {
+            IProgramVariable res, ImmutableList<Expression> args) {
         this(method, newContext, res, args, false);
     }
 
     public MethodBodyStatement(IProgramMethod method, ReferencePrefix newContext,
-            IProgramVariable res, ImmutableArray<Expression> args, ProgramElement scope) {
+            IProgramVariable res, ImmutableList<Expression> args, ProgramElement scope) {
         this(method, newContext, res, args, false, scope);
     }
 
@@ -197,7 +197,7 @@ public class MethodBodyStatement extends JavaNonTerminalProgramElement
         return methodReference.getReferencePrefix();
     }
 
-    public ImmutableArray<? extends Expression> getArguments() {
+    public ImmutableList<? extends Expression> getArguments() {
         return methodReference.getArguments();
     }
 

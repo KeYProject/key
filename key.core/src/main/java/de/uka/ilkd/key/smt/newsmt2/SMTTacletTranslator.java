@@ -20,7 +20,7 @@ import de.uka.ilkd.key.taclettranslation.SkeletonGenerator;
 
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This class uses the existing taclet translation technology to translate taclets to smt axioms.
@@ -66,7 +66,7 @@ public class SMTTacletTranslator {
         }
 
         JTerm[] subs = { smt };
-        ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(variables.values());
+        ImmutableList<QuantifiableVariable> bvars = ImmutableList.fromList(variables.values());
         return services.getTermFactory().createTerm(Quantifier.ALL, subs, bvars, null);
     }
 
@@ -110,7 +110,7 @@ public class SMTTacletTranslator {
         }
 
         if (changes) {
-            var bvars = new ImmutableArray<>(qvars);
+            var bvars = ImmutableList.fromList(qvars);
             return services.getTermFactory().createTerm(op, subs, bvars, term.getLabels());
         } else {
             return term;

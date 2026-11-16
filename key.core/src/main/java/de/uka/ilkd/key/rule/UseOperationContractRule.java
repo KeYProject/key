@@ -344,7 +344,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
 
         if (pe instanceof ProgramPrefix curPrefix) {
 
-            final ImmutableArray<ProgramPrefix> prefix = curPrefix.getPrefixElements();
+            final ImmutableList<ProgramPrefix> prefix = curPrefix.getPrefixElements();
             final int length = prefix.size();
 
             // fail fast check
@@ -936,7 +936,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                     ruleApp.posInOccurrence(),
                     ruleApp.rule(), ruleApp, excPostGoal, "ExceptionalPostModality", null,
                     tb.tf().createTerm(instantiatedModality,
-                        new ImmutableArray<>(inst.progPost.sub(0)), null,
+                        ImmutableList.of(inst.progPost.sub(0)), null,
                         inst.progPost.getLabels()))),
                 null);
             final JTerm excPost =
@@ -967,7 +967,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                         ruleApp.posInOccurrence(), ruleApp.rule(), ruleApp, postGoal,
                         "PostModality", null,
                         tb.tf().createTerm(modality,
-                            new ImmutableArray<>(inst.progPost.sub(0)), null,
+                            ImmutableList.of(inst.progPost.sub(0)), null,
                             inst.progPost.getLabels()))),
                 null);
             postGoal.addFormula(new SequentFormula(wellFormedAnon), true, false);

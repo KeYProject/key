@@ -26,7 +26,6 @@ import org.key_project.logic.Name;
 import org.key_project.prover.indexing.FormulaTag;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -150,7 +149,7 @@ public class OriginTermLabelRefactoring implements TermLabelRefactoring {
             result.addAll((Set<Origin>) label.getTLChild(1));
         }
 
-        ImmutableArray<JTerm> subterms = term.subs();
+        ImmutableList<JTerm> subterms = term.subs();
         for (int i = 0; i < subterms.size(); ++i) {
             result.addAll(collectSubtermOrigins(subterms.get(i), originsCache));
         }

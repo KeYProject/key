@@ -14,7 +14,6 @@ import de.uka.ilkd.key.java.ast.reference.TypeReferenceContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -77,7 +76,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      *        a boolean set true iff the parent is an
      *        InterfaceDeclaration
      */
-    protected VariableDeclaration(ImmutableArray<Modifier> mods, TypeReference typeRef,
+    protected VariableDeclaration(ImmutableList<Modifier> mods, TypeReference typeRef,
             boolean parentIsInterfaceDeclaration) {
         super(mods);
         typeReference = typeRef;
@@ -101,7 +100,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
     }
 
-    public VariableDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
+    public VariableDeclaration(PositionInfo pi, List<Comment> c, ImmutableList<Modifier> modArray,
             TypeReference type, boolean parentIsInferface) {
         super(pi, c, modArray, ImmutableList.nil());
         this.typeReference = type;
@@ -161,7 +160,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
 
 
     @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
+    public @NonNull ImmutableList<Modifier> getModifiers() {
         return modArray;
     }
 
@@ -172,7 +171,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
      * @return the variable specification array wrapper
      */
 
-    public abstract ImmutableArray<? extends VariableSpecification> getVariables();
+    public abstract ImmutableList<? extends VariableSpecification> getVariables();
 
     /**
      * Test whether the declaration is final.

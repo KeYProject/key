@@ -17,7 +17,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.GotoNextInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.GotoNextSiblingInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -35,7 +35,7 @@ public final class OperatorPlan implements MatchPlan {
 
     private final MatchHead head;
     private final List<MatchPlan> children;
-    private final ImmutableArray<? extends QuantifiableVariable> boundVars;
+    private final ImmutableList<? extends QuantifiableVariable> boundVars;
     private final BinderMatcher binder;
 
     /**
@@ -46,7 +46,7 @@ public final class OperatorPlan implements MatchPlan {
      *        non-empty)
      */
     public OperatorPlan(MatchHead head, List<MatchPlan> children,
-            ImmutableArray<? extends QuantifiableVariable> boundVars, BinderMatcher binder) {
+            ImmutableList<? extends QuantifiableVariable> boundVars, BinderMatcher binder) {
         this.head = head;
         this.children = children;
         this.boundVars = boundVars;
@@ -121,7 +121,7 @@ public final class OperatorPlan implements MatchPlan {
      * element it could read.
      */
     private record UnbindInstruction(BinderMatcher binder,
-            ImmutableArray<? extends QuantifiableVariable> boundVars) implements VMInstruction {
+            ImmutableList<? extends QuantifiableVariable> boundVars) implements VMInstruction {
         @Override
         public MatchResultInfo match(PoolSyntaxElementCursor cursor, MatchResultInfo mc,
                 LogicServices services) {

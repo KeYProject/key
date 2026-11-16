@@ -25,7 +25,6 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -121,7 +120,7 @@ public class ConstructorCall extends ProgramTransformer {
                 ? newObjectVar
                 : (ProgramVariable) svInst.getInstantiation(newObjectSV);
         final ExecutionContext ec = svInst.getExecutionContext();
-        final ImmutableArray<Expression> arguments = constructorReference.getArguments();
+        final ImmutableList<Expression> arguments = constructorReference.getArguments();
 
         final ArrayList<Statement> evaluatedArgs = new ArrayList<>();
 
