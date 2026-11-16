@@ -16,8 +16,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp.
@@ -37,9 +35,9 @@ public class FIFOStrategy implements JavaStrategy {
      *         all (it is discarded by the strategy).
      */
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+    public RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pio,
-            Goal goal,
+            ProofGoal<?> goal,
             MutableState mState) {
         // FIFO ordering is purely the goal age, which RuleAppContainer.withAge adds once per
         // container, so the age-free strategy cost is zero.

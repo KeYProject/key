@@ -19,13 +19,9 @@ import org.key_project.prover.strategy.AbstractFeatureStrategy;
 import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
-import org.key_project.prover.strategy.costbased.feature.instantiator.ForEachCP;
-import org.key_project.prover.strategy.costbased.feature.instantiator.OneOfCP;
 import org.key_project.prover.strategy.costbased.feature.instantiator.SVInstantiationCP;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
-import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
-import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;

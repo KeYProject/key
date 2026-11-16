@@ -31,8 +31,6 @@ import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
-
 /// Combines a list of component strategies [ComponentStrategy] into a unified strategy. Theory
 /// combination
 /// is based on the costs computed by each component strategy. Age of the rule
@@ -245,8 +243,8 @@ public class ModularJavaDLStrategy extends JavaAbstractFeatureStrategy {
     }
 
     @Override
-    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, GOAL goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return totalCost.computeCost(app, pos, goal, mState);
     }
 
@@ -273,8 +271,8 @@ public class ModularJavaDLStrategy extends JavaAbstractFeatureStrategy {
         }
 
         @Override
-        public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
-                PosInOccurrence pos, GOAL goal, MutableState mState) {
+        public RuleAppCost computeCost(RuleApp app,
+                PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
             return reduceTillMax(NumberRuleAppCost.getZeroCost(), TopRuleAppCost.INSTANCE,
                 RuleAppCost::add, s -> mapper.compute(s, app, pos, (Goal) goal, mState),
                 ruleToStrategy.apply(app.rule()));

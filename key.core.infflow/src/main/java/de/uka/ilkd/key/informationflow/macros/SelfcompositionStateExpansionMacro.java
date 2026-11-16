@@ -128,8 +128,8 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         }
 
         @Override
-        public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp ruleApp,
-                PosInOccurrence pio, G p_goal, MutableState mState) {
+        public RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, ProofGoal<?> p_goal, MutableState mState) {
             final var goal = (Goal) p_goal;
             String name = ruleApp.rule().name().toString();
             if ((admittedRuleNames.contains(name) || name.startsWith(INF_FLOW_UNFOLD_PREFIX))

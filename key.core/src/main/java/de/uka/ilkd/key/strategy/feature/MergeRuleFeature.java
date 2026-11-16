@@ -19,8 +19,6 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Costs for the {@link MergeRule}; cheap if the first statement in the chosen top-level formula is
  * a {@link MergePointStatement}, otherwise, infinitely expensive.
@@ -35,8 +33,8 @@ public class MergeRuleFeature implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         final JTerm t = (JTerm) pos.subTerm();
         if (!pos.isTopLevel() || !t.containsJavaBlockRecursive()) {

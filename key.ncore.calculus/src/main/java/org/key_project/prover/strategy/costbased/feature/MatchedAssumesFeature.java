@@ -13,16 +13,15 @@ import org.key_project.prover.strategy.costbased.MutableState;
 /// Taclet
 /// does not have any assumes-formulas.
 @StableCost
-public final class MatchedAssumesFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature {
-    public static <GOAL extends ProofGoal<GOAL>> MatchedAssumesFeature<GOAL> create() {
-        return new MatchedAssumesFeature<>();
+public final class MatchedAssumesFeature extends BinaryTacletAppFeature {
+    public static MatchedAssumesFeature create() {
+        return new MatchedAssumesFeature();
     }
 
     private MatchedAssumesFeature() {}
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal,
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         return app.assumesInstantionsComplete();
     }

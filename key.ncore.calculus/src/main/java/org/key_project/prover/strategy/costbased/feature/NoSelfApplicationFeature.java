@@ -14,16 +14,15 @@ import org.key_project.util.collection.ImmutableList;
 /// This feature checks that the position of application is not contained in the if-formulas. If the
 /// rule application is admissible, zero is returned.
 @StableCost
-public class NoSelfApplicationFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature {
-    public static <GOAL extends ProofGoal<GOAL>> NoSelfApplicationFeature<GOAL> create() {
-        return new NoSelfApplicationFeature<>();
+public class NoSelfApplicationFeature extends BinaryTacletAppFeature {
+    public static NoSelfApplicationFeature create() {
+        return new NoSelfApplicationFeature();
     }
 
     private NoSelfApplicationFeature() {}
 
     @Override
-    protected boolean filter(ITacletApp p_app, PosInOccurrence pos, GOAL goal,
+    protected boolean filter(ITacletApp p_app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         assert pos != null
                 : "NoSelfApplicationFeature: Need to know the position of the application of the taclet";

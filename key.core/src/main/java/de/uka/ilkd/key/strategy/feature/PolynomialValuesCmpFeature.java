@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -85,8 +86,9 @@ public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+            ProofGoal<?> p_goal, MutableState mState) {
         final TacletApp tacletApp = (TacletApp) app;
+        final Goal goal = (Goal) p_goal;
         return compare(getPolynomial(left, leftCoeff, tacletApp, pos, goal, mState),
             getPolynomial(right, rightCoeff, tacletApp, pos, goal, mState));
     }

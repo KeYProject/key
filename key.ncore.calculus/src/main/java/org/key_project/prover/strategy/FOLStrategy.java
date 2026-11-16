@@ -115,7 +115,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
         setupEquationReasoning(d);
 
         bindRuleSet(d, "order_terms",
-            add(TermSmallerThanFeature.<G>create(instOf("commEqLeft"), instOf("commEqRight"),
+            add(TermSmallerThanFeature.create(instOf("commEqLeft"), instOf("commEqRight"),
                 createTermOrdering()),
                 CostBand.NORMALIZE.cost()));
 
@@ -211,8 +211,8 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     /// `TopRuleAppCost.INSTANCE` indicates that the rule shall not be applied at
     /// all (it is discarded by the strategy).
     @Override
-    public <GOAL extends ProofGoal<GOAL>> RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
-            GOAL goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
+            ProofGoal<?> goal, MutableState mState) {
         return costComputationF.computeCost(app, pio, goal, mState);
     }
 

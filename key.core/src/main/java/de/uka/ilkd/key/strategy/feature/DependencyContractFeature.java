@@ -8,7 +8,6 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -20,15 +19,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 
 
 public final class DependencyContractFeature extends BinaryFeature {
 
     @Override
-    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
+    protected boolean filter(RuleApp app,
             PosInOccurrence pos,
-            Goal p_goal, MutableState mState) {
+            ProofGoal<?> p_goal, MutableState mState) {
         IBuiltInRuleApp bapp = (IBuiltInRuleApp) app;
 
         final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;

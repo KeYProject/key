@@ -27,7 +27,7 @@ import org.key_project.util.collection.ImmutableList;
 /// Checks whether the product of two monomials has the same variables as the left side of
 /// an inequation in the sequent. Required to bound the number of cross-multiplications.
 @VolatileCost
-public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
+public final class IsBoundedByInequationFeature
         extends BinaryTacletAppFeature {
     private final ProjectionToTerm mult1;
     private final ProjectionToTerm mult2;
@@ -43,7 +43,7 @@ public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
             Set<Map<Term, Integer>> variables) {
     }
 
-    private final Map<GOAL, InequationInfo> relations = new ConcurrentLruCache<>(200);
+    private final Map<ProofGoal<?>, InequationInfo> relations = new ConcurrentLruCache<>(200);
 
     /// @param mult1 the left side of the first inequation to be multiplied
     /// @param mult2 the left side of the second inequation to be multiplied
@@ -58,7 +58,8 @@ public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         final LogicServices services = goal.proof().getServices();
         final Term firstTerm = mult1.toTerm(app, pos, goal, mState);
         final Term secondTerm = mult2.toTerm(app, pos, goal, mState);
@@ -69,7 +70,7 @@ public final class IsBoundedByInequationFeature<GOAL extends ProofGoal<GOAL>>
         return getInEquations(goal, mState).contains(variables(first, second));
     }
 
-    private Set<Map<Term, Integer>> getInEquations(GOAL goal, MutableState mState) {
+    private Set<Map<Term, Integer>> getInEquations(ProofGoal<?> goal, MutableState mState) {
         final ImmutableList<Term> selection = inEquations.selection(goal, mState);
         final InequationInfo cached = relations.get(goal);
         if (cached != null && cached.selection() == selection) {

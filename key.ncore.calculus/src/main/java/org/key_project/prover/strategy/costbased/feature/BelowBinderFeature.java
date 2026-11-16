@@ -11,7 +11,6 @@ import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-import org.jspecify.annotations.NonNull;
 
 
 /// Returns zero iff the position of a rule application is not below any operators that bind
@@ -25,8 +24,8 @@ public class BelowBinderFeature extends BinaryFeature {
 
     private BelowBinderFeature() {}
 
-    public <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+    public boolean filter(RuleApp app, PosInOccurrence pos,
+            ProofGoal<?> goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         return belowBinder(pos);

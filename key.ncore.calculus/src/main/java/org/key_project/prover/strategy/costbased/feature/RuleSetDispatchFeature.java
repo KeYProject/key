@@ -49,8 +49,8 @@ public class RuleSetDispatchFeature implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         if (!(app instanceof ITacletApp tapp)) {
             return NumberRuleAppCost.getZeroCost();

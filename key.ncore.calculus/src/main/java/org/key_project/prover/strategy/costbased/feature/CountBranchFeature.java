@@ -12,8 +12,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-
 /// Feature that returns the number of branches for a given taclet application Size of "assumes"
 /// sequents is currently not considered
 public class CountBranchFeature implements Feature {
@@ -30,8 +28,8 @@ public class CountBranchFeature implements Feature {
     /// @param mState
     /// @return the cost of `app`
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         if (app.rule() instanceof Taclet tac) {
             final long branches = tac.goalTemplates().size();

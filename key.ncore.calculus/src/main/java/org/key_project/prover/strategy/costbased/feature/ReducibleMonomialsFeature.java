@@ -46,8 +46,7 @@ public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
     /// @param divisor
     /// @param monBuilder builder used to create a term from a monomial
     /// @return
-    /// @param <GOAL>
-    public static <GOAL extends ProofGoal<GOAL>> Feature createReducible(
+    public static Feature createReducible(
             ProjectionToTerm dividend,
             ProjectionToTerm divisor,
             BiFunction<Term, LogicServices, Monomial> monBuilder) {
@@ -60,15 +59,15 @@ public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
     /// @param divisor
     /// @param monBuilder builder used to create a term from a monomial
     /// @return
-    /// @param <GOAL>
-    public static <GOAL extends ProofGoal<GOAL>> Feature createDivides(
+    public static Feature createDivides(
             ProjectionToTerm dividend,
             ProjectionToTerm divisor, BiFunction<Term, LogicServices, Monomial> monBuilder) {
         return new ReducibleMonomialsFeature<>(dividend, divisor, Check.DIVIDES, monBuilder);
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         final Term dividendT = dividend.toTerm(app, pos, goal, mState);
         final Term divisorT = divisor.toTerm(app, pos, goal, mState);
         assert dividendT != null && divisorT != null

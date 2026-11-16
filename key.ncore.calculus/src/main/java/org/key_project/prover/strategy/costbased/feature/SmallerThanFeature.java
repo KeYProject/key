@@ -12,8 +12,7 @@ import org.key_project.util.collection.ImmutableList;
 
 /// Abstract superclass for features comparing terms (in particular polynomials or monomials) using
 /// the term ordering
-public abstract class SmallerThanFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature {
+public abstract class SmallerThanFeature extends BinaryTacletAppFeature {
 
     private final TermOrdering termOrdering;
 
@@ -21,8 +20,7 @@ public abstract class SmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         this.termOrdering = termOrdering;
     }
 
-    protected boolean lessThan(Term t1, Term t2,
-            PosInOccurrence focus, GOAL currentGoal) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, ProofGoal<?> currentGoal) {
         return compare(t1, t2) < 0;
     }
 
@@ -33,7 +31,7 @@ public abstract class SmallerThanFeature<GOAL extends ProofGoal<GOAL>>
     /// @return `true` iff each element of `list1` is strictly smaller than all
     /// elements of `list2`
     protected final boolean lessThan(ImmutableList<Term> list1, ImmutableList<Term> list2,
-            PosInOccurrence focus, GOAL currentGoal) {
+            PosInOccurrence focus, ProofGoal<?> currentGoal) {
         if (list2.isEmpty()) {
             return false;
         }

@@ -16,8 +16,6 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
-
 /// Counts how often a given term occurs in the sequent: the returned cost is the number of
 /// to the given term modulo `equalsProp`. Used by the splitting heuristics to prefer cutting
 /// over formulas that occur often.
@@ -34,7 +32,7 @@ import org.jspecify.annotations.NonNull;
 ///
 /// If the projection has no value (its schema variable is not instantiated), the result is
 /// [TopRuleAppCost], as with the comprehension it replaces.
-public class CountOccurrencesFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
+public class CountOccurrencesFeature implements Feature {
     private final ProjectionToTerm target;
     private final Property<Term> equalsProp;
 
@@ -43,14 +41,13 @@ public class CountOccurrencesFeature<Goal extends ProofGoal<@NonNull Goal>> impl
         this.target = target;
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
-            ProjectionToTerm target, Property<Term> equalsProp) {
-        return new CountOccurrencesFeature<Goal>(target, equalsProp);
+    public static Feature create(ProjectionToTerm target, Property<Term> equalsProp) {
+        return new CountOccurrencesFeature(target, equalsProp);
     }
 
     @Override
-    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, G goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         final Term targetTerm = target.toTerm(app, pos, goal, mState);
         if (targetTerm == null) {
             assert false : "CountOccurrencesFeature: got undefined argument (null)";

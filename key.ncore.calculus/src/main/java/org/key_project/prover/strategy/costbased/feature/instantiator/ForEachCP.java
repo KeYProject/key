@@ -45,8 +45,8 @@ public class ForEachCP<G extends ProofGoal<G>> implements Feature {
     }
 
     @Override
-    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(final RuleApp app,
-            final PosInOccurrence pos, final GOAL goal,
+    public RuleAppCost computeCost(final RuleApp app,
+            final PosInOccurrence pos, final ProofGoal<?> goal,
             MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
         var.setContent(null, mState);

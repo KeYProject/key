@@ -30,8 +30,6 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
 
-import org.jspecify.annotations.NonNull;
-
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
 import static de.uka.ilkd.key.strategy.SymExCost.*;
 
@@ -231,8 +229,8 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
                  */
                 bindRuleSet(d, "merge_point", new Feature() {
                     @Override
-                    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
-                            PosInOccurrence pos, G goal, MutableState mState) {
+                    public RuleAppCost computeCost(RuleApp app,
+                            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
                         return ParallelProver.isMultiThreadedRunActive(goal.proof())
                                 ? NumberRuleAppCost.create(-5000)
                                 : DeleteMergePointRuleFeature.INSTANCE.computeCost(app, pos, goal,
@@ -291,8 +289,8 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
     }
 
     @Override
-    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, GOAL goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return costComputationF.computeCost(app, pos, goal, mState);
     }
 

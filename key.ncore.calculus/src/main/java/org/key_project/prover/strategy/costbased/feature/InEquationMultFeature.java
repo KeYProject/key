@@ -19,7 +19,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 /// inEqSimp\_nonLin\_multiply) is allowed. We only do this if the product of the left sides of the
 /// inequations has factors in common with the left side of some other inequation, similarly to how
 /// it is decided in the Buchberger algorithm.
-public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
+public abstract class InEquationMultFeature
         extends BinaryTacletAppFeature {
     protected final ProjectionToTerm targetCandidate;
     protected final ProjectionToTerm mult1Candidate;
@@ -34,11 +34,11 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
     /// @param mult2Candidate the left side of the second inequation to be multiplied
     /// @param targetCandidate the left side of the inequation that is supposed to bound the other
     /// two inequations
-    public static <GOAL extends ProofGoal<GOAL>> Feature partiallyBounded(
+    public static Feature partiallyBounded(
             ProjectionToTerm mult1Candidate,
             ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate,
             BiFunction<Term, LogicServices, Monomial> builder) {
-        return new InEquationMultFeature<GOAL>(mult1Candidate, mult2Candidate, targetCandidate,
+        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate,
             builder) {
             @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
@@ -49,11 +49,11 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
     }
 
     /// Return zero iff the product of mult1 and mult2 is a factor of target
-    public static <GOAL extends ProofGoal<GOAL>> Feature totallyBounded(
+    public static Feature totallyBounded(
             ProjectionToTerm mult1Candidate,
             ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate,
             BiFunction<Term, LogicServices, Monomial> builder) {
-        return new InEquationMultFeature<GOAL>(mult1Candidate, mult2Candidate, targetCandidate,
+        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate,
             builder) {
             @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
@@ -63,11 +63,11 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
     }
 
     /// Return zero iff the product of mult1 and mult2 is target
-    public static <GOAL extends ProofGoal<GOAL>> Feature exactlyBounded(
+    public static Feature exactlyBounded(
             ProjectionToTerm mult1Candidate,
             ProjectionToTerm mult2Candidate, ProjectionToTerm targetCandidate,
             BiFunction<Term, LogicServices, Monomial> builder) {
-        return new InEquationMultFeature<GOAL>(mult1Candidate, mult2Candidate, targetCandidate,
+        return new InEquationMultFeature(mult1Candidate, mult2Candidate, targetCandidate,
             builder) {
             @Override
             protected boolean filter(Monomial targetM, Monomial mult1M, Monomial mult2M) {
@@ -86,7 +86,7 @@ public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
     }
 
     @Override
-    protected final boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal,
+    protected final boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         final LogicServices services = goal.proof().getServices();
         final Term target = targetCandidate.toTerm(app, pos, goal, mState);

@@ -47,8 +47,8 @@ public class ComprehendedSumFeature<Goal extends ProofGoal<@NonNull Goal>> imple
     }
 
     @Override
-    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, G goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         final Term outerVarContent = var.getContent(mState);
 
         final var it = generator.generate(app, pos, (Goal) goal, mState);

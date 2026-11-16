@@ -5,10 +5,10 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -36,7 +36,8 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
     private DiffFindAndReplacewithFeature() {}
 
     @Override
-    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, Goal goal,
+    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos,
+            ProofGoal<?> goal,
             MutableState mState) {
         assert pos != null && app.rule() instanceof RewriteTaclet
                 : "Feature is only applicable to rewrite taclets";

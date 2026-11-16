@@ -639,9 +639,9 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
      *         all (it is discarded by the strategy).
      */
     @Override
-    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(@NonNull RuleApp app,
+    public RuleAppCost computeCost(@NonNull RuleApp app,
             @NonNull PosInOccurrence pio,
-            @NonNull GOAL goal,
+            ProofGoal<?> goal,
             @NonNull MutableState mState) {
         final long time = PerfScope.start();
         try {

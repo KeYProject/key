@@ -35,9 +35,9 @@ public abstract class FilterStrategy implements JavaStrategy {
     }
 
     @Override
-    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
+    public RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pio,
-            G goal, MutableState mState) {
+            ProofGoal<?> goal, MutableState mState) {
         if (assumesMatched(app) && !isApprovedApp(app, pio, (de.uka.ilkd.key.proof.Goal) goal)) {
             return TopRuleAppCost.INSTANCE;
         }

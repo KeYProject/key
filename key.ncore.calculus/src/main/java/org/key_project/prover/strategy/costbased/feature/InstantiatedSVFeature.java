@@ -19,12 +19,11 @@ import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationP
 /// [StableCost]: the instantiation is read from the rule application's own instantiations, not
 /// from the goal, so the result is fixed for a given application.
 @StableCost
-public class InstantiatedSVFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature {
+public class InstantiatedSVFeature extends BinaryTacletAppFeature {
     private final ProjectionToTerm instProj;
 
     public static Feature create(Name svName) {
-        return new InstantiatedSVFeature<>(svName);
+        return new InstantiatedSVFeature(svName);
     }
 
     protected InstantiatedSVFeature(Name svName) {
@@ -32,7 +31,8 @@ public class InstantiatedSVFeature<GOAL extends ProofGoal<GOAL>>
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         return instProj.toTerm(app, pos, goal, mState) != null;
     }
 }

@@ -6,8 +6,8 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
@@ -33,7 +33,8 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
     private CheckApplyEqFeature() {}
 
     @Override
-    protected boolean filter(@MonotonicNonNull ITacletApp p_app, PosInOccurrence pos, Goal goal,
+    protected boolean filter(@MonotonicNonNull ITacletApp p_app, PosInOccurrence pos,
+            ProofGoal<?> goal,
             MutableState mState) {
         assert pos != null : "Need to know the position of " + "the application of the taclet";
 

@@ -30,8 +30,6 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * The macro UseInformationFlowContractMacro applies all applicable information flow contracts.
@@ -187,8 +185,8 @@ public class UseInformationFlowContractMacro extends StrategyProofMacro {
 
 
         @Override
-        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
-                PosInOccurrence pio, Goal goal,
+        public RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, ProofGoal<?> goal,
                 MutableState mState) {
             // first try to apply
             // - impLeft on previous information flow contract application

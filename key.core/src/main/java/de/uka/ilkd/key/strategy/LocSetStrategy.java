@@ -135,8 +135,8 @@ public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
     }
 
     @Override
-    public <GOAL extends ProofGoal<GOAL>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, GOAL goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
     }
 

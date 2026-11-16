@@ -13,8 +13,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.jspecify.annotations.NonNull;
-
 public class OneOfCP implements Feature {
     private final Feature[] features;
 
@@ -27,9 +25,9 @@ public class OneOfCP implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+    public RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos,
-            Goal goal,
+            ProofGoal<?> goal,
             MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(new CP(mState), this);

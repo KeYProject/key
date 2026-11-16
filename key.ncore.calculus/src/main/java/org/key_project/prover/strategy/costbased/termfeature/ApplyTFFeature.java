@@ -15,8 +15,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
-
 /// Feature for invoking a term feature on the instantiation of a schema variable
 @StableCost
 public class ApplyTFFeature implements Feature {
@@ -49,8 +47,8 @@ public class ApplyTFFeature implements Feature {
     }
 
     @Override
-    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, G goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         final Term te = proj.toTerm(app, pos, goal, mState);
         if (te == null) {

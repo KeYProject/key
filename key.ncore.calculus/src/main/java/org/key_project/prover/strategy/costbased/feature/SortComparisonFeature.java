@@ -14,14 +14,13 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 
 import org.jspecify.annotations.NonNull;
 
-public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
-        extends BinaryFeature {
+public class SortComparisonFeature extends BinaryFeature {
 
     public final static int SUBSORT = 0;
 
     public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
             ProjectionToTerm s1, ProjectionToTerm s2, int cmp) {
-        return new SortComparisonFeature<>(s1, s2, cmp);
+        return new SortComparisonFeature(s1, s2, cmp);
     }
 
     private final ProjectionToTerm s1;
@@ -37,8 +36,8 @@ public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
     }
 
     @Override
-    protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app, PosInOccurrence pos,
-            G goal, MutableState mState) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos,
+            ProofGoal<?> goal, MutableState mState) {
         final Term term1 = s1.toTerm(app, pos, goal, mState);
         final Term term2 = s2.toTerm(app, pos, goal, mState);
         assert term1 != null && term2 != null

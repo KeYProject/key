@@ -25,7 +25,6 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,9 +79,9 @@ public class QueryExpandCost implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+    public RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos,
-            Goal p_goal,
+            ProofGoal<?> p_goal,
             MutableState mState) {
         final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;
         final Services services = goal.proof().getServices();

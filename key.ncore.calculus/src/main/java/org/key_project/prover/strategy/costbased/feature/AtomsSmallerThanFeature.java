@@ -28,7 +28,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 ///
 @StableCost
 public class AtomsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
-        extends AbstractMonomialSmallerThanFeature<GOAL> {
+        extends AbstractMonomialSmallerThanFeature {
     private final ProjectionToTerm left, right;
     private final Function Z;
 
@@ -48,7 +48,7 @@ public class AtomsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
-            GOAL goal, MutableState mState) {
+            ProofGoal<?> goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
         assert leftTerm != null && rightTerm != null
@@ -58,7 +58,7 @@ public class AtomsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
 
     /// this overwrites the method of `SmallerThanFeature`
     @Override
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, GOAL goal) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, ProofGoal<?> goal) {
         if (t1.op() == Z) {
             if (t2.op() != Z) {
                 return true;

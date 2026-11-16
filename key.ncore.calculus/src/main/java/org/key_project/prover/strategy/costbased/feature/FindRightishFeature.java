@@ -16,8 +16,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-
 /// Walking from the root of a formula down to the focus of a rule application, count how often we
 /// choose the left branch (subterm) and how the right branches. This is used to identify the
 /// upper/righter/bigger summands in a polynomial that is arranged in a left-associated way.
@@ -37,8 +35,8 @@ public class FindRightishFeature implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

@@ -10,6 +10,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.logic.Name;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
@@ -41,8 +42,10 @@ public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos, Goal goal,
+    protected boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos,
+            ProofGoal<?> p_goal,
             MutableState mState) {
+        final Goal goal = (Goal) p_goal;
         final Node root = goal.proof().root();
 
         Node n = goal.node();

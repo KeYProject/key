@@ -16,8 +16,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Feature that returns the number of branches after instantiated the quantifier formula.
  */
@@ -41,8 +39,8 @@ public class InstantiationCost implements Feature {
      * Compute the cost of a RuleApp.
      */
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         final Term formula = pos.sequentFormula().formula();

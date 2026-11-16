@@ -213,8 +213,8 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         }
 
         @Override
-        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-                PosInOccurrence pio, Goal goal,
+        public RuleAppCost computeCost(RuleApp app,
+                PosInOccurrence pio, ProofGoal<?> goal,
                 MutableState mState) {
 
             if (app.rule() instanceof OneStepSimplifier) {

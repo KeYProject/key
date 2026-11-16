@@ -22,7 +22,6 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /// Feature representing a `ChoicePoint` for instantiating a schema variable of a taclet
@@ -48,9 +47,9 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+    public RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+            ProofGoal<?> goal, MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
         manager.passChoicePoint(new CP(app, pos, (G) goal, mState), this);
         return NumberRuleAppCost.getZeroCost();

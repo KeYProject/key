@@ -11,8 +11,8 @@ import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-public class SVNeedsInstantiation<GOAL extends ProofGoal<GOAL>>
-        extends InstantiatedSVFeature<GOAL> {
+public class SVNeedsInstantiation
+        extends InstantiatedSVFeature {
     public static Feature create(String svName) {
         return new SVNeedsInstantiation(new Name(svName));
     }
@@ -25,7 +25,8 @@ public class SVNeedsInstantiation<GOAL extends ProofGoal<GOAL>>
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         boolean res = super.filter(app, pos, goal, mState);
         if (!res) {
             for (SchemaVariable sv : app.uninstantiatedVars()) {

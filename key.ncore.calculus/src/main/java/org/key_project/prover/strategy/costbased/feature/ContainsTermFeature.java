@@ -55,8 +55,8 @@ public class ContainsTermFeature implements Feature {
 
 
     @Override
-    public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, G goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         final Term t1 = proj1.toTerm(app, pos, goal, mState);
         final Term t2 = proj2.toTerm(app, pos, goal, mState);

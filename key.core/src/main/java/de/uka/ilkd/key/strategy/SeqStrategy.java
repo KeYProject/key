@@ -37,7 +37,6 @@ import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.strategy.SeqCost.*;
@@ -197,8 +196,8 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
     }
 
     @Override
-    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, GOAL goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return costDispatcher.computeCost(app, pos, goal, mState);
     }
 

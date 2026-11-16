@@ -19,8 +19,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.jspecify.annotations.NonNull;
-
 
 /**
  * This abstract class contains some auxiliary methods for the selection of beta rules that are
@@ -341,8 +339,8 @@ public abstract class AbstractBetaFeature implements Feature {
      * @return the cost of <code>app</code>
      */
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

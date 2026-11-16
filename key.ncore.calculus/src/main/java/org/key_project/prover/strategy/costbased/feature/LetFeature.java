@@ -39,8 +39,8 @@ public class LetFeature<Goal extends ProofGoal<@NonNull Goal>> implements Featur
     }
 
     @Override
-    public <G extends @NonNull ProofGoal<G>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, G goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         final var outerVarContent = var.getContent(mState);
 

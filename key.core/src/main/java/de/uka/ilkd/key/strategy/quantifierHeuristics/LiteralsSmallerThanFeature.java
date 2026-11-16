@@ -10,11 +10,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.TermOrdering;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -23,7 +23,7 @@ import org.key_project.prover.strategy.costbased.feature.SmallerThanFeature;
 import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
+public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm left, right;
     private final IntegerLDT numbers;
@@ -46,7 +46,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+            ProofGoal<?> goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
@@ -54,7 +54,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
     }
 
     protected boolean compareTerms(Term leftTerm, Term rightTerm,
-            PosInOccurrence pos, Goal goal) {
+            PosInOccurrence pos, ProofGoal<?> goal) {
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);
         final LiteralCollector m2 = new LiteralCollector();
@@ -67,7 +67,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, ProofGoal<?> goal) {
         final int t1Def = quanAnalyser.eliminableDefinition(t1, focus);
         final int t2Def = quanAnalyser.eliminableDefinition(t2, focus);
 
@@ -114,7 +114,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature<Goal> {
                 return false;
             }
 
-            final Services services = goal.proof().getServices();
+            final Services services = (Services) goal.proof().getServices();
             final Polynomial t1RHS = JPolynomial.create(t1.sub(1), services);
             final Polynomial t2RHS = JPolynomial.create(t2.sub(1), services);
             if (t1RHS.valueLess(t2RHS)) {

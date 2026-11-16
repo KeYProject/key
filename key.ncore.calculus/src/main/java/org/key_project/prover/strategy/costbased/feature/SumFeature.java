@@ -21,8 +21,8 @@ import org.jspecify.annotations.NonNull;
 public class SumFeature implements Feature {
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         // We require that there is at least one feature (in method
         // <code>createSum</code>)

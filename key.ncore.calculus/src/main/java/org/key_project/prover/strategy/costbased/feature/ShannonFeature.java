@@ -11,8 +11,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-
 
 /// A conditional feature, in which the condition itself is a (binary) feature. The general notion
 /// is
@@ -44,8 +42,8 @@ public class ShannonFeature implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         if (cond.computeCost(app, pos, goal, mState).equals(trueCost)) {
             return thenFeature.computeCost(app, pos, goal, mState);
         } else {

@@ -110,8 +110,8 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-                PosInOccurrence pio, Goal p_goal,
+        public RuleAppCost computeCost(RuleApp app,
+                PosInOccurrence pio, ProofGoal<?> p_goal,
                 MutableState mState) {
 
             final var goal = (de.uka.ilkd.key.proof.Goal) p_goal;

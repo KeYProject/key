@@ -21,16 +21,15 @@ import org.key_project.util.collection.ImmutableList;
 // \find(b)), so the formula sits above the find term; a sibling rewrite then changes the formula
 // while the find subterm survives. Reusable only while the find formula is unchanged.
 @WeakStableCost
-public class DiffFindAndAssumesFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature {
-    public static <GOAL extends ProofGoal<GOAL>> DiffFindAndAssumesFeature<GOAL> create() {
-        return new DiffFindAndAssumesFeature<>();
+public class DiffFindAndAssumesFeature extends BinaryTacletAppFeature {
+    public static DiffFindAndAssumesFeature create() {
+        return new DiffFindAndAssumesFeature();
     }
 
     private DiffFindAndAssumesFeature() {}
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal,
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 

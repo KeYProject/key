@@ -14,12 +14,11 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 
 /// Feature that returns zero iff one term is smaller than another term in the current term ordering
 @StableCost
-public class TermSmallerThanFeature<GOAL extends ProofGoal<GOAL>> extends SmallerThanFeature<GOAL> {
+public class TermSmallerThanFeature extends SmallerThanFeature {
     private final ProjectionToTerm left, right;
 
-    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm left,
-            ProjectionToTerm right,
-            TermOrdering termOrdering) {
+    public static Feature create(ProjectionToTerm left,
+            ProjectionToTerm right, TermOrdering termOrdering) {
         return new TermSmallerThanFeature(left, right, termOrdering);
     }
 
@@ -31,7 +30,8 @@ public class TermSmallerThanFeature<GOAL extends ProofGoal<GOAL>> extends Smalle
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
         assert leftTerm != null && rightTerm != null

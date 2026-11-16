@@ -110,8 +110,8 @@ public class WellDefinednessMacro extends StrategyProofMacro {
         }
 
         @Override
-        public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
-                PosInOccurrence pio, Goal goal,
+        public RuleAppCost computeCost(RuleApp ruleApp,
+                PosInOccurrence pio, ProofGoal<?> goal,
                 MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (name.startsWith(WD_PREFIX)) {

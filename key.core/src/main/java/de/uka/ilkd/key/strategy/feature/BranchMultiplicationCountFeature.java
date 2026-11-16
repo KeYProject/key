@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy.feature;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -102,7 +103,8 @@ public final class BranchMultiplicationCountFeature extends BinaryTacletAppFeatu
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return countFor(goal) <= maxOnBranch;
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
+        return countFor((Goal) goal) <= maxOnBranch;
     }
 }

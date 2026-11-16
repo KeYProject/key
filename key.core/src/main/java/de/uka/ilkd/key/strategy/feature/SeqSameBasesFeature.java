@@ -7,11 +7,10 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.SeqTermFeatures;
 
 import org.key_project.logic.LogicServices;
+import org.key_project.logic.Term;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -21,8 +20,6 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
-
-import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -42,19 +39,19 @@ public final class SeqSameBasesFeature extends BinaryFeature {
     }
 
     @Override
-    protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app,
-            PosInOccurrence pos, G goal, MutableState mState) {
-        final LogicServices services = ((Goal) goal).proof().getServices();
-        final JTerm perm = (JTerm) pos.subTerm();
-        final Set<JTerm> left = new LinkedHashSet<>();
-        final Set<JTerm> right = new LinkedHashSet<>();
+    protected boolean filter(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
+        final LogicServices services = goal.proof().getServices();
+        final Term perm = pos.subTerm();
+        final Set<Term> left = new LinkedHashSet<>();
+        final Set<Term> right = new LinkedHashSet<>();
         collectBaseSequences(perm.sub(0), left, mState, services);
         collectBaseSequences(perm.sub(1), right, mState, services);
         // subset is used as we need to compare the terms modulo renaming
         return isSubset(right, left) && isSubset(left, right);
     }
 
-    private void collectBaseSequences(JTerm t, Set<JTerm> baseSequences, MutableState mState,
+    private void collectBaseSequences(Term t, Set<Term> baseSequences, MutableState mState,
             LogicServices services) {
         if (isConstructorTerm(t, tf.upd, mState, services)
                 || isConstructorTerm(t, tf.swap, mState, services)
@@ -69,12 +66,13 @@ public final class SeqSameBasesFeature extends BinaryFeature {
         }
     }
 
-    private static boolean isSubset(Set<JTerm> subset, Set<JTerm> superset) {
+    private static boolean isSubset(Set<Term> subset, Set<Term> superset) {
         return subset.stream().allMatch(
-            r -> superset.stream().anyMatch(t -> t.equalsModProperty(r, RENAMING_TERM_PROPERTY)));
+            r -> superset.stream()
+                    .anyMatch(t -> RENAMING_TERM_PROPERTY.equalsModThisProperty(t, r)));
     }
 
-    private static boolean isConstructorTerm(JTerm t, TermFeature constructor,
+    private static boolean isConstructorTerm(Term t, TermFeature constructor,
             MutableState mState, LogicServices services) {
         return !(constructor.compute(t, mState, services) instanceof TopRuleAppCost);
     }

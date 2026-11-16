@@ -11,11 +11,10 @@ import org.key_project.logic.Term;
 import org.key_project.logic.TermOrdering;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
-import org.key_project.prover.proof.ProofGoal;
 import org.key_project.util.collection.ImmutableList;
 
-public abstract class AbstractMonomialSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
-        extends SmallerThanFeature<GOAL> {
+public abstract class AbstractMonomialSmallerThanFeature
+        extends SmallerThanFeature {
     private final Function mul;
 
     protected AbstractMonomialSmallerThanFeature(TermOrdering termOrdering, IIntLdt numbers) {

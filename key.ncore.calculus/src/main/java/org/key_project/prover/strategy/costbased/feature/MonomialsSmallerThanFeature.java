@@ -34,8 +34,7 @@ import org.key_project.util.collection.ImmutableList;
 /// [AbstractMonomialSmallerThanFeature#introductionTime]).
 ///
 @StableCost
-public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
-        extends AbstractMonomialSmallerThanFeature<GOAL> {
+public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeature {
     private final TermFeature hasCoeff;
 
     private final ProjectionToTerm left, right;
@@ -60,15 +59,15 @@ public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
                     OperatorTF.create(numbers.getNumberSymbol()) }));
     }
 
-    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm left,
+    public static Feature create(ProjectionToTerm left,
             ProjectionToTerm right,
             TermOrdering termOrdering, IIntLdt numbers) {
-        return new MonomialsSmallerThanFeature<GOAL>(left, right, termOrdering, numbers);
+        return new MonomialsSmallerThanFeature(left, right, termOrdering, numbers);
     }
 
     @Override
     protected boolean filter(ITacletApp app, PosInOccurrence pos,
-            GOAL goal, MutableState mState) {
+            ProofGoal<?> goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
         assert leftTerm != null && rightTerm != null
@@ -84,7 +83,7 @@ public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
 
     /// this overwrites the method of `SmallerThanFeature`
     @Override
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, GOAL goal) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, ProofGoal<?> goal) {
 
         // here, the ordering is graded concerning multiplication on integers
         final int t1Deg = degree(t1);
@@ -119,7 +118,7 @@ public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
                 return true;
             }
 
-            final int v = compareLexNewSyms(atoms1, atoms2, goal);
+            final int v = compareLexNewSyms(atoms1, atoms2);
             if (v < 0) {
                 return true;
             }
@@ -131,8 +130,7 @@ public class MonomialsSmallerThanFeature<GOAL extends ProofGoal<GOAL>>
         return super.lessThan(t1, t2, focus, goal);
     }
 
-    private int compareLexNewSyms(ImmutableList<Term> atoms1, ImmutableList<Term> atoms2,
-            GOAL goal) {
+    private int compareLexNewSyms(ImmutableList<Term> atoms1, ImmutableList<Term> atoms2) {
         while (!atoms1.isEmpty()) {
             final Term t1 = atoms1.head();
             final Term t2 = atoms2.head();

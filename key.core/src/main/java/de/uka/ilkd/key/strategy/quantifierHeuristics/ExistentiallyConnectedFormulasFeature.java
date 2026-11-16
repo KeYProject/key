@@ -4,8 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.java.Services;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -31,11 +32,13 @@ public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeatur
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
-        final ClausesGraph graph = ClausesGraph.create(pos.sequentFormula().formula(),
-            goal.proof().getServices().getCaches());
+        final var services = (Services) goal.proof().getServices();
+        final ClausesGraph graph =
+            ClausesGraph.create(pos.sequentFormula().formula(), services.getCaches());
 
         return graph.connected(for0.toTerm(app, pos, goal, mState),
             for1.toTerm(app, pos, goal, mState));

@@ -21,8 +21,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Orders quantifier instantiation candidates whose predicted cost is equal, so the choice within a
  * cost band falls to the content of the instance instead of the position of the quantified formula.
@@ -64,8 +62,8 @@ public class InstantiationTieBreakFeature implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         assert pos != null : "Projection is only applicable to rules with find";
 
         final de.uka.ilkd.key.proof.Goal jgoal = (de.uka.ilkd.key.proof.Goal) goal;

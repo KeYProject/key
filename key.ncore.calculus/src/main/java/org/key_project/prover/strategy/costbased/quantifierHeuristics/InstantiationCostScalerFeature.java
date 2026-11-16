@@ -13,8 +13,6 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.jspecify.annotations.NonNull;
-
 public class InstantiationCostScalerFeature
         implements Feature {
     private final Feature costFeature;
@@ -34,8 +32,8 @@ public class InstantiationCostScalerFeature
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         final RuleAppCost cost = costFeature.computeCost(app, pos, goal, mState);
 

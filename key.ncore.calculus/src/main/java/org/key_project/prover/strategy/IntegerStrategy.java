@@ -246,8 +246,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     @Override
-    public <Goal extends ProofGoal<Goal>> RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
+            ProofGoal<?> goal, MutableState mState) {
         return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
     }
 
@@ -867,7 +867,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
                     instOf("multFacLeft"),
                     sub(intRel, 0), monomialBuilder),
                 intRelation))));
-        final Feature exactlyBounded = new IsBoundedByInequationFeature<>(
+        final Feature exactlyBounded = new IsBoundedByInequationFeature(
             instOf("multLeft"), instOf("multFacLeft"), tf.intRelation, monomialBuilder);
 
         // this is a bit hackish

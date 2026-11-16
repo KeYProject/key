@@ -32,8 +32,6 @@ import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
-import org.jspecify.annotations.NonNull;
-
 import static de.uka.ilkd.key.strategy.StringCost.*;
 
 /// Strategy for string related rules.
@@ -193,8 +191,8 @@ public class StringStrategy extends JavaAbstractFeatureStrategy implements Compo
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
     }
 

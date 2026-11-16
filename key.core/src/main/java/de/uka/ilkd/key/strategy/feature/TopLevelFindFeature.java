@@ -5,8 +5,8 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -57,7 +57,8 @@ public final class TopLevelFindFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
         return atTopLevel(pos) && matchesSide(pos);
     }

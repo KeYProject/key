@@ -23,7 +23,6 @@ import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
-import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 /// Determines whether the equality of the length of two sequences can be easily derived from their
@@ -50,8 +49,8 @@ public final class SeqEqualLengthFeature extends BinaryFeature {
     }
 
     @Override
-    protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app,
-            PosInOccurrence pos, G goal, MutableState mState) {
+    protected boolean filter(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         final Goal g = (Goal) goal;
         final Services services = g.proof().getServices();
         final Polynomial firstAsPoly = length(first.toTerm(app, pos, g, mState), mState, services);

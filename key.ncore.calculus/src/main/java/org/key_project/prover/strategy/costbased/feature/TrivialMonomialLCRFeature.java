@@ -21,8 +21,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 ///
 /// "A critical-pair/completion algorithm for finitely generated ideals in rings"
 @StableCost
-public class TrivialMonomialLCRFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature {
+public class TrivialMonomialLCRFeature extends BinaryTacletAppFeature {
     private final ProjectionToTerm a, b;
     // creates a monomial from a given term
     private final BiFunction<Term, LogicServices, Monomial> builder;
@@ -34,14 +33,15 @@ public class TrivialMonomialLCRFeature<GOAL extends ProofGoal<GOAL>>
         this.builder = builder;
     }
 
-    public static <GOAL extends ProofGoal<GOAL>> Feature create(ProjectionToTerm a,
+    public static Feature create(ProjectionToTerm a,
             ProjectionToTerm b,
             BiFunction<Term, LogicServices, Monomial> builder) {
-        return new TrivialMonomialLCRFeature<GOAL>(a, b, builder);
+        return new TrivialMonomialLCRFeature(a, b, builder);
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         final LogicServices services = goal.proof().getServices();
         final Term aTerm = a.toTerm(app, pos, goal, mState);
         final Term bTerm = b.toTerm(app, pos, goal, mState);
