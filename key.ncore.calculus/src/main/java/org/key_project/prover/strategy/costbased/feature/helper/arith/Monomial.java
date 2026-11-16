@@ -12,6 +12,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
+/// A monomial over the integers: the product of `coefficient` and the terms in `parts`.
 public class Monomial {
     public static final Monomial ONE = new Monomial(ImmutableList.nil(), BigInteger.ONE);
     protected final ImmutableList<Term> parts;

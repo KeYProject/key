@@ -13,6 +13,9 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+/// Maps the cost that `costFeature` predicts for a quantifier instance to the cost of the
+/// instantiation. The cost 0 maps to -3000 and the cost 1 maps to 0. Another finite cost maps to
+/// that cost plus 200 if `allowSplitting` returns zero, and to infinity otherwise.
 public class InstantiationCostScalerFeature
         implements Feature {
     private final Feature costFeature;

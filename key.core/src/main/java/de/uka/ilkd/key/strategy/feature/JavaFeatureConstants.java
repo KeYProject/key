@@ -32,6 +32,7 @@ import org.jspecify.annotations.NullMarked;
 import static org.key_project.prover.strategy.StaticFeatureCollection.op;
 
 @NullMarked
+/// Implements [FeatureConstants] with the features, projections and term generators of Java.
 public class JavaFeatureConstants implements FeatureConstants {
     @Override
     public Feature nonDuplicateAppModPositionFeature() {

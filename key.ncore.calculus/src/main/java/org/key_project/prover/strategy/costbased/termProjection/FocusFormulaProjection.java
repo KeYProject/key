@@ -12,6 +12,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 
+/// Projects a rule application to the sequent formula that contains its find position.
 // WeakStable, not Stable: returns the whole find formula (pos.sequentFormula().formula()), i.e.
 // it reads above the find subterm -- valid only while that formula is unchanged.
 @WeakStableCost

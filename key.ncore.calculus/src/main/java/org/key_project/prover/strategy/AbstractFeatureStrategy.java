@@ -29,6 +29,9 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.SuperTermGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
+/// Base class of the strategies that compute costs with features. It holds one
+/// [RuleSetDispatchFeature] for each [StrategyAspect] and binds rule sets to features in these
+/// dispatchers.
 public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
         extends StaticFeatureCollection implements Strategy<G> {
     /// The dispatchers of the cost, approval and instantiation aspects.

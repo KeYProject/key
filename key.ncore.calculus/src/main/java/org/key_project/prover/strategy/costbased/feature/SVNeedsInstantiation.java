@@ -11,6 +11,8 @@ import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
+/// Feature that returns zero iff the schema variable is one of the uninstantiated variables of
+/// the taclet application, and infinity otherwise.
 public class SVNeedsInstantiation
         extends InstantiatedSVFeature {
     public static Feature create(String svName) {

@@ -11,6 +11,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
+/// A polynomial over the integers: the sum of `constantPart` and the monomials in `parts`.
 public class Polynomial {
     /// The polynomial expression of the BigInteger constant '0'.
     public final static Polynomial ZERO =

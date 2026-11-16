@@ -11,6 +11,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationProjection;
 
+/// Feature that returns zero iff the trigger variable of the taclet is instantiated, and infinity
+/// otherwise.
 public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
     public static TriggerVarInstantiatedFeature create() {
         return new TriggerVarInstantiatedFeature();

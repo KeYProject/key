@@ -13,6 +13,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
 
+/// Base class of the features that compare monomials in a [TermOrdering]. The atoms of a
+/// monomial are its subterms that are not a multiplication of [IIntLdt].
 public abstract class AbstractMonomialSmallerThanFeature
         extends SmallerThanFeature {
     private final Function mul;

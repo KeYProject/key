@@ -16,6 +16,8 @@ import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationP
 
 import org.jspecify.annotations.Nullable;
 
+/// Projects a taclet application to the instantiation of the trigger variable of its taclet.
+/// The trigger variable must be instantiated.
 @StableCost
 public class TriggerVariableInstantiationProjection implements ProjectionToTerm {
     @Override
