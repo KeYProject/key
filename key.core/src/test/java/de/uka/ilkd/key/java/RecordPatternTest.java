@@ -16,6 +16,7 @@ import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
@@ -25,6 +26,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -90,6 +93,39 @@ class RecordPatternTest {
     private static PosInOccurrence topLevelPosition(Goal goal) {
         return new PosInOccurrence(goal.sequent().succedent().getFirst(), PosInTerm.getTopLevel(),
             false);
+    }
+
+    private Goal applyRule(String ruleName, String program) {
+        var taclet = rules.lookup(ruleName);
+        assertNotNull(taclet, "rule " + ruleName + " not found");
+        var tacletIndex = TacletIndexKit.getKit().createTacletIndex();
+        tacletIndex.add(taclet);
+        Goal goal = createGoal(program, tacletIndex);
+        var pos = topLevelPosition(goal);
+        var apps = goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pos, services);
+        assertEquals(1, apps.size(),
+            "Expected exactly one application of " + ruleName + " at " + pos + ", but found:\n"
+                + apps);
+        var app = apps.head().tryToInstantiate(services);
+        assertNotNull(app, "Rule application of " + ruleName + " could not be completed");
+        assertTrue(app.complete(), "Rule application of " + ruleName + " should be complete");
+        ImmutableList<Goal> goals = app.taclet().getExecutor().apply(goal, app);
+        assertEquals(1, goals.size(), "Applying " + ruleName + " should create a single goal");
+        return goals.head();
+    }
+
+
+    @Test
+    void loweringDeclaresPatternVariablesInTheBranch() {
+        Goal goal = applyRule("ifUnfoldPattern",
+            "if (new Object() instanceof Point(int x, int y)) { int z = x + y; }");
+        String printed = ProofSaver.printAnything(goal.sequent().succedent().getFirst().formula(),
+            services);
+        assertTrue(printed.contains("instanceof Point"), printed);
+        assertTrue(printed.contains("int x ="), printed);
+        assertTrue(printed.contains("int y ="), printed);
+        assertTrue(printed.indexOf("int x =") > printed.indexOf("instanceof Point"),
+            "the pattern variable must be declared inside the test branch:\n" + printed);
     }
 
     @Test

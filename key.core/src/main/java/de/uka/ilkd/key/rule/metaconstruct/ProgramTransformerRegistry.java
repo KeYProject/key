@@ -69,8 +69,8 @@ public final class ProgramTransformerRegistry {
         register(byName, InitArrayCreation.class);
         register(byName, ReattachLoopInvariant.class);
         register(byName, RecordPatternUnfold.class);
-        register(byName, AssumeTrueBindings.class);
-        register(byName, AssumeFalseBindings.class);
+        register(byName, PatternIf.class);
+        register(byName, PatternIfElse.class);
         BY_NAME = DefaultImmutableMap.fromMap(byName);
         NAMES = Collections.unmodifiableSet(new LinkedHashSet<>(byName.keySet()));
 

@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Mon Nov 16 23:13:51 CET 2026
+# Date: Tue Nov 17 00:49:30 CET 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -10849,17 +10849,9 @@ ifElseUnfoldPattern {
   if (#nse) #s0
   else #s1
 ... }}| (post))
-\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \isBindingExpr(#nse))
+\varcond(\isBindingExpr(#nse))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  boolean #boolv;
-  #boolv = #nse;
-  if (#boolv) {
-    #assumeTrueBindings(#nse)
-    #s0
-  } else {
-    #assumeFalseBindings(#nse)
-    #s1
-  }
+  #patternIfElse(#nse, #s0, #s1)
 ... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
@@ -11154,17 +11146,9 @@ ifUnfoldPattern {
 \find(#allmodal ((modal operator))|{{ ..
   if (#nse) #s0
 ... }}| (post))
-\varcond(\new(#boolv (program Variable), (type, sort): (boolean,boolean)), \isBindingExpr(#nse))
+\varcond(\isBindingExpr(#nse))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  boolean #boolv;
-  #boolv = #nse;
-  if (#boolv) {
-    #assumeTrueBindings(#nse)
-    #s0
-  }
-  if (!#boolv) {
-    #assumeFalseBindings(#nse)
-  }
+  #patternIf(#nse, #s0)
 ... }}| (post)) 
 \heuristics(simplify_autoname)
 Choices: programRules:Java}
