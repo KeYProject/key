@@ -41,10 +41,9 @@ import org.jspecify.annotations.NonNull;
 import static de.uka.ilkd.key.strategy.JavaStaticFeatureCollection.*;
 import static org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment.*;
 
-/// This strategy extends the classical [FOLStrategy] with heuristics
-/// for quantifier instantiation based on E-matching, which involves
-/// normalization of quantified formulas, as well as term features depending on
-/// integer theory.
+/// Extends [FOLStrategy] with the bindings that depend on Java: the commutation of clauses
+/// ordered by [ClausesSmallerThanFeature], the cost of `cut_direct`, the rules on
+/// `instanceof` and casts, and the quantifier options of the [StrategyProperties].
 ///
 /// Do not create directly; use [JFOLStrategyFactory] instead.
 public class JFOLStrategy extends FOLStrategy<Goal> implements ComponentStrategy<Goal> {

@@ -103,13 +103,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
         setupInstantiationWithoutRetry(d);
         setupInEqSimpInstantiation(d);
 
-        // The multiply_2_inEq* taclets used to receive their instantiation cost from the
-        // inEqSimp_nonLin rule set (bound in setupArithPrimaryCategories above). Now that
-        // they only carry inEqSimp_nonLin_multiply, bind that rule set here explicitly.
-        // Both Model Search and DefOps must complete cross-multiplication candidates (the
-        // \assumes clause is matched during instantiation), so both get the finite stock
-        // cost; Basic keeps them uninstantiated at infinity. Model Search stays
-        // byte-identical because this reproduces the value inEqSimp_nonLin gave it.
+        // Model Search and DefOps instantiate the \assumes clause of the multiply_2_inEq*
+        // taclets, so both bind inEqSimp_nonLin_multiply to IN_EQ_SIMP_NON_LIN_COST.
         bindRuleSet(d, "inEqSimp_nonLin_multiply",
             arith != ArithTreatment.BASIC ? longConst(IN_EQ_SIMP_NON_LIN_COST)
                     : inftyConst());
@@ -126,9 +121,8 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             // sequent are approved, so the derivable monomials are capped. In
             // DefOps mode the check is stricter (exact match only) to avoid the
             // saturation blow-up acceptable for Model Search.
-            // baseCost is zero on the approval dispatcher: approval only distinguishes
-            // finite (approved) from infinite (rejected), so the base cost is irrelevant
-            // here and left out to keep the approval decision identical to stock.
+            // The approval dispatcher distinguishes only finite from infinite cost,
+            // so the base cost is zero.
             setupMultiplyInequations(d, longConst(0), inftyConst(), AT_APPROVAL);
         }
         // these taclets are not supposed to be applied with metavariable
@@ -686,14 +680,11 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             // no equation splitting, case distinctions or cuts, and only multiplies when
             // the product exactly matches the left side of an inequation already in the
             // sequent, which the approval dispatcher enforces. DefOps proofs without
-            // integer inequations enqueue no multiply candidates and keep their stock
-            // search path.
+            // integer inequations enqueue no multiply candidates.
             setupMultiplyInequations(d, longConst(IN_EQ_SIMP_NON_LIN_COST), longConst(100),
                 AT_COST);
         } else {
-            // Basic arithmetic: cross-multiplication is off. inEqSimp_nonLin used to be
-            // the off-switch via the (now removed) tag on the multiply taclets, so the
-            // multiply rule set must be pinned to infinity explicitly.
+            // Basic arithmetic does not cross-multiply.
             bindRuleSet(d, "inEqSimp_nonLin_multiply", inftyConst());
         }
 
@@ -784,16 +775,9 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     /// Sets up the cost/approval features for the cross-multiplication of inequations
     /// (rule set inEqSimp\_nonLin\_multiply).
     ///
-    /// The multiply\_2\_inEq\* taclets used to carry the inEqSimp\_nonLin rule set in addition to
-    /// inEqSimp\_nonLin\_multiply, which contributed the base cost [#IN_EQ_SIMP_NON_LIN_COST]
-    /// and, in DefOps mode, the infinite off-switch. They no longer do; the base cost is therefore
-    /// passed in explicitly via `baseCost` so that inEqSimp\_nonLin can keep its stock cost
-    /// and DefOps proofs that never cross-multiply stay on their stock path.
-    ///
     /// @param d the dispatcher to bind the features to
-    /// @param baseCost cost added unconditionally (previously supplied by the inEqSimp\_nonLin
-    /// rule set); zero for the approval dispatcher, [#IN_EQ_SIMP_NON_LIN_COST] for
-    /// the cost dispatcher
+    /// @param baseCost cost added unconditionally; zero for the approval dispatcher,
+    /// [#IN_EQ_SIMP_NON_LIN_COST] for the cost dispatcher
     /// @param notAllowedF the costs in case the multiplication is not allowed
     /// @param atApproval whether the features are bound to the approval dispatcher, which is the
     /// only place a limit can be enforced that depends on how far the proof has come: a

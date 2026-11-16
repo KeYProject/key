@@ -39,8 +39,8 @@ public class ContainsTermFeature implements Feature {
     /// @param proj1 the ProjectionToTerm resolving to the term in which to search for the second
     /// term
     /// @param proj2 the ProjectionToTerm resolving to the term to be checked whether it is a
-    /// subterm
-    /// of the first one
+    /// subterm of the first one
+    /// @param eq the property that decides whether a subterm equals the second term
     private ContainsTermFeature(ProjectionToTerm proj1, ProjectionToTerm proj2, Property<Term> eq) {
         this.proj1 = proj1;
         this.proj2 = proj2;

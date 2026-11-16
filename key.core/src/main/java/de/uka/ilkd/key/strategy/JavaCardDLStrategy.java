@@ -293,7 +293,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             // in isApproved()
             ifZero(applyTF("s", not(rec(any(), SimplifiedSelectTermFeature.create(heapLDT)))),
                 // the applyEq taclet also carries apply_equations, so the dispatch sums the
-                // bindings; the tuned sum is CombinationCost.APPLY_SELECT_EQ_EFFECTIVE
+                // bindings; the tuned sum is HeapSelectCost.APPLY_SELECT_EQ_EFFECTIVE
                 longConst(APPLY_SELECT_EQ)));
         bindRuleSet(d, "simplify_select",
             // simplify_select term in pulled out equation (right hand

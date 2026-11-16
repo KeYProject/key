@@ -4,9 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy.costbased;
 
-/// Costs whose meaning spans more than one component strategy — the theory-_combination_
-/// constants, as opposed to the theory-internal holders (like [FOLCost] and the integer
-/// holders).
+/// Costs that more than one component strategy uses: the combination constants, as opposed to the
+/// theory-internal holders (like [FOLCost] and the integer holders).
 ///
 /// A theory-local rule may also reference a constant here when sharing the level is the documented
 /// intent (e.g. `conjNormalForm` at [#CNF_CONVERSION]), so that retuning the
@@ -23,8 +22,8 @@ final public class CombinationCost {
     /// `MonomialsSmallerThanFeature` guards at the call sites; right ≺ left). The FOL half
     /// instantiates this with the generic term ordering, the Integer half with the monomial
     /// ordering. The orientation step itself (`order_terms`) sits at
-    /// `CostBand.NORMALIZE`. Deliberately its own level — _not_`EXECUTE`, which
-    /// is reserved for symbolic execution.
+    /// `CostBand.NORMALIZE`. The level differs from `EXECUTE`, which is reserved for symbolic
+    /// execution.
     static public final long ORDERED_REWRITING = -4000;
 
     /// Priority at which CNF conversion runs: `conjNormalForm` (associativity, commutation,

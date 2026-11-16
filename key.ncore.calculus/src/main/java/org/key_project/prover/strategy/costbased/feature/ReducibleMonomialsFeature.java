@@ -44,7 +44,7 @@ public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
     ///
     /// @param dividend the monomial that is queried for reducibility
     /// @param divisor
-    /// @param monBuilder builder used to create a term from a monomial
+    /// @param monBuilder creates a monomial from a term
     /// @return
     public static Feature createReducible(
             ProjectionToTerm dividend,
@@ -57,7 +57,7 @@ public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
     ///
     /// @param dividend
     /// @param divisor
-    /// @param monBuilder builder used to create a term from a monomial
+    /// @param monBuilder creates a monomial from a term
     /// @return
     public static Feature createDivides(
             ProjectionToTerm dividend,

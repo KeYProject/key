@@ -89,7 +89,7 @@ final class JavaCardDLCost {
  * <p>
  * <b>Combination-relevant, not purely local:</b> this ladder is tuned <em>relative to</em> the
  * demodulation cost {@link CombinationCost#ORDERED_REWRITING}: {@link #APPLY_SELECT_EQ} is the
- * JavaCardDL-side remainder of the tuned sum {@link APPLY_SELECT_EQ_EFFECTIVE}
+ * JavaCardDL-side remainder of the tuned sum {@link #APPLY_SELECT_EQ_EFFECTIVE}
  * (the {@code applyEq} taclet carries both rule sets, so the dispatch sums the contributions).
  * </p>
  *
@@ -120,7 +120,7 @@ final class HeapSelectCost {
      * {@code apply_select_eq}: replace a not-yet-simplified select by the skolem constant of its
      * pull-out. The {@code applyEq} taclet carries both {@code apply_equations} and
      * {@code apply_select_eq}, so the effective cost is the SUM of the two bindings; the tuned
-     * quantity is {@link APPLY_SELECT_EQ_EFFECTIVE} and this constant is the
+     * quantity is {@link #APPLY_SELECT_EQ_EFFECTIVE} and this constant is the
      * JavaCardDL-side remainder (currently −1700).
      */
     static final long APPLY_SELECT_EQ =

@@ -227,7 +227,7 @@ public class Monomial {
     }
 
     /// @return the result of dividing `a` by `c`, such that the remainder
-    /// becomes minimal in the reduction ordering `LexPathOrdering.compare` on
+    /// becomes minimal in the reduction ordering [#compare] on
     /// integers
     public static BigInteger divide(BigInteger a, BigInteger c) {
         final BigInteger[] divRem = a.divideAndRemainder(c);

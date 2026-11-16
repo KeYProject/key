@@ -23,8 +23,8 @@ import static org.key_project.prover.strategy.costbased.FOLCost.*;
 /// Strategy for general FOL rules. This does not consider other
 /// theories like integers or language-specific functions.
 ///
-/// In particular, instantiation of quantifiers is not supported by this
-/// strategy, as the current E-matching depends on the theory of integers.
+/// Quantifier instantiation binds the rule sets `gamma` and `triggered`. The instantiation
+/// candidates and their costs come from [FeatureConstants].
 ///
 /// This abstract strategy is independent of the concrete KeY instance but
 /// assumes certain rule sets.
