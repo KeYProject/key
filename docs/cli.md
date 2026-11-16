@@ -84,16 +84,18 @@ diagnostic of §8).
 - Every written proof file starts with a status marker line:
 
   ```
-  KEY_PROOF_STATUS closed 0
+  // KEY_PROOF_STATUS closed 0
   ```
 
   for a closed proof, or
 
   ```
-  KEY_PROOF_STATUS open <openGoals>
+  // KEY_PROOF_STATUS open <openGoals>
   ```
 
-  for a saved unclosed proof (`<openGoals>` ≥ 1). Consumers: read the first line; it equals
+  for a saved unclosed proof (`<openGoals>` ≥ 1). The marker is a `//` line comment, so the
+  proof content below it is unchanged and every KeY consumer ignores it. Consumers: read the
+  first line, strip an optional leading `//` and blanks; the remainder equals
   `KEY_PROOF_STATUS closed 0` iff the proof is closed.
 - No proof file is written to a location the caller did not request via `--proof` /
   `--proof-dir` (in particular, no surprise `<file>.auto.N.proof` files).

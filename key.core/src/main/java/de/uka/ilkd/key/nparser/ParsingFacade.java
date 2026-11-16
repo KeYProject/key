@@ -25,7 +25,6 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
-import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jspecify.annotations.NonNull;
@@ -176,50 +175,15 @@ public final class ParsingFacade {
     /**
      * Parses a KeY file from the given stream.
      * <p>
-     * A first line starting with the {@code KEY_PROOF_STATUS } marker prefix (§3 of the headless
-     * interface spec, written by {@link ProofSaver#marker}) is skipped before lexing; any other
-     * first line is passed through unchanged, so files without a marker parse exactly as before.
-     * When a marker line is skipped, the line numbers reported for the remaining tokens still
-     * refer to the original file (the marker counts as line 1).
+     * A leading status marker comment (§3 of the headless interface spec, written by
+     * {@link ProofSaver#marker}) is a {@code //} line comment, so the lexer hides it and the token
+     * positions still refer to the original file.
      *
      * @param stream the stream to parse
      * @return the parsed file AST
      */
     public static KeyAst.File parseFile(CharStream stream) {
-        if (leadingMarkerLineLength(stream) > 0) {
-            // the marker line counts as line 1: token line numbers keep referring to the
-            // original file
-            return parseFile(withoutStatusMarker(stream), 2);
-        }
-        return parseFile(stream, 1);
-    }
-
-    /**
-     * Returns a char stream over the content of the given stream without a leading
-     * {@code KEY_PROOF_STATUS} marker line (§3 of the headless interface spec). If the first
-     * line of the given stream does not start with the marker prefix, the given stream is
-     * returned unchanged.
-     * <p>
-     * Every consumer that derives a char stream from the same file must apply this method, so
-     * that the token positions of an AST produced by {@link #parseFile(CharStream)} (which
-     * skips the marker line) remain valid for re-reading the file, e.g. when replaying a saved
-     * proof from the {@code \proof} token's position.
-     *
-     * @param stream the stream to inspect
-     * @return a stream over the file content without the marker line
-     */
-    public static CharStream withoutStatusMarker(CharStream stream) {
-        int markerLineLength = leadingMarkerLineLength(stream);
-        if (markerLineLength <= 0) {
-            return stream;
-        }
-        return CharStreams.fromString(
-            stream.getText(Interval.of(markerLineLength, stream.size() - 1)),
-            stream.getSourceName());
-    }
-
-    private static KeyAst.File parseFile(CharStream stream, int firstLine) {
-        JavaKeYParser p = createParser(lexerAt(stream, firstLine));
+        JavaKeYParser p = createParser(createLexer(stream));
 
         p.getInterpreter().setPredictionMode(PredictionMode.SLL);
         p.removeErrorListeners();
@@ -236,7 +200,7 @@ public final class ParsingFacade {
             // there are several. Zero errors means SLL was merely insufficient and the LL parse
             // actually succeeded - fall through and return the tree.
             stream.seek(0);
-            p = createParser(lexerAt(stream, firstLine));
+            p = createParser(createLexer(stream));
             ctx = p.file();
             if (p.getErrorReporter().errorCount() == 1) {
                 throw ex;
@@ -245,48 +209,6 @@ public final class ParsingFacade {
 
         p.getErrorReporter().throwException();
         return new KeyAst.File(ctx);
-    }
-
-    /**
-     * Creates a lexer for the given stream that reports line numbers starting at the given line
-     * (used after skipping a status marker line).
-     *
-     * @param stream the stream to lex
-     * @param firstLine the line number of the stream's first line in the original file
-     * @return the lexer
-     */
-    private static JavaKeYLexer lexerAt(CharStream stream, int firstLine) {
-        JavaKeYLexer lexer = createLexer(stream);
-        lexer.getInterpreter().setLine(firstLine);
-        return lexer;
-    }
-
-    /**
-     * Returns the length in characters of the first line of the given stream if that line starts
-     * with the {@code KEY_PROOF_STATUS } marker prefix, or {@code 0} otherwise. The returned
-     * length includes the line terminator, so the stream content after the marker line starts at
-     * that offset.
-     *
-     * @param stream the stream to inspect
-     * @return the number of characters to skip past the marker line, or {@code 0}
-     */
-    private static int leadingMarkerLineLength(CharStream stream) {
-        int size = stream.size();
-        if (size <= 0) {
-            return 0;
-        }
-        int lineEnd = size;
-        for (int i = 1; i <= size; i++) {
-            if (stream.LA(i) == '\n') {
-                lineEnd = i;
-                break;
-            }
-        }
-        String firstLine = stream.getText(Interval.of(0, lineEnd - 1));
-        if (firstLine.endsWith("\r")) {
-            firstLine = firstLine.substring(0, firstLine.length() - 1);
-        }
-        return firstLine.startsWith(ProofSaver.KEY_PROOF_STATUS_PREFIX + " ") ? lineEnd : 0;
     }
 
     public static KeyAst.Term parseExpression(CharStream stream) {

@@ -76,7 +76,7 @@ class ProofSaverTest {
         assertNull(status);
 
         String firstLine = Files.readAllLines(file).get(0);
-        assertEquals("KEY_PROOF_STATUS closed 0", firstLine);
+        assertEquals("// KEY_PROOF_STATUS closed 0", firstLine);
 
         Files.deleteIfExists(file);
     }
@@ -104,7 +104,7 @@ class ProofSaverTest {
 
     @Test
     void markerProducesExpectedStrings() {
-        assertEquals("KEY_PROOF_STATUS closed 0", ProofSaver.marker(true, 0));
-        assertEquals("KEY_PROOF_STATUS open 3", ProofSaver.marker(false, 3));
+        assertEquals("// KEY_PROOF_STATUS closed 0", ProofSaver.marker(true, 0));
+        assertEquals("// KEY_PROOF_STATUS open 3", ProofSaver.marker(false, 3));
     }
 }

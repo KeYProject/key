@@ -31,7 +31,7 @@ import picocli.CommandLine.Spec;
 
 /**
  * The {@code replay} subcommand (§7.2 of the headless interface spec): loads a saved proof file
- * (marker-tolerantly, since the first line may carry the {@code KEY_PROOF_STATUS} marker) and
+ * (marker-tolerantly, since the first line may carry the {@code // KEY_PROOF_STATUS} comment) and
  * re-checks it against the sources it refers to.
  * <p>
  * The subcommand prints exactly one of the following as the last line of stdout:
@@ -41,8 +41,8 @@ import picocli.CommandLine.Spec;
  * <li>{@code REPLAY incompatible <reason>} (exit {@code 3})</li>
  * </ul>
  * The marker rule of §3 decides for header-carrying files: a
- * {@code KEY_PROOF_STATUS open <n>} marker reports {@code REPLAY unclosed <n>} even if the
- * internal replay disagrees; a {@code KEY_PROOF_STATUS closed 0} marker must be confirmed by the
+ * {@code // KEY_PROOF_STATUS open <n>} marker reports {@code REPLAY unclosed <n>} even if the
+ * internal replay disagrees; a {@code // KEY_PROOF_STATUS closed 0} marker must be confirmed by the
  * internal replay, otherwise the file is {@code incompatible}. Without a marker, the internal
  * state of the loaded proof decides. All load and replay errors are {@code incompatible}.
  * <p>
@@ -201,11 +201,12 @@ public final class ReplayCommand implements Callable<Integer> {
     }
 
     /**
-     * The first-line status marker of a proof file (§3 of the headless interface spec).
+     * The first-line status marker of a proof file (§3 of the headless interface spec). The marker
+     * is a {@code //} line comment, so proof consumers ignore it.
      *
      * @param line the raw first line of the file
-     * @param closed the marker is {@code KEY_PROOF_STATUS closed 0}
-     * @param openGoals the marker is {@code KEY_PROOF_STATUS open <n>}; {@code null} otherwise
+     * @param closed the marker is {@code // KEY_PROOF_STATUS closed 0}
+     * @param openGoals the marker is {@code // KEY_PROOF_STATUS open <n>}; {@code null} otherwise
      * @param malformed the first line starts with the marker prefix but is not a well-formed
      *        marker
      */
@@ -222,14 +223,19 @@ public final class ReplayCommand implements Callable<Integer> {
          */
         static StatusMarker parse(String line) {
             String l = line.endsWith("\r") ? line.substring(0, line.length() - 1) : line;
-            if (!l.startsWith(MARKER_PREFIX)) {
+            // §3: the marker is a line comment
+            if (!l.startsWith("//")) {
                 return new StatusMarker(line, false, null, false);
             }
-            if (l.equals(ProofSaver.KEY_PROOF_STATUS_CLOSED)) {
+            String payload = l.substring(2).stripLeading();
+            if (!payload.startsWith(MARKER_PREFIX)) {
+                return new StatusMarker(line, false, null, false);
+            }
+            if (payload.equals(ProofSaver.KEY_PROOF_STATUS_CLOSED)) {
                 return new StatusMarker(line, true, null, false);
             }
-            if (l.startsWith(ProofSaver.KEY_PROOF_STATUS_OPEN_PREFIX)) {
-                String rest = l.substring(ProofSaver.KEY_PROOF_STATUS_OPEN_PREFIX.length());
+            if (payload.startsWith(ProofSaver.KEY_PROOF_STATUS_OPEN_PREFIX)) {
+                String rest = payload.substring(ProofSaver.KEY_PROOF_STATUS_OPEN_PREFIX.length());
                 if (!rest.isEmpty() && rest.chars().allMatch(Character::isDigit)) {
                     try {
                         return new StatusMarker(line, false, Integer.parseInt(rest), false);
