@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -94,6 +93,8 @@ public class TestParser {
     // Handled by javac, javaparser does no type checking
     @Disabled
     @Test
+    // uses the deprecated Location#getFileURI() accessor of the legacy location API
+    @SuppressWarnings("deprecation")
     void testConstantEvaluationError() throws MalformedURLException {
         var file =
             HelperClassForTests.TESTCASE_DIRECTORY.resolve("parserErrorTest/AssignToArray.java");
@@ -104,6 +105,6 @@ public class TestParser {
         var location = error.getLocation();
         assertEquals(4, location.getPosition().line());
         assertEquals(9, location.getPosition().column());
-        assertEquals(Optional.of(file.toUri()), location.getFileURI());
+        assertEquals(file.toUri(), location.getFileUri());
     }
 }

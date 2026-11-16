@@ -59,11 +59,11 @@ public final class CheckerData implements Logger {
     // TODO: side effects: may be changed by checkers (e.g. remove paths of taclet proofs)
     private List<Path> proofPaths;
 
-    ////////////////////////////////// results from dependency checker
+    // results from dependency checker
 
     private DependencyGraph dependencyGraph;
 
-    ////////////////////////////////// results from missing proofs checker
+    // results from missing proofs checker
 
     public Set<Contract> getContractsWithoutProof() {
         return contractsWithoutProof;
@@ -88,7 +88,7 @@ public final class CheckerData implements Logger {
         }
     }
 
-    ////////////////////////////////// results from settings checker
+    // results from settings checker
 
     /** all choice names that occur in at least one settings object of a proof */
     private final SortedSet<String> choiceNames = new TreeSet<>();
@@ -159,8 +159,6 @@ public final class CheckerData implements Logger {
         }
         return res;
     }
-
-    //////////////////////////////////
 
     private LoadingState srcLoadingState = LoadingState.UNKNOWN;
     // we use methods to determine these states on the fly

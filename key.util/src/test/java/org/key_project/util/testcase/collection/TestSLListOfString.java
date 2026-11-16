@@ -52,7 +52,8 @@ public class TestSLListOfString {
     @Test
     public void testPrepend() {
         @SuppressWarnings("unchecked")
-        ImmutableList<String>[] newList = new ImmutableList[str.length + 1];
+        ImmutableList<String>[] newList =
+            (ImmutableList<String>[]) new ImmutableList<?>[str.length + 1];
         newList[0] = ImmutableList.nil();
 
         for (int i = 1; i < str.length + 1; i++) {
@@ -90,7 +91,8 @@ public class TestSLListOfString {
     @Test
     public void testAppend() {
         @SuppressWarnings("unchecked")
-        ImmutableList<String>[] newList = new ImmutableList[str.length + 1];
+        ImmutableList<String>[] newList =
+            (ImmutableList<String>[]) new ImmutableList<?>[str.length + 1];
         newList[0] = ImmutableList.nil();
 
         for (int i = 1; i < str.length + 1; i++) {
@@ -129,7 +131,8 @@ public class TestSLListOfString {
     @Test
     public void testHeadTail() {
         @SuppressWarnings("unchecked")
-        ImmutableList<String>[] newList = new ImmutableList[str.length + 1];
+        ImmutableList<String>[] newList =
+            (ImmutableList<String>[]) new ImmutableList<?>[str.length + 1];
         newList[0] = ImmutableList.nil();
 
         for (int i = 1; i < str.length + 1; i++) {

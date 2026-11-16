@@ -39,6 +39,9 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * @author Tobias Reinhold
  */
+// The equality properties under test receive terms built with the deprecated ImmutableArray
+// label container, so the deprecated type is used throughout this test class on purpose.
+@SuppressWarnings("deprecation")
 public class TestEqualsModProperty {
     private TermBuilder tb;
 

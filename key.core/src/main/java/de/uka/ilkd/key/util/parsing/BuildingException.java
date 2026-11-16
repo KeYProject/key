@@ -74,7 +74,7 @@ public class BuildingException extends RuntimeException implements HasLocation {
     }
 
     private static String locationSuffix(@Nullable Location location) {
-        if (location == null || location.getFileURI().isEmpty()
+        if (location == null || location.getFileUri() == null
                 || location.getPosition().isNegative()) {
             return "";
         }

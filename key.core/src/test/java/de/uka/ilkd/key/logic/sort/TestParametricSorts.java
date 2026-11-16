@@ -69,6 +69,8 @@ class TestParametricSorts {
     }
 
     @Test
+    // ParametricFunctionDecl is created with the deprecated ImmutableArray argument container
+    @SuppressWarnings("deprecation")
     public void testParametricFunctionInstantiation() {
         ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.COVARIANT);
         Sort intSort = nss.sorts().lookup("int");

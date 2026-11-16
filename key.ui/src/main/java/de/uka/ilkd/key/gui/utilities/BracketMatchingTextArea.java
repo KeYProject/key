@@ -5,10 +5,10 @@
 package de.uka.ilkd.key.gui.utilities;
 
 import java.awt.*;
+import java.awt.geom.Rectangle2D;
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
-import javax.swing.plaf.TextUI;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Document;
@@ -335,25 +335,29 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
             Rectangle alloc = bounds.getBounds();
             try {
                 // --- determine locations ---
-                TextUI mapper = c.getUI();
-                Rectangle p0 = mapper.modelToView(c, offs0);
-                Rectangle p1 = mapper.modelToView(c, offs1);
+                Rectangle2D p0 = c.modelToView2D(offs0);
+                Rectangle2D p1 = c.modelToView2D(offs1);
 
                 g.setColor(highlightColor);
 
-                if (p0.y == p1.y) {
+                if ((int) p0.getY() == (int) p1.getY()) {
                     // same line, render a rectangle
-                    Rectangle r = p0.union(p1);
-                    g.drawRect(r.x, r.y, r.width - 1, r.height - 1);
+                    Rectangle2D r = new Rectangle2D.Double();
+                    Rectangle2D.union(p0, p1, r);
+                    g.drawRect((int) r.getX(), (int) r.getY(), (int) r.getWidth() - 1,
+                        (int) r.getHeight() - 1);
                 } else {
                     // different lines
-                    int p0ToMarginWidth = alloc.x + alloc.width - p0.x;
-                    g.drawRect(p0.x, p0.y, p0ToMarginWidth, p0.height);
-                    if ((p0.y + p0.height) != p1.y) {
-                        g.drawRect(alloc.x, p0.y + p0.height, alloc.width - 1,
-                            p1.y - (p0.y + p0.height) - 1);
+                    int p0ToMarginWidth = alloc.x + alloc.width - (int) p0.getX();
+                    g.drawRect((int) p0.getX(), (int) p0.getY(), p0ToMarginWidth,
+                        (int) p0.getHeight());
+                    if (((int) p0.getY() + (int) p0.getHeight()) != (int) p1.getY()) {
+                        g.drawRect(alloc.x, (int) p0.getY() + (int) p0.getHeight(),
+                            alloc.width - 1, (int) p1.getY() - ((int) p0.getY()
+                                    + (int) p0.getHeight()) - 1);
                     }
-                    g.drawRect(alloc.x, p1.y, (p1.x - alloc.x) - 1, p1.height - 1);
+                    g.drawRect(alloc.x, (int) p1.getY(), ((int) p1.getX() - alloc.x) - 1,
+                        (int) p1.getHeight() - 1);
                 }
             } catch (BadLocationException e) {
                 // can't render

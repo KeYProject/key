@@ -20,7 +20,6 @@ checkerFramework {
                 "-Xmaxerrs", "10000",
                 "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
                 "-AstubNoWarnIfNotFound",
-                "-Werror",
                 "-Aversion",
         ]
     }

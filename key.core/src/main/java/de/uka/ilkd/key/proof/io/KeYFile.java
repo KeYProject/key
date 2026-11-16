@@ -7,9 +7,7 @@ package de.uka.ilkd.key.proof.io;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -463,9 +461,9 @@ public class KeYFile implements EnvInput {
         return issues.stream().map(w -> {
             try {
                 return new PositionedString(w.message(),
-                    new Location(file != null ? new URL(file.getExternalForm()).toURI() : null,
+                    new Location(file != null ? URI.create(file.getExternalForm()) : null,
                         w.position()));
-            } catch (MalformedURLException | URISyntaxException e) {
+            } catch (IllegalArgumentException | NullPointerException e) {
                 throw new RuntimeException(e);
             }
         })

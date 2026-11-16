@@ -100,7 +100,7 @@ public class SettingsTreeModel extends DefaultTreeModel {
             parent.add(new DefaultMutableTreeNode(value));
         } else if (value instanceof Collection<?> col) {
             configurationTable(parent, col);
-        } else if (value instanceof Map map) {
+        } else if (value instanceof Map<?, ?> map) {
         } else if (value instanceof Configuration map) {
             configurationTable(parent, map);
         }

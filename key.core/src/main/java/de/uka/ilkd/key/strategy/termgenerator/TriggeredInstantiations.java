@@ -180,6 +180,9 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
         return cost == -1;
     }
 
+    // Constraint is deprecated wholesale (quantifierHeuristics.constraint); no replacement API
+    // exists.
+    @SuppressWarnings("deprecation")
     private HashSet<org.key_project.logic.Term> computeInstances(Services services,
             final JTerm comprehension,
             final Metavariable mv, final JTerm trigger, Set<JTerm> terms,

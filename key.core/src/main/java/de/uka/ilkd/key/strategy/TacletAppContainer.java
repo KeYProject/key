@@ -174,7 +174,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             ImmutableList<RuleAppContainer> targetList, final Goal p_goal) {
         // just for being able to modify the result-list in an
         // anonymous class
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "rawtypes" }) // generic array creation requires the raw
+        // ImmutableList array; element types are kept consistent by the collector below
         final ImmutableList<RuleAppContainer>[] resA = new ImmutableList[] { targetList };
 
         final RuleAppCostCollector collector = (newApp, cost) -> {

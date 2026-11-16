@@ -127,7 +127,7 @@ public class TacletPrefixBuilder {
     public void build() {
         visit(tacletBuilder.assumesSequent());
 
-        if (tacletBuilder instanceof FindTacletBuilder findBuilder) {
+        if (tacletBuilder instanceof FindTacletBuilder<?> findBuilder) {
             @SuppressWarnings("unchecked")
             final SyntaxElement find = findBuilder.getFind();
             if (find instanceof JTerm t)

@@ -134,7 +134,7 @@ public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContrac
         Node previousNode = null;
         while (selfOrParentNode != null) {
             RuleApp app = selfOrParentNode.getAppliedRuleApp();
-            if (app instanceof BlockContractInternalBuiltInRuleApp blockRuleApp) {
+            if (app instanceof BlockContractInternalBuiltInRuleApp<?> blockRuleApp) {
                 if (blockRuleApp.getStatement().equals(contract.getBlock())
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch

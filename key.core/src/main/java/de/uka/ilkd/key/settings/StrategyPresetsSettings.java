@@ -60,12 +60,12 @@ public class StrategyPresetsSettings extends AbstractSettings {
      */
     public record StrategyPreset(String name, int maxSteps, StrategyProperties properties) {
         public StrategyPreset {
-            properties = (StrategyProperties) properties.clone();
+            properties = properties.clone();
         }
 
         @Override
         public StrategyProperties properties() {
-            return (StrategyProperties) properties.clone();
+            return properties.clone();
         }
     }
 
@@ -197,6 +197,7 @@ public class StrategyPresetsSettings extends AbstractSettings {
      * {@link Properties} format cannot represent a list of presets and is intentionally not
      * supported here.
      */
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void readSettings(Properties props) {
         // intentionally empty: see class documentation
@@ -207,6 +208,7 @@ public class StrategyPresetsSettings extends AbstractSettings {
      * {@link Properties} format cannot represent a list of presets and is intentionally not
      * supported here.
      */
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void writeSettings(Properties props) {
         // intentionally empty: see class documentation

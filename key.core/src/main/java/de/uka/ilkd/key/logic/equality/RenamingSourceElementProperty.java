@@ -60,6 +60,7 @@ public class RenamingSourceElementProperty implements Property<SourceElement> {
      * @param <V> is supposed to be {@link NameAbstractionTable} for this equality check
      */
     @Override
+    @SuppressWarnings("unchecked") // varargs array is only inspected via instanceof / elements
     public <V> boolean equalsModThisProperty(SourceElement se1, SourceElement se2, V... v) {
         NameAbstractionTable nat;
         if (v.length > 0 && (v[0] instanceof NameAbstractionTable n)) {

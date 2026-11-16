@@ -96,6 +96,8 @@ public class TestGoal {
      * deregistration during pruning must iterate the node itself, not its parent.
      */
     @Test
+    // Proof#add(Goal) is deprecated but deliberately used to attach a single residual goal
+    @SuppressWarnings("deprecation")
     public void testSetBackRemovesJustificationOfResidualBranch() {
         Sequent seq = JavaDLSequentKit.createSuccSequent(
             ImmutableList.of(new SequentFormula(TacletForTests.parseTerm("A"))));

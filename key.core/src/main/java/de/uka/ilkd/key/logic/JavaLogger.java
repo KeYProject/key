@@ -11,7 +11,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 
 import de.uka.ilkd.key.java.ast.CompilationUnit;
-import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 import org.key_project.logic.SyntaxElement;
@@ -45,7 +44,7 @@ public class JavaLogger {
             out.format(
                 "\n=== %d ======================================================\n```\n%s\n```\n\n",
                 block.hashCode(), block);
-            toSexpr((JavaProgramElement) jb.program(), 0, out);
+            toSexpr(jb.program(), 0, out);
             out.println();
             out.flush();
         }

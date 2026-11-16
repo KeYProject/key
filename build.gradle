@@ -110,6 +110,10 @@ subprojects {
         options.encoding = "UTF-8"
         // Setting the release to Java 21
         options.release = 21
+        // Show warnings, ignore serialization and this-escapes warnings
+        options.compilerArgs += ['-Xlint:all,-serial,-this-escape']
+        // Increase the displayed warnings
+        // options.compilerArgs += ['-Xmaxwarns', '100000']
     }
 
     tasks.withType(Javadoc).configureEach {

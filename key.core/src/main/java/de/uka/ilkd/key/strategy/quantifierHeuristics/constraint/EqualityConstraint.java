@@ -39,6 +39,10 @@ import static de.uka.ilkd.key.logic.equality.RenamingSourceElementProperty.RENAM
  * constraint would not be satisfiable (cycles, unification failed) the Constraint TOP of interface
  * Constraint is returned.
  */
+// Constraint is deprecated wholesale (quantifierHeuristics.constraint) with no replacement API;
+// this class
+// implements it and must keep compiling against it.
+@SuppressWarnings("deprecation")
 public class EqualityConstraint implements Constraint {
 
     /**
@@ -92,9 +96,9 @@ public class EqualityConstraint implements Constraint {
 
     @Override
     protected synchronized Object clone() {
-        EqualityConstraint res = new EqualityConstraint((HashMap<Metavariable, JTerm>) map.clone());
-        res.instantiationCache = instantiationCache == null ? null
-                : (HashMap<Metavariable, JTerm>) instantiationCache.clone();
+        EqualityConstraint res = new EqualityConstraint(new HashMap<>(map));
+        res.instantiationCache =
+            instantiationCache == null ? null : new HashMap<>(instantiationCache);
         return res;
     }
 
@@ -580,7 +584,7 @@ public class EqualityConstraint implements Constraint {
         if (modifyThis) {
             return this;
         }
-        return new EqualityConstraint((HashMap<Metavariable, JTerm>) map.clone());
+        return new EqualityConstraint(new HashMap<>(map));
     }
 
     /**

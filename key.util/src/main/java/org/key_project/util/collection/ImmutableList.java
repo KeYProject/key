@@ -442,6 +442,8 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @param type the class of the type
     /// @return an array of the specified type containing all elements in this list
     /// @see #iterator()
+    @SuppressWarnings("cast") // the explicit (S) cast is required by the nullness checker, see
+                              // below
     default <S extends @Nullable Object> S[] toArray(Class<S> type) {
         S[] result = (S[]) Array.newInstance(type, size());
         int pos = 0;

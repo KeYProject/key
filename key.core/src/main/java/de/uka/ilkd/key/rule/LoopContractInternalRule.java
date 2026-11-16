@@ -261,17 +261,17 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public LoopContractInternalBuiltInRuleApp createApp(final PosInOccurrence occurrence,
-            TermServices services) {
-        return new LoopContractInternalBuiltInRuleApp(this, occurrence);
+    public LoopContractInternalBuiltInRuleApp<LoopContractInternalRule> createApp(
+            final PosInOccurrence occurrence, TermServices services) {
+        return new LoopContractInternalBuiltInRuleApp<>(this, occurrence);
     }
 
     @Override
     public @NonNull ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractInternalBuiltInRuleApp;
-        LoopContractInternalBuiltInRuleApp application =
-            (LoopContractInternalBuiltInRuleApp) ruleApp;
+        LoopContractInternalBuiltInRuleApp<?> application =
+            (LoopContractInternalBuiltInRuleApp<?>) ruleApp;
 
         final Instantiation instantiation =
             instantiate((JTerm) application.posInOccurrence().subTerm(), goal);

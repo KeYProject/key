@@ -233,7 +233,8 @@ public class InvariantConfigurator {
              */
             private void initInvariants() {
 
-                @SuppressWarnings("unchecked")
+                @SuppressWarnings({ "unchecked", "rawtypes" }) // generic array creation requires
+                // the raw Map array; element types are kept consistent by the index assignments
                 Map<String, String>[] loopInvTexts = new Map[IF_OO_IDX + 1];
 
                 loopInvTexts[INV_IDX] = new LinkedHashMap<>();

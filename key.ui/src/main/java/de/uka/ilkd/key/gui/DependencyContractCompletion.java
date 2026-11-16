@@ -29,7 +29,7 @@ public class DependencyContractCompletion implements InteractiveRuleApplicationC
 
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
-        UseDependencyContractApp cApp = (UseDependencyContractApp) app;
+        UseDependencyContractApp<?> cApp = (UseDependencyContractApp<?>) app;
 
         Services services = goal.proof().getServices();
 

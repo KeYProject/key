@@ -603,7 +603,7 @@ public class WhileInvariantRule implements BuiltInRule {
         }
 
         protected Guard prepareGuard(final Instantiation inst,
-                final KeYJavaType booleanKJT, LoopInvariantBuiltInRuleApp loopRuleApp,
+                final KeYJavaType booleanKJT, LoopInvariantBuiltInRuleApp<?> loopRuleApp,
                 final TermServices services) {
             final TermBuilder tb = services.getTermBuilder();
             final ProgramElementName guardVarName = new ProgramElementName(tb.newName("b"));

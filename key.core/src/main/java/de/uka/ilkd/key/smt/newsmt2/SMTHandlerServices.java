@@ -115,7 +115,8 @@ public class SMTHandlerServices {
         Collection<SMTHandler> result = new LinkedList<>();
         for (String name : handlerNames) {
             try {
-                Class<SMTHandler> handlerClass = (Class<SMTHandler>) Class.forName(name);
+                Class<? extends SMTHandler> handlerClass =
+                    Class.forName(name).asSubclass(SMTHandler.class);
                 if (findHandler(handlerClass, result)) {
                     continue;
                 }
@@ -152,7 +153,8 @@ public class SMTHandlerServices {
 
     // Search for a handler of the given class in the snippetMap and if it exists, add it to
     // the result collection.
-    private boolean findHandler(Class<SMTHandler> clazz, Collection<SMTHandler> result) {
+    private boolean findHandler(Class<? extends SMTHandler> clazz,
+            Collection<SMTHandler> result) {
         Optional<SMTHandler> handler =
             snippetMap.keySet().stream().filter(h -> h.getClass().equals(clazz)).findFirst();
         if (handler.isPresent()) {
