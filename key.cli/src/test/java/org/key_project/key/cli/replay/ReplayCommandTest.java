@@ -25,7 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for the {@code replay} subcommand (§7.2 of the headless interface spec): a saved proof
  * file is re-checked against its sources. The first-line status marker decides for
- * header-carrying files ({@code KEY_PROOF_STATUS open <n>} wins, {@code KEY_PROOF_STATUS closed
+ * header-carrying files ({@code // KEY_PROOF_STATUS open <n>} wins,
+ * {@code // KEY_PROOF_STATUS closed
  * 0} must be confirmed by the internal replay); without a marker, {@code proof.closed()}
  * decides.
  */
@@ -45,7 +46,7 @@ class ReplayCommandTest {
 
     /**
      * Proves the closed {@code one()} contract and saves it to {@code tmp/one.proof} with the
-     * {@code KEY_PROOF_STATUS closed 0} marker.
+     * {@code // KEY_PROOF_STATUS closed 0} marker.
      */
     private Path saveClosedProof() {
         Path proof = tmp.resolve("one.proof");
@@ -73,7 +74,7 @@ class ReplayCommandTest {
     @Timeout(300)
     void closedProofReplaysClosed() throws Exception {
         Path proof = saveClosedProof();
-        assertThat(lines(proof).get(0)).isEqualTo("KEY_PROOF_STATUS closed 0");
+        assertThat(lines(proof).get(0)).isEqualTo("// KEY_PROOF_STATUS closed 0");
 
         Run run = run("replay", proof.toString());
 
@@ -85,7 +86,7 @@ class ReplayCommandTest {
     @Timeout(300)
     void openMarkerWinsOverClosedInternalReplay() throws Exception {
         // G2: the same (internally closed) proof with the header swapped to open 3
-        Path proof = rewriteFirstLine(saveClosedProof(), "KEY_PROOF_STATUS open 3");
+        Path proof = rewriteFirstLine(saveClosedProof(), "// KEY_PROOF_STATUS open 3");
 
         Run run = run("replay", proof.toString());
 
@@ -111,7 +112,7 @@ class ReplayCommandTest {
     @Test
     @Timeout(300)
     void oversizedOpenMarkerIsReportedAsMalformed() throws Exception {
-        Path proof = rewriteFirstLine(saveClosedProof(), "KEY_PROOF_STATUS open 99999999999");
+        Path proof = rewriteFirstLine(saveClosedProof(), "// KEY_PROOF_STATUS open 99999999999");
 
         Run run = run("replay", proof.toString());
 

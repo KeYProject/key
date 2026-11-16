@@ -58,8 +58,9 @@ import picocli.CommandLine.Spec;
 <DIR>
  * } for runs with
  * several contracts (files {@code <position>.proof}, 0-based selection position). A closed proof
- * is always written (first line {@code KEY_PROOF_STATUS closed 0}); an unclosed proof is written
- * only with {@code --save-partial} (first line {@code KEY_PROOF_STATUS open <n>}); without
+ * is always written (first line {@code // KEY_PROOF_STATUS closed 0}); an unclosed proof is
+ * written only with {@code --save-partial} (first line {@code // KEY_PROOF_STATUS open <n>});
+ * without
  * {@code --proof}/{@code --proof-dir} nothing is written. Proof output requires exactly one load
  * file: {@code --proof} with several selected contracts, and {@code --proof} or
  * {@code --proof-dir} with several load files, are input errors (exit {@code 3}) because the
@@ -145,7 +146,7 @@ public final class ProveCommand implements Callable<Integer> {
 
     @Option(names = "--save-partial",
         description = "Also write the proof file of an unclosed proof (marked "
-            + "'KEY_PROOF_STATUS open <n>') when --proof or --proof-dir is given (§3).")
+            + "'// KEY_PROOF_STATUS open <n>') when --proof or --proof-dir is given (§3).")
     private boolean savePartial;
 
     @Option(names = "--print-open-goals", arity = "0..1", fallbackValue = "10",

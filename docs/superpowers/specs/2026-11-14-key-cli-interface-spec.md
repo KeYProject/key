@@ -88,15 +88,16 @@ Acceptance B2: for a known-open contract the JSON has `"status":"open"` and `"op
 - Default: a `.proof` file is written **only when** the contract's proof is closed (`status == "closed"`).
 - Explicit output location: `--proof <PATH>` (writes the proof there; overridden per contract by `--proof <PATH>` + `--proof-suffix`? — no: `--proof <PATH>` is for single-contract runs; multi-contract runs use `--proof-dir <DIR>` and name files `<contract-index>.proof`).
 - `--save-partial`: if given, an unclosed proof MAY be saved; **must** then contain the marker line as first line:
-  `KEY_PROOF_STATUS open <openGoals>`
+  `// KEY_PROOF_STATUS open <openGoals>`
 - A closed proof's file **must** start with the marker line:
-  `KEY_PROOF_STATUS closed 0`
+  `// KEY_PROOF_STATUS closed 0`
 - No proof file may be written to a location the caller did not request via `--proof`/`--proof-dir` (this kills the current surprise `quickheap.auto.0.proof` behavior). In pure legacy mode (`--auto` without `--proof*`), no proof file is written at all unless a `\proof` block exists in the load file.
-- Marker parse rule for consumers: read first line; if it equals `KEY_PROOF_STATUS closed 0` ⇒ treat as closed, else not closed.
+- The marker is a single-line comment (`//`): proof consumers that lex KeY files ignore it, so the file below the marker is unchanged and remains loadable without special-casing the first line.
+- Marker parse rule for consumers: read the first line, strip an optional leading `//` and blanks; if the remainder equals `KEY_PROOF_STATUS closed 0` ⇒ treat as closed, else not closed.
 
 Acceptance C1 (open, default): known-open contract, no `--save-partial` ⇒ no new `.proof` file exists anywhere under the run directory (assert with `find . -newer <stamp>`), exit `1`.
-Acceptance C2 (open, with `--save-partial`): file starts with `KEY_PROOF_STATUS open ` followed by an integer ≥ 1.
-Acceptance C3 (closed): file starts exactly with `KEY_PROOF_STATUS closed 0`; `grep -c 'KEY_PROOF_STATUS closed 0' file` = 1.
+Acceptance C2 (open, with `--save-partial`): file starts with `// KEY_PROOF_STATUS open ` followed by an integer ≥ 1.
+Acceptance C3 (closed): file starts exactly with `// KEY_PROOF_STATUS closed 0`; `grep -c 'KEY_PROOF_STATUS closed 0' file` = 1.
 
 ---
 
@@ -263,7 +264,7 @@ cmd         := "proceed"                          // one auto-strategy step
 - The marker rule of §3 determines "closed" if the proof has no internal status; if both exist they must agree.
 
 Acceptance G1: a genuinely closed proof (§9, trivial) → `REPLAY closed 0`, exit 0.
-Acceptance G2: putting an `KEY_PROOF_STATUS open 3` header on the same file → `REPLAY unclosed 3`, exit 1.
+Acceptance G2: putting a `// KEY_PROOF_STATUS open 3` header comment on the same file → `REPLAY unclosed 3`, exit 1.
 Acceptance G3: a hand-script (≥2 distinct commands, incl. `apply`) on the known-open `size()` obligation reports `SCRIPT OK` for every command, then `openGoals` drops strictly between first and last `print-open-goals`.
 
 ---

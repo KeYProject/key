@@ -15,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Tests for the marker-tolerant file parsing of {@link ParsingFacade} (§3 and §7.2 of the
- * headless interface spec): a first line starting with {@code KEY_PROOF_STATUS } is skipped
- * before lexing, and any other first line is passed through unchanged.
+ * headless interface spec): the status marker is a line comment, so the lexer hides it and the
+ * token positions still refer to the original file.
  */
 class ParsingFacadeMarkerTest {
 
@@ -29,9 +29,9 @@ class ParsingFacadeMarkerTest {
     }
 
     @Test
-    void closedMarkerFirstLineIsSkipped() throws IOException {
+    void closedMarkerCommentIsIgnored() throws IOException {
         Path plain = writeTempFile(BODY);
-        Path marked = writeTempFile("KEY_PROOF_STATUS closed 0\n" + BODY);
+        Path marked = writeTempFile("// KEY_PROOF_STATUS closed 0\n" + BODY);
 
         KeyAst.File plainAst = ParsingFacade.parseFile(plain);
         KeyAst.File markedAst = ParsingFacade.parseFile(marked);
@@ -39,16 +39,16 @@ class ParsingFacadeMarkerTest {
         var plainCtx = ParsingFacade.getParseRuleContext(plainAst);
         var markedCtx = ParsingFacade.getParseRuleContext(markedAst);
         assertEquals(plainCtx.getText(), markedCtx.getText(),
-            "the marker line must not be visible to the parser");
+            "the marker comment must not be visible to the parser");
         // positions refer to the original file: \problem starts on line 2 of the marked file
         assertEquals(1, plainCtx.problem().getStart().getLine());
         assertEquals(2, markedCtx.problem().getStart().getLine());
     }
 
     @Test
-    void openMarkerFirstLineIsSkipped() throws IOException {
+    void openMarkerCommentIsIgnored() throws IOException {
         Path plain = writeTempFile(BODY);
-        Path marked = writeTempFile("KEY_PROOF_STATUS open 3\n" + BODY);
+        Path marked = writeTempFile("// KEY_PROOF_STATUS open 3\n" + BODY);
 
         var plainCtx = ParsingFacade.getParseRuleContext(ParsingFacade.parseFile(plain));
         var markedCtx = ParsingFacade.getParseRuleContext(ParsingFacade.parseFile(marked));
@@ -58,9 +58,9 @@ class ParsingFacadeMarkerTest {
     }
 
     @Test
-    void markerLineWithCrlfIsSkipped() throws IOException {
+    void markerCommentWithCrlfIsIgnored() throws IOException {
         Path plain = writeTempFile(BODY);
-        Path marked = writeTempFile("KEY_PROOF_STATUS closed 0\r\n" + BODY);
+        Path marked = writeTempFile("// KEY_PROOF_STATUS closed 0\r\n" + BODY);
 
         var plainCtx = ParsingFacade.getParseRuleContext(ParsingFacade.parseFile(plain));
         var markedCtx = ParsingFacade.getParseRuleContext(ParsingFacade.parseFile(marked));

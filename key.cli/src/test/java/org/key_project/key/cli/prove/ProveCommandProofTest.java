@@ -26,9 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Tests for the proof-file honesty of the {@code prove} subcommand (§3 of the headless interface
  * spec): a proof file is written only where the caller requested one ({@code --proof} or
- * {@code --proof-dir}), always for a closed proof (marker {@code KEY_PROOF_STATUS closed 0}) and
+ * {@code --proof-dir}), always for a closed proof (marker {@code // KEY_PROOF_STATUS closed 0}) and
  * for an unclosed proof only with {@code --save-partial} (marker
- * {@code KEY_PROOF_STATUS open <n>}). An unwritable requested path, and proof output together
+ * {@code // KEY_PROOF_STATUS open <n>}). An unwritable requested path, and proof output together
  * with several load files, are input errors (exit {@code 3}).
  */
 class ProveCommandProofTest {
@@ -68,8 +68,9 @@ class ProveCommandProofTest {
         assertThat(run.exit()).isEqualTo(1);
         assertThat(Files.exists(proof)).isTrue();
         List<String> lines = Files.readAllLines(proof);
-        assertThat(lines.get(0)).startsWith("KEY_PROOF_STATUS open ");
-        int openGoals = Integer.parseInt(lines.get(0).substring("KEY_PROOF_STATUS open ".length()));
+        assertThat(lines.get(0)).startsWith("// KEY_PROOF_STATUS open ");
+        int openGoals = Integer.parseInt(
+            lines.get(0).substring("// KEY_PROOF_STATUS open ".length()));
         assertThat(openGoals).isGreaterThanOrEqualTo(1);
         assertThat(run.resultLines().get(0))
                 .contains(
@@ -87,7 +88,8 @@ class ProveCommandProofTest {
 
             assertThat(run.exit()).isZero();
             assertThat(run.err()).doesNotContain("KEY_ERROR");
-            assertThat(Files.readAllLines(relative).get(0)).isEqualTo("KEY_PROOF_STATUS closed 0");
+            assertThat(Files.readAllLines(relative).get(0))
+                    .isEqualTo("// KEY_PROOF_STATUS closed 0");
             assertThat(Files.readString(relative)).contains("\\proof");
             assertThat(run.resultLines().get(0))
                     .contains("\"proofFile\":\"" + jsonPath(relative.toAbsolutePath().normalize())
@@ -107,9 +109,9 @@ class ProveCommandProofTest {
         assertThat(run.exit()).isZero();
         assertThat(Files.exists(proof)).isTrue();
         List<String> lines = Files.readAllLines(proof);
-        assertThat(lines.get(0)).isEqualTo("KEY_PROOF_STATUS closed 0");
+        assertThat(lines.get(0)).isEqualTo("// KEY_PROOF_STATUS closed 0");
         // exactly one marker line in the whole file
-        long count = lines.stream().filter("KEY_PROOF_STATUS closed 0"::equals).count();
+        long count = lines.stream().filter("// KEY_PROOF_STATUS closed 0"::equals).count();
         assertThat(count).isEqualTo(1);
         assertThat(run.resultLines().get(0))
                 .contains(
@@ -207,9 +209,9 @@ class ProveCommandProofTest {
         assertThat(Files.exists(dir.resolve("0.proof"))).isTrue();
         assertThat(Files.exists(dir.resolve("1.proof"))).isTrue();
         assertThat(Files.readAllLines(dir.resolve("0.proof")).get(0))
-                .startsWith("KEY_PROOF_STATUS open ");
+                .startsWith("// KEY_PROOF_STATUS open ");
         assertThat(Files.readAllLines(dir.resolve("1.proof")).get(0))
-                .isEqualTo("KEY_PROOF_STATUS closed 0");
+                .isEqualTo("// KEY_PROOF_STATUS closed 0");
         assertThat(run.resultLines()).hasSize(2);
         assertThat(run.resultLines().get(0))
                 .contains("\"proofFile\":\""

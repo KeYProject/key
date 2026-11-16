@@ -28,8 +28,8 @@ public class ProofSaver extends OutputStreamProofSaver {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofSaver.class);
 
     /**
-     * First-line marker denoting a closed proof, as written with
-     * {@link ProofSaver#marker(boolean, int)}.
+     * Payload of the first-line marker denoting a closed proof, as written (prefixed by the
+     * comment leader) with {@link ProofSaver#marker(boolean, int)}.
      */
     public static final String KEY_PROOF_STATUS_CLOSED = "KEY_PROOF_STATUS closed 0";
 
@@ -40,21 +40,30 @@ public class ProofSaver extends OutputStreamProofSaver {
     public static final String KEY_PROOF_STATUS_OPEN_PREFIX = "KEY_PROOF_STATUS open ";
 
     /**
-     * Prefix shared by all {@code KEY_PROOF_STATUS *} markers. A first line starting with this
-     * prefix is treated as a status marker.
+     * Prefix shared by the payloads of all {@code KEY_PROOF_STATUS *} markers. A first line whose
+     * content (after the comment leader) starts with this prefix is a status marker.
      */
     public static final String KEY_PROOF_STATUS_PREFIX = "KEY_PROOF_STATUS";
 
     /**
-     * Build the status marker line for a proof.
+     * Comment leader of the status marker line. The marker is a line comment, so every consumer
+     * that lexes KeY files ignores it and the proof content stays readable.
+     */
+    public static final String KEY_PROOF_STATUS_COMMENT = "// ";
+
+    /**
+     * Build the status marker line for a proof. The marker is a {@code //} line comment so that a
+     * written proof file remains loadable by every KeY consumer without special-casing the first
+     * line.
      *
      * @param closed whether the proof is closed
      * @param openGoals the number of open goals
-     * @return the marker string, e.g. {@code "KEY_PROOF_STATUS closed 0"} or
-     *         {@code "KEY_PROOF_STATUS open 3"}
+     * @return the marker string, e.g. {@code "// KEY_PROOF_STATUS closed 0"} or
+     *         {@code "// KEY_PROOF_STATUS open 3"}
      */
     public static String marker(boolean closed, int openGoals) {
-        return closed ? KEY_PROOF_STATUS_CLOSED : KEY_PROOF_STATUS_OPEN_PREFIX + openGoals;
+        return KEY_PROOF_STATUS_COMMENT
+                + (closed ? KEY_PROOF_STATUS_CLOSED : KEY_PROOF_STATUS_OPEN_PREFIX + openGoals);
     }
 
     /**

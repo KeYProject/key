@@ -155,7 +155,7 @@ public final class HeadlessProver {
      * to the locations requested by the given {@code output} (§3 of the headless interface spec):
      * a closed proof is written whenever a location is requested, an unclosed proof only when
      * {@code output.savePartial()} is set, and nothing at all without a requested location. Each
-     * written file carries the {@code KEY_PROOF_STATUS} marker as its first line.
+     * written file carries the {@code // KEY_PROOF_STATUS} marker comment as its first line.
      *
      * @param problem the KeY problem file ({@code .key}) to load
      * @param selectors the {@code --choose-contract} selector values in command-line order
@@ -296,9 +296,9 @@ public final class HeadlessProver {
 
     /**
      * Writes the finished proof to the requested location per §3 of the headless interface spec:
-     * a closed proof is always written (marker {@code KEY_PROOF_STATUS closed 0}), an unclosed
+     * a closed proof is always written (marker {@code // KEY_PROOF_STATUS closed 0}), an unclosed
      * proof only when {@code --save-partial} was requested (marker
-     * {@code KEY_PROOF_STATUS open <n>}), and nothing when no location was requested.
+     * {@code // KEY_PROOF_STATUS open <n>}), and nothing when no location was requested.
      *
      * @param proof the finished proof to save (not yet disposed)
      * @param closed whether all goals of the proof are closed
