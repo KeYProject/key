@@ -65,7 +65,7 @@ public final class UnaryAssignment extends Operator
 
     public UnaryAssignment(PositionInfo pi, List<Comment> c, UnaryAssignmentKind kind,
             Expression sub) {
-        super(pi, c, ImmutableList.of(sub));
+        super(pi, c, ImmutableList.ofFixedSize(sub));
         this.kind = Objects.requireNonNull(kind);
     }
 

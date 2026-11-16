@@ -87,7 +87,7 @@ public final class TermFactory {
     }
 
     public JTerm createTerm(Operator op, JTerm[] subs, TermLabel label) {
-        return createTerm(op, subs, null, ImmutableList.of(label));
+        return createTerm(op, subs, null, ImmutableList.ofFixedSize(label));
     }
 
     public JTerm createTerm(Operator op, JTerm[] subs, ImmutableList<TermLabel> labels) {
@@ -95,7 +95,7 @@ public final class TermFactory {
     }
 
     public JTerm createTerm(Operator op, JTerm sub, ImmutableList<TermLabel> labels) {
-        return createTerm(op, ImmutableList.of(sub), null, labels);
+        return createTerm(op, ImmutableList.ofFixedSize(sub), null, labels);
     }
 
     public JTerm createTerm(Operator op, JTerm sub1, JTerm sub2,
@@ -113,7 +113,7 @@ public final class TermFactory {
     // -------------------------------------------------------------------------
 
     private ImmutableList<JTerm> createSubtermArray(JTerm[] subs) {
-        return subs == null || subs.length == 0 ? NO_SUBTERMS : ImmutableList.of(subs);
+        return subs == null || subs.length == 0 ? NO_SUBTERMS : ImmutableList.ofFixedSize(subs);
     }
 
     private JTerm doCreateTerm(Operator op, ImmutableList<JTerm> subs,

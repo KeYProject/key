@@ -49,7 +49,7 @@ public class TypeCast extends TypeOperator {
     }
 
     public TypeCast(PositionInfo pi, List<Comment> c, Expression expr, TypeReference type) {
-        super(pi, c, ImmutableList.of(expr), type);
+        super(pi, c, ImmutableList.ofFixedSize(expr), type);
     }
 
 

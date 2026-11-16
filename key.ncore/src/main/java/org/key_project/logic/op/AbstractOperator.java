@@ -35,7 +35,7 @@ public abstract class AbstractOperator implements Operator {
     }
 
     protected AbstractOperator(Name name, int arity, Boolean[] whereToBind, boolean isRigid) {
-        this(name, arity, ImmutableList.of(whereToBind), isRigid);
+        this(name, arity, ImmutableList.ofFixedSize(whereToBind), isRigid);
     }
 
     protected AbstractOperator(Name name, int arity, boolean isRigid) {

@@ -48,7 +48,7 @@ public class Instanceof extends TypeOperator {
     }
 
     public Instanceof(PositionInfo pi, List<Comment> c, Expression lhs, TypeReference type) {
-        super(pi, c, ImmutableList.of(lhs), type);
+        super(pi, c, ImmutableList.ofFixedSize(lhs), type);
     }
 
     /**

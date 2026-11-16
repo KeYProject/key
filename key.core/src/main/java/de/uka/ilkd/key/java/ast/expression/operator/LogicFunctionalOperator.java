@@ -40,7 +40,7 @@ public class LogicFunctionalOperator extends Operator
 
     public LogicFunctionalOperator(PositionInfo pi, List<Comment> comments, LogicFunction function,
             Expression... args) {
-        super(pi, comments, ImmutableList.of(args));
+        super(pi, comments, ImmutableList.ofFixedSize(args));
         this.function = Objects.requireNonNull(function);
     }
 

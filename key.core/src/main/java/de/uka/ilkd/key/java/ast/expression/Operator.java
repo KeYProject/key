@@ -58,7 +58,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
     protected Operator(ExtList children) {
         super(children);
-        this.children = ImmutableList.of(children.collect(Expression.class));
+        this.children = ImmutableList.ofFixedSize(children.collect(Expression.class));
     }
 
     /**
@@ -69,7 +69,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     protected Operator(Expression unaryChild) {
-        this.children = ImmutableList.of(unaryChild);
+        this.children = ImmutableList.ofFixedSize(unaryChild);
     }
 
     /**
@@ -80,7 +80,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     protected Operator(Expression[] arguments) {
-        this.children = ImmutableList.of(arguments);
+        this.children = ImmutableList.ofFixedSize(arguments);
     }
 
     public Operator(PositionInfo pi, List<Comment> comments, ImmutableList<Expression> children) {
