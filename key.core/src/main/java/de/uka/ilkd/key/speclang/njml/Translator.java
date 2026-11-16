@@ -1159,8 +1159,10 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression rangeFrom = accept(ctx.from);
         SLExpression rangeTo = accept(ctx.to);
         if (curReceiver != null && curReceiver.getType() == null) {
-            // e.g. bucketData[*][*]: a star reference (x[*]) produces an untyped expression
-            // which cannot be indexed again
+            // e.g. bucketData[*][*]: a star reference (x[*]) translates to the *locset*
+            // allFields(x) (see JmlTermFactory.translateArrayReference) and therefore carries no
+            // Java type; a locset cannot be indexed again, so nested star references have no
+            // translation. Reported as a structured diagnostic instead of the former NPE (§8).
             ParserRuleContext postfix = enclosingPostfix(ctx);
             Token start = postfix.getStart();
             throw new ConstructNotSupportedException(

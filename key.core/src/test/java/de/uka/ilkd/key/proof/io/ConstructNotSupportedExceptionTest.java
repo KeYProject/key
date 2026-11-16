@@ -106,6 +106,23 @@ class ConstructNotSupportedExceptionTest {
             + cause.reason(), cause.formattedMessage());
     }
 
+    @Test
+    void exposesTheSourceLocation() {
+        ConstructNotSupportedException cause =
+            new ConstructNotSupportedException("/tmp/Bad.java", 5, 22, "x", "reason");
+
+        var location = cause.getLocation();
+        assertNotNull(location);
+        assertEquals(5, location.position().line());
+        assertEquals(22, location.position().column());
+        assertNotNull(location.fileUri());
+        assertTrue(location.fileUri().toString().endsWith("/tmp/Bad.java"));
+
+        ConstructNotSupportedException unknown = new ConstructNotSupportedException(
+            ConstructNotSupportedException.UNKNOWN_FILE, 0, 0, "x", "reason");
+        assertNull(unknown.getLocation());
+    }
+
     /**
      * Writes the given Java source plus a minimal load file into a fresh directory and loads it;
      * returns the {@link ConstructNotSupportedException} found in the cause chain.

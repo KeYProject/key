@@ -5,7 +5,12 @@
 package de.uka.ilkd.key.proof.io;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import org.key_project.util.parsing.HasLocation;
+import org.key_project.util.parsing.Location;
+import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.Nullable;
 
@@ -22,7 +27,7 @@ import org.jspecify.annotations.Nullable;
  * surrounding {@link ProblemLoaderException}; consumers (e.g. the headless CLI) should report it
  * verbatim as an input error.
  */
-public final class ConstructNotSupportedException extends RuntimeException {
+public final class ConstructNotSupportedException extends RuntimeException implements HasLocation {
 
     /** Placeholder for the file part of the diagnostic when the source file is unknown. */
     public static final String UNKNOWN_FILE = "?";
@@ -94,6 +99,44 @@ public final class ConstructNotSupportedException extends RuntimeException {
      */
     public String formattedMessage() {
         return formatMessage(file, line, column, snippet, reason);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The location is {@code null} when the source position is unknown (line or column {@code 0}),
+     * e.g. for synthetic nodes without a token range.
+     */
+    @Override
+    public @Nullable Location getLocation() {
+        if (line <= 0 || column <= 0) {
+            return null;
+        }
+        return new Location(fileUri(), Position.newOneBased(line, column));
+    }
+
+    /**
+     * Converts the stored file reference (a path, a {@code file:} URI, or any other URI) to a URI.
+     * Paths become absolute {@code file:} URIs; an unknown file yields {@code null}.
+     */
+    private @Nullable URI fileUri() {
+        if (UNKNOWN_FILE.equals(file) || file.isBlank()) {
+            return null;
+        }
+        try {
+            URI uri = URI.create(file);
+            if (uri.getScheme() != null) {
+                return uri;
+            }
+        } catch (IllegalArgumentException e) {
+            // not a URI: treat the reference as a path below
+        }
+        try {
+            Path path = Paths.get(file);
+            return path.toAbsolutePath().toUri();
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private static String formatMessage(String file, int line, int column, String snippet,
