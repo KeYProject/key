@@ -34,6 +34,8 @@ import org.jspecify.annotations.NonNull;
  *
  * @author christoph
  */
+@SuppressWarnings("unchecked") // Taclet's raw getExecutor() override of Rule's generic method is
+                               // flagged as unchecked on every concrete Taclet subclass
 public class InfFlowContractAppTaclet extends RewriteTaclet {
 
     public static final String USE_IF = "Use information flow contract for ";

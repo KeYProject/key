@@ -54,6 +54,7 @@ public interface ImmutableSet<T extends @Nullable Object>
         return empty();
     }
 
+    @SuppressWarnings("unchecked") // varargs array is forwarded to ImmutableList.of which copies it
     static <T extends @Nullable Object> ImmutableSet<T> of(T... elems) {
         return DefaultImmutableSet.fromImmutableList(ImmutableList.of(elems));
     }

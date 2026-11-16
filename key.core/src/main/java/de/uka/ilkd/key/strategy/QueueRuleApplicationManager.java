@@ -506,8 +506,9 @@ public class QueueRuleApplicationManager implements RuleApplicationManager<Goal>
     }
 
     @Override
+    @SuppressWarnings("unchecked") // clone() returns Object; the clone is a
+    // QueueRuleApplicationManager
     public RuleApplicationManager<Goal> copy() {
-        // noinspection unchecked
         return (RuleApplicationManager<Goal>) clone();
     }
 

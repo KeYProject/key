@@ -215,7 +215,7 @@ public class QueryExpand implements BuiltInRule {
 
         stmnt.add(KeYJavaASTFactory.declare(result, new TypeRef(progResultType)));
 
-        final Assignment assignment = new BinaryAssignment(COPY, result, mr);
+        final Assignment<?> assignment = new BinaryAssignment(COPY, result, mr);
 
         stmnt.add(assignment);
 
@@ -570,7 +570,7 @@ public class QueryExpand implements BuiltInRule {
      * @param it iterator with argument positions. This is the path in the syntax tree of term.
      * @param services TODO
      * @return Resulting term after replacement.
-     * @note Was originally implemented in QueryExpand.java.
+     *         Note: Was originally implemented in QueryExpand.java.
      */
     protected JTerm replace(JTerm term, JTerm with, int[] it, int idx, TermServices services) {
         if (!(idx < it.length)) {
@@ -698,8 +698,9 @@ public class QueryExpand implements BuiltInRule {
     }
 
     @Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, LogicServices services) {
-        return new DefaultBuiltInRuleApp(this, pos);
+    public DefaultBuiltInRuleApp<QueryExpand> createApp(PosInOccurrence pos,
+            LogicServices services) {
+        return new DefaultBuiltInRuleApp<>(this, pos);
     }
 
     /**

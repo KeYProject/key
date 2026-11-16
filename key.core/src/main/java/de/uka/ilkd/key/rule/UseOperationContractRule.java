@@ -112,7 +112,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                 && ((New) activeStatement).getTypeDeclarationCount() == 0) {
             actualResult = null;
             mr = (New) activeStatement;
-        } else if (activeStatement instanceof Assignment ca && JavaAstUtils.isCopyAssignment(ca)) {
+        } else if (activeStatement instanceof Assignment<?> ca
+                && JavaAstUtils.isCopyAssignment(ca)) {
             final Expression lhs = ca.getExpressionAt(0);
             final Expression rhs = ca.getExpressionAt(1);
             if ((rhs instanceof MethodReference
@@ -952,7 +953,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             if (inst.actualResult == null) {
                 resultAssign = new StatementBlock();
             } else {
-                final Assignment ca =
+                final Assignment<?> ca =
                     new BinaryAssignment(COPY, inst.actualResult,
                         resultVar);
                 resultAssign = new StatementBlock(ca);

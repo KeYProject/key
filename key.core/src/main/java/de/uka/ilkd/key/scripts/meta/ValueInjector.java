@@ -260,6 +260,8 @@ public class ValueInjector {
         return handled;
     }
 
+    @SuppressWarnings("unchecked") // the values are injected reflectively; the cast reflects the
+    // caller-declared collection types
     private Object convert(ProofScriptArgument meta, Object val)
             throws NoSpecifiedConverterException, ConversionException {
         if (meta.isPositionalVarArgs()) {

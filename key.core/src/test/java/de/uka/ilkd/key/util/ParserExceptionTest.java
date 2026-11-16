@@ -87,6 +87,8 @@ public abstract class ParserExceptionTest {
     protected abstract void tryLoadFile(Path file) throws Exception;
 
     // This method does not depend on anything can also be called from other test cases.
+    // uses the deprecated Location#getFileURI() accessor of the legacy location API
+    @SuppressWarnings("deprecation")
     public void parseAndInterpret(Path file) throws Exception {
         List<String> lines = Files.readAllLines(file);
         Properties props = new Properties();
@@ -167,7 +169,7 @@ public abstract class ParserExceptionTest {
                     if (actLoc == null) {
                         throw new Exception("there is no location in the exception");
                     }
-                    assertEquals(file.toUri(), actLoc.getFileURI().orElse(null),
+                    assertEquals(file.toUri(), actLoc.getFileUri(),
                         "Exception location must point to file under test");
                     assertEquals(loc, actLoc.getPosition().toString());
                 }

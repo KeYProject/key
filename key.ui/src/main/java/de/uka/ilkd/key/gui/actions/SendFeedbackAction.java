@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -284,7 +284,7 @@ public class SendFeedbackAction extends AbstractAction {
             if (throwable != null) {
                 try {
                     var location = ExceptionTools.getLocation(throwable);
-                    return location != null && location.getFileURI().isPresent();
+                    return location != null && location.getFileUri() != null;
                 } catch (MalformedURLException e) {
                     // no valid location could be extracted
                     LOGGER.warn("Failed to extract location", e);
@@ -400,7 +400,7 @@ public class SendFeedbackAction extends AbstractAction {
         try {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
             saveMetaData(buffer, message);
-            URLConnection connection = new URL(REPORT_URL).openConnection();
+            URLConnection connection = URI.create(REPORT_URL).toURL().openConnection();
             connection.setDoOutput(true);
             connection.setRequestProperty("Content-Type", "application/zip");
             connection.setRequestProperty("KeY-Version",

@@ -176,6 +176,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         SwingUtilities.invokeLater(() -> taskFinishedInternal(info));
     }
 
+    // info.getResult() is only an ApplyStrategyInfo for ProverCore sources; cast is safe here.
+    @SuppressWarnings("unchecked")
     private void taskFinishedInternal(TaskFinishedInfo info) {
         if (info != null && info.getSource() instanceof ProverCore) {
             if (!isAtLeastOneMacroRunning()) {
@@ -404,6 +406,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      * @param fileExtension the respective file extension
      * @return the saved proof as a file
      */
+    // GeneralFailureEvent is deprecated; the successor IssueDialog would bypass the configurable
+    // notification pipeline (NotificationManager/tasks), so keep the notification event here.
+    @SuppressWarnings("deprecation")
     public Path saveProof(Proof proof, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
@@ -445,6 +450,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
      *
      * @param proof the proof to save
      */
+    // GeneralFailureEvent is deprecated; the successor IssueDialog would bypass the configurable
+    // notification pipeline (NotificationManager/tasks), so keep the notification event here.
+    @SuppressWarnings("deprecation")
     public void saveProofBundle(Proof proof) {
         final MainWindow mainWindow = MainWindow.getInstance();
         final KeYFileChooser fileChooser =
@@ -557,17 +565,25 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
 
 
 
-    /**
+    /*
+     * Demoted from a doc comment: it documents a commented-out method, so it must not be a
+     * javadoc comment (otherwise javac reports a dangling-doc-comment lint warning).
      * Loads the given location and returns all required references as {@link KeYEnvironment} with
      * KeY's {@link MainWindow}.
      *
      * @param location The location to load.
+     *
      * @param classPaths The class path entries to use.
+     *
      * @param bootClassPath The boot class path to use.
+     *
      * @param includes Optional includes to consider.
+     *
      * @param makeMainWindowVisible Make KeY's {@link MainWindow} visible if it is not already
-     *        visible?
+     * visible?
+     *
      * @return The {@link KeYEnvironment} which contains all references to the loaded location.
+     *
      * @throws ProblemLoaderException Occurred Exception
      */
     // public static KeYEnvironment<WindowUserInterfaceControl> loadInMainWindow(File location,

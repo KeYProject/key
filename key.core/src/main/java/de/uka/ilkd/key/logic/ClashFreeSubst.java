@@ -13,6 +13,7 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+@SuppressWarnings("deprecation") // clash-free substitution API binds deprecated element types
 public class ClashFreeSubst {
     protected final QuantifiableVariable v;
     protected final JTerm s;
@@ -86,7 +87,8 @@ public class ClashFreeSubst {
     private JTerm applyOnSubterms(JTerm t) {
         final int arity = t.arity();
         final JTerm[] newSubterms = new JTerm[arity];
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings({ "unchecked", "rawtypes" }) // raw new ImmutableArray[...] array +
+                                                       // unchecked cast
         final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[arity];
         for (int i = 0; i < arity; i++) {
             applyOnSubterm(t, i, newSubterms, newBoundVars);

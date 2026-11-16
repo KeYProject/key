@@ -67,11 +67,11 @@ public class DefaultAutoMacro extends AbstractProofMacro {
 
         List<Node> nodes = goals.stream().map(Goal::node).collect(Collectors.toList());
 
-        final GoalChooser goalChooser =
-            proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create();
+        final GoalChooser<Proof, Goal> goalChooser = proof.getInitConfig().getProfile()
+                .<Proof, Goal>getSelectedGoalChooserBuilder().create();
         // Route through AutoProvers: this macro is the toolbar/context-menu equivalent of plain
         // automode, so it has to honour the selected prover mode (single- or multi-core).
-        final ProverCore applyStrategy =
+        final ProverCore<Proof, Goal> applyStrategy =
             AutoProvers.create(goalChooser, proof.getInitConfig().getProfile());
 
         final ProofMacroListener pml =

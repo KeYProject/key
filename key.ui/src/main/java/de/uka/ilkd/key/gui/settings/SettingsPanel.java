@@ -95,6 +95,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      * @param <T>
      * @return
      */
+    @SuppressWarnings("unchecked") // the selected item's runtime type is validated by the
+    // validator; it cannot be checked statically against T
     protected <T> JComboBox<T> createSelection(T[] elements, Validator<T> validator) {
         JComboBox<T> comboBox = new JComboBox<>(elements);
         comboBox.addActionListener(e -> {
@@ -199,6 +201,8 @@ public abstract class SettingsPanel extends SimpleSettingsPanel {
      *        the type of the items
      * @return the combo box
      */
+    @SuppressWarnings({ "unchecked", "varargs" }) // the items and the selection are validated by
+    // the validator; T cannot be checked statically and the vararg array is never exposed
     protected <T> JComboBox<T> addComboBox(String title, String info, int selectionIndex,
             @Nullable Validator<T> validator, T... items) {
         JComboBox<T> comboBox = new JComboBox<>(items);

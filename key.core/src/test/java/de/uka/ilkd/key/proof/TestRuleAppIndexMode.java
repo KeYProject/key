@@ -59,6 +59,7 @@ public class TestRuleAppIndexMode {
     }
 
     @Test
+    @SuppressWarnings("try") // unused auto-closeable resources
     void scopesRestoreThePreviousMode(@TempDir Path dir) throws Exception {
         final KeYEnvironment<DefaultUserInterfaceControl> env = load(dir);
         try {
@@ -77,6 +78,7 @@ public class TestRuleAppIndexMode {
     }
 
     @Test
+    @SuppressWarnings("try") // unused auto-closeable resources
     void anInteractiveQueryReportsTacletsWithoutRuleSetInAutomaticMode(@TempDir Path dir)
             throws Exception {
         final KeYEnvironment<DefaultUserInterfaceControl> env = load(dir);

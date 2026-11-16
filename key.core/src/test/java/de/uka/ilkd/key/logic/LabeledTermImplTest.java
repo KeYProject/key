@@ -31,6 +31,8 @@ public class LabeledTermImplTest {
     }
 
     @Test
+    // ImmutableArray (deprecated) is the term-label container used by the tested code
+    @SuppressWarnings("deprecation")
     public void testEqualsLabelOnTop() {
         JTerm unlabeledTerm =
             tf.createTerm(Junctor.AND, tf.createTerm(Junctor.TRUE), tf.createTerm(Junctor.FALSE));
@@ -52,6 +54,8 @@ public class LabeledTermImplTest {
      * {@link JTerm#containsLabel(TermLabel)}.
      */
     @Test
+    // ImmutableArray (deprecated) is the term-label container used by the tested code
+    @SuppressWarnings("deprecation")
     public void testGetHasAndContainsLabels() {
         // Create terms
         JTerm unlabeled = services.getTermBuilder().tt();

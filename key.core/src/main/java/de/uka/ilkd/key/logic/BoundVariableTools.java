@@ -89,7 +89,7 @@ public class BoundVariableTools {
         return changedVar;
     }
 
-    /**
+    /*
      * Ensure that none of the variables <code>criticalVars</code> is bound by the top-level
      * operator of <code>t</code> (by bound renaming)
      */

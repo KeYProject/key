@@ -191,17 +191,6 @@ public class SemisequentChangeInfo {
         return lastFormulaIndex;
     }
 
-    /// returns the semisequent that is the result of the change operation
-    // public Semisequent semisequent() {
-    // final Semisequent semisequent;
-    // if (modifiedSemisequent().isEmpty()) {
-    // semisequent = SequentKit.emptySemisequent();
-    // } else {
-    // semisequent = new Semisequent(modifiedSemisequent());
-    // }
-    // return semisequent;
-    // }
-
     /// toString
     public String toString() {
         return "changed:" + hasChanged() + "\n  added (pos):" + added + "(" + lastFormulaIndex + ")"

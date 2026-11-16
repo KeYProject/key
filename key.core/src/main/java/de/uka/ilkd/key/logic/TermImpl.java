@@ -395,6 +395,10 @@ class TermImpl implements JTerm {
     }
 
     @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    // the visitor's type parameter T cannot be bound to the concrete term type here (the tree
+    // nodes are TermImpl, never statically the visitor's T), so the generic Visitor is used raw
+    // (see Term.execPostOrder)
     public void execPostOrder(Visitor visitor) {
         visitor.subtreeEntered(this);
         if (visitor.visitSubtree(this)) {
@@ -408,6 +412,8 @@ class TermImpl implements JTerm {
 
 
     @Override
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    // see execPostOrder: the Visitor type parameter cannot be stated for the same reason
     public void execPreOrder(Visitor visitor) {
         visitor.subtreeEntered(this);
         visitor.visit(this);
@@ -466,6 +472,8 @@ class TermImpl implements JTerm {
     }
 
     @Override
+    @SuppressWarnings({ "varargs", "unchecked" }) // the V... parameter is unused and never
+    // dereferenced, so no heap pollution can occur from the parameterized vararg
     public <V> boolean equalsModProperty(Object o, Property<? super JTerm> property, V... v) {
         if (!(o instanceof JTerm other)) {
             return false;

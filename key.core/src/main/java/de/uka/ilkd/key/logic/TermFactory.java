@@ -26,6 +26,7 @@ import org.jspecify.annotations.NonNull;
  * This class is used to encapsulate knowledge about the internal term structures. See
  * {@link TermBuilder} for more convenient methods to create terms.
  */
+@SuppressWarnings("deprecation") // term-creation API is bound to the deprecated ImmutableArray
 public final class TermFactory {
 
 

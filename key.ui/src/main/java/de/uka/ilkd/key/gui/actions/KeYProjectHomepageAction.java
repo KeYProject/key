@@ -6,10 +6,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
@@ -41,13 +38,12 @@ public class KeYProjectHomepageAction extends MainWindowAction {
     }
 
     private static URI getURI() {
-        URI res = null;
         try {
-            res = (new URL(url)).toURI();
-        } catch (MalformedURLException | URISyntaxException e) {
-            // todo Auto-generated catch block
+            return URI.create(url);
+        } catch (IllegalArgumentException e) {
+            // malformed homepage URL, keep the previous failure semantics
+            return null;
         }
-        return res;
     }
 
     @Override

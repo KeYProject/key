@@ -275,6 +275,7 @@ public class TestLinkedHashMapWrapper {
     }
 
     @Test
+    @SuppressWarnings("deprecation") // ctor variant takes deprecated ImmutableArray args
     public void testConstructors() {
         LinkedHashMapWrapper<JTerm, Integer> wrappedMap =
             new LinkedHashMapWrapper<JTerm, Integer>(tb.tt(), 1, TERM_LABELS_PROPERTY);
