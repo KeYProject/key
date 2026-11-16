@@ -16,8 +16,9 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 
 /**
- * Feature for investigating whether the focus of a rule application is a top-level formula, a
- * top-level formula of the antecedent or a top-level formula of the succedent. The {@code …_UPDATE}
+ * Feature for investigating whether the focus of a rule application is a top-level formula of the
+ * antecedent, of the succedent, or, for the {@code ANTEC_OR_SUCC_WITH_UPDATE} variant, of either.
+ * The {@code …_UPDATE}
  * variants also accept a focus that sits below a prefix of update applications only.
  */
 @StableCost
@@ -32,9 +33,6 @@ public final class TopLevelFindFeature extends BinaryTacletAppFeature {
     private enum Side {
         ANTEC_OR_SUCC, ANTEC, SUCC
     }
-
-    public final static Feature ANTEC_OR_SUCC =
-        new TopLevelFindFeature(Update.WITHOUT, Side.ANTEC_OR_SUCC);
 
     public final static Feature ANTEC = new TopLevelFindFeature(Update.WITHOUT, Side.ANTEC);
 

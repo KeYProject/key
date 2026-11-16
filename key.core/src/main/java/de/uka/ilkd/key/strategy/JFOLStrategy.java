@@ -102,7 +102,7 @@ public class JFOLStrategy extends FOLStrategy<Goal> implements ComponentStrategy
         bindRuleSet(d, "cut_direct",
             SumFeature
                     .createSum(
-                        ifZero(notBelowQuantifier(fc, ff),
+                        ifZero(notBelowQuantifier(ff),
                             add(
                                 // prefer cuts over "something = null"
                                 ifZero(applyTF(FocusProjection.create(),

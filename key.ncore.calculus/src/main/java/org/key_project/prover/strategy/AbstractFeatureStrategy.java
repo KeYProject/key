@@ -18,6 +18,7 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.FindAtTopLevelFeature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ForEachCP;
@@ -130,8 +131,8 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
             not(applyTF(superTerm, t))));
     }
 
-    protected Feature notBelowQuantifier(FeatureConstants fc, IFormulaTermFeatures ff) {
-        return or(fc.topLevelFindAntecOrSucc(), not(isBelow(ff.quantifierF())));
+    protected Feature notBelowQuantifier(IFormulaTermFeatures ff) {
+        return or(FindAtTopLevelFeature.getInstance(), not(isBelow(ff.quantifierF())));
     }
 
     @Override

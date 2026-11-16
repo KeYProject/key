@@ -20,8 +20,6 @@ public interface FeatureConstants {
 
     Feature notInScopeOfModalityFeature();
 
-    Feature topLevelFindAntecOrSucc();
-
     Feature topLevelFindAntecOrSuccWithUpdate();
 
     Feature topLevelFindAntec();

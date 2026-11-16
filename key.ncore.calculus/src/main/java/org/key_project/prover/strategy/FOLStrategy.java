@@ -211,7 +211,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
         bindRuleSet(d, "conjNormalForm",
             ifZero(
-                add(or(FocusInAntecFeature.getInstance(), notBelowQuantifier(fc, ff)),
+                add(or(FocusInAntecFeature.getInstance(), notBelowQuantifier(ff)),
                     fc.notInScopeOfModalityFeature()),
                 add(longConst(CombinationCost.CNF_CONVERSION),
                     ScaleFeature.createScaled(FindDepthFeature.getInstance(), 20)),
@@ -430,7 +430,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                     .createSum(
                         not(fc.topLevelFindAntecOrSuccWithUpdate()),
                         fc.allowedCutPositions(),
-                        ifZero(notBelowQuantifier(fc, ff),
+                        ifZero(notBelowQuantifier(ff),
                             add(
                                 applyTF(cutFormula, add(ff.cutAllowed(),
                                     // do not cut over formulas containing
@@ -460,7 +460,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
             sum(subFor, fc.allowedCutPositionsGenerator(), compareCutAllowed);
 
         bindRuleSet(d, "cut_direct", add(allowSplitting(FocusFormulaProjection.create()),
-            ifZero(notBelowQuantifier(fc, ff), noBetterCut)));
+            ifZero(notBelowQuantifier(ff), noBetterCut)));
     }
 
     // //////////////////////////////////////////////////////////////////////////

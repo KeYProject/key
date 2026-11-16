@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.feature.JavaFeatureConstants;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 import de.uka.ilkd.key.strategy.feature.SeqEqualLengthFeature;
 import de.uka.ilkd.key.strategy.feature.SeqSameBasesFeature;
@@ -22,7 +21,6 @@ import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ComponentStrategy;
-import org.key_project.prover.strategy.FeatureConstants;
 import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -43,7 +41,6 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
 
     private final SeqTermFeatures tf;
     private final boolean stopAtFirstNonCloseableGoal;
-    private final FeatureConstants fc = new JavaFeatureConstants();
     private final FormulaTermFeatures ff;
 
     public SeqStrategy(Proof proof, StrategyProperties strategyProperties) {
@@ -125,7 +122,7 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
         // Hence, it should be done late if both sequences are built from the same base sequences
         // (as they usually share then some of the element numbers).
         // Otherwise, it should only be used as a last resort if nothing else can be done anymore.
-        bindRuleSet(d, "seqPermCount", add(focusInSuccedent, notBelowQuantifier(fc, ff),
+        bindRuleSet(d, "seqPermCount", add(focusInSuccedent, notBelowQuantifier(ff),
             ifZero(SeqSameBasesFeature.create(tf), CostBand.DEFER_STRONG.cost(),
                 CostBand.LAST_RESORT.cost())));
 
@@ -138,7 +135,7 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
             add(NonDuplicateAppModPositionFeature.INSTANCE, longConst(AXIOM_LIKE)));
 
         bindRuleSet(d, "seqNPermProperties", add(NonDuplicateAppModPositionFeature.INSTANCE,
-            notBelowQuantifier(fc, ff), longConst(AXIOM_LIKE)));
+            notBelowQuantifier(ff), longConst(AXIOM_LIKE)));
     }
 
     /// The returned feature checks that the focus term is a `seqGet` that appears as top level

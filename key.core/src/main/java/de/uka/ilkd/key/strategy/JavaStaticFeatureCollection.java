@@ -200,9 +200,9 @@ public abstract class JavaStaticFeatureCollection
     public static Feature directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
         final var oneUp = FocusProjection.<Goal>create(1);
         if (index == -1) {
-            return add(not(TopLevelFindFeature.ANTEC_OR_SUCC), applyTF(oneUp, symbolTF));
+            return add(not(FindAtTopLevelFeature.getInstance()), applyTF(oneUp, symbolTF));
         }
-        return add(not(TopLevelFindFeature.ANTEC_OR_SUCC),
+        return add(not(FindAtTopLevelFeature.getInstance()),
             ifZero(applyTF(oneUp, symbolTF), eq(sub(oneUp, index), FocusProjection.create()),
                 inftyConst()));
     }

@@ -55,11 +55,6 @@ public class JavaFeatureConstants implements FeatureConstants {
     }
 
     @Override
-    public Feature topLevelFindAntecOrSucc() {
-        return TopLevelFindFeature.ANTEC_OR_SUCC;
-    }
-
-    @Override
     public Feature topLevelFindAntec() {
         return TopLevelFindFeature.ANTEC;
     }
