@@ -198,6 +198,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ImmutableList<Expression> children;
         if (n.getInitializer().isPresent()) {
             ArrayInitializerExpr initializer = n.getInitializer().get();
+            // KeY's NewArray cannot represent a nested initializer: the initializer is translated
+            // as a flat list of expressions, so new int[][]{{1,2}} used to die with a
+            // ClassCastException. Report the construct instead of crashing (§8).
             if (containsNestedInitializer(initializer)) {
                 throw unsupportedConstruct(n,
                     "multi-dimensional array initializer (nested '{ ... }' in array creation)");
@@ -205,6 +208,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             ai = visitArrayInitializerExpr(initializer, type.getKeYJavaType());
             children = null;
         } else {
+            // new int[n][] leaves a dimension without a size, which NewArray cannot represent
+            // (the dimension expression would be null). Report the construct instead of
+            // crashing (§8).
             for (ArrayCreationLevel level : n.getLevels()) {
                 if (level.getDimension().isEmpty()) {
                     throw unsupportedConstruct(n,
