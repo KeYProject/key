@@ -12,8 +12,8 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
-import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.prover.proof.ProofGoal;
@@ -25,11 +25,9 @@ import org.key_project.prover.strategy.AbstractFeatureStrategy;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
-import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
 import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
-import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -173,10 +171,7 @@ public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
     }
 
     @Override
-    protected Feature isBelow(TermFeature t) {
-        final de.uka.ilkd.key.strategy.termProjection.TermBuffer superTerm =
-            new de.uka.ilkd.key.strategy.termProjection.TermBuffer();
-        return not(sum(superTerm, SuperTermGenerator.upwards(any(), proof.getServices()),
-            not(applyTF(superTerm, t))));
+    protected LogicServices getServices() {
+        return proof.getServices();
     }
 }

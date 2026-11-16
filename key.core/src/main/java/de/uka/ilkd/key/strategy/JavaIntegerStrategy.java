@@ -10,7 +10,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
-import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
@@ -23,7 +22,6 @@ import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.IntegerStrategy;
 import org.key_project.prover.strategy.costbased.DivModCost;
 import org.key_project.prover.strategy.costbased.feature.*;
-import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 
@@ -98,13 +96,6 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
         assert h != null : "Did not find the rule set " + p_name;
 
         return h;
-    }
-
-    @Override
-    protected Feature isBelow(TermFeature t) {
-        final TermBuffer superTerm = new TermBuffer();
-        return not(sum(superTerm, SuperTermGenerator.upwards(any(), proof.getServices()),
-            not(applyTF(superTerm, t))));
     }
 
     @Override

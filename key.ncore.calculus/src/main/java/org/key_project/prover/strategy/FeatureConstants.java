@@ -45,8 +45,6 @@ public interface FeatureConstants {
 
     Feature splittableQuantifiedFormula();
 
-    TermGenerator superTermGenerator(TermFeature cond, LogicServices services);
-
     TermGenerator createTriggeredInstantiations(boolean skipConditions);
 
     Feature diffFindAndReplacewithFeature();

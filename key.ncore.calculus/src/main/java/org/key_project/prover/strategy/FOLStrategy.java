@@ -7,7 +7,6 @@ package org.key_project.prover.strategy;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.TermOrdering;
 import org.key_project.prover.proof.ProofGoal;
@@ -20,6 +19,7 @@ import org.key_project.prover.strategy.costbased.quantifierHeuristics.Instantiat
 import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.*;
 import org.key_project.prover.strategy.costbased.termfeature.IsNonRigidTermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.SuperTermGenerator;
 
 import static org.key_project.prover.strategy.costbased.FOLCost.*;
 
@@ -293,14 +293,14 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
         final TermBuffer superFor = new TermBuffer();
         final Feature onlyBelowQuanAndOr =
-            sum(superFor, fc.superTermGenerator(any(), getServices()),
+            sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
                 applyTF(superFor, or(ff.quantifiedFor(), ff.andF(), ff.orF())));
 
         final Feature belowUnskolemisableQuantifier =
             ifZero(FocusInAntecFeature.getInstance(),
-                not(sum(superFor, fc.superTermGenerator(any(), getServices()),
+                not(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
                     not(applyTF(superFor, op(ff.all()))))),
-                not(sum(superFor, fc.superTermGenerator(any(), getServices()),
+                not(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
                     not(applyTF(superFor, op(ff.exists()))))));
 
         bindRuleSet(d, "cnf_expandIfThenElse", add(
@@ -393,7 +393,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
     protected final Feature onlyInScopeOfQuantifiers() {
         final TermBuffer buf = new TermBuffer();
-        return sum(buf, fc.superTermGenerator(any(), getServices()),
+        return sum(buf, SuperTermGenerator.upwards(any(), getServices()),
             applyTF(buf, ff.quantifiedFor()));
     }
 
@@ -444,7 +444,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                 rec(ff.quantifiedFor(), ifZero(ff.quantifiedFor(), longTermConst(-10)))),
             FindDepthFeature.getInstance(), // prefer top level splits
             ScaleFeature.createAffine(fc.countOccurrences(splitCondition), -10, 10),
-            sum(superF, fc.superTermGenerator(any(), getServices()),
+            sum(superF, SuperTermGenerator.upwards(any(), getServices()),
                 applyTF(superF, not(ff.elemUpdate()))),
             ifZero(applyTF(focus, fc.containsExecutableCodeTF()),
                 CostBand.DEFAULT.at(-100), CostBand.DEFAULT.at(25))));
@@ -548,8 +548,6 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     protected abstract Feature allowSplitting(ProjectionToTerm focus);
 
     protected abstract boolean normalSplitting();
-
-    protected abstract LogicServices getServices();
 
     protected abstract TermOrdering createTermOrdering();
 }

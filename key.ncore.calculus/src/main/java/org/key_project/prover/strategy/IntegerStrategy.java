@@ -1177,8 +1177,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     protected abstract Term zTerm(String num);
 
-    protected abstract LogicServices getServices();
-
     protected abstract TermOrdering createTermOrdering();
 
     public record Config(ArithTermFeatures tf, boolean nonLinearArithmeticEnabled,

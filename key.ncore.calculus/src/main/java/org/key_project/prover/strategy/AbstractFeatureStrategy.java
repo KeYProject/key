@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -21,6 +22,7 @@ import org.key_project.prover.strategy.costbased.feature.instantiator.SVInstanti
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
+import org.key_project.prover.strategy.costbased.termgenerator.SuperTermGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
@@ -88,7 +90,13 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
         return OneOfCP.create(features);
     }
 
-    protected abstract Feature isBelow(TermFeature t);
+    protected abstract LogicServices getServices();
+
+    protected Feature isBelow(TermFeature t) {
+        final TermBuffer superTerm = new TermBuffer();
+        return not(sum(superTerm, SuperTermGenerator.upwards(any(), getServices()),
+            not(applyTF(superTerm, t))));
+    }
 
     protected Feature notBelowQuantifier(FeatureConstants fc, IFormulaTermFeatures ff) {
         return or(fc.topLevelFindAntecOrSucc(), not(isBelow(ff.quantifierF())));

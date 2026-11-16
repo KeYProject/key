@@ -92,7 +92,7 @@ public class JavaFeatureConstants implements FeatureConstants {
     @Override
     public TermGenerator upwardsWithIndexSuperGenerator(TermFeature cond,
             LogicServices services) {
-        return SuperTermGenerator.upwardsWithIndex(cond, (Services) services);
+        return SuperTermWithIndexGenerator.upwardsWithIndex(cond, (Services) services);
     }
 
     @Override
@@ -110,10 +110,6 @@ public class JavaFeatureConstants implements FeatureConstants {
         return TriggeredInstantiations.create(skipConditions);
     }
 
-    @Override
-    public TermGenerator superTermGenerator(TermFeature cond, LogicServices services) {
-        return SuperTermGenerator.upwards(cond, (Services) services);
-    }
 
     @Override
     public Feature diffFindAndReplacewithFeature() {

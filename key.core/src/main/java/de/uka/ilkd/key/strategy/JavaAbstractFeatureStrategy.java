@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
@@ -18,7 +17,6 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.strategy.AbstractFeatureStrategy;
 import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -84,13 +82,6 @@ public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrateg
      */
     protected final Services getServices() {
         return getProof().getServices();
-    }
-
-    protected final Feature isBelow(TermFeature t) {
-        final de.uka.ilkd.key.strategy.termProjection.TermBuffer superTerm =
-            new de.uka.ilkd.key.strategy.termProjection.TermBuffer();
-        return not(sum(superTerm, SuperTermGenerator.upwards(any(), getServices()),
-            not(applyTF(superTerm, t))));
     }
 
 }

@@ -14,9 +14,7 @@ import de.uka.ilkd.key.strategy.feature.EqNonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.JavaFeatureConstants;
 import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
-import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
@@ -37,7 +35,6 @@ import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
-import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
 
@@ -241,12 +238,5 @@ public class JFOLStrategy extends FOLStrategy<Goal> implements ComponentStrategy
         assert h != null : "Did not find the rule set " + p_name;
 
         return h;
-    }
-
-    @Override
-    protected Feature isBelow(TermFeature t) {
-        final TermBuffer superTerm = new TermBuffer();
-        return not(sum(superTerm, SuperTermGenerator.upwards(any(), proof.getServices()),
-            not(applyTF(superTerm, t))));
     }
 }
