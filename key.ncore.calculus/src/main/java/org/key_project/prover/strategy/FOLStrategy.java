@@ -179,12 +179,6 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     }
 
     @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
-                || approvalDispatcher.get(rs) != null;
-    }
-
-    @Override
     public boolean isStopAtFirstNonCloseableGoal() {
         return false;
     }

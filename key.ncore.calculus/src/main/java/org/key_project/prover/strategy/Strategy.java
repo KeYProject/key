@@ -8,7 +8,6 @@ import org.key_project.logic.Named;
 import org.key_project.prover.indexing.RuleAppIndexMode;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
@@ -60,8 +59,6 @@ public interface Strategy<Goal extends ProofGoal<Goal>> extends Named, Feature {
     /// applications by feeding them into the provided `RuleAppCostCollector`.
     void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
             RuleAppCostCollector collector);
-
-    boolean isResponsibleFor(RuleSet rs);
 
     default RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio,
             Goal goal, MutableState mState) {

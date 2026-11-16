@@ -85,11 +85,6 @@ public class SetStrategy extends AbstractFeatureStrategy<Goal> implements Compon
     }
 
     @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null;
-    }
-
-    @Override
     public boolean isStopAtFirstNonCloseableGoal() {
         return stopAtFirstNonCloseableGoal;
     }

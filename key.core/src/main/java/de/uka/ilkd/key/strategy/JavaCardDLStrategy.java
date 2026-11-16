@@ -114,12 +114,6 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         };
     }
 
-    @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
-                || approvalDispatcher.get(rs) != null;
-    }
-
     protected Feature setupGlobalF(@NonNull Feature dispatcher) {
         final String queryProp =
             strategyProperties.getProperty(StrategyProperties.QUERY_OPTIONS_KEY);

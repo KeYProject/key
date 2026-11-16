@@ -62,11 +62,6 @@ public class StringStrategy extends JavaAbstractFeatureStrategy implements Compo
                     .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
-    @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null;
-    }
-
     private RuleSetDispatchFeature setupCostComputationF() {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         setUpStringNormalisation(d);

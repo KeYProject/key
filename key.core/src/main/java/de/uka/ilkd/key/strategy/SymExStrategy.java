@@ -63,11 +63,6 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
     }
 
     @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null;
-    }
-
-    @Override
     public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
         var set = new HashSet<RuleSet>();
         RuleSetDispatchFeature dispatcher = getDispatcher(aspect);

@@ -169,11 +169,6 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
     }
 
     @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costDispatcher.get(rs) != null;
-    }
-
-    @Override
     public boolean isStopAtFirstNonCloseableGoal() {
         return stopAtFirstNonCloseableGoal;
     }

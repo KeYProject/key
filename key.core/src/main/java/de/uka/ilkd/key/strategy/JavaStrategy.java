@@ -8,7 +8,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofSettings;
 
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.strategy.Strategy;
 
 
@@ -36,6 +35,4 @@ public interface JavaStrategy extends Strategy<Goal> {
         proof.setActiveStrategy(strategy);
     }
 
-    @Override
-    default boolean isResponsibleFor(RuleSet rs) { return false; }
 }

@@ -162,11 +162,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null;
-    }
-
-    @Override
     public boolean isStopAtFirstNonCloseableGoal() {
         return cfg.stopAtFirstNonCloseableGoal();
     }

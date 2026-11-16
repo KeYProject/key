@@ -107,11 +107,6 @@ public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
     }
 
     @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null;
-    }
-
-    @Override
     public boolean isStopAtFirstNonCloseableGoal() {
         return stopAtFirstNonCloseableGoal;
     }
