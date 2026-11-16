@@ -64,13 +64,15 @@ public class IntegerStrategyFactory implements StrategyFactory {
     public JavaIntegerStrategy create(Proof proof, StrategyProperties strategyProperties) {
         var tf = new JavaArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
         var ff = new FormulaTermFeatures(tf);
-        var cfg = new IntegerStrategy.Config(tf, StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(
-            strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY)),
-            StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(
-                strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY))
-                    || StrategyProperties.NON_LIN_ARITH_DEF_OPS.equals(
-                        strategyProperties
-                                .getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY)),
+        final String nonLin =
+            strategyProperties.getProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY);
+        final IntegerStrategy.ArithTreatment arith =
+            StrategyProperties.NON_LIN_ARITH_COMPLETION.equals(nonLin)
+                    ? IntegerStrategy.ArithTreatment.MODEL_SEARCH
+                    : StrategyProperties.NON_LIN_ARITH_DEF_OPS.equals(nonLin)
+                            ? IntegerStrategy.ArithTreatment.DEF_OPS
+                            : IntegerStrategy.ArithTreatment.BASIC;
+        var cfg = new IntegerStrategy.Config(tf, arith,
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE),
             proof.getServices().getTypeConverter().getIntegerLDT(),
