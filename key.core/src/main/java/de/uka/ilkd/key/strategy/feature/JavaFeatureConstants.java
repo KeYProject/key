@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.StaticFeatureCollection;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
@@ -33,7 +32,7 @@ import org.jspecify.annotations.NullMarked;
 import static org.key_project.prover.strategy.StaticFeatureCollection.op;
 
 @NullMarked
-public class JavaFeatureConstants implements FeatureConstants<Goal> {
+public class JavaFeatureConstants implements FeatureConstants {
     @Override
     public Feature nonDuplicateAppModPositionFeature() {
         return NonDuplicateAppModPositionFeature.INSTANCE;

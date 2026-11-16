@@ -43,10 +43,10 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
     protected final IFormulaTermFeatures ff;
 
-    protected final FeatureConstants<G> fc;
+    protected final FeatureConstants fc;
 
     public FOLStrategy(IFormulaTermFeatures ff,
-            FeatureConstants<G> featureConstants, Feature globalF) {
+            FeatureConstants featureConstants, Feature globalF) {
         this.ff = ff;
         this.fc = featureConstants;
 

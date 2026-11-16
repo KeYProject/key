@@ -6,7 +6,6 @@ package org.key_project.prover.strategy;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.op.Operator;
-import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
@@ -16,7 +15,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 /// Features that are required for the [IntegerStrategy] and [FOLStrategy] but
 /// are language-dependent and need to be defined for JavaKeY, RustyKeY, etc.
-public interface FeatureConstants<G extends ProofGoal<G>> {
+public interface FeatureConstants {
     Feature nonDuplicateAppModPositionFeature();
 
     Feature notInScopeOfModalityFeature();

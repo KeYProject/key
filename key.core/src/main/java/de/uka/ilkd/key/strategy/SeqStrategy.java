@@ -51,7 +51,7 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
     private final RuleSetDispatchFeature costDispatcher;
     private final RuleSetDispatchFeature approvalDispatcher;
     private final boolean stopAtFirstNonCloseableGoal;
-    private final FeatureConstants<Goal> fc = new JavaFeatureConstants();
+    private final FeatureConstants fc = new JavaFeatureConstants();
     private final FormulaTermFeatures ff;
 
     public SeqStrategy(Proof proof, StrategyProperties strategyProperties) {
