@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.CharListLDT;
@@ -19,7 +17,6 @@ import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.CostBand;
@@ -42,7 +39,6 @@ public class StringStrategy extends JavaAbstractFeatureStrategy implements Compo
 
     /// The features defining the three phases: cost computation, approval,
     /// additionalInstanceCreationAndEvaluation
-    private final RuleSetDispatchFeature costComputationDispatcher;
 
     /// Useful [TermFeature] collections
     private final JavaArithTermFeatures tf;
@@ -55,17 +51,15 @@ public class StringStrategy extends JavaAbstractFeatureStrategy implements Compo
         this.tf = new JavaArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
 
-        costComputationDispatcher = setupCostComputationF();
+        setupCostComputationF(costComputationDispatcher);
 
         stopAtFirstNonCloseableGoal =
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupCostComputationF(RuleSetDispatchFeature d) {
         setUpStringNormalisation(d);
-        return d;
     }
 
     private void setUpStringNormalisation(RuleSetDispatchFeature d) {
@@ -189,24 +183,6 @@ public class StringStrategy extends JavaAbstractFeatureStrategy implements Compo
     public RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        RuleSetDispatchFeature dispatcher = getDispatcher(aspect);
-        if (dispatcher != null) {
-            set.addAll(dispatcher.ruleSets());
-        }
-        return set;
-    }
-
-    @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return switch (aspect) {
-            case StrategyAspect.Cost -> costComputationDispatcher;
-            default -> null;
-        };
     }
 
     @Override

@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
@@ -20,7 +18,6 @@ import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.CostBand;
@@ -43,9 +40,7 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
 
     private final StrategyProperties strategyProperties;
 
-    private final RuleSetDispatchFeature costComputationDispatcher;
     private final Feature costComputationF;
-    private final RuleSetDispatchFeature instantiationDispatcher;
     private final Feature instantiationF;
 
     public SymExStrategy(Proof proof, StrategyProperties strategyProperties) {
@@ -55,30 +50,10 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
         var tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         ff = new FormulaTermFeatures(tf);
 
-        costComputationDispatcher = setupCostComputationF();
-        instantiationDispatcher = new RuleSetDispatchFeature();
+        setupCostComputationF(costComputationDispatcher);
 
         costComputationF = setupGlobalF(costComputationDispatcher);
         instantiationF = setupGlobalF(instantiationDispatcher);
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        RuleSetDispatchFeature dispatcher = getDispatcher(aspect);
-        if (dispatcher != null) {
-            set.addAll(dispatcher.ruleSets());
-        }
-        return set;
-    }
-
-    @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return switch (aspect) {
-            case StrategyAspect.Cost -> costComputationDispatcher;
-            case StrategyAspect.Instantiation -> instantiationDispatcher;
-            default -> null;
-        };
     }
 
 
@@ -143,8 +118,7 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
             loopBlockFeature, loopBlockApplyHeadFeature, dispatcher);
     }
 
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupCostComputationF(RuleSetDispatchFeature d) {
         boolean programsToRight = true; // XXX
 
         final String[] exceptionsWithPenalty = { "java.lang.NullPointerException",
@@ -259,7 +233,6 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
             add(sum(superFor, SuperTermGenerator.upwards(any(), getServices()),
                 applyTF(superFor, not(ff.program))), longConst(SPLIT_IF)));
 
-        return d;
     }
 
     @Override

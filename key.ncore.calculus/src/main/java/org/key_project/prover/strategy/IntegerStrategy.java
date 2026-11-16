@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 
@@ -14,7 +12,6 @@ import org.key_project.logic.*;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.*;
 import org.key_project.prover.strategy.costbased.feature.*;
@@ -56,9 +53,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     /// The features defining the three phases: cost computation, approval,
     /// additionalInstanceCreationAndEvaluation
-    private final RuleSetDispatchFeature costComputationDispatcher = new RuleSetDispatchFeature();
-    private final RuleSetDispatchFeature approvalDispatcher = new RuleSetDispatchFeature();
-    private final RuleSetDispatchFeature instantiationDispatcher = new RuleSetDispatchFeature();
 
     /// Useful [TermFeature] collections
     protected final ArithTermFeatures tf;
@@ -237,11 +231,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     }
 
     @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        return new HashSet<>(getDispatcher(aspect).ruleSets());
-    }
-
-    @Override
     public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, G goal) {
         return !(approvalDispatcher.computeCost(app, pio, goal,
             new MutableState()) == TopRuleAppCost.INSTANCE);
@@ -257,15 +246,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
     @Override
     public Name name() {
         return NAME;
-    }
-
-    @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return switch (aspect) {
-            case StrategyAspect.Cost -> costComputationDispatcher;
-            case StrategyAspect.Instantiation -> instantiationDispatcher;
-            case StrategyAspect.Approval -> approvalDispatcher;
-        };
     }
 
     private void setupInEqCaseDistinctionsApproval(RuleSetDispatchFeature d) {

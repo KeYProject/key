@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -22,7 +20,6 @@ import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.FeatureConstants;
@@ -37,8 +34,6 @@ import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.Nullable;
-
 import static de.uka.ilkd.key.strategy.SeqCost.*;
 import static de.uka.ilkd.key.strategy.StaticFeatureCollection.directlyBelowSymbolAtIndex;
 
@@ -47,8 +42,6 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
     public static final Name NAME = new Name("Sequence Strategy");
 
     private final SeqTermFeatures tf;
-    private final RuleSetDispatchFeature costDispatcher;
-    private final RuleSetDispatchFeature approvalDispatcher;
     private final boolean stopAtFirstNonCloseableGoal;
     private final FeatureConstants fc = new JavaFeatureConstants();
     private final FormulaTermFeatures ff;
@@ -59,15 +52,14 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
         ff = new FormulaTermFeatures(new JavaArithTermFeatures(types.getIntegerLDT()));
         tf = new SeqTermFeatures(types.getSeqLDT(), types.getPSeqLDT(), types.getIntegerLDT(),
             types.getBooleanLDT());
-        costDispatcher = setupCostDispatcher();
-        approvalDispatcher = setupApprovalDispatcher();
+        setupCostDispatcher(costComputationDispatcher);
+        setupApprovalDispatcher(approvalDispatcher);
         stopAtFirstNonCloseableGoal =
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
-    private RuleSetDispatchFeature setupCostDispatcher() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupCostDispatcher(RuleSetDispatchFeature d) {
         final ProjectionToTerm focus = FocusProjection.create();
 
         // === Rewriting Defaults ===
@@ -120,7 +112,6 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
 
         setupSequencePermutationStrategy(d);
 
-        return d;
     }
 
     private void setupSequencePermutationStrategy(RuleSetDispatchFeature d) {
@@ -158,14 +149,12 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
                 directlyBelowSymbolAtIndex(Equality.EQUALS, 1)));
     }
 
-    private RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupApprovalDispatcher(RuleSetDispatchFeature d) {
         bindRuleSet(d, "seqPermTransitivity", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "seqLenOfEquality", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "seqEqExpandAntec", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "seqNPermProperties", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "seqPermCountAntec", NonDuplicateAppModPositionFeature.INSTANCE);
-        return d;
     }
 
     @Override
@@ -193,26 +182,7 @@ public class SeqStrategy extends JavaAbstractFeatureStrategy implements Componen
     @Override
     public RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
-        return costDispatcher.computeCost(app, pos, goal, mState);
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        RuleSetDispatchFeature dispatcher = getDispatcher(aspect);
-        if (dispatcher != null) {
-            set.addAll(dispatcher.ruleSets());
-        }
-        return set;
-    }
-
-    @Override
-    public @Nullable RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return switch (aspect) {
-            case Cost -> costDispatcher;
-            case Approval -> approvalDispatcher;
-            case Instantiation -> null;
-        };
+        return costComputationDispatcher.computeCost(app, pos, goal, mState);
     }
 
     @Override

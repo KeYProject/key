@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -32,7 +30,6 @@ import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.strategy.SetCosts.COMMUTE;
 import static de.uka.ilkd.key.strategy.SetCosts.DIST;
@@ -42,7 +39,6 @@ import static de.uka.ilkd.key.strategy.SetCosts.DIST;
 public class SetStrategy extends AbstractFeatureStrategy<Goal> implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("Set Strategy");
 
-    private final RuleSetDispatchFeature costComputationDispatcher;
 
     private final boolean stopAtFirstNonCloseableGoal;
     private final SetTermFeatures stf;
@@ -51,15 +47,14 @@ public class SetStrategy extends AbstractFeatureStrategy<Goal> implements Compon
     public SetStrategy(Proof proof, StrategyProperties strategyProperties) {
         this.proof = proof;
         stf = new SetTermFeatures(proof.getServices().getTypeConverter().getLDT(SetLDT.class));
-        costComputationDispatcher = setupCostComputationF();
+        setupCostComputationF(costComputationDispatcher);
 
         stopAtFirstNonCloseableGoal =
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupCostComputationF(RuleSetDispatchFeature d) {
         bindRuleSet(d, "setEqualityBlastingRight", CostBand.DEFAULT.at(-90));
 
         // Distribution duplicates the distributed set, so it is allowed only
@@ -81,7 +76,6 @@ public class SetStrategy extends AbstractFeatureStrategy<Goal> implements Compon
                 SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), stf,
                     StaticFeatureCollection.createTermOrdering()),
                 longConst(COMMUTE)));
-        return d;
     }
 
     @Override
@@ -109,21 +103,6 @@ public class SetStrategy extends AbstractFeatureStrategy<Goal> implements Compon
     public RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        RuleSetDispatchFeature dispatcher = getDispatcher(aspect);
-        if (dispatcher != null) {
-            set.addAll(dispatcher.ruleSets());
-        }
-        return set;
-    }
-
-    @Override
-    public @Nullable RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return aspect == StrategyAspect.Cost ? costComputationDispatcher : null;
     }
 
     @Override

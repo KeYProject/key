@@ -4,14 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.TermOrdering;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.*;
 import org.key_project.prover.strategy.costbased.feature.*;
@@ -35,9 +32,6 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
         implements ComponentStrategy<G> {
     public static final Name NAME = new Name("FOL Strategy");
 
-    private final RuleSetDispatchFeature costComputationDispatcher = new RuleSetDispatchFeature();
-    private final RuleSetDispatchFeature approvalDispatcher = new RuleSetDispatchFeature();
-    private final RuleSetDispatchFeature instantiationDispatcher = new RuleSetDispatchFeature();
     private final Feature costComputationF;
     private final Feature instantiationF;
 
@@ -162,20 +156,6 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
     public RuleAppCost instantiateApp(RuleApp app, PosInOccurrence pio, G goal,
             MutableState mState) {
         return instantiationF.computeCost(app, pio, goal, mState);
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        return new HashSet<>(getDispatcher(aspect).ruleSets());
-    }
-
-    @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return switch (aspect) {
-            case StrategyAspect.Cost -> costComputationDispatcher;
-            case StrategyAspect.Instantiation -> instantiationDispatcher;
-            case StrategyAspect.Approval -> approvalDispatcher;
-        };
     }
 
     @Override

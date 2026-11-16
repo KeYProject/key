@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -27,7 +25,6 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
 import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.CostBand;
@@ -64,11 +61,8 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
 
     protected final StrategyProperties strategyProperties;
 
-    private final RuleSetDispatchFeature costComputationDispatcher;
     private final Feature costComputationF;
-    private final RuleSetDispatchFeature approvalDispatcher;
     private final Feature approvalF;
-    private final RuleSetDispatchFeature instantiationDispatcher;
     private final Feature instantiationF;
 
     private final HeapLDT heapLDT;
@@ -86,9 +80,9 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         this.tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
 
-        costComputationDispatcher = setupCostComputationF();
-        approvalDispatcher = setupApprovalDispatcher();
-        instantiationDispatcher = setupInstantiationF();
+        setupCostComputationF(costComputationDispatcher);
+        setupApprovalDispatcher(approvalDispatcher);
+        setupInstantiationF(instantiationDispatcher);
 
         costComputationF = setupGlobalF(costComputationDispatcher);
         instantiationF = setupGlobalF(instantiationDispatcher);
@@ -98,20 +92,6 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
 
     protected final RuleSetDispatchFeature getCostComputationDispatcher() {
         return costComputationDispatcher;
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        return new HashSet<>(getDispatcher(aspect).ruleSets());
-    }
-
-    @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return switch (aspect) {
-            case StrategyAspect.Cost -> costComputationDispatcher;
-            case StrategyAspect.Instantiation -> instantiationDispatcher;
-            case StrategyAspect.Approval -> approvalDispatcher;
-        };
     }
 
     protected Feature setupGlobalF(@NonNull Feature dispatcher) {
@@ -177,8 +157,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         };
     }
 
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupCostComputationF(RuleSetDispatchFeature d) {
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
 
@@ -293,7 +272,6 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
                 longConst(0), inftyConst()));
         }
 
-        return d;
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
@@ -494,8 +472,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         return depSpecF; // add(NonDuplicateAppFeature.INSTANCE, depSpecF);
     }
 
-    private RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupApprovalDispatcher(RuleSetDispatchFeature d) {
 
         // Only derive a disequality that is not known yet. The same disequality follows from
         // every location the two objects read differently, so a duplicate-application check does
@@ -537,7 +514,6 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
                 not(ContainsTermFeature.create(instOf("s"), instOf("t1"),
                     RENAMING_TERM_PROPERTY))));
 
-        return d;
     }
 
     private void setupClassAxiomApproval(final RuleSetDispatchFeature d) {
@@ -587,14 +563,12 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    private RuleSetDispatchFeature setupInstantiationF() {
+    private void setupInstantiationF(RuleSetDispatchFeature d) {
         enableInstantiate();
 
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         setClassAxiomInstantiation(d);
 
         disableInstantiate();
-        return d;
     }
 
     private void setClassAxiomInstantiation(final RuleSetDispatchFeature d) {

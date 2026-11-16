@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -30,7 +28,6 @@ import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
 
 import org.jspecify.annotations.NonNull;
-import org.jspecify.annotations.Nullable;
 
 /// Strategy for location sets
 /// Do not create directly; use [SetStrategyFactory] instead.
@@ -38,7 +35,6 @@ public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
         implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("LocSet Strategy");
 
-    private final RuleSetDispatchFeature costComputationDispatcher;
 
     private final boolean stopAtFirstNonCloseableGoal;
     private final LocSetTermFeatures lsf;
@@ -51,15 +47,14 @@ public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
             typeConverter.getLDT(de.uka.ilkd.key.ldt.SetLDT.class),
             typeConverter.getLocSetLDT(),
             typeConverter.getHeapLDT());
-        costComputationDispatcher = setupCostComputationF();
+        setupCostComputationF(costComputationDispatcher);
 
         stopAtFirstNonCloseableGoal =
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupCostComputationF(RuleSetDispatchFeature d) {
         /// ensures that blasting rules are only applied if the focus formula
         /// contains a constructor whose rules need to decompose a locations
         /// avoid split up
@@ -103,7 +98,6 @@ public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
                 PolynomialValuesCmpFeature.lt(instOf("upper2"), instOf("lower")),
                 longConst(0)),
                 longConst(-4000)));
-        return d;
     }
 
     @Override
@@ -131,21 +125,6 @@ public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
     public RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        RuleSetDispatchFeature dispatcher = getDispatcher(aspect);
-        if (dispatcher != null) {
-            set.addAll(dispatcher.ruleSets());
-        }
-        return set;
-    }
-
-    @Override
-    public @Nullable RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return aspect == StrategyAspect.Cost ? costComputationDispatcher : null;
     }
 
     @Override

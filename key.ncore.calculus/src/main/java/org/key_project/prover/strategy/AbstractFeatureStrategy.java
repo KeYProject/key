@@ -4,12 +4,16 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy.StrategyAspect;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
@@ -27,6 +31,11 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
         extends StaticFeatureCollection implements Strategy<G> {
+    /// The dispatchers of the cost, approval and instantiation aspects.
+    protected final RuleSetDispatchFeature costComputationDispatcher = new RuleSetDispatchFeature();
+    protected final RuleSetDispatchFeature approvalDispatcher = new RuleSetDispatchFeature();
+    protected final RuleSetDispatchFeature instantiationDispatcher = new RuleSetDispatchFeature();
+
     /// It is possible to turn off the method <code>instantiate</code>,
     /// which can be useful in order to use the same feature definitions both for
     /// cost computation and instantiation.
@@ -88,6 +97,26 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
 
     protected Feature oneOf(Feature... features) {
         return OneOfCP.create(features);
+    }
+
+    /// Returns the dispatcher of an aspect.
+    ///
+    /// @param aspect the aspect
+    /// @return the dispatcher of `aspect`
+    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
+        return switch (aspect) {
+            case Cost -> costComputationDispatcher;
+            case Instantiation -> instantiationDispatcher;
+            case Approval -> approvalDispatcher;
+        };
+    }
+
+    /// Returns the rule sets bound in the dispatcher of an aspect.
+    ///
+    /// @param aspect the aspect
+    /// @return the rule sets bound in the dispatcher of `aspect`
+    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
+        return new HashSet<>(getDispatcher(aspect).ruleSets());
     }
 
     protected abstract LogicServices getServices();
