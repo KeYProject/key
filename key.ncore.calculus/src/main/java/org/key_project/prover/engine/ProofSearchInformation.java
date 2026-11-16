@@ -38,7 +38,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// @see ProofObject
 /// @see ProofGoal
-public interface ProofSearchInformation<P extends ProofObject<G>, G extends @Nullable ProofGoal<G>> {
+public interface ProofSearchInformation<P extends ProofObject<G>, G extends ProofGoal<G>> {
 
     /// Retrieves the explanation or reason wjy the proof search (strategy execution) finished.
     ///

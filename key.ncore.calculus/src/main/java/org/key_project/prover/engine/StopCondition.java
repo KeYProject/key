@@ -33,7 +33,7 @@ import org.jspecify.annotations.Nullable;
 ///
 ///
 /// @author Martin Hentschel
-public interface StopCondition<G extends @Nullable ProofGoal<G>> {
+public interface StopCondition<G extends ProofGoal<G>> {
     /// Returns the maximal amount of work needed to complete the task, used to display a
     /// progress bar. Pass `0` to indicate unknown size.
     ///
