@@ -282,7 +282,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             // function symbol)
             add(applyTF("h",
                 not(or(PrimitiveHeapTermFeature.create(heapLDT), anonHeapTermFeature()))),
-                ifZero(applyTF(FocusFormulaProjection.<Goal>create(), ff.update),
+                ifZero(applyTF(FocusFormulaProjection.create(), ff.update),
                     longConst(PULL_OUT_SELECT_BELOW_UPDATE),
                     longConst(PULL_OUT_SELECT)),
                 NonDuplicateAppModPositionFeature.INSTANCE));
@@ -302,7 +302,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             // to be a select term on a non-base- and
             // non-anon-heap)
             add(isSelectSkolemConstantTerm("sk"),
-                applyTF(sub(FocusProjection.<Goal>create(), 0),
+                applyTF(sub(FocusProjection.create(), 0),
                     not(SimplifiedSelectTermFeature.create(heapLDT))),
                 longConst(SIMPLIFY_SELECT)));
         bindRuleSet(d, "simplify_select_concrete", longConst(-6000));
@@ -351,8 +351,8 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         final TermFeature chain =
             TermPredicateTermFeature.create(
                 t -> getHeapTermSize(t, minHeapSizeForPullout) >= minHeapSizeForPullout);
-        final Feature updateValue = applyTF(FocusProjection.<Goal>create(1), ff.elemUpdate);
-        return add(applyTF(FocusProjection.<Goal>create(), chain), updateValue, longConst(-30000));
+        final Feature updateValue = applyTF(FocusProjection.create(1), ff.elemUpdate);
+        return add(applyTF(FocusProjection.create(), chain), updateValue, longConst(-30000));
     }
 
 
@@ -400,7 +400,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
     private Feature isSkolemConstantUsedElsewhereInSequent() {
         final TermBuffer sf = new TermBuffer();
         return add(sequentContainsNoPrograms(),
-            sum(sf, SequentFormulasGenerator.<Goal>sequent(),
+            sum(sf, SequentFormulasGenerator.sequent(),
                 or(JavaStaticFeatureCollection.eq(sf, FocusFormulaProjection.create()),
                     not(ContainsTermFeature.create(sf, instOf("auxiliarySK"),
                         RENAMING_TERM_PROPERTY)))));
@@ -484,7 +484,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         final TermBuffer secondObject = new TermBuffer();
         bindRuleSet(d, "derive_inequality",
             let(firstObject, instOf("o"), let(secondObject, instOf("o2"),
-                sum(succedentFormula, SequentFormulasGenerator.<Goal>succedent(),
+                sum(succedentFormula, SequentFormulasGenerator.succedent(),
                     not(applyTF(succedentFormula,
                         or(opSub(Equality.EQUALS, JavaStaticFeatureCollection.eq(firstObject),
                             JavaStaticFeatureCollection.eq(secondObject)),

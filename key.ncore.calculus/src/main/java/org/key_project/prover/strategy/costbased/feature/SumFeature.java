@@ -61,8 +61,7 @@ public class SumFeature implements Feature {
         LinkedHashSet<Feature> featureSet = new LinkedHashSet<>();
         flatten(fs, featureSet);
 
-        // noinspection unchecked
-        return new SumFeature(featureSet.<Feature>toArray(new Feature[0]));
+        return new SumFeature(featureSet.toArray(new Feature[0]));
     }
 
     private final Feature[] features;

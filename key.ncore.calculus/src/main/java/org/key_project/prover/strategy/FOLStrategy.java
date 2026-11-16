@@ -100,7 +100,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
             add(not(TriggerVarInstantiatedFeature.create()), CostBand.DEFER.cost()));
 
         bindRuleSet(d, "comprehension_split",
-            add(applyTF(FocusFormulaProjection.<G>create(), ff.notContainsExecutable()),
+            add(applyTF(FocusFormulaProjection.create(), ff.notContainsExecutable()),
                 ifZero(allowQuantifierSplitting(), CostBand.DEFER.at(2000),
                     CostBand.DEFER.at(4500))));
 
@@ -206,7 +206,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
         bindRuleSet(d, "moveQuantToLeft",
             add(quantifiersMightSplit() ? CostBand.DEFAULT.cost()
-                    : applyTF(FocusFormulaProjection.<G>create(), ff.quantifiedPureLitConjDisj()),
+                    : applyTF(FocusFormulaProjection.create(), ff.quantifiedPureLitConjDisj()),
                 CostBand.PREFER.at(-50)));
 
         bindRuleSet(d, "conjNormalForm",
@@ -314,7 +314,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
 
             bindRuleSet(d, "gamma",
                 SumFeature.createSum(FocusInAntecFeature.getInstance(),
-                    applyTF(FocusProjection.<G>create(0),
+                    applyTF(FocusProjection.create(0),
                         add(ff.quantifiedClauseSet(),
                             instQuantifiersWithQueries() ? longTermConst(0)
                                     : ff.notContainsExecutable())),
@@ -440,7 +440,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                                 longConst(CUT_DIRECT_STANDARD)),
                             SumFeature // check for cuts below quantifiers
                                     .createSum(applyTF(cutFormula, ff.cutAllowedBelowQuantifier()),
-                                        applyTF(FocusFormulaProjection.<G>create(),
+                                        applyTF(FocusFormulaProjection.create(),
                                             ff.quantifiedClauseSet()),
                                         ifZero(allowQuantifierSplitting(),
                                             CostBand.DEFAULT.cost(),
@@ -497,7 +497,7 @@ public abstract class FOLStrategy<G extends ProofGoal<G>> extends AbstractFeatur
                 longConst(CombinationCost.ORDERED_REWRITING)));
 
         bindRuleSet(d, "insert_eq_nonrigid",
-            applyTF(FocusProjection.<G>create(0), IsNonRigidTermFeature.INSTANCE));
+            applyTF(FocusProjection.create(0), IsNonRigidTermFeature.INSTANCE));
     }
 
     // //////////////////////////////////////////////////////////////////////////

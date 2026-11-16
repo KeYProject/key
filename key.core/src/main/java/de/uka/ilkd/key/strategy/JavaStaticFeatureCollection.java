@@ -11,7 +11,6 @@ import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.*;
@@ -198,7 +197,7 @@ public abstract class JavaStaticFeatureCollection
     }
 
     public static Feature directlyBelowSymbolAtIndex(TermFeature symbolTF, int index) {
-        final var oneUp = FocusProjection.<Goal>create(1);
+        final var oneUp = FocusProjection.create(1);
         if (index == -1) {
             return add(not(FindAtTopLevelFeature.getInstance()), applyTF(oneUp, symbolTF));
         }

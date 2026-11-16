@@ -62,7 +62,7 @@ public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
         /// rest of the sequent (e.g, ==> l \in allObjects(f) would lead to an application but
         /// allObjects(f) = EQ ==> l \in EQ not)
         bindRuleSet(d, "locSetEqualityBlastingRight",
-            ifZero(applyTF(FocusFormulaProjection.<Goal>create(), lsf.requireLocationDecomposition),
+            ifZero(applyTF(FocusFormulaProjection.create(), lsf.requireLocationDecomposition),
                 longConst(-100), longConst(-80)));
 
         bindRuleSet(d, "locSetArrayRangeMerge",
