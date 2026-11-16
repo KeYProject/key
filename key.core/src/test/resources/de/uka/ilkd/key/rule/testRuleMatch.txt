@@ -98,12 +98,12 @@
   TestMatchTaclet_whileright {
 		\find (\<{.. while(#e2) {#p1} ...}\>post)
                 \varcond(\newLabel(#inner), \newLabel(#outer))
-	        \replacewith (\<{.. #unwind-loop (#inner, #outer, while(#e2) {#p1});  ...}\>post) }; 
+	        \replacewith (\<{.. #unwindLoop (#inner, #outer, while(#e2) {#p1});  ...}\>post) }; 
 
   TestMatchTaclet_whileright_labeled {
 		\find (\<{.. #lab:{ while(#e2) {boolean #b = #e2;#p1}} ...}\>post)
                 \varcond(\newLabel(#inner), \newLabel(#outer))
-	        \replacewith (\<{.. #unwind-loop (#inner, #outer,while(#e2) {#p1});  ...}\>post) }; 
+	        \replacewith (\<{.. #unwindLoop (#inner, #outer,while(#e2) {#p1});  ...}\>post) }; 
 
   TestMatchTaclet_break_while {
 		\find (\<{..  while(#e2) {break; #stmnt_list} ...}\>post)
@@ -115,7 +115,7 @@
   TestMatchTaclet_for_right {
 		\find (\<{.. for(#loopInit; #guard; #forupdates) {#p1} ...}\>post)
                 \varcond(\newLabel(#inner), \newLabel(#outer))
-	        \replacewith (\<{.. #unwind-loop (#inner, #outer,for(#loopInit; #guard; #forupdates) {#p1});  ...}\>post) }; 
+	        \replacewith (\<{.. #unwindLoop (#inner, #outer,for(#loopInit; #guard; #forupdates) {#p1});  ...}\>post) }; 
 
   TestMatchTaclet_local_variable_rename { \find (\<{.. {#ty #var=0; #p1} ...}\>post) \replacewith (true)};
 

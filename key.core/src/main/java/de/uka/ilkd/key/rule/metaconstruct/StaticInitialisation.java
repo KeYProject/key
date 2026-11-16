@@ -18,10 +18,13 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.collection.ImmutableList;
+
+@TransformerMeta(name = "#staticInitialisation")
 public class StaticInitialisation extends ProgramTransformer {
 
     public StaticInitialisation(Expression expr) {
-        super("static-initialisation", expr);
+        super("#staticInitialisation", expr);
 
     }
 
@@ -77,5 +80,10 @@ public class StaticInitialisation extends ProgramTransformer {
             ClassInitializeMethodBuilder.CLASS_INITIALIZE_IDENTIFIER);
 
         return new ProgramElement[] { KeYJavaASTFactory.passiveExpression(methodCall) };
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return ImmutableList.of(body());
     }
 }

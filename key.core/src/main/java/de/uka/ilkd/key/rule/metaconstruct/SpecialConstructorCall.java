@@ -15,6 +15,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.Name;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The constructor call meta construct is used to handle a allocation expression like
@@ -22,6 +23,7 @@ import org.key_project.logic.Name;
  * to an implict method called <code>&lt;init&gt;</code> that is mainly the constructor but in its
  * normalform.
  */
+@TransformerMeta(name = "#specialConstructorCall")
 public class SpecialConstructorCall extends ProgramTransformer {
 
     /**
@@ -34,7 +36,7 @@ public class SpecialConstructorCall extends ProgramTransformer {
      * @param consRef The constructor reference.
      */
     public SpecialConstructorCall(ProgramElement consRef) {
-        super(new Name("special-constructor-call"), consRef);
+        super(new Name("#specialConstructorCall"), consRef);
     }
 
     @Override
@@ -54,4 +56,9 @@ public class SpecialConstructorCall extends ProgramTransformer {
             constructorReference.getArguments()) };
     }
 
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return ImmutableList.of(body());
+    }
 }

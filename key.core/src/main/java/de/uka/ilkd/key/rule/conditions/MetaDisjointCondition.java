@@ -35,7 +35,7 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
         final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
         if (t1.op() instanceof Function func1 && func1.isUnique()
                 && t2.op() instanceof Function func2 && func2.isUnique()
-                && !t1.equals(t2)) {
+                && func1 != func2) {
             return true;
         } else if (t1.sort().equals(setLDT.targetSort()) && t2.sort().equals(setLDT.targetSort())) {
             final ImmutableSet<JTerm> t1set = services.getTermBuilder().unionToSet(t1);

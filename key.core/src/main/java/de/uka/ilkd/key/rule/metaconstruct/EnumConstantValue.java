@@ -24,6 +24,7 @@ import org.key_project.logic.op.Operator;
  *
  * @author mulbrich
  */
+@TransformerMeta(name = "#enumconstantvalue")
 public final class EnumConstantValue extends AbstractTermTransformer {
 
     public EnumConstantValue() {

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.math.BigInteger;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
@@ -91,8 +93,10 @@ public class QueryExpandCost implements Feature {
 
         if (useExperimentalHeuristics) {
             // If the factor is too small, then higher cost has no effect for some reason.
-            int litcost = maxIntliteralInArgumentsTimesTwo(t, integerLDT, services);
-            if (litcost > CONSIDERED_AS_BIG_LITERAL * 2) {
+            BigInteger litcost = maxIntliteralInArgumentsTimesTwo(t, integerLDT, services);
+            // CONSIDERED_AS_BIG_LITERAL * 2 is considered to not overflow at the momen
+            // CONSIDERED_AS_BIG_LITERAL has at time of writing the value 7
+            if (litcost.compareTo(BigInteger.valueOf(CONSIDERED_AS_BIG_LITERAL * 2)) > 0) {
                 return TOP_COST;
             }
         }
@@ -124,16 +128,17 @@ public class QueryExpandCost implements Feature {
      * @return Cost that is computed base on the integer literals occurring in the numerical
      *         arguments of the query t.
      */
-    private static int maxIntliteralInArgumentsTimesTwo(JTerm t, IntegerLDT iLDT, Services serv) {
+    private static BigInteger maxIntliteralInArgumentsTimesTwo(JTerm t, IntegerLDT iLDT,
+            Services serv) {
         final Namespace<Sort> sorts = serv.getNamespaces().sorts();
         final Sort intSort = sorts.lookup(IntegerLDT.NAME);
-        int cost = 0;
+        BigInteger cost = BigInteger.ZERO;
         // The computation is limited to arguments that have an arithmetic type.
         // E.g., don't calculate int literals in the heap parameter.
         for (int i = 0; i < t.arity(); i++) {
             JTerm arg = t.sub(i);
             if (arg.sort() == intSort) {
-                cost = Math.max(cost, sumOfAbsLiteralsTimesTwo(arg, iLDT, serv));
+                cost = cost.max(sumOfAbsLiteralsTimesTwo(arg, iLDT, serv));
             }
         }
         return cost;
@@ -148,20 +153,20 @@ public class QueryExpandCost implements Feature {
      *         The sum is modified by extrapolating negative numbers from zero by one. The cost of a
      *         query f(n-1) a slightly higher cost than the cost of f(n+1).
      */
-    private static int sumOfAbsLiteralsTimesTwo(JTerm t, IntegerLDT iLDT, Services serv) {
+    private static BigInteger sumOfAbsLiteralsTimesTwo(JTerm t, IntegerLDT iLDT, Services serv) {
         if (t.op() == iLDT.getNumberSymbol()) {
             String strVal = AbstractTermTransformer.convertToDecimalString(t, serv);
-            int val = Integer.parseInt(strVal);
-            if (val >= 0) {
-                return val * 2;
+            BigInteger val = new BigInteger(strVal);
+            if (val.compareTo(BigInteger.ZERO) >= 0) {
+                return val.multiply(BigInteger.TWO);
             } else {
                 // Negative numbers get a slightly higher cost than positive numbers.
-                return (val * -2) + 1;
+                return val.multiply(BigInteger.TWO).negate().add(BigInteger.ONE);
             }
         } else {
-            int sum = 0;
+            BigInteger sum = BigInteger.ZERO;
             for (int i = 0; i < t.arity(); i++) {
-                sum += sumOfAbsLiteralsTimesTwo(t.sub(i), iLDT, serv);
+                sum = sum.add(sumOfAbsLiteralsTimesTwo(t.sub(i), iLDT, serv));
             }
             return sum;
         }
