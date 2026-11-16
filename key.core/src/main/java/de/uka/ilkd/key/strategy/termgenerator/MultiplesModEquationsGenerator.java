@@ -12,11 +12,11 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
@@ -41,7 +41,7 @@ import org.key_project.util.collection.ImmutableList;
  * In the future, this class should also be used for instantiating explicit quantifiers over the
  * integers.
  */
-public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
+public class MultiplesModEquationsGenerator implements TermGenerator {
 
     private final ProjectionToTerm source;
     private final ProjectionToTerm target;
@@ -52,15 +52,15 @@ public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
         this.target = target;
     }
 
-    public static TermGenerator<Goal> create(ProjectionToTerm source,
+    public static TermGenerator create(ProjectionToTerm source,
             ProjectionToTerm target) {
         return new MultiplesModEquationsGenerator(source, target);
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
-        final Services services = goal.proof().getServices();
+        final Services services = (Services) goal.proof().getServices();
 
         final Monomial sourceM = JMonomial.create(source.toTerm(app, pos, goal, mState), services);
         final Monomial targetM = JMonomial.create(target.toTerm(app, pos, goal, mState), services);
@@ -146,7 +146,7 @@ public class MultiplesModEquationsGenerator implements TermGenerator<Goal> {
      * @return a list of polynomials, stored in objects of <code>CofactorPolynomial</code>. The
      *         initial cofactor is set to zero.
      */
-    private List<CofactorPolynomial> extractPolys(Goal goal, Services services) {
+    private List<CofactorPolynomial> extractPolys(ProofGoal<?> goal, Services services) {
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
         final List<CofactorPolynomial> res = new ArrayList<>();

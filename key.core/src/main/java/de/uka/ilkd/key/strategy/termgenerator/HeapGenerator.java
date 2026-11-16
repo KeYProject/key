@@ -10,9 +10,10 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -28,10 +29,10 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
  * <li>depending on the mode: heaps just occurring in updates are included or ignored</li>
  * </ol>
  */
-public class HeapGenerator implements TermGenerator<Goal> {
+public class HeapGenerator implements TermGenerator {
 
-    public static final TermGenerator<Goal> INSTANCE = new HeapGenerator(true);
-    public static final TermGenerator<Goal> INSTANCE_EXCLUDE_UPDATES = new HeapGenerator(false);
+    public static final TermGenerator INSTANCE = new HeapGenerator(true);
+    public static final TermGenerator INSTANCE_EXCLUDE_UPDATES = new HeapGenerator(false);
 
     private final boolean includeUpdates;
 
@@ -40,7 +41,7 @@ public class HeapGenerator implements TermGenerator<Goal> {
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         LinkedHashSet<Term> heaps = new LinkedHashSet<>();
         Sequent seq = goal.sequent();
@@ -50,7 +51,8 @@ public class HeapGenerator implements TermGenerator<Goal> {
         return heaps.iterator();
     }
 
-    private void collectHeaps(Term term, LinkedHashSet<Term> heaps, Services services) {
+    private void collectHeaps(Term term, LinkedHashSet<Term> heaps, LogicServices p_services) {
+        final var services = (Services) p_services;
         if (term.sort().equals(services.getTypeConverter().getHeapLDT().targetSort())) {
             heaps.add(term);
         } else {

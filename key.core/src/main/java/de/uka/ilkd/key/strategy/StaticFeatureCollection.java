@@ -465,7 +465,7 @@ public abstract class StaticFeatureCollection {
         return ApplyTFFeature.createNonStrict(term, tf, NumberRuleAppCost.getZeroCost());
     }
 
-    protected static Feature sum(TermBuffer x, TermGenerator<Goal> gen, Feature body) {
+    protected static Feature sum(TermBuffer x, TermGenerator gen, Feature body) {
         return ComprehendedSumFeature.create(x, gen, body);
     }
 

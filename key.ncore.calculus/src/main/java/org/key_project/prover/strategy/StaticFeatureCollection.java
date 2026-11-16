@@ -63,7 +63,7 @@ public class StaticFeatureCollection {
         return BinarySumTermFeature.createSum(a, b);
     }
 
-    public static <G extends ProofGoal<G>> Feature sum(TermBuffer x, TermGenerator<G> gen,
+    public static <G extends ProofGoal<G>> Feature sum(TermBuffer x, TermGenerator gen,
             Feature body) {
         return ComprehendedSumFeature.create(x, gen, body);
     }

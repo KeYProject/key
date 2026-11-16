@@ -91,7 +91,7 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public TermGenerator<Goal> upwardsWithIndexSuperGenerator(TermFeature cond,
+    public TermGenerator upwardsWithIndexSuperGenerator(TermFeature cond,
             LogicServices services) {
         return SuperTermGenerator.upwardsWithIndex(cond, (Services) services);
     }
@@ -107,12 +107,12 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public TermGenerator<Goal> createTriggeredInstantiations(boolean skipConditions) {
+    public TermGenerator createTriggeredInstantiations(boolean skipConditions) {
         return TriggeredInstantiations.create(skipConditions);
     }
 
     @Override
-    public TermGenerator<Goal> superTermGenerator(TermFeature cond, LogicServices services) {
+    public TermGenerator superTermGenerator(TermFeature cond, LogicServices services) {
         return SuperTermGenerator.upwards(cond, (Services) services);
     }
 
@@ -137,7 +137,7 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public TermGenerator<Goal> allowedCutPositionsGenerator() {
+    public TermGenerator allowedCutPositionsGenerator() {
         return AllowedCutPositionsGenerator.INSTANCE;
     }
 
@@ -162,7 +162,7 @@ public class JavaFeatureConstants implements FeatureConstants<Goal> {
     }
 
     @Override
-    public TermGenerator<Goal> heuristicGenerator(TriggerTreatment option) {
+    public TermGenerator heuristicGenerator(TriggerTreatment option) {
         return HeuristicInstantiation.forOption(option);
     }
 

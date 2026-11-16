@@ -13,11 +13,11 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -36,7 +36,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
  * addition or multiplication) and {@code l} is a literal. The generator will then produce at most
  * one formula that describes the solutions of the formula using linear (in)equations.
  */
-public class RootsGenerator implements TermGenerator<Goal> {
+public class RootsGenerator implements TermGenerator {
 
     private final ProjectionToTerm powerRelation;
 
@@ -44,7 +44,7 @@ public class RootsGenerator implements TermGenerator<Goal> {
     private final BigInteger one = BigInteger.ONE;
     private final BigInteger two = BigInteger.valueOf(2);
 
-    public static TermGenerator<Goal> create(ProjectionToTerm powerRelation,
+    public static TermGenerator create(ProjectionToTerm powerRelation,
             LogicServices services) {
         return new RootsGenerator(powerRelation, ((Services) services).getTermBuilder());
     }
@@ -55,9 +55,9 @@ public class RootsGenerator implements TermGenerator<Goal> {
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
-        final Services services = goal.proof().getServices();
+        final Services services = (Services) goal.proof().getServices();
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
 
         final Term powerRel = powerRelation.toTerm(app, pos, goal, mState);

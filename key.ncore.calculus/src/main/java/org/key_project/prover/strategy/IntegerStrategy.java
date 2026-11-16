@@ -1065,7 +1065,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
         final Feature rootInferences = forEach(intRel, SequentFormulasGenerator.antecedent(),
             add(isRootInferenceProducer(intRel),
-                forEach(rootInf, (TermGenerator<G>) cfg.roots.apply(intRel, getServices()),
+                forEach(rootInf, (TermGenerator) cfg.roots.apply(intRel, getServices()),
                     add(instantiate("cutFormula", rootInf),
                         ifZero(applyTF(rootInf, ff.orF()),
                             CostBand.DEFAULT.at(50)),
@@ -1196,7 +1196,7 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
             QuadFunction<ProjectionToTerm, ProjectionToTerm, ProjectionToTerm, ProjectionToTerm, Feature> polyLeqCoeff,
             BiFunction<ProjectionToTerm, ProjectionToTerm, Feature> polyEq,
             BiFunction<ProjectionToTerm, ProjectionToTerm, Feature> polyDivides,
-            BiFunction<ProjectionToTerm, ProjectionToTerm, TermGenerator<?>> multiplesModEquations,
-            BiFunction<ProjectionToTerm, LogicServices, TermGenerator<?>> roots) {
+            BiFunction<ProjectionToTerm, ProjectionToTerm, TermGenerator> multiplesModEquations,
+            BiFunction<ProjectionToTerm, LogicServices, TermGenerator> roots) {
     }
 }

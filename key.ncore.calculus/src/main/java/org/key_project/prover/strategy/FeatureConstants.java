@@ -40,15 +40,15 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
     ProjectionToTerm opTerm(Operator op, ProjectionToTerm subTerm0,
             ProjectionToTerm subTerm1);
 
-    TermGenerator<G> upwardsWithIndexSuperGenerator(TermFeature cond, LogicServices services);
+    TermGenerator upwardsWithIndexSuperGenerator(TermFeature cond, LogicServices services);
 
     Feature eqNonDuplicateAppFeature();
 
     Feature splittableQuantifiedFormula();
 
-    TermGenerator<G> superTermGenerator(TermFeature cond, LogicServices services);
+    TermGenerator superTermGenerator(TermFeature cond, LogicServices services);
 
-    TermGenerator<G> createTriggeredInstantiations(boolean skipConditions);
+    TermGenerator createTriggeredInstantiations(boolean skipConditions);
 
     Feature diffFindAndReplacewithFeature();
 
@@ -58,7 +58,7 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     Feature countPosDPath();
 
-    TermGenerator<G> allowedCutPositionsGenerator();
+    TermGenerator allowedCutPositionsGenerator();
 
     Feature allowedCutPositions();
 
@@ -68,7 +68,7 @@ public interface FeatureConstants<G extends ProofGoal<G>> {
 
     TermFeature containsExecutableCodeTF();
 
-    TermGenerator<G> heuristicGenerator(TriggerTreatment option);
+    TermGenerator heuristicGenerator(TriggerTreatment option);
 
     Feature computeInstantiationCostOf(ProjectionToTerm instOfT,
             TriggerTreatment triggerTreatment);

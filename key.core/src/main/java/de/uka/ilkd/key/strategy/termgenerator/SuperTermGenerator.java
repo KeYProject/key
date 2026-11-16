@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
@@ -20,6 +19,7 @@ import org.key_project.logic.op.Modifier;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -38,7 +38,7 @@ import org.key_project.util.collection.ImmutableArray;
  * As it only looks upwards, the computed cost is weak stable
  */
 @WeakStableCost
-public abstract class SuperTermGenerator implements TermGenerator<Goal> {
+public abstract class SuperTermGenerator implements TermGenerator {
 
     private final TermFeature cond;
 
@@ -46,7 +46,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
         this.cond = cond;
     }
 
-    public static TermGenerator<Goal> upwards(TermFeature cond, final Services services) {
+    public static TermGenerator upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator(cond) {
             @Override
             protected Iterator<Term> createIterator(
@@ -57,7 +57,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
         };
     }
 
-    public static TermGenerator<Goal> upwardsWithIndex(TermFeature cond, final Services services) {
+    public static TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
         return new SuperTermWithIndexGenerator(cond, services) {
             @Override
             protected Iterator<Term> createIterator(
@@ -69,8 +69,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos,
-            Goal goal,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         return createIterator(pos, mState);
     }
@@ -99,8 +98,7 @@ public abstract class SuperTermGenerator implements TermGenerator<Goal> {
         }
 
         @Override
-        public Iterator<Term> generate(RuleApp app,
-                PosInOccurrence pos, Goal goal,
+        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
                 MutableState mState) {
             return createIterator(pos, mState);
         }

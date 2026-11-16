@@ -80,7 +80,7 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
         }
     }
 
-    protected Feature forEach(TermBuffer x, TermGenerator<G> gen, Feature body) {
+    protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {
         return ForEachCP.create(x, gen, body);
     }
 

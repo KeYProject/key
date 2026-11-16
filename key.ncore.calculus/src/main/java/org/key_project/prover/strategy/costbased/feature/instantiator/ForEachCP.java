@@ -24,7 +24,7 @@ import org.jspecify.annotations.NonNull;
 /// and can subsequently be used to instantiate a rule application
 public class ForEachCP<G extends ProofGoal<G>> implements Feature {
     private final TermBuffer var;
-    private final TermGenerator<@NonNull G> generator;
+    private final TermGenerator generator;
     private final Feature body;
 
     /// @param var`TermBuffer` in which the terms are going to be stored
@@ -32,12 +32,12 @@ public class ForEachCP<G extends ProofGoal<G>> implements Feature {
     /// @param body a feature that is supposed to be evaluated repeatedly for the possible values of
     /// `var`
     public static <G extends ProofGoal<G>> Feature create(TermBuffer var,
-            TermGenerator<@NonNull G> generator,
+            TermGenerator generator,
             Feature body) {
         return new ForEachCP<>(var, generator, body);
     }
 
-    private ForEachCP(TermBuffer var, TermGenerator<@NonNull G> generator,
+    private ForEachCP(TermBuffer var, TermGenerator generator,
             Feature body) {
         this.var = var;
         this.generator = generator;

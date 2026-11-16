@@ -124,7 +124,7 @@ public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrateg
             not(applyTF(superTerm, t))));
     }
 
-    protected Feature forEach(TermBuffer x, TermGenerator<Goal> gen, Feature body) {
+    protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {
         return ForEachCP.create(x, gen, body);
     }
 
