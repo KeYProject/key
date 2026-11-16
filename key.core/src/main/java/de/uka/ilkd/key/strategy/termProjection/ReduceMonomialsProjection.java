@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termProjection;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
@@ -15,9 +17,12 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Projection for dividing one monomial by another.
  */
+@NullMarked
 @StableCost
 public class ReduceMonomialsProjection implements ProjectionToTerm<Goal> {
 
@@ -36,8 +41,8 @@ public class ReduceMonomialsProjection implements ProjectionToTerm<Goal> {
 
     @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        final Term dividendT = dividend.toTerm(app, pos, goal, mState);
-        final Term divisorT = divisor.toTerm(app, pos, goal, mState);
+        final Term dividendT = Objects.requireNonNull(dividend.toTerm(app, pos, goal, mState));
+        final Term divisorT = Objects.requireNonNull(divisor.toTerm(app, pos, goal, mState));
 
         final Services services = goal.proof().getServices();
         final Monomial mDividend = Monomial.create(dividendT, services);

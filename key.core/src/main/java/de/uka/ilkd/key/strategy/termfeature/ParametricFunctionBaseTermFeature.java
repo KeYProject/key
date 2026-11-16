@@ -13,6 +13,8 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Returns zero iff the term's operator is an instance of the given parametric function
  * (independent of their sorts).
@@ -20,6 +22,7 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
  * {@link org.key_project.prover.strategy.costbased.termfeature.OperatorTF}
  * but for a parametric function symbols.
  */
+@NullMarked
 public class ParametricFunctionBaseTermFeature extends BinaryTermFeature {
 
     private final ParametricFunctionDecl base;

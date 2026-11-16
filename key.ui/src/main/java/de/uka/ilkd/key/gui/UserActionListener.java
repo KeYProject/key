@@ -6,12 +6,15 @@ package de.uka.ilkd.key.gui;
 
 import de.uka.ilkd.key.gui.actions.useractions.UserAction;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Listener for user actions.
  *
  * @see UserAction
  * @author Arne Keller
  */
+@NullMarked
 public interface UserActionListener {
     /**
      * Handle a user action just performed by the user.

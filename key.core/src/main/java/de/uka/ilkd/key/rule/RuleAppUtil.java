@@ -18,11 +18,14 @@ import org.key_project.prover.rules.instantiation.AssumesFormulaInstSeq;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Utilities for working with rule applications.
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class RuleAppUtil {
     private RuleAppUtil() {
 

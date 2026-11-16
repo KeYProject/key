@@ -11,6 +11,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -21,6 +22,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @param <T> the type of the object this listener is listening to.
  */
+@NullMarked
 abstract class SequentViewListener<T extends SequentView> implements MouseListener {
 
     /**

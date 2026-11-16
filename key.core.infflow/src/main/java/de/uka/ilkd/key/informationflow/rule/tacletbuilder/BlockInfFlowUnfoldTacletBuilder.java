@@ -15,15 +15,19 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class BlockInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTacletBuilder {
 
-    private BlockContract contract;
-    private ExecutionContext executionContext;
+    private @Nullable BlockContract contract;
+    private @Nullable ExecutionContext executionContext;
 
 
     public BlockInfFlowUnfoldTacletBuilder(Services services) {
@@ -43,15 +47,35 @@ public class BlockInfFlowUnfoldTacletBuilder extends AbstractInfFlowUnfoldTaclet
 
     @Override
     Name getTacletName() {
-        return MiscTools
-                .toValidTacletName(UNFOLD + unfoldCounter + " of " + contract.getUniqueName());
+        return MiscTools.toValidTacletName(UNFOLD + unfoldCounter + " of " + requireContract()
+                .getUniqueName());
     }
 
 
     @Override
     JTerm createFindTerm(IFProofObligationVars ifVars) {
-        InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(contract, ifVars.c1,
-            ifVars.c2, executionContext, services);
+        InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(requireContract(),
+            ifVars.c1, ifVars.c2, requireExecutionContext(), services);
         return f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_BLOCK_WITH_PRE_RELATION);
+    }
+
+
+    private BlockContract requireContract() {
+        final BlockContract c = contract;
+        if (c == null) {
+            throw new NullPointerException(
+                "No contract for building the information flow block unfold taclet.");
+        }
+        return c;
+    }
+
+
+    private ExecutionContext requireExecutionContext() {
+        final ExecutionContext context = executionContext;
+        if (context == null) {
+            throw new NullPointerException(
+                "No execution context for building the information flow block unfold taclet.");
+        }
+        return context;
     }
 }

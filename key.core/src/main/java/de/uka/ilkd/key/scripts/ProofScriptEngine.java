@@ -98,7 +98,8 @@ public class ProofScriptEngine {
 
         // add the filename (if available) to the statemap.
         try {
-            URI url = commands.getFirst().location().fileUri();
+            URI url = Objects.requireNonNull(commands.getFirst().location(),
+                "no location recorded for the first command").fileUri();
             stateMap.setBaseFileName(Paths.get(url));
         } catch (NullPointerException | InvalidPathException ignored) {
             // weigl: occurs on windows platforms, due to the fact
@@ -157,8 +158,11 @@ public class ProofScriptEngine {
                     break;
                 }
             } catch (Exception e) {
-                LOGGER.debug("GOALS: {}", proof.getSubtreeGoals(proof.root()).size());
-                proof.getSubtreeGoals(stateMap.getProof().root())
+                LOGGER.debug("GOALS: {}",
+                    proof.getSubtreeGoals(Objects.requireNonNull(proof.root(),
+                        "proof has no root node")).size());
+                proof.getSubtreeGoals(Objects.requireNonNull(stateMap.getProof().root(),
+                    "proof has no root node"))
                         .forEach(g -> LOGGER.debug("{}", g.sequent()));
 
                 LOGGER.debug("Commands: {}", commands.stream()
@@ -192,13 +196,13 @@ public class ProofScriptEngine {
     /**
      * Set the routine that is executed before every successfully executed command.
      *
-     * @param monitor the monitor to set
+     * @param monitor the monitor to set, or null to disable command monitoring
      */
-    public void setCommandMonitor(Consumer<Message> monitor) {
+    public void setCommandMonitor(@Nullable Consumer<Message> monitor) {
         this.stateMap.setObserver(monitor);
     }
 
-    public static ProofScriptCommand getCommand(String commandName) {
+    public static @Nullable ProofScriptCommand getCommand(String commandName) {
         return COMMANDS.get(commandName);
     }
 
@@ -208,7 +212,7 @@ public class ProofScriptEngine {
     public record EchoMessage(String message) implements Message {
     }
 
-    public record ExecuteInfo(String command, Location location, int nodeSerial)
+    public record ExecuteInfo(String command, @Nullable Location location, int nodeSerial)
             implements Message {
     }
 }

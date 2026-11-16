@@ -16,6 +16,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The objects of this class represent array sorts (in the sense of *Java* arrays). There can be one
  * such sort for every element sort; however, the array sorts are only created lazily on demand.
@@ -26,6 +29,7 @@ import org.key_project.util.collection.ImmutableSet;
  * the mathematical integers), but we have different array sorts int[], byte[], char[], short[] and
  * long[], all storing mathematical integers.
  */
+@NullMarked
 public final class ArraySort extends SortImpl {
 
     private static final WeakHashMap<SortKey, WeakReference<ArraySort>> aSH =
@@ -63,8 +67,9 @@ public final class ArraySort extends SortImpl {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private static ImmutableSet<Sort> getArraySuperSorts(Sort elemSort, Sort objectSort,
-            Sort cloneableSort, Sort serializableSort) {
+    private static ImmutableSet<Sort> getArraySuperSorts(Sort elemSort,
+            @Nullable Sort objectSort, @Nullable Sort cloneableSort,
+            @Nullable Sort serializableSort) {
         ImmutableSet<Sort> result = DefaultImmutableSet.nil();
         ImmutableSet<Sort> elemDirectSuperSorts = elemSort.extendsSorts();
 
@@ -81,7 +86,10 @@ public final class ArraySort extends SortImpl {
             }
         } else {
             for (Sort s : elemDirectSuperSorts) {
-                result = result.add(getArraySort(s, objectSort, cloneableSort, serializableSort));
+                // element type of the super sort is unknown; the 5-argument overload also
+                // tolerates the @Nullable JDK sorts (which the 4-argument one does not)
+                result =
+                    result.add(getArraySort(s, null, objectSort, cloneableSort, serializableSort));
             }
         }
 
@@ -97,8 +105,9 @@ public final class ArraySort extends SortImpl {
      * Returns the ArraySort to the given element sort and element type. This method ensures that
      * only one ArraySort-object exists for each array sort.
      */
-    public static ArraySort getArraySort(Sort elemSort, Type elemType, Sort objectSort,
-            Sort cloneableSort, Sort serializableSort) {
+    public static ArraySort getArraySort(Sort elemSort, @Nullable Type elemType,
+            @Nullable Sort objectSort, @Nullable Sort cloneableSort,
+            @Nullable Sort serializableSort) {
         if (elemType != PrimitiveType.JAVA_BYTE && elemType != PrimitiveType.JAVA_CHAR
                 && elemType != PrimitiveType.JAVA_INT && elemType != PrimitiveType.JAVA_LONG
                 && elemType != PrimitiveType.JAVA_SHORT) {
@@ -155,11 +164,11 @@ public final class ArraySort extends SortImpl {
         return elementSort().containsGenericSort();
     }
 
-    private record SortKey(Sort elemSort, Type elemType, Sort javaLangObjectSort,
-            Sort javaLangCloneable,
-            Sort javaLangSerializable) {
-        public boolean equals(Object o) {
-            if (!(o instanceof SortKey(Sort sort, Type type, Sort langObjectSort, Sort langCloneable, Sort langSerializable))) {
+    private record SortKey(Sort elemSort, @Nullable Type elemType,
+            @Nullable Sort javaLangObjectSort, @Nullable Sort javaLangCloneable,
+            @Nullable Sort javaLangSerializable) {
+        public boolean equals(@Nullable Object o) {
+            if (!(o instanceof SortKey(Sort sort, @Nullable Type type, @Nullable Sort langObjectSort, @Nullable Sort langCloneable, @Nullable Sort langSerializable))) {
                 return false;
             }
             return elemSort == sort && elemType == type

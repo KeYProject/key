@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java;
 
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestContextStatementBlock {
 
+    @Nullable
     JavaBlock blockOne;
 
     @BeforeEach
@@ -40,6 +43,7 @@ public class TestContextStatementBlock {
 
     @Test
     public void testContextTermInstantiation() {
+        Objects.requireNonNull(blockOne, "set up in @BeforeEach setUp()");
         ExtList statementList = new ExtList();
         StatementBlock stContainer = (StatementBlock) blockOne.program();
         int size = stContainer.getChildCount();

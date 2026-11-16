@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.proof.Goal;
@@ -25,6 +27,8 @@ import org.key_project.prover.strategy.costbased.termfeature.SubTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Feature that returns zero iff each monomial of one polynomial is smaller than all monomials of a
@@ -38,6 +42,7 @@ import org.key_project.util.collection.ImmutableList;
  * {@link AbstractMonomialSmallerThanFeature#introductionTime}).
  * </p>
  */
+@NullMarked
 @StableCost
 public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeature {
 
@@ -75,9 +80,11 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     protected boolean filter(TacletApp app, PosInOccurrence pos,
             Goal goal, MutableState mState) {
         final MonomialCollector m1 = new MonomialCollector();
-        m1.collect(left.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
+        m1.collect(Objects.requireNonNull(left.toTerm(app, pos, goal, mState)), mState,
+            goal.proof().getServices());
         final MonomialCollector m2 = new MonomialCollector();
-        m2.collect(right.toTerm(app, pos, goal, mState), mState, goal.proof().getServices());
+        m2.collect(Objects.requireNonNull(right.toTerm(app, pos, goal, mState)), mState,
+            goal.proof().getServices());
 
         return lessThan(m1.getResult(), m2.getResult(), pos, goal);
 

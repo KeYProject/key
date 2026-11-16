@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -104,7 +105,7 @@ public class TestProofScriptCommand {
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(tmpKey);
 
-        Proof proof = env.getLoadedProof();
+        Proof proof = Objects.requireNonNull(env.getLoadedProof(), "no proof loaded");
 
         KeyAst.ProofScript script = ParsingFacade.parseScript(data.script());
         ProofScriptEngine pse = new ProofScriptEngine(proof);
@@ -117,7 +118,9 @@ public class TestProofScriptCommand {
             assertTrue(data.exception != null && !data.exception.isEmpty(),
                 "An exception was not expected, but got " + ex.getMessage());
             // weigl: fix spurious error on Windows machine due to different file endings.
-            String msg = ex.getMessage().trim().replaceAll("\r\n", "\n");
+            String message =
+                Objects.requireNonNull(ex.getMessage(), "exception message expected");
+            String msg = message.trim().replaceAll("\r\n", "\n");
             assertThat(msg)
                     .containsIgnoringWhitespaces(data.exception.trim())
                     .as("Unexpected exception: %s\n expected: %s",

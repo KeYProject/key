@@ -8,9 +8,13 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A JML represents clause in textual form.
  */
+@NullMarked
 public final class TextualJMLRepresents extends TextualJMLConstruct {
 
     private final LabeledParserRuleContext represents;
@@ -41,7 +45,7 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!(o instanceof TextualJMLRepresents r)) {
             return false;
         }
@@ -54,7 +58,7 @@ public final class TextualJMLRepresents extends TextualJMLConstruct {
         return modifiers.hashCode() + represents.hashCode();
     }
 
-    public String getName() {
+    public @Nullable String getName() {
         return name;
     }
 }

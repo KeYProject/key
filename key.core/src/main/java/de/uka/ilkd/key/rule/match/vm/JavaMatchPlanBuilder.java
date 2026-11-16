@@ -27,6 +27,7 @@ import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.getMatchIdentityInstruction;
@@ -51,6 +52,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
  * facades} raise a clear error pointing at the missing head (no current taclet hits this; adding a
  * construct means adding one head, see the developer docs).
  */
+@NullMarked
 public final class JavaMatchPlanBuilder extends MatchPlanBuilder {
 
     /**

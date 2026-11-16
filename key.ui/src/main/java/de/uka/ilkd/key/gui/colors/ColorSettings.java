@@ -19,6 +19,7 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,17 +32,27 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (10.05.19)
  */
+@NullMarked
 public class ColorSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ColorSettings.class);
 
     public static final Path SETTINGS_FILE_NEW = PathConfig.getSettingsFile("colors.json");
 
-
-    private static ColorSettings INSTANCE;
+    private static @Nullable ColorSettings INSTANCE;
     private final Map<String, Object> properties = new TreeMap<>();
     private final List<ColorProperty> propertyEntries = new ArrayList<>(64);
+    private final PropertyChangeSupport propertyChangeSupport;
 
+    /**
+     * The ctor registers the shutdown hook while the receiver is still under initialization (EISOP
+     * initialization check); the hook only fires when the JVM shuts down, long after the settings
+     * have been fully constructed, and the change support bound to the under-construction
+     * receiver is only used after construction completes, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:methodref.receiver.bound.invalid", "nullness:assignment.type.incompatible" })
     public ColorSettings(Configuration load) {
+        propertyChangeSupport = new PropertyChangeSupport(this);
         // props.forEach((k, v) -> this.properties.put(k.toString(), v));
         load.getEntries().forEach(entry -> properties.put(entry.getKey(), entry.getValue()));
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
@@ -123,9 +134,8 @@ public class ColorSettings {
         return propertyEntries.stream();
     }
 
-    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
-
-    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+    protected void firePropertyChange(String propertyName, @Nullable Object oldValue,
+            @Nullable Object newValue) {
         propertyChangeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
 
@@ -162,9 +172,8 @@ public class ColorSettings {
         private Color defaultLightValue;
         private Color defaultDarkValue;
 
-        private Color lightValue;
-        private Color darkValue;
-
+        private @Nullable Color lightValue;
+        private @Nullable Color darkValue;
 
         public ColorProperty(String key, String description, Color defaultValue) {
             this(key, description, defaultValue, defaultValue);
@@ -174,10 +183,11 @@ public class ColorSettings {
                 Color defaultDarkValue) {
             this.key = key;
             this.description = description;
-            if (!properties.containsKey(key)) {
-                this.defaultLightValue = defaultLightValue;
-                this.defaultDarkValue = defaultDarkValue;
-            }
+            // The defaults are stored unconditionally; they are only read when no configured
+            // value exists for the key, in which case they were set by the (original) enclosing
+            // check as well.
+            this.defaultLightValue = defaultLightValue;
+            this.defaultDarkValue = defaultDarkValue;
         }
 
         public Color getCurrentColor() {
@@ -189,10 +199,16 @@ public class ColorSettings {
         }
 
         public Color getLightValue() {
-            if (lightValue == null) {
+            Color current = lightValue;
+            if (current == null) {
                 update();
+                current = lightValue;
+                if (current == null) {
+                    // update() always establishes the light value
+                    throw new NullPointerException("No light color value available.");
+                }
             }
-            return lightValue;
+            return current;
         }
 
         public void setLightValue(Color lightValue) {
@@ -202,10 +218,16 @@ public class ColorSettings {
         }
 
         public Color getDarkValue() {
-            if (darkValue == null) {
+            Color current = darkValue;
+            if (current == null) {
                 update();
+                current = darkValue;
+                if (current == null) {
+                    // update() always establishes the dark value
+                    throw new NullPointerException("No dark color value available.");
+                }
             }
-            return darkValue;
+            return current;
         }
 
         public void setDarkValue(Color darkValue) {
@@ -230,8 +252,18 @@ public class ColorSettings {
                 setDarkValue(c);
                 setLightValue(c);
             } else if (v instanceof List<?> seq) {
-                setLightValue(fromHex(seq.get(0).toString()));
-                setDarkValue(fromHex(seq.get(1).toString()));
+                Object lightObject = seq.get(0);
+                if (lightObject == null) {
+                    // a stored color list always carries both values
+                    throw new NullPointerException("No light color value available.");
+                }
+                Object darkObject = seq.get(1);
+                if (darkObject == null) {
+                    // a stored color list always carries both values
+                    throw new NullPointerException("No dark color value available.");
+                }
+                setLightValue(fromHex(lightObject.toString()));
+                setDarkValue(fromHex(darkObject.toString()));
             } else {
                 throw new IllegalArgumentException(
                     "Unexpected types for color " + key + " with value " + v);
@@ -239,6 +271,10 @@ public class ColorSettings {
         }
 
         public Color fromObject(@Nullable Object o) {
+            if (o == null) {
+                // callers must provide a color-convertible value
+                throw new NullPointerException("No color value available.");
+            }
             return fromHex(o.toString());
         }
 

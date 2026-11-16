@@ -7,7 +7,6 @@ package org.key_project.isabelletranslation.translation;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,12 +22,15 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class handles the translation of field values.
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class FieldHandler implements IsabelleHandler {
     /**
      * The predefined fields.
@@ -38,17 +40,20 @@ public class FieldHandler implements IsabelleHandler {
     /**
      * The Field sort.
      */
-    private Sort fieldSort;
+    private @Nullable Sort fieldSort;
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) throws IOException {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         fieldSort = services.getNamespaces().sorts().lookup("Field");
         predefinedFields.add("created");
 
         Namespace<@NonNull Sort> sorts = services.getNamespaces().sorts();
-        masterHandler.addPredefinedSort(Objects.requireNonNull(sorts.lookup(new Name("Field"))),
-            "Field");
+        Sort fieldSortLookup = sorts.lookup(new Name("Field"));
+        if (fieldSortLookup == null) {
+            throw new NullPointerException("Sort 'Field' not found in the namespaces");
+        }
+        masterHandler.addPredefinedSort(fieldSortLookup, "Field");
     }
 
     @Override
@@ -66,7 +71,10 @@ public class FieldHandler implements IsabelleHandler {
             String fieldName = op.name().toString()
                     .replace(JavaDLFieldNames.IMPLICIT_FIELD_INFIX, "_").replace(".", "_");
             if (m.find()) {
-                fieldName = m.group(1);
+                String captured = m.group(1);
+                if (captured != null) {
+                    fieldName = captured;
+                }
             }
             if (predefinedFields.contains(fieldName)) {
                 return new StringBuilder(fieldName);

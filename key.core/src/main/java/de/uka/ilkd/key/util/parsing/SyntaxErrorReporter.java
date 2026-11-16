@@ -21,6 +21,7 @@ import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.*;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (13.09.19)
  */
+@NullMarked
 public class SyntaxErrorReporter extends BaseErrorListener {
     private final List<SyntaxError> errors = new ArrayList<>();
     /**
@@ -41,18 +43,18 @@ public class SyntaxErrorReporter extends BaseErrorListener {
      */
     private final boolean throwDirect;
 
-    private final Logger logger;
+    private final @Nullable Logger logger;
 
-    public SyntaxErrorReporter(Logger logger, boolean throwDirect) {
+    public SyntaxErrorReporter(@Nullable Logger logger, boolean throwDirect) {
         this.logger = logger;
         this.throwDirect = throwDirect;
     }
 
-    public SyntaxErrorReporter(Class<?> loggerCategory) {
+    public SyntaxErrorReporter(@Nullable Class<?> loggerCategory) {
         this(loggerCategory, false);
     }
 
-    public SyntaxErrorReporter(Class<?> loggerCategory, boolean throwDirect) {
+    public SyntaxErrorReporter(@Nullable Class<?> loggerCategory, boolean throwDirect) {
         this(loggerCategory != null ? LoggerFactory.getLogger(loggerCategory) : null, throwDirect);
     }
 
@@ -86,8 +88,8 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             SourceNames.getURIFromTokenSource(tok.getTokenSource()), stack);
 
         if (logger != null) {
-            logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", se.source, line, charPositionInLine,
-                msg, tok, stack);
+            logger.warn("[syntax-error] {}:{}:{}: {} {} ({})", String.valueOf(se.source), line,
+                charPositionInLine, msg, tok, stack);
         }
         errors.add(se);
 
@@ -162,11 +164,13 @@ public class SyntaxErrorReporter extends BaseErrorListener {
         final Token offendingSymbol;
         final int charPositionInLine;
         final String msg;
-        final URI source;
+        // The source URI may be unknown (e.g. for synthetic token streams); a null file URI is
+        // already tolerated by Location (cf. ExceptionTools/LabeledParserRuleContext).
+        final @Nullable URI source;
         final String stack;
 
         public SyntaxError(Recognizer<?, ?> recognizer, int line, Token offendingSymbol,
-                int charPositionInLine, String msg, URI source, String stack) {
+                int charPositionInLine, String msg, @Nullable URI source, String stack) {
             this.recognizer = recognizer;
             this.line = line;
             this.offendingSymbol = offendingSymbol;
@@ -208,7 +212,14 @@ public class SyntaxErrorReporter extends BaseErrorListener {
          */
         public Location getLocation() {
             // charPositionInLine is 0-based
-            return new Location(source, Position.fromOneZeroBased(line, charPositionInLine));
+            // A null source URI means the input has no file (e.g. parsing from a string); main
+            // constructs the Location with a null file directly, which preserves the position:
+            // error mapping anchors on the position, not on the file (Location tolerates a null
+            // fileUri at runtime, cf. UNDEFINED and fromToken).
+            @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+            Location result =
+                new Location(source, Position.fromOneZeroBased(line, charPositionInLine));
+            return result;
         }
     }
 
@@ -224,8 +235,12 @@ public class SyntaxErrorReporter extends BaseErrorListener {
             } else {
                 SyntaxError e = errors.get(0);
                 // e.charPositionInLine is 0 based!
-                location =
+                // Preserve the position even when the source has no file URI (see getLocation
+                // above); main constructs the Location with a null file directly.
+                @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+                Location firstError =
                     new Location(e.source, Position.fromOneZeroBased(e.line, e.charPositionInLine));
+                location = firstError;
             }
         }
 

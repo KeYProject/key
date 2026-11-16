@@ -10,12 +10,15 @@ import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 import org.key_project.prover.rules.VariableCondition;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A specilized {@link TacletBuilderCommand} for handling {@code \varcond}s.
  *
  * @author Alexander Weigl
  * @version 1 (12/10/19)
  */
+@NullMarked
 public interface ConditionBuilder extends TacletBuilderCommand {
     /**
      * Should construct a variable condition for the given arguments and parameters. The arguments

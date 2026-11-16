@@ -22,6 +22,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -31,6 +32,7 @@ import org.jspecify.annotations.Nullable;
  * more general than just to be useful for Information Flow proofs, but as only they are using the
  * feature, it is currently moved into this subclass.
  */
+@NullMarked
 public class InfFlowProof extends Proof {
 
     /**
@@ -41,7 +43,7 @@ public class InfFlowProof extends Proof {
     /**
      * Aggregated proof statistics from other proofs which contributed to this one.
      */
-    private SideProofStatistics sideProofStatistics = null;
+    private @Nullable SideProofStatistics sideProofStatistics = null;
 
     public InfFlowProof(String name, Sequent sequent, KeyAst.@Nullable Declarations header,
             TacletIndex rules,
@@ -137,10 +139,18 @@ public class InfFlowProof extends Proof {
     public void addSideProof(InfFlowProof proof) {
         assert proof != null;
         if (proof.hasSideProofs()) {
+            final SideProofStatistics proofStats = proof.sideProofStatistics;
+            if (proofStats == null) {
+                throw new NullPointerException("No side proof statistics of the side proof.");
+            }
             if (this.hasSideProofs()) {
-                sideProofStatistics = sideProofStatistics.add(proof.sideProofStatistics);
+                final SideProofStatistics myStats = sideProofStatistics;
+                if (myStats == null) {
+                    throw new NullPointerException("No side proof statistics of this proof.");
+                }
+                sideProofStatistics = myStats.add(proofStats);
             } else {
-                sideProofStatistics = SideProofStatistics.create(proof.sideProofStatistics);
+                sideProofStatistics = SideProofStatistics.create(proofStats);
             }
             proof.sideProofStatistics = null;
         }
@@ -150,7 +160,11 @@ public class InfFlowProof extends Proof {
     private void addSideProofStatistics(Statistics stat) {
         assert stat != null;
         if (this.hasSideProofs()) {
-            sideProofStatistics = sideProofStatistics.add(stat);
+            final SideProofStatistics myStats = sideProofStatistics;
+            if (myStats == null) {
+                throw new NullPointerException("No side proof statistics of this proof.");
+            }
+            sideProofStatistics = myStats.add(stat);
         } else {
             sideProofStatistics = SideProofStatistics.create(stat);
         }
@@ -161,7 +175,7 @@ public class InfFlowProof extends Proof {
      *
      * @return the proof statistics
      */
-    public SideProofStatistics getSideProofStatistics() {
+    public @Nullable SideProofStatistics getSideProofStatistics() {
         return sideProofStatistics;
     }
 

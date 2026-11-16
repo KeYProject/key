@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  * Symbolic-execution-internal ordering costs, used by {@link SymExStrategy}. These are the fine,
  * within-SE ordering values that deserve a speaking name of their own; the coarse priorities that
@@ -18,6 +21,7 @@ package de.uka.ilkd.key.strategy;
  * {@link org.key_project.prover.strategy.costbased.CostBand}).
  * </p>
  */
+@NullMarked
 final class SymExCost {
     private SymExCost() {}
 

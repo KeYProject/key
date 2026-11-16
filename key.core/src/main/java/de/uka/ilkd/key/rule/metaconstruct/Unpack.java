@@ -4,17 +4,24 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.LoopInitializer;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.statement.For;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 @TransformerMeta(name = "#unpack")
+@NullMarked
 public class Unpack extends ProgramTransformer {
 
     /**
@@ -32,14 +39,18 @@ public class Unpack extends ProgramTransformer {
             SVInstantiations svInst) {
         Debug.assertTrue(pe instanceof For, "Unpack cannot handle ", pe);
         final For astFor = (For) pe;
-        final Statement[] loopInitStatementList =
-            new Statement[astFor.getInitializers().size() + 1];
+        final ImmutableArray<LoopInitializer> initializers = Objects.requireNonNull(
+            astFor.getInitializers(), "no initializers for unpacked for loop");
+        final Statement[] loopInitStatementList = new Statement[initializers.size() + 1];
         for (int i = 0; i < loopInitStatementList.length - 1; i++) {
-            loopInitStatementList[i] = astFor.getInitializers().get(i);
+            loopInitStatementList[i] = initializers.get(i);
         }
 
         loopInitStatementList[loopInitStatementList.length - 1] =
-            KeYJavaASTFactory.forLoop(astFor.getGuard(), astFor.getIForUpdates(), astFor.getBody());
+            KeYJavaASTFactory.forLoop(astFor.getGuard(),
+                Objects.requireNonNull(astFor.getIForUpdates(),
+                    "no updates for unpacked for loop"),
+                astFor.getBody());
         return new ProgramElement[] { KeYJavaASTFactory.block(loopInitStatementList) };
     }
 

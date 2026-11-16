@@ -18,6 +18,7 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.type.VoidType;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -40,6 +41,7 @@ import org.jspecify.annotations.Nullable;
  * methodcall <code>&lt;init&gt;<cons_args)</code>. The visibility of
  * the normalform is the same as for the original constructor.
  */
+@NullMarked
 public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
     /**
      * creates the constructor normalform builder
@@ -73,9 +75,14 @@ public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
      *        the TypeDeclaration<?> where the cons is declared
      * @param cons
      *        the Constructor to be transformed
+     *        <p>
+     *        The parameter list of a constructor call is present once the explicit and implicit
+     *        parameters were combined; the dereference of the (nullable) parameter list is
+     *        suppressed
+     *        with a scoped key.
      */
-    private void normalform(@NonNull ClassOrInterfaceDeclaration cd,
-            @NonNull ConstructorDeclaration cons) {
+    @SuppressWarnings("nullness:dereference.of.nullable")
+    private void normalform(ClassOrInterfaceDeclaration cd, ConstructorDeclaration cons) {
         final var enclosingClass = getEnclosingClass(cd);
         NodeList<Modifier> mods = new NodeList<>();
 
@@ -111,10 +118,14 @@ public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
         }
 
         // transfer the modification
-        mods.addAll(TransformationPipelineServices.cloneList(cons.getModifiers()));
+        mods.addAll(Objects.requireNonNull(
+            TransformationPipelineServices.cloneList(cons.getModifiers()),
+            "constructor modifiers are always present"));
 
         // transfer the parameters
-        parameters.addAll(TransformationPipelineServices.cloneList(cons.getParameters()));
+        parameters.addAll(Objects.requireNonNull(
+            TransformationPipelineServices.cloneList(cons.getParameters()),
+            "constructor parameters are always present"));
 
         // transfer constructor body
         BlockStmt origBody = cons.body();
@@ -130,7 +141,10 @@ public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
             }
 
             for (var v : outerVars) {
-                parameters.add(new Parameter(services.getType(v.getType()), v.getName()));
+                parameters.add(new Parameter(
+                    Objects.requireNonNull(services.getType(v.getType()),
+                        "outer variable type must resolve"),
+                    v.getName()));
             }
         }
 
@@ -171,8 +185,9 @@ public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
                                 .map(TransformationPipelineServices::cloneList)
                                 .orElse(new NodeList<>());
 
-                    final NodeList<Expression> params =
-                        TransformationPipelineServices.cloneList(constructorCall.getArguments());
+                    final NodeList<Expression> params = Objects.requireNonNull(
+                        TransformationPipelineServices.cloneList(constructorCall.getArguments()),
+                        "explicit constructor invocation has an argument list");
                     if (implictParameter != null)
                         params.addFirst(implictParameter.getNameAsExpression());
 
@@ -227,8 +242,7 @@ public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
      * @param offset in case of an inner class the first statement is the initialisation
      *        of the outer this reference not an initializer
      */
-    private void addInitializers(@NonNull ClassOrInterfaceDeclaration cd,
-            BlockStmt body, int offset) {
+    private void addInitializers(ClassOrInterfaceDeclaration cd, BlockStmt body, int offset) {
         var initializers = services.getInitializers(cd);
         int i = offset + 1; // + 1 as initialisation happens after super(..) call
         for (Statement initializer : initializers) {
@@ -245,8 +259,7 @@ public class ConstructorNormalformBuilder extends JavaTransformerAbstract {
         return Optional.empty();
     }
 
-    @Nullable
-    private ConstructorDeclaration attachConstructorDecl(TypeDeclaration<?> td) {
+    private @Nullable ConstructorDeclaration attachConstructorDecl(TypeDeclaration<?> td) {
         if (td.getParentNode().get() instanceof ObjectCreationExpr) {
             var n = (ObjectCreationExpr) td.getParentNode().get();
             final var args = n.getArguments();

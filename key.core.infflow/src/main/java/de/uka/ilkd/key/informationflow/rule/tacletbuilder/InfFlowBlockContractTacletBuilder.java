@@ -19,15 +19,19 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
+@NullMarked
 public final class InfFlowBlockContractTacletBuilder
         extends AbstractInfFlowContractAppTacletBuilder {
 
-    private BlockContract blockContract;
-    private ExecutionContext executionContext;
+    private @Nullable BlockContract blockContract;
+    private @Nullable ExecutionContext executionContext;
 
 
     public InfFlowBlockContractTacletBuilder(final Services services) {
@@ -47,29 +51,29 @@ public final class InfFlowBlockContractTacletBuilder
 
     @Override
     Name generateName() {
-        return MiscTools.toValidTacletName(USE_IF + blockContract.getUniqueName());
+        return MiscTools.toValidTacletName(USE_IF + requireBlockContract().getUniqueName());
     }
 
     @Override
     JTerm generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services) {
-        BasicPOSnippetFactory fAssumes = POSnippetFactory.getBasicFactory(blockContract,
-            schemaDataAssumes, executionContext, services);
+        BasicPOSnippetFactory fAssumes = POSnippetFactory.getBasicFactory(requireBlockContract(),
+            schemaDataAssumes, requireExecutionContext(), services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
 
     @Override
     JTerm generateSchemaFind(ProofObligationVars schemaDataFind, Services services) {
-        BasicPOSnippetFactory fFind = POSnippetFactory.getBasicFactory(blockContract,
-            schemaDataFind, executionContext, services);
+        BasicPOSnippetFactory fFind = POSnippetFactory.getBasicFactory(requireBlockContract(),
+            schemaDataFind, requireExecutionContext(), services);
         return fFind.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
 
     @Override
     JTerm getContractApplPred(ProofObligationVars appData) {
-        BasicPOSnippetFactory f =
-            POSnippetFactory.getBasicFactory(blockContract, appData, executionContext, services);
+        BasicPOSnippetFactory f = POSnippetFactory.getBasicFactory(requireBlockContract(),
+            appData, requireExecutionContext(), services);
         return f.create(BasicPOSnippetFactory.Snippet.BLOCK_CALL_RELATION);
     }
 
@@ -78,12 +82,13 @@ public final class InfFlowBlockContractTacletBuilder
     JTerm buildContractApplications(ProofObligationVars contAppData,
             ProofObligationVars contAppData2, Services services) {
         ImmutableSet<BlockContract> ifContracts =
-            services.getSpecificationRepository().getBlockContracts(blockContract.getBlock());
+            services.getSpecificationRepository().getBlockContracts(requireBlockContract()
+                    .getBlock());
         ifContracts = filterContracts(ifContracts);
         ImmutableList<JTerm> contractsApplications = ImmutableList.nil();
         for (BlockContract cont : ifContracts) {
             InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(cont, contAppData,
-                contAppData2, executionContext, services);
+                contAppData2, requireExecutionContext(), services);
             contractsApplications = contractsApplications
                     .append(f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_CONTRACT_APPL));
         }
@@ -94,14 +99,35 @@ public final class InfFlowBlockContractTacletBuilder
 
     ImmutableSet<BlockContract> filterContracts(ImmutableSet<BlockContract> ifContracts) {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
+        final BlockContract contract = requireBlockContract();
         for (BlockContract cont : ifContracts) {
-            if ((cont.getBlock().getStartPosition().line() == blockContract.getBlock()
+            if ((cont.getBlock().getStartPosition().line() == contract.getBlock()
                     .getStartPosition().line())
                     && cont.getTarget().getUniqueName()
-                            .equalsIgnoreCase(blockContract.getTarget().getUniqueName())) {
+                            .equalsIgnoreCase(contract.getTarget().getUniqueName())) {
                 result = result.add(cont);
             }
         }
         return result;
+    }
+
+
+    private BlockContract requireBlockContract() {
+        final BlockContract c = blockContract;
+        if (c == null) {
+            throw new NullPointerException(
+                "No block contract for building the information flow block contract taclet.");
+        }
+        return c;
+    }
+
+
+    private ExecutionContext requireExecutionContext() {
+        final ExecutionContext context = executionContext;
+        if (context == null) {
+            throw new NullPointerException(
+                "No execution context for building the information flow block contract taclet.");
+        }
+        return context;
     }
 }

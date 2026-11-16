@@ -18,6 +18,7 @@
 package de.uka.ilkd.key.java.ast.declaration;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.PositionInfo;
@@ -31,17 +32,19 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Interface declaration.
  */
+@NullMarked
 public class InterfaceDeclaration extends TypeDeclaration {
-    protected final Extends extending;
+    protected final @Nullable Extends extending;
 
 
     public InterfaceDeclaration(PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray, ProgramElementName name,
+            ImmutableArray<Modifier> modArray, ProgramElementName name,
             ProgramElementName fullName, ImmutableArray<MemberDeclaration> members,
             boolean parentIsInterfaceDeclaration, boolean isLibrary, Extends extending,
             List<TextualJMLConstruct> spec) {
@@ -59,7 +62,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
      */
     public InterfaceDeclaration(Modifier[] modifiers, ProgramElementName name,
             ProgramElementName fullName,
-            Extends extended, MemberDeclaration[] members,
+            @Nullable Extends extended, MemberDeclaration[] members,
             boolean isLibrary) {
         super(modifiers, name, fullName, members, false, isLibrary);
         extending = extended;
@@ -69,7 +72,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
      * Construct a new outer or member interface class.
      */
     public InterfaceDeclaration(Modifier[] modifiers, ProgramElementName name,
-            Extends extended, MemberDeclaration[] members,
+            @Nullable Extends extended, MemberDeclaration[] members,
             boolean isLibrary) {
         this(modifiers, name, name, extended, members, isLibrary);
     }
@@ -166,7 +169,7 @@ public class InterfaceDeclaration extends TypeDeclaration {
      *
      * @return the extends.
      */
-    public Extends getExtendedTypes() {
+    public @Nullable Extends getExtendedTypes() {
         return extending;
     }
 
@@ -238,7 +241,10 @@ public class InterfaceDeclaration extends TypeDeclaration {
         ImmutableList<KeYJavaType> types = ImmutableList.<KeYJavaType>nil();
         if (extending != null) {
             for (int i = extending.getTypeReferenceCount() - 1; i >= 0; i--) {
-                types = types.prepend(extending.getTypeReferenceAt(i).getKeYJavaType());
+                final KeYJavaType kjt = Objects.requireNonNull(
+                    extending.getTypeReferenceAt(i).getKeYJavaType(),
+                    "extended type must be resolvable");
+                types = types.prepend(kjt);
             }
         }
         return types;

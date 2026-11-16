@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This simple taclet menu displays the user a list of applicable taclets and lets select her/him
  * one of those. It is similar to {@link de.uka.ilkd.key.gui.nodeviews.CurrentGoalViewMenu} but with
@@ -24,6 +26,7 @@ import org.key_project.util.collection.ImmutableList;
  * abbreviation etc.</li>
  * </ul>
  */
+@NullMarked
 public class SimpleTacletSelectionMenu extends JMenu {
 
     /**
@@ -32,12 +35,18 @@ public class SimpleTacletSelectionMenu extends JMenu {
     private static final long serialVersionUID = 3027934580300468044L;
 
     /**
-     * creates an instance of this menu displaying the applications stored in <tt>apps</tt>
+     * Creates an instance of this menu displaying the applications stored in <tt>apps</tt>.
+     *
+     * <p>
+     * The menu fills its entries while the receiver is still under initialization (EISOP
+     * initialization check); the entries only materialize once the menu is displayed after
+     * construction, suppressed with a scoped key.
      *
      * @param apps the {@link ImmutableList<PosTacletApp>} to be displayed
      * @param info the NotationInfo used to pretty print the taclets in tooltips
      * @param listener the ActionListener which is registered at each menu item
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SimpleTacletSelectionMenu(ImmutableList<PosTacletApp> apps, NotationInfo info,
             ActionListener listener, Services services) {
         super("Select Rule to Apply");

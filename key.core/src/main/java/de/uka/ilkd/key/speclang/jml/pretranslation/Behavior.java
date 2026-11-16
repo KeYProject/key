@@ -5,9 +5,12 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Enum type for the JML behavior kinds.
  */
+@NullMarked
 public enum Behavior {
 
     NONE(""), BEHAVIOR("behavior "), MODEL_BEHAVIOR("model_behavior "),

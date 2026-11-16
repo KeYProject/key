@@ -13,6 +13,8 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An axiom originating from a (JML) specification, belonging to a particular class, and
@@ -21,13 +23,14 @@ import org.key_project.util.collection.Pair;
  * rules of Java. If visible, it is made available not as a formula, but as one or many taclets (for
  * performance reasons).
  */
+@NullMarked
 public abstract class ClassAxiom implements SpecificationElement {
-    protected String displayName;
+    protected @Nullable String displayName;
 
     /**
      * Returns the axiomatised function symbol.
      */
-    public abstract IObserverFunction getTarget();
+    public abstract @Nullable IObserverFunction getTarget();
 
 
     /**

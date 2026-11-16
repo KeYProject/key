@@ -14,6 +14,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructionSet.getMatchInstructionForSortArgument;
@@ -21,6 +22,7 @@ import static de.uka.ilkd.key.rule.match.vm.instructions.JavaDLMatchVMInstructio
 /**
  * Matches a parametric sort instance
  */
+@NullMarked
 public final class MatchParametricSortInstruction implements MatchInstruction {
     private final ParametricSortDecl base;
     private final MatchInstruction[] argMatchers;

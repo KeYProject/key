@@ -6,6 +6,7 @@ package org.key_project.logic;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Objects;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -105,7 +106,7 @@ public class PoolSyntaxElementCursor {
         // cannot be null as then hasNext would have returned false (and top would be -1)
         final SyntaxElement current = elements[top];
         assert current != null;
-        return current;
+        return Objects.requireNonNull(current);
     }
 
     private /* @ helper @ */ void gotoNextHelper() {
@@ -116,9 +117,10 @@ public class PoolSyntaxElementCursor {
             final SyntaxElement se = elements[top];
             final int pos = nextChild[top];
             assert se != null;
+            final SyntaxElement seNonNull = Objects.requireNonNull(se);
             @SuppressWarnings("nullness") // se cannot be null, if elements[top] is null then we
                                           // iterated over the whole term and top is < 0
-            final int childCount = se.getChildCount();
+            final int childCount = seNonNull.getChildCount();
             if (pos < childCount) {
                 if (pos + 1 >= childCount) {
                     // we visited all children of that element,
@@ -127,7 +129,7 @@ public class PoolSyntaxElementCursor {
                 } else {
                     nextChild[top] = pos + 1;
                 }
-                push(se.getChild(pos));
+                push(seNonNull.getChild(pos));
             } else {
                 pop();
             }

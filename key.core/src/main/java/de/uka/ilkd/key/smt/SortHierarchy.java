@@ -9,17 +9,22 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 class SortWrapper {
     private final Sort sort;
     private final StringBuilder name;
-    private final StringBuilder predicateName;
+    private final @Nullable StringBuilder predicateName;
     private final List<SortWrapper> parentSorts = new LinkedList<>();
 
     public boolean extendsTrans(SortWrapper sw) {
@@ -34,11 +39,11 @@ class SortWrapper {
         return name;
     }
 
-    public StringBuilder getPredicateName() {
+    public @Nullable StringBuilder getPredicateName() {
         return predicateName;
     }
 
-    public SortWrapper(Sort sort, StringBuilder name, StringBuilder predicateName) {
+    public SortWrapper(Sort sort, StringBuilder name, @Nullable StringBuilder predicateName) {
         super();
         this.sort = sort;
         this.name = name;
@@ -68,7 +73,8 @@ class SortWrapper {
 
     private boolean addParent(SortWrapper parent, boolean explicitNullHierarchy,
             boolean explicitHierarchy, Services services) {
-        Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
+        Function nullOp = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT").getNull();
         if ((explicitNullHierarchy && this.getSort() == nullOp.sort()) || explicitHierarchy) {
             parentSorts.add(parent);
             return true;
@@ -95,6 +101,7 @@ class SortWrapper {
  *
  * @author Simon Greiner
  */
+@NullMarked
 public class SortHierarchy {
 
     private final LinkedList<SortWrapper> sorts = new LinkedList<>();

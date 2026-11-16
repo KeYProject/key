@@ -28,10 +28,14 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This profile sets up KeY for verification of JavaCard programs.
  *
  */
+@NullMarked
 public class JavaProfile extends AbstractProfile {
     public static final String PROFILE_ID = "Java Profile";
     public static final String NAME_WITH_PERMISSIONS = "Java with Permissions Profile";
@@ -77,8 +81,8 @@ public class JavaProfile extends AbstractProfile {
      * {@link Thread}).
      * </p>
      */
-    public static JavaProfile defaultInstance;
-    public static JavaProfile defaultInstancePermissions;
+    public static @Nullable JavaProfile defaultInstance;
+    public static @Nullable JavaProfile defaultInstancePermissions;
 
     /**
      * The default strategy factory to be used if no other strategy factory is
@@ -90,7 +94,7 @@ public class JavaProfile extends AbstractProfile {
      *
      * (solution suggested by AW)
      */
-    private static StrategyFactory DEFAULT;
+    private static @Nullable StrategyFactory DEFAULT;
 
     public static StrategyFactory getDefault() {
         if (DEFAULT == null) {
@@ -101,8 +105,15 @@ public class JavaProfile extends AbstractProfile {
 
     private boolean permissions = false;
 
-    private OneStepSimplifier oneStepSimpilifier;
+    private @Nullable OneStepSimplifier oneStepSimpilifier;
 
+    /**
+     * The {@link #setSelectedGoalChooserBuilder} call operates on {@code this} while the
+     * receiver is still under initialization (EISOP initialization check); safe here because it
+     * only selects among the factories set up by {@code super(...)}, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     protected JavaProfile(String standardRules) {
         super(standardRules);
         setSelectedGoalChooserBuilder(DepthFirstGoalChooserFactory.NAME);
@@ -244,7 +255,7 @@ public class JavaProfile extends AbstractProfile {
      * @return the default strategy factory
      */
     @Override
-    public StrategyFactory getDefaultStrategyFactory() {
+    public @Nullable StrategyFactory getDefaultStrategyFactory() {
         return DEFAULT;
     }
 

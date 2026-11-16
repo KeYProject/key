@@ -8,9 +8,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class CompoundProof extends ProofAggregate {
 
     private final ArrayList<ProofAggregate> proofs;
@@ -72,12 +77,13 @@ public class CompoundProof extends ProofAggregate {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (!super.equals(o)) {
             return false;
         }
 
-        final CompoundProof other = (CompoundProof) o;
+        final CompoundProof other =
+            Objects.requireNonNull((CompoundProof) o, "equality target not null");
 
         for (int i = 0; i < proofs.size(); i++) {
             if (!proofs.get(i).equals(other.proofs.get(i))) {

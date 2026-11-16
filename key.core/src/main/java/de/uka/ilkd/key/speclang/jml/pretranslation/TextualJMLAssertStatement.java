@@ -9,14 +9,16 @@ import de.uka.ilkd.key.nparser.KeyAst;
 import org.key_project.util.collection.ImmutableList;
 
 import org.antlr.v4.runtime.RuleContext;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * A JML assert/assume statement.
  */
+@NullMarked
 public class TextualJMLAssertStatement extends TextualJMLConstruct {
     private final KeyAst.Expression context;
-    private final String optLabel;
+    private final @Nullable String optLabel;
     private final KeyAst.@Nullable JMLProofScript assertionProof;
     private final Kind kind;
 
@@ -25,7 +27,7 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
     }
 
     public TextualJMLAssertStatement(Kind kind, KeyAst.Expression clause,
-            KeyAst.@Nullable JMLProofScript assertionProof, String optLabel) {
+            KeyAst.@Nullable JMLProofScript assertionProof, @Nullable String optLabel) {
         super(ImmutableList.nil(), kind.toString() + " " + clause);
         this.kind = kind;
         this.context = clause;
@@ -74,7 +76,7 @@ public class TextualJMLAssertStatement extends TextualJMLConstruct {
         return kind;
     }
 
-    public String getOptLabel() {
+    public @Nullable String getOptLabel() {
         return optLabel;
     }
 

@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Label;
@@ -22,10 +23,14 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This variable condition ensures that no other label of the same name exists in the context
  * program or one of the schemavariable instantiations.
  */
+@NullMarked
 public final class NewJumpLabelCondition implements VariableCondition {
 
     private final ProgramSV labelSV;
@@ -41,8 +46,8 @@ public final class NewJumpLabelCondition implements VariableCondition {
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var,
-            SyntaxElement instCandidate,
+    public @Nullable MatchConditions check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo matchCond,
             LogicServices services) {
         SVInstantiations instantiations = (SVInstantiations) matchCond.getInstantiations();
@@ -56,7 +61,8 @@ public final class NewJumpLabelCondition implements VariableCondition {
                 return null;
             }
             final List<ProgramElement> programs = collect(instantiations);
-            programs.add(instantiations.getContextInstantiation().program());
+            programs.add(Objects.requireNonNull(instantiations.getContextInstantiation(),
+                "no context instantiation").program());
             if (!isUnique((Label) instCandidate, programs, services)) {
                 return null;
             }

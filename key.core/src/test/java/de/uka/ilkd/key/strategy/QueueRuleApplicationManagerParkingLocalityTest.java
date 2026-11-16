@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.strategy.ParkedBases.WakeKey;
@@ -38,7 +39,8 @@ public class QueueRuleApplicationManagerParkingLocalityTest {
         // the deep-copy.
         final WakeKey key = new WakeKey(WakeKind.OP, true, Junctor.AND, null);
         orig.parkForTests(key, new StubRuleAppContainer());
-        final Collection<RuleAppContainer> bucket = orig.parkedMapForTests().get(key);
+        final Collection<RuleAppContainer> bucket =
+            Objects.requireNonNull(orig.parkedMapForTests(), "parking created the map").get(key);
         orig.pendingWakeKeys = new LinkedHashSet<>();
         orig.pendingWakeKeys.add(new WakeKey(WakeKind.OP, true, Junctor.OR, null));
 
@@ -51,7 +53,9 @@ public class QueueRuleApplicationManagerParkingLocalityTest {
             "the parked map must be deep-copied, not shared");
         assertNotSame(orig.pendingWakeKeys, copy.pendingWakeKeys,
             "the pending change set must be deep-copied, not shared");
-        final Collection<RuleAppContainer> copyBucket = copy.parkedMapForTests().get(key);
+        final Collection<RuleAppContainer> copyBucket = Objects.requireNonNull(
+            Objects.requireNonNull(copy.parkedMapForTests(), "parking created the map").get(key),
+            "the parked base must have a bucket in the copy");
         assertNotSame(bucket, copyBucket, "the parking bucket must be deep-copied");
 
         // Independence: a park or wake recorded on one sibling after the split must not appear on

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Contains commonly (at least in the context of KeY) used Unicode symbols. The names for the
  * constants mostly derive from the common names in LaTeX, such as the bottom symbol is noted as
@@ -15,6 +17,7 @@ package de.uka.ilkd.key.util;
  * @author bruns
  *
  */
+@NullMarked
 public final class UnicodeHelper {
 
     // first order operators

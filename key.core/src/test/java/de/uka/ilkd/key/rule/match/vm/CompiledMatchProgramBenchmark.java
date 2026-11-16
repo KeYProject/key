@@ -8,9 +8,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -22,6 +25,7 @@ import org.key_project.prover.rules.matcher.vm.MatchProgram;
 import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -106,17 +110,21 @@ public class CompiledMatchProgramBenchmark {
                 .resolve("tacletMatch1.key").toString());
     }
 
-    private static Task buildTask(String pathStr) {
+    // returns null if the problem file does not exist
+    private static @Nullable Task buildTask(String pathStr) {
         final Path path = Path.of(pathStr.trim());
         if (!Files.exists(path)) {
             System.out.println("  (skip, not found) " + path);
             return null;
         }
         final ProofAggregate pa = HelperClassForTests.parse(path);
-        final Services services = pa.getFirstProof().getServices();
+        final Proof proof =
+            Objects.requireNonNull(pa.getFirstProof(), "the archive has the first proof");
+        final Services services = proof.getServices();
 
         final List<JTerm> corpus = new ArrayList<>();
-        for (SequentFormula sf : pa.getFirstProof().root().sequent()) {
+        final Node root = Objects.requireNonNull(proof.root(), "the proof has a root");
+        for (SequentFormula sf : root.sequent()) {
             collectSubterms((JTerm) sf.formula(), corpus);
         }
         for (String f : CORPUS_FORMULAS) {
@@ -129,8 +137,10 @@ public class CompiledMatchProgramBenchmark {
 
         final List<VMProgramInterpreter> interps = new ArrayList<>();
         final List<MatchProgram> comps = new ArrayList<>();
+        final var initConfig =
+            Objects.requireNonNull(proof.getInitConfig(), "the proof has an init config");
         int findTaclets = 0;
-        for (Taclet t : pa.getFirstProof().getInitConfig().activatedTaclets()) {
+        for (Taclet t : initConfig.activatedTaclets()) {
             if (!(t instanceof FindTaclet ft)) {
                 continue;
             }

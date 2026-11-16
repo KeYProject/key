@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.ClassType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
@@ -16,6 +18,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * This variable condition checks if a given type denotes a final type.
@@ -25,6 +30,7 @@ import org.key_project.logic.sort.Sort;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public final class FinalTypeVarCond extends VariableConditionAdapter {
 
     private final TypeResolver resolver;
@@ -40,14 +46,18 @@ public final class FinalTypeVarCond extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            SVInstantiations instMap,
             Services services) {
-        Sort sort = resolver.resolveSort(var, instCandidate, instMap, services);
+        Sort sort = Objects.requireNonNull(
+            resolver.resolveSort(var, instCandidate, instMap, services),
+            "no sort resolved by " + resolver);
         while (sort instanceof ArraySort arraySort) {
             sort = arraySort.elementSort();
         }
 
-        Type type = services.getJavaInfo().getKeYJavaType(sort).getJavaType();
+        Type type = Objects.requireNonNull(services.getJavaInfo().getKeYJavaType(sort),
+            "no KeYJavaType for sort " + sort).getJavaType();
 
         boolean isFinal;
         if (type instanceof PrimitiveType) {

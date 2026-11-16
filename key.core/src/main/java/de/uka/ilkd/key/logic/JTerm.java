@@ -16,7 +16,8 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * In contrast to the distinction of formulas and terms as made by most of the inductive definitions
@@ -42,6 +43,7 @@ import org.jspecify.annotations.NonNull;
  * Term supports the {@link Visitor} pattern. Two different visit strategies are currently
  * supported: {@link JTerm#execPostOrder(Visitor)} and {@link JTerm#execPreOrder(Visitor)}.
  */
+@NullMarked
 public interface JTerm
         extends Sorted, EqualsModProperty<JTerm>, Term {
     @Override
@@ -80,7 +82,6 @@ public interface JTerm
     /**
      * The Java block at top level.
      */
-    @NonNull
     JavaBlock javaBlock();
 
     /**
@@ -108,6 +109,7 @@ public interface JTerm
      * @param termLabelName The {@link Name} of the {@link TermLabel} to search.
      * @return The first found {@link TermLabel} or {@code null} if not available.
      */
+    @Nullable
     TermLabel getLabel(Name termLabelName);
 
     /**

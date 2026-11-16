@@ -256,6 +256,7 @@ public abstract class ImmutableLeftistHeap<T extends Comparable<T>> implements I
          * @return the minimum element of this heap, or null iff this heap is empty
          *         (<code>isEmpty()==true</code>)
          */
+        @SuppressWarnings("NullAway") // contract allows null for the empty heap (see javadoc)
         public S findMin() {
             return null;
         }

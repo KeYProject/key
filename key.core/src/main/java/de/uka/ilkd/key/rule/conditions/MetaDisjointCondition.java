@@ -18,7 +18,11 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public final class MetaDisjointCondition extends VariableConditionAdapter {
 
     private final TermSV var1;
@@ -70,7 +74,8 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst, SVInstantiations svInst,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement subst,
+            SVInstantiations svInst,
             Services services) {
         final JTerm s1Inst = svInst.getInstantiation(var1);
         final JTerm s2Inst = svInst.getInstantiation(var2);

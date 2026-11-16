@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.JTerm;
 
@@ -38,7 +39,8 @@ public class DesignTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(DesignTests.class);
 
     static {
-        File projectRoot = IOUtil.getClassLocation(JTerm.class);
+        File projectRoot =
+            Objects.requireNonNull(IOUtil.getClassLocation(JTerm.class), "JTerm class location");
         if ("org.key_project.core".equals(projectRoot.getName())) {
             projectRoot = new File(projectRoot, "bin");
         } else if (projectRoot.isFile()) {

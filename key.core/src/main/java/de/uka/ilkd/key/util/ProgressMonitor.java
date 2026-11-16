@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An interface to some progress reporting mechanism. the {@link #setMaximum(int)} method must
  * always be called first to determine the number of steps at which the task is finished. After
@@ -16,6 +18,7 @@ package de.uka.ilkd.key.util;
  * don't want more than one progress bar anyway.
  */
 
+@NullMarked
 public interface ProgressMonitor {
 
     /**

@@ -15,6 +15,10 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class EmptyEnvInput extends AbstractEnvInput {
 
     public EmptyEnvInput(Profile profile) {
@@ -27,7 +31,7 @@ public class EmptyEnvInput extends AbstractEnvInput {
     }
 
     @Override
-    public Path getInitialFile() {
+    public @Nullable Path getInitialFile() {
         // no file availbale. may return null
         return null;
     }

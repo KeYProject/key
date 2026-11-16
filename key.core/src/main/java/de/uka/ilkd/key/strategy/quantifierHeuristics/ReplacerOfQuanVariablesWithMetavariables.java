@@ -16,11 +16,14 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is used to create metavariables for every universal variables in quantified formula
  * <code>allTerm</code> and create constant functions for all existential variables. The variables
  * with new created metavariables or constant functions are store to a map <code>mapQM</code>.
  */
+@NullMarked
 public class ReplacerOfQuanVariablesWithMetavariables {
 
     private ReplacerOfQuanVariablesWithMetavariables() {}

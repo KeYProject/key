@@ -18,6 +18,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This facade provides facilities for the creation of lexer and parser of JML. It is the
@@ -31,6 +32,7 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (5/10/20)
  * @see JmlIO
  */
+@NullMarked
 public final class JmlFacade {
 
     private JmlFacade() {

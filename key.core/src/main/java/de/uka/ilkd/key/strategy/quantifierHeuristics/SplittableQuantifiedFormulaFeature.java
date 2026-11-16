@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
@@ -20,7 +22,10 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
     private SplittableQuantifiedFormulaFeature() {}
@@ -38,10 +43,12 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
         }
 
         if (analyser.binOp == Junctor.AND) {
-            return TriggerUtils.intersect(analyser.left.freeVars(),
-                analyser.right.freeVars(), analyser.existentialVars).isEmpty();
+            return TriggerUtils.intersect(Objects.requireNonNull(analyser.left).freeVars(),
+                Objects.requireNonNull(analyser.right).freeVars(), analyser.existentialVars)
+                    .isEmpty();
         } else if (analyser.binOp == Junctor.OR) {
-            return TriggerUtils.intersect(analyser.left.freeVars(), analyser.right.freeVars())
+            return TriggerUtils.intersect(Objects.requireNonNull(analyser.left).freeVars(),
+                Objects.requireNonNull(analyser.right).freeVars())
                     .union(analyser.existentialVars).size() == analyser.existentialVars.size();
         }
 
@@ -51,8 +58,8 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
     private static class Analyser {
         public ImmutableSet<QuantifiableVariable> existentialVars =
             DefaultImmutableSet.nil();
-        public Operator binOp;
-        public Term left, right;
+        public @Nullable Operator binOp;
+        public @Nullable Term left, right;
 
         public boolean analyse(Term formula) {
             final Operator op = formula.op();

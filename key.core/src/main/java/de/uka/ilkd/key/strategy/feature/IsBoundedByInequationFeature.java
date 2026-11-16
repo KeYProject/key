@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy.feature;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -24,11 +25,14 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.ConcurrentLruCache;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Checks whether the product of two monomials has the same variables as the left side of
  * an inequation in the sequent. Required to bound the number of cross-multiplications.
  */
+@NullMarked
 @VolatileCost
 public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature {
 
@@ -62,8 +66,10 @@ public final class IsBoundedByInequationFeature extends BinaryTacletAppFeature {
     @Override
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Monomial first = Monomial.create(mult1.toTerm(app, pos, goal, mState), services);
-        final Monomial second = Monomial.create(mult2.toTerm(app, pos, goal, mState), services);
+        final Monomial first = Monomial
+                .create(Objects.requireNonNull(mult1.toTerm(app, pos, goal, mState)), services);
+        final Monomial second = Monomial
+                .create(Objects.requireNonNull(mult2.toTerm(app, pos, goal, mState)), services);
         return getInEquations(goal, mState).contains(variables(first, second));
     }
 

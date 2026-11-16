@@ -51,6 +51,8 @@ import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,6 +82,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergeRuleUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergeRuleUtils.class);
 
@@ -94,7 +97,7 @@ public class MergeRuleUtils {
      * @param obj The object to wrap.
      * @return None iff obj is null, Some(obj) otherwise.
      */
-    public static <T> Optional<T> wrapOption(T obj) {
+    public static <T> Optional<T> wrapOption(@Nullable T obj) {
         if (obj == null) {
             return Optional.empty();
         } else {
@@ -149,12 +152,18 @@ public class MergeRuleUtils {
     /**
      * Translates a String into a formula or to null if not applicable.
      *
-     * @param services The services object.
+     * @param services The services object, or {@code null} (in which case {@code null} is
+     *        returned).
      * @param toTranslate The formula to be translated.
      * @return The formula represented by the input or null if not applicable.
      */
-    public static JTerm translateToFormula(final Services services, final String toTranslate) {
+    public static @Nullable JTerm translateToFormula(final @Nullable Services services,
+            final String toTranslate) {
         try {
+            // The KeyIO constructor declares a non-null services parameter, although a null
+            // services here only surfaces as an NPE during parsing, caught below, yielding the
+            // documented null result.
+            @SuppressWarnings("NullAway")
             @NonNull
             JTerm result = new KeyIO(services).parseExpression(toTranslate);
             return result.sort() == JavaDLTheory.FORMULA ? result : null;
@@ -320,7 +329,7 @@ public class MergeRuleUtils {
      * @return The right side in the update for the given left side, or null if the right side could
      *         not be determined.
      */
-    public static JTerm getUpdateRightSideFor(JTerm update, LocationVariable leftSide) {
+    public static @Nullable JTerm getUpdateRightSideFor(JTerm update, LocationVariable leftSide) {
         if (update.op() instanceof ElementaryUpdate elementaryUpdate
                 && elementaryUpdate.lhs().equals(leftSide)) {
 
@@ -499,7 +508,8 @@ public class MergeRuleUtils {
      *        constant.
      * @return A term equal to the input, but with constants substituted by fresh variables.
      */
-    public static JTerm substConstantsByFreshVars(JTerm term, HashSet<Function> restrictTo,
+    public static JTerm substConstantsByFreshVars(JTerm term,
+            @Nullable HashSet<Function> restrictTo,
             HashMap<Function, LogicVariable> replMap, Services services) {
         TermBuilder tb = services.getTermBuilder();
 
@@ -621,11 +631,12 @@ public class MergeRuleUtils {
         int newCounter = 0;
         String branchUniqueName = base;
         Iterable<IProgramVariable> progVars = intrNode.getLocalProgVars();
+        LocationVariable existing = lookupVarInNS(branchUniqueName, services);
         while (!isUniqueInGlobals(branchUniqueName, progVars)
-                || (lookupVarInNS(branchUniqueName, services) != null
-                        && !lookupVarInNS(branchUniqueName, services).sort().equals(var.sort()))) {
+                || (existing != null && !existing.sort().equals(var.sort()))) {
             newCounter += 1;
             branchUniqueName = base + "_" + newCounter;
+            existing = lookupVarInNS(branchUniqueName, services);
         }
 
         LocationVariable branchUniqueVar = lookupVarInNS(branchUniqueName, services);
@@ -643,7 +654,7 @@ public class MergeRuleUtils {
     public static Node getIntroducingNodeforLocVar(LocationVariable var, Node node) {
 
         while (!node.root() && node.getLocalProgVars().contains(var)) {
-            node = node.parent();
+            node = Objects.requireNonNull(node.parent());
         }
 
         return node;
@@ -827,7 +838,13 @@ public class MergeRuleUtils {
      * @param node The node of the current branch (for getting branch-unique names).
      * @param services The Services object.
      * @return true iff source elements can be matched, considering branch-unique location names.
+     *         <p>
+     *         The two rewrite visitors always return a replacement element (the replaced element
+     *         itself
+     *         when no renaming applies); the dereference of one result and the use of the other
+     *         result as the equality argument are suppressed with a scoped key.
      */
+    @SuppressWarnings({ "nullness:dereference.of.nullable", "nullness:argument.type.incompatible" })
     public static boolean equalsModBranchUniqueRenaming(SourceElement se1, SourceElement se2,
             Node node, Services services) {
 
@@ -849,8 +866,11 @@ public class MergeRuleUtils {
         replVisitor1.start();
         replVisitor2.start();
 
-        return replVisitor1.result().equalsModProperty(replVisitor2.result(),
-            RENAMING_SOURCE_ELEMENT_PROPERTY,
+        ProgramElement replaced1 =
+            Objects.requireNonNull(replVisitor1.result(), "replaced program");
+        ProgramElement replaced2 =
+            Objects.requireNonNull(replVisitor2.result(), "replaced program");
+        return replaced1.equalsModProperty(replaced2, RENAMING_SOURCE_ELEMENT_PROPERTY,
             new NameAbstractionTable());
     }
 
@@ -1006,7 +1026,12 @@ public class MergeRuleUtils {
      * @param mergeNodeParent Parent of remaining join node.
      * @param mergePartner Partner goal to close.
      * @param newNames The set of new names (of Skolem constants) introduced in the merge.
+     *        <p>
+     *        The parent of the merge node always belongs to a proof whose init config is present;
+     *        the
+     *        dereference of the (nullable) init config is suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static void closeMergePartnerGoal(Node mergeNodeParent, Goal mergePartner,
             PosInOccurrence pio, SymbolicExecutionState mergeState,
             SymbolicExecutionState mergePartnerState, JTerm pc, Set<Name> newNames) {
@@ -1068,7 +1093,12 @@ public class MergeRuleUtils {
      * @param pio Position of update-program counter formula in goal.
      * @param services The services object.
      * @return An SE state (U,C,p).
+     *         <p>
+     *         The symbolic state and program counter are only non-null when the selected formula is
+     *         an update application (the program-counter form produced by symbolic execution); the
+     *         possibly-null locals passed to the constructor are suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public static SymbolicExecutionStateWithProgCnt sequentToSETriple(Node node,
             PosInOccurrence pio, Services services) {
 
@@ -1139,7 +1169,14 @@ public class MergeRuleUtils {
      * @param services The {@link Services} object.
      *
      * @return The renamed {@link SymbolicExecutionState} of the second merge partner.
+     *         <p>
+     *         The services belong to the merge proof, and both merge-partner states originate from
+     *         open goals of that proof; the dereferences of the (nullable) proof and open goals and
+     *         the (nullable) corresponding nodes passed to them as arguments are suppressed with a
+     *         scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     public static Pair<SymbolicExecutionState, SymbolicExecutionState> handleNameClashes(
             SymbolicExecutionState mergeState, SymbolicExecutionState mergePartnerState,
             Services services) {
@@ -1308,7 +1345,14 @@ public class MergeRuleUtils {
      * @param localNamespaces The local {@link NamespaceSet}.
      * @return The parsed {@link AbstractionPredicate}.
      * @throws ParserException If there is a syntax error.
+     *         <p>
+     *         The services belong to the proof that registers the predicate, whose abbreviations
+     *         are
+     *         always present while parsing; the dereference of the (nullable) proof is suppressed
+     *         with a
+     *         scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public static AbstractionPredicate parsePredicate(String input,
             ArrayList<Pair<Sort, Name>> registeredPlaceholders, NamespaceSet localNamespaces,
             Services services) throws ParserException {
@@ -1336,7 +1380,8 @@ public class MergeRuleUtils {
                 "An abstraction predicate must contain exactly one placeholder.");
         }
 
-        return AbstractionPredicate.create(formula, usedPlaceholder, services);
+        return AbstractionPredicate.create(formula,
+            Objects.requireNonNull(usedPlaceholder), services);
     }
 
     // /////////////////////////////////////////////////
@@ -1394,9 +1439,10 @@ public class MergeRuleUtils {
      * @return equivalent operator with the new name
      */
     public static LocationVariable rename(Name newName, LocationVariable lv) {
-        if (lv.getKeYJavaType() != null) {
+        final var keYJavaType = lv.getKeYJavaType();
+        if (keYJavaType != null) {
             return new LocationVariable(new ProgramElementName(newName.toString()),
-                lv.getTypeReference(),
+                Objects.requireNonNull(lv.getTypeReference(), "type reference of " + lv),
                 lv.getContainerType(), lv.isStatic(), lv.isModel());
         } else {
             return new LocationVariable(new ProgramElementName(newName.toString()), lv.sort());
@@ -1458,11 +1504,12 @@ public class MergeRuleUtils {
             Services services) {
         final var mod = (JModality) programCounterTerm.op();
         final JavaProgramElement program = mod.programBlock().program();
-        if (program instanceof StatementBlock && (((StatementBlock) program).isEmpty()
-                || (((StatementBlock) program).getInnerMostMethodFrame() != null
-                        && ((StatementBlock) program).getInnerMostMethodFrame().getBody()
-                                .isEmpty()))) {
-            return new HashSet<>();
+        if (program instanceof StatementBlock statementBlock) {
+            final var innerMostMethodFrame = statementBlock.getInnerMostMethodFrame();
+            if (statementBlock.isEmpty()
+                    || (innerMostMethodFrame != null && innerMostMethodFrame.getBody().isEmpty())) {
+                return new HashSet<>();
+            }
         }
 
         CollectLocationVariablesVisitorHashSet visitor =
@@ -1531,8 +1578,9 @@ public class MergeRuleUtils {
             Services services,
             boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
-        final ProofEnvironment sideProofEnv =
-            SideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(services.getProof());
+        final ProofEnvironment sideProofEnv = SideProofUtil
+                .cloneProofEnvironmentWithOwnOneStepSimplifier(
+                    Objects.requireNonNull(services.getProof()));
 
         ProofStarter proofStarter = SideProofUtil.createSideProof(sideProofEnv, // Proof
             // environment
@@ -1701,7 +1749,7 @@ public class MergeRuleUtils {
      * @param name Name to find a PV for.
      * @return The PV with the given name in the global namespace, or null if there is none.
      */
-    private static LocationVariable lookupVarInNS(String name, Services services) {
+    private static @Nullable LocationVariable lookupVarInNS(String name, Services services) {
         return (LocationVariable) services.getNamespaces().programVariables()
                 .lookup(new Name(name));
     }
@@ -1857,18 +1905,25 @@ public class MergeRuleUtils {
             return false;
         }
 
+        /**
+         * This wrapper map does not track key-ownership semantics, so the inherited conditional
+         * postcondition of {@link java.util.Map#containsKey} (a key reported {@code true} is
+         * {@code @KeyFor("this")}) cannot be established; the contract difference is suppressed
+         * with a scoped key.
+         */
+        @SuppressWarnings("nullness:contracts.conditional.postcondition.not.satisfied")
         @Override
-        public boolean containsKey(Object key) {
+        public boolean containsKey(@Nullable Object key) {
             return key instanceof LocationVariable;
         }
 
         @Override
-        public boolean containsValue(Object value) {
+        public boolean containsValue(@Nullable Object value) {
             return false;
         }
 
         @Override
-        public LocationVariable get(Object key) {
+        public @Nullable LocationVariable get(@Nullable Object key) {
             if (key instanceof LocationVariable var) {
 
                 if (doNotRename.contains(var)) {
@@ -1888,28 +1943,49 @@ public class MergeRuleUtils {
             }
         }
 
+        /**
+         * This wrapper map does not track key-ownership semantics, so the inherited
+         * {@code @KeyFor("this")} postcondition of {@link java.util.Map#put} cannot be
+         * established; the contract difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:contracts.postcondition.not.satisfied")
         @Override
-        public LocationVariable put(LocationVariable key, LocationVariable value) {
+        public @Nullable LocationVariable put(LocationVariable key, LocationVariable value) {
             return null;
         }
 
         @Override
-        public LocationVariable remove(Object key) {
+        public @Nullable LocationVariable remove(@Nullable Object key) {
             return null;
         }
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
-        public Set<LocationVariable> keySet() {
+        public @Nullable Set<LocationVariable> keySet() {
             return null;
         }
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
-        public Collection<LocationVariable> values() {
+        public @Nullable Collection<LocationVariable> values() {
             return null;
         }
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
-        public Set<Map.Entry<LocationVariable, LocationVariable>> entrySet() {
+        public @Nullable Set<Map.Entry<LocationVariable, LocationVariable>> entrySet() {
             return null;
         }
     }

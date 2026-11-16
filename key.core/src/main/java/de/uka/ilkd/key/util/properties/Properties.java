@@ -7,11 +7,15 @@ package de.uka.ilkd.key.util.properties;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 
 /// WEIGL: These classes are redundant with {@link PropertyEntry}
 /// {@link PropertyEntry} is also prepared for {@link Configuration} which provides
 /// a type safe access.
+@NullMarked
 public interface Properties {
 
     final class Property<T> {
@@ -44,18 +48,18 @@ public interface Properties {
     }
 
     interface PropertyListener {
-        <T> void propertyChanged(Property<T> property, T oldValue, T newValue);
+        <T> void propertyChanged(Property<T> property, @Nullable T oldValue, @Nullable T newValue);
     }
 
-    <T> void put(Property<T> property, T value);
+    <T> void put(Property<T> property, @Nullable T value);
 
-    <T> T get(Property<T> property);
+    <T> @Nullable T get(Property<T> property);
 
     <T> void remove(Property<T> property);
 
-    void addPropertyListener(Property<?> property, PropertyListener listener);
+    void addPropertyListener(@Nullable Property<?> property, PropertyListener listener);
 
-    void removePropertyListener(Property<?> property, PropertyListener listener);
+    void removePropertyListener(@Nullable Property<?> property, PropertyListener listener);
 
     void removePropertyListener(PropertyListener listener);
 

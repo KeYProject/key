@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Comment;
 import de.uka.ilkd.key.java.ast.Label;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
@@ -37,10 +38,14 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Walks through a java AST in depth-left-first-order. This visitor replaces a number of program
  * variables by others or new ones.
  */
+@NullMarked
 public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     // indicates if ALL program variables are to be replace by new
@@ -52,7 +57,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      */
     protected final Map<LocationVariable, LocationVariable> replaceMap;
 
-    private ProgramElement result = null;
+    private @Nullable ProgramElement result = null;
 
     /**
      * creates a visitor that replaces the program variables in the given statement by new ones with
@@ -101,8 +106,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         /*
          * if(pv.isFinal()){ return pv; }
          */
-        return LocationVariable.fromProgramVariable(pv,
-            VariableNamer.parseName(name.toString() + postFix, name.getCreationInfo()));
+        return LocationVariable.fromProgramVariable(pv, VariableNamer.parseName(
+            name.toString() + postFix, name.getCreationInfo(), new Comment[0]));
     }
 
     @Override
@@ -130,8 +135,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         node.visit(this);
     }
 
-    /** starts the walker */
+    /**
+     * starts the walker
+     * <p>
+     * The stack of pending replacements is non-empty whenever the walker is started; the
+     * dereference of the (nullable) top of the stack is suppressed with a scoped key.
+     */
     @Override
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void start() {
         stack.push(new ExtList());
         walk(root());
@@ -143,7 +154,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         result = (ProgramElement) stack.peek().get(i);
     }
 
-    public ProgramElement result() {
+    public @Nullable ProgramElement result() {
         return result;
     }
 
@@ -158,7 +169,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
     }
 
-    private JTerm replaceVariablesInTerm(JTerm t) {
+    /**
+     * Passes {@code null} through (pre-existing behavior); a non-null term is never replaced by
+     * {@code null}, but the checker cannot see that invariant, hence the scoped suppression for
+     * the recursive sub-term stores.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible" })
+    private @Nullable JTerm replaceVariablesInTerm(@Nullable JTerm t) {
         if (t == null) {
             return null;
         }
@@ -190,6 +207,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
     }
 
+    /**
+     * Replaces the variables in each list element; the checker cannot see that a non-null element
+     * is never replaced by {@code null}, hence the scoped suppressions for the local and the
+     * append.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible" })
     private ImmutableList<JTerm> replaceVariablesInTerms(ImmutableList<JTerm> terms) {
         ImmutableList<JTerm> res = ImmutableList.nil();
         boolean changed = false;
@@ -298,6 +322,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 .addMergeContract(createNewMergeContract(c, newMps, !oldMps.equals(newMps))));
     }
 
+    /**
+     * Replaces the program variables in a merge contract; possibly-null replacements are passed
+     * through as in the pre-nullness code (see {@link #replaceVariablesInTerm}), hence the scoped
+     * suppressions.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible" })
     private MergeContract createNewMergeContract(final MergeContract oldContract,
             final MergePointStatement newMps, final boolean changed) {
 
@@ -344,6 +375,15 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return oldContract;
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the per-heap
+     * dereference is suppressed with a scoped key. The (nullable) replaced contract terms are
+     * stored into non-null-typed locals and maps as in the pre-nullness code, hence the further
+     * scoped suppressions.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:assignment.type.incompatible", "nullness:argument.type.incompatible" })
     private BlockContract createNewBlockContract(final BlockContract oldContract,
             final StatementBlock newBlock, final boolean blockChanged) {
         final BlockContract.Variables newVariables =
@@ -405,6 +445,15 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 : oldContract;
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the per-heap
+     * dereference is suppressed with a scoped key. The (nullable) replaced contract terms are
+     * stored into non-null-typed locals and maps as in the pre-nullness code, hence the further
+     * scoped suppressions.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:assignment.type.incompatible", "nullness:argument.type.incompatible" })
     private LoopContract createNewLoopContract(final LoopContract oldContract,
             final JavaStatement newStatement, final boolean blockChanged) {
         final LoopContract.Variables newVariables =
@@ -471,6 +520,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
     }
 
+    /**
+     * Replaces the variables of a block contract; a possibly-null replacement for the exception
+     * variable is passed through as in the pre-nullness code (see {@link #replaceVariable}),
+     * hence the scoped suppression.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     private AuxiliaryContract.Variables replaceBlockContractVariables(
             final AuxiliaryContract.Variables variables) {
         return new AuxiliaryContract.Variables(replaceVariable(variables.self),
@@ -483,7 +538,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             replaceRemembranceLocalVariables(variables.outerRemembranceVariables), services);
     }
 
-    private LocationVariable replaceVariable(final LocationVariable variable) {
+    /**
+     * Returns the replacement of the given variable, or the variable itself if it is not replaced.
+     * A present key of {@link #replaceMap} is never mapped to {@code null} (values are freshly
+     * created variables), but the checker cannot see that map invariant, hence the
+     * {@code @Nullable} return type.
+     */
+    private @Nullable LocationVariable replaceVariable(final @Nullable LocationVariable variable) {
         if (variable != null) {
             if (replaceMap.containsKey(variable)) {
                 // TODO Can we really safely assume that replaceMap contains a
@@ -502,6 +563,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         }
     }
 
+    /**
+     * Replaces the flag variables; present keys are never replaced by {@code null} (see
+     * {@link #replaceVariable}), hence the scoped suppression.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private Map<Label, LocationVariable> replaceFlags(final Map<Label, LocationVariable> flags) {
         final Map<Label, LocationVariable> result = new LinkedHashMap<>();
         for (Map.Entry<Label, LocationVariable> flag : flags.entrySet()) {
@@ -510,6 +576,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return result;
     }
 
+    /**
+     * Replaces the remembrance heap variables; present keys are never replaced by {@code null}
+     * (see {@link #replaceVariable}), hence the scoped suppression.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private Map<LocationVariable, LocationVariable> replaceRemembranceHeaps(
             final Map<LocationVariable, LocationVariable> remembranceHeaps) {
         final Map<LocationVariable, LocationVariable> result =
@@ -518,12 +589,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 .entrySet()) {
             // TODO Can we really safely assume that replaceVariable returns a
             // location variable?
-            result.put(remembranceHeap.getKey(),
-                replaceVariable(remembranceHeap.getValue()));
+            result.put(remembranceHeap.getKey(), replaceVariable(remembranceHeap.getValue()));
         }
         return result;
     }
 
+    /**
+     * Replaces the remembrance local variables; present keys are never replaced by {@code null}
+     * (see {@link #replaceVariable}), hence the scoped suppression.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private Map<LocationVariable, LocationVariable> replaceRemembranceLocalVariables(
             final Map<LocationVariable, LocationVariable> remembranceLocalVariables) {
         final Map<LocationVariable, LocationVariable> result =
@@ -536,7 +611,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         return result;
     }
 
+    /**
+     * The heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the per-heap
+     * dereference is suppressed with a scoped key. The (nullable) replaced specification terms
+     * (e.g. the free invariant of a loop without one) are stored into non-null-typed locals and
+     * maps as in the pre-nullness code, hence the further scoped suppressions.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:assignment.type.incompatible", "nullness:argument.type.incompatible" })
     public void performActionOnLoopInvariant(LoopStatement oldLoop, LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
         LoopSpecification inv = services.getSpecificationRepository().getLoopSpec(oldLoop);
@@ -614,6 +698,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         handleJmlStatements(x, SetStatement::new);
     }
 
+    /**
+     * Replaces the program variables in a JML statement spec; possibly-null replacements and map
+     * entries are passed through as in the pre-nullness code (see {@link #replaceVariablesInTerm}
+     * and {@link #replaceVariable}), hence the scoped suppressions.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible", "nullness:return.type.incompatible" })
     public <T extends Statement> void handleJmlStatements(T x, Function<T, T> cloner) {
         var spec = Objects.requireNonNull(
             services.getSpecificationRepository().getStatementSpec(x));

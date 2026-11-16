@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
@@ -22,6 +24,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Variable condition that enforces a given generic sort to be instantiated with the type of a field
  * constant.
@@ -29,6 +34,7 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
  * The condition can only be fulfilled if the given field term is constant of which the referred
  * type is known.
  */
+@NullMarked
 public final class FieldTypeToSortCondition implements VariableCondition {
 
     private final SchemaVariable exprOrTypeSV;
@@ -48,7 +54,8 @@ public final class FieldTypeToSortCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement svSubst,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement svSubst,
             MatchResultInfo matchCond, LogicServices services) {
 
         if (var != exprOrTypeSV) {
@@ -74,7 +81,10 @@ public final class FieldTypeToSortCondition implements VariableCondition {
                     return null;
                 }
 
-                Sort targetSort = attribute.getKeYJavaType().getSort();
+                Sort targetSort = Objects.requireNonNull(
+                    Objects.requireNonNull(attribute.getKeYJavaType(),
+                        "no KeYJavaType for attribute " + attribute).getSort(),
+                    "no sort for attribute " + attribute);
 
                 return matchCond.setInstantiations(inst.add(
                     GenericSortCondition.createIdentityCondition(sort, targetSort), services));

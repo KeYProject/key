@@ -10,11 +10,14 @@ import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Schema variable that is instantiated with fresh Skolem constants. At the moment, such schema
  * variables have to be accompanied by a "NewDependingOn" varcond, although with the removal of the
  * meta variable mechanism, this would no longer really be necessary.
  */
+@NullMarked
 public final class SkolemTermSV extends JOperatorSV implements TerminalSyntaxElement {
 
     /** whether the constants created for this schema variable are definitional symbols */

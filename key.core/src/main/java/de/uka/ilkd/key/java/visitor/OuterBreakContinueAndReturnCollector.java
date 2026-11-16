@@ -21,6 +21,10 @@ import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.java.ast.statement.Return;
 import de.uka.ilkd.key.java.ast.statement.Switch;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
 
     private final List<Break> breaks;
@@ -118,8 +122,9 @@ public class OuterBreakContinueAndReturnCollector extends JavaASTVisitor {
     }
 
     private boolean isJumpToOuterLabel(final LabelJumpStatement x) {
+        final @Nullable Label label = x.getLabel();
         return loopAndSwitchCascadeDepth == 0 && x.getProgramElementName() == null
-                || x.getLabel() != null && labels.search(x.getLabel()) == -1;
+                || label != null && labels.search(label) == -1;
     }
 
     @Override

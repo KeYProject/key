@@ -7,9 +7,12 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import de.uka.ilkd.key.informationflow.ProofObligationVars;
 import de.uka.ilkd.key.logic.JTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author christoph
  */
+@NullMarked
 interface FactoryMethod {
 
     JTerm produce(BasicSnippetData d, ProofObligationVars poVars)

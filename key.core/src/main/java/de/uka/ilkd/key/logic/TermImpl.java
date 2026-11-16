@@ -23,13 +23,16 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
  * The currently only class implementing the Term interface. TermFactory should be the only class
  * dealing directly with the TermImpl class.
  */
+@NullMarked
 class TermImpl implements JTerm {
 
     /**
@@ -87,13 +90,13 @@ class TermImpl implements JTerm {
     private static final int FLAG_TRUE = 2;
 
     private int depth = -1;
-    private ImmutableSet<QuantifiableVariable> freeVars = null;
+    private @Nullable ImmutableSet<QuantifiableVariable> freeVars = null;
     /**
      * Cached {@link #hashCode()} value.
      */
     private int hashcode = -1;
 
-    private Sort sort;
+    private @MonotonicNonNull Sort sort;
 
     /**
      * Cached renaming-invariant hashCode ({@link RenamingTermProperty#hashCodeModThisProperty}),
@@ -126,7 +129,8 @@ class TermImpl implements JTerm {
      * @param boundVars the bounded variables (if applicable), e.g., for quantifiers
      */
     public TermImpl(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars) {
+            // null denotes no bounded variables
+            @Nullable ImmutableArray<QuantifiableVariable> boundVars) {
         assert op != null;
         assert subs != null;
         this.op = op;
@@ -210,7 +214,7 @@ class TermImpl implements JTerm {
 
 
     @Override
-    public @NonNull JavaBlock javaBlock() {
+    public JavaBlock javaBlock() {
         if (op instanceof JModality mod) {
             return mod.programBlock();
         } else {
@@ -423,7 +427,7 @@ class TermImpl implements JTerm {
      * true iff <code>o</code> is syntactically equal to this term
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -527,7 +531,7 @@ class TermImpl implements JTerm {
     }
 
     @Override
-    public TermLabel getLabel(Name termLabelName) {
+    public @Nullable TermLabel getLabel(Name termLabelName) {
         return null;
     }
 

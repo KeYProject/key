@@ -6,12 +6,15 @@ package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionSettings;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
@@ -21,6 +24,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 class DataRecordingTestFile extends TestFile {
     public final ProfilingDirectories directories;
@@ -33,7 +37,7 @@ class DataRecordingTestFile extends TestFile {
 
     @Override
     protected void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            KeyAst.ProofScript script) throws Exception {
+            @Nullable ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             DataRecordingStrategy strategy = new DataRecordingStrategy(loadedProof, this);
@@ -54,9 +58,10 @@ class DataRecordingTestFile extends TestFile {
     private static ApplyStrategyInfo<@NonNull Proof, Goal> applyStrategy(Proof proof,
             Strategy<@NonNull Goal> strategy) {
         proof.setActiveStrategy(strategy);
-        return new ApplyStrategy(
-            proof.getInitConfig().getProfile().<Proof, Goal>getSelectedGoalChooserBuilder()
-                    .create())
+        InitConfig initConfig =
+            Objects.requireNonNull(proof.getInitConfig(), "init config of the proof");
+        Profile profile = Objects.requireNonNull(initConfig.getProfile(), "profile of the proof");
+        return new ApplyStrategy(profile.<Proof, Goal>getSelectedGoalChooserBuilder().create())
                 .start(proof, proof.openGoals().head());
     }
 

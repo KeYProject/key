@@ -12,11 +12,14 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * Matches a GenericArgument by the identity of its sort
  */
+@NullMarked
 public class MatchBySortIdentityInstruction implements MatchInstruction {
     private final Sort patternSort;
 

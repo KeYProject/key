@@ -7,12 +7,15 @@ package de.uka.ilkd.key.smt.lang;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  *
  * @author Aboubakr Achraf El Ghazi
  *
  */
+@NullMarked
 public class SMTTerms extends SMTTerm {
 
     protected List<SMTTerm> terms;

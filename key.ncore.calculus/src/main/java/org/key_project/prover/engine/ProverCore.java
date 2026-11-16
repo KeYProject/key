@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.engine;
 
+import java.util.Objects;
+
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 import org.key_project.util.collection.ImmutableList;
@@ -92,7 +94,9 @@ public interface ProverCore<P extends ProofObject<G>, G extends @Nullable ProofG
                     (remainingTime -= System.currentTimeMillis()) <= 0) {
                 break;
             }
-            result = start(proof, ImmutableList.singleton(goal), maxSteps, remainingTime, false);
+            final G goalNonNull = Objects.requireNonNull(goal, "goal must not be null");
+            result = start(proof, ImmutableList.singleton(goalNonNull), maxSteps, remainingTime,
+                false);
 
             aggregatedResult = aggregatedResult == null ? result : aggregatedResult.join(result);
 

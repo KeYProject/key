@@ -11,17 +11,23 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public interface IObserverFunction extends SortedOperator, Operator {
 
     /**
      * Returns the result type of this symbol.
      */
+    @Nullable
     KeYJavaType getType();
 
     /**
      * Returns the container type of this symbol; for non-static observer symbols, this corresponds
      * to the sort of its second argument.
      */
+    @Nullable
     KeYJavaType getContainerType();
 
     /**
@@ -50,12 +56,14 @@ public interface IObserverFunction extends SortedOperator, Operator {
      * Gives the type of the i-th parameter of this observer symbol. "Parameters" here includes only
      * the *explicit* parameters, not the heap and the receiver object.
      */
+    @Nullable
     KeYJavaType getParamType(int i);
 
     /**
      * Returns the parameter types of this observer symbol. "Parameters" here includes only the
      * *explicit* parameters, not the heap and the receiver object.
      */
+    @Nullable
     ImmutableArray<KeYJavaType> getParamTypes();
 
 }

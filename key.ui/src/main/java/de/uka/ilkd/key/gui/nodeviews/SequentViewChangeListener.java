@@ -13,6 +13,9 @@ import java.beans.PropertyChangeListener;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 class SequentViewChangeListener
         implements ComponentListener, PropertyChangeListener, HierarchyBoundsListener {
 

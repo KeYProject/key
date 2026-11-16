@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.*;
@@ -19,10 +20,14 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Synchronized block.
  */
 
+@NullMarked
 public class SynchronizedBlock extends JavaStatement
         implements StatementContainer, ExpressionContainer, ProgramPrefix {
 
@@ -30,7 +35,7 @@ public class SynchronizedBlock extends JavaStatement
      * Expression.
      */
 
-    protected final Expression expression;
+    protected final @Nullable Expression expression;
 
     /**
      * Body.
@@ -38,7 +43,7 @@ public class SynchronizedBlock extends JavaStatement
 
     protected final StatementBlock body;
 
-    private final MethodFrame innerMostMethodFrame;
+    private final @Nullable MethodFrame innerMostMethodFrame;
 
     private final int prefixLength;
 
@@ -46,11 +51,16 @@ public class SynchronizedBlock extends JavaStatement
 
     /**
      * Synchronized block.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param body
      *        a statement block.
      */
 
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public SynchronizedBlock(StatementBlock body) {
         this.body = body;
         this.expression = null;
@@ -62,6 +72,10 @@ public class SynchronizedBlock extends JavaStatement
 
     /**
      * Synchronized block.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param e
      *        an expression.
@@ -69,7 +83,8 @@ public class SynchronizedBlock extends JavaStatement
      *        a statement block.
      */
 
-    public SynchronizedBlock(Expression e, StatementBlock body) {
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    public SynchronizedBlock(@Nullable Expression e, StatementBlock body) {
         expression = e;
         this.body = body;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
@@ -80,15 +95,21 @@ public class SynchronizedBlock extends JavaStatement
 
     /**
      * Synchronized block.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param children
      *        a list with all children
      */
 
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public SynchronizedBlock(ExtList children) {
         super(children);
         expression = children.get(Expression.class);
-        body = children.get(StatementBlock.class);
+        body = Objects.requireNonNull(children.get(StatementBlock.class),
+            "a synchronized block requires a body");
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -96,7 +117,7 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     public SynchronizedBlock(PositionInfo pi, List<Comment> c, Expression expr, StatementBlock body,
-            MethodFrame innerMostMethodFrame, int prefixLength) {
+            @Nullable MethodFrame innerMostMethodFrame, int prefixLength) {
         super(pi, c);
         this.expression = expr;
         this.body = body;
@@ -129,7 +150,7 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     @Override
-    public MethodFrame getInnerMostMethodFrame() {
+    public @Nullable MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;
     }
 
@@ -191,7 +212,7 @@ public class SynchronizedBlock extends JavaStatement
      * @return the expression.
      */
 
-    public Expression getExpression() {
+    public @Nullable Expression getExpression() {
         return expression;
     }
 

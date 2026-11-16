@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.expression.operator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author Alexander Weigl
  * @version 1 (25.04.26)
  */
+@NullMarked
 public enum BinaryOperatorKind {
     DIVIDE(2, "/"),
     MODULO(2, "%"),

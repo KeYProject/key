@@ -12,7 +12,7 @@ final /*@ nullable */ class MyRecord extends Record {
       @*/
     @javax.annotation.processing.Generated("RecordClassBuilder")
     public MyRecord(String test) {
-        //Created by RecordClassBuilder.java:132
+        //Created by RecordClassBuilder.java:135
         this.test = test;
     }
 
@@ -56,7 +56,7 @@ final /*@ nullable */ class MyRecord extends Record {
 
     public void $init(String test) {
         super.$init();
-        //Created by RecordClassBuilder.java:132
+        //Created by RecordClassBuilder.java:135
         this.test = test;
     }
 
@@ -67,35 +67,35 @@ final /*@ nullable */ class MyRecord extends Record {
         if (!@($classInitialized)) {
             if (!@($classInitializationInProgress)) {
                 if (!@($classPrepared)) {
-                    //Created by ClassInitializeMethodBuilder.java:220
+                    //Created by ClassInitializeMethodBuilder.java:223
                     @($clprepare());
                 }
                 if (@($classErroneous)) {
                     throw new java.lang.NoClassDefFoundError();
                 }
-                //Created by ClassInitializeMethodBuilder.java:244
+                //Created by ClassInitializeMethodBuilder.java:249
                 @($classInitializationInProgress) = true;
                 try {
                     @(java.lang.Record.$clinit());
-                }//Created by ClassInitializeMethodBuilder.java:195
+                }//Created by ClassInitializeMethodBuilder.java:196
                  catch (java.lang.Error err) {
-                    //Created by ClassInitializeMethodBuilder.java:155
-                    @($classInitializationInProgress) = false;
                     //Created by ClassInitializeMethodBuilder.java:156
+                    @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:157
                     @($classErroneous) = true;
                     throw err;
                 } catch (java.lang.Throwable twa) {
-                    //Created by ClassInitializeMethodBuilder.java:155
-                    @($classInitializationInProgress) = false;
                     //Created by ClassInitializeMethodBuilder.java:156
+                    @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:157
                     @($classErroneous) = true;
                     throw new java.lang.ExceptionInInitializerError(twa);
                 }
-                //Created by ClassInitializeMethodBuilder.java:250
+                //Created by ClassInitializeMethodBuilder.java:255
                 @($classInitializationInProgress) = false;
-                //Created by ClassInitializeMethodBuilder.java:252
+                //Created by ClassInitializeMethodBuilder.java:257
                 @($classErroneous) = false;
-                //Created by ClassInitializeMethodBuilder.java:254
+                //Created by ClassInitializeMethodBuilder.java:259
                 @($classInitialized) = true;
             }
         }
@@ -103,13 +103,13 @@ final /*@ nullable */ class MyRecord extends Record {
 
     protected void $prepare() {
         super.$prepare();
-        //Created by PrepareObjectBuilder.java:95
+        //Created by PrepareObjectBuilder.java:97
         this.test = null;
     }
 
     private void $prepareEnter() {
         super.$prepare();
-        //Created by PrepareObjectBuilder.java:95
+        //Created by PrepareObjectBuilder.java:97
         this.test = null;
     }
 }

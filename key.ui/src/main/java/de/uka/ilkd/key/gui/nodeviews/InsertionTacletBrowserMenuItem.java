@@ -20,9 +20,12 @@ import de.uka.ilkd.key.rule.TacletApp;
 
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public abstract class InsertionTacletBrowserMenuItem extends JMenu implements TacletMenuItem {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(InsertionTacletBrowserMenuItem.class);
@@ -45,13 +48,22 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
     /** the parent frame of the selection dialog to be displayed */
     protected final JFrame parent;
     /** the selected taclet to be applied */
-    private TacletApp selectedTaclet;
+    private @Nullable TacletApp selectedTaclet;
     /** the services */
     protected final Services services;
 
     /** the base title; used title = basetitle + ( nrOfItems ) */
     private final String baseTitle;
 
+    /**
+     * Creates the selection menu for the given taclet apps.
+     *
+     * <p>
+     * The ctor builds the insertable-apps list, the dialog entry and the separators while the
+     * receiver is still under initialization (EISOP initialization check); all of them only
+     * materialize once the menu is displayed after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     protected InsertionTacletBrowserMenuItem(String title, JFrame parent, NotationInfo notInfo,
             Services services) {
 
@@ -92,7 +104,12 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         if (getItemCount() >= MAX_ITEM_NUMBER) {
             if (getItemCount() == MAX_ITEM_NUMBER) {
                 JLabel l = new JLabel("For more hidden formulas, see 'Open Dialog'");
-                l.setFont(l.getFont().deriveFont(Font.ITALIC));
+                Font font = l.getFont();
+                if (font == null) {
+                    // a realized label always carries a font
+                    throw new NullPointerException("No label font available.");
+                }
+                l.setFont(font.deriveFont(Font.ITALIC));
                 add(l);
             }
             return;
@@ -110,10 +127,10 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         listenerList.add(listener);
     }
 
-    protected abstract Sequent checkTaclet(Taclet t);
+    protected abstract @Nullable Sequent checkTaclet(Taclet t);
 
-    /** @return the selected taclet to be applied */
-    public TacletApp connectedTo() {
+    /** @return the selected taclet to be applied (may be {@code null} if no selection was made) */
+    public @Nullable TacletApp connectedTo() {
         return selectedTaclet;
     }
 
@@ -147,13 +164,11 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         scrollPane.setPreferredSize(new Dimension(300, 100));
         scrollPane.setMinimumSize(new Dimension(150, 50));
 
-
         selectionList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         if (getAppSize() > 0) { // should always be true
             selectionList.setSelectedIndex(0);
         }
-
 
         final JTextArea displayHiddenFormula = new JTextArea();
 
@@ -167,9 +182,9 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
         selectionList.addListSelectionListener(e -> {
             if (e.getSource() instanceof JList<?> list) {
                 if (list.getSelectedIndex() >= 0) {
-                    if (list.getSelectedValue() instanceof TacletAppListItem) {
-                        displayHiddenFormula.setText(
-                            ((TacletAppListItem) list.getSelectedValue()).longDescription());
+                    Object value = list.getSelectedValue();
+                    if (value instanceof TacletAppListItem item) {
+                        displayHiddenFormula.setText(item.longDescription());
                     }
                 } else {
                     displayHiddenFormula.setText("");
@@ -248,7 +263,12 @@ public abstract class InsertionTacletBrowserMenuItem extends JMenu implements Ta
     }
 
     public TacletAppListItem createListItem(TacletApp app) {
-        return new TacletAppListItem(app, checkTaclet(app.taclet()), notInfo, services);
+        Sequent sequent = checkTaclet(app.taclet());
+        if (sequent == null) {
+            // this item is only created for responsible taclets, which always carry a sequent
+            throw new NullPointerException("No sequent available for the taclet item.");
+        }
+        return new TacletAppListItem(app, sequent, notInfo, services);
     }
 
     /**

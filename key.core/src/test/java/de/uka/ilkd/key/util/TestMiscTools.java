@@ -126,6 +126,8 @@ public class TestMiscTools {
     public void testTryParseURL() throws Exception {
         // test null string -> MalformedURLException
         try {
+            // deliberately passing null to assert that parseURL rejects it
+            @SuppressWarnings("NullAway")
             URL uNull = MiscTools.parseURL(null);
             fail("Expected a MalformedURLException!");
         } catch (NullPointerException e) {

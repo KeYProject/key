@@ -8,6 +8,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.TermServices;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -19,6 +20,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @param <T> the type of the wrapped term label can be narrowed.
  */
+@NullMarked
 public final class SingletonLabelFactory<T extends TermLabel> implements TermLabelFactory<T> {
 
     /**

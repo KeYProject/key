@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.scripts;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.nparser.ParsingFacade;
 
 import org.junit.jupiter.api.Test;
@@ -76,7 +78,7 @@ public class ProofScriptParserTest {
         String crlf = "select formula=\"line one\r\nline two\";\r\n";
 
         var parser = new ScriptLineParser(new java.io.StringReader(crlf), null);
-        var cmd = parser.parseCommand();
+        var cmd = Objects.requireNonNull(parser.parseCommand(), "expected a command");
 
         assertThat(cmd.args().values()).noneMatch(v -> v.contains("\r"));
     }

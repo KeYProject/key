@@ -10,14 +10,18 @@ import java.util.Map.Entry;
 
 import de.uka.ilkd.key.java.ast.SourceElement;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public abstract class RenamingTable {
 
-    public abstract SourceElement getRenaming(SourceElement se);
+    public abstract @Nullable SourceElement getRenaming(SourceElement se);
 
     public abstract Iterator<? extends SourceElement> getRenamingIterator();
 
-    public static RenamingTable getRenamingTable(
+    public static @Nullable RenamingTable getRenamingTable(
             HashMap<? extends SourceElement, ? extends SourceElement> hmap) {
         if (hmap.size() == 0) {
             return null;

@@ -57,22 +57,28 @@ public class TestTerm {
         tf = tb.tf();
     }
 
+    // the test terms deliberately carry no substitution and no attributes,
+    // hence the null arguments to the 4-argument createTerm
+    @SuppressWarnings("NullAway")
     private JTerm t1() {
         JTerm t_x = tf.createTerm(x);
         return tf.createTerm(p, new JTerm[] { t_x }, null, null);
     }
 
+    @SuppressWarnings("NullAway")
     private JTerm t2() {
         JTerm t_x = tf.createTerm(x);
         JTerm t_w = tf.createTerm(w);
         return tf.createTerm(r, new JTerm[] { t_x, t_w }, null, null);
     }
 
+    @SuppressWarnings("NullAway")
     private JTerm t3() {
         JTerm t_y = tf.createTerm(y);
         return tf.createTerm(f, new JTerm[] { t_y }, null, null);
     }
 
+    @SuppressWarnings("NullAway")
     private JTerm t4() {
         JTerm t_pv0 = tf.createTerm(pv0);
         return tf.createTerm(p, new JTerm[] { t_pv0 }, null, null);
@@ -83,6 +89,8 @@ public class TestTerm {
         JTerm t_y = tf.createTerm(y);
         assertEquals(0, t_y.depth());
         // p(f(y)): a chain of three operators has depth 2
+        // (the term deliberately carries no substitution and no attributes)
+        @SuppressWarnings("NullAway")
         JTerm deep = tf.createTerm(p, new JTerm[] { t3() }, null, null);
         assertEquals(2, deep.depth());
         // p(f(y)) & p(x): the depth of a term is the maximum over all its subterms plus one,
@@ -181,9 +189,12 @@ public class TestTerm {
     @Test
     public void testEqualsModRenaming() {
 
+        // the terms deliberately carry no substitution and no attributes
+        @SuppressWarnings("NullAway")
         final JTerm px = tf.createTerm(p, new JTerm[] { tf.createTerm(x) }, null, null);
         final JTerm quant1 = tb.all(z, tb.all(zz, tb.all(x, px)));
 
+        @SuppressWarnings("NullAway")
         final JTerm pz = tf.createTerm(p, new JTerm[] { tf.createTerm(z) }, null, null);
         final JTerm quant2 = tb.all(z, tb.all(z, tb.all(z, pz)));
 

@@ -6,6 +6,8 @@ package de.uka.ilkd.key.gui.notification.events;
 
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A NotificationEvent is triggered if the system wants to notify the user about a certain
  * situation. Each kind of event is assigned a unique id which are declared in
@@ -13,6 +15,7 @@ import de.uka.ilkd.key.gui.notification.NotificationEventID;
  *
  * @author bubel
  */
+@NullMarked
 public abstract class NotificationEvent {
 
     /** the unique id identifying the kind of this event */

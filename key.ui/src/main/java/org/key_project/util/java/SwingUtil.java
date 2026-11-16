@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.util.java;
 
-
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
@@ -19,6 +18,8 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 import bibliothek.gui.dock.themes.basic.BasicDockableDisplayer;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +28,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class SwingUtil {
     public static final Logger LOGGER = LoggerFactory.getLogger(SwingUtil.class);
     private static final String NOTIFICATION_ERROR = "failed to show notification ";
-
 
     private SwingUtil() {
     }
@@ -74,7 +75,7 @@ public final class SwingUtil {
      * @return the object if found, otherwise null
      * @param <T> class of the component
      */
-    public static <T> T findComponent(Container container, Class<T> classToFind) {
+    public static <T> @Nullable T findComponent(Container container, Class<T> classToFind) {
         for (int i = 0; i < container.getComponentCount(); i++) {
             var c = container.getComponent(i);
             if (c.getClass().equals(classToFind)) {
@@ -187,7 +188,13 @@ public final class SwingUtil {
             ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         Dimension dim = new Dimension(table.getPreferredSize());
-        dim.width += (Integer) UIManager.get("ScrollBar.width") + 2;
+        Integer scrollBarWidth = (Integer) UIManager.get("ScrollBar.width");
+        if (scrollBarWidth == null) {
+            // the active look-and-feel normally installs a scroll bar width; fall back to the
+            // swing default of 15 so a missing entry cannot crash the layout
+            scrollBarWidth = 15;
+        }
+        dim.width += scrollBarWidth + 2;
         dim.height = scrollPane.getPreferredSize().height;
         scrollPane.setPreferredSize(dim);
 
@@ -200,7 +207,7 @@ public final class SwingUtil {
      * @param component the component
      * @param font the font
      */
-    public static void setFont(JComponent component, Font font) {
+    public static void setFont(@Nullable JComponent component, Font font) {
         if (component == null) {
             return;
         }

@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -118,7 +119,8 @@ public abstract class ParserExceptionTest {
         } catch (Throwable e) {
             Throwable error = e;
             if (error instanceof ProblemLoaderException) {
-                error = error.getCause();
+                error = Objects.requireNonNull(error.getCause(),
+                    "expected a cause for the exception");
             }
             if ("true".equals(props.getProperty("verbose"))) {
                 LOGGER.info("Exception raised while parsing {}", file.getFileName(), error);
@@ -139,7 +141,8 @@ public abstract class ParserExceptionTest {
                     }
                 }
 
-                String actualMessage = ExceptionTools.getMessage(error);
+                String actualMessage =
+                    Objects.requireNonNull(ExceptionTools.getMessage(error), "expected a message");
                 String msg = props.getProperty("msgContains");
                 String errMsg = e.getMessage();
                 if (msg != null) {

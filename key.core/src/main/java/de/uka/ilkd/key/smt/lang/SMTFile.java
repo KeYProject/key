@@ -11,18 +11,24 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  *
  * @author Aboubakr Achraf El Ghazi
  *
  */
+@NullMarked
 public class SMTFile {
 
     List<SMTSort> sorts;
     List<SMTFunction> functions;
     List<SMTTerm> formulas;
+    @Nullable
     String scope;
+    @Nullable
     String defaultLogic;
 
 
@@ -86,28 +92,28 @@ public class SMTFile {
     /**
      * @return the defaultLogic
      */
-    public String getDefaultLogic() {
+    public @Nullable String getDefaultLogic() {
         return defaultLogic;
     }
 
     /**
      * @param defaultLogic the defaultLogic to set
      */
-    public void setDefaultLogic(String defaultLogic) {
+    public void setDefaultLogic(@Nullable String defaultLogic) {
         this.defaultLogic = defaultLogic;
     }
 
     /**
      * @return the scope
      */
-    public String getScope() {
+    public @Nullable String getScope() {
         return scope;
     }
 
     /**
      * @param scope the scope to set
      */
-    public void setScope(String scope) {
+    public void setScope(@Nullable String scope) {
         this.scope = scope;
     }
 

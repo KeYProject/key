@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * this interface is implemented by listener of change events of a model
  */
 
+@NullMarked
 public interface ModelChangeListener {
 
     /** this method is called if the model has changed */

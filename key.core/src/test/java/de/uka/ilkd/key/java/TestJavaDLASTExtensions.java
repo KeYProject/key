@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.HelperClassForTests;
@@ -43,9 +44,11 @@ public class TestJavaDLASTExtensions {
      * its (now no longer hidden) message mentions the unresolvable type.
      */
     private static void assertUnsolvedType(BuildingException ex) {
-        Assertions.assertTrue(ExceptionTools.getMessage(ex).contains("Cannot resolve"),
+        final String message = Objects.requireNonNull(ExceptionTools.getMessage(ex),
+            "the BuildingException must carry a message");
+        Assertions.assertTrue(message.contains("Cannot resolve"),
             "the message should expose the unresolved symbol in user-facing wording, but was: "
-                + ExceptionTools.getMessage(ex));
+                + message);
         boolean hasUnsolvedCause = false;
         for (Throwable c = ex; c != null; c = c.getCause()) {
             if (c instanceof UnsolvedSymbolException) {

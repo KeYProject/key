@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -17,7 +18,9 @@ import org.key_project.prover.strategy.costbased.feature.instantiator.CPBranch;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class OneOfCP implements Feature {
 
     private final Feature[] features;
@@ -35,7 +38,8 @@ public class OneOfCP implements Feature {
             PosInOccurrence pos,
             Goal goal,
             MutableState mState) {
-        final BackTrackingManager manager = mState.getBacktrackingManager();
+        final BackTrackingManager manager =
+            Objects.requireNonNull(mState.getBacktrackingManager());
         // The chosen branch is kept in the per-evaluation MutableState, not in a field of this
         // choice point: one strategy (hence one feature tree, hence this OneOfCP) is shared by all
         // goals, so a field here would be written concurrently by the multi-core prover's workers

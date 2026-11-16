@@ -11,16 +11,20 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A collection of all program variables needed to translate a textual JML specification case.
  *
  * Used in {@link JMLSpecFactory}.
  */
+@NullMarked
 public class ProgramVariableCollection {
     /**
      * {@code self}
      */
-    public LocationVariable selfVar;
+    public @Nullable LocationVariable selfVar;
 
     /**
      * The list of method parameters if the textual specification case is a method contract.
@@ -30,12 +34,12 @@ public class ProgramVariableCollection {
     /**
      * {@code result}
      */
-    public LocationVariable resultVar;
+    public @Nullable LocationVariable resultVar;
 
     /**
      * {@code exception}
      */
-    public LocationVariable excVar;
+    public @Nullable LocationVariable excVar;
 
     /**
      * A map from every variable {@code var} to {@code \old(var)}.
@@ -50,12 +54,12 @@ public class ProgramVariableCollection {
     /**
      * A map from every variable {@code var} to {@code \before(var)} (if applicable).
      */
-    public Map<LocationVariable, LocationVariable> atBeforeVars;
+    public @Nullable Map<LocationVariable, LocationVariable> atBeforeVars;
 
     /**
      * A map from every variable {@code var} to {@code \before(var)} (if applicable).
      */
-    public Map<LocationVariable, JTerm> atBefores;
+    public @Nullable Map<LocationVariable, JTerm> atBefores;
 
     /**
      * Create a collection containing the specified variables.
@@ -68,9 +72,9 @@ public class ProgramVariableCollection {
      * @param atPreVars a map from every variable {@code var} to {@code \old(var)}.
      * @param atPres a map from every variable {@code var} to {@code \old(var)}.
      */
-    public ProgramVariableCollection(LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+    public ProgramVariableCollection(@Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, JTerm> atPres) {
         this(selfVar, paramVars, resultVar, excVar, atPreVars, atPres, null, null);
     }
@@ -90,12 +94,12 @@ public class ProgramVariableCollection {
      * @param atBefores a map from every variable {@code var} to {@code \before(var)} (if
      *        applicable).
      */
-    public ProgramVariableCollection(LocationVariable selfVar,
-            ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
-            LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
+    public ProgramVariableCollection(@Nullable LocationVariable selfVar,
+            ImmutableList<LocationVariable> paramVars, @Nullable LocationVariable resultVar,
+            @Nullable LocationVariable excVar, Map<LocationVariable, LocationVariable> atPreVars,
             Map<LocationVariable, JTerm> atPres,
-            Map<LocationVariable, LocationVariable> atBeforeVars,
-            Map<LocationVariable, JTerm> atBefores) {
+            @Nullable Map<LocationVariable, LocationVariable> atBeforeVars,
+            @Nullable Map<LocationVariable, JTerm> atBefores) {
         super();
         this.selfVar = selfVar;
         this.paramVars = paramVars;
@@ -111,5 +115,8 @@ public class ProgramVariableCollection {
      * Create an empty collection.
      */
     public ProgramVariableCollection() {
+        this.paramVars = ImmutableList.of();
+        this.atPreVars = Map.of();
+        this.atPres = Map.of();
     }
 }

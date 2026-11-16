@@ -9,11 +9,14 @@ import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author Alexander Weigl
  * @version 1 (13.08.26)
  */
+@NullMarked
 public class JavaAstUtils {
     public static boolean isCopyAssignment(SyntaxElement a) {
         return a instanceof Assignment b

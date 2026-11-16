@@ -15,10 +15,13 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Returns zero iff a term contains a program or (optionally) a query expression
  */
+@NullMarked
 public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
 
     private final boolean considerQueries;

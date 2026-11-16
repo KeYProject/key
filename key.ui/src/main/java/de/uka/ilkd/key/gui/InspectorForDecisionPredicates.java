@@ -19,14 +19,16 @@ import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import org.key_project.prover.sequent.Semisequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class InspectorForDecisionPredicates implements CheckedUserInputInspector {
 
     private final Services services;
     private final Node node;
     private final int cutMode;
     private final List<ApplicationCheck> additionalChecks = new LinkedList<>();
-
-
 
     public InspectorForDecisionPredicates(Services services, Node node, int cutMode,
             List<ApplicationCheck> additionalChecks) {
@@ -37,10 +39,8 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
         this.additionalChecks.addAll(additionalChecks);
     }
 
-
-
     @Override
-    public String check(String toBeChecked) {
+    public @Nullable String check(String toBeChecked) {
         if (toBeChecked.isEmpty()) {
             return NO_USER_INPUT;
         }
@@ -75,7 +75,7 @@ public class InspectorForDecisionPredicates implements CheckedUserInputInspector
 
     }
 
-    public static JTerm translate(Services services, String toBeChecked) {
+    public static @Nullable JTerm translate(Services services, String toBeChecked) {
         try {
             return new KeyIO(services).parseExpression(toBeChecked);
         } catch (Throwable e) {

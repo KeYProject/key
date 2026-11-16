@@ -81,7 +81,7 @@ public final class ArgumentsLifter {
     }
 
     public static String extractDocumentation(String command, Class<?> commandClazz,
-            Class<?> parameterClazz) {
+            @Nullable Class<?> parameterClazz) {
         StringBuilder sb = new StringBuilder();
 
         Deprecated dep = commandClazz.getAnnotation(Deprecated.class);
@@ -138,17 +138,19 @@ public final class ArgumentsLifter {
             }
 
             if (meta.isPositionalVarArgs()) {
+                PositionalVarargs varargs = Objects.requireNonNull(meta.getPositionalVarargs());
                 sb.append("* `%s...` (%s): %s".formatted(
                     meta.getName(),
-                    meta.getPositionalVarargs().as(),
-                    meta.getPositionalVarargs().startIndex(),
+                    varargs.as(),
+                    varargs.startIndex(),
                     meta.getDocumentation()));
             }
 
             if (meta.isOptionalVarArgs()) {
+                OptionalVarargs varargs = Objects.requireNonNull(meta.getOptionalVarArgs());
                 sb.append("* `%s...`: *(options prefixed by `%s`, type %s)*:<br>%s".formatted(
-                    meta.getName(), meta.getOptionalVarArgs().prefix(),
-                    meta.getOptionalVarArgs().as().getSimpleName(),
+                    meta.getName(), varargs.prefix(),
+                    varargs.as().getSimpleName(),
                     meta.getDocumentation()));
             }
 

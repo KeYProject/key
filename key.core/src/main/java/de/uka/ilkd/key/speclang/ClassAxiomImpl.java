@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.speclang;
 
 
+import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
@@ -23,20 +24,24 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents an axiom specified in a class.
  *
  * @author bruns
  *
  */
+@NullMarked
 public final class ClassAxiomImpl extends ClassAxiom {
 
 
     private final String name;
     private final KeYJavaType kjt;
-    private final ModifierKind visibility;
+    private final @Nullable ModifierKind visibility;
     private final JTerm originalRep;
-    private final LocationVariable originalSelfVar;
+    private final @Nullable LocationVariable originalSelfVar;
 
     /**
      * JML axioms may not be declared static, but they may be used like static specifications. This
@@ -45,8 +50,9 @@ public final class ClassAxiomImpl extends ClassAxiom {
     private final boolean isStatic;
 
 
-    public ClassAxiomImpl(String name, KeYJavaType kjt, ModifierKind visibility, JTerm rep,
-            LocationVariable selfVar) {
+    public ClassAxiomImpl(String name, KeYJavaType kjt, @Nullable ModifierKind visibility,
+            JTerm rep,
+            @Nullable LocationVariable selfVar) {
         assert name != null;
         assert kjt != null;
         this.name = name;
@@ -56,12 +62,15 @@ public final class ClassAxiomImpl extends ClassAxiom {
         this.originalSelfVar = selfVar;
         final OpCollector oc = new OpCollector();
         originalRep.execPostOrder(oc);
-        this.isStatic = !oc.contains(originalSelfVar);
+        @SuppressWarnings("NullAway") // contains() delegates to HashSet.contains(), which is
+                                      // null-tolerant: static axioms have no self variable
+        final boolean containsSelf = oc.contains(originalSelfVar);
+        this.isStatic = !containsSelf;
     }
 
 
-    public ClassAxiomImpl(String name, String displayName, KeYJavaType kjt,
-            ModifierKind visibility, JTerm rep, LocationVariable selfVar) {
+    public ClassAxiomImpl(String name, @Nullable String displayName, KeYJavaType kjt,
+            @Nullable ModifierKind visibility, JTerm rep, @Nullable LocationVariable selfVar) {
         this(name, kjt, visibility, rep, selfVar);
         this.displayName = displayName;
     }
@@ -74,7 +83,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
@@ -94,8 +103,10 @@ public final class ClassAxiomImpl extends ClassAxiom {
             if (other.originalSelfVar == null) {
                 return false;
             } else {
-                return originalSelfVar.getKeYJavaType()
-                        .equals(other.originalSelfVar.getKeYJavaType());
+                return Objects.requireNonNull(originalSelfVar.getKeYJavaType(),
+                    "no self variable type")
+                        .equals(Objects.requireNonNull(other.originalSelfVar.getKeYJavaType(),
+                            "no self variable type"));
             }
         }
         return true;
@@ -120,7 +131,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
 
 
     @Override
-    public ModifierKind getVisibility() {
+    public @Nullable ModifierKind getVisibility() {
         return visibility;
     }
 
@@ -129,9 +140,11 @@ public final class ClassAxiomImpl extends ClassAxiom {
     public ImmutableSet<Taclet> getTaclets(ImmutableSet<Pair<Sort, IObserverFunction>> toLimit,
             Services services) {
         ImmutableList<LocationVariable> replaceVars = ImmutableList.nil();
-        replaceVars = replaceVars.append(services.getTypeConverter().getHeapLDT().getHeap());
+        replaceVars = replaceVars.append(Objects.requireNonNull(
+            services.getTypeConverter().getHeapLDT(), "heap LDT").getHeap());
         if (!isStatic) {
-            replaceVars = replaceVars.append(originalSelfVar);
+            replaceVars = replaceVars.append(Objects.requireNonNull(originalSelfVar,
+                "no self variable for instance axiom"));
         }
         JTerm rep = services.getTermBuilder().convertToFormula(originalRep);
         TacletGenerator TG = TacletGenerator.getInstance();
@@ -186,7 +199,7 @@ public final class ClassAxiomImpl extends ClassAxiom {
      * Class axioms do not have targets (in opposition to represents clauses)
      */
     @Override
-    public IObserverFunction getTarget() {
+    public @Nullable IObserverFunction getTarget() {
         return null;
     }
 

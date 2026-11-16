@@ -16,16 +16,20 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This handler treats polymorphic symbols, in particular if-then-else and equals.
  *
  * @author Jonas Schiffl
  */
+@NullMarked
 public class PolymorphicHandler implements SMTHandler {
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         // nothing to be done
         // there are also no snippets.
     }

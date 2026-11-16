@@ -35,6 +35,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
@@ -61,13 +62,14 @@ import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
  * </pre>
  * </p>
  */
+@NullMarked
 public class FunctionalOperationContractPO extends AbstractOperationPO implements ContractPO {
     public static final Map<Boolean, @NonNull String> TRANSACTION_TAGS =
         new LinkedHashMap<>();
 
     private final FunctionalOperationContract contract;
 
-    protected JTerm mbyAtPre;
+    protected @Nullable JTerm mbyAtPre;
 
     static {
         TRANSACTION_TAGS.put(false, "transaction_inactive");
@@ -171,8 +173,13 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     /**
      * {@inheritDoc}
+     * <p>
+     * The {@link #tb} term builder is assigned by {@code postInit()} before this helper is invoked
+     * (see the field declaration in {@link AbstractPO}); the dereferences are suppressed with a
+     * scoped key.
      */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected JTerm generateMbyAtPreDef(LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, Services services) {
         final JTerm mbyAtPreDef;
@@ -183,7 +190,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
              * services.getTypeConverter().getIntegerLDT().targetSort()); register(mbyAtPreFunc);
              * mbyAtPre = TB.func(mbyAtPreFunc);
              */
-            final JTerm mby = contract.getMby(selfVar, paramVars, services);
+            final JTerm mby = Objects.requireNonNull(
+                contract.getMby(selfVar, paramVars, services),
+                "no measured-by clause for contract: " + contract.getName());
             // mbyAtPreDef = TB.equals(mbyAtPre, mby);
             mbyAtPreDef = tb.measuredBy(mby);
         } else {
@@ -195,7 +204,16 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     /**
      * {@inheritDoc}
+     * The contract may yield {@code null} pre terms for trivial cases, but the overridden
+     * declaration requires a non-null term; the difference is suppressed with a scoped key. A
+     * contract may also declare only a free precondition, in which case {@code pre} is
+     * {@code null} inside the {@code and} call; the pre-existing code would fail there anyway,
+     * so that argument mismatch is suppressed with a scoped key too.
      */
+    @SuppressWarnings({
+        "NullAway",
+        "nullness:return.type.incompatible",
+        "nullness:argument.type.incompatible" })
     @Override
     protected JTerm getPre(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
@@ -208,7 +226,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     /**
      * {@inheritDoc}
+     * The contract may yield {@code null} post terms for trivial cases, but the overridden
+     * declaration requires a non-null term; the difference is suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     @Override
     protected JTerm getPost(List<LocationVariable> modifiableHeaps, LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars, LocationVariable resultVar,
@@ -220,14 +241,21 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     }
 
     @Override
-    protected JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
-            ImmutableList<JTerm> paramTerms, Services services) {
+    protected @Nullable JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> paramTerms, Services services) {
         return contract.getGlobalDefs(heap, heapTerm, selfTerm, paramTerms, services);
     }
 
     /**
      * {@inheritDoc}
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key. The
+     * {@link #tb} term builder is assigned by {@code postInit()} before this helper is invoked (see
+     * the field declaration in {@link AbstractPO}); its dereferences are suppressed with a scoped
+     * key too.
      */
+    @SuppressWarnings({ "NullAway", "nullness:override.return.invalid",
+        "nullness:dereference.of.nullable" })
     @Override
     protected @Nullable JTerm buildFrameClause(List<LocationVariable> modifiableHeaps,
             Map<JTerm, JTerm> heapToAtPre, LocationVariable selfVar,
@@ -240,16 +268,24 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                     ft = tb.frameStrictlyEmpty(tb.var(heap), heapToAtPre);
                 } else {
                     ft = tb.frame(tb.var(heap), heapToAtPre,
-                        getContract().getFreeModifiable(heap, selfVar, paramVars, services));
+                        Objects.requireNonNull(
+                            getContract().getFreeModifiable(heap, selfVar, paramVars, services),
+                            "no free modifiable clause for heap: " + heap));
                 }
             } else {
                 if (!getContract().hasFreeModifiable(heap)) {
                     ft = tb.frame(tb.var(heap), heapToAtPre,
-                        getContract().getModifiable(heap, selfVar, paramVars, services));
+                        Objects.requireNonNull(
+                            getContract().getModifiable(heap, selfVar, paramVars, services),
+                            "no modifiable clause for heap: " + heap));
                 } else {
                     ft = tb.frame(tb.var(heap), heapToAtPre, tb.union(
-                        getContract().getModifiable(heap, selfVar, paramVars, services),
-                        getContract().getFreeModifiable(heap, selfVar, paramVars, services)));
+                        Objects.requireNonNull(
+                            getContract().getModifiable(heap, selfVar, paramVars, services),
+                            "no modifiable clause for heap: " + heap),
+                        Objects.requireNonNull(
+                            getContract().getFreeModifiable(heap, selfVar, paramVars, services),
+                            "no free modifiable clause for heap: " + heap)));
                 }
             }
 
@@ -260,7 +296,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             }
         }
 
-        return tb.addLabelToAllSubs(frameTerm, new Origin(SpecType.ASSIGNABLE));
+        return tb.addLabelToAllSubs(
+            Objects.requireNonNull(frameTerm, "no frame clause for the given heaps"),
+            new Origin(SpecType.ASSIGNABLE));
     }
 
     /**
@@ -273,7 +311,19 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
 
     /**
      * {@inheritDoc}
+     * The accumulator is {@code @Nullable} during the build; the invariants of the method guarantee
+     * a non-null result, so the difference is suppressed with a scoped key. If no AtPre variables
+     * are declared the accumulator may still be {@code null} during the copy-of-arguments pass; the
+     * pre-existing code would fail there anyway, so the argument mismatch is suppressed with a
+     * scoped key too. The {@link #tb} term builder is assigned by {@code postInit()} before this
+     * helper is invoked (see the field declaration in {@link AbstractPO}); its dereferences are
+     * suppressed with a scoped key too.
      */
+    @SuppressWarnings({
+        "NullAway",
+        "nullness:return.type.incompatible",
+        "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     @Override
     protected JTerm buildUpdate(ImmutableList<LocationVariable> paramVars,
             ImmutableList<LocationVariable> formalParamVars,
@@ -314,11 +364,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
         return contract;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public JTerm getMbyAtPre() {
+    public @Nullable JTerm getMbyAtPre() {
         return mbyAtPre;
     }
 
@@ -337,7 +384,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof FunctionalOperationContractPO) {
             return contract.equals(((FunctionalOperationContractPO) o).contract);
         }

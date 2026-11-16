@@ -6,6 +6,7 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -106,7 +107,8 @@ public class RewriteCommand extends AbstractCommand {
         if (!failposInOccs.isEmpty()) {
 
             CutCommand.Parameters param = new CutCommand.Parameters();
-            param.formula = args.replace;
+            param.formula =
+                Objects.requireNonNull(args.replace, "No replacement term was given");
             CutCommand.execute(state(), param);
         }
 
@@ -176,6 +178,10 @@ public class RewriteCommand extends AbstractCommand {
                         try { // Term not already successfully replaced
                             Goal goalold = state.getFirstOpenAutomaticGoal();
                             if (pta.complete()) {
+                                // A null term label state is deliberate here: the script command
+                                // requests no label refactoring. The downstream visitor chain
+                                // tolerates a null state, only the executor signature is non-null.
+                                @SuppressWarnings("NullAway")
                                 SequentFormula rewriteResult =
                                     ((RewriteTacletExecutor) rw.getExecutor()).getRewriteResult(
                                         goalold, null, goalold.proof().getServices(), pta);

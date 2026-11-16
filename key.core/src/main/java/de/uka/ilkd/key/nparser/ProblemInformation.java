@@ -12,6 +12,7 @@ import java.util.Map;
 import org.key_project.util.parsing.Location;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -27,6 +28,7 @@ import org.jspecify.annotations.Nullable;
  * @author weigl
  * @see de.uka.ilkd.key.nparser.builder.FindProblemInformation
  */
+@NullMarked
 public class ProblemInformation {
     /**
      * A list of class paths entries.

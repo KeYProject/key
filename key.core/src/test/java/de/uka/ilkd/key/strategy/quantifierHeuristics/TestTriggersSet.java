@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -423,7 +424,8 @@ public class TestTriggersSet {
         // loaded problem are used.
         final Services services = HelperClassForTests.createServices();
         final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "the JavaDL heap theory must be registered");
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
         final Sort intArray = ArraySort.getArraySort(intSort, services.getJavaInfo().objectSort(),
@@ -460,7 +462,8 @@ public class TestTriggersSet {
         // no theory-provided trigger is derived.
         final Services services = proof.getServices();
         final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "the JavaDL heap theory must be registered");
         final Sort intSort = services.getTypeConverter().getIntegerLDT().targetSort();
         final Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
         final JTerm o = tb.func(

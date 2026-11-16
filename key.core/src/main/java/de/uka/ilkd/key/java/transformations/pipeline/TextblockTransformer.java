@@ -8,11 +8,14 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
 import com.github.javaparser.ast.expr.TextBlockLiteralExpr;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author Alexander Weigl
  * @version 1 (3/31/26)
  */
+@NullMarked
 public class TextblockTransformer implements JavaTransformer {
     @Override
     public void apply(TypeDeclaration<?> td) {

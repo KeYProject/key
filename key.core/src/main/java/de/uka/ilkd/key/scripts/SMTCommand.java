@@ -20,7 +20,6 @@ import de.uka.ilkd.key.smt.solvertypes.SolverTypes;
 
 import org.key_project.util.collection.ImmutableList;
 
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,15 +55,15 @@ public class SMTCommand extends AbstractCommand {
 
     @Override
     public void execute(ScriptCommandAst params) throws ScriptException, InterruptedException {
-        var args = state.getValueInjector().inject(new SMTCommandArguments(), params);
+        var args = state().getValueInjector().inject(new SMTCommandArguments(), params);
 
         SolverTypeCollection su = computeSolvers(args.solver);
 
         ImmutableList<Goal> goals;
         if (args.all) {
-            goals = state.getProof().openGoals();
+            goals = state().getProof().openGoals();
         } else {
-            goals = ImmutableList.<Goal>nil().prepend(state.getFirstOpenAutomaticGoal());
+            goals = ImmutableList.<Goal>nil().prepend(state().getFirstOpenAutomaticGoal());
         }
 
         for (Goal goal : goals) {
@@ -93,8 +92,10 @@ public class SMTCommand extends AbstractCommand {
             SMTSolverResult finalResult = problem.getFinalResult();
             if (finalResult.isValid() == ThreeValuedTruth.VALID) {
                 IBuiltInRuleApp app = SMTRule.INSTANCE.createApp(args.solver);
-                app = app.tryToInstantiate(problem.getGoal());
-                problem.getGoal().apply(app);
+                Goal problemGoal = Objects.requireNonNull(problem.getGoal(),
+                    "No goal for the SMT problem");
+                app = app.tryToInstantiate(problemGoal);
+                problemGoal.apply(app);
             }
             LOGGER.info("Finished run on goal " + goal.node().serialNr() + " in "
                 + timerListener.getRuntime() + "ms, result is " + finalResult);
@@ -132,7 +133,7 @@ public class SMTCommand extends AbstractCommand {
         public boolean all = false;
 
         @Option(value = "timeout")
-        public @Nullable int timeout = -1;
+        public int timeout = -1;
     }
 
     private static class TimerListener implements SolverLauncherListener {

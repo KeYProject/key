@@ -13,15 +13,19 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.taclettranslation.TacletFormula;
 import de.uka.ilkd.key.taclettranslation.TacletTranslator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A Lemma Generator translates a taclet to its corresponding first order logic formula thats
  * validity implies the validity of the taclet.
  */
+@NullMarked
 public interface LemmaGenerator extends TacletTranslator {
     TacletFormula translate(Taclet taclet, TermServices services);
 }
 
 
+@NullMarked
 class LemmaFormula implements TacletFormula {
     private final Taclet taclet;
     private final LinkedList<JTerm> formula = new LinkedList<>();

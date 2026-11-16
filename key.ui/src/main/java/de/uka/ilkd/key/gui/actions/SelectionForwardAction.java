@@ -11,11 +11,14 @@ import de.uka.ilkd.key.gui.SelectionHistory;
 import de.uka.ilkd.key.gui.SelectionHistoryChangeListener;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to navigate forward in proof node selection history.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class SelectionForwardAction extends MainWindowAction
         implements SelectionHistoryChangeListener {
     /**
@@ -30,6 +33,11 @@ public class SelectionForwardAction extends MainWindowAction
      * @param mainWindow the main window
      * @param history selection history
      */
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SelectionForwardAction(MainWindow mainWindow, SelectionHistory history) {
         super(mainWindow);
         this.history = history;

@@ -14,9 +14,12 @@ import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /// Factory for [JavaCardDLStrategy]. Additionally, handles all strategy settings
 /// relevant to it.
 /// @author Kai Wallisch <kai.wallisch@ira.uka.de>
+@NullMarked
 public class JavaCardDLStrategyFactory implements StrategyFactory {
 
     /**

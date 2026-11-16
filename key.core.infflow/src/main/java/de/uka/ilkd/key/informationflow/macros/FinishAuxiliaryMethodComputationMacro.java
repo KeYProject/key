@@ -24,15 +24,19 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  * @author christoph
  */
+@NullMarked
 public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxiliaryComputationMacro {
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         if (proof != null && proof.getServices() != null) {
             final ProofOblInput poForProof =
                 proof.getServices().getSpecificationRepository().getProofOblInput(proof);
@@ -43,15 +47,24 @@ public class FinishAuxiliaryMethodComputationMacro extends AbstractFinishAuxilia
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, final Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener) {
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener) {
 
         final ProofOblInput poForProof =
             proof.getServices().getSpecificationRepository().getProofOblInput(proof);
-        final Goal initiatingGoal = ((SymbolicExecutionPO) poForProof).getInitiatingGoal();
+        if (!(poForProof instanceof SymbolicExecutionPO symbExecPO)) {
+            throw new NullPointerException("No symbolic execution proof obligation for "
+                + "the auxiliary proof.");
+        }
+        final Goal initiatingGoal = symbExecPO.getInitiatingGoal();
         final InfFlowProof initiatingProof = (InfFlowProof) initiatingGoal.proof();
         final Services services = initiatingProof.getServices();
-        final InfFlowContractPO ifPO = (InfFlowContractPO) services.getSpecificationRepository()
+        final ProofOblInput poInput = services.getSpecificationRepository()
                 .getProofOblInput(initiatingProof);
+        if (!(poInput instanceof InfFlowContractPO ifPO)) {
+            throw new NullPointerException("No information flow contract proof obligation for "
+                + "the initiating proof.");
+        }
         final IFProofObligationVars ifVars = ifPO.getIFVars().labelHeapAtPreAsAnonHeapFunc();
         final InformationFlowContract ifContract = ifPO.getContract();
 

@@ -6,16 +6,20 @@ package de.uka.ilkd.key.proof;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Encapsulates information describing changes to a proof tree, and used to notify proof tree
  * listeners of the change.
  */
 
+@NullMarked
 public class ProofTreeEvent {
 
     private final Proof source;
-    private Node node;
-    private Goal goal;
+    private @Nullable Node node;
+    private @Nullable Goal goal;
     private ImmutableList<Goal> goals = ImmutableList.nil();
 
     /**
@@ -49,7 +53,7 @@ public class ProofTreeEvent {
         this.goals = goals;
     }
 
-    public Node getNode() {
+    public @Nullable Node getNode() {
         return node;
     }
 
@@ -57,7 +61,7 @@ public class ProofTreeEvent {
         return source;
     }
 
-    public Goal getGoal() {
+    public @Nullable Goal getGoal() {
         return goal;
     }
 

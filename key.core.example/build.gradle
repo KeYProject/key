@@ -4,6 +4,21 @@ plugins {
 
 description = "Example project to use KeY's APIs"
 
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^org\\.key_project",
+                "-Xmaxerrs", "10000",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}
+
 application {
     mainClass = "org.key_project.Main"
 }

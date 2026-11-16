@@ -5,10 +5,14 @@
 package de.uka.ilkd.key.smt;
 
 import java.util.Collection;
+import java.util.Objects;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Encapsulates all exceptions that have occurred while executing the solvers.
  */
+@NullMarked
 public class SolverException extends RuntimeException {
     private static final long serialVersionUID = 1L;
     private final transient Collection<SMTSolver> solvers;
@@ -27,9 +31,10 @@ public class SolverException extends RuntimeException {
         StringBuilder s = new StringBuilder("\n");
         for (SMTSolver solver : solvers) {
             s.append("Solver: ").append(solver.name()).append("\n");
-            if (solver.getProblem().getGoal() != null) {
-                s.append("Goal-No.: ").append(solver.getProblem().getGoal().node().serialNr())
-                        .append("\n");
+            // a solver that raised an exception has a problem object attached
+            SMTProblem problem = Objects.requireNonNull(solver.getProblem(), "problem");
+            if (problem.getGoal() != null) {
+                s.append("Goal-No.: ").append(problem.getGoal().node().serialNr()).append("\n");
             }
             s.append("Exception:\n");
             s.append(solver.getException());

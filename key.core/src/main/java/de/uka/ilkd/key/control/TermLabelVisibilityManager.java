@@ -17,6 +17,10 @@ import de.uka.ilkd.key.proof.init.Profile;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class TermLabelVisibilityManager implements VisibleTermLabels {
 
     /**
@@ -109,7 +113,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      * {@inheritDoc}
      */
     @Override
-    public boolean contains(TermLabel label) {
+    public boolean contains(@Nullable TermLabel label) {
         return label != null && contains(label.name());
     }
 
@@ -130,7 +134,8 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      *
      * @param l The {@link TermLabelVisibilityManagerListener} to add.
      */
-    public void addTermLabelVisibilityManagerListener(TermLabelVisibilityManagerListener l) {
+    public void addTermLabelVisibilityManagerListener(
+            @Nullable TermLabelVisibilityManagerListener l) {
         if (l != null) {
             listeners.add(l);
         }
@@ -141,7 +146,8 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
      *
      * @param l The {@link TermLabelVisibilityManagerListener} to remove.
      */
-    public void removeTermLabelVisibilityManagerListener(TermLabelVisibilityManagerListener l) {
+    public void removeTermLabelVisibilityManagerListener(
+            @Nullable TermLabelVisibilityManagerListener l) {
         if (l != null) {
             listeners.remove(l);
         }

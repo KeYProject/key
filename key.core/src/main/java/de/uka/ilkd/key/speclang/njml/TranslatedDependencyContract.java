@@ -7,12 +7,16 @@ package de.uka.ilkd.key.speclang.njml;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The information obtain from an JML accessible clause.
  *
  * @author Alexander Weigl
  * @version 1 (23.04.24)
  */
+@NullMarked
 public record TranslatedDependencyContract(IObserverFunction observerFunction, JTerm rhs,
-        JTerm mby) {
+        @Nullable JTerm mby) {
 }

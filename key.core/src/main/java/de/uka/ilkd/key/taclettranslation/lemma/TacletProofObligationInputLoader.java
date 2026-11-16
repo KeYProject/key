@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.awt.GraphicsEnvironment;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -28,7 +29,8 @@ public class TacletProofObligationInputLoader implements ProofObligationLoader {
             TacletProofObligationInput.LOGGER.info("Proof obligation for taclet: {}", tacletName);
         }
         TacletProofObligationInput proofOblInput =
-            new TacletProofObligationInput(tacletName, initConfig);
+            new TacletProofObligationInput(Objects.requireNonNull(tacletName,
+                "Missing property " + IPersistablePO.PROPERTY_NAME), initConfig);
         proofOblInput.setLoadInfo(properties);
         return new IPersistablePO.LoadedPOContainer(proofOblInput);
     }

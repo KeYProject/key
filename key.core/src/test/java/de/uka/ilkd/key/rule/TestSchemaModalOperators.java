@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.rule;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.*;
@@ -113,6 +115,7 @@ public class TestSchemaModalOperators {
     }
 
     @AfterEach
+    @SuppressWarnings("NullAway") // deliberate null reset after each test
     public void tearDown() {
         proof = null;
     }
@@ -151,8 +154,9 @@ public class TestSchemaModalOperators {
         RewriteTaclet t = rtb.getRewriteTaclet();
 
         JTerm goal = TB.prog(JModality.JavaModalityKind.DIA, JavaBlock.EMPTY_JAVABLOCK, TB.ff());
-        MatchResultInfo mc =
-            t.getMatcher().matchFind(goal, EMPTY_MATCHCONDITIONS, services);
+        MatchResultInfo mc = Objects
+                .requireNonNull(t.getMatcher(), "the taclet has a matcher")
+                .matchFind(goal, EMPTY_MATCHCONDITIONS, services);
         assertNotNull(mc);
         assertNotNull(mc.getInstantiations().getInstantiation(osv));
         assertTrue(mc.getInstantiations().isInstantiated(osv),
@@ -161,7 +165,9 @@ public class TestSchemaModalOperators {
 
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(goal), PosInTerm.getTopLevel(), true);
-        PosTacletApp tacletApp = PosTacletApp.createPosTacletApp(t, mc, pos, services);
+        PosTacletApp tacletApp = Objects
+                .requireNonNull(PosTacletApp.createPosTacletApp(t, mc, pos, services),
+                    "the taclet application must be valid");
         JTerm instReplace =
             (JTerm) t.getRewriteResult(TacletForTests.createGoal(), new TermLabelState(), services,
                 tacletApp).formula();
@@ -175,12 +181,12 @@ public class TestSchemaModalOperators {
         NoPosTacletApp testmodal1 = TacletForTests.lookupTaclet("testSchemaModal1");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal1);
-        Goal goal = createGoal(proof[0].root(), tacletIndex);
+        Goal goal = createGoal(
+            Objects.requireNonNull(proof[0].root(), "root of proof[0]"), tacletIndex);
         PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
-        ImmutableList<TacletApp> rApplist =
-            goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
+        ImmutableList<TacletApp> rApplist = tacletAppsAt(goal.ruleAppIndex(), applyPos);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
@@ -210,12 +216,12 @@ public class TestSchemaModalOperators {
         NoPosTacletApp testmodal2 = TacletForTests.lookupTaclet("testSchemaModal2");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal2);
-        Goal goal = createGoal(proof[1].root(), tacletIndex);
+        Goal goal = createGoal(
+            Objects.requireNonNull(proof[1].root(), "root of proof[1]"), tacletIndex);
         PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
-        ImmutableList<TacletApp> rApplist =
-            goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
+        ImmutableList<TacletApp> rApplist = tacletAppsAt(goal.ruleAppIndex(), applyPos);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
@@ -241,12 +247,12 @@ public class TestSchemaModalOperators {
         NoPosTacletApp testmodal3 = TacletForTests.lookupTaclet("testSchemaModal3");
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
         tacletIndex.add(testmodal3);
-        Goal goal = createGoal(proof[1].root(), tacletIndex);
+        Goal goal = createGoal(
+            Objects.requireNonNull(proof[1].root(), "root of proof[1]"), tacletIndex);
         PosInOccurrence applyPos =
             new PosInOccurrence(goal.sequent().succedent().getFirst(),
                 PosInTerm.getTopLevel(), false);
-        ImmutableList<TacletApp> rApplist =
-            goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, applyPos, null);
+        ImmutableList<TacletApp> rApplist = tacletAppsAt(goal.ruleAppIndex(), applyPos);
         assertEquals(1, rApplist.size(), "Too many or zero rule applications.");
         TacletApp rApp = rApplist.head();
         assertTrue(rApp.complete(), "Rule App should be complete");
@@ -284,6 +290,13 @@ public class TestSchemaModalOperators {
     private Goal createGoal(Node n, TacletIndex tacletIndex) {
         final BuiltInRuleAppIndex birIndex = new BuiltInRuleAppIndex(new BuiltInRuleIndex());
         return new Goal(n, tacletIndex, birIndex, n.proof().getServices());
+    }
+
+    // a null Services is intentional: the test taclets are pure logic
+    @SuppressWarnings("NullAway")
+    private static ImmutableList<TacletApp> tacletAppsAt(RuleAppIndex index,
+            PosInOccurrence pos) {
+        return index.getTacletAppAt(TacletFilter.TRUE, pos, null);
     }
 
 }

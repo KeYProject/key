@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.TypeConverter;
@@ -56,7 +57,8 @@ public class SeqStrategy extends AbstractFeatureStrategy implements ComponentStr
         costDispatcher = setupCostDispatcher();
         approvalDispatcher = setupApprovalDispatcher();
         stopAtFirstNonCloseableGoal =
-            strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
+            Objects.requireNonNull(strategyProperties.getProperty(
+                StrategyProperties.STOPMODE_OPTIONS_KEY), "no stop mode strategy property")
                     .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 

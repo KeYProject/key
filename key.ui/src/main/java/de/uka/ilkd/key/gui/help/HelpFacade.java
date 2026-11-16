@@ -19,6 +19,8 @@ import org.key_project.util.java.SwingUtil;
 
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (10.04.19)
  */
+@NullMarked
 public class HelpFacade {
     private static final Logger LOGGER = LoggerFactory.getLogger(HelpFacade.class);
     /**
@@ -52,8 +55,9 @@ public class HelpFacade {
     public static String HELP_BASE_URL = "https://keyproject.github.io/key-docs/";
 
     static {
-        if (System.getProperty("KEY_HELP_URL") != null) {
-            HELP_BASE_URL = System.getProperty(KEY_HELP_URL);
+        String helpUrl = System.getProperty(KEY_HELP_URL);
+        if (helpUrl != null) {
+            HELP_BASE_URL = helpUrl;
         }
     }
 
@@ -97,15 +101,16 @@ public class HelpFacade {
      * @param path
      */
     public static void openHelp(Component path) {
-        while (path != null) {
-            if (openHelpOfClass(path.getClass())) {
+        @Nullable
+        Component current = path;
+        while (current != null) {
+            if (openHelpOfClass(current.getClass())) {
                 break;
             } else {
-                path = path.getParent();
+                current = current.getParent();
             }
         }
     }
-
 
     /**
      * Opens documentation given for the given class.
@@ -159,6 +164,15 @@ public class HelpFacade {
     private static class OpenHelpAction extends KeyAction {
         private static final long serialVersionUID = 85722762932429493L;
 
+        /**
+         * Creates the action opening the help.
+         *
+         * <p>
+         * The action names itself and binds its accelerator while the receiver is still under
+         * initialization (EISOP initialization check); the settings only materialize once the
+         * action is displayed after construction, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public OpenHelpAction() {
             setName("Open help");
             setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));

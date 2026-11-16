@@ -12,7 +12,9 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.VMProgramInterpreter;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * Matches the Java program of a modality by running a sub-program of {@code VMInstruction}s over
@@ -22,6 +24,7 @@ import org.jspecify.annotations.Nullable;
  * {@code MatchProgramInstruction}); the sub-program runs on its {@code program()}, leaving the
  * outer cursor at the {@code JavaBlock} so the surrounding navigation is unchanged.
  */
+@NullMarked
 public final class MatchSubProgramInstruction implements MatchInstruction {
 
     private final VMProgramInterpreter program;

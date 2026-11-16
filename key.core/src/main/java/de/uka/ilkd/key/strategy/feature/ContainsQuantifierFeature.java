@@ -12,12 +12,15 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Binary feature that returns zero iff the focus of a rule contains a quantifier
  * <p>
  * NB: this can nowadays be done more nicely using term features
  */
+@NullMarked
 public class ContainsQuantifierFeature extends AbstractBetaFeature {
 
     public final static Feature INSTANCE = new ContainsQuantifierFeature();

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
@@ -15,6 +17,8 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Modality;
 import org.key_project.logic.op.UpdateableOperator;
+
+import org.jspecify.annotations.NullMarked;
 
 
 /**
@@ -34,6 +38,7 @@ import org.key_project.logic.op.UpdateableOperator;
  * @author Dominic Steinhoefel
  */
 @TransformerMeta(name = "#createBeforeLoopUpdate")
+@NullMarked
 public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
 
     public CreateBeforeLoopUpdate() {
@@ -71,7 +76,8 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
             JTerm anonPermissionsHeapTerm,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT");
 
         JTerm beforeLoopUpdate =
             tb.elementary((UpdateableOperator) anonHeapTerm.op(), tb.var(heapLDT.getHeap()));
@@ -84,7 +90,8 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
         if (isPermissions) {
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
                 tb.elementary((UpdateableOperator) anonPermissionsHeapTerm.op(),
-                    tb.var(heapLDT.getPermissionHeap())));
+                    tb.var(Objects.requireNonNull(heapLDT.getPermissionHeap(),
+                        "no permission heap available"))));
         }
 
         return beforeLoopUpdate;

@@ -6,11 +6,14 @@ package de.uka.ilkd.key.java.ast.expression.operator;
 
 import de.uka.ilkd.key.java.ast.expression.Operator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  *
  * @author Alexander Weigl
  * @version 1 (25.04.26)
  */
+@NullMarked
 public enum UnaryOperatorKind {
     LOGICAL_NOT("!", 1),
     NEGATIVE("-", 1),

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.match.vm.instructions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.reference.SchemaTypeReference;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 
@@ -12,7 +14,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * Matches a {@link SchemaTypeReference} against the source element, replicating
@@ -22,6 +26,7 @@ import org.jspecify.annotations.Nullable;
  * other single-position program instructions the cursor advance is the emitted {@code
  * gotoNextSibling}.
  */
+@NullMarked
 public final class MatchSchemaTypeReferenceInstruction implements MatchInstruction {
 
     private final SchemaTypeReference pattern;
@@ -34,7 +39,8 @@ public final class MatchSchemaTypeReferenceInstruction implements MatchInstructi
     public @Nullable MatchResultInfo match(SyntaxElement actualElement,
             MatchResultInfo matchConditions, LogicServices services) {
         if (actualElement instanceof TypeReference tr
-                && pattern.getName().equals(tr.getName())
+                && Objects.requireNonNull(pattern.getName(),
+                    "schema type reference has no name").equals(tr.getName())
                 && tr.getDimensions() == pattern.getDimensions()) {
             return matchConditions;
         }

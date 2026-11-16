@@ -15,6 +15,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A factory class for {@link MergeWithPredicateAbstraction} which is itself a
  * {@link MergeProcedure}. This class is used by the merge rule completion GUI which needs in
@@ -24,6 +26,7 @@ import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergeWithPredicateAbstractionFactory extends MergeWithPredicateAbstraction {
 
     private static final MergeWithPredicateAbstractionFactory INSTANCE =

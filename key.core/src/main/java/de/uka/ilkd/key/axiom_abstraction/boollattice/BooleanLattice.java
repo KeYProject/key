@@ -9,11 +9,14 @@ import java.util.Iterator;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A simple lattice for booleans.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class BooleanLattice extends AbstractDomainLattice {
 
     /**

@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A semantical part of the software model. A source element is not necessarily connected to a piece
  * of syntax.
  *
  */
+@NullMarked
 public interface ModelElement {
 
 }

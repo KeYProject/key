@@ -10,6 +10,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
@@ -137,7 +138,8 @@ public class MtSyntheticBenchmark {
             System.clearProperty(ParallelProver.PARALLEL_PROPERTY);
         }
         try {
-            Proof proof = env.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
             starter.setMaxRuleApplications(MAX_STEPS);
@@ -211,7 +213,7 @@ public class MtSyntheticBenchmark {
     private static int countLeaves(Proof proof) {
         int leaves = 0;
         Deque<Node> stack = new ArrayDeque<>();
-        stack.push(proof.root());
+        stack.push(Objects.requireNonNull(proof.root(), "the proof has a root node"));
         while (!stack.isEmpty()) {
             Node n = stack.pop();
             int kids = n.childrenCount();
@@ -230,7 +232,7 @@ public class MtSyntheticBenchmark {
         int max = 0;
         Deque<Node> nodes = new ArrayDeque<>();
         Deque<Integer> depths = new ArrayDeque<>();
-        nodes.push(proof.root());
+        nodes.push(Objects.requireNonNull(proof.root(), "the proof has a root node"));
         depths.push(1);
         while (!nodes.isEmpty()) {
             Node n = nodes.pop();

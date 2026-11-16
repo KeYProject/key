@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.ast.statement;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
@@ -15,7 +16,8 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The new enhanced form of a for-loop.
@@ -27,9 +29,10 @@ import org.jspecify.annotations.NonNull;
  *
  * @author mulbrich
  */
+@NullMarked
 public class EnhancedFor extends LoopStatement implements VariableScope {
-    private EnhancedFor(PositionInfo pi, List<Comment> comments, ILoopInit inits,
-            IForUpdates updates, IGuard guard, Statement body) {
+    private EnhancedFor(PositionInfo pi, @Nullable List<Comment> comments, ILoopInit inits,
+            @Nullable IForUpdates updates, IGuard guard, Statement body) {
         super(pi, comments, inits, updates, guard, body, ImmutableList.nil());
     }
 
@@ -59,7 +62,7 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @param info
      *        position
      */
-    public EnhancedFor(@NonNull LoopInit init, @NonNull Guard guard, @NonNull Statement statement,
+    public EnhancedFor(LoopInit init, Guard guard, Statement statement,
             ExtList comments, PositionInfo info) {
         this(info, null, init, null, guard, statement);
     }
@@ -71,8 +74,13 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      *        a list of parameters
      */
     public EnhancedFor(ExtList children) {
-        super(children.get(ILoopInit.class), children.get(IGuard.class), null,
-            children.get(Statement.class), children);
+        super(Objects.requireNonNull(children.get(ILoopInit.class),
+            "enhanced for loop needs a loop initializer"),
+            Objects.requireNonNull(children.get(IGuard.class), "enhanced for loop needs a guard"),
+            null,
+            Objects.requireNonNull(children.get(Statement.class),
+                "enhanced for loop needs a body statement"),
+            children);
     }
 
     /**
@@ -80,7 +88,6 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @see JavaSourceElement#getLastElement()
      */
     @Override
-    @NonNull
     public SourceElement getLastElement() {
         return (body != null) ? body.getLastElement() : this;
     }
@@ -106,6 +113,7 @@ public class EnhancedFor extends LoopStatement implements VariableScope {
      * @return the local variable declaration.
      */
     public LocalVariableDeclaration getVariableDeclaration() {
-        return (LocalVariableDeclaration) getInitializers().get(0);
+        return (LocalVariableDeclaration) Objects.requireNonNull(getInitializers(),
+            "an enhanced for loop always has exactly one initializer").get(0);
     }
 }

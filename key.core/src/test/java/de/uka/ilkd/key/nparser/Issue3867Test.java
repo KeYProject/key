@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.nparser;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.ExceptionTools;
@@ -49,7 +51,7 @@ class Issue3867Test {
             "the error should point at the unterminated modality (line 4), not the later "
                 + "'\\endmodality' on line 5");
 
-        String msg = ExceptionTools.getMessage(ex);
+        String msg = Objects.requireNonNull(ExceptionTools.getMessage(ex), "error message");
         assertTrue(msg.contains("endmodality") || msg.toLowerCase().contains("not terminated"),
             "message should mention the missing \\endmodality, got: " + msg);
     }

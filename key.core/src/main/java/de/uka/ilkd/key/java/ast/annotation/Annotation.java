@@ -8,6 +8,8 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * This is the abstract class representing a Java annotation (like @Override
  * or @NonNull).
@@ -31,7 +33,7 @@ public abstract class Annotation extends JavaNonTerminalProgramElement {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

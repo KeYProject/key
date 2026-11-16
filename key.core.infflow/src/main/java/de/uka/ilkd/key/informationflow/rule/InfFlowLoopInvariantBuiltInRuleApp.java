@@ -8,6 +8,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -19,33 +20,36 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (7/28/25)
  */
+@NullMarked
 public class InfFlowLoopInvariantBuiltInRuleApp
         extends LoopInvariantBuiltInRuleApp<InfFlowWhileInvariantRule> {
 
     private @Nullable IFProofObligationVars infFlowVars;
 
     protected InfFlowLoopInvariantBuiltInRuleApp(InfFlowWhileInvariantRule rule,
-            PosInOccurrence pio,
+            @Nullable PosInOccurrence pio,
             @Nullable ImmutableList<PosInOccurrence> ifInsts, @Nullable LoopSpecification inv,
             @Nullable List<LocationVariable> heapContext, TermServices services) {
-        super(rule, pio, ifInsts, inv, heapContext, services);
+        super(rule, requirePio(pio), ifInsts, inv, heapContext, services);
     }
 
     protected InfFlowLoopInvariantBuiltInRuleApp(InfFlowWhileInvariantRule rule,
-            PosInOccurrence pio, LoopSpecification inv,
+            @Nullable PosInOccurrence pio, LoopSpecification inv,
             TermServices services) {
-        super(rule, pio, inv, services);
+        super(rule, requirePio(pio), inv, services);
     }
 
-    public InfFlowLoopInvariantBuiltInRuleApp(InfFlowWhileInvariantRule rule, PosInOccurrence pos,
+    public InfFlowLoopInvariantBuiltInRuleApp(InfFlowWhileInvariantRule rule,
+            @Nullable PosInOccurrence pos,
             TermServices services) {
-        super(rule, pos, services);
+        super(rule, requirePio(pos), services);
     }
 
     @Override
@@ -55,7 +59,12 @@ public class InfFlowLoopInvariantBuiltInRuleApp
         }
         final Services services = goal.proof().getServices();
         LoopSpecification inv = retrieveLoopInvariantFromSpecification(services);
-        var m = ((JModality) programTerm().op()).<JModality.JavaModalityKind>kind();
+        final JTerm programTerm = programTerm();
+        if (programTerm == null) {
+            throw new NullPointerException(
+                "No program term for instantiating the information flow loop invariant rule app.");
+        }
+        var m = ((JModality) programTerm.op()).<JModality.JavaModalityKind>kind();
         return new InfFlowLoopInvariantBuiltInRuleApp(builtInRule, pio, ifInsts, inv,
             HeapContext.getModifiableHeaps(services, m.transaction()), services);
     }
@@ -82,11 +91,19 @@ public class InfFlowLoopInvariantBuiltInRuleApp
             services);
     }
 
+    private static PosInOccurrence requirePio(@Nullable PosInOccurrence pio) {
+        if (pio == null) {
+            throw new NullPointerException(
+                "No position in occurrence for the information flow loop invariant rule app.");
+        }
+        return pio;
+    }
+
     public void setInformationFlowProofObligationVars(IFProofObligationVars vars) {
         this.infFlowVars = vars;
     }
 
-    public IFProofObligationVars getInformationFlowProofObligationVars() {
+    public @Nullable IFProofObligationVars getInformationFlowProofObligationVars() {
         return infFlowVars;
     }
 }

@@ -6,6 +6,8 @@ package de.uka.ilkd.key.logic.equality;
 
 import org.key_project.logic.Property;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interface to check for equality ignoring given properties and to compute according hash codes.
  * <p>
@@ -31,6 +33,7 @@ import org.key_project.logic.Property;
  *
  * @author Tobias Reinhold
  */
+@NullMarked
 public interface EqualsModProperty<T> {
 
     /**

@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.abstraction;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A program model element representing variables.
  *
  * @author AL
  * @author RN
  */
+@NullMarked
 public interface Variable extends ProgramModelElement {
 
     /**

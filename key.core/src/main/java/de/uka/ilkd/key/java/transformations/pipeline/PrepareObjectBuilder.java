@@ -33,6 +33,7 @@ import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.VoidType;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.java.transformations.AstFactory.assign;
 import static de.uka.ilkd.key.java.transformations.AstFactory.attribute;
@@ -43,6 +44,7 @@ import static de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants.IM
  * Creates the preparation method for pre-initilizing the object fields
  * with their default settings.
  */
+@NullMarked
 public class PrepareObjectBuilder extends JavaTransformerAbstract {
     public PrepareObjectBuilder(TransformationPipelineServices services) {
         super(services);

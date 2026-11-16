@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.tacletmatch.classic;
 
-
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.Collection;
@@ -14,6 +13,7 @@ import javax.swing.border.TitledBorder;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
@@ -21,6 +21,8 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,12 +36,13 @@ import org.slf4j.LoggerFactory;
  * display, program-variable info, status area, button panel) that the shared base shed when the
  * redesigned dialog replaced this one — kept here so the classic dialog stays self-contained.
  */
+@NullMarked
 public abstract class ApplyTacletDialog extends de.uka.ilkd.key.gui.ApplyTacletDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplyTacletDialog.class);
 
     protected final boolean checkAfterEachInput = true;
 
-    private JTextArea statusArea;
+    private @Nullable JTextArea statusArea;
 
     protected ApplyTacletDialog(Frame parent, TacletInstantiationModel[] model,
             KeYMediator mediator) {
@@ -81,8 +84,14 @@ public abstract class ApplyTacletDialog extends de.uka.ilkd.key.gui.ApplyTacletD
         Taclet taclet = model[0].taclet();
         StringBuilder tacletSB = new StringBuilder();
 
+        Services services = mediator.getServices();
+        if (services == null) {
+            // a running interaction always carries services
+            throw new NullPointerException("No services available.");
+        }
+
         SequentViewLogicPrinter tp = SequentViewLogicPrinter.purePrinter(68, new NotationInfo(),
-            mediator.getServices(), MainWindow.getInstance().getVisibleTermLabels());
+            services, MainWindow.getInstance().getVisibleTermLabels());
 
         tp.printTaclet(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS,
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getShowWholeTaclet(),

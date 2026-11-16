@@ -6,11 +6,14 @@ package de.uka.ilkd.key.gui.notification.events;
 
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * If the system wants to inform the user it may emit this event. If the flavour of the information
  * is that of an error message, one should use the
  * {@link de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent} instead.
  */
+@NullMarked
 public class GeneralInformationEvent extends NotificationEvent {
 
     /** the message with the information to be displayed */
@@ -54,6 +57,5 @@ public class GeneralInformationEvent extends NotificationEvent {
     public String getMessage() {
         return informationMessage;
     }
-
 
 }

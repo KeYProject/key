@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.macros;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A macro that performs all simplifications that are necessary in order to perform a translation of
  * the sequent to SMT. These include symbolic execution and heap simplification.
  *
  * @author js
  */
+@NullMarked
 public class SMTPreparationMacro extends SequentialProofMacro {
     /**
      * Creates the proof macro array.

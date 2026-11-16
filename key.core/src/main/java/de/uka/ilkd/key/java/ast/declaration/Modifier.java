@@ -75,7 +75,7 @@ public class Modifier extends JavaProgramElement implements ProgramElementWithKi
     }
 
     @Override
-    public final boolean equals(Object o) {
+    public final boolean equals(@Nullable Object o) {
         if (!(o instanceof Modifier modifier))
             return false;
         if (!super.equals(o))

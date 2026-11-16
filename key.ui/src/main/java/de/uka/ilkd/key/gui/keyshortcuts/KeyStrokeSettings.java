@@ -22,6 +22,8 @@ import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.settings.PathConfig;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +40,7 @@ import static de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager.SHORTCUT_KEY_MAS
  * @author Alexander Weigl, Wolfram Pfeifer (overhaul, v2)
  * @version 2 (04.08.23)
  */
+@NullMarked
 public class KeyStrokeSettings extends AbstractPropertiesSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeyStrokeSettings.class);
 
@@ -47,7 +50,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     /**
      * singleton instance
      */
-    private static KeyStrokeSettings INSTANCE = null;
+    private static @Nullable KeyStrokeSettings INSTANCE = null;
 
     /**
      * default {@link KeyStroke}s
@@ -118,10 +121,18 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         // defineDefault(HelpFacade.ACTION_OPEN_HELP.getClass(), KeyEvent.VK_F1, 0);
     }
 
+    /**
+     * {@code save()} and the shutdown-hook method reference receive {@code this} while it is
+     * still under initialization (EISOP initialization check); the settings properties are
+     * already assigned by {@code super(...)} so the calls only touch initialized state, and the
+     * shutdown hook thread only fires after construction, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:methodref.receiver.bound.invalid" })
     private KeyStrokeSettings(Properties init) {
         super(""); // no category, separate file
         this.properties.putAll(DEFAULT_KEYSTROKES);
-        init.forEach((key, value) -> {
+        init.forEach((Object key, Object value) -> {
             if (value != null && !value.toString().isEmpty()) {
                 this.properties.put(key.toString(), value);
             }
@@ -130,6 +141,12 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         Runtime.getRuntime().addShutdownHook(new Thread(this::save));
     }
 
+    /**
+     * See the {@code KeyStrokeSettings(Properties)} constructor; additionally {@code readSettings}
+     * operates on the already-initialized properties, suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:methodref.receiver.bound.invalid" })
     public KeyStrokeSettings(Configuration config) {
         super("");
         this.properties.putAll(DEFAULT_KEYSTROKES);
@@ -175,10 +192,10 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
 
     @Override
     public void readSettings(Properties props) {
-        props.forEach((k, v) -> this.properties.put(k.toString(), v));
+        props.forEach((Object k, Object v) -> this.properties.put(k.toString(), v));
     }
 
-    void setKeyStroke(String key, KeyStroke stroke, boolean override) {
+    void setKeyStroke(String key, @Nullable KeyStroke stroke, boolean override) {
         var old = getKeyStroke(key, null);
         if (override || (old == null)) {
             properties.put(key, stroke != null ? stroke.toString() : "");
@@ -186,9 +203,14 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
         }
     }
 
-    KeyStroke getKeyStroke(String key, KeyStroke defaultValue) {
+    @Nullable
+    KeyStroke getKeyStroke(String key, @Nullable KeyStroke defaultValue) {
         try {
-            KeyStroke ks = KeyStroke.getKeyStroke(properties.get(key).toString());
+            Object value = properties.get(key);
+            if (value == null) {
+                return defaultValue;
+            }
+            KeyStroke ks = KeyStroke.getKeyStroke(value.toString());
             if (ks != null) {
                 return ks;
             }
@@ -199,7 +221,10 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
 
     public void save() {
         try {
-            Files.createDirectories(SETTINGS_FILE.getParent());
+            Path settingsParent = SETTINGS_FILE.getParent();
+            if (settingsParent != null) {
+                Files.createDirectories(settingsParent);
+            }
             LOGGER.info("Save keyboard shortcuts to: {}", SETTINGS_FILE.toAbsolutePath());
             try (Writer writer = Files.newBufferedWriter(SETTINGS_FILE)) {
                 var config = new Configuration(properties);

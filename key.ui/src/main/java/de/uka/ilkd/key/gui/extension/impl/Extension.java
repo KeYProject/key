@@ -11,25 +11,39 @@ import de.uka.ilkd.key.gui.extension.ExtensionManager;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.settings.FeatureSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Manages a single registered GUI extension and its lazy {@link #getInstance() instance}.
+ * <p>
+ * The self-referential generic bound ({@code Extension<T> implements Comparable<Extension<T>>})
+ * can trip the EISOP type-argument comparability check under partial/incremental compilation:
+ * the checker then resolves {@code T}'s lower bound to the KeyFor bottom qualifier instead of
+ * the top (@KeyForBottom vs @UnknownKeyFor above {@code NullType}), a fixpoint artifact of the
+ * recursive bound that never occurs when the module compiles as a whole. Compiles fine under
+ * plain javac and is sound; suppressed with a scoped key (same pattern as keyext.proofmanagement
+ * check/Node) so every build mode stays EISOP-green.
+ *
  * @author Alexander Weigl
  * @version 1 (07.04.19)
  */
+@NullMarked
+@SuppressWarnings("nullness:type.argument.type.incompatible")
 public class Extension<T> implements Comparable<Extension<T>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Extension.class);
     private final Class<T> clazz;
-    private final KeYGuiExtension.Info info;
-    private T instance = null;
+    private final KeYGuiExtension.@Nullable Info info;
+    private @Nullable T instance = null;
 
     public Extension(Class<T> clazz) {
         this.clazz = clazz;
         this.info = clazz.getAnnotation(KeYGuiExtension.Info.class);
     }
 
-    public T getInstance() {
+    public @Nullable T getInstance() {
         if (instance == null) {
             try {
                 instance = clazz.getDeclaredConstructor().newInstance();
@@ -84,9 +98,8 @@ public class Extension<T> implements Comparable<Extension<T>> {
         return Integer.compare(getPriority(), o.getPriority());
     }
 
-
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }

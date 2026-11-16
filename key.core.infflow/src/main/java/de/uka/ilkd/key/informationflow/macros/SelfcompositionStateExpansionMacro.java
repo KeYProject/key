@@ -26,6 +26,8 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The macro SelfcompositionStateExpansionMacro applies rules to extract the self-composed states
@@ -36,6 +38,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author christoph
  */
+@NullMarked
 public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExpansionMacro {
 
     @Override
@@ -64,7 +67,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         return new SelfCompExpansionStrategy(getAdmittedRuleNames());
     }
 
@@ -87,7 +90,7 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
      */
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
 
         if (proof == null) {
             return false;
@@ -99,7 +102,22 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
         final ProofOblInput poForProof =
             services.getSpecificationRepository().getProofOblInput(proof);
         return (poForProof instanceof AbstractInfFlowPO)
-                && super.canApplyTo(proof, goals, posInOcc);
+                && canApplyToSuper(proof, goals, posInOcc);
+    }
+
+
+    /**
+     * Deliberately forwards the position of the occurrence to the base
+     * implementation even when it is {@code null}: the base
+     * {@link StrategyProofMacro#canApplyTo} only consults the goals and never
+     * dereferences the position, so a {@code null} position must not change
+     * the applicability of this macro. The base signature is not
+     * nullness-annotated and cannot be widened from this module.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    private boolean canApplyToSuper(Proof proof, ImmutableList<Goal> goals,
+            @Nullable PosInOccurrence posInOcc) {
+        return super.canApplyTo(proof, goals, posInOcc);
     }
 
     @Override

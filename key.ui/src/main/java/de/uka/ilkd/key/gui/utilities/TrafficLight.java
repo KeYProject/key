@@ -8,10 +8,12 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A traffic light: It can be either green or red.
  */
+@NullMarked
 class TrafficLight extends JPanel {
     private static final Color VALID_COLOR = Color.GREEN;
     private static final Color INVALID_COLOR = Color.RED;
@@ -19,8 +21,15 @@ class TrafficLight extends JPanel {
     private boolean isGreen = true;
     private final int diameter;
 
-
-
+    /**
+     * Creates the traffic light.
+     *
+     * <p>
+     * The light sizes itself and sets its border while the receiver is still under initialization
+     * (EISOP initialization check); both only take effect once the light is displayed after
+     * construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TrafficLight(int diameter) {
         super();
         this.diameter = diameter;
@@ -28,8 +37,6 @@ class TrafficLight extends JPanel {
         this.setMaximumSize(new Dimension(diameter + 5, 2 * diameter + 7));
         this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
     }
-
-
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -50,8 +57,6 @@ class TrafficLight extends JPanel {
         g2D.setColor(Color.BLACK);
         g2D.drawOval(2, 2, diameter, diameter);
         g2D.drawOval(2, diameter + 4, diameter, diameter);
-
-
 
     }
 

@@ -17,7 +17,10 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.key_project.prover.sequent.PosInOccurrence;
+
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -25,6 +28,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @param <T> a type of {@link SequentView} on which this menu is shown.
  */
+@NullMarked
 public class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * The position of the selected term.
@@ -32,9 +36,10 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
     private @Nullable PosInSequent pos;
 
     /**
-     * The sequent view associated with this menu.
+     * The sequent view associated with this menu; {@code null} for an empty menu that has not been
+     * attached to a view yet.
      */
-    private @NonNull T sequentView;
+    private @Nullable T sequentView;
 
     private final KeyAction actionCopyToClipboard = new CopyToClipboardAction();
     private final KeyAction actionNameCreationInfo = new NameCreationInfoAction();
@@ -67,9 +72,13 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
     /**
      * @return the sequent view on which to show this menu.
      */
-    @NonNull
-    protected T getSequentView() {
-        return sequentView;
+    protected @NonNull T getSequentView() {
+        T view = sequentView;
+        if (view == null) {
+            // the menu is only used after its sequent view has been attached
+            throw new NullPointerException("No sequent view available.");
+        }
+        return view;
     }
 
     /**
@@ -104,26 +113,52 @@ public class SequentViewMenu<T extends SequentView> extends JMenu {
         add(new JMenuItem(actionNameCreationInfo));
     }
 
-
     class CopyToClipboardAction extends KeyAction {
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public CopyToClipboardAction() {
             setName("Copy to clipboard");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            GuiUtilities.copyHighlightToClipboard(sequentView, pos);
+            PosInSequent currentPos = pos;
+            if (currentPos == null) {
+                // the copy action is only enabled when a term is selected
+                throw new NullPointerException("No position available.");
+            }
+            GuiUtilities.copyHighlightToClipboard(getSequentView(), currentPos);
         }
     }
 
     class NameCreationInfoAction extends KeyAction {
+        /**
+         * The action-configuration setters are called on {@code this} while the receiver is still
+         * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public NameCreationInfoAction() {
             setName("View name creation info");
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            var t = pos.getPosInOccurrence().subTerm();
+            PosInSequent currentPos = pos;
+            if (currentPos == null) {
+                // the info action is only enabled when a term is selected
+                throw new NullPointerException("No position available.");
+            }
+            PosInOccurrence occurrence = currentPos.getPosInOccurrence();
+            if (occurrence == null) {
+                // the info action is only enabled when a term is selected
+                throw new NullPointerException("No occurrence available.");
+            }
+            var t = occurrence.subTerm();
             ProgramVariable var = (ProgramVariable) t.op();
             ProgramElementName name = var.getProgramElementName();
             NameCreationInfo info = name.getCreationInfo();

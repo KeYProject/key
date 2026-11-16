@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.EnumClassDeclaration;
@@ -14,6 +16,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author mulbrich
  * @since 2006-12-14
  */
+@NullMarked
 public final class EnumTypeCondition extends VariableConditionAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(EnumTypeCondition.class);
 
@@ -42,7 +47,8 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
 
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement candidate, SVInstantiations svInst,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement candidate,
+            SVInstantiations svInst,
             Services services) {
 
         if (!resolver.isComplete(var, candidate, svInst, services)) {
@@ -51,9 +57,12 @@ public final class EnumTypeCondition extends VariableConditionAdapter {
             return true;
         } else {
             // complete
-            Sort sort = resolver.resolveSort(var, candidate, svInst, services);
+            Sort sort = Objects.requireNonNull(
+                resolver.resolveSort(var, candidate, svInst, services),
+                "no sort resolved by " + resolver);
             KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(sort);
-            return kjt.getJavaType() instanceof EnumClassDeclaration;
+            return Objects.requireNonNull(kjt, "no KeYJavaType for sort " + sort)
+                    .getJavaType() instanceof EnumClassDeclaration;
         }
     }
 

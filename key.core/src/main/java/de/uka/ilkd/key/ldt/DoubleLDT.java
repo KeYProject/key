@@ -20,8 +20,10 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
     public static final Name NAME = new Name("double");
@@ -187,7 +189,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
     }
 
     @Override
-    public Function getFunctionFor(Operator op,
+    public @Nullable Function getFunctionFor(Operator op,
             Services services,
             ExecutionContext ec) {
         if (op instanceof UnaryOperator u
@@ -222,7 +224,7 @@ public final class DoubleLDT extends LDT implements FloatingPointLDT {
 
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         if (t.sort() == targetSort()) {
             return PrimitiveType.JAVA_DOUBLE;
         } else {

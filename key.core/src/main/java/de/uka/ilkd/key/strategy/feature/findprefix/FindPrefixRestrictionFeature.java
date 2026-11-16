@@ -11,12 +11,15 @@ import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Feature for investigating whether some restrictions to the prefix of the find formula apply.
  *
  * @author christoph
  */
+@NullMarked
 public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
     public enum PrefixChecker {

@@ -15,6 +15,9 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The <em>monolithic</em> program matcher: matches the Java program of a modality by delegating to
  * the pattern's own {@code ProgramElement.match(SourceData, MatchConditions)}, which walks the
@@ -27,6 +30,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
  * single-source dispatch, e.g. a variable-arity list schema variable), and it is the main consumer
  * of the AST {@code match} methods.
  */
+@NullMarked
 public class MatchProgramInstruction implements MatchInstruction {
 
     private final ProgramElement pe;
@@ -36,8 +40,8 @@ public class MatchProgramInstruction implements MatchInstruction {
     }
 
     @Override
-    public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchConditions,
-            LogicServices services) {
+    public @Nullable MatchResultInfo match(SyntaxElement actualElement,
+            MatchResultInfo matchConditions, LogicServices services) {
         final MatchConditions result = pe.match(
             new SourceData(((JavaBlock) actualElement).program(), -1,
                 (Services) services),

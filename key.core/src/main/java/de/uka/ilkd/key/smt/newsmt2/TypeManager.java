@@ -7,6 +7,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -15,6 +16,8 @@ import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This class contains the outsourced routines for KeY sort definitions and axioms for the modular
@@ -28,6 +31,7 @@ import org.key_project.logic.sort.Sort;
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
  */
+@NullMarked
 class TypeManager {
 
     private final Services services;
@@ -148,7 +152,8 @@ class TypeManager {
         }
 
         // and have a type hierarchy.
-        if (!HandlerUtil.PROPERTY_NO_TYPE_HIERARCHY.get(services)) {
+        if (!Objects.requireNonNull(HandlerUtil.PROPERTY_NO_TYPE_HIERARCHY.get(services),
+            "no 'no type hierarchy' property")) {
             createSortTypeHierarchy(master, services);
         }
     }

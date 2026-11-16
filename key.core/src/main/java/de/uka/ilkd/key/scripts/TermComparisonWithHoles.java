@@ -89,12 +89,15 @@ public class TermComparisonWithHoles {
 
         if (focus.getIndex() == (char) -1) {
             // ellipsis found, we need to expand
-            expandFocusPaths(focus.up(), input, base, collected);
-            expandFocusPaths(focus, input.up(), base.prepend((char) input.getIndex()), collected);
+            expandFocusPaths(Objects.requireNonNull(focus.up(), "no focus parent"), input, base,
+                collected);
+            expandFocusPaths(focus, Objects.requireNonNull(input.up(), "no input parent"),
+                base.prepend((char) input.getIndex()), collected);
         } else {
             if (focus.getIndex() == input.getIndex()) {
-                expandFocusPaths(focus.up(), input.up(), base.prepend((char) input.getIndex()),
-                    collected);
+                expandFocusPaths(Objects.requireNonNull(focus.up(), "no focus parent"),
+                    Objects.requireNonNull(input.up(), "no input parent"),
+                    base.prepend((char) input.getIndex()), collected);
             } else {
                 // mismatch
                 return;
@@ -167,11 +170,12 @@ public class TermComparisonWithHoles {
             return unifyHelp(t0.sub(0), t1, ownBoundVars, cmpBoundVars, null);
         } else if (op.name().equals(ELLIPSIS_NAME)) {
             // return true if it hits one subterm ...
-            Set<Pair<JTerm, PosInTerm>> deepAllSubs = new HashSet<>();
+            Set<SubtermCandidate> deepAllSubs = new HashSet<>();
             computeSubterms(t1, expectedFocus, deepAllSubs);
             var lookfor = t0.sub(0);
-            return deepAllSubs.stream().anyMatch(
-                t -> unifyHelp(lookfor, t.first, ownBoundVars, cmpBoundVars, t.second));
+            return deepAllSubs.stream()
+                    .anyMatch(c -> unifyHelp(lookfor, c.term(), ownBoundVars, cmpBoundVars,
+                        c.focus()));
         }
 
 
@@ -196,9 +200,20 @@ public class TermComparisonWithHoles {
         return descendRecursively(t0, t1, ownBoundVars, cmpBoundVars, expectedFocus);
     }
 
+    /**
+     * A subterm together with the (optional) path to the focus position below it, collected for the
+     * ellipsis expansion.
+     *
+     * @param term the subterm
+     * @param focus the path from the subterm down to the ellipsis position, or null if not on the
+     *        focus path
+     */
+    private record SubtermCandidate(JTerm term, @Nullable PosInTerm focus) {
+    }
+
     private static void computeSubterms(JTerm t, @Nullable PosInTerm expectedPos,
-            Set<Pair<JTerm, @Nullable PosInTerm>> deepAllSubs) {
-        deepAllSubs.add(new Pair<>(t, expectedPos));
+            Set<SubtermCandidate> deepAllSubs) {
+        deepAllSubs.add(new SubtermCandidate(t, expectedPos));
         for (int i = 0; i < t.arity(); i++) {
             computeSubterms(t.sub(i), nextFocusPos(expectedPos, i), deepAllSubs);
         }
@@ -266,7 +281,7 @@ public class TermComparisonWithHoles {
     private static boolean descendRecursively(JTerm t0, JTerm t1,
             ImmutableList<QuantifiableVariable> ownBoundVars,
             ImmutableList<QuantifiableVariable> cmpBoundVars,
-            PosInTerm expectedFocus) {
+            @Nullable PosInTerm expectedFocus) {
 
         for (int i = 0; i < t0.arity(); i++) {
             ImmutableList<QuantifiableVariable> subOwnBoundVars = ownBoundVars;
@@ -299,7 +314,7 @@ public class TermComparisonWithHoles {
         return true;
     }
 
-    private static @Nullable PosInTerm nextFocusPos(PosInTerm expectedFocus, int i) {
+    private static @Nullable PosInTerm nextFocusPos(@Nullable PosInTerm expectedFocus, int i) {
         if (expectedFocus != null && !expectedFocus.isTopLevel()
                 && expectedFocus.getIndexAt(0) == i) {
             // we are on the path to the focus

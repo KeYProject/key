@@ -23,6 +23,7 @@ import org.key_project.logic.Term;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
  * @author Jonas Schiffl
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class ModularSMTLib2Translator implements SMTTranslator {
     /**
      * Logger.

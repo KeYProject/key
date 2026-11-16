@@ -18,11 +18,14 @@ import org.key_project.slicing.RuleStatistics;
 import org.key_project.slicing.RuleStatistics.RuleStatisticEntry;
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Dialog that displays the results of the dependency analysis algorithm.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class RuleStatisticsDialog extends JDialog {
     /**
      * The rule statistics displayed in this dialog.
@@ -31,10 +34,15 @@ public class RuleStatisticsDialog extends JDialog {
 
     /**
      * Construct and show a new dialog based on the provided analysis results.
+     * <p>
+     * The UI-creating calls below operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the widget setup is purely
+     * local to this class, suppressed with a scoped key.
      *
      * @param window main window
      * @param results the results to show
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public RuleStatisticsDialog(Window window, AnalysisResults results) {
         super(window, "Rule Statistics");
 

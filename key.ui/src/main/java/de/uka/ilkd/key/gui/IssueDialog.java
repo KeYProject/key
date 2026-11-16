@@ -45,6 +45,8 @@ import org.key_project.util.java.SwingUtil;
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +73,7 @@ import org.slf4j.LoggerFactory;
  * @version 1 (6/8/21)
  * @version 2 (11/15/21)
  */
+@NullMarked
 public final class IssueDialog extends JDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(IssueDialog.class);
 
@@ -92,7 +95,7 @@ public final class IssueDialog extends JDialog {
     private static final Set<PositionedString> ignoredWarnings = new HashSet<>();
 
     /** the single critical issue that is shown in this dialog */
-    private final Throwable throwable;
+    private final @Nullable Throwable throwable;
 
     /** the warnings that are shown in this dialog */
     private final List<PositionedIssueString> warnings;
@@ -128,7 +131,13 @@ public final class IssueDialog extends JDialog {
      * Reacts to selection events to the "Show details" checkbox (fold/unfold stacktrace). Performs
      * some calculations to make the dialog only expand/collapse the stacktrace panel, but keep the
      * rest of the dialog looking the same as before.
+     *
+     * <p>
+     * The listener only fires when the checkbox is toggled in the shown dialog, after construction
+     * has completed; the EISOP initialization check nevertheless analyzes the field initializer
+     * under initialization, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final transient ItemListener detailsBoxListener = e -> {
         int width = getWidth();
         int height = getHeight();
@@ -218,7 +227,7 @@ public final class IssueDialog extends JDialog {
      * @param throwable exception to show (may be null)
      */
     IssueDialog(Window owner, String title, Set<PositionedIssueString> warnings,
-            boolean critical, Throwable throwable) {
+            boolean critical, @Nullable Throwable throwable) {
         this(owner, title, critical ? CRITICAL_ISSUE : NON_CRITICAL_ISSUE, warnings, critical,
             throwable);
     }
@@ -232,9 +241,15 @@ public final class IssueDialog extends JDialog {
      * @param warnings warnings to show
      * @param critical criticality of the issue
      * @param throwable exception to show (may be null)
+     *
+     *        <p>
+     *        The dialog configures its close operation and layout while the receiver is still
+     *        under initialization (EISOP initialization check); both only take effect once the
+     *        dialog is shown after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     IssueDialog(Window owner, String title, String head, Set<PositionedIssueString> warnings,
-            boolean critical, Throwable throwable) {
+            boolean critical, @Nullable Throwable throwable) {
         super(owner, title, ModalityType.APPLICATION_MODAL);
 
         this.throwable = throwable;
@@ -483,7 +498,7 @@ public final class IssueDialog extends JDialog {
      * @param event the mouse event, needed to get the position of the cursor
      * @return the corresponding tag element or null if the mouse does not currently point to one
      */
-    private static Element getHyperlinkElement(MouseEvent event) {
+    private static @Nullable Element getHyperlinkElement(MouseEvent event) {
         JEditorPane editor = (JEditorPane) event.getSource();
         int pos = editor.getUI().viewToModel(editor, event.getPoint());
         if (pos >= 0 && editor.getDocument() instanceof HTMLDocument hdoc) {
@@ -654,7 +669,6 @@ public final class IssueDialog extends JDialog {
         return result;
     }
 
-
     private void accept() {
         if (!critical && chkIgnoreWarnings.isSelected()) {
             ignoredWarnings.addAll(warnings);
@@ -794,12 +808,12 @@ public final class IssueDialog extends JDialog {
         }
     }
 
-    private boolean isJava(String fileName) {
+    private boolean isJava(@Nullable String fileName) {
         // fileName can be null for URIs like "jar:file:/xxx/yyy.jar!aaa.java"
         return fileName != null && fileName.endsWith(".java");
     }
 
-    private boolean isKeY(String fileName) {
+    private boolean isKeY(@Nullable String fileName) {
         return fileName != null && (fileName.endsWith(".key") || fileName.endsWith(".proof"));
     }
 

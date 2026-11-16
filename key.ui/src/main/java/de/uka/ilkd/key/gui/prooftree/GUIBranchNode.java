@@ -12,7 +12,11 @@ import javax.swing.tree.TreeNode;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.Taclet;
 
+import org.key_project.prover.rules.RuleApp;
+
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Branch node indicating the start of a new proof branch.
@@ -20,12 +24,12 @@ import org.jspecify.annotations.NonNull;
  * @author early KeY team
  * @see ProofTreeView
  */
+@NullMarked
 class GUIBranchNode extends GUIAbstractTreeNode {
 
     private final Object label;
 
-    private ArrayList<TreeNode> childrenCache = null;
-
+    private @Nullable ArrayList<TreeNode> childrenCache = null;
 
     public GUIBranchNode(GUIProofTreeModel tree, Node subTree, Object label) {
         super(tree, subTree);
@@ -36,9 +40,22 @@ class GUIBranchNode extends GUIAbstractTreeNode {
         childrenCache = new ArrayList<>();
     }
 
+    /**
+     * @return the children cache, which {@link #fillChildrenCache(boolean)} (without dry run)
+     *         always establishes before children are added.
+     */
+    private ArrayList<TreeNode> requireChildrenCache() {
+        ArrayList<TreeNode> cache = childrenCache;
+        if (cache == null) {
+            // fillChildrenCache(false) initializes the cache before any node is added
+            throw new NullPointerException("No children cache available.");
+        }
+        return cache;
+    }
+
     public TreeNode getChildAt(int childIndex) {
         fillChildrenCache(false);
-        return childrenCache.get(childIndex);
+        return requireChildrenCache().get(childIndex);
     }
 
     /**
@@ -73,7 +90,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
                 if (!dryRun) {
                     var newNode = getProofTreeModel().getProofTreeNode(n);
                     newNode.setParent(this);
-                    childrenCache.add(newNode);
+                    requireChildrenCache().add(newNode);
                 }
             }
             List<Node> nextN = findChild(n);
@@ -83,7 +100,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
             if (nextN.size() > 1) {
                 // linearized mode: the main branch will be continued without a new BranchNode
                 if (getProofTreeModel().linearizedModeActive()
-                        && (n.getAppliedRuleApp().rule() instanceof Taclet taclet && Objects
+                        && (requireRuleApp(n).rule() instanceof Taclet taclet && Objects
                                 .equals(taclet.goalTemplates().last().tag(), "main"))) {
                     n = nextN.get(0);
                     nextN.remove(0);
@@ -92,7 +109,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
                         if (!dryRun) {
                             var branchNode = findBranch(node);
                             branchNode.setParent(this);
-                            childrenCache.add(branchNode);
+                            requireChildrenCache().add(branchNode);
                         }
                     }
                     continue;
@@ -109,7 +126,7 @@ class GUIBranchNode extends GUIAbstractTreeNode {
                 if (!dryRun) {
                     var branchNode = findBranch(n.child(i));
                     branchNode.setParent(this);
-                    childrenCache.add(branchNode);
+                    requireChildrenCache().add(branchNode);
                 }
             }
         }
@@ -123,6 +140,14 @@ class GUIBranchNode extends GUIAbstractTreeNode {
      */
     private static boolean showStep(Node n) {
         return !ProofTreeViewFilter.SEARCH.isActive() || ProofTreeViewFilter.SEARCH.matches(n);
+    }
+
+    /**
+     * @return the rule application that produced {@code n}; the original code dereferences it
+     *         directly, so a missing rule application is a null-pointer failure.
+     */
+    private static RuleApp requireRuleApp(Node n) {
+        return Objects.requireNonNull(n.getAppliedRuleApp(), "No applied rule available.");
     }
 
     @Override

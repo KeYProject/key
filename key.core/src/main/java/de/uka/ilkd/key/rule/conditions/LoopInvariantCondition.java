@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -27,11 +28,15 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Extracts the loop invariants for a loop term (for all applicable heap contexts).
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class LoopInvariantCondition implements VariableCondition {
     private final ProgramSV loopStmtSV;
     private final SchemaVariable modalitySV;
@@ -45,7 +50,8 @@ public class LoopInvariantCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices p_services) {
         final Services services = (Services) p_services;
         final var svInst =
@@ -56,7 +62,8 @@ public class LoopInvariantCondition implements VariableCondition {
             return matchCond;
         }
 
-        final LoopStatement loop = svInst.getInstantiation(loopStmtSV);
+        final LoopStatement loop = Objects.requireNonNull(svInst.getInstantiation(loopStmtSV),
+            "no instantiation of " + loopStmtSV);
         final LoopSpecification loopSpec = //
             services.getSpecificationRepository().getLoopSpec(loop);
 
@@ -65,14 +72,16 @@ public class LoopInvariantCondition implements VariableCondition {
         }
 
         final JavaBlock javaBlock = JavaBlock.createJavaBlock(
-            (StatementBlock) svInst.getContextInstantiation().program());
+            (StatementBlock) Objects.requireNonNull(svInst.getContextInstantiation(),
+                "no context instantiation").program());
 
         final MethodFrame mf = //
             JavaTools.getInnermostMethodFrame(javaBlock, services);
         final JTerm selfTerm = Optional.ofNullable(mf)
                 .map(methodFrame -> MiscTools.getSelfTerm(methodFrame, services)).orElse(null);
 
-        final JModality.JavaModalityKind modalityKind = svInst.getInstantiation(modalitySV);
+        final JModality.JavaModalityKind modalityKind = Objects.requireNonNull(
+            svInst.getInstantiation(modalitySV), "no instantiation of " + modalitySV);
 
         JTerm invInst = tb.tt();
         for (final LocationVariable heap : MiscTools.applicableHeapContexts(modalityKind,

@@ -7,6 +7,9 @@ package de.uka.ilkd.key.informationflow.macros;
 import de.uka.ilkd.key.macros.AlternativeMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class StartAuxiliaryComputationMacro extends AlternativeMacro {
 
     @Override

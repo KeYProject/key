@@ -14,10 +14,12 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Abstract superclass for features of TacletApps that have either zero or top cost.
  */
+@NullMarked
 public abstract class BinaryTacletAppFeature extends BinaryFeature {
 
     private final boolean nonTacletValue;

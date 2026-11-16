@@ -20,12 +20,15 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableMap;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This visitor is used to collect information about schema variable pairs occurring within the same
  * substitution operator within a taclet. This information is used to choose names of metavariables
  * or skolem functions.
  */
 
+@NullMarked
 public class SVNameCorrespondenceCollector implements DefaultVisitor {
 
     /**

@@ -9,9 +9,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.proof.Proof;
 
 import org.junit.jupiter.api.Test;
 
@@ -30,15 +32,20 @@ public class TestZipProofSaving {
 
     private void loadZip(Path fileTarget) throws Exception {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(fileTarget);
-        env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
+        Objects.requireNonNull(env.getProofControl(), "the proof control must be available")
+                .startAndWaitForAutoMode(
+                    Objects.requireNonNull(env.getLoadedProof(),
+                        "the proof must have been loaded"));
     }
 
     private void proveAndSaveZip(Path file, Path fileTarget)
             throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(file);
-        env.getProofControl().startAndWaitForAutoMode(env.getLoadedProof());
-        GZipProofSaver proofSaver =
-            new GZipProofSaver(env.getLoadedProof(), fileTarget.toString(), "n/a");
+        Proof proof =
+            Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
+        Objects.requireNonNull(env.getProofControl(), "the proof control must be available")
+                .startAndWaitForAutoMode(proof);
+        GZipProofSaver proofSaver = new GZipProofSaver(proof, fileTarget.toString(), "n/a");
         proofSaver.save();
     }
 

@@ -1,5 +1,20 @@
 description = "Caching of provable nodes to make proving with KeY faster."
 
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^de\\.uka\\.ilkd\\.key\\.(gui|proof)",
+                "-Xmaxerrs", "10000",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}
+
 dependencies {
     implementation project(":key.core")
     implementation project(":key.ui")

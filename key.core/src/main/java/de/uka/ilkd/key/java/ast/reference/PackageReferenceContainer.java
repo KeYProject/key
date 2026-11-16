@@ -6,11 +6,15 @@ package de.uka.ilkd.key.java.ast.reference;
 
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Element that contains a PackageReference.
  *
  * @author AL
  */
+@NullMarked
 public interface PackageReferenceContainer extends NonTerminalProgramElement {
 
     /**
@@ -18,5 +22,6 @@ public interface PackageReferenceContainer extends NonTerminalProgramElement {
      *
      * @return the package reference.
      */
+    @Nullable
     PackageReference getPackageReference();
 }

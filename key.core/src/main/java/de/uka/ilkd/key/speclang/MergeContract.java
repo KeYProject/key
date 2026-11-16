@@ -12,11 +12,15 @@ import de.uka.ilkd.key.java.ast.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Specification of a {@link MergePointStatement}.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public interface MergeContract extends SpecificationElement {
 
     @Override
@@ -39,7 +43,7 @@ public interface MergeContract extends SpecificationElement {
     MergeProcedure getInstantiatedMergeProcedure(Services services);
 
     @Override
-    default ModifierKind getVisibility() {
+    default @Nullable ModifierKind getVisibility() {
         assert false : "Method getVisibility() is unimplemented for MergeContract";
         return null;
     }

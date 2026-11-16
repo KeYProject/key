@@ -13,11 +13,13 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * This class maps a {@link ParserRuleContext} to a {@link TermLabel}.
  */
+@NullMarked
 public class LabeledParserRuleContext {
 
     public final @Nullable ParserRuleContext first;

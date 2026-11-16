@@ -22,6 +22,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -29,6 +30,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author christoph
  */
+@NullMarked
 public class ProofObligationVars {
 
     /** Variables for the pre and post condition. */
@@ -38,7 +40,7 @@ public class ProofObligationVars {
     public final JTerm exceptionParameter;
 
     /** The formal parameters of a method. */
-    public final ImmutableList<JTerm> formalParams;
+    public final @Nullable ImmutableList<JTerm> formalParams;
 
     /**
      * If this object was created form another ProofObligationVars object by adding a postfix to the
@@ -53,8 +55,8 @@ public class ProofObligationVars {
         this.pre = StateVars.buildMethodContractPreVars(pm, typeRef, services);
         this.post = StateVars.buildMethodContractPostVars(this.pre, pm, typeRef, services);
         this.tb = services.getTermBuilder();
-        this.exceptionParameter = buildExceptionParameter(services);
-        this.formalParams = buildFormalParamVars(services);
+        this.exceptionParameter = buildExceptionParameter(services, this.tb);
+        this.formalParams = buildFormalParamVars(this.pre, services, this.tb);
         this.postfix = "";
     }
 
@@ -63,14 +65,15 @@ public class ProofObligationVars {
         this.pre = StateVars.buildInfFlowPreVars(orig.pre, postfix, services);
         this.post = StateVars.buildInfFlowPostVars(orig.pre, orig.post, pre, postfix, services);
         this.tb = services.getTermBuilder();
-        this.exceptionParameter = buildExceptionParameter(services);
-        this.formalParams = orig.formalParams != null ? buildFormalParamVars(services) : null;
+        this.exceptionParameter = buildExceptionParameter(services, this.tb);
+        this.formalParams = orig.formalParams != null ? buildFormalParamVars(this.pre, services,
+            this.tb) : null;
         this.postfix = postfix;
     }
 
 
     public ProofObligationVars(StateVars pre, StateVars post, JTerm exceptionParameter,
-            ImmutableList<JTerm> formalParams, Services services) {
+            @Nullable ImmutableList<JTerm> formalParams, Services services) {
         this.pre = pre;
         this.post = post;
         this.exceptionParameter = exceptionParameter;
@@ -94,7 +97,7 @@ public class ProofObligationVars {
         this.post = post;
         this.postfix = "";
         this.tb = services.getTermBuilder();
-        this.exceptionParameter = buildExceptionParameter(services);
+        this.exceptionParameter = buildExceptionParameter(services, this.tb);
         // formal parameters are needed only for proof obligations
         // of methods
         this.formalParams = null;
@@ -121,11 +124,16 @@ public class ProofObligationVars {
      * Build variable for try statement.
      *
      * @param services the services object.
+     * @param tb the term builder.
      * @return the generated variable.
      */
-    private JTerm buildExceptionParameter(Services services) {
+    private static JTerm buildExceptionParameter(Services services, TermBuilder tb) {
         JavaInfo javaInfo = services.getJavaInfo();
         final KeYJavaType eType = javaInfo.getTypeByClassName("java.lang.Exception");
+        if (eType == null) {
+            throw new NullPointerException(
+                "No type 'java.lang.Exception' in the Java info.");
+        }
         final ProgramElementName ePEN = new ProgramElementName("e");
         return tb.var(new LocationVariable(ePEN, new TypeRef(eType)));
     }
@@ -135,14 +143,19 @@ public class ProofObligationVars {
      *
      * @throws IllegalArgumentException
      */
-    private ImmutableList<JTerm> buildFormalParamVars(Services services)
+    private static ImmutableList<JTerm> buildFormalParamVars(StateVars pre, Services services,
+            TermBuilder tb)
             throws IllegalArgumentException {
         ImmutableList<JTerm> formalParamVars = ImmutableList.nil();
         for (JTerm param : pre.localVars) {
             ProgramVariable paramVar = param.op(ProgramVariable.class);
             ProgramElementName pen = new ProgramElementName("_" + paramVar.name());
-            LocationVariable formalParamVar =
-                new LocationVariable(pen, paramVar.getTypeReference());
+            final TypeReference paramType = paramVar.getTypeReference();
+            if (paramType == null) {
+                throw new NullPointerException(
+                    "No type for the formal parameter " + paramVar + ".");
+            }
+            LocationVariable formalParamVar = new LocationVariable(pen, paramType);
             register(formalParamVar, services);
             JTerm formalParam = tb.var(formalParamVar);
             formalParamVars = formalParamVars.append(formalParam);
@@ -151,7 +164,7 @@ public class ProofObligationVars {
     }
 
 
-    static void register(ProgramVariable pv, Services services) {
+    static void register(@Nullable ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);

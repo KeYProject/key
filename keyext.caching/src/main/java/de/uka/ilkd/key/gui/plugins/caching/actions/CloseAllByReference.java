@@ -13,16 +13,20 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.plugins.caching.CachingExtension;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.proof.reference.ReferenceSearcher;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Proof context menu action to perform proof caching for all open goals on that proof.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class CloseAllByReference extends KeyAction {
     /**
      * The caching extension.
@@ -42,7 +46,12 @@ public class CloseAllByReference extends KeyAction {
      *
      * @param mediator the mediator
      * @param proof the proof
+     *        <p>
+     *        The setters below are called on {@code this} while the receiver is still under
+     *        initialization (EISOP initialization check); safe here since all fields are set
+     *        before the calls, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public CloseAllByReference(CachingExtension cachingExtension, KeYMediator mediator,
             Proof proof) {
         this.cachingExtension = cachingExtension;
@@ -65,7 +74,11 @@ public class CloseAllByReference extends KeyAction {
             ClosedBy c = ReferenceSearcher.findPreviousProof(
                 mediator.getCurrentlyOpenedProofs(), n);
             if (c != null) {
-                n.proof().closeGoal(n.proof().getOpenGoal(n));
+                Goal goal = n.proof().getOpenGoal(n);
+                if (goal == null) {
+                    throw new NullPointerException("No open goal for node " + n.serialNr() + ".");
+                }
+                n.proof().closeGoal(goal);
                 n.register(c, ClosedBy.class);
                 matches++;
             }

@@ -16,8 +16,10 @@ import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 class ContractClauses {
     public @Nullable JTerm measuredBy;
     public @Nullable JTerm decreases;

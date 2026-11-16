@@ -16,11 +16,15 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Projection of taclet apps to the instantiation of a schema variable. The projection can either be
  * partial and undefined for those apps that do not instantiate the schema variable in question, or
  * it can raise an error for such applications
  */
+@NullMarked
 @StableCost
 public class SVInstantiationProjection implements ProjectionToTerm<Goal> {
 
@@ -37,7 +41,8 @@ public class SVInstantiationProjection implements ProjectionToTerm<Goal> {
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mutableState) {
+    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal,
+            MutableState mutableState) {
         if (!(app instanceof final TacletApp tapp)) {
             Debug.fail("Projection is only applicable to taclet apps," + " but got " + app);
             throw new IllegalArgumentException(

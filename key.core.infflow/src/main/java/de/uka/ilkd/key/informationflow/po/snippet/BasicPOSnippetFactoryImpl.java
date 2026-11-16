@@ -18,6 +18,7 @@ import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 
 import org.key_project.logic.TermCreationException;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author christoph
  */
+@NullMarked
 class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(BasicPOSnippetFactoryImpl.class);
@@ -49,7 +51,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     BasicPOSnippetFactoryImpl(BasicSnippetData data, ProofObligationVars poVars) {
         this.data = data;
         this.poVars = poVars;
-        registerFactoryMethods();
+        registerFactoryMethods(this.factoryMethods);
     }
 
 
@@ -57,14 +59,14 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
             Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
-        registerFactoryMethods();
+        registerFactoryMethods(this.factoryMethods);
     }
 
     BasicPOSnippetFactoryImpl(LoopSpecification invariant, ProofObligationVars poVars,
             ExecutionContext context, JTerm guardTerm, Services services) {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars = poVars;
-        registerFactoryMethods();
+        registerFactoryMethods(this.factoryMethods);
     }
 
 
@@ -72,7 +74,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
             Services services) {
         this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
-        registerFactoryMethods();
+        registerFactoryMethods(this.factoryMethods);
     }
 
 
@@ -80,11 +82,12 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
             ExecutionContext context, Services services) {
         this.data = new BasicSnippetData(contract, context, services);
         this.poVars = poVars;
-        registerFactoryMethods();
+        registerFactoryMethods(this.factoryMethods);
     }
 
 
-    private void registerFactoryMethods() {
+    private static void registerFactoryMethods(
+            EnumMap<Snippet, FactoryMethod> factoryMethods) {
         try {
             for (Snippet s : Snippet.values()) {
                 FactoryMethod fm = (FactoryMethod) s.c.getDeclaredConstructor().newInstance();

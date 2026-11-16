@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.util.EqualityUtils;
 import org.key_project.logic.Property;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A property that can be used in
  * {@link EqualsModProperty#equalsModProperty(Object, Property, Object[])} for terms.
@@ -21,6 +23,7 @@ import org.key_project.util.collection.ImmutableArray;
  *
  * @author Tobias Reinhold
  */
+@NullMarked
 public class IrrelevantTermLabelsProperty implements Property<JTerm> {
     /**
      * The single instance of this property.

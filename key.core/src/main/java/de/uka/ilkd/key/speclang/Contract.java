@@ -19,9 +19,13 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A contractual agreement about an ObserverFunction.
  */
+@NullMarked
 public interface Contract extends SpecificationElement {
 
     int INVALID_ID = Integer.MIN_VALUE;
@@ -68,9 +72,12 @@ public interface Contract extends SpecificationElement {
      * @param paramVars parameter variables
      * @param atPreVars variables at previous heap
      * @param services services object
-     * @return precondition
+     * @return precondition, or {@code null} if the contract has no precondition clause for the
+     *         given heap (this is a regular situation, e.g. for a contract that does not mention
+     *         the heap at all; callers must treat it as "no precondition")
      */
-    JTerm getPre(LocationVariable heap, LocationVariable selfVar,
+    @Nullable
+    JTerm getPre(LocationVariable heap, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
@@ -84,7 +91,8 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return precondition
      */
-    JTerm getPre(List<LocationVariable> heapContext, LocationVariable selfVar,
+    @Nullable
+    JTerm getPre(List<LocationVariable> heapContext, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
             Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
@@ -97,9 +105,11 @@ public interface Contract extends SpecificationElement {
      * @param paramTerms parameter terms
      * @param atPres terms of variables at previous heap
      * @param services services object
-     * @return the precondition
+     * @return the precondition, or {@code null} if the contract has no precondition clause for
+     *         the given heap
      */
-    JTerm getPre(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+    @Nullable
+    JTerm getPre(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services);
 
@@ -114,8 +124,10 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the precondition
      */
+    @Nullable
     JTerm getPre(List<LocationVariable> heapContext, Map<LocationVariable, JTerm> heapTerms,
-            JTerm selfTerm, ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> paramTerms,
+            Map<LocationVariable, JTerm> atPres,
             Services services);
 
     /**
@@ -127,11 +139,13 @@ public interface Contract extends SpecificationElement {
      * @param paramVars parameter variables
      * @param atPreVars variables at previous heap
      * @param services services object
-     * @return the dependency set
+     * @return the dependency set, or {@code null} if the contract has no {@code \deps} clause for
+     *         the given heap
      */
-    JTerm getDep(LocationVariable heap, boolean atPre, LocationVariable selfVar,
+    @Nullable
+    JTerm getDep(LocationVariable heap, boolean atPre, @Nullable LocationVariable selfVar,
             ImmutableList<LocationVariable> paramVars,
-            Map<LocationVariable, LocationVariable> atPreVars, Services services);
+            @Nullable Map<LocationVariable, LocationVariable> atPreVars, Services services);
 
     /**
      * Returns the dependency set of the contract.
@@ -143,23 +157,31 @@ public interface Contract extends SpecificationElement {
      * @param paramTerms terms of parameter variables
      * @param atPres terms of variables at previous heap
      * @param services services object
-     * @return the dependency set
+     * @return the dependency set, or {@code null} if the contract has no {@code \deps} clause for
+     *         the given heap
      */
-    JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, JTerm selfTerm,
-            ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
+    @Nullable
+    JTerm getDep(LocationVariable heap, boolean atPre, JTerm heapTerm, @Nullable JTerm selfTerm,
+            ImmutableList<JTerm> paramTerms, @Nullable Map<LocationVariable, JTerm> atPres,
             Services services);
 
+    @Nullable
     JTerm getRequires(LocationVariable heap);
 
+    @Nullable
     JTerm getModifiable(LocationVariable heap);
 
+    @Nullable
     JTerm getAccessible(LocationVariable heap);
 
+    @Nullable
     JTerm getGlobalDefs();
 
-    JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, JTerm selfTerm,
+    @Nullable
+    JTerm getGlobalDefs(LocationVariable heap, JTerm heapTerm, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Services services);
 
+    @Nullable
     JTerm getMby();
 
     /**
@@ -170,7 +192,8 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the measured-by term
      */
-    JTerm getMby(LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
+    @Nullable
+    JTerm getMby(@Nullable LocationVariable selfVar, ImmutableList<LocationVariable> paramVars,
             Services services);
 
     /**
@@ -183,7 +206,8 @@ public interface Contract extends SpecificationElement {
      * @param services services object
      * @return the measured-by term
      */
-    JTerm getMby(Map<LocationVariable, JTerm> heapTerms, JTerm selfTerm,
+    @Nullable
+    JTerm getMby(Map<LocationVariable, JTerm> heapTerms, @Nullable JTerm selfTerm,
             ImmutableList<JTerm> paramTerms, Map<LocationVariable, JTerm> atPres,
             Services services);
 
@@ -237,6 +261,7 @@ public interface Contract extends SpecificationElement {
      * @param services the services instance
      * @return the proof obligation according to the specification repository
      */
+    @Nullable
     ProofOblInput getProofObl(Services services);
 
     /**
@@ -305,9 +330,9 @@ public interface Contract extends SpecificationElement {
      */
     final class OriginalVariables {
 
-        public final LocationVariable self;
-        public final LocationVariable result;
-        public final LocationVariable exception;
+        public final @Nullable LocationVariable self;
+        public final @Nullable LocationVariable result;
+        public final @Nullable LocationVariable exception;
         public final Map<LocationVariable, LocationVariable> atPres;
         public final ImmutableList<LocationVariable> params;
 
@@ -321,10 +346,10 @@ public interface Contract extends SpecificationElement {
          * @param paramVars the original parameter variables
          */
         @SuppressWarnings("unchecked")
-        public OriginalVariables(LocationVariable selfVar, LocationVariable resVar,
-                LocationVariable excVar,
+        public OriginalVariables(@Nullable LocationVariable selfVar,
+                @Nullable LocationVariable resVar, @Nullable LocationVariable excVar,
                 Map<LocationVariable, LocationVariable> atPreVars,
-                ImmutableList<LocationVariable> paramVars) {
+                @Nullable ImmutableList<LocationVariable> paramVars) {
             this.self = selfVar;
             this.result = resVar;
             this.exception = excVar;

@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /*
  * Theory-internal cost constants for the integer arithmetic strategy, grouped by the arithmetic
  * sub-theory they belong to. The grouping deliberately anticipates a future split of
@@ -18,6 +21,7 @@ package de.uka.ilkd.key.strategy;
  */
 
 /** Polynomial normal-form canonicalisation (Buchberger normalisation) — the "basic" substrate. */
+@NullMarked
 final class PolynomialCost {
     private PolynomialCost() {}
 
@@ -40,6 +44,7 @@ final class PolynomialCost {
  * <em>derive</em> from and apply equations, so they belong to the "linear" (solving) layer next to
  * {@link LinearInequationCost}.
  */
+@NullMarked
 final class LinearEquationCost {
     private LinearEquationCost() {}
 
@@ -64,6 +69,7 @@ final class LinearEquationCost {
 
 
 /** Linear inequation solving — the Omega / Fourier-Motzkin machinery ({@code inEqSimp_*}). */
+@NullMarked
 final class LinearInequationCost {
     private LinearInequationCost() {}
 
@@ -88,6 +94,7 @@ final class LinearInequationCost {
 
 
 /** Non-linear arithmetic — cross-multiplication, sign cases, root inferences (Model Search). */
+@NullMarked
 final class NonlinearArithmeticCost {
     private NonlinearArithmeticCost() {}
 
@@ -108,6 +115,7 @@ final class NonlinearArithmeticCost {
 
 
 /** Division / modulo and DefOps expansion ({@code polyDivision}, {@code defOps_*}). */
+@NullMarked
 final class DivModCost {
     private DivModCost() {}
 

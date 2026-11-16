@@ -12,12 +12,14 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 
 
+@NullMarked
 public class ZipFileCollection implements FileCollection, AutoCloseable {
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipFileCollection.class);
 
@@ -46,12 +49,24 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
     }
 
 
-    public Walker createWalker(String[] extensions) throws IOException {
+    /**
+     * {@inheritDoc}
+     * <p>
+     * In contrast to the interface contract, {@code null} (meaning "all files") is not supported
+     * by this implementation and results in a {@link NullPointerException}; the walker always
+     * filters on the given extensions.
+     */
+    @Override
+    public Walker createWalker(@Nullable String[] extensions) throws IOException {
+        if (extensions == null) {
+            throw new NullPointerException("extensions");
+        }
         return new Walker(extensions);
     }
 
-    public Walker createWalker(String extension) throws IOException {
-        return createWalker(new String[] { extension });
+    @Override
+    public Walker createWalker(@Nullable String extension) throws IOException {
+        return createWalker(new String[] { Objects.requireNonNull(extension, "extension") });
     }
 
     @Override
@@ -65,12 +80,12 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
         private @Nullable ZipEntry currentEntry;
         private final List<String> extensions;
 
-        public Walker(String[] extensions) {
+        public Walker(@Nullable String[] extensions) {
             assert extensions.length > 0;
             this.enumeration = zipFile.entries();
             this.extensions = new ArrayList<>();
             for (String extension : extensions) {
-                this.extensions.add(extension.toLowerCase());
+                this.extensions.add(Objects.requireNonNull(extension, "extension").toLowerCase());
             }
         }
 
@@ -83,13 +98,14 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
         }
 
         @Override
-        public InputStream openCurrent(FileRepo fileRepo) throws IOException {
+        public InputStream openCurrent(@Nullable FileRepo fileRepo) throws IOException {
             if (currentEntry == null) {
                 throw new NoSuchElementException();
             } else if (fileRepo != null) {
                 // request an InputStream from the FileRepo
                 URI uri = MiscTools.getZipEntryURI(zipFile, currentEntry.getName());
-                return fileRepo.getInputStream(uri.toURL());
+                return Objects.requireNonNull(fileRepo.getInputStream(uri.toURL()),
+                    "input stream");
             } else {
                 return openCurrent(); // fallback without FileRepo
             }
@@ -97,11 +113,11 @@ public class ZipFileCollection implements FileCollection, AutoCloseable {
 
         @Override
         public Path getCurrentLocation() {
-            return path.resolve(currentEntry.toString());
+            return path.resolve(Objects.requireNonNull(currentEntry, "current entry").toString());
         }
 
         public String getRelativeLocation() {
-            return currentEntry.getName().toString();
+            return Objects.requireNonNull(currentEntry, "current entry").getName().toString();
         }
 
         public boolean step() {

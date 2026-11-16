@@ -47,6 +47,7 @@ public class StringUtilTest {
      * Tests {@link StringUtil#chop(String, int)}
      */
     @Test
+    @SuppressWarnings("NullAway") // tests @PolyNull null-propagation, unknown to NullAway
     public void testChop() {
         assertNull(StringUtil.chop(null, 0));
         assertNull(StringUtil.chop(null, 10));
@@ -70,6 +71,7 @@ public class StringUtilTest {
      * Tests {@link StringUtil#trimRight(String)}.
      */
     @Test
+    @SuppressWarnings("NullAway") // tests @PolyNull null-propagation, unknown to NullAway
     public void testTrimRight() {
         // Test empty stuff
         assertNull(StringUtil.trimRight(null));
@@ -234,6 +236,7 @@ public class StringUtilTest {
      * Tests {@link StringUtil#toLowerCase(String)}
      */
     @Test
+    @SuppressWarnings("NullAway") // tests @PolyNull null-propagation, unknown to NullAway
     public void testToLowerCase() {
         assertNull(StringUtil.toLowerCase(null));
         assertEquals("aa", StringUtil.toLowerCase("AA"));

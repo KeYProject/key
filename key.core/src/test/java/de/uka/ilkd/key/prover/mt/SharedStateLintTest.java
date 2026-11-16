@@ -26,6 +26,7 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -152,7 +153,7 @@ public final class SharedStateLintTest {
      *
      * @return a human-readable problem description, or {@code null} if the field is fine
      */
-    private static String judge(Field field, List<String> unreadable) {
+    private static @Nullable String judge(Field field, List<String> unreadable) {
         if (!Modifier.isFinal(field.getModifiers())) {
             return "non-final static field: every worker thread sees and may write this one "
                 + "field. Make it final (and its content immutable), or use one of the patterns "

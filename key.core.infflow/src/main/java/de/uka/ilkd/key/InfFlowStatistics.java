@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
@@ -21,7 +22,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public class InfFlowStatistics extends Statistics {
     private boolean sideProofs;
-    private Statistics stat;
+    private @Nullable Statistics stat;
 
     protected InfFlowStatistics(int nodes, int branches, int cachedBranches, int interactiveSteps,
             int symbExApps, int quantifierInstantiations, int ossApps, int mergeRuleApps,
@@ -49,10 +50,14 @@ public class InfFlowStatistics extends Statistics {
     protected void generateSummary(InfFlowProof proof) {
         sideProofs = proof.hasSideProofs();
         if (sideProofs) {
-            final long autoTime = proof.getAutoModeTime()
-                    + proof.getSideProofStatistics().autoModeTimeInMillis;
-            final SideProofStatistics side = proof.getSideProofStatistics()
-                    .add(this).setAutoModeTime(autoTime);
+            final SideProofStatistics sideStats = proof.getSideProofStatistics();
+            if (sideStats == null) {
+                throw new NullPointerException("No side proof statistics although the proof "
+                    + "has side proofs.");
+            }
+            final long autoTime =
+                proof.getAutoModeTime() + sideStats.autoModeTimeInMillis;
+            final SideProofStatistics side = sideStats.add(this).setAutoModeTime(autoTime);
             stat = create(side, proof.getCreationTime());
         }
     }

@@ -26,6 +26,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestPosInOcc {
 
+    // assigned in setUp() before every test; JUnit lifecycle initialization is invisible
+    // to NullAway's field initialization analysis
+    @SuppressWarnings("NullAway")
     private static TermBuilder TB;
 
     @BeforeEach

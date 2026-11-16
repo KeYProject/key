@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.logic.sort;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.GenericArgument;
@@ -59,7 +61,9 @@ class TestParametricSorts {
         ImmutableList<GenericParameter> params = ImmutableList.of();
         for (int i = 0; i < variance.length; i++) {
             GenericParameter.Variance varia = variance[i];
-            GenericSort genSort = (GenericSort) nss.sorts().lookup("G" + (i + 1));
+            Sort lookedUp = Objects
+                    .requireNonNull(nss.sorts().lookup("G" + (i + 1)), "sort G" + (i + 1));
+            GenericSort genSort = (GenericSort) lookedUp;
             params = params.prepend(new GenericParameter(genSort, varia));
         }
         ParametricSortDecl psd =
@@ -71,7 +75,7 @@ class TestParametricSorts {
     @Test
     public void testParametricFunctionInstantiation() {
         ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.COVARIANT);
-        Sort intSort = nss.sorts().lookup("int");
+        Sort intSort = Objects.requireNonNull(nss.sorts().lookup("int"), "int must be declared");
 
         var someConst = new ParametricFunctionDecl(new Name("someConst"),
             ImmutableList.of(new GenericParameter(g1, GenericParameter.Variance.INVARIANT)),
@@ -105,8 +109,8 @@ class TestParametricSorts {
     @Test
     public void testCovariance() {
         ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.COVARIANT);
-        Sort intSort = nss.sorts().lookup("int");
-        Sort anySort = nss.sorts().lookup("any");
+        Sort intSort = Objects.requireNonNull(nss.sorts().lookup("int"), "int must be declared");
+        Sort anySort = Objects.requireNonNull(nss.sorts().lookup("any"), "any must be declared");
 
         var intList = ParametricSortInstance.get(psd,
             ImmutableList.of(new GenericArgument(intSort)), services);
@@ -120,8 +124,8 @@ class TestParametricSorts {
     @Test
     public void testContravariance() {
         ParametricSortDecl psd = addParametricSort("List", GenericParameter.Variance.CONTRAVARIANT);
-        Sort intSort = nss.sorts().lookup("int");
-        Sort anySort = nss.sorts().lookup("any");
+        Sort intSort = Objects.requireNonNull(nss.sorts().lookup("int"), "int must be declared");
+        Sort anySort = Objects.requireNonNull(nss.sorts().lookup("any"), "any must be declared");
 
         var intList = ParametricSortInstance.get(psd,
             ImmutableList.of(new GenericArgument(intSort)), services);

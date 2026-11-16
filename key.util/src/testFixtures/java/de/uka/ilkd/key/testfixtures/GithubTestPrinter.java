@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.testfixtures;
 
+import java.util.Objects;
 import java.util.Optional;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -22,15 +24,16 @@ public class GithubTestPrinter implements TestWatcher, BeforeAllCallback, AfterA
     private static final boolean DISABLED = !"true".equals(System.getenv("CI"));
 
     @Override
-    public void testAborted(ExtensionContext context, Throwable cause) {
+    public void testAborted(ExtensionContext context, @Nullable Throwable cause) {
         if (DISABLED) {
             return;
         }
+        final Throwable reason = Objects.requireNonNull(cause, "cause");
         System.out.format("::error title=Test aborted %s::Test %s#%s aborted due to \"%s: %s\"%n",
             context.getDisplayName(),
             context.getRequiredTestClass().getName(),
             context.getRequiredTestMethod().getName(),
-            cause.getClass().getName(), cause.getMessage());
+            reason.getClass().getName(), reason.getMessage());
     }
 
     @Override
@@ -46,15 +49,16 @@ public class GithubTestPrinter implements TestWatcher, BeforeAllCallback, AfterA
     }
 
     @Override
-    public void testFailed(ExtensionContext context, Throwable cause) {
+    public void testFailed(ExtensionContext context, @Nullable Throwable cause) {
         if (DISABLED) {
             return;
         }
+        final Throwable reason = Objects.requireNonNull(cause, "cause");
         System.out.format("::error title=Test failed %s::Test %s#%s aborted due to \"%s: %s\"%n",
             context.getDisplayName(),
             context.getRequiredTestClass().getName(),
             context.getRequiredTestMethod().getName(),
-            cause.getClass().getName(), cause.getMessage());
+            reason.getClass().getName(), reason.getMessage());
     }
 
     @Override

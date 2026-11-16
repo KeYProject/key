@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.match.vm;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -40,16 +43,20 @@ public class VMTacletMatcherTest {
         ProofAggregate pa = HelperClassForTests.parse(
             HelperClassForTests.TESTCASE_DIRECTORY.resolve("tacletmatch")
                     .resolve("tacletMatch1.key"));
+        Proof proof = Objects.requireNonNull(pa.getFirstProof(), "the archive has the test proof");
+        var initConfig =
+            Objects.requireNonNull(proof.getInitConfig(), "the proof has an init config");
 
         for (int i = 0; i < NR_TACLETS; i++) {
-            taclet[i] = pa.getFirstProof().getInitConfig()
-                    .lookupActiveTaclet(new Name("taclet_match_rule_" + (i + 1)));
-            assertNotNull(taclet[i], "Taclet required for test not found");
+            String name = "taclet_match_rule_" + (i + 1);
+            taclet[i] = Objects
+                    .requireNonNull(initConfig.lookupActiveTaclet(new Name(name)),
+                        "Taclet required for test not found: " + name);
             assertTrue(taclet[i] instanceof FindTaclet,
                 "Taclet should be a FindTaclet, but is not.");
             matcher[i] = new VMTacletMatcher(taclet[i]);
         }
-        services = pa.getFirstProof().getServices();
+        services = proof.getServices();
     }
 
     @Test

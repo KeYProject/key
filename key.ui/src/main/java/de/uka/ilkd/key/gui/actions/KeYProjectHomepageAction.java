@@ -16,6 +16,9 @@ import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
 import org.key_project.util.java.SwingUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Open the KeY project homepage in the system default browser. May be inactive if Java 6 Desktop
  * system is not supported or internet connection missing.
@@ -23,10 +26,16 @@ import org.key_project.util.java.SwingUtil;
  * @author bruns
  *
  */
+@NullMarked
 public class KeYProjectHomepageAction extends MainWindowAction {
     private static final long serialVersionUID = 8657661861116034536L;
     private final static String url = "https://www.key-project.org/";
 
+    /**
+     * The action-configuration calls operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public KeYProjectHomepageAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("KeY Homepage");
@@ -40,7 +49,7 @@ public class KeYProjectHomepageAction extends MainWindowAction {
         return SwingUtil.browseIsSupported();
     }
 
-    private static URI getURI() {
+    private static @Nullable URI getURI() {
         URI res = null;
         try {
             res = (new URL(url)).toURI();
@@ -52,8 +61,14 @@ public class KeYProjectHomepageAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        URI uri = getURI();
+        if (uri == null) {
+            // The homepage URI is a compile-time constant; the loop below only fails for
+            // impossible URL syntax errors, mirroring the previous NPE-guarded behavior.
+            throw new NullPointerException("Cannot construct the KeY project homepage URI.");
+        }
         try {
-            SwingUtil.browse(getURI());
+            SwingUtil.browse(uri);
         } catch (IOException ignored) {
         }
     }

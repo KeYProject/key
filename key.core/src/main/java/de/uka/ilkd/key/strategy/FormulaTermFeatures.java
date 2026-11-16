@@ -13,6 +13,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 class FormulaTermFeatures extends StaticFeatureCollection {
 
     public FormulaTermFeatures(ArithTermFeatures tf) {

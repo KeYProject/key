@@ -36,7 +36,7 @@ public class PLookup {
     /// @param key the property to be looked-uped
     /// @param defaultValue the defaultValue return
     @SuppressWarnings("unchecked")
-    public <T extends @Nullable Object> T get(Property<T> key, @Nullable T defaultValue) {
+    public <T extends @Nullable Object> @Nullable T get(Property<T> key, @Nullable T defaultValue) {
         return (T) serviceMap.getOrDefault(key, defaultValue);
     }
 

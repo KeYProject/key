@@ -9,6 +9,8 @@ import java.util.Set;
 
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * How much the quantifier instantiation heuristic is told about the theories, as the strategy's
  * trigger option selects it.
@@ -22,6 +24,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
  * matching of the formula's own triggers, which every treatment runs (see
  * {@code BasicMatching}).
  */
+@NullMarked
 public enum TriggerTreatment {
 
     /** Everything the heuristic knows. */

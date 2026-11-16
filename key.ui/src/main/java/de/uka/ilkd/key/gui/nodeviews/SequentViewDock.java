@@ -20,15 +20,26 @@ import de.uka.ilkd.key.proof.Proof;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.NullMultipleCDockableFactory;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @version 1 (24.05.19)
  */
+@NullMarked
 public class SequentViewDock extends DefaultMultipleCDockable {
     private final SequentView sequentView;
     private final Node node;
 
+    /**
+     * Creates a dockable sequent view for the given node.
+     *
+     * <p>
+     * The dockable configures its close button, title, layout and toolbar actions while the
+     * receiver is still under initialization (EISOP initialization check); the settings only
+     * take effect once the dockable is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public SequentViewDock(MainWindow mainWindow, Node node) {
         super(NullMultipleCDockableFactory.NULL);
         this.node = node;
@@ -48,6 +59,15 @@ public class SequentViewDock extends DefaultMultipleCDockable {
         private static final long serialVersionUID = 8488446344747995700L;
         private final Node node;
 
+        /**
+         * Creates the action opening the current node in a separate buffer.
+         *
+         * <p>
+         * The action names itself while the receiver is still under initialization (EISOP
+         * initialization check); the name only materializes after construction, suppressed with
+         * a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         public OpenCurrentNodeAction(MainWindow mainWindow, Node node) {
             super(mainWindow);
             this.node = node;
@@ -67,6 +87,15 @@ public class SequentViewDock extends DefaultMultipleCDockable {
     private class JumpIntoTreeAction extends KeyAction {
         private static final long serialVersionUID = 2784076203317037461L;
 
+        /**
+         * Creates the action jumping into the proof tree.
+         *
+         * <p>
+         * The action names itself, binds its icon and accelerator while the receiver is still
+         * under initialization (EISOP initialization check); the settings only materialize
+         * after construction, suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:method.invocation.invalid")
         JumpIntoTreeAction() {
             setName("Jump into Tree");
             putValue(SMALL_ICON, IconFactory.JUMP_INTO_TREE.get());

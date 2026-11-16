@@ -32,6 +32,9 @@ public class InfFlowContractPOLoader implements ProofObligationLoader {
     public IPersistablePO.LoadedPOContainer loadFrom(InitConfig initConfig,
             Configuration properties) {
         final String contractName = properties.getString("contract");
+        if (contractName == null) {
+            throw new NullPointerException("No contract name given in the load properties.");
+        }
         final Contract contract =
             initConfig.getServices().getSpecificationRepository().getContractByName(contractName);
         if (contract == null) {

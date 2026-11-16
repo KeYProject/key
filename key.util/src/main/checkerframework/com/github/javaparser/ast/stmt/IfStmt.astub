@@ -1,0 +1,18 @@
+package com.github.javaparser.ast.stmt;
+
+import com.github.javaparser.ast.expr.Expression;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * Re-specification of the {@code IfStmt} constructor for the nullness checker. JavaParser treats
+ * the {@code elseStmt} as optional: a {@code null} else branch denotes an {@code if} without
+ * {@code else}. The KeY code base deliberately passes {@code null} as the else branch when
+ * generating such statements (e.g. the {@code if} returning an enum constant by name in the
+ * {@code $values} builder). Widening the parameter nullness matches the library's actual behavior
+ * without any source changes.
+ */
+public class IfStmt {
+
+    public IfStmt(Expression condition, Statement thenStmt, @Nullable Statement elseStmt);
+}

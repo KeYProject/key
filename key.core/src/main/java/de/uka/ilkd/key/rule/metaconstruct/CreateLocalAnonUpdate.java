@@ -16,7 +16,10 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
+
+import org.jspecify.annotations.NullMarked;
 
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
@@ -28,6 +31,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  * @author Dominic Steinhoefel
  */
 @TransformerMeta(name = "#createLocalAnonUpdate")
+@NullMarked
 public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
 
     public CreateLocalAnonUpdate() {
@@ -40,7 +44,8 @@ public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
 
         // the target term should have a Java block
         if (target.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) {
-            return null;
+            // an empty body writes no local variables, so the anonymizing update is empty
+            return createLocalAnonUpdate(DefaultImmutableSet.nil(), services);
         }
 
         assert target.op() instanceof JModality;

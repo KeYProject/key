@@ -26,7 +26,11 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public final class DropEffectlessElementariesCondition implements VariableCondition {
     private final UpdateSV u;
     private final SchemaVariable x;
@@ -39,7 +43,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
 
-    static JTerm dropEffectlessElementariesHelper(JTerm update,
+    static @Nullable JTerm dropEffectlessElementariesHelper(JTerm update,
             Set<LocationVariable> relevantVars, TermServices services) {
         if (update.op() instanceof ElementaryUpdate eu) {
             LocationVariable lhs = (LocationVariable) eu.lhs();
@@ -79,7 +83,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
     }
 
 
-    private static JTerm dropEffectlessElementaries(JTerm update, JTerm target,
+    private static @Nullable JTerm dropEffectlessElementaries(JTerm update, JTerm target,
             LogicServices p_services) {
         final Services services = (Services) p_services;
         return dropEffectlessElementariesTargeted(update, target, services);
@@ -92,7 +96,7 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
      * termination once all are found -- avoids the full program walk that made symbolic execution
      * quadratic (each update-simplification step re-walked the whole remaining program).
      */
-    static JTerm dropEffectlessElementariesTargeted(JTerm update, JTerm target,
+    static @Nullable JTerm dropEffectlessElementariesTargeted(JTerm update, JTerm target,
             Services services) {
         final Set<LocationVariable> updateVars = new LinkedHashSet<>();
         collectUpdateLhsVars(update, updateVars);
@@ -158,7 +162,8 @@ public final class DropEffectlessElementariesCondition implements VariableCondit
 
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo mc,
             LogicServices services) {
         SVInstantiations svInst =

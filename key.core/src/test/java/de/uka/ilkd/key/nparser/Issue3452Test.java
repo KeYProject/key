@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.nparser;
 
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -36,10 +37,13 @@ public class Issue3452Test {
         final var contract = env.getProofContracts().getFirst();
         var po = contract.createProofObl(env.getInitConfig(), contract);
         var proof = env.createProof(po); // just to ensure there is exception
-        Services services = proof.getInitConfig().getServices();
+        Services services =
+            Objects.requireNonNull(proof.getInitConfig(), "init config must be set").getServices();
         Namespace<@NonNull Function> functions = services.getNamespaces().functions();
-        assertEquals("[int]", functions.lookup("A::b").argSorts().toString());
-        assertEquals("[Heap,int]", functions.lookup("A::c").argSorts().toString());
+        Function b = Objects.requireNonNull(functions.lookup("A::b"), "A::b must be defined");
+        assertEquals("[int]", b.argSorts().toString());
+        Function c = Objects.requireNonNull(functions.lookup("A::c"), "A::c must be defined");
+        assertEquals("[Heap,int]", c.argSorts().toString());
     }
 
     @Test

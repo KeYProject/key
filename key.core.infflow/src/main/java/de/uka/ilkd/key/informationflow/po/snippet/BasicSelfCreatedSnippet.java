@@ -9,11 +9,14 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Generate term "self.created".
  *
  * @author christoph
  */
+@NullMarked
 class BasicSelfCreatedSnippet implements FactoryMethod {
 
     @Override

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -21,6 +22,10 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm<Goal> left, right;
@@ -47,7 +52,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
-        return compareTerms(leftTerm, rightTerm, pos, goal);
+        return compareTerms(Objects.requireNonNull(leftTerm), Objects.requireNonNull(rightTerm),
+            pos, goal);
     }
 
     protected boolean compareTerms(Term leftTerm, Term rightTerm,
@@ -188,8 +194,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
     }
 
     private class MonomialIterator implements Iterator<Term> {
-        private Term polynomial;
-        private Term nextMonomial = null;
+        private @Nullable Term polynomial;
+        private @Nullable Term nextMonomial = null;
 
         private MonomialIterator(Term polynomial) {
             this.polynomial = polynomial;
@@ -219,7 +225,8 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
 
         @Override
         public Term next() {
-            final Term res = nextMonomial;
+            // hasNext() is the protocol witness that nextMonomial is non-null.
+            final Term res = Objects.requireNonNull(nextMonomial);
             nextMonomial = null;
             findNextMonomial();
             return res;

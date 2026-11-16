@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.visitor;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.JavaService;
@@ -13,6 +14,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.logic.Named;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +37,7 @@ public class TestDeclarationProgramVariableCollector {
         { { "j1", "j2", "j3", "j4" }, { "j1", "j5" }, { "j0" } };
 
 
-    private static JavaBlock[] test_block = new JavaBlock[jblocks.length];
+    private static JavaBlock @Nullable [] test_block = new JavaBlock[jblocks.length];
 
     private static int testCases = 0;
     private static int down = 0;
@@ -50,9 +52,12 @@ public class TestDeclarationProgramVariableCollector {
         if (down != 0) {
             return;
         }
+        // only cleared in tearDown after the very last test, when no further setUp runs
+        final JavaBlock @Nullable [] blocks =
+            Objects.requireNonNull(test_block, "cleared only after the last test ran");
         final JavaService r2k = TacletForTests.services().getJavaService();
         for (int i = 0; i < jblocks.length; i++) {
-            test_block[i] = r2k.readBlockWithEmptyContext(jblocks[i], null);
+            blocks[i] = r2k.readBlockWithEmptyContext(jblocks[i], null);
         }
     }
 
@@ -81,6 +86,7 @@ public class TestDeclarationProgramVariableCollector {
 
     @Test
     public void testVisitor() {
+        Objects.requireNonNull(test_block, "set up in @BeforeEach setUp()");
         DeclarationProgramVariableCollector dpvc;
         for (int i = 0; i < jblocks.length; i++) {
             dpvc = new DeclarationProgramVariableCollector(test_block[i].program(),

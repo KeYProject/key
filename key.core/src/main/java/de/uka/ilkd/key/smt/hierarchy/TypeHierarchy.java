@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
  * @author mihai
  */
 
+@NullMarked
 public class TypeHierarchy {
     private static final Logger LOGGER = LoggerFactory.getLogger(TypeHierarchy.class);
 
@@ -47,10 +49,13 @@ public class TypeHierarchy {
     public TypeHierarchy(Services services) {
         this.services = services;
 
+        Sort nullSort = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT").getNull().sort();
+
         // Find all sorts
         for (var sort : services.getNamespaces().sorts().allElements()) {
             // don't add the null sort
-            if (!sort.equals(services.getTypeConverter().getHeapLDT().getNull().sort())) {
+            if (!sort.equals(nullSort)) {
                 addSort(sort);
                 sortList.add(sort);
 
@@ -117,7 +122,7 @@ public class TypeHierarchy {
      * @return The SortNodes containing the parents of s.
      */
     public Set<SortNode> getParents(Sort s) {
-        return sortMap.get(s).getParents();
+        return Objects.requireNonNull(sortMap.get(s), "no sort node for " + s).getParents();
     }
 
     /**
@@ -179,7 +184,7 @@ public class TypeHierarchy {
      * @param s The sort to be contracted.
      */
     private void contractNode(Sort s) {
-        SortNode node = sortMap.get(s);
+        SortNode node = Objects.requireNonNull(sortMap.get(s), "no sort node for " + s);
         Set<SortNode> parents = node.getParents();
         Set<SortNode> children = node.getChildren();
 

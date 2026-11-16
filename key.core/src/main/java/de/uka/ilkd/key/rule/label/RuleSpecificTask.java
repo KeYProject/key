@@ -7,6 +7,9 @@ package de.uka.ilkd.key.rule.label;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Instances of this class provides functionality only if a supported rule is active.
  *
@@ -15,6 +18,7 @@ import org.key_project.util.collection.ImmutableList;
  * @see TermLabelUpdate
  * @see TermLabelRefactoring
  */
+@NullMarked
 public interface RuleSpecificTask {
     /**
      * Returns the supported rule {@link Name}s or {@code null} or an empty list if all rules are
@@ -23,5 +27,6 @@ public interface RuleSpecificTask {
      * @return The list of supported rule {@link Name}s or {@code null}/empty list if all rules are
      *         supported.
      */
+    @Nullable
     ImmutableList<Name> getSupportedRuleNames();
 }

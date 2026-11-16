@@ -12,6 +12,8 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.util.LinkedHashMap;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Translates the configuration grammar (something like JSON) into a {@link Configuration} object.
@@ -20,6 +22,7 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (03.04.23)
  * @see KeyAst.ConfigurationFile#asConfiguration()
  */
+@NullMarked
 class ConfigurationBuilder extends JavaKeYParserBaseVisitor<Object> {
     @Override
     public List<Object> visitCfile(JavaKeYParser.CfileContext ctx) {
@@ -33,8 +36,13 @@ class ConfigurationBuilder extends JavaKeYParserBaseVisitor<Object> {
         return ctx.IDENT().getText();
     }
 
+    /**
+     * The overridden declaration requires a non-null return type, but this implementation may
+     * legitimately return {@code null}; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "nullness:override.return.invalid", "NullAway" })
     @Override
-    public String visitCsymbol(JavaKeYParser.CsymbolContext ctx) {
+    public @Nullable String visitCsymbol(JavaKeYParser.CsymbolContext ctx) {
         if (ctx.getText().equals("null")) {
             return null;
         }
@@ -106,8 +114,8 @@ class ConfigurationBuilder extends JavaKeYParserBaseVisitor<Object> {
     }
 
     @Override
-    public List<Object> visitList(JavaKeYParser.ListContext ctx) {
-        var seq = new ArrayList<>(ctx.children.size());
+    public List<@Nullable Object> visitList(JavaKeYParser.ListContext ctx) {
+        var seq = new ArrayList<@Nullable Object>(ctx.children.size());
         for (JavaKeYParser.CvalueContext context : ctx.cvalue()) {
             seq.add(context.accept(this));
         }

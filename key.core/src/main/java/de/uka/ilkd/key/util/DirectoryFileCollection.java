@@ -12,8 +12,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class is used to describe a directory structure as a repository for files to read in. A
@@ -26,6 +30,7 @@ import de.uka.ilkd.key.proof.io.consistency.FileRepo;
  *
  * @author MU
  */
+@NullMarked
 public class DirectoryFileCollection implements FileCollection {
 
     /**
@@ -98,7 +103,7 @@ public class DirectoryFileCollection implements FileCollection {
      *
      * @see de.uka.ilkd.key.util.FileCollection#createWalker(java.lang.String)
      */
-    public Walker createWalker(String extension) {
+    public Walker createWalker(@Nullable String extension) {
         return createWalker(new String[] { extension });
     }
 
@@ -108,7 +113,7 @@ public class DirectoryFileCollection implements FileCollection {
      *
      * @see de.uka.ilkd.key.util.FileCollection#createWalker(java.lang.String[])
      */
-    public Walker createWalker(String[] extensions) {
+    public Walker createWalker(@Nullable String[] extensions) {
         List<Path> files = new ArrayList<>();
 
         try (var stream = Files.walk(directory)) {
@@ -134,7 +139,7 @@ public class DirectoryFileCollection implements FileCollection {
     public class Walker implements FileCollection.Walker {
 
         private final Iterator<Path> iterator;
-        private Path currentFile;
+        private @Nullable Path currentFile;
 
         public Walker(Iterator<Path> iterator) {
             this.iterator = iterator;
@@ -152,7 +157,8 @@ public class DirectoryFileCollection implements FileCollection {
         @Override
         public InputStream openCurrent(FileRepo fileRepo) throws IOException {
             if (fileRepo != null) {
-                return fileRepo.getInputStream(currentFile);
+                return Objects.requireNonNull(fileRepo.getInputStream(
+                    Objects.requireNonNull(currentFile, "current file")), "input stream");
             } else {
                 return openCurrent(); // fallback without FileRepo
             }
@@ -160,7 +166,7 @@ public class DirectoryFileCollection implements FileCollection {
 
         @Override
         public Path getCurrentLocation() {
-            return currentFile;
+            return Objects.requireNonNull(currentFile, "current file");
         }
 
         @Override

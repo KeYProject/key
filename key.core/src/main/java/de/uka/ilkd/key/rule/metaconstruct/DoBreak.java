@@ -16,6 +16,9 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class performs a labeled break. This means <code>
  *  l1:l2:{l3:{l4:{break l3;}} ...}
@@ -24,6 +27,7 @@ import org.key_project.util.collection.ImmutableList;
  * </code>
  */
 @TransformerMeta(name = "#doBreak")
+@NullMarked
 public class DoBreak extends ProgramTransformer {
 
     /**
@@ -41,7 +45,8 @@ public class DoBreak extends ProgramTransformer {
      * @param block the NonTerminalProgramElement to go through and look for the label
      * @param breakLabel the Label the break statement marked
      */
-    private ProgramElement doBreak(NonTerminalProgramElement block, Label breakLabel, Break b) {
+    private @Nullable ProgramElement doBreak(NonTerminalProgramElement block,
+            @Nullable Label breakLabel, Break b) {
 
         if (block instanceof LabeledStatement) {
             // we enter a labeled block so we have to check the label

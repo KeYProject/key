@@ -25,11 +25,15 @@ import org.key_project.logic.Namespace;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  *
  * @author christoph
  */
+@NullMarked
 abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacro {
 
     @Override
@@ -92,7 +96,7 @@ abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractProofMacr
         }
     }
 
-    private static JTerm[] buildExecution(ProofObligationVars c, Map<JTerm, JTerm> vsMap,
+    private static JTerm[] buildExecution(ProofObligationVars c, @Nullable Map<JTerm, JTerm> vsMap,
             ImmutableList<Goal> symbExecGoals, Goal initGoal) {
         Services services = initGoal.proof().getServices();
         final JTerm[] goalFormulas = buildFormulasFromGoals(symbExecGoals);

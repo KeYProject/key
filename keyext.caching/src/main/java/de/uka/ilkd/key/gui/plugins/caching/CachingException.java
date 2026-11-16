@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.plugins.caching;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Helpful error message used when the proof cache cannot
  * be applied successfully.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class CachingException extends Exception {
     private static final String EXPLANATION_TEXT =
         """

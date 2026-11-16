@@ -18,6 +18,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.util.ExceptionTools;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
@@ -108,7 +109,7 @@ public class JavaFeatureCoverageTest {
     }
 
     /** Loads the feature's {@code problem.key}; returns {@code null} on success, else the error. */
-    private static Throwable tryLoad(Path featureDir) {
+    private static @Nullable Throwable tryLoad(Path featureDir) {
         Path problem = featureDir.resolve("problem.key");
         KeYEnvironment<?> env = null;
         try {

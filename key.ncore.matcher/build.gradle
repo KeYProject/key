@@ -14,7 +14,7 @@ checkerFramework {
         ]
         extraJavacArgs = [
                 "-Xmaxerrs", "10000",
-                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework",
                 "-AstubNoWarnIfNotFound",
                 "-Werror",
                 "-Aversion",

@@ -6,10 +6,13 @@ package de.uka.ilkd.key.rule.inst;
 
 import org.key_project.prover.rules.instantiation.IllegalInstantiationException;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * this exception is thrown from an "SVInstantiations"-Object if the sorts of a schema variable and
  * its instantiation are not compatible (and not generic)
  */
+@NullMarked
 public class SortException extends IllegalInstantiationException {
 
     /**

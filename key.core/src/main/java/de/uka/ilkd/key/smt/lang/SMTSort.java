@@ -6,12 +6,16 @@ package de.uka.ilkd.key.smt.lang;
 
 
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  *
  *
  * @author Aboubakr Achraf El Ghazi, Fikri Kabakcha
  *
  */
+@NullMarked
 public class SMTSort {
 
     public static final SMTSort BOOL = new SMTSort("Bool");
@@ -21,14 +25,23 @@ public class SMTSort {
     public static final SMTSort FPROUNDINGMODE = new SMTSort("RoundingMode");
 
     private String id;
-    private SMTSort topLevel;
-    private SMTFunction is;
+    private @Nullable SMTSort topLevel;
+    private @Nullable SMTFunction is;
     // public List<Sig> superSigs;
     private long bound = -1;
     private long bitSize = -1;
-    private SMTFunction boundConst;
-    private SMTFunction allocatedAtoms;
+    private @Nullable SMTFunction boundConst;
+    private @Nullable SMTFunction allocatedAtoms;
 
+    /**
+     * Constructs a sort with the given name whose top-level sort is itself. Storing the
+     * still-under-construction receiver {@code this} into {@link #topLevel} while {@code this} is
+     * {@code @UnderInitialization} is safe: the field is only written here and never read before
+     * construction finishes, and the object is not published concurrently.
+     *
+     * @param name the sort's name
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     public SMTSort(String name) {
         this.id = name;
         this.topLevel = this;
@@ -98,15 +111,15 @@ public class SMTSort {
         return (topLevel != null ? topLevel : this);
     }
 
-    public void setTopLevel(SMTSort topLevel) {
+    public void setTopLevel(@Nullable SMTSort topLevel) {
         this.topLevel = topLevel;
     }
 
-    public SMTFunction getIs() {
+    public @Nullable SMTFunction getIs() {
         return is;
     }
 
-    public void setIs(SMTFunction is) {
+    public void setIs(@Nullable SMTFunction is) {
         this.is = is;
     }
 
@@ -158,28 +171,28 @@ public class SMTSort {
     /**
      * @return the boundConst
      */
-    public SMTFunction getBoundConst() {
+    public @Nullable SMTFunction getBoundConst() {
         return boundConst;
     }
 
     /**
      * @param boundConst the boundConst to set
      */
-    public void setBoundConst(SMTFunction boundConst) {
+    public void setBoundConst(@Nullable SMTFunction boundConst) {
         this.boundConst = boundConst;
     }
 
     /**
      * @return the allocatedAtoms
      */
-    public SMTFunction getAllocatedAtoms() {
+    public @Nullable SMTFunction getAllocatedAtoms() {
         return allocatedAtoms;
     }
 
     /**
      * @param allocatedAtoms the allocatedAtoms to set
      */
-    public void setAllocatedAtoms(SMTFunction allocatedAtoms) {
+    public void setAllocatedAtoms(@Nullable SMTFunction allocatedAtoms) {
         this.allocatedAtoms = allocatedAtoms;
     }
 
@@ -207,7 +220,7 @@ public class SMTSort {
 
     /** Returns true iff ((that is from type sort) and (this.id == that.id)) */
     @Override
-    public boolean equals(Object that) {
+    public boolean equals(@Nullable Object that) {
         if (this == that) {
             return true;
         }

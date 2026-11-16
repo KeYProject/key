@@ -10,6 +10,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * This class defines the logic equality operator {@code =}. It is a binary predicate accepting
@@ -18,6 +20,7 @@ import org.key_project.logic.sort.Sort;
  * It also defines the formula equivalence operator {@code <->} (which could alternatively be seen
  * as a Junctor).
  */
+@NullMarked
 public final class Equality extends JAbstractSortedOperator {
 
     /**

@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  * String/sequence-theory-internal ordering costs, used by {@link StringStrategy}.
  *
@@ -20,6 +23,7 @@ package de.uka.ilkd.key.strategy;
  * {@link org.key_project.prover.strategy.costbased.CostBand}).
  * </p>
  */
+@NullMarked
 final class StringCost {
     private StringCost() {}
 

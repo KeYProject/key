@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.reference;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * ReferencePrefix and -suffix that is admissible for outer type references.
  */
+@NullMarked
 public interface TypeReferenceInfix extends ReferencePrefix, ReferenceSuffix, NameReference {
 
 }

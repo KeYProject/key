@@ -9,6 +9,9 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Shows two components side by side in a horizontal split pane when there is enough width, and
  * collapses them into a tabbed pane when the available width drops below a threshold. Used to place
@@ -16,6 +19,7 @@ import javax.swing.*;
  * in
  * a narrow window.
  */
+@NullMarked
 public class ResponsiveSplit extends JPanel {
 
     private static final long serialVersionUID = 1L;
@@ -29,8 +33,17 @@ public class ResponsiveSplit extends JPanel {
     private final String rightTitle;
 
     /** current layout (null until first laid out): true = split, false = tabs */
-    private Boolean wide;
+    private @Nullable Boolean wide;
 
+    /**
+     * Creates a responsive split view.
+     *
+     * <p>
+     * The view registers its resize listener and lays out its initial state while the receiver is
+     * still under initialization (EISOP initialization check); the layout only materializes once
+     * the view is shown after construction, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ResponsiveSplit(JComponent left, String leftTitle, JComponent right, String rightTitle) {
         super(new BorderLayout());
         this.left = left;

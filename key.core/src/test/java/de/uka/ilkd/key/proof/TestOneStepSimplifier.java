@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -16,7 +17,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class TestOneStepSimplifier {
-    public static final Path testCaseDirectory = FindResources.getTestCasesDirectory();
+    public static final Path testCaseDirectory = Objects
+            .requireNonNull(FindResources.getTestCasesDirectory(), "test cases must be available");
 
     @Test
     void loadWithRestriction() throws ProblemLoaderException {

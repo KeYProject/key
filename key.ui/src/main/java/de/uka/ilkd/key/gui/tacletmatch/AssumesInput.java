@@ -13,6 +13,9 @@ import org.key_project.util.parsing.HasLocation;
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * GUI-independent logic for the "type the {@code \assumes} sequent" editor: how the two typed parts
  * are combined for the parser, where an error offset falls, whether the parsed arity matches, how a
@@ -23,6 +26,7 @@ import org.key_project.util.parsing.Position;
  * Deliberately free of AWT/Swing so it can be unit-tested without a display; the panel keeps only
  * the widget wiring (text areas, highlighting, status colours) and delegates the decisions here.
  */
+@NullMarked
 final class AssumesInput {
 
     /** the separator inserted between the typed antecedent and succedent before parsing. */
@@ -66,7 +70,8 @@ final class AssumesInput {
      * {@code null} if the parsed arity matches the expectation, otherwise a message describing the
      * mismatch.
      */
-    static String arityError(int parsedAnte, int parsedSucc, int expectedAnte, int expectedSucc) {
+    static @Nullable String arityError(int parsedAnte, int parsedSucc, int expectedAnte,
+            int expectedSucc) {
         if (parsedAnte == expectedAnte && parsedSucc == expectedSucc) {
             return null;
         }
@@ -88,7 +93,7 @@ final class AssumesInput {
      * StatusKind#OK} verdict carrying the full text, anything else is {@link StatusKind#INCOMPLETE}
      * carrying only its first line.
      */
-    static ModelStatus classify(String modelStatus) {
+    static ModelStatus classify(@Nullable String modelStatus) {
         if (modelStatus != null && modelStatus.startsWith("Instantiation is OK")) {
             return new ModelStatus(StatusKind.OK, modelStatus);
         }
@@ -98,7 +103,7 @@ final class AssumesInput {
     /**
      * a cleaned parse-failure message and the source position it points at (may be {@code null}).
      */
-    record SyntaxError(String message, Position position) {
+    record SyntaxError(String message, @Nullable Position position) {
     }
 
     /**
@@ -151,7 +156,7 @@ final class AssumesInput {
      * named — each field holds only one side of the sequent, so the parser hitting them just means
      * the formula there is unfinished ("incomplete formula"), not a missing sequent arrow.
      */
-    static String humanize(String raw) {
+    static String humanize(@Nullable String raw) {
         if (raw == null) {
             return "";
         }

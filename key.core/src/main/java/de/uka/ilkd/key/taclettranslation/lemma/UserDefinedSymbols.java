@@ -21,6 +21,10 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class UserDefinedSymbols {
     static class NamedComparator implements Comparator<Named> {
         static final NamedComparator INSTANCE = new NamedComparator();
@@ -31,7 +35,7 @@ public class UserDefinedSymbols {
         }
     }
 
-    final UserDefinedSymbols parent;
+    final @Nullable UserDefinedSymbols parent;
     final Set<Function> usedExtraFunctions = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Function> usedExtraPredicates = new TreeSet<>(NamedComparator.INSTANCE);
     final Set<Sort> usedExtraSorts = new TreeSet<>(NamedComparator.INSTANCE);

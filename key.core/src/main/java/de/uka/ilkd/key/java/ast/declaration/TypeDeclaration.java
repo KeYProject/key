@@ -20,13 +20,15 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Type declaration. taken from COMPOST and changed to achieve an immutable structure
  */
+@NullMarked
 public abstract class TypeDeclaration extends JavaDeclaration
         implements NamedProgramElement, MemberDeclaration,
         TypeDeclarationContainer, ClassType, VariableScope, TypeScope {
@@ -52,15 +54,24 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * @param specMathMode spec math mode
      */
     public record JMLModifiers(boolean strictlyPure, boolean pure, boolean nullableByDefault,
-            SpecMathMode specMathMode) {
+            // no JML spec math modifier means an absent (null) mode
+            @Nullable SpecMathMode specMathMode) {
     }
 
     protected final JMLModifiers jmlModifiers;
 
-
+    /**
+     * Constructs a type declaration.
+     * <p>
+     * The {@link JMLInfoExtractor#parseClass} call operates on {@code this} while the receiver is
+     * still under initialization (EISOP initialization check); safe here because the JML modifiers
+     * only depend on the fields assigned in the previous lines of this constructor, suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public TypeDeclaration(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray,
+            ImmutableArray<Modifier> modArray,
             ProgramElementName name, ProgramElementName fullName,
             ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
             boolean isLibrary, ImmutableList<TextualJMLConstruct> jmlAttachments) {
@@ -74,6 +85,14 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     @Deprecated
+    // The deprecated no-arg constructor deliberately leaves the name/fullName/members
+    // fields unset (null): it builds an "empty" declaration stub whose consumers are all
+    // null-guarded (getName/getFullName/getAllFields/getTypeDeclarationCount/...). The
+    // null assignments violate the @NonNull field contracts, and the JMLInfoExtractor.parseClass
+    // call operates on {@code this} while the receiver is still under initialization, so both
+    // are checked with scoped keys here.
+    @SuppressWarnings({ "NullAway", "nullness:assignment.type.incompatible",
+        "nullness:argument.type.incompatible" })
     public TypeDeclaration() {
         this.name = null;
         this.fullName = null;
@@ -89,7 +108,13 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * @param mods a modifier array.
      * @param name ProgramElementName of the type
      * @param members an array containing the memberdeclarations of this type
+     *        <p>
+     *        The {@link JMLInfoExtractor#parseClass} call operates on {@code this} while the
+     *        receiver is still under initialization (EISOP initialization check); safe here
+     *        because the JML modifiers only depend on the fields assigned in the previous lines
+     *        of this constructor, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public TypeDeclaration(Modifier[] mods, ProgramElementName name, ProgramElementName fullName,
             MemberDeclaration[] members, boolean parentIsInterfaceDeclaration, boolean isLibrary) {
         super(mods);
@@ -106,7 +131,13 @@ public abstract class TypeDeclaration extends JavaDeclaration
      * @param name the ProgramElementName of the type May contain: several MemberDeclaration (as
      *        members of the type), a parentIsInterfaceDeclaration (indicating if parent is
      *        interface), several Modifier (as modifiers of the type decl), Comments
+     *        <p>
+     *        The {@link JMLInfoExtractor#parseClass} call operates on {@code this} while the
+     *        receiver is still under initialization (EISOP initialization check); safe here
+     *        because the JML modifiers only depend on the children set up in the previous lines
+     *        of this constructor, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public TypeDeclaration(ExtList children, ProgramElementName name, ProgramElementName fullName,
             boolean isLibrary) {
         super(children);
@@ -128,6 +159,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *        MemberDeclaration (as members of the type), a parentIsInterfaceDeclaration (indicating
      *        if parent is interface), several Modifier (as modifiers of the type decl), Comments
      */
+    // ExtList.get(ProgramElementName.class) may be empty for anonymous classes and for
+    // declarations created directly by njml (see JP2KeYConverter), where the name is deliberately
+    // left unset; the resulting declaration is only used through null-guarded accessors, so the
+    // @NonNull parameter contract is intentionally not met at the delegation site.
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public TypeDeclaration(ExtList children, ProgramElementName fullName, boolean isLibrary) {
         this(children, children.get(ProgramElementName.class), fullName, isLibrary);
     }
@@ -150,6 +186,11 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *
      * @return the string.
      */
+    // name/fullName may legitimately be null for anonymous classes and for the
+    // deprecated no-arg constructor's stub declarations (see the constructor above);
+    // returning null here collides with the @NonNull contract of
+    // NamedModelElement.getName(), which cannot be widened without ripple.
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     public final String getName() {
         return (name == null) ? ((fullName == null) ? null : fullName.toString())
                 : name.toString();
@@ -194,7 +235,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public Package getPackage(Services s) {
+    public @Nullable Package getPackage(Services s) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -207,7 +248,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<ClassType> getAllSupertypes(Services services) {
+    public @Nullable ImmutableList<ClassType> getAllSupertypes(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -215,7 +256,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<Field> getFields(Services services) {
+    public @Nullable ImmutableList<Field> getFields(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -245,7 +286,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<Method> getMethods(Services services) {
+    public @Nullable ImmutableList<Method> getMethods(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -254,7 +295,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<Method> getAllMethods(Services services) {
+    public @Nullable ImmutableList<Method> getAllMethods(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -262,7 +303,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<Constructor> getConstructors(Services services) {
+    public @Nullable ImmutableList<Constructor> getConstructors(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -270,7 +311,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<ClassType> getTypes(Services services) {
+    public @Nullable ImmutableList<ClassType> getTypes(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -278,7 +319,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     /**
      * TO BE IMPLEMENTED
      */
-    public ImmutableList<ClassType> getAllTypes(Services services) {
+    public @Nullable ImmutableList<ClassType> getAllTypes(Services services) {
         LOGGER.error("Method in class TypeDeclaration not implemented.");
         return null;
     }
@@ -302,7 +343,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
+    public ImmutableArray<Modifier> getModifiers() {
         return modArray;
     }
 
@@ -382,7 +423,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         return super.isAbstract();
     }
 
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o instanceof TypeDeclaration) {
             return ((TypeDeclaration) o).fullName.equals(fullName);
         } else

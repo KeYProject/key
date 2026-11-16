@@ -19,6 +19,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -42,6 +43,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * If the projection has no value (its schema variable is not instantiated), the result is
  * {@link TopRuleAppCost}, as with the comprehension it replaces.
  */
+@NullMarked
 public class CountOccurrencesFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
 
     private final ProjectionToTerm<Goal> target;

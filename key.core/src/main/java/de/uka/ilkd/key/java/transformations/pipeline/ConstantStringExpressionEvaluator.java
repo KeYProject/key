@@ -44,7 +44,9 @@ import com.github.javaparser.ast.modules.ModuleUsesDirective;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class ConstantStringExpressionEvaluator extends JavaTransformerAbstract {
 
     public ConstantStringExpressionEvaluator(TransformationPipelineServices services) {
@@ -52,6 +54,12 @@ public class ConstantStringExpressionEvaluator extends JavaTransformerAbstract {
     }
 
 
+    /**
+     * Runs the constant-string evaluator over the given declaration. The visitor never consults
+     * its argument, which is why {@code null} is passed deliberately; the argument nullness check
+     * of the visitor's {@code accept} is suppressed for this traversal.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private void evaluateConstantStringExpressions(Node td) {
         td.accept(new ConstantStringEvaluator(), null);
     }

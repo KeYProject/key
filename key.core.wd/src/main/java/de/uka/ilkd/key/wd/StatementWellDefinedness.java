@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -22,6 +23,9 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A contract for checking the well-definedness of a jml statement. Contrary to jml specifications
  * for methods, model fields and class invariants, the well-definedness of jml statements is checked
@@ -34,17 +38,28 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public abstract class StatementWellDefinedness extends WellDefinednessCheck {
 
     StatementWellDefinedness(String name, int id, IObserverFunction target,
             OriginalVariables origVars, Type type, Services services) {
-        super(ContractFactory.generateContractTypeName(name, target.getContainerType(), target,
-            target.getContainerType()), id, target, origVars, type, services);
+        super(ContractFactory.generateContractTypeName(name, requireContainerType(target), target,
+            requireContainerType(target)), id, target, origVars, type, services);
+    }
+
+    private static KeYJavaType requireContainerType(IObserverFunction target) {
+        final KeYJavaType container = target.getContainerType();
+        if (container == null) {
+            throw new NullPointerException(
+                "No container type for the well-definedness target.");
+        }
+        return container;
     }
 
     StatementWellDefinedness(String name, int id, Type type, IObserverFunction target,
             LocationVariable heap, OriginalVariables origVars, Condition requires, JTerm modifiable,
-            JTerm accessible, Condition ensures, JTerm mby, JTerm rep, TermBuilder tb) {
+            @Nullable JTerm accessible, Condition ensures, @Nullable JTerm mby, @Nullable JTerm rep,
+            TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires, modifiable, accessible, ensures,
             mby, rep, tb);
     }
@@ -77,7 +92,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    final Function generateMbyAtPreFunc(Services services) {
+    final @Nullable Function generateMbyAtPreFunc(Services services) {
         return null;
     }
 
@@ -125,14 +140,15 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services The current services reference
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(LocationVariable self,
-            LocationVariable exception,
-            LocationVariable result, LocationVariable heap, LocationVariable heapAtPre,
-            JTerm anonHeap,
+    public SequentFormula generateSequent(@Nullable LocationVariable self,
+            @Nullable LocationVariable exception,
+            @Nullable LocationVariable result, LocationVariable heap,
+            @Nullable LocationVariable heapAtPre,
+            @Nullable JTerm anonHeap,
             ImmutableSet<LocationVariable> ps, JTerm leadingUpdate, JTerm localAnonUpdate,
             Services services) {
         final ImmutableList<LocationVariable> params = convertParams(ps);
-        final Map<LocationVariable, LocationVariable> atPres =
+        final Map<LocationVariable, @Nullable LocationVariable> atPres =
             new LinkedHashMap<>();
         atPres.put(heap, heapAtPre);
         final Variables vars =
@@ -158,7 +174,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
      * @param services
      * @return The proof sequent for the well-definedness check
      */
-    public SequentFormula generateSequent(LocationVariable self, LocationVariable heap,
+    public SequentFormula generateSequent(@Nullable LocationVariable self, LocationVariable heap,
             JTerm anonHeap, ImmutableSet<LocationVariable> ps, JTerm leadingUpdate,
             JTerm localAnonUpdate, Services services) {
         return generateSequent(self, null, null, heap, null, anonHeap, ps, leadingUpdate,
@@ -174,12 +190,12 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
     }
 
     @Override
-    public final JTerm getGlobalDefs() {
+    public final @Nullable JTerm getGlobalDefs() {
         return null;
     }
 
     @Override
-    public final JTerm getAxiom() {
+    public final @Nullable JTerm getAxiom() {
         return null;
     }
 
@@ -206,7 +222,7 @@ public abstract class StatementWellDefinedness extends WellDefinednessCheck {
         final JTerm wdRest;
         final JTerm anonWdPost;
 
-        private SequentTerms(JTerm context, JTerm pre, JTerm anonHeap, JTerm modifiable,
+        private SequentTerms(JTerm context, JTerm pre, @Nullable JTerm anonHeap, JTerm modifiable,
                 ImmutableList<JTerm> rest, JTerm anonWdPost, TermServices services) {
             this.context = context;
             this.pre = pre;

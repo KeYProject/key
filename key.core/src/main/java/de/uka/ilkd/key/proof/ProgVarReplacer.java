@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -25,10 +26,12 @@ import org.key_project.prover.rules.instantiation.ListInstantiation;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Replaces program variables.
  */
+@NullMarked
 public final class ProgVarReplacer {
 
     /**
@@ -82,9 +85,10 @@ public final class ProgVarReplacer {
             SVInstantiations newInsts = replace(insts);
 
             if (newInsts != insts) {
-                NoPosTacletApp newNoPosTacletApp =
+                NoPosTacletApp newNoPosTacletApp = Objects.requireNonNull(
                     NoPosTacletApp.createNoPosTacletApp(noPosTacletApp.taclet(), newInsts,
-                        noPosTacletApp.assumesFormulaInstantiations(), services);
+                        noPosTacletApp.assumesFormulaInstantiations(), services),
+                    "Rebuilt NoPosTacletApp must not be null");
                 appsToBeRemoved = appsToBeRemoved.add(noPosTacletApp);
                 appsToBeAdded = appsToBeAdded.add(newNoPosTacletApp);
             }
@@ -268,7 +272,8 @@ public final class ProgVarReplacer {
      */
     private JTerm replaceProgramVariableInLHSOfElementaryUpdate(JTerm t) {
         final JTerm newTerm = services.getTermBuilder().elementary(
-            map.get(((ElementaryUpdate) t.op()).lhs()),
+            Objects.requireNonNull(map.get(((ElementaryUpdate) t.op()).lhs()),
+                "LHS location variable must be present in the replacement map"),
             standardReplace(t.sub(0)));
         return newTerm;
     }
@@ -280,6 +285,10 @@ public final class ProgVarReplacer {
     public ProgramElement replace(ProgramElement pe) {
         ProgVarReplaceVisitor pvrv = new ProgVarReplaceVisitor(pe, map, false, services);
         pvrv.start();
-        return pvrv.result();
+        ProgramElement result = pvrv.result();
+        if (result == null) {
+            throw new IllegalStateException("Program variable replacement produced no result");
+        }
+        return result;
     }
 }

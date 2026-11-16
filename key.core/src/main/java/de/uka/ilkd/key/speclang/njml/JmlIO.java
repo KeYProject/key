@@ -6,6 +6,7 @@ package de.uka.ilkd.key.speclang.njml;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.Label;
@@ -125,7 +126,8 @@ public class JmlIO {
      */
     public @NonNull Pair<IObserverFunction, JTerm> translateRepresents(
             @NonNull LabeledParserRuleContext clause) {
-        Pair<IObserverFunction, JTerm> p = translateRepresents(clause.first);
+        Pair<IObserverFunction, JTerm> p =
+            translateRepresents(Objects.requireNonNull(clause.first));
         return new Pair<>(p.first, p.second);
     }
 
@@ -151,7 +153,8 @@ public class JmlIO {
     @SuppressWarnings("unchecked")
     public Pair<Label, JTerm> translateLabeledClause(LabeledParserRuleContext parserRuleContext,
             OriginTermLabel.SpecType type) {
-        Pair<Label, JTerm> t = (Pair<Label, JTerm>) interpret(parserRuleContext.first);
+        Pair<Label, JTerm> t =
+            (Pair<Label, JTerm>) interpret(Objects.requireNonNull(parserRuleContext.first));
         return new Pair<>(t.first, attachTermLabel(t.second, type));
     }
 
@@ -171,15 +174,21 @@ public class JmlIO {
     public JTerm parseExpression(PositionedString p) {
         ParserRuleContext ctx = JmlFacade.parseExpr(p);
         SLExpression expr = (SLExpression) interpret(ctx);
-        return expr.getTerm();
+        // The parse result must actually be a term; a pure type without a term is a translation
+        // error that would otherwise surface as a null dereference at the caller.
+        return Objects.requireNonNull(expr.getTerm());
     }
 
     /**
      * Interpret the given parse tree as an JML expression in the current context.
      */
     private Object interpret(ParserRuleContext ctx) {
-        Translator visitor = new Translator(services, specInClass, selfVar, specMathMode, paramVars,
-            resultVar, excVar, atPres, atBefores);
+        // The Translator needs a spec-in class and a spec math mode for resolving the JML
+        // construct; they are part of the mandatory context (see the builder methods).
+        Translator visitor = new Translator(services,
+            Objects.requireNonNull(specInClass, "no spec-in class set"), selfVar,
+            Objects.requireNonNull(specMathMode, "no spec math mode set"), paramVars, resultVar,
+            excVar, atPres, atBefores);
         Object obj = ctx.accept(visitor);
         ImmutableList<PositionedString> newWarnings = ImmutableList.fromList(visitor.getWarnings());
         warnings = warnings.prepend(newWarnings);
@@ -223,7 +232,8 @@ public class JmlIO {
     public JTerm translateTerm(ParserRuleContext expr) {
         Object interpret = interpret(expr);
         if (interpret instanceof SLExpression) {
-            return ((SLExpression) interpret).getTerm();
+            // The expression was parsed as a term; a pure type would be a translation error.
+            return Objects.requireNonNull(((SLExpression) interpret).getTerm());
         } else {
             return (JTerm) interpret;
         }
@@ -250,7 +260,7 @@ public class JmlIO {
      * attached.
      */
     public JTerm translateTerm(LabeledParserRuleContext expr) {
-        JTerm term = translateTerm(expr.first);
+        JTerm term = translateTerm(Objects.requireNonNull(expr.first));
         if (expr.second != null) {
             return services.getTermBuilder().addLabel(term, expr.second);
         } else {
@@ -263,7 +273,7 @@ public class JmlIO {
      * labels {@code type} and in labeled parse tree.
      */
     public JTerm translateTerm(LabeledParserRuleContext expr, OriginTermLabel.SpecType type) {
-        JTerm term = translateTerm(expr.first);
+        JTerm term = translateTerm(Objects.requireNonNull(expr.first));
         OriginTermLabel.Origin origin = new OriginTermLabel.Origin(type);
         if (expr.second != null) {
             return services.getTermBuilder().addLabel(term, expr.second);
@@ -292,7 +302,9 @@ public class JmlIO {
      * @see #translateTerm(LabeledParserRuleContext)
      */
     public JTerm translateTermAsFormula(final LabeledParserRuleContext condition) {
-        JTerm term = services.getTermBuilder().convertToFormula(translateTerm(condition.first));
+        JTerm term =
+            services.getTermBuilder().convertToFormula(translateTerm(Objects.requireNonNull(
+                condition.first)));
         if (condition.second != null) {
             return services.getTermBuilder().addLabel(term, condition.second);
         }
@@ -305,7 +317,8 @@ public class JmlIO {
     public JTerm parseExpression(String input) {
         ParserRuleContext ctx = JmlFacade.parseExpr(input);
         SLExpression expr = (SLExpression) interpret(ctx);
-        return expr.getTerm();
+        // See parseExpression(PositionedString): the result must be a term, not a pure type.
+        return Objects.requireNonNull(expr.getTerm());
     }
 
     /**
@@ -328,7 +341,7 @@ public class JmlIO {
      * label.
      */
     public InfFlowSpec translateInfFlow(LabeledParserRuleContext expr) {
-        return translateInfFlow(expr.first);
+        return translateInfFlow(Objects.requireNonNull(expr.first));
     }
 
     /**
@@ -354,7 +367,7 @@ public class JmlIO {
      * @throws ClassCastException if the {@code ctx} is not suitable
      */
     public TranslatedDependencyContract translateDependencyContract(LabeledParserRuleContext ctx) {
-        return translateDependencyContract(ctx.first);
+        return translateDependencyContract(Objects.requireNonNull(ctx.first));
     }
     // endregion
 

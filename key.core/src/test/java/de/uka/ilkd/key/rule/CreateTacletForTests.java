@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -26,6 +27,7 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,45 +38,47 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class CreateTacletForTests extends AbstractTestTermParser {
     private static final Logger LOGGER = LoggerFactory.getLogger(CreateTacletForTests.class);
-    private Sort nat;
+    // lazily set in setUp(); null until then
+    private @Nullable Sort nat;
 
-    public static AntecTaclet impleft;
-    public static SuccTaclet impright;
-    public static SuccTaclet imprightadd;
-    public static AntecTaclet notleft;
-    public static SuccTaclet notright;
-    public static SuccTaclet close;
-    public static SuccTaclet allright;
-    public static AntecTaclet allleft;
-    public static RewriteTaclet contradiction;
-    public static NoFindTaclet cut;
-    public static RewriteTaclet predsuccelim;
-    public static RewriteTaclet pluszeroelim;
-    public static RewriteTaclet zeropluselim;
-    public static RewriteTaclet succelim;
-    public static RewriteTaclet switchsecondsucc;
-    public static RewriteTaclet switchfirstsucc;
-    public static SuccTaclet closewitheq;
+    // lazily set in createTaclets()/setUp(); null until then
+    public static @Nullable AntecTaclet impleft;
+    public static @Nullable SuccTaclet impright;
+    public static @Nullable SuccTaclet imprightadd;
+    public static @Nullable AntecTaclet notleft;
+    public static @Nullable SuccTaclet notright;
+    public static @Nullable SuccTaclet close;
+    public static @Nullable SuccTaclet allright;
+    public static @Nullable AntecTaclet allleft;
+    public static @Nullable RewriteTaclet contradiction;
+    public static @Nullable NoFindTaclet cut;
+    public static @Nullable RewriteTaclet predsuccelim;
+    public static @Nullable RewriteTaclet pluszeroelim;
+    public static @Nullable RewriteTaclet zeropluselim;
+    public static @Nullable RewriteTaclet succelim;
+    public static @Nullable RewriteTaclet switchsecondsucc;
+    public static @Nullable RewriteTaclet switchfirstsucc;
+    public static @Nullable SuccTaclet closewitheq;
 
-    static Function func_0;
-    static Function func_eq;
-    static Function func_plus;
-    static Function func_min1;
-    static Function func_plus1;
-    static Function func_p; // Sort.FORMULA
+    static @Nullable Function func_0;
+    static @Nullable Function func_eq;
+    static @Nullable Function func_plus;
+    static @Nullable Function func_min1;
+    static @Nullable Function func_plus1;
+    static @Nullable Function func_p; // Sort.FORMULA
 
-    static Sequent seq_test1;
-    static Sequent seq_test2;
-    static Sequent seq_test3;
-    public static Sequent seq_testNat;
-    static Sequent seq_testAll;
+    static @Nullable Sequent seq_test1;
+    static @Nullable Sequent seq_test2;
+    static @Nullable Sequent seq_test3;
+    public static @Nullable Sequent seq_testNat;
+    static @Nullable Sequent seq_testAll;
 
-    static SchemaVariable b;
-    static LogicVariable z;
-    static Sort sort1;
-    static TermFactory tf;
+    static @Nullable SchemaVariable b;
+    static @Nullable LogicVariable z;
+    static @Nullable Sort sort1;
+    static @Nullable TermFactory tf;
 
-    static NamespaceSet nss;
+    static @Nullable NamespaceSet nss;
 
     public final Services services;
 
@@ -111,6 +115,12 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
     public void createNatTaclets() {
         // decls for nat
+        Sort nat = Objects
+                .requireNonNull(this.nat, "the nat sort must have been declared in setUp");
+        TermFactory tf = Objects
+                .requireNonNull(this.tf, "the term factory must have been created");
+        NamespaceSet nss = Objects
+                .requireNonNull(this.nss, "the namespace set must have been created");
         func_0 = new JFunction(new Name("zero"), nat, new Sort[] {});
         func_eq = new JFunction(new Name("="), JavaDLTheory.FORMULA, nat, nat);
         func_plus = new JFunction(new Name("+"), nat, nat, nat);
@@ -239,6 +249,8 @@ public class CreateTacletForTests extends AbstractTestTermParser {
 
     public void setUp() throws IOException {
         nss = new NamespaceSet();
+        TermFactory tf = Objects
+                .requireNonNull(this.tf, "the term factory must have been created");
 
         parseDecls("""
                 \\sorts { Nat; testSort1; }
@@ -249,8 +261,10 @@ public class CreateTacletForTests extends AbstractTestTermParser {
                 }
                 """);
 
-        sort1 = nss.sorts().lookup(new Name("testSort1"));
-        nat = nss.sorts().lookup(new Name("Nat"));
+        sort1 = Objects.requireNonNull(nss.sorts().lookup(new Name("testSort1")),
+            "the testSort1 sort must exist");
+        nat = Objects
+                .requireNonNull(nss.sorts().lookup(new Name("Nat")), "the Nat sort must exist");
 
         b = (SchemaVariable) nss.variables().lookup(new Name("b"));
 
@@ -263,9 +277,11 @@ public class CreateTacletForTests extends AbstractTestTermParser {
         String test1 = "\\predicates {A; B; } (A -> B) -> (!(!(A -> B)))";
         JTerm t_test1 = null;
         try {
-            t_test1 =
-                (JTerm) io.load(test1).loadDeclarations().loadProblem().getProblem().succedent()
-                        .get(0).formula();
+            Sequent problem = Objects
+                    .requireNonNull(
+                        io.load(test1).loadDeclarations().loadProblem().getProblem(),
+                        "the problem must have been parsed");
+            t_test1 = (JTerm) problem.succedent().get(0).formula();
         } catch (Exception e) {
             LOGGER.error("Parser Error or Input Error", e);
             fail("Parser Error");

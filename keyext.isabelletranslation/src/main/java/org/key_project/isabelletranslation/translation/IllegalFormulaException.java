@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.isabelletranslation.translation;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class IllegalFormulaException extends Exception {
     /**
      *

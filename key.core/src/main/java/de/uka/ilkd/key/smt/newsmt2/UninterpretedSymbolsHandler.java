@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -17,6 +18,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
@@ -26,6 +30,7 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
  *
  * According declarations are added.
  */
+@NullMarked
 public class UninterpretedSymbolsHandler implements SMTHandler {
 
     public final static String PREFIX = "u_";
@@ -34,9 +39,10 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
     private boolean enableQuantifiers;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
-        enableQuantifiers = !HandlerUtil.NO_QUANTIFIERS.get(services);
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
+        enableQuantifiers = !Objects.requireNonNull(HandlerUtil.NO_QUANTIFIERS.get(services),
+            "no 'no quantifiers' property");
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * There is one instance of this class per proof, representing the sort "Null". This sort is a
@@ -24,6 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
  * after the NullSort object itself has to be created; and immutability prevents us from filling in
  * this information later.
  */
+@NullMarked
 public final class NullSort extends SortImpl {
 
     public static final Name NAME = new Name("Null");

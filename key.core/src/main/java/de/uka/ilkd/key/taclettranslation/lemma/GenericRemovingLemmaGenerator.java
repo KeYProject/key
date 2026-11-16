@@ -21,6 +21,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Generic removing lemma generator adds the default implementation only that all
  * {@link GenericSort}s are replaced to equally named {@link ProxySort}s.
@@ -31,6 +33,7 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * For every generic sort, precisely one proxy sort is introduced.
  */
+@NullMarked
 public class GenericRemovingLemmaGenerator extends DefaultLemmaGenerator {
     /**
      * The map from generic sorts to proxy sorts.

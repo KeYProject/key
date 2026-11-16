@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +56,7 @@ public class SetStatementTest {
     /**
      * services needed for translation
      */
-    private Services services;
+    private @Nullable Services services;
 
     /**
      * service for JML translation
@@ -64,7 +66,7 @@ public class SetStatementTest {
     /**
      * context information needed for JmlIO/parser
      */
-    private KeYJavaType testClassType;
+    private @Nullable KeYJavaType testClassType;
 
     /**
      * Creates the JavaInfo, Services, and JmlIO.
@@ -72,17 +74,29 @@ public class SetStatementTest {
     @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
-            javaInfo = HelperClassForTests.parse(TEST_FILE).getFirstProof().getJavaInfo();
+            javaInfo = Objects
+                    .requireNonNull(HelperClassForTests.parse(TEST_FILE).getFirstProof(),
+                        "the test file must contain a proof")
+                    .getJavaInfo();
             services = javaInfo.getServices();
             testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
         }
+        // the fields are set above for this instance; the local aliases narrow them to non-null
+        final Services services = Objects.requireNonNull(this.services, "set in setUp");
+        final KeYJavaType testClassType =
+            Objects.requireNonNull(this.testClassType, "set in setUp");
         var selfVar = new LocationVariable(
             new ProgramElementName("self"), new TypeRef(testClassType));
 
         var normalLocal = new LocationVariable(new ProgramElementName("normalLocal"),
-            new TypeRef(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT)));
+            new TypeRef(
+                Objects.requireNonNull(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT),
+                    "the int type must exist")));
         var ghostLocal = new LocationVariable(new ProgramElementName("ghostLocal"),
-            new TypeRef(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT)), true, false);
+            new TypeRef(
+                Objects.requireNonNull(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT),
+                    "the int type must exist")),
+            true, false);
 
         jmlIO = new JmlIO(services)
                 .context(Context.inClass(testClassType, false, services.getTermBuilder()))
@@ -111,8 +125,9 @@ public class SetStatementTest {
             "'" + statement + "' should not produce an error: " + reason);
     }
 
-    private String parseAndCheck(String statementText) {
-        JMLSpecFactory jsf = new JMLSpecFactory(services);
+    private @Nullable String parseAndCheck(String statementText) {
+        JMLSpecFactory jsf =
+            new JMLSpecFactory(Objects.requireNonNull(services, "set in setUp"));
         ImmutableList<TextualJMLConstruct> constructs =
             new de.uka.ilkd.key.speclang.njml.PreParser().parseMethodLevel(statementText, null,
                 Position.newOneBased(1, 1));

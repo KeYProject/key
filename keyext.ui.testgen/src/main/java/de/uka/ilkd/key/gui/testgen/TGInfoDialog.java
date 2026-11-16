@@ -16,6 +16,7 @@ import de.uka.ilkd.key.testgen.smt.testgen.TGPhase;
 import de.uka.ilkd.key.testgen.smt.testgen.TestGenerationLifecycleListener;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ public class TGInfoDialog extends JDialog {
     private final JButton exitButton;
     private final JButton startButton;
 
-    private transient TGWorker worker;
+    private transient @Nullable TGWorker worker;
 
     private final KeyAction actionStop = new KeyAction() {
         {
@@ -70,7 +71,7 @@ public class TGInfoDialog extends JDialog {
 
     private final TestGenerationLifecycleListener logger = new TestGenerationLifecycleListener() {
         @Override
-        public void writeln(Object sender, String message) {
+        public void writeln(Object sender, @Nullable String message) {
             ThreadUtilities.invokeOnEventQueue(() -> textArea.append(message + "\n"));
         }
 
@@ -92,6 +93,12 @@ public class TGInfoDialog extends JDialog {
         }
     };
 
+    /**
+     * The window-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here since members are
+     * initialized above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public TGInfoDialog(Window owner) {
         super(owner);
 

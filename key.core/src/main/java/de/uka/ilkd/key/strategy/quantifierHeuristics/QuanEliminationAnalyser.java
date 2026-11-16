@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -13,6 +15,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class QuanEliminationAnalyser {
 
     /**
@@ -30,7 +35,7 @@ public class QuanEliminationAnalyser {
             return Integer.MAX_VALUE;
         }
 
-        PosInOccurrence quantPIO = matrixPIO.up();
+        PosInOccurrence quantPIO = Objects.requireNonNull(matrixPIO.up());
         Term quantTerm = quantPIO.subTerm();
         final boolean ex;
         if (quantTerm.op() == Quantifier.EX) {
@@ -57,7 +62,7 @@ public class QuanEliminationAnalyser {
             if (quantPIO.isTopLevel()) {
                 return Integer.MAX_VALUE;
             }
-            quantPIO = quantPIO.up();
+            quantPIO = Objects.requireNonNull(quantPIO.up());
             quantTerm = quantPIO.subTerm();
 
             if (quantTerm.op() != (ex ? Quantifier.EX : Quantifier.ALL)) {
@@ -98,7 +103,7 @@ public class QuanEliminationAnalyser {
     private PosInOccurrence walkUpMatrix(
             PosInOccurrence pio) {
         while (!pio.isTopLevel()) {
-            final PosInOccurrence parent = pio.up();
+            final PosInOccurrence parent = Objects.requireNonNull(pio.up());
             final var parentOp = parent.subTerm().op();
             if (parentOp != Junctor.AND && parentOp != Junctor.OR) {
                 return pio;

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -12,6 +14,8 @@ import de.uka.ilkd.key.util.properties.Properties.Property;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Counts how often a rule has already been applied on the branch leading to a goal, and admits a
@@ -25,6 +29,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
  * pilot prune heavily.
  * </p>
  */
+@NullMarked
 public final class BranchMultiplicationCountFeature extends BinaryTacletAppFeature {
 
     /**
@@ -93,7 +98,7 @@ public final class BranchMultiplicationCountFeature extends BinaryTacletAppFeatu
         }
         // Reaching the root without meeting the remembered node means the count cannot be built on
         // it, and the walk has already counted the whole branch.
-        final int total = (walk == null ? 0 : known.count()) + since;
+        final int total = (walk == null ? 0 : Objects.requireNonNull(known).count()) + since;
 
         goal.addStrategyInfo(COUNT_ON_BRANCH, new BranchCount(node.serialNr(), total),
             strategyInfos -> strategyInfos.put(COUNT_ON_BRANCH, known));

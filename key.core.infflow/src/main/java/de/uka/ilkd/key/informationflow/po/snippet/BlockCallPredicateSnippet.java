@@ -9,6 +9,9 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Generate term "self != null".
@@ -16,15 +19,18 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author christoph
  */
+@NullMarked
 class BlockCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
 
     @Override
-    String generatePredicateName(IProgramMethod pm, StatementBlock block,
-            LoopSpecification loopInv) {
+    String generatePredicateName(@Nullable IProgramMethod pm, @Nullable StatementBlock block,
+            @Nullable LoopSpecification loopInv) {
+        final StatementBlock targetBlock = requireBlock(block);
+        final IProgramMethod method = requirePm(pm);
         final String nameString =
             MiscTools
                     .toValidTacletName("RELATED_BY_BLOCK_" + "at_line_"
-                        + block.getStartPosition().line() + "_in_" + pm.getUniqueName())
+                        + targetBlock.getStartPosition().line() + "_in_" + method.getUniqueName())
                     .toString();
         return nameString;
     }

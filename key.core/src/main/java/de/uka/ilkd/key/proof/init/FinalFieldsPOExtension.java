@@ -18,6 +18,8 @@ import de.uka.ilkd.key.logic.op.*;
 import org.key_project.logic.Choice;
 import org.key_project.logic.op.Function;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is responsible for making the immutable treatment of final fields possible also for
  * constructors.
@@ -38,6 +40,7 @@ import org.key_project.logic.op.Function;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class FinalFieldsPOExtension implements POExtension {
 
     private static final Choice FINAL_IMMUTABLE_CHOICE = new Choice("finalFields", "immutable");
@@ -86,6 +89,13 @@ public class FinalFieldsPOExtension implements POExtension {
         return postTerm;
     }
 
+    /**
+     * The constructor's container type exists whenever a proper method declaration is present, and
+     * the heap LDT is always registered in the {@link Services} of a fully initialized KeY
+     * environment (see {@link de.uka.ilkd.key.java.TypeConverter#getHeapLDT()}); the dereferences
+     * are suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private List<Function> findFinalFields(IProgramMethod iconstructor, Services services) {
         Type type = iconstructor.getContainerType().getJavaType();
         assert type instanceof ClassType

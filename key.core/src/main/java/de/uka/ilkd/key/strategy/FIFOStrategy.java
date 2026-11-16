@@ -17,11 +17,14 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp.
  */
+@NullMarked
 public class FIFOStrategy implements Strategy<Goal> {
 
     private static final Name NAME = new Name("FIFO");
@@ -81,7 +84,7 @@ public class FIFOStrategy implements Strategy<Goal> {
         }
 
         @Override
-        public StrategySettingsDefinition getSettingsDefinition() {
+        public @Nullable StrategySettingsDefinition getSettingsDefinition() {
             return null;
         }
     }

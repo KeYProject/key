@@ -14,22 +14,24 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public class UninstantiatedGenericSortCollector extends TacletSchemaVariableCollector {
     /** collects all found variables */
-    protected @NonNull Set<GenericSort> sortList = new HashSet<>();
+    protected Set<GenericSort> sortList = new HashSet<>();
 
     /**
      * @param svInsts the SVInstantiations that have been already found (needed by unwind loop
      *        constructs to determine which labels are needed)
      */
-    public UninstantiatedGenericSortCollector(@NonNull SVInstantiations svInsts) {
+    public UninstantiatedGenericSortCollector(SVInstantiations svInsts) {
         super(svInsts);
     }
 
     @Override
-    public void visit(@NonNull Term p_visited) {
+    public void visit(Term p_visited) {
         visit(p_visited.sort());
         for (var t : p_visited.subs()) {
             visit(t);

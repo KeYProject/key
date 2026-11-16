@@ -34,7 +34,9 @@ import bibliothek.gui.dock.common.intern.action.CDecorateableAction;
 import bibliothek.gui.dock.control.focus.DefaultFocusRequest;
 import bibliothek.gui.dock.control.focus.FocusRequest;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class DockingHelper {
     public final static List<String> LEFT_TOP_PANEL = new LinkedList<>();
     public final static List<String> RIGHT_PANEL = new LinkedList<>();
@@ -125,7 +127,14 @@ public class DockingHelper {
      *
      * @param mainWindow main window
      * @param panel class name of the panel to show
+     *
+     *        <p>
+     *        A {@code null} focus component requests the docking framework to focus the dockable
+     *        without selecting a specific child component; the deliberate {@code null} for the
+     *        non-null parameter of the framework's {@link DefaultFocusRequest} is suppressed with
+     *        a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static void focus(MainWindow mainWindow, Class<?> panel) {
         SingleCDockable dockable = mainWindow.getDockControl().getSingleDockable(panel.getName());
         if (dockable == null) {
@@ -156,7 +165,6 @@ public class DockingHelper {
         }
     }
 
-
     /**
      * Constructs a dockable for the given component.
      *
@@ -174,9 +182,17 @@ public class DockingHelper {
     }
 
     /**
-     * @param p
-     * @return
+     * Creates a dockable for the given tab panel.
+     *
+     * @param p the tab panel to wrap
+     * @return a new single dockable
+     *
+     *         <p>
+     *         {@link TabPanel#getIcon()} and {@link TabPanel#getPermissions()} are optional and
+     *         default to {@code null}; the docking framework treats these deliberately {@code null}
+     *         values as "absent" at runtime, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public static SingleCDockable createSingleDock(TabPanel p) {
         Stream<CAction> actions = p.getTitleActions().stream().map(DockingHelper::translateAction);
         CAction[] a = Stream.concat(actions, p.getTitleCActions().stream()).toArray(CAction[]::new);

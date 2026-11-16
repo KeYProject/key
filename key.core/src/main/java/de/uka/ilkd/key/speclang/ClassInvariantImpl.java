@@ -23,10 +23,13 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import org.key_project.logic.op.Operator;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Standard implementation of the ClassInvariant interface.
  */
+@NullMarked
 public final class ClassInvariantImpl implements ClassInvariant {
 
     /**
@@ -52,7 +55,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     /**
      * The original self variable of the receiver object.
      */
-    private final LocationVariable originalSelfVar;
+    private final @Nullable LocationVariable originalSelfVar;
     /**
      * Whether the class invariant is a static (i.e., &lt;$inv&gt;) or an instance invariant (i.e.,
      * &lt;inv&gt;).
@@ -79,7 +82,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param selfVar the variable used for the receiver object
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            ModifierKind visibility, JTerm inv, LocationVariable selfVar) {
+            @Nullable ModifierKind visibility, JTerm inv, @Nullable LocationVariable selfVar) {
         this(name, displayName, kjt, visibility, inv, selfVar, false);
     }
 
@@ -96,7 +99,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
      * @param free whether this contract is free.
      */
     public ClassInvariantImpl(String name, String displayName, KeYJavaType kjt,
-            ModifierKind visibility, JTerm inv, LocationVariable selfVar,
+            @Nullable ModifierKind visibility, JTerm inv, @Nullable LocationVariable selfVar,
             boolean free) {
 
         this.name = Objects.requireNonNull(name);
@@ -124,7 +127,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
     // internal methods
     // -------------------------------------------------------------------------
 
-    private Map<Operator, Operator> getReplaceMap(JAbstractSortedOperator selfVar,
+    private Map<Operator, Operator> getReplaceMap(@Nullable JAbstractSortedOperator selfVar,
             TermServices services) {
         Map<Operator, Operator> result = new LinkedHashMap<>();
 
@@ -167,7 +170,7 @@ public final class ClassInvariantImpl implements ClassInvariant {
 
 
     @Override
-    public JTerm getInv(JAbstractSortedOperator selfVar, TermServices services) {
+    public JTerm getInv(@Nullable JAbstractSortedOperator selfVar, TermServices services) {
         final Map<Operator, Operator> replaceMap = getReplaceMap(selfVar, services);
         final OpReplacer or = new OpReplacer(replaceMap, services.getTermFactory());
         JTerm res = or.replace(originalInv);

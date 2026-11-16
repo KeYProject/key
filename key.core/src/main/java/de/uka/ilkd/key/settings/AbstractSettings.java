@@ -8,11 +8,19 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * @author Alexander Weigl
  * @version 1 (1/30/22)
  */
+@NullMarked
 public abstract class AbstractSettings implements Settings {
+    /// The receiver is passed to the JDK {@code PropertyChangeSupport} constructor while the
+    /// enclosing object is still under initialization; the JDK class is outside our annotated
+    /// sources, so the resulting (under-initialization) value is suppressed with a scoped key.
+    @SuppressWarnings("nullness:assignment.type.incompatible")
     protected final PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     @Override
@@ -44,7 +52,8 @@ public abstract class AbstractSettings implements Settings {
         return changeSupport.getPropertyChangeListeners(propertyName);
     }
 
-    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+    protected void firePropertyChange(String propertyName, @Nullable Object oldValue,
+            @Nullable Object newValue) {
         changeSupport.firePropertyChange(propertyName, oldValue, newValue);
     }
 

@@ -6,15 +6,20 @@ package de.uka.ilkd.key.smt;
 
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Translates a number into a string representation.
  */
+@NullMarked
 public final class NumberTranslation {
 
     private NumberTranslation() {}
@@ -25,7 +30,7 @@ public final class NumberTranslation {
      * @param term term with sort "numbers"
      * @return An instance of BigInteger representing the number
      */
-    public static BigInteger translate(Term term) {
+    public static @Nullable BigInteger translate(Term term) {
         if (!term.sort().name().toString().trim().equals("numbers")) {
             throw new IllegalArgumentException(
                 "Only terms with sort \"numbers\" may be translated.\n" + "Term " + term
@@ -37,7 +42,8 @@ public final class NumberTranslation {
             char ch = name.charAt(0);
             if (ch >= '0' && ch <= '9') {
                 Debug.assertTrue(term.arity() == 1);
-                return translate(term.sub(0)).multiply(smallInts[10]).add(smallInts[ch - '0']);
+                return Objects.requireNonNull(translate(term.sub(0)), "number")
+                        .multiply(smallInts[10]).add(smallInts[ch - '0']);
             } else if (ch == '#') {
                 Debug.assertTrue(term.arity() == 0);
                 return BigInteger.ZERO;
@@ -50,7 +56,7 @@ public final class NumberTranslation {
             /*
              * Hint: translate operator "neg" at all places correctly, e.g. neg(1(neg(1(#)))).
              */
-            return translate(term.sub(0)).negate();
+            return Objects.requireNonNull(translate(term.sub(0)), "number").negate();
         } else {
             Debug.fail("unknown number literal");
             return null; // not reached

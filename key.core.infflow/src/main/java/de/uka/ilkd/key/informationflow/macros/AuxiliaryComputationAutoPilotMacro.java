@@ -10,11 +10,14 @@ import de.uka.ilkd.key.macros.SequentialOnLastGoalProofMacro;
 import de.uka.ilkd.key.macros.SequentialProofMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  *
  * @author christoph scheben
  */
+@NullMarked
 public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
 
     @Override
@@ -48,6 +51,7 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
             public String getName() { return ""; }
 
             @Override
+            @SuppressWarnings("NullAway") // uncategorized macro: null is deliberate
             public String getCategory() { return null; }
 
             @Override
@@ -69,6 +73,7 @@ public class AuxiliaryComputationAutoPilotMacro extends ExhaustiveProofMacro {
                     public String getName() { return ""; }
 
                     @Override
+                    @SuppressWarnings("NullAway") // uncategorized macro: null is deliberate
                     public String getCategory() { return null; }
 
                     @Override

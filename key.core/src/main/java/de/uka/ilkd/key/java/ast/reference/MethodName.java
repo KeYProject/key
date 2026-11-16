@@ -7,9 +7,12 @@ package de.uka.ilkd.key.java.ast.reference;
 
 import de.uka.ilkd.key.java.ast.TerminalProgramElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Method name.
  */
+@NullMarked
 public interface MethodName extends TerminalProgramElement {
 
 

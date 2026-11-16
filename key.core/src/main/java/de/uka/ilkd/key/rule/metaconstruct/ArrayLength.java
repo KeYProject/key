@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -12,7 +14,10 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 @TransformerMeta(name = "#lengthReference")
+@NullMarked
 public class ArrayLength extends ProgramTransformer {
 
     /**
@@ -29,7 +34,8 @@ public class ArrayLength extends ProgramTransformer {
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations insts) {
         return new ProgramElement[] { KeYJavaASTFactory.fieldReference(services, "length",
-            (Expression) pe, insts.getExecutionContext()) };
+            (Expression) pe, Objects.requireNonNull(insts.getExecutionContext(),
+                "no execution context for array length")) };
     }
 
     @Override

@@ -14,6 +14,9 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A proof macro that attempts to automatically close provable side branch goals.
  * <p>
@@ -39,6 +42,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @see TryCloseMacro
  */
+@NullMarked
 public class TryCloseSideBranchesMacro extends TryCloseMacro {
 
     /**
@@ -80,13 +84,20 @@ public class TryCloseSideBranchesMacro extends TryCloseMacro {
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic,
             Proof proof,
             ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc,
-            ProverTaskListener listener) throws InterruptedException {
+            @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener) throws InterruptedException {
         ImmutableList<Goal> sideGoals = goals.filter(TryCloseSideBranchesMacro::isSideGoal);
 
         return super.applyTo(uic, proof, sideGoals, posInOcc, listener);
     }
 
+    /**
+     * Whether the given goal is a side goal of a branch that can be closed.
+     * <p>
+     * The branch label of a side goal is present when the goal came from symbolic execution; the
+     * dereference of the (nullable) label is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private static boolean isSideGoal(Goal g) {
         Node node = g.node();
         while (node != null && node.getNodeInfo() != null

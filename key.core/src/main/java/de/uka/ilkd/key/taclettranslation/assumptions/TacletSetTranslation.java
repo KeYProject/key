@@ -10,11 +10,15 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This interface provides the mechanism of translating taclets to formulae. The resulting formulae
  * can be used for example for building assumptions for external proofers. CAUTION: The correctness
  * of a single formula, i.d. the universal validity, depends on the particular taclet.
  */
+@NullMarked
 public interface TacletSetTranslation {
 
 
@@ -27,7 +31,7 @@ public interface TacletSetTranslation {
      * @return returns the resulting formulae of the taclets. Each formula of the resulting set is
      *         associated with one taclet.
      */
-    ImmutableList<TacletFormula> getTranslation(ImmutableSet<Sort> sorts);
+    ImmutableList<TacletFormula> getTranslation(@Nullable ImmutableSet<Sort> sorts);
 
     /**
      * Returns all taclet that have not been translated. The reason can be got by

@@ -23,11 +23,14 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * creates a method declaration with no implementation. The methods intention is
  * to allocate a new object of the type it is declared in and to return it.
  * The functionality will be described using taclets
  */
+@NullMarked
 public class InstanceAllocationMethodBuilder extends JavaTransformerAbstract {
 
     public InstanceAllocationMethodBuilder(TransformationPipelineServices services) {

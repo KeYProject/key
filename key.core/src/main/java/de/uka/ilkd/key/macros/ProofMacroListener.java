@@ -10,6 +10,9 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Listener for the application of proof macros (which may be run in a separate worker thread). They
  * work in a mutual way by also storing a reference to the superordinate listener on the level
@@ -20,12 +23,13 @@ import org.key_project.prover.engine.TaskStartedInfo;
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class ProofMacroListener implements ProverTaskListener {
     private int numOfInvokedMacros;
-    private final ProverTaskListener superordinateListener;
+    private final @Nullable ProverTaskListener superordinateListener;
     private final String macroName;
 
-    public ProofMacroListener(String macroName, ProverTaskListener listener) {
+    public ProofMacroListener(String macroName, @Nullable ProverTaskListener listener) {
         this.macroName = macroName;
         this.numOfInvokedMacros = 0;
         this.superordinateListener = listener;

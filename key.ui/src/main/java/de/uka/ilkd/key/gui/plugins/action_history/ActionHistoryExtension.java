@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.WeakHashMap;
 import javax.swing.*;
@@ -25,12 +26,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
 import de.uka.ilkd.key.proof.event.ProofDisposedListener;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Entry point for the Action History functionality.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ActionHistoryExtension implements UserActionListener,
         ProofDisposedListener, KeYSelectionListener {
     /**
@@ -45,9 +49,23 @@ public class ActionHistoryExtension implements UserActionListener,
 
     /**
      * The undo button contained in the main toolbar.
+     *
+     * <p>
+     * The button is only created in
+     * {@link #ActionHistoryExtension(MainWindow, KeYMediator)}, so the {@code null} initializer
+     * is deliberate; every read happens after construction, suppressed with a scoped key.
      */
-    private UndoHistoryButton undoButton = null;
-    private JButton undoUptoButton = null;
+    @SuppressWarnings("nullness:assignment.type.incompatible")
+    private @Nullable UndoHistoryButton undoButton = null;
+    /**
+     * The selection button of {@link #undoButton}.
+     *
+     * <p>
+     * Assigned right after {@link #undoButton} in the constructor; the {@code null} initializer
+     * is deliberate, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:assignment.type.incompatible")
+    private @Nullable JButton undoUptoButton = null;
     /**
      * Proofs this extension is monitoring for changes.
      */
@@ -55,10 +73,14 @@ public class ActionHistoryExtension implements UserActionListener,
     /**
      * The currently shown proof.
      */
-    private Proof currentProof = null;
+    private @Nullable Proof currentProof = null;
 
     private List<UserAction> getActions() {
-        List<UserAction> actions = userActions.get(currentProof);
+        Proof proof = currentProof;
+        if (proof == null) {
+            return List.of();
+        }
+        List<UserAction> actions = userActions.get(proof);
         if (actions == null) {
             return List.of();
         }
@@ -74,6 +96,10 @@ public class ActionHistoryExtension implements UserActionListener,
 
     private void undoOneAction(UserAction userAction) {
         List<UserAction> allActions = userActions.get(userAction.getProof());
+        if (allActions == null) {
+            // the action that is undone was always recorded before being invoked
+            throw new NullPointerException("No recorded actions for the proof.");
+        }
         assert !allActions.isEmpty();
         assert allActions.get(allActions.size() - 1) == userAction;
         allActions.remove(allActions.size() - 1);
@@ -88,6 +114,10 @@ public class ActionHistoryExtension implements UserActionListener,
      */
     private void undoUptoAction(UserAction userAction) {
         List<UserAction> allActions = userActions.get(userAction.getProof());
+        if (allActions == null) {
+            // the action that is undone was always recorded before being invoked
+            throw new NullPointerException("No recorded actions for the proof.");
+        }
         int idx = allActions.indexOf(userAction);
         for (int i = allActions.size() - 1; i >= idx; i--) {
             allActions.get(i).undo();
@@ -95,17 +125,30 @@ public class ActionHistoryExtension implements UserActionListener,
         }
     }
 
+    /**
+     * Creates the extension and registers it with the mediator.
+     *
+     * <p>
+     * The registration calls and the button configuration bind {@code this} while the receiver
+     * is still under initialization (EISOP initialization check); the listeners only fire after
+     * construction completes, and the buttons are only used through the toolbar afterwards,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:argument.type.incompatible",
+        "nullness:methodref.receiver.bound.invalid" })
     public ActionHistoryExtension(MainWindow window, KeYMediator mediator) {
         mediator.addUserActionListener(this);
         mediator.addKeYSelectionListener(this);
         new StateChangeListener(mediator);
-        undoButton =
+        UndoHistoryButton button =
             new UndoHistoryButton(window, MainWindow.TOOLBAR_ICON_SIZE, UNDO, "Undo ",
                 this::undoOneAction, this::undoUptoAction, this::getActions);
-        undoUptoButton = undoButton.getSelectionButton();
-        undoUptoButton.setToolTipText(
+        undoButton = button;
+        JButton uptoButton = button.getSelectionButton();
+        undoUptoButton = uptoButton;
+        uptoButton.setToolTipText(
             "Select an action to undo, including all actions performed afterwards");
-        undoButton.refreshState();
+        button.refreshState();
     }
 
     @Override
@@ -114,7 +157,8 @@ public class ActionHistoryExtension implements UserActionListener,
             userActions.computeIfAbsent(action.getProof(), x -> new ArrayList<>());
         userActionList.add(action);
         currentProof = action.getProof();
-        undoButton.refreshState();
+        Objects.requireNonNull(undoButton, "the undo button is created in the constructor")
+                .refreshState();
     }
 
     @Override
@@ -129,7 +173,8 @@ public class ActionHistoryExtension implements UserActionListener,
 
     @Override
     public void proofDisposed(ProofDisposedEvent e) {
-        undoButton.refreshState();
+        Objects.requireNonNull(undoButton, "the undo button is created in the constructor")
+                .refreshState();
     }
 
     @Override
@@ -149,10 +194,10 @@ public class ActionHistoryExtension implements UserActionListener,
     }
 
     public JButton getUndoUptoButton() {
-        return undoUptoButton;
+        return Objects.requireNonNull(undoUptoButton, "the button is created in the constructor");
     }
 
     public UndoHistoryButton getUndoButton() {
-        return undoButton;
+        return Objects.requireNonNull(undoButton, "the button is created in the constructor");
     }
 }

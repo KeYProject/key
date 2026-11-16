@@ -15,6 +15,8 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.theory.TheoryReasoning;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Equality reasoning over the ground equalities assumed on a sequent, used by the quantifier
  * instantiation cost prediction. The two sides of every assumed equality are merged into a class,
@@ -33,6 +35,7 @@ import org.key_project.util.collection.ImmutableSet;
  * predictions of all candidate instantiations of the quantified formula, so the union-find is
  * built once rather than once per candidate.
  */
+@NullMarked
 final class Congruence {
 
     /** Union-find parent map over the terms merged by the assumed equalities. */

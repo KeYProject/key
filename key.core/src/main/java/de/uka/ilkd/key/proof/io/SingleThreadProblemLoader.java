@@ -12,11 +12,14 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This single threaded problem loader is used by the Eclipse integration of KeY.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class SingleThreadProblemLoader extends AbstractProblemLoader {
     /**
      * Constructor.

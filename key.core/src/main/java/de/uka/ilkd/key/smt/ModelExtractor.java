@@ -15,11 +15,15 @@ import de.uka.ilkd.key.smt.model.*;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Represents a query directed to towards the z3 solver.
  *
  * @author mihai
  */
+@NullMarked
 interface Query {
     String SELECT_ID = "select_";
 
@@ -36,12 +40,14 @@ interface Query {
     /**
      * Returns the stored result.
      */
+    @Nullable
     String getResult();
 }
 
 
+@NullMarked
 abstract class AbstractQuery implements Query {
-    protected String result;
+    protected @Nullable String result;
 
     protected AbstractQuery() {
         super();
@@ -52,7 +58,7 @@ abstract class AbstractQuery implements Query {
     /**
      * @return the result
      */
-    public String getResult() {
+    public @Nullable String getResult() {
         return result;
     }
 
@@ -82,6 +88,7 @@ abstract class AbstractQuery implements Query {
  *
  * @author mihai
  */
+@NullMarked
 class ConstantQuery extends AbstractQuery {
     public ConstantQuery(String constantID) {
         super();
@@ -119,6 +126,7 @@ class ConstantQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class SeqFieldQuery extends AbstractQuery {
     private final Sequence seqID;
 
@@ -176,6 +184,7 @@ class SeqFieldQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class ArrayFieldQuery extends AbstractQuery {
     private final String heapID;
     private final String objectID;
@@ -230,6 +239,7 @@ class ArrayFieldQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class FieldQuery extends AbstractQuery {
 
     private final String heapID;
@@ -289,6 +299,7 @@ class FieldQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class LocSetQuery extends AbstractQuery {
 
 
@@ -343,6 +354,7 @@ class LocSetQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class SeqLengthQuery extends AbstractQuery {
 
     private final String seqID;
@@ -401,6 +413,7 @@ class SeqLengthQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class ObjectLengthQuery extends AbstractQuery {
 
     private final String objectID;
@@ -461,6 +474,7 @@ class ObjectLengthQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class FunValueQuery extends AbstractQuery {
 
     private final String objectId;
@@ -520,6 +534,7 @@ class FunValueQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class ExactInstanceQuery extends AbstractQuery {
     private final String objectId;
     private final Sort sort;
@@ -578,6 +593,7 @@ class ExactInstanceQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 class ObjectTypeQuery extends AbstractQuery {
 
     private final String objectId;
@@ -634,6 +650,7 @@ class ObjectTypeQuery extends AbstractQuery {
  *
  * @author mihai
  */
+@NullMarked
 public class ModelExtractor {
 
     public static final int DEFAULT = 0;
@@ -658,14 +675,21 @@ public class ModelExtractor {
     private final List<SMTFunction> seqs;
     private final Map<String, SMTSort> objFunctions;
 
-    private ProblemTypeInformation types;
+    private @Nullable ProblemTypeInformation types;
     private final Map<String, Sort> objectSorts;
 
-    private List<Query> queries;
+    private List<Query> queries = new LinkedList<>();
     private int currentQuery;
     private int intBound;
 
 
+    /**
+     * {@link SMTFunction#getDomainSorts()} and {@link SMTFunction#getImageSort()} are declared
+     * nullable, but every function registered here stems from a well-formed SMT2 declaration in
+     * which the domain and image sorts are always present; the dereferences are suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void addFunction(SMTFunction f) {
         if (f.getDomainSorts().isEmpty()) {
             switch (f.getImageSort().getId()) {
@@ -685,7 +709,8 @@ public class ModelExtractor {
             if (s1.getId().equals(SMTObjTranslator.HEAP_SORT)
                     && s2.getId().equals(SMTObjTranslator.OBJECT_SORT)) {
 
-                objFunctions.put(f.getId(), f.getImageSort());
+                objFunctions.put(Objects.requireNonNull(f.getId()),
+                    Objects.requireNonNull(f.getImageSort()));
 
 
             }
@@ -699,6 +724,11 @@ public class ModelExtractor {
         return model;
     }
 
+    /**
+     * {@code types} is set via {@link #setTypes(ProblemTypeInformation)} prior to any query
+     * generation; the dereference of this nullable field is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void generateTypeQueries() {
         queries = new LinkedList<>();
         currentQuery = 0;
@@ -712,6 +742,11 @@ public class ModelExtractor {
     }
 
 
+    /**
+     * {@code types} is set via {@link #setTypes(ProblemTypeInformation)} prior to any query
+     * generation; the dereference of this nullable field is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void generateBasicQueries() {
         queries = new LinkedList<>();
         currentQuery = 0;
@@ -727,7 +762,7 @@ public class ModelExtractor {
         constants.addAll(seqs);
 
         for (SMTFunction f : constants) {
-            String constantID = f.getId();
+            String constantID = Objects.requireNonNull(f.getId());
             ConstantQuery q = new ConstantQuery(constantID);
             queries.add(q);
         }
@@ -735,7 +770,7 @@ public class ModelExtractor {
         // generate heap queries
 
         for (SMTFunction h : heaps) {
-            String heapID = h.getId();
+            String heapID = Objects.requireNonNull(h.getId());
 
 
             for (String objectID : getAllIDs((int) types.getSettings().getObjectBound())) {
@@ -749,7 +784,7 @@ public class ModelExtractor {
 
                 // generate the named fields queries
                 for (SMTFunction f : fields) {
-                    String fieldID = f.getId();
+                    String fieldID = Objects.requireNonNull(f.getId());
 
                     Sort s = objectSorts.get(objectID);
                     Set<String> fields;
@@ -808,7 +843,7 @@ public class ModelExtractor {
                 }
 
                 for (SMTFunction f : fields) {
-                    String fieldID = f.getId();
+                    String fieldID = Objects.requireNonNull(f.getId());
                     Query q = new LocSetQuery(locSetID, objectID, fieldID);
                     queries.add(q);
                 }
@@ -844,11 +879,12 @@ public class ModelExtractor {
 
         for (Heap h : model.getHeaps()) {
             for (ObjectVal ov : h.getObjects()) {
-                if (ov.getSort() == null) {
+                final Sort sort = ov.getSort();
+                if (sort == null) {
                     continue;
                 }
 
-                String sortName = ov.getSort().name().toString();
+                String sortName = sort.name().toString();
                 if (!sortName.endsWith("[]")) {
                     continue;
                 }
@@ -861,6 +897,11 @@ public class ModelExtractor {
         }
     }
 
+    /**
+     * {@code types} is set via {@link #setTypes(ProblemTypeInformation)} prior to any query
+     * generation; the dereference of this nullable field is suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void generateSeqQueries() {
         queries = new LinkedList<>();
         currentQuery = 0;
@@ -925,7 +966,7 @@ public class ModelExtractor {
 
     }
 
-    public ProblemTypeInformation getTypes() {
+    public @Nullable ProblemTypeInformation getTypes() {
         return types;
     }
 
@@ -969,14 +1010,20 @@ public class ModelExtractor {
     }
 
 
+    /**
+     * The revived {@code types} and the query results delivered by the SMT solver are guaranteed
+     * to be present at the time this method runs (see {@link #setTypes(ProblemTypeInformation)}
+     * and the query-answer protocol); the dereferences are suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void processBasicQueries() {
-        model.setTypes(types);
+        model.setTypes(Objects.requireNonNull(types));
 
 
         for (Query q : queries) {
 
             if (q instanceof ConstantQuery cq) {
-                model.addConstant(cq.getConstantID(), cq.getResult());
+                model.addConstant(cq.getConstantID(), Objects.requireNonNull(cq.getResult()));
             } else if (q instanceof FieldQuery fq) {
 
                 String heapID = fq.getHeapID();
@@ -984,7 +1031,7 @@ public class ModelExtractor {
 
 
                 String fieldID = fq.getFieldID();
-                String value = fq.getResult();
+                String value = Objects.requireNonNull(fq.getResult());
 
                 List<Heap> heaps = model.getHeaps();
 
@@ -1031,7 +1078,7 @@ public class ModelExtractor {
             } else if (q instanceof ObjectLengthQuery oq) {
                 String objectID = oq.getObjectID();
 
-                int result = Integer.parseInt(oq.getResult());
+                int result = Integer.parseInt(Objects.requireNonNull(oq.getResult()));
 
                 long intBound = (long) Math.pow(2, types.getSettings().getIntBound());
 
@@ -1055,7 +1102,7 @@ public class ModelExtractor {
                 String seqId = sq.getSeqID();
 
 
-                int result = Integer.parseInt(sq.getResult());
+                int result = Integer.parseInt(Objects.requireNonNull(sq.getResult()));
 
                 long intBound = (long) Math.pow(2, types.getSettings().getIntBound());
 
@@ -1073,7 +1120,7 @@ public class ModelExtractor {
                 String heapID = iq.getHeapID();
                 String objectID = iq.getObjectID();
                 String fun = iq.getFunctionID();
-                String result = iq.getResult();
+                String result = Objects.requireNonNull(iq.getResult());
 
                 List<Heap> heaps = model.getHeaps();
 
@@ -1102,7 +1149,7 @@ public class ModelExtractor {
                     result = model.processConstantValue(result, sort);
                 }
 
-                ov.putFunValue(fun, result);
+                ov.putFunValue(fun, Objects.requireNonNull(result));
 
 
             } else if (q instanceof ExactInstanceQuery eq) {
@@ -1230,6 +1277,12 @@ public class ModelExtractor {
     }
 
 
+    /**
+     * The query answers delivered by the SMT solver are guaranteed to be present when this method
+     * runs (see the query-answer protocol); the dereference of the possibly-null query result is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void processTypesQueries() {
         for (Query q : queries) {
             if (q instanceof ObjectTypeQuery oq) {
@@ -1272,7 +1325,7 @@ public class ModelExtractor {
 
                 String heapID = aq.getHeapID();
                 String objectID = aq.getObjectID();
-                String result = aq.getResult();
+                String result = Objects.requireNonNull(aq.getResult());
                 Heap heap = new Heap(heapID);
                 Heap h = model.getHeaps().get(model.getHeaps().indexOf(heap));
 

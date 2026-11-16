@@ -14,8 +14,10 @@ import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public record BuildingIssue(String message, @Nullable Throwable cause, boolean isWarning,
         Position position, @Nullable String sourceName) {
 
@@ -62,7 +64,14 @@ public record BuildingIssue(String message, @Nullable Throwable cause, boolean i
                 uri = null;
             }
         }
-        return new Location(uri, position);
+        // A source may not resolve to a file URI (e.g. "memory:/" Java block fragments), but the
+        // position must be preserved: error mapping and highlighting anchor on the position, not
+        // on the file. Location's fileUri component is declared non-null but tolerates null at
+        // runtime (see the suppressions on UNDEFINED and fromToken); main constructs the location
+        // with a null file directly.
+        @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+        Location result = new Location(uri, position);
+        return result;
     }
 
     public PositionedString asPositionedString() {

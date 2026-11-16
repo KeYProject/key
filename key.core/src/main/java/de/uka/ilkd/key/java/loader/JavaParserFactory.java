@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.Services;
@@ -95,6 +96,14 @@ public class JavaParserFactory {
         typeSolver.lazyRebuild();
     }
 
+    /**
+     * Returns the parser configuration of this factory, creating and configuring it on first use.
+     * <p>
+     * The configuration field is set in the guarded block below; the flow analysis cannot see
+     * through the field assignment, hence the dereference of the (nullable) configuration is
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     private ParserConfiguration getConfiguration() {
         if (config == null) {
             config = new ParserConfiguration();
@@ -189,8 +198,8 @@ public class JavaParserFactory {
      * @author Alexander Weigl
      */
     private class DynamicTypeSolver implements TypeSolver {
-        private TypeSolver delegate;
-        private TypeSolver parent;
+        private @Nullable TypeSolver delegate;
+        private @Nullable TypeSolver parent;
 
         /**
          * rebuilds the type solver.
@@ -204,8 +213,13 @@ public class JavaParserFactory {
             delegate = ct;
         }
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
-        public TypeSolver getParent() {
+        public @Nullable TypeSolver getParent() {
             return parent;
         }
 
@@ -223,7 +237,7 @@ public class JavaParserFactory {
             if (delegate == null) {
                 rebuild();
             }
-            return delegate.tryToSolveType(name);
+            return Objects.requireNonNull(delegate, "delegated type solver").tryToSolveType(name);
         }
 
         @Override
@@ -232,12 +246,13 @@ public class JavaParserFactory {
             if (delegate == null) {
                 rebuild();
             }
-            return delegate.tryToSolveTypeInModule(qualifiedModuleName, simpleTypeName);
+            return Objects.requireNonNull(delegate, "delegated type solver")
+                    .tryToSolveTypeInModule(qualifiedModuleName, simpleTypeName);
         }
     }
 
     private static class ListTypeSolver implements TypeSolver {
-        private TypeSolver parent;
+        private @Nullable TypeSolver parent;
         private final Collection<CompilationUnit> units;
 
         private final Cache<String, SymbolReference<ResolvedReferenceTypeDeclaration>> foundTypes =
@@ -249,8 +264,13 @@ public class JavaParserFactory {
             this.units = units;
         }
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
-        public TypeSolver getParent() {
+        public @Nullable TypeSolver getParent() {
             return parent;
         }
 
@@ -320,10 +340,15 @@ public class JavaParserFactory {
 
     private class LogicalTypeSolver implements TypeSolver {
 
-        private TypeSolver parent;
+        private @Nullable TypeSolver parent;
 
+        /**
+         * The overridden declaration requires a non-null return type, but this implementation may
+         * legitimately return {@code null}; the difference is suppressed with a scoped key.
+         */
+        @SuppressWarnings("nullness:override.return.invalid")
         @Override
-        public TypeSolver getParent() {
+        public @Nullable TypeSolver getParent() {
             return parent;
         }
 

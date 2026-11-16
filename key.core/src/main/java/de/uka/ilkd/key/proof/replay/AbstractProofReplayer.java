@@ -7,6 +7,7 @@ package de.uka.ilkd.key.proof.replay;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
@@ -39,6 +40,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.proof.io.OutputStreamProofSaver.printAnything;
 
 /**
@@ -47,6 +51,7 @@ import static de.uka.ilkd.key.proof.io.OutputStreamProofSaver.printAnything;
  *
  * @author Arne Keller
  */
+@NullMarked
 public abstract class AbstractProofReplayer {
     /**
      * The original proof used when constructing the new proof.
@@ -76,9 +81,9 @@ public abstract class AbstractProofReplayer {
      * @return the new goals added by this rule application
      * @throws IntermediateProofReplayer.BuiltInConstructionException on error
      */
-    protected ImmutableList<Goal> reApplyRuleApp(Node node, Goal openGoal)
+    protected @Nullable ImmutableList<Goal> reApplyRuleApp(Node node, Goal openGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
-        RuleApp ruleApp = node.getAppliedRuleApp();
+        RuleApp ruleApp = Objects.requireNonNull(node.getAppliedRuleApp());
         ImmutableList<Goal> nextGoals;
         if (ruleApp.rule() instanceof BuiltInRule) {
             IBuiltInRuleApp builtInRuleApp = constructBuiltinApp(node, openGoal);
@@ -102,10 +107,17 @@ public abstract class AbstractProofReplayer {
      * @param currGoal open goal in proof slice
      * @return built-in rule app
      * @throws IntermediateProofReplayer.BuiltInConstructionException on error
+     *         <p>
+     *         Every replayed step of the original proof carries a rule application, an init config,
+     *         a rule
+     *         justification and a position; the dereferences of the corresponding (nullable) values
+     *         are
+     *         suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private IBuiltInRuleApp constructBuiltinApp(Node originalStep, Goal currGoal)
             throws IntermediateProofReplayer.BuiltInConstructionException {
-        final RuleApp ruleApp = originalStep.getAppliedRuleApp();
+        final RuleApp ruleApp = Objects.requireNonNull(originalStep.getAppliedRuleApp());
         final String ruleName = ruleApp.rule().displayName();
 
         Contract currContract = null;
@@ -124,7 +136,7 @@ public abstract class AbstractProofReplayer {
         // Load ifInsts, if applicable
         builtinIfInsts = ImmutableList.nil();
         for (PosInOccurrence oldFormulaPio : RuleAppUtil
-                .assumesInstantiationsOfRuleApp(originalStep.getAppliedRuleApp(), originalStep)) {
+                .assumesInstantiationsOfRuleApp(ruleApp, originalStep)) {
             PosInOccurrence newFormula =
                 findInNewSequent(oldFormulaPio, currGoal.sequent());
             if (newFormula == null) {
@@ -144,10 +156,8 @@ public abstract class AbstractProofReplayer {
         IBuiltInRuleApp ourApp;
         PosInOccurrence pos = null;
 
-        if (originalStep.getAppliedRuleApp().posInOccurrence() != null) { // otherwise we have no
-                                                                          // pos
-            PosInOccurrence oldPos =
-                originalStep.getAppliedRuleApp().posInOccurrence();
+        PosInOccurrence oldPos = originalStep.getAppliedRuleApp().posInOccurrence();
+        if (oldPos != null) { // otherwise we have no pos
             pos = findInNewSequent(oldPos, currGoal.sequent());
             if (pos == null) {
                 throw new IllegalStateException("failed to find new formula");
@@ -159,14 +169,22 @@ public abstract class AbstractProofReplayer {
 
             if (currContract instanceof OperationContract) {
                 var rule = proof.getServices().getProfile().getUseOperationContractRule();
-                contractApp = rule.createApp(pos).setContract(currContract);
+                contractApp = rule.createApp(Objects.requireNonNull(pos))
+                        .setContract(currContract);
             } else {
                 var rule = proof.getServices().getProfile().getUseDependencyContractRule();
-                // copy over the mysterious "step"
-                PosInOccurrence step =
-                    findInNewSequent(((UseDependencyContractApp<?>) ruleApp).step(),
-                        currGoal.sequent());
-                contractApp = rule.createApp(pos).setContract(currContract).setStep(step);
+                // an applied dependency-contract application always records the "step"; slicing
+                // may fail to locate it in the new sequent, in which case the application stays
+                // incomplete for tryToInstantiate to recompute the step later
+                PosInOccurrence step = findInNewSequent(
+                    Objects.requireNonNull(((UseDependencyContractApp<?>) ruleApp).step()),
+                    currGoal.sequent());
+                UseDependencyContractApp<?> dependencyApp =
+                    rule.createApp(Objects.requireNonNull(pos)).setContract(currContract);
+                contractApp = dependencyApp;
+                if (step != null) {
+                    contractApp = dependencyApp.setStep(step);
+                }
             }
 
             if (contractApp.check(currGoal.proof().getServices()) == null) {
@@ -183,7 +201,7 @@ public abstract class AbstractProofReplayer {
         }
 
         final ImmutableSet<IBuiltInRuleApp> ruleApps = IntermediateProofReplayer.collectAppsForRule(
-            ruleName, currGoal, pos);
+            ruleName, currGoal, Objects.requireNonNull(pos));
         if (ruleApps.size() != 1) {
             if (ruleApps.size() < 1) {
                 throw new IntermediateProofReplayer.BuiltInConstructionException(
@@ -204,7 +222,7 @@ public abstract class AbstractProofReplayer {
         return ourApp;
     }
 
-    private NoPosTacletApp lookupIntroducedTaclet(TacletApp app, Goal goal) {
+    private @Nullable NoPosTacletApp lookupIntroducedTaclet(TacletApp app, Goal goal) {
         for (Node n = goal.node(); n != null; n = n.parent()) {
             for (NoPosTacletApp introduced : n.getLocalIntroducedRules()) {
                 if (EqualityModuloProofIrrelevancy.equalsModProofIrrelevancy(introduced,
@@ -222,7 +240,15 @@ public abstract class AbstractProofReplayer {
      * @param originalStep step in original proof
      * @param currGoal open goal in proof slice
      * @return new taclet app equivalent to {@code originalStep}
+     *         <p>
+     *         The original step is a supported taclet application (asserted at the entry), the
+     *         proof's
+     *         init config is present, and the locally constructed application is finalized before
+     *         it is
+     *         used; the dereferences of the (nullable) taclet app, init config and local app are
+     *         suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private TacletApp constructTacletApp(Node originalStep, Goal currGoal) {
         TacletApp originalTacletApp = null;
         if (originalStep.getAppliedRuleApp() instanceof TacletApp tacletApp) {
@@ -280,8 +306,8 @@ public abstract class AbstractProofReplayer {
         }
 
         SVInstantiations instantantions = originalTacletApp.instantiations();
-        ourApp = IntermediateProofReplayer.constructInsts(ourApp, currGoal,
-            getInterestingInstantiations(instantantions), services);
+        ourApp = IntermediateProofReplayer.constructInsts(Objects.requireNonNull(ourApp),
+            currGoal, getInterestingInstantiations(instantantions), services);
 
         ImmutableList<AssumesFormulaInstantiation> ifFormulaList = ImmutableList.nil();
         List<Pair<PosInOccurrence, Boolean>> oldFormulas = RuleAppUtil
@@ -291,8 +317,10 @@ public abstract class AbstractProofReplayer {
                 .collect(Collectors.toList());
         // add direct instantiations
         if (originalTacletApp instanceof PosTacletApp posTacletApp) {
-            if (posTacletApp.assumesFormulaInstantiations() != null) {
-                for (AssumesFormulaInstantiation x : posTacletApp.assumesFormulaInstantiations()) {
+            final ImmutableList<AssumesFormulaInstantiation> afis =
+                posTacletApp.assumesFormulaInstantiations();
+            if (afis != null) {
+                for (AssumesFormulaInstantiation x : afis) {
                     if (x instanceof AssumesFormulaInstDirect) {
                         oldFormulas.add(new Pair<>(new PosInOccurrence(x.getSequentFormula(),
                             PosInTerm.getTopLevel(), true), false));
@@ -330,6 +358,11 @@ public abstract class AbstractProofReplayer {
             ourApp = ourApp.tryToInstantiate(proof.getServices());
         }
 
+        if (ourApp == null) {
+            throw new IllegalStateException(String.format(
+                "slicing encountered null rule app of %s after instantiating variables",
+                tacletName));
+        }
         return ourApp;
     }
 
@@ -341,7 +374,7 @@ public abstract class AbstractProofReplayer {
      * @param newSequent sequent
      * @return the formula in the sequent, or null if not found
      */
-    private PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
+    private @Nullable PosInOccurrence findInNewSequent(PosInOccurrence oldPos,
             Sequent newSequent) {
         SequentFormula oldFormula = oldPos.sequentFormula();
         Semisequent semiSeq = oldPos.isInAntec() ? newSequent.antecedent()

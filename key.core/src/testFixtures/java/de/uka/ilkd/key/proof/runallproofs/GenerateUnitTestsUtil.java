@@ -101,18 +101,19 @@ public class GenerateUnitTestsUtil {
         vars.put("packageName", packageName);
         vars.put("baseDirectory", settings.getBaseDirectory().getAbsolutePath()
                 .replaceAll("\\\\", "/"));
+        var statisticsFile =
+            Objects.requireNonNull(settings.getStatisticsFile(), "statistics file");
         vars.put("statisticsFile",
-            settings.getStatisticsFile().getStatisticsFile().getAbsolutePath()
-                    .replaceAll("\\\\", "/"));
+            statisticsFile.getStatisticsFile().getAbsolutePath().replaceAll("\\\\", "/"));
         vars.put("name", name);
         vars.put("reloadEnabled", String.valueOf(settings.reloadEnabled()));
         vars.put("tempDir", settings.getTempDir().getAbsolutePath()
                 .replaceAll("\\\\", "/"));
 
         vars.put("globalSettings", settings.getGlobalKeYSettings().replace("\n", "\\n"));
-        vars.put("localSettings",
-            (settings.getLocalKeYSettings() == null ? "" : settings.getLocalKeYSettings())
-                    .replace("\n", "\\n"));
+        String localSettings = settings.getLocalKeYSettings();
+        localSettings = localSettings == null ? "" : localSettings;
+        vars.put("localSettings", localSettings.replace("\n", "\\n"));
 
         vars.put("timeout", "");
 

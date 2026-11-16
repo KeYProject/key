@@ -8,10 +8,13 @@ import java.awt.Color;
 import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Encapsulates the table of progress bars that is shown within the progress dialog: For each solver
  * and each goal there is a cell.
  */
+@NullMarked
 class ProgressModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
 

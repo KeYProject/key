@@ -8,11 +8,14 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.util.collection.DefaultEdge;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An edge of the dependency graph. Stores additional metadata.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class AnnotatedEdge extends DefaultEdge {
     /**
      * The node that added this edge to the dependency graph.

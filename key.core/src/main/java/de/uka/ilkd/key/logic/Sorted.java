@@ -6,6 +6,9 @@ package de.uka.ilkd.key.logic;
 
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface Sorted {
     /**
      * the sort of the entity

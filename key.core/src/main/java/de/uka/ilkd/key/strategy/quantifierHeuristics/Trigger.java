@@ -9,6 +9,9 @@ import de.uka.ilkd.key.java.Services;
 import org.key_project.logic.Term;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface Trigger {
     /**
      * @param targetTerm

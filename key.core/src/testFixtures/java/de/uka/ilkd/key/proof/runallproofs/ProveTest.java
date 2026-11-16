@@ -11,10 +11,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.nparser.KeyAst.ProofScript;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -29,6 +30,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +63,7 @@ public class ProveTest {
     protected String tempDir = "/tmp";
     protected String globalSettings = "";
     protected String localSettings = "";
-    private StatisticsFile statistics;
+    private @Nullable StatisticsFile statistics;
 
     protected void assertProvability(String file) throws Exception {
         runKey(file, TestProperty.PROVABLE);
@@ -114,9 +116,10 @@ public class ProveTest {
             LOGGER.info("({}) Proving done", caseId);
             env = pair.first;
             var script = pair.second;
-            loadedProof = env.getLoadedProof();
+            loadedProof = Objects.requireNonNull(env.getLoadedProof(), "loaded proof");
 
-            AbstractProblemLoader.ReplayResult replayResult = env.getReplayResult();
+            AbstractProblemLoader.ReplayResult replayResult = Objects.requireNonNull(
+                env.getReplayResult(), "replay result of the loaded proof");
             if (replayResult.hasErrors() && verbose) {
                 LOGGER.info("({}) {} Error(s) while loading", caseId, replayResult.getErrorList());
                 for (Throwable error : replayResult.getErrorList()) {
@@ -143,8 +146,9 @@ public class ProveTest {
                         (closed ? "closed." : "open goal(s)"));
                     appendStatistics(loadedProof, keyFile.toFile());
 
-                    var path = Paths.get("proofs",
-                        loadedProof.getProofFile().getFileName() + ".proof.xml");
+                    var loadedProofFile = Objects.requireNonNull(
+                        loadedProof.getProofFile(), "proof file of the loaded proof");
+                    var path = Paths.get("proofs", loadedProofFile.getFileName() + ".proof.xml");
                     saveProofXml(loadedProof, path);
 
                     if (success) {
@@ -181,7 +185,8 @@ public class ProveTest {
     private static void toXml(PrintWriter out, Node node) {
         Name name1;
         try {
-            name1 = node.getAppliedRuleApp().rule().name();
+            name1 = Objects.requireNonNull(node.getAppliedRuleApp(), "applied rule app").rule()
+                    .name();
         } catch (NullPointerException e) {
             name1 = new Name("<null>");
         }
@@ -219,14 +224,16 @@ public class ProveTest {
      * want to use a different strategy.
      */
     private void autoMode(KeYEnvironment<DefaultUserInterfaceControl> env, Proof loadedProof,
-            KeyAst.ProofScript script) throws Exception {
+            @Nullable ProofScript script) throws Exception {
         // Run KeY prover.
         if (script == null) {
             // auto mode
-            env.getProofControl().startAndWaitForAutoMode(loadedProof);
+            Objects.requireNonNull(env.getProofControl(), "proof control of the KeY environment")
+                    .startAndWaitForAutoMode(loadedProof);
         } else {
             // ... script
-            ProofScriptEngine pse = new ProofScriptEngine(env.getLoadedProof());
+            ProofScriptEngine pse = new ProofScriptEngine(
+                Objects.requireNonNull(env.getLoadedProof(), "loaded proof"));
             pse.execute(env.getUi(), script);
         }
     }
@@ -234,7 +241,10 @@ public class ProveTest {
     /*
      * has resemblances with KeYEnvironment.load ...
      */
-    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, KeyAst.ProofScript> load(Path keyFile)
+    // Pair's type parameters cannot be @Nullable, but getProofScript() is @Nullable (auto-mode
+    // runs have no proof script); callers null-check the second component.
+    @SuppressWarnings("NullAway")
+    private Pair<KeYEnvironment<DefaultUserInterfaceControl>, ProofScript> load(Path keyFile)
             throws ProblemLoaderException {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         return new Pair<>(env, env.getProofScript());
@@ -256,7 +266,8 @@ public class ProveTest {
         try {
             proofLoadEnvironment = KeYEnvironment.load(proofFile);
 
-            AbstractProblemLoader.ReplayResult result = proofLoadEnvironment.getReplayResult();
+            AbstractProblemLoader.ReplayResult result = Objects.requireNonNull(
+                proofLoadEnvironment.getReplayResult(), "replay result");
             if (result.hasErrors()) {
                 List<Throwable> errorList = result.getErrorList();
                 for (Throwable ex : errorList) {
@@ -265,7 +276,8 @@ public class ProveTest {
                 throw errorList.getFirst();
             }
 
-            reloadedProof = proofLoadEnvironment.getLoadedProof();
+            reloadedProof =
+                Objects.requireNonNull(proofLoadEnvironment.getLoadedProof(), "loaded proof");
             return reloadedProof.closed();
         } catch (Throwable t) {
             throw new Exception(
@@ -280,7 +292,7 @@ public class ProveTest {
         }
     }
 
-    protected StatisticsFile getStatisticsFile() throws IOException {
+    protected @Nullable StatisticsFile getStatisticsFile() throws IOException {
         if (!statisticsFile.isEmpty()) {
             if (statistics == null) {
                 // Always give each JVM its own statistics file

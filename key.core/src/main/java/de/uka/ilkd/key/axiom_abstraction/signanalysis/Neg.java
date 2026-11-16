@@ -10,11 +10,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The Neg element of the sign lattice, representing all strictly negative integers.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class Neg extends SignAnalysisDomainElem {
 
     private static final Neg INSTANCE = new Neg();

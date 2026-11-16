@@ -6,10 +6,14 @@ package org.key_project.isabelletranslation.automation;
 
 import java.time.Duration;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This class stores the result of a {@link IsabelleSolver}.
  * This includes computation times and in some cases successful tactics and exceptions.
  */
+@NullMarked
 public class IsabelleResult {
     /**
      * Returns a {@link String} description of the type of this result.
@@ -78,20 +82,21 @@ public class IsabelleResult {
     /**
      * The computation time for this result. Only set for successful and timeout results.
      */
-    private final Duration computationTime;
+    private final @Nullable Duration computationTime;
 
     /**
      * A successful tactic returned by an Isabelle automation method
      */
-    private final String successfulTactic;
+    private final @Nullable String successfulTactic;
 
     /**
      * An exception thrown during computation by the solver
      */
-    private final Exception exception;
+    private final @Nullable Exception exception;
 
-    private IsabelleResult(Type type, Duration computationTime, String successfulTactic,
-            Exception exception) {
+    private IsabelleResult(Type type, @Nullable Duration computationTime,
+            @Nullable String successfulTactic,
+            @Nullable Exception exception) {
         this.type = type;
         this.computationTime = computationTime;
         this.successfulTactic = successfulTactic;
@@ -177,7 +182,7 @@ public class IsabelleResult {
         return type == Type.TIMEOUT;
     }
 
-    public Duration getComputationTime() {
+    public @Nullable Duration getComputationTime() {
         return this.computationTime;
     }
 
@@ -186,7 +191,7 @@ public class IsabelleResult {
      *
      * @return exception encountered during proving || null if not error result
      */
-    public Exception getException() {
+    public @Nullable Exception getException() {
         return this.exception;
     }
 
@@ -195,7 +200,7 @@ public class IsabelleResult {
      *
      * @return successful tactic || null if not successful
      */
-    public String getSuccessfulTactic() {
+    public @Nullable String getSuccessfulTactic() {
         return this.successfulTactic;
     }
 

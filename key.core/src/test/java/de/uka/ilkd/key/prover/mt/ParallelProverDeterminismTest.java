@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.prover.mt;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Node;
@@ -90,13 +91,17 @@ public class ParallelProverDeterminismTest {
             final KeYEnvironment<?> seqEnv = prove(file, 0);
             final KeYEnvironment<?> w1Env = prove(file, 1);
             try {
-                final Proof seq = seqEnv.getLoadedProof();
-                final Proof w1 = w1Env.getLoadedProof();
+                final Proof seq =
+                    Objects.requireNonNull(seqEnv.getLoadedProof(), "the proof must be loaded");
+                final Proof w1 =
+                    Objects.requireNonNull(w1Env.getLoadedProof(), "the proof must be loaded");
                 assertTrue(seq.closed(), rel + ": sequential proof did not close");
                 assertTrue(w1.closed(), rel + ": 1-worker proof did not close");
                 assertEquals(seq.countNodes(), w1.countNodes(),
                     rel + ": proof sizes differ between sequential and 1-worker prover");
-                assertTreesEqual(rel, seq.root(), w1.root(), "");
+                assertTreesEqual(rel,
+                    Objects.requireNonNull(seq.root(), "the proof has a root node"),
+                    Objects.requireNonNull(w1.root(), "the proof has a root node"), "");
             } finally {
                 seqEnv.dispose();
                 w1Env.dispose();
@@ -155,7 +160,7 @@ public class ParallelProverDeterminismTest {
         }
         final KeYEnvironment<?> env = KeYEnvironment.load(file);
         final ProofStarter starter = new ProofStarter(false);
-        starter.init(env.getLoadedProof());
+        starter.init(Objects.requireNonNull(env.getLoadedProof(), "the proof must be loaded"));
         starter.setMaxRuleApplications(MAX_STEPS);
         starter.start();
         return env;

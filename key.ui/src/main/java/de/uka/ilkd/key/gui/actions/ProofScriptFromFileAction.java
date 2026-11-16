@@ -18,6 +18,8 @@ import de.uka.ilkd.key.gui.ProofScriptWorker;
 import de.uka.ilkd.key.nparser.ParsingFacade;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,13 +28,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class ProofScriptFromFileAction extends AbstractAction {
     private static final long serialVersionUID = -3181592516055470032L;
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofScriptFromFileAction.class);
 
     private final KeYMediator mediator;
 
-    private static Path lastDirectory;
+    private static @Nullable Path lastDirectory;
 
     /**
      * Instantiates a new proof script from file action.
@@ -53,7 +56,7 @@ public class ProofScriptFromFileAction extends AbstractAction {
             Proof currentProof = mediator.getSelectedProof();
             if (currentProof != null) {
                 Path currentFile = currentProof.getProofFile();
-                if (currentFile != null) {
+                if (currentFile != null && currentFile.getParent() != null) {
                     dir = currentFile.getParent();
                 }
             }
@@ -68,7 +71,16 @@ public class ProofScriptFromFileAction extends AbstractAction {
             int res = fc.showOpenDialog(mainWindow);
             if (res == JFileChooser.APPROVE_OPTION) {
                 File selectedFile = fc.getSelectedFile();
-                lastDirectory = selectedFile.getParentFile().toPath();
+                if (selectedFile == null) {
+                    throw new NullPointerException("No file selected in the file chooser.");
+                }
+                File parentFile = selectedFile.getParentFile();
+                if (parentFile == null) {
+                    // The file chooser always selects an existing file whose parent directory
+                    // exists; keep the previous NPE behavior for impossible relative files.
+                    throw new NullPointerException("The selected file has no parent directory.");
+                }
+                lastDirectory = parentFile.toPath();
                 var script = ParsingFacade.parseScript(selectedFile.toPath());
                 ProofScriptWorker psw = new ProofScriptWorker(mediator, script);
                 psw.init();

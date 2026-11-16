@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public interface KeYConstants {
     String INTERNAL_VERSION = KeYResourceManager.getManager().getSHA1();
 

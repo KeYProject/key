@@ -17,14 +17,18 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.pp.InitialPositionTable;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.Debug;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +37,7 @@ import org.slf4j.LoggerFactory;
  * as the application of rules. It offers services for highlighting formulas, selecting applicable
  * rules (in particular taclets) and drag'n drop instantiation of taclets.
  */
+@NullMarked
 public final class CurrentGoalView extends SequentView implements Autoscroll {
     private static final Logger LOGGER = LoggerFactory.getLogger(CurrentGoalView.class);
 
@@ -53,13 +58,27 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * creates a viewer for a sequent
      *
      * @param mainWindow the MainWindow allowing access to the current system status
+     *        <p>
+     *        The view configures itself with colors, listeners, drag'n'drop support and mediator
+     *        registration while the receiver is still under initialization (EISOP initialization
+     *        check) and passes itself to the mouse listener, the drag gesture recognizer, the
+     *        {@link DragNDropInstantiator} and the {@link DropTarget}; the listener instance is
+     *        correspondingly typed by the checker while only used after construction completes,
+     *        suppressed with scoped keys.
      */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible", "nullness:assignment.type.incompatible" })
     public CurrentGoalView(MainWindow mainWindow) {
         super(mainWindow);
         this.mediator = mainWindow.getMediator();
 
         // disables selection
-        setSelectionColor(getBackground());
+        Color background = getBackground();
+        if (background == null) {
+            // a Swing component always has a background color from the look and feel
+            throw new NullPointerException("No background color for the goal view.");
+        }
+        setSelectionColor(background);
         listener = new CurrentGoalViewListener(this, getMediator());
 
         GUIListener guiListener = new GUIListener() {
@@ -139,6 +158,10 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
 
         updateHighlights.clear();
         InitialPositionTable ipt = getInitialPositionTable();
+        if (ipt == null) {
+            // no position table means nothing can be highlighted
+            return;
+        }
         Range[] ranges = ipt.getUpdateRanges();
 
         if (ranges != null) {
@@ -178,7 +201,8 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      * sets the text being printed
      */
     synchronized void printSequentImmediately() {
-        if (getMainWindow().getMediator().getSelectedNode() == null) {
+        Node selectedNode = getMainWindow().getMediator().getSelectedNode();
+        if (selectedNode == null) {
             // only print when a node is selected
             // (avoids NPE when no proof is loaded and font size is changed)
             return;
@@ -190,7 +214,7 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         setLineWidth(computeLineWidth());
 
         if (getLogicPrinter() != null) {
-            updateSequent(getMainWindow().getMediator().getSelectedNode());
+            updateSequent(selectedNode);
         }
 
         updateUpdateHighlights();
@@ -224,15 +248,25 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
      */
     public void setPrinter(Goal goal) {
         getFilter().setSequent(goal.sequent());
+        Services services = mediator.getServices();
+        if (services == null) {
+            // a goal is only printed while services are available
+            throw new NullPointerException("No services available for the goal view.");
+        }
         setLogicPrinter(SequentViewLogicPrinter.positionPrinter(getMediator().getNotationInfo(),
-            mediator.getServices(), getVisibleTermLabels()));
+            services, getVisibleTermLabels()));
     }
 
     public void resetPrinter() {
         // set a printer for the currently selected proof or just a default printer with no services
         // avoids a memory leak by the printer holding services for an abandoned proof
+        Services services = mediator.getServices();
+        if (services == null) {
+            // the printer still needs the notation of the currently selected proof
+            throw new NullPointerException("No services available for the goal view.");
+        }
         setLogicPrinter(SequentViewLogicPrinter.positionPrinter(getMediator().getNotationInfo(),
-            mediator.getServices(), getVisibleTermLabels()));
+            services, getVisibleTermLabels()));
     }
 
     /**
@@ -257,10 +291,14 @@ public final class CurrentGoalView extends SequentView implements Autoscroll {
         // No functionality is allowed in this method body!
         Goal goal = r.getSelectedGoal();
         Debug.assertTrue(goal != null);
+        if (goal == null) {
+            // the selected taclet can only be applied to an open goal
+            throw new NullPointerException("No goal selected for the taclet application.");
+        }
         r.getUI().getProofControl().selectedTaclet(taclet.taclet(), goal, pos.getPosInOccurrence());
     }
 
-    public PosInSequent getMousePosInSequent() {
+    public @Nullable PosInSequent getMousePosInSequent() {
         return getPosInSequent(getMousePosition());
     }
 

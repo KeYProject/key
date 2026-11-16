@@ -9,11 +9,14 @@ import javax.swing.JCheckBoxMenuItem;
 
 import de.uka.ilkd.key.gui.MainWindow;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class can be used for adding Checkboxes to the menu.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
 
     /**
@@ -29,6 +32,13 @@ public abstract class KeYMenuCheckBox extends JCheckBoxMenuItem {
         this(mainWindow, label, false);
     }
 
+    /**
+     * The {@code setAction} call below operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the action field is assigned
+     * just above and the resulting menu item is only rendered after construction completes,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     KeYMenuCheckBox(MainWindow mainWindow, String label, boolean selectedState) {
         super("", selectedState);
         final KeYMenuCheckBox checkBox = this;

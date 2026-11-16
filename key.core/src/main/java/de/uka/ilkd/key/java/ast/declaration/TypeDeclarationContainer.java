@@ -6,10 +6,13 @@ package de.uka.ilkd.key.java.ast.declaration;
 
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Type declaration container. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public interface TypeDeclarationContainer extends NonTerminalProgramElement {
 
     /**

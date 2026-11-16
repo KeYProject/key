@@ -17,6 +17,8 @@
 
 package de.uka.ilkd.key.macros;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A proof macro that automates the KeY proof workflow when JML proof scripts are present,
  * without attempting to close goals.
@@ -37,6 +39,7 @@ package de.uka.ilkd.key.macros;
  * @see ScriptAwareMacro
  * @see ApplyScriptsMacro
  */
+@NullMarked
 public class ScriptAwarePrepMacro extends SequentialProofMacro {
 
     private final ProofMacro autoMacro = new SymbolicExecutionOnlyMacro();

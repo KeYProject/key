@@ -6,11 +6,14 @@ package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.BranchLocation;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Graph node that represents a closed goal.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ClosedGoal extends GraphNode {
     /**
      * The serial number of the corresponding node in the proof tree.

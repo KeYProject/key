@@ -6,12 +6,15 @@ package de.uka.ilkd.key.java.ast.statement;
 
 import de.uka.ilkd.key.java.ast.StatementContainer;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Branch.
  *
  * @author <TT>AutoDoc</TT>
  */
 
+@NullMarked
 public interface Branch extends StatementContainer {
 
 

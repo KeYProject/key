@@ -90,6 +90,7 @@ class ExceptionToolsTest {
     }
 
     @Test
+    @SuppressWarnings("NullAway") // deliberate: no loader origin for a standalone test exception
     void getMessagesExpandsBundledProblemLoaderException() {
         // e.g. a partial proof replay where several rule applications could not be replayed: every
         // failure must be reported, not just the first.

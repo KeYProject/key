@@ -6,11 +6,13 @@ package de.uka.ilkd.key.proof.proofevent;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Information about a formula that has been added to a node (the position given is the position of
  * the formula within the new sequent)
  */
+@NullMarked
 public class NodeChangeAddFormula extends NodeChangeARFormula {
     public NodeChangeAddFormula(PosInOccurrence p_pos) {
         super(p_pos);

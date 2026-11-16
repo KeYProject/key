@@ -20,6 +20,9 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.*;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class TacletPrefixBuilder {
 
     /**

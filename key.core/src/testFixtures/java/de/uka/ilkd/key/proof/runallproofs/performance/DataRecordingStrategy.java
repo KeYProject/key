@@ -5,11 +5,14 @@
 package de.uka.ilkd.key.proof.runallproofs.performance;
 
 import java.io.File;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
@@ -31,8 +34,7 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     final DataRecordingTestFile dataRecordingTestFile;
 
     DataRecordingStrategy(Proof proof, DataRecordingTestFile dataRecordingTestFile) {
-        super(proof, proof.getInitConfig().getSettings().getStrategySettings()
-                .getActiveStrategyProperties());
+        super(proof, strategyPropertiesOf(proof));
         this.dataRecordingTestFile = dataRecordingTestFile;
 
         File computeCostDataDir = dataRecordingTestFile.getProfileDirectories().computeCostDataDir;
@@ -42,6 +44,14 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
             dataRecordingTestFile.getProfileDirectories().instantiateAppDataDir;
         instantiateAppData =
             new FunctionPerformanceData(instantiateAppDataDir, dataRecordingTestFile);
+    }
+
+    private static StrategyProperties strategyPropertiesOf(Proof proof) {
+        ProofSettings settings = Objects.requireNonNull(
+            Objects.requireNonNull(proof.getInitConfig(), "init config of the proof")
+                    .getSettings(),
+            "settings of the init config");
+        return settings.getStrategySettings().getActiveStrategyProperties();
     }
 
     @Override

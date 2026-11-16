@@ -6,6 +6,7 @@ package de.uka.ilkd.key.proof;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -46,7 +47,8 @@ public class EssentialListenerFailureTest {
         final KeYEnvironment<?> env = KeYEnvironment.load(JavaProfile.getDefaultInstance(),
             key, null, null, null, true);
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             final RogueEssentialListener rogue = new RogueEssentialListener();
             proof.addRuleAppListener(rogue);
 

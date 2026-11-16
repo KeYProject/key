@@ -18,12 +18,15 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class handles translation of the instance and exactInstance function.
  *
  * @author Nils Buchholz
  */
+@NullMarked
 public class InstanceOperatorHandler implements IsabelleHandler {
     /**
      * Map of the operators supported by this handler and their respective translation.
@@ -32,7 +35,7 @@ public class InstanceOperatorHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) throws IOException {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         Namespace<@NonNull Function> functionNamespace = services.getNamespaces().functions();
         Map<String, String> definedSortDependingFunctions = new HashMap<>();
 

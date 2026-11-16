@@ -18,12 +18,15 @@ import org.key_project.logic.op.Function;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.rule.AuxiliaryContractBuilders.GoalsConfigurator;
 
 /**
  * @author Alexander Weigl
  * @version 1 (7/27/25)
  */
+@NullMarked
 public class WdBlockContractInternalRule extends BlockContractInternalRule {
     public static final WdBlockContractInternalRule INSTANCE = new WdBlockContractInternalRule();
 

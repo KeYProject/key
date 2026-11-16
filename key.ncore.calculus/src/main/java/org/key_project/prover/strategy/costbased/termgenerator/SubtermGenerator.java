@@ -5,6 +5,7 @@
 package org.key_project.prover.strategy.costbased.termgenerator;
 
 import java.util.Iterator;
+import java.util.Objects;
 
 import org.key_project.logic.LogicServices;
 import org.key_project.logic.Term;
@@ -65,7 +66,7 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
     protected Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Term completeTermInst = completeTerm.toTerm(app, pos, goal, mState);
         assert completeTermInst != null : "@AssumeAssertion(nullness): Term should not be null";
-        return completeTermInst;
+        return Objects.requireNonNull(completeTermInst);
     }
 
     private boolean descendFurther(Term t, MutableState mState, LogicServices services) {

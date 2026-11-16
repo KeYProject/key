@@ -136,6 +136,7 @@ public interface ImmutableSet<T extends @Nullable Object>
      */
     <S> S[] toArray(S[] array);
 
+    @SuppressWarnings("NullAway") // foreach var of nullable-bounded T into T-typed parameter
     default ImmutableSet<T> add(Iterable<T> seq) {
         ImmutableSet<T> cur = this;
         for (T item : seq) {

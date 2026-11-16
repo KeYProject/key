@@ -8,11 +8,14 @@ import java.awt.Frame;
 
 import de.uka.ilkd.key.gui.notification.NotificationAction;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Actions which display a text should inherit from this abstract notification action.
  *
  * @author bubel
  */
+@NullMarked
 public abstract class ShowDisplayPane implements NotificationAction {
 
     /**
@@ -20,7 +23,6 @@ public abstract class ShowDisplayPane implements NotificationAction {
      */
     private String message = "";
     protected final Frame parentComponent;
-
 
     /**
      * creates an instance of this action kind

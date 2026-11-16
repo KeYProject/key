@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.configuration;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The ConfigChangeListener is notified if the UI settings in class Config change.
  */
+@NullMarked
 public interface ConfigChangeListener {
 
     /** focused node has changed */

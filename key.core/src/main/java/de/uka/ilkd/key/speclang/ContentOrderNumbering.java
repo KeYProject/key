@@ -10,6 +10,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.function.Function;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Assigns stable, order-independent numbers {@code 0, 1, 2, ...} to the members of a group, so a
  * number that ends up in a persisted name -- e.g. a class-axiom or partial-invariant taclet name --
@@ -30,6 +32,7 @@ import java.util.function.Function;
  *
  * @param <T> the member type
  */
+@NullMarked
 public final class ContentOrderNumbering<T> {
 
     private final Function<? super T, String> contentKey;

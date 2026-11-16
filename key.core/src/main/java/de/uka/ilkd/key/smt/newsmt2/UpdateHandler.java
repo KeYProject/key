@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -18,18 +19,22 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This handler treats KeY updated terms ({x:=5}x>4).
  *
  * Updates are replaced by let-expressions.
  */
+@NullMarked
 public class UpdateHandler implements SMTHandler {
 
-    private Services services;
+    private @Nullable Services services;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.services = services;
     }
 
@@ -60,7 +65,9 @@ public class UpdateHandler implements SMTHandler {
         } else if (update.op() == UpdateJunctor.SKIP) {
             // Do precisely that: skip
         } else if (update.op() instanceof ElementaryUpdate elemUpd) {
-            Term target = services.getTermFactory().createTerm(elemUpd.lhs());
+            Term target =
+                Objects.requireNonNull(services, "services").getTermFactory()
+                        .createTerm(elemUpd.lhs());
             SExpr smtTarget = trans.translate(target);
             SExpr smtValue = trans.translate(update.sub(0), Type.UNIVERSE);
             individualUpdates.add(new SExpr(smtTarget, smtValue));

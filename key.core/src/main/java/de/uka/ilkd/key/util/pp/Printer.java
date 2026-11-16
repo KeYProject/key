@@ -7,12 +7,16 @@ package de.uka.ilkd.key.util.pp;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The intermediate layer of the pretty printing library. Using the block size information provided
  * by the {@link Layouter} class, this decides where to insert line breaks. It tries to break as few
  * blocks as possible.
  */
 
+@NullMarked
 class Printer<M> {
 
     /**
@@ -114,7 +118,7 @@ class Printer<M> {
         }
     }
 
-    void mark(M o) {
+    void mark(@Nullable M o) {
         back.mark(o);
     }
 

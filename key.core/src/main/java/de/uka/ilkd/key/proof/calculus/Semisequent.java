@@ -10,6 +10,10 @@ import org.key_project.prover.sequent.SemisequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 class Semisequent extends org.key_project.prover.sequent.Semisequent {
 
     static final org.key_project.prover.sequent.Semisequent EMPTY_SEMISEQUENT = new Empty();
@@ -136,17 +140,25 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
          *
          * @param idx int representing the index of the element we want to have
          * @return {@link SequentFormula} found at index idx
+         *         The overridden declaration requires a non-null return type, but this
+         *         implementation may legitimately return {@code null}; the difference is suppressed
+         *         with a scoped key.
          */
+        @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
         @Override
-        public SequentFormula get(int idx) {
+        public @Nullable SequentFormula get(int idx) {
             return null;
         }
 
         /**
          * @return the first SequentFormula of this Semisequent
+         *         The overridden declaration requires a non-null return type, but this
+         *         implementation may legitimately return {@code null}; the difference is suppressed
+         *         with a scoped key.
          */
+        @SuppressWarnings({ "NullAway", "nullness:override.return.invalid" })
         @Override
-        public SequentFormula getFirst() {
+        public @Nullable SequentFormula getFirst() {
             return null;
         }
 
@@ -162,7 +174,7 @@ class Semisequent extends org.key_project.prover.sequent.Semisequent {
         }
 
         @Override
-        public boolean equals(Object other) {
+        public boolean equals(@Nullable Object other) {
             return other == this;
         }
 

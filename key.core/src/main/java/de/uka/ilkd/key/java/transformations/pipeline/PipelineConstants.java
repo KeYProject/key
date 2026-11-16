@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.transformations.pipeline;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.JavaDLFieldNames.IMPLICIT_NAME_PREFIX;
 
 /**
  * @author Alexander Weigl
  * @version 1 (11/6/21)
  */
+@NullMarked
 public interface PipelineConstants {
     String CONSTRUCTOR_NORMALFORM_IDENTIFIER = IMPLICIT_NAME_PREFIX + "init";
     String OBJECT_INITIALIZER_IDENTIFIER = IMPLICIT_NAME_PREFIX + "objectInitializer";

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.FormulaSV;
@@ -15,12 +17,16 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This variable condition checks if an instantiation is a constant formula or term, i.e. its arity
  * is equal to zero.
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class ConstantCondition extends VariableConditionAdapter {
 
     private final JAbstractSortedOperator t;
@@ -32,19 +38,22 @@ public class ConstantCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement instCandidate, SVInstantiations instMap,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement instCandidate,
+            SVInstantiations instMap,
             Services services) {
         if ((!(var instanceof TermSV) || var != this.t)
                 && (!(var instanceof FormulaSV) || var != this.t)) {
             return true;
         }
         if (var instanceof TermSV) {
-            JTerm tInst = instMap.getInstantiation((TermSV) t);
+            JTerm tInst = Objects.requireNonNull(instMap.getInstantiation((TermSV) t),
+                "no instantiation of " + t);
             boolean atomic = (tInst.arity() == 0);
             return negated != atomic;
         }
         if (var instanceof FormulaSV) {
-            JTerm tInst = instMap.getInstantiation((FormulaSV) t);
+            JTerm tInst = Objects.requireNonNull(instMap.getInstantiation((FormulaSV) t),
+                "no instantiation of " + t);
             boolean atomic = (tInst.arity() == 0);
             return negated != atomic;
         }

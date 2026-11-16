@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.scripts;
 
+import java.util.Objects;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -56,7 +57,8 @@ public class JavascriptCommand extends AbstractCommand {
         // create JavaScript engine
         ScriptEngine engine = factory.getEngineByName("JavaScript");
         // evaluate JavaScript code from given file - specified by first argument
-        JavascriptInterface jsIntf = new JavascriptInterface(proof, state());
+        JavascriptInterface jsIntf =
+            new JavascriptInterface(Objects.requireNonNull(proof, "proof is not set"), state());
 
         engine.getBindings(ScriptContext.GLOBAL_SCOPE).put("__state", jsIntf);
         try {

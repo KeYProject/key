@@ -17,6 +17,8 @@ import org.key_project.slicing.DependencyNodeData;
 import org.key_project.slicing.DependencyTracker;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class DependencyGraph {
     private static final Logger LOGGER = LoggerFactory.getLogger(DependencyGraph.class);
 
@@ -70,7 +73,14 @@ public class DependencyGraph {
             throw new IllegalStateException("tried to use DependencyGraph with wrong proof");
         }
         DependencyTracker tracker = p.lookup(DependencyTracker.class);
-        var nodeIterator = p.root().subtreeIterator();
+        if (tracker == null) {
+            throw new NullPointerException("No dependency tracker registered for the proof.");
+        }
+        Node root = p.root();
+        if (root == null) {
+            throw new NullPointerException("No root node in the proof to track.");
+        }
+        var nodeIterator = root.subtreeIterator();
         while (nodeIterator.hasNext()) {
             var node = nodeIterator.next();
             if (node.getAppliedRuleApp() == null || edgeDataReversed.containsKey(node)) {
@@ -189,7 +199,7 @@ public class DependencyGraph {
     public Stream<ClosedGoal> goalsInBranch(BranchLocation location) {
         return graph.vertexSet().stream()
                 .filter(ClosedGoal.class::isInstance)
-                .map(ClosedGoal.class::cast)
+                .map(it -> (ClosedGoal) it)
                 .filter(it -> it.branchLocation.hasPrefix(location));
     }
 
@@ -362,7 +372,8 @@ public class DependencyGraph {
      * @param pio formula
      * @return graph node, null if not found
      */
-    public GraphNode getGraphNode(Proof proof, BranchLocation locationGuess, PosInOccurrence pio) {
+    public @Nullable GraphNode getGraphNode(Proof proof, BranchLocation locationGuess,
+            PosInOccurrence pio) {
         if (proof == null) {
             return null;
         }
@@ -393,7 +404,16 @@ public class DependencyGraph {
         // first, create a copy of the graph
         var nGraph = new DependencyGraph(this);
         // get all nodes in the proof
-        var allNodes = proof().root().subtreeIterator();
+        Proof proof = proof();
+        if (proof == null) {
+            throw new NullPointerException(
+                "Dependency graph is empty, cannot remove chains from it.");
+        }
+        Node root = proof.root();
+        if (root == null) {
+            throw new NullPointerException("No root node in the proof.");
+        }
+        var allNodes = root.subtreeIterator();
         // take the outputs "produced" by the nodes
         var toCheck = StreamSupport.stream(Spliterators.spliteratorUnknownSize(allNodes, 0), false)
                 .flatMap(this::outputsOf).toList();
@@ -447,8 +467,13 @@ public class DependencyGraph {
             var edge3 = new AnnotatedShortenedEdge(initialNode, endNode, edge.replacesInputNode());
             nGraph.graph.addEdge(startGraphNode, endGraphNode, edge3);
             nGraph.edgeDataReversed.remove(startNode);
-            nGraph.edgeDataReversed.get(endNode).remove(edge2);
-            nGraph.edgeDataReversed.get(endNode).add(edge3);
+            var endNodeEdges = nGraph.edgeDataReversed.get(endNode);
+            if (endNodeEdges == null) {
+                throw new NullPointerException(
+                    "No edge data recorded for end node " + endNode.serialNr() + ".");
+            }
+            endNodeEdges.remove(edge2);
+            endNodeEdges.add(edge3);
             removed++;
         }
         LOGGER.debug("removeChains: {} nodes deleted", removed);
@@ -460,7 +485,7 @@ public class DependencyGraph {
      *
      * @return the proof
      */
-    public Proof proof() {
+    public @Nullable Proof proof() {
         return this.edgeDataReversed.keySet().stream().map(Node::proof).findFirst().orElse(null);
     }
 }

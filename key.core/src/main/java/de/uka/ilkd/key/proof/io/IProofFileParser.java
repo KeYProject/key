@@ -6,6 +6,8 @@ package de.uka.ilkd.key.proof.io;
 
 import java.util.List;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Defines the required which a {@link de.uka.ilkd.key.nparser.KeYParser} needs to parse a *.proof
  * file and to apply the
@@ -13,6 +15,7 @@ import java.util.List;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public interface IProofFileParser {
 
     /**

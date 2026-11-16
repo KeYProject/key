@@ -7,6 +7,7 @@ package de.uka.ilkd.key.ldt;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A little helper class to resolve the settings for treatment of final fields.
@@ -21,6 +22,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class FinalHeapResolution {
     private static volatile boolean finalEnabledVariable;
     private static final String SETTING = "finalFields";

@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 import de.uka.ilkd.key.settings.ProofSettings;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -30,7 +31,11 @@ class FinalHeapResolutionTest {
 
     private static final String FINAL_FIELDS = "finalFields";
 
-    private static ProofSettings settingsWith(String finalFieldsValue) {
+    /**
+     * @param finalFieldsValue the value for the {@code finalFields} choice, or {@code null} to
+     *        leave the choice absent
+     */
+    private static ProofSettings settingsWith(@Nullable String finalFieldsValue) {
         ProofSettings settings = new ProofSettings(ProofSettings.DEFAULT_SETTINGS);
         var choices = new TreeMap<>(settings.getChoiceSettings().getDefaultChoices());
         if (finalFieldsValue == null) {

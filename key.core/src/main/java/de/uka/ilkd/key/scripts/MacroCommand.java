@@ -6,8 +6,10 @@ package de.uka.ilkd.key.scripts;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ServiceLoader;
 
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -91,11 +93,13 @@ public class MacroCommand extends AbstractCommand {
             }
         }
 
-        Goal g = state.getFirstOpenAutomaticGoal();
+        Goal g = state().getFirstOpenAutomaticGoal();
         ProofMacroFinishedInfo info =
-            ProofMacroFinishedInfo.getDefaultInfo(macro, state.getProof());
+            ProofMacroFinishedInfo.getDefaultInfo(macro, state().getProof());
+        final AbstractUserInterfaceControl ui =
+            Objects.requireNonNull(uiControl, "No user interface control is available");
         try {
-            uiControl.taskStarted(
+            ui.taskStarted(
                 new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
             final Sequent sequent = g.node().sequent();
             PosInOccurrence pio = null;
@@ -111,13 +115,13 @@ public class MacroCommand extends AbstractCommand {
             }
 
             synchronized (macro) {
-                info = macro.applyTo(uiControl, g.node(), pio, uiControl);
+                info = macro.applyTo(ui, g.node(), pio, ui);
             }
         } catch (Exception e) {
             throw new ScriptException(
                 "Macro '" + args.macroName + "' raised an exception: " + e.getMessage(), e);
         } finally {
-            uiControl.taskFinished(info);
+            ui.taskFinished(info);
             macro.resetParams();
         }
     }
@@ -131,9 +135,8 @@ public class MacroCommand extends AbstractCommand {
      * @return
      * @throws ScriptException
      */
-    public static PosInOccurrence extractMatchingPio(
-            final Sequent sequent, final String matchRegEx,
-            final Services services) throws ScriptException {
+    public static PosInOccurrence extractMatchingPio(final Sequent sequent,
+            final @Nullable String matchRegEx, final Services services) throws ScriptException {
         PosInOccurrence pio = null;
         boolean matched = false;
 
@@ -156,7 +159,7 @@ public class MacroCommand extends AbstractCommand {
                 String.format("Did not find a formula matching regex %s", matchRegEx));
         }
 
-        return pio;
+        return Objects.requireNonNull(pio, "No matching formula found");
     }
 
     /**
@@ -191,7 +194,7 @@ public class MacroCommand extends AbstractCommand {
 
         @Documentation("Run on formula number \"occ\" parameter")
         @Option(value = "occ")
-        public @Nullable Integer occ = -1;
+        public Integer occ = -1;
 
         /** Run on formula matching the given regex */
         @Option(value = "matches")

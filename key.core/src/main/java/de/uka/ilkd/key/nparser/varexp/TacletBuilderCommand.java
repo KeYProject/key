@@ -9,6 +9,7 @@ import java.util.List;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This interface describes a commands that manipulate taclets during construction in the parser.
@@ -21,6 +22,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (12/9/19)
  */
+@NullMarked
 public interface TacletBuilderCommand {
     /**
      * Checks if this command is responsible for the given command name. For example, for

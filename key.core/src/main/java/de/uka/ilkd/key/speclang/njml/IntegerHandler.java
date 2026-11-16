@@ -8,16 +8,19 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.speclang.njml.OverloadedOperatorHandler.JMLOperator.*;
 
+@NullMarked
 public class IntegerHandler extends LDTHandler {
     private final Map<JMLOperator, TypedOperator> jmlCheckedIntMap =
         new EnumMap<>(JMLOperator.class);
@@ -40,9 +43,15 @@ public class IntegerHandler extends LDTHandler {
 
         this.specMathMode = specMathMode;
 
-        var intKjt = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT);
-        var longKjt = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG);
-        var bigIntKjt = services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+        var intKjt = Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_INT),
+            "int KJT not registered");
+        var longKjt = Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_LONG),
+            "long KJT not registered");
+        var bigIntKjt = Objects.requireNonNull(
+            services.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT),
+            "bigint KJT not registered");
 
         var intLDT = services.getTypeConverter().getIntegerLDT();
         Map<JMLOperator, TypedOperator> jmlIntMap = new EnumMap<>(JMLOperator.class);
@@ -183,8 +192,10 @@ public class IntegerHandler extends LDTHandler {
     public EnumSet<SpecMathMode> supportingModes(JMLOperator op) {
         var modes = EnumSet.noneOf(SpecMathMode.class);
         // JAVA mode dispatches to the plain int/long tables
-        if (opCategories.get(PrimitiveType.JAVA_INT).containsKey(op)
-                || opCategories.get(PrimitiveType.JAVA_LONG).containsKey(op)) {
+        if (Objects.requireNonNull(opCategories.get(PrimitiveType.JAVA_INT),
+            "int operator table missing").containsKey(op)
+                || Objects.requireNonNull(opCategories.get(PrimitiveType.JAVA_LONG),
+                    "long operator table missing").containsKey(op)) {
             modes.add(SpecMathMode.JAVA);
         }
         // SAFE mode dispatches to the overflow-checked int/long tables

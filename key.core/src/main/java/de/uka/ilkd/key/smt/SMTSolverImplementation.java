@@ -7,14 +7,17 @@ package de.uka.ilkd.key.smt;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
+import de.uka.ilkd.key.smt.communication.Pipe;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
 import de.uka.ilkd.key.smt.communication.SolverCommunication.Message;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
@@ -24,6 +27,8 @@ import de.uka.ilkd.key.taclettranslation.assumptions.TacletSetTranslation;
 import org.key_project.prover.sequent.Sequent;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * @author ?
  * @author Wolfram Pfeifer (SMT communication overhaul)
  */
+@NullMarked
 public final class SMTSolverImplementation implements SMTSolver, Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(SMTSolverImplementation.class);
 
@@ -62,7 +68,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * the ModelExtractor used to generate counterexamples (only used for CE solver type)
      */
-    private ModelExtractor query;
+    private @Nullable ModelExtractor query;
 
     /**
      * The SMT problem that is related to this solver
@@ -93,13 +99,13 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * The thread that is associated with this solver.
      */
-    private Thread thread;
+    private @Nullable Thread thread;
 
     /**
      * The timeout that is associated with this solver. Represents the timertask that is started
      * when the solver is started.
      */
-    private SolverTimeout solverTimeout;
+    private @Nullable SolverTimeout solverTimeout;
 
     /**
      * stores the reason for interruption if present (e.g. User, Timeout, Exception)
@@ -119,7 +125,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * Stores the settings that are used for the execution.
      */
-    private SMTSettings smtSettings;
+    private @Nullable SMTSettings smtSettings;
 
     /**
      * Stores the translation of the problem that is associated with this solver
@@ -129,12 +135,12 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     /**
      * Stores the taclet translation that is associated with this solver.
      */
-    private TacletSetTranslation tacletTranslation;
+    private @Nullable TacletSetTranslation tacletTranslation;
 
     /**
      * If there was an exception while executing the solver it is stored in this attribute.
      */
-    private Throwable exception;
+    private @Nullable Throwable exception;
 
     /**
      * the exceptions that may occur during taclet translation
@@ -186,11 +192,11 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         return isRunning() ? ReasonOfInterruption.NoInterruption : reasonOfInterruption;
     }
 
-    public Throwable getException() {
+    public @Nullable Throwable getException() {
         return isRunning() ? null : exception;
     }
 
-    public SMTProblem getProblem() {
+    public @Nullable SMTProblem getProblem() {
         return isRunning() ? null : problem;
     }
 
@@ -256,32 +262,34 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         // Secondly: Translate the given problem
         String[] commands;
         try {
-            commands = translateToCommand(problem.getSequent());
+            commands = translateToCommand(Objects.requireNonNull(problem.getSequent(),
+                "sequent"));
         } catch (Throwable e) {
             interruptionOccurred(e);
             listener.processInterrupted(this, problem, e);
             setSolverState(SolverState.Stopped);
-            solverTimeout.cancel();
+            Objects.requireNonNull(solverTimeout, "solver timeout").cancel();
             return;
         }
 
         // Thirdly: start the external process.
         try {
             processLauncher.launch(commands);
-            processLauncher.getPipe().sendMessage(type.modifyProblem(problemString));
-            // processLauncher.getPipe().sendEOF();
+            // the pipe is only accessible after the process has been launched
+            Pipe pipe = Objects.requireNonNull(processLauncher.getPipe(), "pipe");
+            pipe.sendMessage(type.modifyProblem(problemString));
 
-            String msg = processLauncher.getPipe().readMessage();
+            String msg = pipe.readMessage();
             while (msg != null) {
-                socket.messageIncoming(processLauncher.getPipe(), msg);
-                msg = processLauncher.getPipe().readMessage();
+                socket.messageIncoming(pipe, msg);
+                msg = pipe.readMessage();
             }
         } catch (IllegalStateException | IOException | InterruptedException e) {
             interruptionOccurred(e);
             Thread.currentThread().interrupt();
         } finally {
             // Close everything.
-            solverTimeout.cancel();
+            Objects.requireNonNull(solverTimeout, "solver timeout").cancel();
             setSolverState(SolverState.Stopped);
             listener.processStopped(this, problem);
             processLauncher.stop();
@@ -317,8 +325,10 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     }
 
     private String[] translateToCommand(Sequent sequent) throws IllegalFormulaException {
+        // the settings are attached by start() before the solver thread runs
+        SMTSettings settings = Objects.requireNonNull(smtSettings, "smt settings");
         if (getType() == SolverTypes.Z3_CE_SOLVER) {
-            Proof proof = problem.getGoal().proof();
+            Proof proof = Objects.requireNonNull(problem.getGoal(), "goal").proof();
             SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
 
             Proof originalProof = null;
@@ -329,12 +339,15 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
                 }
             }
 
+            ProofOblInput proofOblInput = Objects.requireNonNull(
+                specrep.getProofOblInput(Objects.requireNonNull(originalProof, "original proof")),
+                "proof obligation input");
             KeYJavaType typeOfClassUnderTest =
-                specrep.getProofOblInput(originalProof).getContainerType();
+                Objects.requireNonNull(proofOblInput.getContainerType(), "container type");
 
             SMTObjTranslator objTrans =
-                new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);
-            problemString = objTrans.translateProblem(sequent, services, smtSettings).toString();
+                new SMTObjTranslator(settings, services, typeOfClassUnderTest);
+            problemString = objTrans.translateProblem(sequent, services, settings).toString();
             ModelExtractor transQuery = objTrans.getQuery();
             getSocket().setQuery(transQuery);
             tacletTranslation = null;
@@ -342,7 +355,7 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         } else {
             SMTTranslator trans = getType().createTranslator();
             problemString =
-                indent(trans.translateProblem(sequent, services, smtSettings).toString());
+                indent(trans.translateProblem(sequent, services, settings).toString());
             if (trans instanceof AbstractSMTTranslator) {
                 // Since taclet translation in the old form is no longer used,
                 // this will likely disappear.
@@ -374,17 +387,17 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     }
 
     @Override
-    public SMTSolverResult getFinalResult() {
+    public @Nullable SMTSolverResult getFinalResult() {
         return isRunning() ? null : solverCommunication.getFinalResult();
     }
 
     @Override
-    public TacletSetTranslation getTacletTranslation() {
+    public @Nullable TacletSetTranslation getTacletTranslation() {
         return isRunning() ? null : tacletTranslation;
     }
 
     @Override
-    public String getTranslation() {
+    public @Nullable String getTranslation() {
         return isRunning() ? null : problemString;
     }
 
@@ -424,11 +437,11 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
         return socket;
     }
 
-    public ModelExtractor getQuery() {
+    public @Nullable ModelExtractor getQuery() {
         return query;
     }
 
-    public void setQuery(ModelExtractor query) {
+    public void setQuery(@Nullable ModelExtractor query) {
         this.query = query;
     }
 }

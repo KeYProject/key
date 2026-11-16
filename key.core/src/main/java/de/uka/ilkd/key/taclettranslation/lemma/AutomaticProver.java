@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.taclettranslation.lemma;
 
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
@@ -15,12 +16,16 @@ import de.uka.ilkd.key.proof.Proof;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A very simple type of prover, but it is sufficient for the automatic lemmata handling: Normally
  * there is a mechanism for choosing the next goal in a cyclic way if for the currently chosen goal
  * no rules are left that could be applied. This is not done within this automatic prover, because
  * it is not necessary: Either the proof can be closed or not.
  */
+@NullMarked
 public class AutomaticProver {
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -73,7 +78,7 @@ public class AutomaticProver {
     private class Worker implements Runnable {
         private final Proof proof;
         private final int maxNumberOfRules;
-        private Throwable exception;
+        private @Nullable Throwable exception;
 
         public Worker(Proof proof, int maxNumberOfRules) {
             super();
@@ -89,7 +94,7 @@ public class AutomaticProver {
             return result;
         }
 
-        public Throwable getException() {
+        public @Nullable Throwable getException() {
             return exception;
         }
 
@@ -104,7 +109,7 @@ public class AutomaticProver {
                     if (app == null) {
                         openGoals.removeFirst();
                     } else {
-                        ImmutableList<Goal> goals = goal.apply(app);
+                        ImmutableList<Goal> goals = Objects.requireNonNull(goal.apply(app));
                         for (Goal res : goals) {
                             if (!res.equals(goal)) {
                                 openGoals.add(res);
@@ -129,11 +134,12 @@ public class AutomaticProver {
             }
         }
 
-        private RuleApp getNextApp(Goal goal) {
-            RuleApp app = goal.getRuleAppManager().next();
+        private @Nullable RuleApp getNextApp(Goal goal) {
+            var ruleAppManager = Objects.requireNonNull(goal.getRuleAppManager());
+            RuleApp app = ruleAppManager.next();
             if (app == null) {
                 goal.ruleAppIndex().scanBuiltInRules(goal);
-                app = goal.getRuleAppManager().next();
+                app = ruleAppManager.next();
             }
             return app;
         }

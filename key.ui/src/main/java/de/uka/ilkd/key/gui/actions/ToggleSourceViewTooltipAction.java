@@ -12,6 +12,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Toggles the tooltips of the source view.
  *
@@ -19,6 +21,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
  *
  * @see de.uka.ilkd.key.gui.sourceview.SourceView#getToolTipText()
  */
+@NullMarked
 public class ToggleSourceViewTooltipAction extends MainWindowAction {
     /** This action's name. */
     public static final String NAME = "Show Tooltips in Source View";
@@ -29,7 +32,12 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
 
     // private static final long serialVersionUID = -3352122484627890921L;
 
-    /** Listens to changes to the view settings to call {@link #updateSelectedState()}. */
+    /**
+     * The listener is invoked only for view-settings changes that happen after construction
+     * completes; the reference from the field-initializer lambda to {@link #updateSelectedState()}
+     * is a deferred call (EISOP initialization check), suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final PropertyChangeListener viewSettingsListener = e -> updateSelectedState();
 
     /**
@@ -37,6 +45,12 @@ public class ToggleSourceViewTooltipAction extends MainWindowAction {
      *
      * @param mainWindow the main window.
      */
+    /**
+     * The action-configuration calls and the listener registration below operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * since these configure the local action only, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ToggleSourceViewTooltipAction(MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);

@@ -13,6 +13,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.SMTSolver.ReasonOfInterruption;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * IN ORDER TO START THE SOLVERS USE THIS CLASS.<br>
  * There are two cases how the solvers can be started:<br>
@@ -77,6 +79,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
  * can be accessed by <code>solver.getException</code>.
  */
 
+@NullMarked
 public class SolverLauncher implements SolverListener {
 
     /* ############### Public Interface #################### */
@@ -430,6 +433,7 @@ public class SolverLauncher implements SolverListener {
  * The session class encapsulates some attributes that should be only accessed by specified methods
  * (in order to maintain thread safety)
  */
+@NullMarked
 class Session {
 
     /**

@@ -7,6 +7,7 @@ package de.uka.ilkd.key.speclang.njml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
@@ -69,6 +70,7 @@ public class MethodlevelTranslatorTest {
             System.out.println(e.getMessage());
         }
         assertEquals(0, parser.getNumberOfSyntaxErrors());
+        ctx = Objects.requireNonNull(ctx, "the parse must have succeeded");
 
         // Test parser
         List<JmlParser.ModifierContext> modelMethodModifiers =
@@ -116,6 +118,7 @@ public class MethodlevelTranslatorTest {
             debugLexer(modelMethodNullable);
         }
         assertEquals(0, parser.getNumberOfSyntaxErrors());
+        ctx = Objects.requireNonNull(ctx, "the parse must have succeeded");
 
         // Test parser
 

@@ -9,11 +9,14 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A replacement map for variables.
  *
  * @author lanzinger
  */
+@NullMarked
 public class VariableReplacementMap extends ReplacementMap<LocationVariable> {
 
     /**

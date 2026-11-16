@@ -15,6 +15,8 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An ArrayInitializer is a valid expression exclusively for initializing ArrayTypes. Any other
@@ -23,6 +25,7 @@ import org.key_project.util.collection.ImmutableArray;
  * seem adequate. The parent expression is either another ArrayInitializer (nested blocks) or a
  * VariableDeclaration.
  */
+@NullMarked
 public class ArrayInitializer extends JavaNonTerminalProgramElement
         implements Expression, ExpressionContainer {
 
@@ -102,7 +105,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())
@@ -121,7 +124,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
 
 
     @Override
-    public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
+    public KeYJavaType getKeYJavaType(Services javaServ, @Nullable ExecutionContext ec) {
         return kjt;
     }
 }

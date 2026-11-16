@@ -17,6 +17,10 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class PermissionLDT extends LDT {
 
     public static final Name NAME = new Name("Permission");
@@ -51,13 +55,13 @@ public class PermissionLDT extends LDT {
     }
 
     @Override
-    public JTerm translateLiteral(Literal lit, Services services) {
+    public @Nullable JTerm translateLiteral(Literal lit, Services services) {
         assert false : "PermissionLDT: there are no permission literals: " + lit;
         return null;
     }
 
     @Override
-    public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
+    public @Nullable Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
         assert false : "PermissionLDT: there are no permission operators: " + op;
         return null;
     }
@@ -68,13 +72,13 @@ public class PermissionLDT extends LDT {
     }
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         assert false : "PermissionLDT: Cannot convert term to program: " + t;
         return null;
     }
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false : "PermissionLDT: there are no types associated with permissions " + t;
         return null;
     }

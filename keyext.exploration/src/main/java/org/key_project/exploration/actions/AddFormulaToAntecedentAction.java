@@ -8,22 +8,31 @@ import java.awt.event.ActionEvent;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.exploration.ProofExplorationService;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * @author Alexander Weigl
  * @author Sarah Grebing
  * @version 1 (24.05.18)
  */
+@NullMarked
 public class AddFormulaToAntecedentAction extends ExplorationAction {
     public AddFormulaToAntecedentAction() {
         this(MainWindow.getInstance());
     }
 
+    /**
+     * The {@link #setName(String)} call happens on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public AddFormulaToAntecedentAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Add formula to antecedent");
@@ -36,8 +45,12 @@ public class AddFormulaToAntecedentAction extends ExplorationAction {
             return;
         }
         ProofExplorationService service = ProofExplorationService.get(getMediator());
+        Goal goal = getMediator().getSelectedGoal();
+        if (goal == null) {
+            throw new NullPointerException("No goal selected.");
+        }
         @NonNull
-        Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, true);
+        Node toBeSelected = service.soundAddition(goal, t, true);
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }
 }

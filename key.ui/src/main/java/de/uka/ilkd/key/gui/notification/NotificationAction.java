@@ -6,11 +6,14 @@ package de.uka.ilkd.key.gui.notification;
 
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * this interface is implemented by notification actions
  *
  * @author bubel
  */
+@NullMarked
 public interface NotificationAction {
 
     /**

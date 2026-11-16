@@ -31,6 +31,8 @@ public class Cvc5Test extends SMTSolverTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(Cvc5Test.class);
     private static final String SOLVER_NAME = "cvc5";
 
+    // orElse(null): the registry always contains this solver type
+    @SuppressWarnings("NullAway")
     private static final SolverType CVC5_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
                     && it.getName().equals(SOLVER_NAME))

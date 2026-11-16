@@ -8,20 +8,31 @@ import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A composite structure for prover task listeners. For the moment, this is only used for the
  * application of proof macros at the outermost level.
  *
  * @author Michael Kirsten
  */
+@NullMarked
 public class CompositePTListener implements ProverTaskListener {
-    private final ProverTaskListener[] listeners;
+    private final @Nullable ProverTaskListener[] listeners;
 
-    public CompositePTListener(ProverTaskListener[] l) {
+    /**
+     * Creates a composite listener over the given listeners. Null elements are tolerated and
+     * skipped by the dispatch methods.
+     *
+     * @param l the listeners to combine, possibly containing null entries
+     */
+    public CompositePTListener(@Nullable ProverTaskListener[] l) {
         this.listeners = l;
     }
 
-    public CompositePTListener(ProverTaskListener ptl1, ProverTaskListener ptl2) {
+    public CompositePTListener(@Nullable ProverTaskListener ptl1,
+            @Nullable ProverTaskListener ptl2) {
         this(new ProverTaskListener[] { ptl1, ptl2 });
     }
 

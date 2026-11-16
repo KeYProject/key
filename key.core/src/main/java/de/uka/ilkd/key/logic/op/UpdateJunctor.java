@@ -10,12 +10,15 @@ import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Class of update junctor operators, i.e., operators connecting a given number of updates to create
  * another update. There are currently two such operators: the empty update "skip" and the parallel
  * update connector "|".
  */
+@NullMarked
 public final class UpdateJunctor extends JAbstractSortedOperator {
 
     public static final UpdateJunctor SKIP = new UpdateJunctor(new Name("skip"), 0);

@@ -8,12 +8,16 @@ import de.uka.ilkd.key.java.Services;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A program model element representing class types.
  *
  * @author AL
  * @author RN
  */
+@NullMarked
 public interface ClassType extends Type, Member, ClassTypeContainer {
 
     /**
@@ -44,15 +48,19 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
      * class type isself as first element. The order allows to resolve member overloading or
      * overloading.
      *
-     * @return the array of all supertypes of this type in topological order.
+     * @return the array of all supertypes of this type in topological order, or {@code null} if the
+     *         implementation cannot compute it
      */
+    @Nullable
     ImmutableList<ClassType> getAllSupertypes(Services services);
 
     /**
      * Returns the fields locally defined within this class type.
      *
-     * @return the array of field members of this type.
+     * @return the array of field members of this type, or {@code null} if the implementation cannot
+     *         compute it
      */
+    @Nullable
     ImmutableList<Field> getFields(Services services);
 
 
@@ -67,32 +75,40 @@ public interface ClassType extends Type, Member, ClassTypeContainer {
     /**
      * Returns the methods locally defined within this class type.
      *
-     * @return the array of methods of this type.
+     * @return the array of methods of this type, or {@code null} if the implementation cannot
+     *         compute it
      */
+    @Nullable
     ImmutableList<Method> getMethods(Services services);
 
     /**
      * Returns all visible methods that are defined in this class type or any of its supertypes. The
      * methods are in topological order with respect to the inheritance hierarchy.
      *
-     * @return the array of visible methods of this type and its supertypes.
+     * @return the array of visible methods of this type and its supertypes, or {@code null} if the
+     *         implementation cannot compute it
      */
+    @Nullable
     ImmutableList<Method> getAllMethods(Services services);
 
     /**
      * Returns the constructors locally defined within this class type.
      *
-     * @return the array of constructors of this type.
+     * @return the array of constructors of this type, or {@code null} if the implementation cannot
+     *         compute it
      */
+    @Nullable
     ImmutableList<Constructor> getConstructors(Services services);
 
     /**
      * Returns all class types that are inner types of this class type, including visible inherited
      * types.
      *
-     * @return an array of class types that are members of this type or any of its supertypes.
+     * @return an array of class types that are members of this type or any of its supertypes, or
+     *         {@code null} if the implementation cannot compute it
      * @see #getAllSupertypes
      */
+    @Nullable
     ImmutableList<ClassType> getAllTypes(Services services);
 
 }

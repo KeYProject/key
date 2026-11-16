@@ -5,8 +5,12 @@
 package de.uka.ilkd.key.scripts;
 
 
+import java.util.Objects;
+
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -54,31 +58,42 @@ public class HideCommand extends AbstractCommand {
         var args = state().getValueInjector().inject(new Parameters(), arguments);
 
         Goal goal = state().getFirstOpenAutomaticGoal();
+        Services services = Objects.requireNonNull(service, "proof services are not set");
+        Sequent sequent = Objects.requireNonNull(args.sequent, "sequent must be given");
+        ProofEnvironment env = Objects.requireNonNull(state().getProof().getEnv(),
+            "proof environment is null");
 
-        Taclet hideLeft =
-            state().getProof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(HIDE_LEFT);
-        for (SequentFormula s : args.sequent.antecedent()) {
+        Taclet hideLeft = Objects.requireNonNull(
+            env.getInitConfigForEnvironment().lookupActiveTaclet(HIDE_LEFT),
+            "taclet 'hide_left' not found");
+        for (SequentFormula s : sequent.antecedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideLeft);
             SequentFormula s2 = find(s, goal.sequent().antecedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, (JTerm) s2.formula(),
-                service, true);
-            app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), true),
-                service);
+            app = Objects.requireNonNull(
+                app.addCheckedInstantiation(sv, (JTerm) s2.formula(), services, true),
+                "checked instantiation of schema variable failed");
+            app = Objects.requireNonNull(
+                app.setPosInOccurrence(
+                    new PosInOccurrence(s2, PosInTerm.getTopLevel(), true), services),
+                "could not set position in occurrence");
             goal.apply(app);
         }
 
-        Taclet hideRight =
-            state().getProof().getEnv().getInitConfigForEnvironment()
-                    .lookupActiveTaclet(HIDE_RIGHT);
-        for (SequentFormula s : args.sequent.succedent()) {
+        Taclet hideRight = Objects.requireNonNull(
+            env.getInitConfigForEnvironment().lookupActiveTaclet(HIDE_RIGHT),
+            "taclet 'hide_right' not found");
+        for (SequentFormula s : sequent.succedent()) {
             TacletApp app = NoPosTacletApp.createNoPosTacletApp(hideRight);
             SequentFormula s2 = find(s, goal.sequent().succedent());
             SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-            app = app.addCheckedInstantiation(sv, (JTerm) s2.formula(),
-                service, true);
-            app = app.setPosInOccurrence(new PosInOccurrence(s2, PosInTerm.getTopLevel(), false),
-                service);
+            app = Objects.requireNonNull(
+                app.addCheckedInstantiation(sv, (JTerm) s2.formula(), services, true),
+                "checked instantiation of schema variable failed");
+            app = Objects.requireNonNull(
+                app.setPosInOccurrence(
+                    new PosInOccurrence(s2, PosInTerm.getTopLevel(), false), services),
+                "could not set position in occurrence");
             goal.apply(app);
         }
     }

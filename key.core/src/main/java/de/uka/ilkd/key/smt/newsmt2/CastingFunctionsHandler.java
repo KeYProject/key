@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt.newsmt2;
 
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -15,6 +16,9 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This SMT translation handler takes care of those parametric functions f whose return type is
@@ -29,18 +33,21 @@ import org.key_project.logic.sort.Sort;
  * @author Mattias Ulbrich
  * @see CastHandler
  */
+@NullMarked
 public class CastingFunctionsHandler implements SMTHandler {
 
-    private ParametricFunctionDecl seqGet;
-    private ParametricFunctionDecl select;
+    private @Nullable ParametricFunctionDecl seqGet;
+    private @Nullable ParametricFunctionDecl select;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.seqGet = services.getTypeConverter().getSeqLDT().getSeqGet();
-        this.select =
-            services.getTypeConverter().getHeapLDT().getSelect();
-        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+        this.select = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT").getSelect();
+        // the master always loads the snippets for every handler
+        masterHandler.addDeclarationsAndAxioms(
+            Objects.requireNonNull(handlerSnippets, "handler snippets"));
     }
 
     @Override

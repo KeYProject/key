@@ -6,6 +6,7 @@ package de.uka.ilkd.key.gui.join;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.Objects;
 import javax.swing.*;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -19,16 +20,28 @@ import de.uka.ilkd.key.proof.join.ProspectivePartner;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The menu item for the "delayed-cut" join rule.
  *
  * @author Benjamin Niedermann
  * @see JoinProcessor
  */
+@NullMarked
 public class JoinMenuItem extends JMenuItem {
 
     private static final long serialVersionUID = -2602116358650063634L;
 
+    /**
+     * Creates the join menu item.
+     *
+     * <p>
+     * The item sets its text and action while the receiver is still under initialization (EISOP
+     * initialization check); the action only fires once the item is displayed after construction,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public JoinMenuItem(final List<ProspectivePartner> partner, final Proof proof,
             final KeYMediator mediator) {
         super();
@@ -54,7 +67,6 @@ public class JoinMenuItem extends JMenuItem {
 
     private void start(ProspectivePartner partner, Proof proof, final KeYMediator mediator) {
 
-
         JoinProcessor processor = new JoinProcessor(partner, proof);
 
         processor.addListener(new Listener() {
@@ -70,10 +82,12 @@ public class JoinMenuItem extends JMenuItem {
                     // This method delegates the request only to the UserInterfaceControl which
                     // implements the functionality.
                     // No functionality is allowed in this method body!
-                    mediator.getUI().getProofControl()
-                            .startAutoMode(mediator.getSelectedProof(), goals);
+                    // Auto mode requires a selected proof; without one the auto-mode
+                    // implementations crashed with an NPE, kept crash-equivalent here.
+                    Proof selectedProof =
+                        Objects.requireNonNull(mediator.getSelectedProof());
+                    mediator.getUI().getProofControl().startAutoMode(selectedProof, goals);
                 });
-
 
             }
         });
@@ -81,7 +95,6 @@ public class JoinMenuItem extends JMenuItem {
         Thread thread = new Thread(processor, "ProofJoinProcessor");
         thread.start();
     }
-
 
     @Override
     public String toString() {

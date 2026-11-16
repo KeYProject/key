@@ -18,9 +18,13 @@ import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Extracts specifications from comments.
  */
+@NullMarked
 public interface SpecExtractor {
 
     /**
@@ -41,6 +45,7 @@ public interface SpecExtractor {
     /**
      * Returns the loop invariant for the passed loop (if any).
      */
+    @Nullable
     LoopSpecification extractLoopInvariant(IProgramMethod pm, LoopStatement loop)
             throws SLTranslationException;
 
@@ -82,7 +87,7 @@ public interface SpecExtractor {
      * @param methodParams TODO
      */
     ImmutableSet<MergeContract> extractMergeContracts(IProgramMethod method,
-            MergePointStatement mps, ImmutableList<LocationVariable> methodParams)
+            MergePointStatement mps, @Nullable ImmutableList<LocationVariable> methodParams)
             throws SLTranslationException;
 
     /**

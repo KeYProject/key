@@ -6,11 +6,16 @@ package de.uka.ilkd.key.gui.fonticons;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Alexander Weigl
  * @version 1 (08.04.19)
  */
+@NullMarked
 public enum FontAwesomeSolid implements IconFont {
     AD('\uf641'), ADDRESS_BOOK('\uf2b9'), ADDRESS_CARD('\uf2bb'), ADJUST('\uf042'),
     AIR_FRESHENER('\uf5d0'), ALIGN_CENTER('\uf037'), ALIGN_JUSTIFY('\uf039'), ALIGN_LEFT('\uf036'),
@@ -254,18 +259,35 @@ public enum FontAwesomeSolid implements IconFont {
     WINDOW_RESTORE('\uf2d2'), WINE_BOTTLE('\uf72f'), WINE_GLASS('\uf4e3'), WINE_GLASS_ALT('\uf5ce'),
     WON_SIGN('\uf159'), WRENCH('\uf0ad'), X_RAY('\uf497'), YEN_SIGN('\uf157'), YIN_YANG('\uf6ad');
 
-    private static Font font;
+    private static @Nullable Font font;
     private final char unicode;
 
     FontAwesomeSolid(char c) {
         unicode = c;
     }
 
+    /**
+     * Returns the font of this icon set, loaded lazily from the bundled resource.
+     *
+     * <p>
+     * The stream returned by the class-loading chain is initialized by construction, but EISOP
+     * models it as {@code @UnknownInitialization} in this large enum (the JDK stub annotates only
+     * the nullness of {@code Class.getResourceAsStream}); the {@code null} guard above already
+     * excludes a missing resource, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     @Override
     public Font getFont() throws IOException, FontFormatException {
         if (font == null) {
-            font = Font.createFont(Font.TRUETYPE_FONT,
-                getClass().getResourceAsStream("/fonts/Font Awesome 6 Free-Solid-900.otf"));
+            InputStream stream = FontAwesomeSolid.class
+                    .getResourceAsStream("/fonts/Font Awesome 6 Free-Solid-900.otf");
+            if (stream == null) {
+                // the solid font is bundled with KeY; a missing resource is an inconsistent
+                // state in which the original code failed with a NullPointerException
+                throw new NullPointerException(
+                    "Missing font resource /fonts/Font Awesome 6 Free-Solid-900.otf");
+            }
+            font = Font.createFont(Font.TRUETYPE_FONT, stream);
         }
         return font;
     }

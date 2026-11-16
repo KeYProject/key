@@ -9,6 +9,8 @@ import java.util.List;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Trigger;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The triggers that trigger selection found in one literal of a clause.
  *
@@ -21,6 +23,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.Trigger;
  * @param covering the triggers of the literal that bind every universal variable of the clause
  * @param elements the triggers of the literal that bind only some of them
  */
+@NullMarked
 public record LiteralTriggers(JTerm literal, List<Trigger> covering, List<Trigger> elements) {
 
     /** Whether the literal yielded neither a covering trigger nor an element. */

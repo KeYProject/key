@@ -11,6 +11,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * One clause of a quantified formula, as trigger selection reads it.
  *
@@ -23,6 +25,7 @@ import org.key_project.util.collection.ImmutableSet;
  * @param universalVariables the formula's universal variables occurring free in the clause
  * @param literals the literals, negations stripped, if-then-else expanded
  */
+@NullMarked
 public record ClauseAnalysis(JTerm clause,
         ImmutableSet<QuantifiableVariable> universalVariables,
         List<JTerm> literals) {

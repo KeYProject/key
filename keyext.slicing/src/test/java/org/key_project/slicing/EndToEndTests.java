@@ -6,7 +6,6 @@ package org.key_project.slicing;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -25,6 +24,7 @@ import org.key_project.slicing.analysis.DependencyAnalyzer;
 import org.key_project.util.collection.Pair;
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -40,8 +40,39 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class EndToEndTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(EndToEndTests.class);
 
-    public static final Path testCaseDirectory =
-        Objects.requireNonNull(FindResources.getTestCasesDirectory()).toAbsolutePath();
+    public static final Path testCaseDirectory = requireTestCasesDirectory();
+
+    private static Path requireTestCasesDirectory() {
+        Path directory = FindResources.getTestCasesDirectory();
+        if (directory == null) {
+            throw new NullPointerException("Test case directory not found.");
+        }
+        return directory.toAbsolutePath();
+    }
+
+    /**
+     * Walk up {@code levels} parent directories of the given path, failing loudly if the path
+     * chain ends prematurely.
+     *
+     * @param path the starting path
+     * @param levels how many parent steps to take
+     * @return the ancestor {@code levels} levels above {@code path}
+     */
+    private static Path getAncestor(Path path, int levels) {
+        Path current = path;
+        for (int i = 0; i < levels; i++) {
+            if (current == null) {
+                throw new NullPointerException(
+                    "Path has no parent " + (i + 1) + " level(s) up: " + path);
+            }
+            current = current.getParent();
+        }
+        if (current == null) {
+            throw new NullPointerException(
+                "Path has no parent " + levels + " level(s) up: " + path);
+        }
+        return current;
+    }
 
     /**
      * Load and slice a proof after analyzing it using the dependency analysis algorithm.
@@ -58,14 +89,24 @@ class EndToEndTests {
 
         // test getNodeThatProduced
         DependencyTracker tracker = proof.lookup(DependencyTracker.class);
+        if (tracker == null) {
+            throw new NullPointerException("No dependency tracker registered for the proof.");
+        }
         Node node26 = proof.findAny(n -> n != null && n.serialNr() == 26);
+        if (node26 == null) {
+            throw new NullPointerException("Node with serial number 26 not found.");
+        }
         int[] producingNodes =
             { 15, 15, 13, 12, 11, 23, 25, 24, 22, 21, 19, 17, 2, 16, 0 };
         for (int i = 0; i < producingNodes.length; i++) {
             PosInOccurrence pio = PosInOccurrence.findInSequent(
                 node26.sequent(), i + 1, PosInTerm.getTopLevel());
-            assertEquals(producingNodes[i],
-                tracker.getNodeThatProduced(node26, pio).serialNr());
+            Node producingNode = tracker.getNodeThatProduced(node26, pio);
+            if (producingNode == null) {
+                throw new NullPointerException(
+                    "No node producing sequent formula " + (i + 1) + ".");
+            }
+            assertEquals(producingNodes[i], producingNode.serialNr());
         }
         proof.dispose();
     }
@@ -80,8 +121,7 @@ class EndToEndTests {
     @Test
     void sliceMultipleIterations() throws Exception {
         // simple Java proof
-        Path directory = testCaseDirectory
-                .getParent().getParent().getParent().getParent().getParent()
+        Path directory = getAncestor(testCaseDirectory, 5)
                 .resolve("key.ui")
                 .resolve("examples").resolve("firstTouch").resolve("05-ReverseArray")
                 .resolve("reverseArray.proof");
@@ -177,10 +217,16 @@ class EndToEndTests {
             sliceProofFullFilename(iteration2.second, 10, 9, false, true, true);
         var iteration4 =
             sliceProofFullFilename(iteration3.second, 9, 8, false, true, true);
-        assertEquals("w TRUE",
-            iteration4.first.findAny(x -> x.serialNr() == 6).getNodeInfo().getBranchLabel());
-        assertEquals("w FALSE",
-            iteration4.first.findAny(x -> x.serialNr() == 7).getNodeInfo().getBranchLabel());
+        Node branchNode = iteration4.first.findAny(x -> x.serialNr() == 6);
+        if (branchNode == null) {
+            throw new NullPointerException("Node with serial number 6 not found.");
+        }
+        assertEquals("w TRUE", branchNode.getNodeInfo().getBranchLabel());
+        branchNode = iteration4.first.findAny(x -> x.serialNr() == 7);
+        if (branchNode == null) {
+            throw new NullPointerException("Node with serial number 7 not found.");
+        }
+        assertEquals("w FALSE", branchNode.getNodeInfo().getBranchLabel());
         Files.delete(iteration4.second);
         Files.delete(iteration3.second);
         Files.delete(iteration2.second);
@@ -282,7 +328,7 @@ class EndToEndTests {
         GeneralSettings.noPruningClosed = false;
         // load proof
         Assertions.assertTrue(Files.exists(proofFile), "File " + proofFile + " does not exist");
-        AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
+        AtomicReference<@Nullable DependencyTracker> tracker = new AtomicReference<>();
         LOGGER.trace("Loading {}", proofFile.toAbsolutePath());
         KeYEnvironment<?> environment =
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null,
@@ -295,15 +341,25 @@ class EndToEndTests {
         try {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
+            if (proof == null) {
+                throw new NullPointerException("No proof loaded from '" + proofFile + "'.");
+            }
             Assertions.assertNotNull(proof);
             boolean originalProofClosed = proof.closed();
             // track proof (if not done already)
             if (!trackOnline) {
                 tracker.set(new DependencyTracker(proof));
             }
+            DependencyTracker dependencyTracker = tracker.get();
+            if (dependencyTracker == null) {
+                throw new NullPointerException("No dependency tracker registered for the proof.");
+            }
             // analyze proof
             AnalysisResults results =
-                tracker.get().analyze(doDependencyAnalysis, doDeduplicateRuleApps);
+                dependencyTracker.analyze(doDependencyAnalysis, doDeduplicateRuleApps);
+            if (results == null) {
+                throw new NullPointerException("No analysis results returned.");
+            }
             if (expectedTotal > 0) {
                 assertEquals(expectedTotal, results.totalSteps);
             } else {
@@ -323,6 +379,9 @@ class EndToEndTests {
                 KeYEnvironment.load(JavaProfile.getDefaultInstance(), tempFile, null, null,
                     null, null, null, DependencyTracker::new, true);
             Proof slicedProof = loadedEnvironment.getLoadedProof();
+            if (slicedProof == null) {
+                throw new NullPointerException("No proof loaded from the sliced proof file.");
+            }
 
             if (originalProofClosed) {
                 Assertions.assertTrue(slicedProof.closed(), "Proof is not closed");

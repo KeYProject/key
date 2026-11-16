@@ -6,8 +6,10 @@ package de.uka.ilkd.key.util.properties;
 
 import java.util.IdentityHashMap;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class MapProperties extends AbstractProperties {
 
     private final IdentityHashMap<Object, Object> map;
@@ -31,7 +33,7 @@ public class MapProperties extends AbstractProperties {
      * @see jatc.util.Properties#put(jatc.util.MapProperties.Property, T)
      */
     @Override
-    public <T> void put(Property<T> property, T value) {
+    public <T> void put(Property<T> property, @Nullable T value) {
         T oldValue = get(property);
         // double check typing
         property.getType().cast(value);

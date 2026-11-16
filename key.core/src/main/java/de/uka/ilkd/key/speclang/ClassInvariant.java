@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.JAbstractSortedOperator;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A class invariant. Objects of type ClassInvariant are an intermediate result of the specification
@@ -20,6 +21,7 @@ import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
  * precisely, of its subclasses RepresentsAxiom and PartialInvAxiom), through which class invariants
  * are actually used in proofs.
  */
+@NullMarked
 public interface ClassInvariant extends SpecificationElement {
 
 

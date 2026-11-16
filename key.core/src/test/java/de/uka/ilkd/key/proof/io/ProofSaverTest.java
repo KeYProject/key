@@ -7,6 +7,7 @@ package de.uka.ilkd.key.proof.io;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -28,7 +29,8 @@ class ProofSaverTest {
         Services services = TacletForTests.services();
         KeyIO io = new KeyIO(services);
         KeyIO.Loader loader = io.load(content);
-        Sequent seq = loader.parseFile().loadProblem().getProblem();
+        Sequent seq = Objects.requireNonNull(loader.parseFile().loadProblem().getProblem(),
+            "the problem file must contain a problem");
         final InitConfig initConfig =
             new InitConfig(new Services(AbstractProfile.getDefaultProfile()));
         Proof proof = new Proof("test", seq, null, initConfig, null);

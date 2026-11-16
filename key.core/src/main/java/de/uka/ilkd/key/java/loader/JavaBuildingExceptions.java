@@ -7,10 +7,13 @@ package de.uka.ilkd.key.java.loader;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (16.04.23)
  */
+@NullMarked
 public class JavaBuildingExceptions extends RuntimeException {
     private final List<JavaBuildingIssue> issues;
 

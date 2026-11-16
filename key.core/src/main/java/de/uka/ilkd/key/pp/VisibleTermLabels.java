@@ -8,12 +8,15 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This abstract class is used by SequentViewLogicPrinter to determine the set of printed
  * TermLabels.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 public interface VisibleTermLabels {
     boolean contains(TermLabel label);
 

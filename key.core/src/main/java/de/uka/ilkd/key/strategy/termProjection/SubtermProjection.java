@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termProjection;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.Goal;
 
@@ -14,10 +16,13 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Projection for computing a subterm of a given term. The position of the subterm within the
  * complete term is described using a <code>PosInTerm</code>.
  */
+@NullMarked
 @StableCost
 public class SubtermProjection implements ProjectionToTerm<Goal> {
 
@@ -36,6 +41,7 @@ public class SubtermProjection implements ProjectionToTerm<Goal> {
 
     @Override
     public JTerm toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
-        return (JTerm) pit.getSubTerm(completeTerm.toTerm(app, pos, goal, mState));
+        return (JTerm) pit.getSubTerm(
+            Objects.requireNonNull(completeTerm.toTerm(app, pos, goal, mState)));
     }
 }

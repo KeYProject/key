@@ -9,11 +9,14 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Tab component for {@link JTabbedPane} with a close button.
  *
  * @author lanzinger
  */
+@NullMarked
 public class ClosableTabComponent extends JPanel {
 
     private static final long serialVersionUID = -7205139488676599833L;
@@ -21,9 +24,15 @@ public class ClosableTabComponent extends JPanel {
     /**
      * Creates a new {@code ClosableTabComponent}.
      *
+     * <p>
+     * The component styles itself and adds its children while the receiver is still under
+     * initialization (EISOP initialization check); the layout only materializes once the
+     * component is shown after construction, suppressed with a scoped key.
+     *
      * @param title the component's title.
      * @param closeAction the action to execute when the component is closed.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ClosableTabComponent(String title, Action closeAction) {
         setOpaque(false);
 

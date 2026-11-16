@@ -64,6 +64,9 @@ public class TestNonDuplicateAppFeature {
             false);
     }
 
+    // the null services argument is deliberate: the indexed taclets are no-find taclets over
+    // pure formulas, so the services argument is never dereferenced
+    @SuppressWarnings("NullAway")
     private static TacletApp appAt(Goal goal, PosInOccurrence pos) {
         return goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pos, null).head();
     }

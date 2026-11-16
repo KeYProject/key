@@ -6,6 +6,7 @@ package de.uka.ilkd.key.smt;
 
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Objects;
 
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.NewSMTTranslationSettings;
@@ -35,10 +36,12 @@ public class SMTTestSettings implements de.uka.ilkd.key.smt.SMTSettings {
 
     @Override
     public Path getSMTTemporaryFolder() {
-        return PathConfig.currentPaths.keyConfigDir.resolve("smt_formula");
+        return Objects.requireNonNull(PathConfig.currentPaths, "current paths").keyConfigDir
+                .resolve("smt_formula");
     }
 
     @Override
+    @SuppressWarnings("NullAway") // test fixture: null means "no special taclets"
     public Collection<Taclet> getTaclets() {
         return null;
     }

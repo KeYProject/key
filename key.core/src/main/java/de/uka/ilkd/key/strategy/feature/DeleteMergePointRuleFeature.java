@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -18,6 +20,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Costs for the {@link DeleteMergePointRuleFeature}; incredibly cheap if the previous rule
@@ -29,6 +32,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class DeleteMergePointRuleFeature implements Feature {
     public static final Feature INSTANCE = new DeleteMergePointRuleFeature();
 
@@ -39,7 +43,7 @@ public class DeleteMergePointRuleFeature implements Feature {
     @Override
     public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, Goal goal, MutableState mState) {
-        return ((de.uka.ilkd.key.proof.Goal) goal).node().parent()
+        return Objects.requireNonNull(((de.uka.ilkd.key.proof.Goal) goal).node().parent())
                 .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
                         ? NumberRuleAppCost.create(-50000)
                         : TopRuleAppCost.INSTANCE;

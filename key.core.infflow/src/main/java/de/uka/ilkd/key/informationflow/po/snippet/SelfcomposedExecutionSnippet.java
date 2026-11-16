@@ -11,10 +11,13 @@ import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.logic.op.QuantifiableVariable;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * @author christoph
  */
+@NullMarked
 class SelfcomposedExecutionSnippet extends ReplaceAndRegisterMethod
         implements InfFlowFactoryMethod {
 

@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -54,8 +55,12 @@ public class TestTacletBuild {
 
     @Test
     public void test0() {
-        SchemaVariable u = TacletForTests.getSchemaVariables().lookup("u");
-        SchemaVariable v = TacletForTests.getSchemaVariables().lookup("v");
+        SchemaVariable u = Objects
+                .requireNonNull(TacletForTests.getSchemaVariables().lookup("u"),
+                    "schema variable u must exist");
+        SchemaVariable v = Objects
+                .requireNonNull(TacletForTests.getSchemaVariables().lookup("v"),
+                    "schema variable v must exist");
         JTerm b = tf.createTerm((JOperatorSV) TacletForTests.getSchemaVariables().lookup("b"),
             NO_SUBTERMS);
         JTerm t1 = tb.ex((QuantifiableVariable) u, b);
@@ -82,7 +87,9 @@ public class TestTacletBuild {
     @Test
     public void testUniquenessOfIfAndFindVarSVsInIfAndFind() {
         boolean thrown = false;
-        SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
+        SchemaVariable u = Objects
+                .requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name("u")),
+                    "schema variable u must exist");
         JTerm A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")),
             NO_SUBTERMS);
         JTerm t1 = tb.all((QuantifiableVariable) u, A);
@@ -104,7 +111,9 @@ public class TestTacletBuild {
     @Test
     public void testUniquenessOfIfAndFindVarSVBothInIf() {
         boolean thrown = false;
-        SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
+        SchemaVariable u = Objects
+                .requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name("u")),
+                    "schema variable u must exist");
         JTerm A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")),
             NO_SUBTERMS);
         JTerm t1 = tb.all((QuantifiableVariable) u, A);
@@ -127,7 +136,9 @@ public class TestTacletBuild {
     @Test
     public void testUniquenessOfIfAndFindVarSVsInFind() {
         boolean thrown = false;
-        SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
+        SchemaVariable u = Objects
+                .requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name("u")),
+                    "schema variable u must exist");
         JTerm A = tf.createTerm(TacletForTests.getFunctions().lookup(new Name("A")),
             NO_SUBTERMS);
         JTerm t1 = tb.all((QuantifiableVariable) u, A);
@@ -154,7 +165,10 @@ public class TestTacletBuild {
         } catch (BuildingException e) {
             assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:3"),
                 "Position of error message is wrong.");
-            assertTrue(e.getCause().getMessage().contains(
+            Throwable cause = Objects.requireNonNull(e.getCause(), "the exception has a cause");
+            String message =
+                Objects.requireNonNull(cause.getMessage(), "the cause has a message");
+            assertTrue(message.contains(
                 "Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."),
                 "Cause should be prefix error");
             return;

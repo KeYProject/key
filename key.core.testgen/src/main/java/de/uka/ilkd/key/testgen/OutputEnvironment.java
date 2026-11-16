@@ -7,7 +7,6 @@ package de.uka.ilkd.key.testgen;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
 /**
  * This class manages the different paths in the output folder.
@@ -78,20 +77,32 @@ public record OutputEnvironment(Path targetFolder, boolean onlyTestDir) {
     private void installProjectFile() throws IOException {
         if (!Files.exists(getAntFile())) {
             try (var buildXml = getClass().getResourceAsStream("/de/uka/ilkd/key/tcg/build.xml")) {
-                Files.copy(Objects.requireNonNull(buildXml), getAntFile());
+                if (buildXml == null) {
+                    throw new NullPointerException(
+                        "Resource '/de/uka/ilkd/key/tcg/build.xml' not found.");
+                }
+                Files.copy(buildXml, getAntFile());
             }
         }
 
         if (!Files.exists(getMavenFile())) {
             try (var pomXml = getClass().getResourceAsStream("/de/uka/ilkd/key/tcg/pom.xml")) {
-                Files.copy(Objects.requireNonNull(pomXml), getMavenFile());
+                if (pomXml == null) {
+                    throw new NullPointerException(
+                        "Resource '/de/uka/ilkd/key/tcg/pom.xml' not found.");
+                }
+                Files.copy(pomXml, getMavenFile());
             }
         }
 
         if (!Files.exists(getGradleFile())) {
             try (var gradleKts =
                 getClass().getResourceAsStream("/de/uka/ilkd/key/tcg/build.gradle.kts")) {
-                Files.copy(Objects.requireNonNull(gradleKts), getGradleFile());
+                if (gradleKts == null) {
+                    throw new NullPointerException(
+                        "Resource '/de/uka/ilkd/key/tcg/build.gradle.kts' not found.");
+                }
+                Files.copy(gradleKts, getGradleFile());
             }
         }
     }

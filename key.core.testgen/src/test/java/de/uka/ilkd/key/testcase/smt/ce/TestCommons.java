@@ -25,7 +25,9 @@ import de.uka.ilkd.key.smt.SMTTestSettings;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import de.uka.ilkd.key.util.ProgressMonitor;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Assumptions;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -41,17 +43,18 @@ public abstract class TestCommons {
      * The set of taclets
      */
     private final Collection<Taclet> taclets = new LinkedList<>();
+    @Nullable
     InitConfig initConfig = null;
-    static protected ProblemInitializer initializer = null;
+    protected static @Nullable ProblemInitializer initializer = null;
     static protected final Profile profile = init();
 
     static Profile init() {
         return new JavaProfile();
     }
 
-    private TermServices services;
+    private @Nullable TermServices services;
 
-    protected TermServices getServices() {
+    protected @Nullable TermServices getServices() {
         return services;
     }
 
@@ -101,7 +104,9 @@ public abstract class TestCommons {
         KeYEnvironment<?> p = loadProof(filepath);
         try {
             Proof proof = p.getLoadedProof();
-            assertNotNull(proof);
+            if (proof == null) {
+                throw new NullPointerException("No proof was loaded from " + filepath + ".");
+            }
             assertEquals(1, proof.openGoals().size());
             Goal g = proof.openGoals().iterator().next();
             return checkGoal(g);
@@ -132,6 +137,9 @@ public abstract class TestCommons {
         if (taclets.isEmpty()) {
             if (initConfig == null) {
                 parse();
+                if (initConfig == null) {
+                    throw new NullPointerException("The taclets could not be parsed.");
+                }
             }
             for (Taclet t : initConfig.getTaclets()) {
                 taclets.add(t);
@@ -174,8 +182,13 @@ public abstract class TestCommons {
         assertTrue(Files.exists(file));
         ProofAggregate result = null;
         try {
+            final Path fileName = file.getFileName();
+            if (fileName == null) {
+                throw new NullPointerException("File name is missing for " + file + ".");
+            }
             KeYUserProblemFile po =
-                new KeYUserProblemFile(file.getFileName().toString(), file, null, pro);
+                new KeYUserProblemFile(fileName.toString(), file,
+                    ProgressMonitor.Empty.getInstance(), pro);
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }
@@ -185,6 +198,9 @@ public abstract class TestCommons {
             // po.close();
         } catch (Exception e) {
             fail("Error while loading problem file " + file + ":\n\n" + e.getMessage());
+        }
+        if (result == null) {
+            throw new NullPointerException("Could not load the proof for " + file + ".");
         }
         return result;
     }

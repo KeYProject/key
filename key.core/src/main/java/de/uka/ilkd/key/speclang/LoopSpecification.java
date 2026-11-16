@@ -20,6 +20,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -28,6 +29,7 @@ import org.jspecify.annotations.Nullable;
  * A loop invariant, consisting of an invariant formula, a set of loop predicates, a modifiable
  * clause, and a variant term.
  */
+@NullMarked
 public interface LoopSpecification extends SpecificationElement {
 
     @Override
@@ -41,6 +43,7 @@ public interface LoopSpecification extends SpecificationElement {
     /**
      * Returns the contracted function symbol.
      */
+    @Nullable
     IProgramMethod getTarget();
 
     /**
@@ -52,14 +55,14 @@ public interface LoopSpecification extends SpecificationElement {
      * @param services the Services object.
      * @return The invariant formula as a term.
      */
-    JTerm getInvariant(LocationVariable heap, JTerm selfTerm,
-            Map<LocationVariable, JTerm> atPres, Services services);
+    JTerm getInvariant(LocationVariable heap, @Nullable JTerm selfTerm,
+            @Nullable Map<LocationVariable, JTerm> atPres, Services services);
 
     JTerm getInvariant(Services services);
 
     /** Returns the free invariant formula. */
-    JTerm getFreeInvariant(LocationVariable heap, JTerm selfTerm,
-            Map<LocationVariable, JTerm> atPres, Services services);
+    JTerm getFreeInvariant(LocationVariable heap, @Nullable JTerm selfTerm,
+            @Nullable Map<LocationVariable, JTerm> atPres, Services services);
 
     JTerm getFreeInvariant(Services services);
 
@@ -72,8 +75,8 @@ public interface LoopSpecification extends SpecificationElement {
      * @param services the Services object.
      * @return The modifiable clause as a term.
      */
-    JTerm getModifiable(LocationVariable heap, JTerm selfTerm,
-            Map<LocationVariable, JTerm> atPres, Services services);
+    JTerm getModifiable(LocationVariable heap, @Nullable JTerm selfTerm,
+            @Nullable Map<LocationVariable, JTerm> atPres, Services services);
 
     /**
      * Returns the modifiable clause.
@@ -83,7 +86,8 @@ public interface LoopSpecification extends SpecificationElement {
      * @param services the Services object.
      * @return The modifiable clause as a term.
      */
-    JTerm getModifiable(JTerm selfTerm, Map<LocationVariable, JTerm> atPres, Services services);
+    JTerm getModifiable(@Nullable JTerm selfTerm, @Nullable Map<LocationVariable, JTerm> atPres,
+            Services services);
 
     /**
      * Returns the free modifiable clause.
@@ -94,8 +98,8 @@ public interface LoopSpecification extends SpecificationElement {
      * @param services the Services object.
      * @return The modifiable clause as a term.
      */
-    JTerm getFreeModifiable(LocationVariable heap, JTerm selfTerm,
-            Map<LocationVariable, JTerm> atPres,
+    JTerm getFreeModifiable(LocationVariable heap, @Nullable JTerm selfTerm,
+            @Nullable Map<LocationVariable, JTerm> atPres,
             Services services);
 
     /**
@@ -105,8 +109,8 @@ public interface LoopSpecification extends SpecificationElement {
 
     ImmutableList<InfFlowSpec> getInfFlowSpecs(Services services);
 
-    ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap, JTerm selfTerm,
-            Map<LocationVariable, JTerm> atPres, Services services);
+    ImmutableList<InfFlowSpec> getInfFlowSpecs(LocationVariable heap, @Nullable JTerm selfTerm,
+            @Nullable Map<LocationVariable, JTerm> atPres, Services services);
 
     boolean hasInfFlowSpec(Services services);
 
@@ -118,7 +122,8 @@ public interface LoopSpecification extends SpecificationElement {
      * @param services the Services object.
      * @return The variant term.
      */
-    JTerm getVariant(JTerm selfTerm, Map<LocationVariable, JTerm> atPres, Services services);
+    JTerm getVariant(@Nullable JTerm selfTerm, @Nullable Map<LocationVariable, JTerm> atPres,
+            Services services);
 
     /**
      * Returns the term internally used for self. Use with care - it is likely that this is *not*
@@ -200,8 +205,8 @@ public interface LoopSpecification extends SpecificationElement {
     LoopSpecification create(LoopStatement loop, IProgramMethod pm, KeYJavaType kjt,
             Map<LocationVariable, JTerm> invariants, Map<LocationVariable, JTerm> freeInvariants,
             Map<LocationVariable, JTerm> modifiable, Map<LocationVariable, JTerm> freeModifiable,
-            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, JTerm variant,
-            JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, @Nullable JTerm variant,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
             Map<LocationVariable, JTerm> atPres);
 
     /**
@@ -224,8 +229,8 @@ public interface LoopSpecification extends SpecificationElement {
     LoopSpecification create(LoopStatement loop,
             Map<LocationVariable, JTerm> invariants, Map<LocationVariable, JTerm> freeInvariants,
             Map<LocationVariable, JTerm> modifiable, Map<LocationVariable, JTerm> freeModifiable,
-            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, JTerm variant,
-            JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, @Nullable JTerm variant,
+            @Nullable JTerm selfTerm, ImmutableList<JTerm> localIns, ImmutableList<JTerm> localOuts,
             Map<LocationVariable, JTerm> atPres);
 
     /**
@@ -250,13 +255,14 @@ public interface LoopSpecification extends SpecificationElement {
      * @param modifiable the new modifiable clauses.
      * @param freeModifiable the new free modifiable clauses.
      * @param infFlowSpecs the new information flow specification elements.
-     * @param variant the new loop variant.
+     * @param variant the new loop variant (may be null, e.g. if the loop has no variant).
      * @return The configured loop specification.
      */
     LoopSpecification configurate(
             Map<LocationVariable, JTerm> invariants, Map<LocationVariable, JTerm> freeInvariants,
             Map<LocationVariable, JTerm> modifiable, Map<LocationVariable, JTerm> freeModifiable,
-            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs, JTerm variant);
+            Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs,
+            @Nullable JTerm variant);
 
     /**
      * Returns a new loop invariant where the loop reference has been replaced with the passed one.
@@ -278,8 +284,8 @@ public interface LoopSpecification extends SpecificationElement {
      * @return The new loop invariant.
      */
     LoopSpecification setInvariant(Map<LocationVariable, JTerm> invariants,
-            Map<LocationVariable, JTerm> freeInvariants, JTerm selfTerm,
-            Map<LocationVariable, JTerm> atPres, Services services);
+            Map<LocationVariable, JTerm> freeInvariants, @Nullable JTerm selfTerm,
+            @Nullable Map<LocationVariable, JTerm> atPres, Services services);
 
     /**
      * Loop invariants can be visited like source elements: This method calls the corresponding

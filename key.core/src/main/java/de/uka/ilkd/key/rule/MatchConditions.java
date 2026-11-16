@@ -4,18 +4,22 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.RenameTable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+
 
 
 /**
  * Simple container class containing the information resulting from a Taclet.match-call
  */
+@NullMarked
 public class MatchConditions extends MatchResultInfo {
 
     public static final MatchConditions EMPTY_MATCHCONDITIONS =
@@ -28,8 +32,8 @@ public class MatchConditions extends MatchResultInfo {
         this.renameTable = RenameTable.EMPTY_TABLE;
     }
 
-    public MatchConditions(@NonNull SVInstantiations p_instantiations,
-            @NonNull RenameTable p_renameTable) {
+    public MatchConditions(SVInstantiations p_instantiations,
+            RenameTable p_renameTable) {
         super(p_instantiations);
         assert p_instantiations != null;
         assert p_renameTable != null;
@@ -64,7 +68,9 @@ public class MatchConditions extends MatchResultInfo {
     }
 
     public MatchConditions shrinkRenameTable() {
-        return new MatchConditions((SVInstantiations) instantiations, renameTable.parent());
+        final RenameTable parent = Objects.requireNonNull(renameTable.parent(),
+            "cannot shrink the root renaming table");
+        return new MatchConditions((SVInstantiations) instantiations, parent);
     }
 
 

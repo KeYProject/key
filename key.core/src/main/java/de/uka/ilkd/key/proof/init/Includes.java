@@ -9,12 +9,15 @@ import java.util.*;
 
 import de.uka.ilkd.key.proof.io.RuleSource;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Encapsulates 2 lists (one for LDT-include, one for "normal" includes) containing the filenames
  * parsed in the include-section of a <code>KeYFile</code>. <code>name2Source</code> maps the
  * entries of both lists to the corresponding RuleSources.
  */
+@NullMarked
 public class Includes {
 
     /** a list containing the "normal" includes, represented as Strings */
@@ -54,7 +57,7 @@ public class Includes {
     /**
      * returns the corresponding RuleSource to the filename <code>name</name>
      */
-    public RuleSource get(String name) {
+    public @Nullable RuleSource get(String name) {
         return name2Source.get(name);
     }
 

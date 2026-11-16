@@ -11,11 +11,15 @@ import org.key_project.util.parsing.HasLocation;
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public class SLTranslationException extends ProofInputException implements HasLocation {
     protected final Location location;
 
-    public SLTranslationException(String message, Throwable cause, Location location) {
+    public SLTranslationException(String message, @Nullable Throwable cause, Location location) {
         super(message, cause);
         if (location == null) {
             throw new IllegalArgumentException();
@@ -23,7 +27,7 @@ public class SLTranslationException extends ProofInputException implements HasLo
         this.location = location;
     }
 
-    public SLTranslationException(String message, Location location, Throwable cause) {
+    public SLTranslationException(String message, Location location, @Nullable Throwable cause) {
         this(message, cause, location);
     }
 
@@ -31,7 +35,10 @@ public class SLTranslationException extends ProofInputException implements HasLo
         this(message, null, location);
     }
 
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public SLTranslationException(String message) {
+        // main's default: an absent file with an undefined position (Location tolerates null
+        // fileUri at runtime, cf. UNDEFINED and fromToken).
         this(message, null, new Location(null, Position.UNDEFINED));
     }
 

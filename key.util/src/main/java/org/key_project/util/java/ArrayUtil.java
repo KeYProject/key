@@ -208,7 +208,7 @@ public final class ArrayUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T extends @Nullable Object> T @NonNull [] remove(@Nullable T @NonNull [] array,
-            T toRemove) {
+            @Nullable T toRemove) {
         List<@Nullable T> result = new LinkedList<>();
         for (T element : array) {
             if (!Objects.equals(element, toRemove)) {

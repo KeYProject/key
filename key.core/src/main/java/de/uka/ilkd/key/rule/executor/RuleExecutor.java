@@ -6,11 +6,14 @@ package de.uka.ilkd.key.rule.executor;
 
 import de.uka.ilkd.key.proof.Goal;
 
+import org.jspecify.annotations.NullMarked;
+
 
 
 /**
  * Executes a Rule with respect to a given instantiation of the schemavariables.
  */
+@NullMarked
 public interface RuleExecutor extends org.key_project.prover.rules.RuleExecutor<Goal> {
 
 }

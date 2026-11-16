@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -14,12 +16,15 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Feature that decides whether the multiplication of two inequations (using rules of set
  * inEqSimp_nonLin_multiply) is allowed. We only do this if the product of the left sides of the
  * inequations has factors in common with the left side of some other inequation, similarly to how
  * it is decided in the Buchberger algorithm.
  */
+@NullMarked
 public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
 
     protected final ProjectionToTerm<Goal> targetCandidate;
@@ -83,12 +88,12 @@ public abstract class InEquationMultFeature extends BinaryTacletAppFeature {
     protected final boolean filter(TacletApp app, PosInOccurrence pos, Goal goal,
             MutableState mState) {
         final Services services = goal.proof().getServices();
-        final Monomial targetM =
-            Monomial.create(targetCandidate.toTerm(app, pos, goal, mState), services);
-        final Monomial mult1M =
-            Monomial.create(mult1Candidate.toTerm(app, pos, goal, mState), services);
-        final Monomial mult2M =
-            Monomial.create(mult2Candidate.toTerm(app, pos, goal, mState), services);
+        final Monomial targetM = Monomial.create(
+            Objects.requireNonNull(targetCandidate.toTerm(app, pos, goal, mState)), services);
+        final Monomial mult1M = Monomial.create(
+            Objects.requireNonNull(mult1Candidate.toTerm(app, pos, goal, mState)), services);
+        final Monomial mult2M = Monomial.create(
+            Objects.requireNonNull(mult2Candidate.toTerm(app, pos, goal, mState)), services);
 
         return filter(targetM, mult1M, mult2M);
     }

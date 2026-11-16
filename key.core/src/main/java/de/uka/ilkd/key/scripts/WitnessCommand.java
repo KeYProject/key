@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -12,6 +13,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.scripts.meta.Argument;
 import de.uka.ilkd.key.scripts.meta.Documentation;
@@ -58,10 +60,11 @@ public class WitnessCommand extends AbstractCommand {
 
         Parameters params = state().getValueInjector().inject(new Parameters(), ast);
 
-        Goal goal = state.getFirstOpenAutomaticGoal();
-        Services services = state.getProof().getServices();
+        Goal goal = state().getFirstOpenAutomaticGoal();
+        Services services = state().getProof().getServices();
 
-        TermComparisonWithHoles comp = params.formula.getMatcher();
+        TermComparisonWithHoles comp = Objects.requireNonNull(params.formula, "no formula given")
+                .getMatcher();
 
         // First component: true for antecedent, false for succedent
         Pair<Boolean, SequentFormula> match =
@@ -90,21 +93,29 @@ public class WitnessCommand extends AbstractCommand {
         }
 
         Name tacletName = match.first ? ANTEC_TACLET : SUCC_TACLET;
-        FindTaclet taclet = (FindTaclet) state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(tacletName);
+        ProofEnvironment env = Objects.requireNonNull(state().getProof().getEnv(),
+            "proof environment is null");
+        FindTaclet taclet = Objects.requireNonNull(
+            (FindTaclet) env.getInitConfigForEnvironment().lookupActiveTaclet(tacletName),
+            "taclet '" + tacletName + "' not found");
         PosInOccurrence pio =
             new PosInOccurrence(match.second, PosInTerm.getTopLevel(), match.first);
         MatchConditions mc = new MatchConditions();
-        TacletApp app = PosTacletApp.createPosTacletApp(taclet, mc, pio, services);
+        TacletApp app = Objects.requireNonNull(
+            PosTacletApp.createPosTacletApp(taclet, mc, pio, services),
+            "could not create a taclet application");
         Set<SchemaVariable> schemaVars = taclet.collectSchemaVars();
-        app = app.addInstantiation(getSV(schemaVars, "u"),
+        app = Objects.requireNonNull(app.addInstantiation(getSV(schemaVars, "u"),
             services.getTermBuilder().tf().createTerm(match.second.formula().boundVars().get(0)),
-            true, services);
-        app = app.addInstantiation(getSV(schemaVars, "b"), match.second.formula().sub(0), true,
-            services);
-        Goal g = state.getFirstOpenAutomaticGoal();
-        app = app.createSkolemConstant(params.as, getSV(schemaVars, "sk"),
-            match.second.formula().boundVars().get(0).sort(), true, g);
+            true, services), "could not add the instantiation");
+        app = Objects.requireNonNull(app.addInstantiation(getSV(schemaVars, "b"),
+            match.second.formula().sub(0), true, services),
+            "could not add the instantiation");
+        Goal g = state().getFirstOpenAutomaticGoal();
+        app = Objects.requireNonNull(app.createSkolemConstant(
+            Objects.requireNonNull(params.as, "witness name must be given"),
+            getSV(schemaVars, "sk"), match.second.formula().boundVars().get(0).sort(), true, g),
+            "could not create a skolem constant");
         g.apply(app);
     }
 

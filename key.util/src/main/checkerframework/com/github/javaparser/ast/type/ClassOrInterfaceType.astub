@@ -1,0 +1,22 @@
+package com.github.javaparser.ast.type;
+
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.expr.SimpleName;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * Re-specification of the {@code ClassOrInterfaceType} constructors for the nullness checker.
+ * JavaParser treats the {@code scope} as optional: a {@code null} scope denotes a top-level type,
+ * and the KeY code base deliberately passes {@code null} when building dotted names (for example
+ * {@code new ClassOrInterfaceType(null, "java")}). The {@code typeArguments} list is likewise
+ * optional for unparameterized types. The type name itself must be non-null. Widening the
+ * parameter nullness matches the library's actual behavior without any source changes.
+ */
+public class ClassOrInterfaceType {
+
+    public ClassOrInterfaceType(@Nullable ClassOrInterfaceType scope, String name);
+
+    public ClassOrInterfaceType(@Nullable ClassOrInterfaceType scope, SimpleName name,
+        @Nullable NodeList<Type> typeArguments);
+}

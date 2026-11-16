@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 
@@ -11,11 +13,14 @@ import org.key_project.logic.op.Operator;
 import org.key_project.prover.sequent.PIOPathIterator;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Checks, whether the position in occurrence has antecedent/succedent polarity.
  *
  * @author christoph
  */
+@NullMarked
 class AntecSuccPrefixChecker implements Checker {
 
     private enum Polarity {
@@ -62,7 +67,8 @@ class AntecSuccPrefixChecker implements Checker {
         if (pio.posInTerm() != null) {
             final PIOPathIterator it = pio.iterator();
             while (pol != 0 && it.next() != -1) {
-                pol = checkOperator(it.getSubTerm().op(), it.getChild(), pol);
+                pol = checkOperator(Objects.requireNonNull(it.getSubTerm()).op(), it.getChild(),
+                    pol);
             }
         }
 

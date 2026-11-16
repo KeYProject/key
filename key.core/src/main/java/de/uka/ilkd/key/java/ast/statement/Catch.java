@@ -12,23 +12,27 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Catch.
  *
  */
+@NullMarked
 public class Catch extends BranchImp implements ParameterContainer, VariableScope {
 
     /**
      * Parameter.
      */
 
-    protected final ParameterDeclaration parameter;
+    protected final @Nullable ParameterDeclaration parameter;
 
     /**
      * Body.
      */
 
-    protected final StatementBlock body;
+    protected final @Nullable StatementBlock body;
 
     /**
      * Catch.
@@ -175,7 +179,7 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      *
      * @return the statement.
      */
-    public StatementBlock getBody() {
+    public @Nullable StatementBlock getBody() {
         return body;
     }
 
@@ -184,7 +188,7 @@ public class Catch extends BranchImp implements ParameterContainer, VariableScop
      *
      * @return the parameter declaration.
      */
-    public ParameterDeclaration getParameterDeclaration() {
+    public @Nullable ParameterDeclaration getParameterDeclaration() {
         return parameter;
     }
 

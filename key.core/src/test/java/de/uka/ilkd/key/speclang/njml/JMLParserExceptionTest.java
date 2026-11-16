@@ -44,6 +44,7 @@ public class JMLParserExceptionTest extends ParserExceptionTest {
      * If this here is not null, this file name (referring to the resources
      * directory) will be loaded.
      */
+    @SuppressWarnings("NullAway") // FIX_FILE is deliberately null; getFiles() scans a directory
     private static final String FIX_FILE = null; // "SomeSpecificFile.java";
 
     public static Stream<Arguments> getFiles() throws URISyntaxException, IOException {
@@ -61,6 +62,7 @@ public class JMLParserExceptionTest extends ParserExceptionTest {
     @Override
     protected void tryLoadFile(Path file) throws Exception {
         ProblemLoaderControl control = new DefaultUserInterfaceControl(null);
+        @SuppressWarnings("NullAway") // unused loader options; null was always passed here
         AbstractProblemLoader pl = new SingleThreadProblemLoader(file, null, null,
             null, AbstractProfile.getDefaultProfile(), false,
             control, false, new Properties());

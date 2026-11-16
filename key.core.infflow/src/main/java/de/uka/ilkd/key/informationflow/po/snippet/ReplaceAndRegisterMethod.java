@@ -24,6 +24,9 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Generate term "self != null".
@@ -31,6 +34,7 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author christoph
  */
+@NullMarked
 abstract class ReplaceAndRegisterMethod {
 
     final JTerm replace(JTerm term, ProofObligationVars origVars, ProofObligationVars poVars,
@@ -43,8 +47,8 @@ abstract class ReplaceAndRegisterMethod {
     final JTerm replace(JTerm term, StateVars origVars, StateVars poVars, TermBuilder tb) {
         LinkedHashMap<JTerm, JTerm> map = new LinkedHashMap<>();
 
-        Iterator<JTerm> origVarsIt;
-        Iterator<JTerm> poVarsIt;
+        Iterator<@Nullable JTerm> origVarsIt;
+        Iterator<@Nullable JTerm> poVarsIt;
         assert origVars.paddedTermList.size() == poVars.paddedTermList.size();
         origVarsIt = origVars.paddedTermList.iterator();
         poVarsIt = poVars.paddedTermList.iterator();
@@ -62,7 +66,11 @@ abstract class ReplaceAndRegisterMethod {
             }
         }
         OpReplacer or = new OpReplacer(map, tb.tf());
-        return or.replace(term);
+        final JTerm result = or.replace(term);
+        if (result == null) {
+            throw new NullPointerException("Term replacement produced no term for " + term + ".");
+        }
+        return result;
     }
 
 
@@ -105,7 +113,12 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final JTerm replace(JTerm term, JTerm[] origVars, JTerm[] poVars, TermBuilder tb) {
+    final JTerm replace(JTerm term, JTerm @Nullable [] origVars, JTerm @Nullable [] poVars,
+            TermBuilder tb) {
+        if (origVars == null || poVars == null) {
+            throw new NullPointerException(
+                "No original or replacement variables for the term replacement.");
+        }
         LinkedHashMap<JTerm, JTerm> map = new LinkedHashMap<>();
 
         assert origVars.length == poVars.length;
@@ -120,11 +133,15 @@ abstract class ReplaceAndRegisterMethod {
 
         OpReplacer or = new OpReplacer(map, tb.tf());
 
-        return or.replace(term);
+        final JTerm result = or.replace(term);
+        if (result == null) {
+            throw new NullPointerException("Term replacement produced no term for " + term + ".");
+        }
+        return result;
     }
 
 
-    final void register(ProgramVariable pv, Services services) {
+    final void register(@Nullable ProgramVariable pv, Services services) {
         Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
@@ -139,7 +156,7 @@ abstract class ReplaceAndRegisterMethod {
     }
 
 
-    final void register(Function f, Services services) {
+    final void register(@Nullable Function f, Services services) {
         Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != JavaDLTheory.UPDATE;
@@ -156,7 +173,12 @@ abstract class ReplaceAndRegisterMethod {
         final OpReplacer op =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
         term = TermLabelManager.removeIrrelevantLabels(term, services.getTermFactory());
-        return op.replace(term);
+        final JTerm result = op.replace(term);
+        if (result == null) {
+            throw new NullPointerException(
+                "Quantifiable variable replacement produced no term for " + term + ".");
+        }
+        return result;
     }
 
     static Set<QuantifiableVariable> collectQuantifiableVariables(JTerm term) {

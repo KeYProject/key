@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt;
 
-
+import org.jspecify.annotations.NullMarked;
 
 /**
  * The class <code>ContextualBlock</code> is used to integrate comments to translations of
@@ -25,6 +25,7 @@ package de.uka.ilkd.key.smt;
  * position in the containers <code>assumptions</code> and <code>predicates</code> blocks begin and
  * end.
  */
+@NullMarked
 class ContextualBlock {
 
     /**

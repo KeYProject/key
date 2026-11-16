@@ -38,6 +38,7 @@ import org.key_project.util.parsing.Location;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Represents an input from a .key file producing an environment.
  */
+@NullMarked
 public class KeYFile implements EnvInput {
     private static final Logger LOGGER = LoggerFactory.getLogger(KeYFile.class);
 
@@ -60,16 +62,16 @@ public class KeYFile implements EnvInput {
     protected final @Nullable ProgressMonitor monitor;
     private final String name;
     protected @Nullable Profile profile;
-    protected InitConfig initConfig;
+    protected @Nullable InitConfig initConfig;
     private KeyAst.@Nullable File fileCtx = null;
     private @Nullable ProblemFinder problemFinder = null;
     private @Nullable ProblemInformation problemInformation = null;
-    private Includes includes;
+    private @Nullable Includes includes;
 
     /**
      * The FileRepo that will store the files.
      */
-    private FileRepo fileRepo;
+    private @Nullable FileRepo fileRepo;
 
     /// creates a new representation for a given file by indicating a name and a RuleSource
     /// representing the physical source of the .key file.
@@ -94,10 +96,11 @@ public class KeYFile implements EnvInput {
      * @param file the physical rule source of the .key file
      * @param monitor monitor for reporting progress
      * @param profile the profile
-     * @param fileRepo the FileRepo which will store the file
+     * @param fileRepo the FileRepo which will store the file, or null if no consistency tracking is
+     *        desired
      */
     public KeYFile(String name, RuleSource file, @Nullable ProgressMonitor monitor,
-            @Nullable Profile profile, FileRepo fileRepo) {
+            @Nullable Profile profile, @Nullable FileRepo fileRepo) {
         this(name, file, monitor, profile);
         this.fileRepo = fileRepo;
     }
@@ -108,7 +111,7 @@ public class KeYFile implements EnvInput {
      */
     public KeYFile(String name, Path file, @Nullable ProgressMonitor monitor,
             @Nullable Profile profile) {
-        this(name, file, monitor, profile, false);
+        this(name, RuleSourceFactory.initRuleFile(file, false), monitor, profile);
     }
 
     /**
@@ -121,7 +124,7 @@ public class KeYFile implements EnvInput {
      * @param profile the KeY profile under which the file is to be load
      * @param compressed <code>true</code> iff the file has compressed content
      */
-    public KeYFile(String name, Path file, ProgressMonitor monitor, Profile profile,
+    public KeYFile(String name, Path file, @Nullable ProgressMonitor monitor, Profile profile,
             boolean compressed) {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
     }
@@ -135,11 +138,12 @@ public class KeYFile implements EnvInput {
      * @param file the file to find it
      * @param fileRepo the FileRepo which will store the file
      * @param monitor a possibly null reference to a monitor for the loading progress
-     * @param profile the KeY profile under which the file is to be load
+     * @param profile the KeY profile under which the file is to be load, or {@code null} to
+     *        respect the profile declared in the file
      * @param compressed <code>true</code> iff the file has compressed content
      */
-    public KeYFile(String name, Path file, FileRepo fileRepo, ProgressMonitor monitor,
-            Profile profile, boolean compressed) {
+    public KeYFile(String name, Path file, FileRepo fileRepo, @Nullable ProgressMonitor monitor,
+            @Nullable Profile profile, boolean compressed) {
         this(name, RuleSourceFactory.initRuleFile(file, compressed), monitor, profile);
         this.fileRepo = fileRepo;
     }
@@ -150,21 +154,17 @@ public class KeYFile implements EnvInput {
             throw new FileNotFoundException("File/Resource " + file + " not found.");
         }
         // open a stream to the file (via FileRepo if possible)
-        InputStream input = null;
         try {
+            InputStream input = null;
             if (fileRepo != null) {
                 input = fileRepo.getInputStream(file);
-                // fallback (e.g. used for *.proof.gz files)
-                if (input == null) {
-                    input = file.getNewStream();
-                }
-            } else {
-                input = file.getNewStream();
             }
+            // fallback (e.g. used for *.proof.gz files)
+            return input != null ? input : file.getNewStream();
         } catch (IOException e) {
             LOGGER.warn("Failed to open new stream", e);
+            throw new FileNotFoundException("Failed to open new stream: " + file);
         }
-        return input;
     }
 
     protected KeyAst.File getParseContext() {
@@ -179,7 +179,23 @@ public class KeYFile implements EnvInput {
         return fileCtx;
     }
 
-    protected ProofSettings getPreferences() {
+    /**
+     * Returns the proof preferences, reading and installing them into the init config on first
+     * access.
+     *
+     * @return The proof preferences (may be {@code null} if none are stored).
+     *         <p>
+     *         The init config is set before the preferences are read; the dereferences of the
+     *         (nullable)
+     *         init-config field are suppressed with a scoped key. The preferences read from the
+     *         file may
+     *         likewise be {@code null} (none stored, e.g. for directory inputs); they are stored
+     *         as-is, so
+     *         the {@code setSettings} argument type mismatch is suppressed as well.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
+    protected @Nullable ProofSettings getPreferences() {
         if (initConfig.getSettings() == null) {
             var settings = readPreferences();
             initConfig.setSettings(settings);
@@ -188,7 +204,7 @@ public class KeYFile implements EnvInput {
         return initConfig.getSettings();
     }
 
-    public ProofSettings readPreferences() {
+    public @Nullable ProofSettings readPreferences() {
         if (file.isDirectory()) {
             return null;
         }
@@ -219,7 +235,7 @@ public class KeYFile implements EnvInput {
         if (includes == null) {
             try {
                 KeyAst.File ctx = getParseContext();
-                includes = ctx.getIncludes(file.file().getParent());
+                includes = ctx.getIncludes(Objects.requireNonNull(file.file().getParent()));
             } catch (ParseCancellationException e) {
                 throw new ParseCancellationException(e);
             } catch (Exception e) {
@@ -246,8 +262,14 @@ public class KeYFile implements EnvInput {
         return path.replace('\\', '/');
     }
 
+    /**
+     * The parsed file is a regular {@code .key} file whose parent directory is guaranteed to be
+     * non-{@code null}; the dereferences of the (nullable) parent-directory paths are suppressed
+     * with a scoped key.
+     */
     @Override
-    public Path readBootClassPath() {
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
+    public @Nullable Path readBootClassPath() {
         ProblemInformation pi = getProblemInformation();
         String bootClassPath = pi.getBootClassPath();
         if (bootClassPath == null) {
@@ -287,7 +309,16 @@ public class KeYFile implements EnvInput {
     }
 
 
+    /**
+     * The parsed file is a regular {@code .key} file whose parent directory is guaranteed to be
+     * non-{@code null}; the dereference of the (nullable) parent-directory path is suppressed
+     * with a scoped key. A {@code \classpath} declaration without a value yields a {@code null}
+     * entry that is deliberately kept in the returned list; the argument suppression is scoped
+     * to that case.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable",
+        "nullness:argument.type.incompatible" })
     public @NonNull List<Path> readClassPath() {
         ProblemInformation pi = getProblemInformation();
         Path parentDirectory = file.file().getParent();
@@ -313,7 +344,7 @@ public class KeYFile implements EnvInput {
     }
 
     @Override
-    public Path readJavaPath() throws ProofInputException {
+    public @Nullable Path readJavaPath() throws ProofInputException {
         ProblemInformation pi = getProblemInformation();
         String javaPath = pi.getJavaSource();
         if (javaPath != null) {
@@ -353,7 +384,14 @@ public class KeYFile implements EnvInput {
      * reads sort, function and predicate declarations
      *
      * @return list of parser warnings
+     *         <p>
+     *         Although {@code initConfig} is null-checked at the entry, the subsequent parser
+     *         access is
+     *         seen as potentially re-assigning the field; the dereferences are suppressed with a
+     *         scoped
+     *         key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public ImmutableSet<PositionedString> readExtendedSignature() {
         if (initConfig == null) {
             throw new IllegalStateException("KeYFile: InitConfig not set.");
@@ -373,7 +411,11 @@ public class KeYFile implements EnvInput {
      * reads contracts and rule definitions
      *
      * @return list of parser warnings
+     *         <p>
+     *         The init config is set before contracts are read; the dereferences of the (nullable)
+     *         init-config field are suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public ImmutableSet<PositionedString> readContracts() {
         SpecificationRepository specRepos = initConfig.getServices().getSpecificationRepository();
         ContractsAndInvariantsFinder cinvs =
@@ -385,10 +427,21 @@ public class KeYFile implements EnvInput {
         return DefaultImmutableSet.nil();
     }
 
+    /**
+     * Returns the problem finder, creating it from the init config on first access.
+     *
+     * @return The problem finder.
+     *         <p>
+     *         The init config is set before the problem finder is created; the dereferences of the
+     *         (nullable) init-config field are suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     protected @NonNull ProblemFinder getProblemFinder() {
         if (problemFinder == null) {
-            problemFinder = new ProblemFinder(initConfig.getServices(), initConfig.namespaces());
-            getParseContext().accept(problemFinder);
+            ProblemFinder finder =
+                new ProblemFinder(initConfig.getServices(), initConfig.namespaces());
+            getParseContext().accept(finder);
+            problemFinder = finder;
         }
         return problemFinder;
     }
@@ -397,7 +450,11 @@ public class KeYFile implements EnvInput {
     /**
      * reads the sorts declaration of the .key file only, modifying the sort namespace of the
      * initial configuration
+     * <p>
+     * The init config is set before sorts are read; the dereferences of the (nullable)
+     * init-config field are suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public Collection<PositionedString> readSorts() {
         KeyAst.File ctx = getParseContext();
         KeyIO io = new KeyIO(initConfig.getServices(), initConfig.namespaces());
@@ -415,7 +472,12 @@ public class KeYFile implements EnvInput {
      * namespaces of the respective taclet options.
      *
      * @return warnings during the interpretation of the AST constructs
+     *         <p>
+     *         The init config is set before functions and predicates are read; the dereferences of
+     *         the
+     *         (nullable) init-config field are suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public List<PositionedString> readFuncAndPred() {
         if (file == null) {
             return Collections.emptyList();
@@ -432,7 +494,11 @@ public class KeYFile implements EnvInput {
      * the initial configuration
      *
      * @return list of issues that occurred during parsing the taclets
+     *         <p>
+     *         The init config is set before rules are read; the dereferences of the (nullable)
+     *         init-config field are suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public List<BuildingIssue> readRules() {
         KeyAst.File ctx = getParseContext();
         TacletPBuilder visitor = new TacletPBuilder(initConfig.getServices(),
@@ -463,7 +529,10 @@ public class KeYFile implements EnvInput {
         return issues.stream().map(w -> {
             try {
                 return new PositionedString(w.message(),
-                    new Location(file != null ? new URL(file.getExternalForm()).toURI() : null,
+                    new Location(
+                        Objects.requireNonNull(file != null
+                                ? new URL(file.getExternalForm()).toURI()
+                                : null),
                         w.position()));
             } catch (MalformedURLException | URISyntaxException e) {
                 throw new RuntimeException(e);
@@ -472,11 +541,11 @@ public class KeYFile implements EnvInput {
                 .collect(Collectors.<PositionedString>toList());
     }
 
-    public String chooseContract() {
+    public @Nullable String chooseContract() {
         return null;
     }
 
-    public Configuration getProofObligation() {
+    public @Nullable Configuration getProofObligation() {
         return null;
     }
 
@@ -488,7 +557,7 @@ public class KeYFile implements EnvInput {
 
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || o.getClass() != this.getClass()) {
             return false;
         }
@@ -518,7 +587,7 @@ public class KeYFile implements EnvInput {
     }
 
     @Override
-    public Path getInitialFile() {
+    public @Nullable Path getInitialFile() {
         return file != null ? file.file() : null;
     }
 }

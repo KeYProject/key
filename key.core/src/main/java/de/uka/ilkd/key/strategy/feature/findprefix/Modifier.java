@@ -6,6 +6,8 @@ package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Interface for position modifiers. A position modifier is a function which gets a position and
@@ -13,6 +15,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  *
  * @author christoph
  */
+@NullMarked
 interface Modifier {
     /**
      * Function which delivers a new position based on pos.

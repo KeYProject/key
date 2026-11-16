@@ -1,5 +1,19 @@
 description = "Proof slicing (removing of unnecessary nodes) for the KeY system."
 
+checkerFramework {
+    if(System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                "-AonlyDefs=^org\\.key_project\\.slicing",
+                "-Xmaxerrs", "10000",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}
 
 dependencies {
     implementation project(":key.core")

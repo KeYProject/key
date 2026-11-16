@@ -9,18 +9,24 @@ import javax.swing.AbstractAction;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.TermLabelSettings;
 
 import org.key_project.prover.sequent.PosInOccurrence;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Opens a {@link OriginTermLabelVisualizer} for the selected term.
  *
  * @author lanzinger
  */
+@NullMarked
 public class ShowOriginAction extends MainWindowAction {
 
     private static final long serialVersionUID = 4557953425770258852L;
@@ -31,8 +37,15 @@ public class ShowOriginAction extends MainWindowAction {
      * Creates a new {@link ShowOriginAction}.
      *
      * @param pos the position of the term whose origin shall be shown.
+     *
+     *        <p>
+     *        The action names itself, binds its settings listener and accelerator while the
+     *        receiver is still under initialization (EISOP initialization check); the listener
+     *        only fires once the action is displayed after construction, suppressed with a
+     *        scoped key.
      */
-    public ShowOriginAction(PosInSequent pos) {
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    public ShowOriginAction(@Nullable PosInSequent pos) {
         super(MainWindow.getInstance());
         this.pos = pos == null ? PosInSequent.createSequentPos() : pos;
 
@@ -51,14 +64,18 @@ public class ShowOriginAction extends MainWindowAction {
         PosInOccurrence pio = pos.getPosInOccurrence();
 
         // OriginTermLabelVisualizer.TermView can only print sequents or formulas, not terms.
-        if (pio != null) {
-            while (!pio.subTerm().sort().equals(JavaDLTheory.FORMULA)) {
-                pio = pio.up();
-            }
+        while (pio != null && !pio.subTerm().sort().equals(JavaDLTheory.FORMULA)) {
+            pio = pio.up();
         }
 
-        OriginTermLabelVisualizer vis = new OriginTermLabelVisualizer(pio,
-            getMediator().getSelectedNode(), getMediator().getServices());
+        Node node = getMediator().getSelectedNode();
+        Services services = getMediator().getServices();
+        if (node == null || services == null) {
+            // the action is only usable while a proof with services is loaded
+            throw new NullPointerException("No proof node or services available.");
+        }
+        OriginTermLabelVisualizer vis =
+            new OriginTermLabelVisualizer(pio, node, services);
 
         mainWindow.getSourceViewFrame().addComponent(vis, vis.getLongName(), new AbstractAction() {
 

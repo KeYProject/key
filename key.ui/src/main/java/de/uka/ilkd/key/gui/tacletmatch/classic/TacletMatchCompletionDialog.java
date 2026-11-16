@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -44,9 +45,12 @@ import de.uka.ilkd.key.proof.ModelEvent;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.rule.TacletApp;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class TacletMatchCompletionDialog extends ApplyTacletDialog {
     private static final Logger LOGGER = LoggerFactory.getLogger(TacletMatchCompletionDialog.class);
 
@@ -72,6 +76,15 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     private final MainWindow mainWindow;
 
+    /**
+     * The dialog configures itself with title, layout, status, preference and visibility calls
+     * while the receiver is still under initialization (EISOP initialization check) and passes
+     * itself to {@link MainWindow#loadPreferences} as component; the effects only take place
+     * after construction completes, suppressed with scoped keys. The {@code alternatives} and
+     * {@code tablePane} fields are bound by the private layout methods.
+     */
+    @SuppressWarnings({ "nullness:initialization.fields.uninitialized",
+        "nullness:method.invocation.invalid", "nullness:argument.type.incompatible", "NullAway" })
     public TacletMatchCompletionDialog(MainWindow parent, TacletInstantiationModel[] model,
             Goal goal, KeYMediator mediator) {
         super(parent, model, mediator);
@@ -117,7 +130,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             }
         }
     }
-
 
     /**
      * update the status by the current model element.
@@ -187,7 +199,8 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 dataTable[i].setIfSelectionPanel(ifSelection);
                 tabContent.add(ifSelection);
             }
-            alternatives.addTab("Alt " + i, null, tabContent, "Instantiations Alternatives");
+            alternatives.addTab("Alt " + i, tabContent);
+            alternatives.setToolTipTextAt(i, "Instantiations Alternatives");
         }
 
         panel.add(alternatives);
@@ -209,7 +222,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
     private void pushAllInputToModel(int i) {
         if (dataTable[i].hasIfSelectionPanel()) {
-            dataTable[i].getIfSelectionPanel().pushAllInputToModel();
+            TacletIfSelectionDialog ifSelection = dataTable[i].getIfSelectionPanel();
+            if (ifSelection != null) {
+                ifSelection.pushAllInputToModel();
+            }
         }
         if (dataTable[i].isEditing()) {
             dataTable[i].getCellEditor().stopCellEditing();
@@ -256,7 +272,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         }
     }
 
-
     /**
      * save the preferences of this window prior to closing it.
      */
@@ -268,19 +283,19 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         super.closeDlg();
     }
 
-
     class ButtonListener implements ActionListener {
-
 
         public ButtonListener() {
         }
 
-
-        private void errorPositionKnown(String errorMessage, int row, int col,
+        private void errorPositionKnown(@Nullable String errorMessage, int row, int col,
                 boolean inIfSequent) {
 
             if (inIfSequent) {
-                dataTable[current()].getIfSelectionPanel().requestFocusAt(row, col);
+                TacletIfSelectionDialog ifSelection = dataTable[current()].getIfSelectionPanel();
+                if (ifSelection != null) {
+                    ifSelection.requestFocusAt(row, col);
+                }
             } else {
                 // select table cell where the error occured
                 // ALL THIS DOES NOT REALLY WORK!!! BUT WHY???
@@ -306,7 +321,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 ed.requestFocus();
             }
         }
-
 
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == cancelButton) {
@@ -364,8 +378,17 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
          * if-sequent or a manual entered instantiation. The value is null if and only if the taclet
          * has no if-sequent
          */
-        private TacletIfSelectionDialog ifSelectionPanel;
+        private @Nullable TacletIfSelectionDialog ifSelectionPanel;
 
+        /**
+         * The table registers itself with the model, configures editors and installs the
+         * drag-and-drop support while the receiver is still under initialization (EISOP
+         * initialization check) and passes itself to the drop target, resizer and to
+         * {@code addModelChangeListener}; the effects only take place after construction
+         * completes, suppressed with scoped keys.
+         */
+        @SuppressWarnings({ "nullness:method.invocation.invalid",
+            "nullness:argument.type.incompatible" })
         private DataTable(TacletMatchCompletionDialog owner, int modelNr, KeYMediator mediator) {
 
             super(owner.model[modelNr].tableModel());
@@ -377,7 +400,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
 
             // And now the Drag'n'drop stuff ...
             DropTarget aDropTarget = new DropTarget(this, new DropTargetListener() {
-
 
                 public void dragEnter(DropTargetDragEvent event) {}
 
@@ -407,7 +429,9 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
                                     PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
 
-                                JTerm term = (JTerm) pis.getPosInOccurrence().subTerm();
+                                var pio = Objects.requireNonNull(pis.getPosInOccurrence(),
+                                    "the dropped term has a position in the sequent");
+                                JTerm term = (JTerm) pio.subTerm();
 
                                 // Reactivate this when the parser is fully capable again.
                                 // droppedString = LogicPrinter.quickPrintTerm(term,
@@ -451,18 +475,15 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 public void dropActionChanged(DropTargetDragEvent dtde) {}
             });
 
-
             this.setDropTarget(aDropTarget);
             new TableRowResizer(this);
 
         } // end constructor
 
-
         /** Provide sane single-click editing in table */
         public javax.swing.table.TableCellEditor getCellEditor(int row, int col) {
             return iEditor;
         }
-
 
         public TableCellRenderer getCellRenderer(int row, int col) {
             return iRenderer;
@@ -491,7 +512,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
          *
          * @return the if selection panel, null if not available
          */
-        private TacletIfSelectionDialog getIfSelectionPanel() {
+        private @Nullable TacletIfSelectionDialog getIfSelectionPanel() {
             return ifSelectionPanel;
         }
 
@@ -538,6 +559,12 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             final JPanel editPanel;
             final JTextArea textarea;
 
+            /**
+             * The editor configures itself with the click-count and drop-target calls while the
+             * receiver is still under initialization (EISOP initialization check); the effects
+             * only take place after construction completes, suppressed with a scoped key.
+             */
+            @SuppressWarnings("nullness:method.invocation.invalid")
             public InputEditor(JTextArea ta) {
                 super(new JCheckBox()); // Unfortunately, the constructor
                 // expects a check box, combo box,
@@ -593,12 +620,13 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                         if (transferable.isDataFlavorSupported(
                             PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER)) {
 
-
                             try {
                                 event.acceptDrop(DnDConstants.ACTION_MOVE);
                                 PosInSequent pis = (PosInSequent) transferable.getTransferData(
                                     PosInSequentTransferable.POS_IN_SEQUENT_TRANSFER);
-                                JTerm term = (JTerm) pis.getPosInOccurrence().subTerm();
+                                var pio = Objects.requireNonNull(pis.getPosInOccurrence(),
+                                    "the dropped term has a position in the sequent");
+                                JTerm term = (JTerm) pio.subTerm();
                                 // Reactivate this when the parser is fully capable again.
                                 // String droppedString = LogicPrinter.quickPrintTerm(term,
                                 // mediator.getServices(),
@@ -614,8 +642,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                             } catch (Exception e) {
                                 event.rejectDrop();
                             }
-
-
 
                         } else if (transferable.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                             event.acceptDrop(DnDConstants.ACTION_MOVE);
@@ -634,8 +660,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                         }
 
                     }
-
-
 
                     public void dropActionChanged(DropTargetDragEvent dtde) {}
                 });
@@ -666,7 +690,6 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
                 textarea.requestFocus();
             }
 
-
             public Component getTableCellEditorComponent(JTable table, Object value,
                     boolean isSelected, int row, int column) {
                 if (value == null) {
@@ -687,7 +710,7 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
             private static final long serialVersionUID = -7270236368657110379L;
             final JTextArea ta = new JTextArea("nothing");
 
-            public Component getTableCellRendererComponent(JTable table, Object obj,
+            public Component getTableCellRendererComponent(JTable table, @Nullable Object obj,
                     boolean isSelected, boolean hasFocus, int row, int column) {
                 if (obj == null) {
                     obj = "";
@@ -710,6 +733,10 @@ public class TacletMatchCompletionDialog extends ApplyTacletDialog {
         final NotationInfo ni = new NotationInfo();
 
         Services services = mediator.getServices();
+        if (services == null) {
+            // the term view is only printed while a proof is loaded
+            throw new NullPointerException("No services available for printing.");
+        }
         final JTerm t = TermLabelManager.removeIrrelevantLabels(term, services);
         LogicPrinter p = LogicPrinter.purePrinter(ni, services);
         boolean pretty = mediator.getNotationInfo().isPrettySyntax();

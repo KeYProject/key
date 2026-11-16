@@ -21,7 +21,7 @@ public class OuterClass {
           @*/
         @javax.annotation.processing.Generated("RecordClassBuilder")
         public MyRecord(String test) {
-            //Created by RecordClassBuilder.java:132
+            //Created by RecordClassBuilder.java:135
             this.test = test;
         }
 
@@ -78,7 +78,7 @@ public class OuterClass {
         public void $init(String test, OuterClass $ENCLOSING_THIS) {
             super.$init();
             this.$enclosingThis = $ENCLOSING_THIS;
-            //Created by RecordClassBuilder.java:132
+            //Created by RecordClassBuilder.java:135
             this.test = test;
         }
 
@@ -89,35 +89,35 @@ public class OuterClass {
             if (!@($classInitialized)) {
                 if (!@($classInitializationInProgress)) {
                     if (!@($classPrepared)) {
-                        //Created by ClassInitializeMethodBuilder.java:220
+                        //Created by ClassInitializeMethodBuilder.java:223
                         @($clprepare());
                     }
                     if (@($classErroneous)) {
                         throw new java.lang.NoClassDefFoundError();
                     }
-                    //Created by ClassInitializeMethodBuilder.java:244
+                    //Created by ClassInitializeMethodBuilder.java:249
                     @($classInitializationInProgress) = true;
                     try {
                         @(java.lang.Record.$clinit());
-                    }//Created by ClassInitializeMethodBuilder.java:195
+                    }//Created by ClassInitializeMethodBuilder.java:196
                      catch (java.lang.Error err) {
-                        //Created by ClassInitializeMethodBuilder.java:155
-                        @($classInitializationInProgress) = false;
                         //Created by ClassInitializeMethodBuilder.java:156
+                        @($classInitializationInProgress) = false;
+                        //Created by ClassInitializeMethodBuilder.java:157
                         @($classErroneous) = true;
                         throw err;
                     } catch (java.lang.Throwable twa) {
-                        //Created by ClassInitializeMethodBuilder.java:155
-                        @($classInitializationInProgress) = false;
                         //Created by ClassInitializeMethodBuilder.java:156
+                        @($classInitializationInProgress) = false;
+                        //Created by ClassInitializeMethodBuilder.java:157
                         @($classErroneous) = true;
                         throw new java.lang.ExceptionInInitializerError(twa);
                     }
-                    //Created by ClassInitializeMethodBuilder.java:250
+                    //Created by ClassInitializeMethodBuilder.java:255
                     @($classInitializationInProgress) = false;
-                    //Created by ClassInitializeMethodBuilder.java:252
+                    //Created by ClassInitializeMethodBuilder.java:257
                     @($classErroneous) = false;
-                    //Created by ClassInitializeMethodBuilder.java:254
+                    //Created by ClassInitializeMethodBuilder.java:259
                     @($classInitialized) = true;
                 }
             }
@@ -158,35 +158,35 @@ public class OuterClass {
         if (!@($classInitialized)) {
             if (!@($classInitializationInProgress)) {
                 if (!@($classPrepared)) {
-                    //Created by ClassInitializeMethodBuilder.java:220
+                    //Created by ClassInitializeMethodBuilder.java:223
                     @($clprepare());
                 }
                 if (@($classErroneous)) {
                     throw new java.lang.NoClassDefFoundError();
                 }
-                //Created by ClassInitializeMethodBuilder.java:244
+                //Created by ClassInitializeMethodBuilder.java:249
                 @($classInitializationInProgress) = true;
                 try {
                     @(java.lang.Object.$clinit());
-                }//Created by ClassInitializeMethodBuilder.java:195
+                }//Created by ClassInitializeMethodBuilder.java:196
                  catch (java.lang.Error err) {
-                    //Created by ClassInitializeMethodBuilder.java:155
-                    @($classInitializationInProgress) = false;
                     //Created by ClassInitializeMethodBuilder.java:156
+                    @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:157
                     @($classErroneous) = true;
                     throw err;
                 } catch (java.lang.Throwable twa) {
-                    //Created by ClassInitializeMethodBuilder.java:155
-                    @($classInitializationInProgress) = false;
                     //Created by ClassInitializeMethodBuilder.java:156
+                    @($classInitializationInProgress) = false;
+                    //Created by ClassInitializeMethodBuilder.java:157
                     @($classErroneous) = true;
                     throw new java.lang.ExceptionInInitializerError(twa);
                 }
-                //Created by ClassInitializeMethodBuilder.java:250
+                //Created by ClassInitializeMethodBuilder.java:255
                 @($classInitializationInProgress) = false;
-                //Created by ClassInitializeMethodBuilder.java:252
+                //Created by ClassInitializeMethodBuilder.java:257
                 @($classErroneous) = false;
-                //Created by ClassInitializeMethodBuilder.java:254
+                //Created by ClassInitializeMethodBuilder.java:259
                 @($classInitialized) = true;
             }
         }

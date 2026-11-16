@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.annotation.Annotation;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
@@ -98,7 +99,7 @@ public final class RemoveAnnotation implements VariableCondition {
             tRef.getProgramElementName(),
             ImmutableList.of(filtered), tRef.getDimensions(),
             tRef.getReferencePrefix(),
-            tRef.getKeYJavaType());
+            Objects.requireNonNull(tRef.getKeYJavaType(), "no KeYJavaType for " + tRef));
     }
 
     private static New newFromTypeRef(New n, TypeReference tRef) {

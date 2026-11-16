@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.MasterHandler.SymbolIntroducer;
@@ -26,6 +27,9 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
@@ -70,6 +74,7 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
  * is the axiom for seqLen (hence stored in <tt>seqLen.dl</tt>). The trigger pattern to be used for
  * instantiation is <tt>seqLen(s)</tt> matching against any ground instance of seqLen.
  */
+@NullMarked
 public class DefinedSymbolsHandler implements SMTHandler {
 
     public static final String PREFIX = "k_";
@@ -87,22 +92,24 @@ public class DefinedSymbolsHandler implements SMTHandler {
                 + "solver astray.");
 
     private final Set<String> supportedFunctions = new HashSet<>();
-    private Services services;
+    private @Nullable Services services;
 
     public static final TermLabel TRIGGER_LABEL = new ParameterlessTermLabel(new Name("Trigger"));
 
-    private Properties snippets;
+    private @Nullable Properties snippets;
     private boolean enabled;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) throws IOException {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         this.services = services;
-        this.snippets = handlerSnippets;
+        // the master always loads the snippets for every handler
+        Properties snippets = Objects.requireNonNull(handlerSnippets, "handler snippets");
+        this.snippets = snippets;
 
         // extract the list of supported suffixes from the keys in the
         // properties.
-        for (String prop : handlerSnippets.stringPropertyNames()) {
+        for (String prop : snippets.stringPropertyNames()) {
             int dot = prop.lastIndexOf('.');
             if (dot < 0) {
                 continue;
@@ -116,7 +123,9 @@ public class DefinedSymbolsHandler implements SMTHandler {
             }
         }
 
-        this.enabled = PROPERTY_AXIOMATISATION.get(masterHandler.getTranslationState());
+        this.enabled = Objects.requireNonNull(
+            PROPERTY_AXIOMATISATION.get(masterHandler.getTranslationState()),
+            "axiomatisation property");
     }
 
 
@@ -126,7 +135,10 @@ public class DefinedSymbolsHandler implements SMTHandler {
     }
 
     private void introduceSymbol(MasterHandler trans, String name) throws SMTTranslationException {
-        introduceSymbol(trans, name, services.getNamespaces().functions().lookup(name));
+        Services services = Objects.requireNonNull(this.services, "services");
+        introduceSymbol(trans, name,
+            Objects.requireNonNull(services.getNamespaces().functions().lookup(name),
+                "function not found: " + name));
     }
 
     private boolean introduceSymbol(MasterHandler trans, String name, SortedOperator op)
@@ -137,7 +149,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
         // Now ... this is the first encounter of name.
         // We have to add axioms and typing and declaration ...
-
+        Properties snippets = Objects.requireNonNull(this.snippets, "snippets");
         String prefixedname = PREFIX + name;
 
         // Lookup a declaration in the snippets or use default if not present
@@ -207,9 +219,15 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     private void handleTacletAxioms(String name, MasterHandler trans)
             throws SMTTranslationException {
+        Properties snippets = Objects.requireNonNull(this.snippets, "snippets");
         String[] strTaclets = snippets.getProperty(name + TACLETS_SUFFIX).trim().split(" *, *");
+        Services services = Objects.requireNonNull(this.services, "services");
         for (String str : strTaclets) {
-            Taclet taclet = services.getProof().getInitConfig().lookupActiveTaclet(new Name(str));
+            // the proof and its init config are always present during translation
+            InitConfig config =
+                Objects.requireNonNull(services.getProof(), "proof").getInitConfig();
+            Taclet taclet = Objects.requireNonNull(config, "init config")
+                    .lookupActiveTaclet(new Name(str));
             if (taclet == null) {
                 throw new SMTTranslationException("Unknown taclet: " + str);
             }
@@ -222,6 +240,7 @@ public class DefinedSymbolsHandler implements SMTHandler {
 
     private void handleSMTAxioms(MasterHandler trans, String name) throws SMTTranslationException {
         // well ... if that is defined by axioms use the general purpose mechanism.
+        Properties snippets = Objects.requireNonNull(this.snippets, "snippets");
         String axioms = snippets.getProperty(name + AXIOMS_SUFFIX);
         trans.addAxiom(new VerbatimSMT(axioms));
         String[] deps = snippets.getProperty(name + ".deps", "").trim().split(", *");
@@ -233,6 +252,8 @@ public class DefinedSymbolsHandler implements SMTHandler {
     private void handleDLAxioms(String name, MasterHandler trans) throws SMTTranslationException {
         int cnt = 2;
         String snipName = name + DL_SUFFIX;
+        Properties snippets = Objects.requireNonNull(this.snippets, "snippets");
+        Services services = Objects.requireNonNull(this.services, "services");
         String dl = snippets.getProperty(snipName);
         do {
             DefaultTermParser tp = new DefaultTermParser();

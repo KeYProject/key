@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -19,6 +20,8 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This SMT translation handler takes care of field constants.
@@ -42,22 +45,27 @@ import org.key_project.logic.sort.Sort;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class FieldConstantHandler implements SMTHandler {
 
     private static final String CONSTANT_COUNTER_PROPERTY = "fieldConstant.counter";
     private static final Sort[] NO_ARGS = new Sort[0];
-    private Services services;
+    private @Nullable Services services;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) {
         this.services = services;
-        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+        // the master always loads the snippets for every handler
+        masterHandler.addDeclarationsAndAxioms(
+            Objects.requireNonNull(handlerSnippets, "handler snippets"));
     }
 
     @Override
     public boolean canHandle(Operator op) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        Services services = Objects.requireNonNull(this.services, "services");
+        HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT");
         return op.arity() == 0 && op.sort(NO_ARGS) == heapLDT.getFieldSort()
                 && op instanceof Function && ((Function) op).isUnique()
                 && (JavaDLFieldNames.isField(op.name())
@@ -70,7 +78,9 @@ public class FieldConstantHandler implements SMTHandler {
         String name = term.op().name().toString();
         String smtName = "field_" + name;
 
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        Services services = Objects.requireNonNull(this.services, "services");
+        HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap LDT");
 
         if (term.op() instanceof SortedOperator op) {
 

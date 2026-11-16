@@ -14,6 +14,9 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A {@link TermLabelMerger} is used by
@@ -30,6 +33,7 @@ import org.key_project.prover.sequent.SequentFormula;
  * @see TermLabel
  * @see TermLabelManager
  */
+@NullMarked
 public interface TermLabelMerger {
     /**
      * Merges the existing and the rejected {@link TermLabel} by updating the merged {@link List}.
@@ -46,7 +50,7 @@ public interface TermLabelMerger {
      *         otherwise.
      */
     boolean mergeLabels(SequentFormula existingSF, JTerm existingTerm,
-            TermLabel existingLabel, SequentFormula rejectedSF,
+            @Nullable TermLabel existingLabel, SequentFormula rejectedSF,
             JTerm rejectedTerm,
             TermLabel rejectedLabel, List<TermLabel> mergedLabels);
 }

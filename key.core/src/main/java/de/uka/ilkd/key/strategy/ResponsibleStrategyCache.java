@@ -14,7 +14,11 @@ import org.key_project.logic.Name;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.rules.RuleSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /// A cache for the strategies responsible for a given [Rule] and [RuleSet].
+@NullMarked
 public class ResponsibleStrategyCache {
     // map rulesets to the strategies that participate in their cost computations, instantiation or
     // approval decisions
@@ -117,7 +121,7 @@ public class ResponsibleStrategyCache {
     }
 
     /// Returns the strategy with the given [Name]
-    public ComponentStrategy getStrategyByName(Name name) {
+    public @Nullable ComponentStrategy getStrategyByName(Name name) {
         return nameToStrategyMap.get(name);
     }
 }

@@ -5,8 +5,10 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -47,8 +49,11 @@ public class CutCommand extends AbstractCommand {
     }
 
     static void execute(EngineState state, Parameters args) throws ScriptException {
-        Taclet cut = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(CUT_TACLET_NAME);
+        ProofEnvironment env = Objects.requireNonNull(state.getProof().getEnv(),
+            "proof environment is null");
+        Taclet cut = Objects.requireNonNull(
+            env.getInitConfigForEnvironment().lookupActiveTaclet(CUT_TACLET_NAME),
+            "taclet 'cut' not found");
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
 
@@ -56,7 +61,8 @@ public class CutCommand extends AbstractCommand {
             state.getProof().getServices().getTermBuilder().convertToFormula(args.formula);
 
         app = app.addCheckedInstantiation(sv, formula, state.getProof().getServices(), true);
-        state.getFirstOpenAutomaticGoal().apply(app);
+        state.getFirstOpenAutomaticGoal()
+                .apply(Objects.requireNonNull(app, "taclet application is null"));
     }
 
     @Documentation(category = "Fundamental", value = """

@@ -11,11 +11,14 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Visitor traversing a term and collecting all variables that occur bound. The visitor implements
  * also a continuation on sequents, traversing all of the formulas occuring in the sequent.
  */
+@NullMarked
 public class BoundVarsVisitor implements DefaultVisitor {
 
     private ImmutableSet<QuantifiableVariable> bdVars = DefaultImmutableSet.nil();

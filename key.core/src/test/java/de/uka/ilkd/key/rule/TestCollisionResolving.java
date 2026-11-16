@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.control.instantiation_model.TacletFindModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -21,6 +23,8 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.TacletMatcher;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.*;
 import org.key_project.util.collection.ImmutableList;
 
@@ -44,7 +48,9 @@ public class TestCollisionResolving {
     public void setUp() {
         TacletForTests.setStandardFile(TacletForTests.testRules);
         TacletForTests.parse();
-        s = TacletForTests.getSorts().lookup(new Name("s"));
+        s = Objects
+                .requireNonNull(TacletForTests.getSorts().lookup(new Name("s")),
+                    "the s sort must exist in the test rules");
 
         services = TacletForTests.services();
 
@@ -54,11 +60,14 @@ public class TestCollisionResolving {
 
         Node node = new Node(proof, seq);
         TacletIndex tacletIndex = TacletIndexKit.getKit().createTacletIndex();
+        // a null built-in rule index is intentional: the test goal needs no built-in rules
+        @SuppressWarnings("NullAway")
         BuiltInRuleAppIndex builtInRuleAppIndex = new BuiltInRuleAppIndex(null);
         goal = new Goal(node, tacletIndex, builtInRuleAppIndex, proof.getServices());
     }
 
     @AfterEach
+    @SuppressWarnings("NullAway") // deliberate null reset after each test
     public void tearDown() {
         s = null;
         goal = null;
@@ -83,23 +92,21 @@ public class TestCollisionResolving {
         FindTaclet coll_varSV =
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_coll_varSV").taclet();
 
-        TacletApp result = NoPosTacletApp.createNoPosTacletApp(coll_varSV, coll_varSV.getMatcher()
-                .matchFind(term, MatchConditions.EMPTY_MATCHCONDITIONS, services),
-            services);
+        TacletApp result = matchToNoPosTacletApp(coll_varSV, term, services);
 
-        SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
-        SchemaVariable c = TacletForTests.getSchemaVariables().lookup(new Name("c"));
-        SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        SchemaVariable v = TacletForTests.getSchemaVariables().lookup(new Name("v"));
+        SchemaVariable b = lookupSV("b");
+        SchemaVariable c = lookupSV("c");
+        SchemaVariable u = lookupSV("u");
+        SchemaVariable v = lookupSV("v");
 
         SVInstantiations insts = result.instantiations();
-        assertNotSame(((JTerm) insts.getInstantiation(b)).sub(0).op(),
-            ((JTerm) insts.getInstantiation(c)).sub(0).op(),
+        assertNotSame(inst(insts, b).sub(0).op(),
+            inst(insts, c).sub(0).op(),
             "Same object for different conceptual variables");
-        assertSame(((JTerm) insts.getInstantiation(u)).op(),
-            ((JTerm) insts.getInstantiation(b)).sub(0).op());
-        assertSame(((JTerm) insts.getInstantiation(v)).op(),
-            ((JTerm) insts.getInstantiation(c)).sub(0).op());
+        assertSame(inst(insts, u).op(),
+            inst(insts, b).sub(0).op());
+        assertSame(inst(insts, v).op(),
+            inst(insts, c).sub(0).op());
     }
 
     @Test
@@ -130,20 +137,18 @@ public class TestCollisionResolving {
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
 
-        TacletApp result =
-            PosTacletApp.createPosTacletApp(coll_varSV, coll_varSV.getMatcher().matchFind(
-                term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, services), pos, services);
+        TacletApp result = matchToPosTacletApp(coll_varSV, term.sub(0), services, pos);
 
-        SchemaVariable b = TacletForTests.getSchemaVariables().lookup(new Name("b"));
-        SchemaVariable c = TacletForTests.getSchemaVariables().lookup(new Name("c"));
-        SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
+        SchemaVariable b = lookupSV("b");
+        SchemaVariable c = lookupSV("c");
+        SchemaVariable u = lookupSV("u");
 
         SVInstantiations insts = result.instantiations();
-        assertNotSame(((JTerm) insts.getInstantiation(b)).sub(0).op(),
-            ((JTerm) insts.getInstantiation(c)).sub(0).op(),
+        assertNotSame(inst(insts, b).sub(0).op(),
+            inst(insts, c).sub(0).op(),
             "Same object for different conceptual variables");
-        assertSame(((JTerm) insts.getInstantiation(u)).op(),
-            ((JTerm) insts.getInstantiation(c)).sub(0).op());
+        assertSame(inst(insts, u).op(),
+            inst(insts, c).sub(0).op());
     }
 
     @Test
@@ -154,9 +159,11 @@ public class TestCollisionResolving {
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_ns1").taclet();
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
-        TacletApp app = PosTacletApp.createPosTacletApp(taclet,
-            taclet.getMatcher().matchFind(term.sub(0), MatchConditions.EMPTY_MATCHCONDITIONS, null),
-            pos, services);
+        TacletApp app = Objects
+                .requireNonNull(
+                    PosTacletApp.createPosTacletApp(taclet,
+                        matchFindNoServices(taclet, term.sub(0)), pos, services),
+                    "the taclet application must be valid");
         TacletApp app1 = app.prepareUserInstantiation(services);
         assertSame(app, app1);
         TacletFindModel instModel = new TacletFindModel(app, TacletForTests.services(),
@@ -218,8 +225,8 @@ public class TestCollisionResolving {
     @Test
     public void testNameConflict1() {
         Services services = new Services(AbstractProfile.getDefaultProfile());
-        SchemaVariable u = TacletForTests.getSchemaVariables().lookup(new Name("u"));
-        SchemaVariable v = TacletForTests.getSchemaVariables().lookup(new Name("v"));
+        SchemaVariable u = lookupSV("u");
+        SchemaVariable v = lookupSV("v");
         FindTaclet taclet =
             (FindTaclet) TacletForTests.getTaclet("TestCollisionResolving_name_conflict").taclet();
         final ImmutableList<SequentFormula> semiseq =
@@ -231,21 +238,25 @@ public class TestCollisionResolving {
             new PosInOccurrence(semiseq.get(0), PosInTerm.getTopLevel(), false);
 
         NoPosTacletApp app0 = NoPosTacletApp.createNoPosTacletApp(taclet);
-        app0 = app0.matchFind(pos, services);
+        app0 = Objects
+                .requireNonNull(app0.matchFind(pos, services), "the taclet must match the formula");
         app0 = (NoPosTacletApp) app0.findIfFormulaInstantiations(seq, services).head();
-        TacletApp app = app0.setPosInOccurrence(pos, services);
+        TacletApp app = Objects
+                .requireNonNull(app0.setPosInOccurrence(pos, services), "the position must be set");
         /*
          * IList<SVInstantiations> sviList=taclet.matchIf (seq,
          * taclet.match(semiseq.get(0).formula(), taclet.find(),
          * MatchConditions.EMPTY_MATCHCONDITIONS, null, Constraint.BOTTOM), null); TacletApp app =
          * PosTacletApp.createPosTacletApp(taclet, sviList.head(), pos);
          */
-        TacletApp app1 = app.prepareUserInstantiation(services);
+        TacletApp app1 = Objects
+                .requireNonNull(app.prepareUserInstantiation(services),
+                    "a new taclet app is created for the user instantiation");
         assertNotSame(app, app1,
             "A different TacletApp should have been created to resolve" + " name conflicts");
 
-        assertNotEquals(((JTerm) app1.instantiations().getInstantiation(u)).op().name(),
-            ((JTerm) app1.instantiations().getInstantiation(v)).op().name(),
+        assertNotEquals(inst(app1.instantiations(), u).op().name(),
+            inst(app1.instantiations(), v).op().name(),
             "The names of the instantiations of u and v should be different");
     }
 
@@ -336,10 +347,10 @@ public class TestCollisionResolving {
         JTerm term = TacletForTests.parseTerm("\\forall s x; p(x)");
         PosInOccurrence pos =
             new PosInOccurrence(new SequentFormula(term), PosInTerm.getTopLevel().down(0), true);
-        MatchConditions mc =
-            (MatchConditions) taclet.getMatcher().matchFind(term.sub(0),
-                MatchConditions.EMPTY_MATCHCONDITIONS, null);
-        TacletApp app = PosTacletApp.createPosTacletApp(taclet, mc, pos, services);
+        MatchResultInfo mc = matchFindNoServices(taclet, term.sub(0));
+        TacletApp app = Objects
+                .requireNonNull(PosTacletApp.createPosTacletApp(taclet, mc, pos, services),
+                    "the taclet application must be valid");
         TacletApp app1 = app.prepareUserInstantiation(services);
         assertSame(app, app1, "Actually there are no conflicts yet.");
         TacletFindModel instModel = new TacletFindModel(app, services,
@@ -384,4 +395,62 @@ public class TestCollisionResolving {
 
     }
 
+    /**
+     * Looks up a schema variable of the test rules and requires it to exist.
+     */
+    private static SchemaVariable lookupSV(String name) {
+        return Objects
+                .requireNonNull(TacletForTests.getSchemaVariables().lookup(new Name(name)),
+                    "schema variable " + name);
+    }
+
+    // the SVs of the test taclets are always instantiated by a successful match
+    private static JTerm inst(SVInstantiations insts, SchemaVariable sv) {
+        return Objects
+                .requireNonNull((JTerm) insts.getInstantiation(sv), "instantiation of " + sv);
+    }
+
+    /**
+     * Matches the term against the find term of the taclet using the given services and creates
+     * the corresponding NoPosTacletApp.
+     */
+    private static NoPosTacletApp matchToNoPosTacletApp(FindTaclet taclet, JTerm term,
+            Services services) {
+        TacletMatcher matcher =
+            Objects.requireNonNull(taclet.getMatcher(), "the taclet has a matcher");
+        MatchResultInfo matchCond = Objects
+                .requireNonNull(matcher.matchFind(term, MatchConditions.EMPTY_MATCHCONDITIONS,
+                    services),
+                    "the term must match the taclet");
+        return Objects.requireNonNull(
+            NoPosTacletApp.createNoPosTacletApp(taclet, matchCond, services),
+            "the taclet application must be valid");
+    }
+
+    /**
+     * Matches the term against the find term of the taclet using the given services and creates
+     * the corresponding positioned TacletApp.
+     */
+    private static PosTacletApp matchToPosTacletApp(FindTaclet taclet, JTerm term,
+            Services services, PosInOccurrence pos) {
+        TacletMatcher matcher =
+            Objects.requireNonNull(taclet.getMatcher(), "the taclet has a matcher");
+        MatchResultInfo matchCond = Objects
+                .requireNonNull(matcher.matchFind(term, MatchConditions.EMPTY_MATCHCONDITIONS,
+                    services),
+                    "the term must match the taclet");
+        return Objects.requireNonNull(
+            PosTacletApp.createPosTacletApp(taclet, matchCond, pos, services),
+            "the taclet application must be valid");
+    }
+
+    // a null services argument is deliberate: the test taclets match pure logic terms
+    @SuppressWarnings("NullAway")
+    private static MatchResultInfo matchFindNoServices(FindTaclet taclet, JTerm term) {
+        return Objects
+                .requireNonNull(
+                    taclet.getMatcher().matchFind(term, MatchConditions.EMPTY_MATCHCONDITIONS,
+                        null),
+                    "the term must match the taclet");
+    }
 }

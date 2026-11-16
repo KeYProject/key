@@ -15,11 +15,13 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Feature that returns the number of branches for a given taclet application Size of "assumes"
  * sequents is currently not considered
  */
+@NullMarked
 public class CountBranchFeature implements Feature {
 
     public static final Feature INSTANCE = new CountBranchFeature();

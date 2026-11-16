@@ -6,11 +6,14 @@ package org.key_project.slicing.graph;
 
 import de.uka.ilkd.key.proof.BranchLocation;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A graph node used in the {@link DependencyGraph}.
  *
  * @author Arne Keller
  */
+@NullMarked
 public abstract class GraphNode {
     /**
      * Location in the proof tree.

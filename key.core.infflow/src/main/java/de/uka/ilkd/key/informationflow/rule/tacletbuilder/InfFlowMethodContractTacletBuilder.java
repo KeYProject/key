@@ -9,6 +9,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.speclang.Contract;
@@ -21,14 +22,18 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Implements the rule which inserts operation contracts for a method call.
  */
+@NullMarked
 public final class InfFlowMethodContractTacletBuilder
         extends AbstractInfFlowContractAppTacletBuilder {
 
-    private FunctionalOperationContract methodContract;
+    private @Nullable FunctionalOperationContract methodContract;
 
 
     public InfFlowMethodContractTacletBuilder(final Services services) {
@@ -43,14 +48,15 @@ public final class InfFlowMethodContractTacletBuilder
 
     @Override
     Name generateName() {
-        return MiscTools.toValidTacletName(USE_IF + methodContract.getTarget().getUniqueName());
+        return MiscTools.toValidTacletName(USE_IF + requireMethodContract().getTarget()
+                .getUniqueName());
     }
 
 
     @Override
     JTerm generateSchemaAssumes(ProofObligationVars schemaDataAssumes, Services services) {
         BasicPOSnippetFactory fAssumes =
-            POSnippetFactory.getBasicFactory(methodContract, schemaDataAssumes, services);
+            POSnippetFactory.getBasicFactory(requireMethodContract(), schemaDataAssumes, services);
         return fAssumes.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
     }
 
@@ -58,7 +64,7 @@ public final class InfFlowMethodContractTacletBuilder
     @Override
     JTerm generateSchemaFind(ProofObligationVars schemaDataFind, Services services) {
         BasicPOSnippetFactory fFind =
-            POSnippetFactory.getBasicFactory(methodContract, schemaDataFind, services);
+            POSnippetFactory.getBasicFactory(requireMethodContract(), schemaDataFind, services);
         return fFind.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
     }
 
@@ -66,7 +72,7 @@ public final class InfFlowMethodContractTacletBuilder
     @Override
     JTerm getContractApplPred(ProofObligationVars appData) {
         BasicPOSnippetFactory f =
-            POSnippetFactory.getBasicFactory(methodContract, appData, services);
+            POSnippetFactory.getBasicFactory(requireMethodContract(), appData, services);
         return f.create(BasicPOSnippetFactory.Snippet.METHOD_CALL_RELATION);
     }
 
@@ -75,7 +81,7 @@ public final class InfFlowMethodContractTacletBuilder
     JTerm buildContractApplications(ProofObligationVars contAppData,
             ProofObligationVars contAppData2, Services services) {
         ImmutableSet<InformationFlowContract> ifContracts =
-            getInformFlowContracts(methodContract.getTarget(), services);
+            getInformFlowContracts(requireMethodContract().getTarget(), services);
         ImmutableList<JTerm> contractsApplications = ImmutableList.nil();
         for (InformationFlowContract cont : ifContracts) {
             InfFlowPOSnippetFactory f =
@@ -90,8 +96,13 @@ public final class InfFlowMethodContractTacletBuilder
 
     private ImmutableSet<InformationFlowContract> getInformFlowContracts(IProgramMethod pm,
             Services services) {
+        final KeYJavaType containerType = pm.getContainerType();
+        if (containerType == null) {
+            throw new NullPointerException(
+                "No container type for the method " + pm.getUniqueName() + ".");
+        }
         ImmutableSet<Contract> contracts =
-            services.getSpecificationRepository().getContracts(pm.getContainerType(), pm);
+            services.getSpecificationRepository().getContracts(containerType, pm);
         ImmutableSet<InformationFlowContract> ifContracts =
             DefaultImmutableSet.nil();
         for (Contract c : contracts) {
@@ -100,5 +111,15 @@ public final class InfFlowMethodContractTacletBuilder
             }
         }
         return ifContracts;
+    }
+
+
+    private FunctionalOperationContract requireMethodContract() {
+        final FunctionalOperationContract c = methodContract;
+        if (c == null) {
+            throw new NullPointerException(
+                "No method contract for building the information flow method contract taclet.");
+        }
+        return c;
     }
 }

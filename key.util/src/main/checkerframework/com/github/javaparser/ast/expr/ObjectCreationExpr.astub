@@ -1,0 +1,22 @@
+package com.github.javaparser.ast.expr;
+
+import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * Re-specification of the {@code ObjectCreationExpr} constructor for the nullness checker.
+ * JavaParser treats the {@code scope} as optional: a {@code null} scope denotes a top-level
+ * {@code new} expression without a qualifier before the type name (e.g. the generated
+ * {@code new IllegalArgumentException(...)} in the {@code $enumConstants} builder or the synthetic
+ * {@code throw} statements of the class-initializer builder). The KeY code base deliberately
+ * passes {@code null} as the scope when generating such expressions. The type and the argument
+ * list must be non-null. Widening the parameter nullness matches the library's actual behavior
+ * without any source changes.
+ */
+public class ObjectCreationExpr {
+
+    public ObjectCreationExpr(@Nullable Expression scope, ClassOrInterfaceType type,
+        NodeList<Expression> arguments);
+}

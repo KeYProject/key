@@ -7,12 +7,15 @@ package de.uka.ilkd.key.speclang.njml;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Externalize algorithm to decide whether a JML comment is active given a set of enabled keys.
@@ -21,16 +24,24 @@ import org.jspecify.annotations.NonNull;
  * @version 1 (9/24/21)
  * @see #isComment(String)
  */
+@NullMarked
 public class JmlMarkerDecision {
-    private final JmlLexer lexer;
+    private final @Nullable JmlLexer lexer;
     private Set<String> enabledKeys = new HashSet<>();
 
     /**
      * Initialize this class with default {@code enabledKeys} of {@code "key"}.
      *
-     * @param lexer a lexer instance which stream is used
+     * @param lexer a lexer instance which stream is used (may be null if only the string-based
+     *        tests are used)
      */
-    public JmlMarkerDecision(JmlLexer lexer) {
+    /**
+     * The key registration operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because it only stores the
+     * caller-provided collection, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
+    public JmlMarkerDecision(@Nullable JmlLexer lexer) {
         this.lexer = lexer;
         setEnabledKeys(
             ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getJmlEnabledKeys());
@@ -91,12 +102,16 @@ public class JmlMarkerDecision {
      * @return true if lexer is at a comment, and not in front of a JML specification.
      */
     public boolean isComment(String expectedCommentStart) {
+        // the stream-based test requires the lexer; a missing lexer is an inconsistent state in
+        // which the previous code crashed with an NPE
+        final JmlLexer lexer =
+            Objects.requireNonNull(this.lexer, "lexer of the JML marker decision");
         int mark = lexer._input.mark();
         int startPos = lexer._input.index();
 
         try {
             // matching the expected start of the comment
-            if (consume(expectedCommentStart)) {
+            if (consume(lexer, expectedCommentStart)) {
                 return false;
             }
 
@@ -119,7 +134,7 @@ public class JmlMarkerDecision {
         }
     }
 
-    private boolean consume(String str) {
+    private boolean consume(JmlLexer lexer, String str) {
         for (int i = 0; i < str.length(); i++) {
             if (lexer._input.LA(1) == str.charAt(i)) {
                 lexer._input.consume();

@@ -30,6 +30,9 @@ import org.junit.jupiter.api.*;
 @Tag("owntest")
 @Tag("slow")
 public class RunAllProofsTestWithComputeCostProfiling {
+    // assigned by the @TestFactory before any test runs; JUnit lifecycle assignments are
+    // invisible to NullAway's field initialization analysis
+    @SuppressWarnings("NullAway")
     private static ProfilingDirectories directories;
     static File plotScript;
 
@@ -47,7 +50,10 @@ public class RunAllProofsTestWithComputeCostProfiling {
     Stream<DynamicTest> data() throws Exception {
         ProofCollection proofCollection = ProofCollections.automaticJavaDL();
         // TODO weigl parseIndexFile("index/automaticJAVADL.txt", DataRecordingParser::new);
-        proofCollection.getSettings().getStatisticsFile().setUp();
+        var statisticsFile =
+            Objects.requireNonNull(proofCollection.getSettings().getStatisticsFile(),
+                "statistics file");
+        statisticsFile.setUp();
         initDirectories(proofCollection.getSettings().runStart);
         return RunAllProofsTest.data(proofCollection);
     }

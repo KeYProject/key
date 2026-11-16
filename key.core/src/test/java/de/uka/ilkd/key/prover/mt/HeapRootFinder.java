@@ -12,6 +12,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Objects;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * In-process, MAT-free "path to GC roots" finder. Seeds a breadth-first search from the static
@@ -30,7 +33,8 @@ final class HeapRootFinder {
     private HeapRootFinder() {}
 
     /** edge to the object that referenced this one, plus a human label for the edge. */
-    private record Edge(Object parent, String label) {
+    // parent is null for the seeded chain roots
+    private record Edge(@Nullable Object parent, String label) {
     }
 
     static void reportPath(Object target) {
@@ -160,8 +164,9 @@ final class HeapRootFinder {
         Edge e = parent.get(node);
         chain.add(brief(node));
         while (e != null && e.parent() != null) {
-            chain.add(e.label() + "  ->  " + brief(e.parent()));
-            node = e.parent();
+            Object child = Objects.requireNonNull(e.parent(), "checked by the loop condition");
+            chain.add(e.label() + "  ->  " + brief(child));
+            node = child;
             e = parent.get(node);
         }
         if (e != null) {
@@ -197,7 +202,7 @@ final class HeapRootFinder {
         }
     }
 
-    private static Object readStatic(Field f) {
+    private static @Nullable Object readStatic(Field f) {
         try {
             f.setAccessible(true);
             return f.get(null);
@@ -206,7 +211,7 @@ final class HeapRootFinder {
         }
     }
 
-    private static Object readInstance(Field f, Object o) {
+    private static @Nullable Object readInstance(Field f, Object o) {
         try {
             f.setAccessible(true);
             return f.get(o);

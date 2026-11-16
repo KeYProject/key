@@ -5,11 +5,11 @@
 package org.key_project.exploration.actions;
 
 import java.awt.event.ActionEvent;
-import java.util.Objects;
 import javax.swing.*;
 
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -17,9 +17,13 @@ import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.exploration.ExplorationModeModel;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Common functionalities for proof exploration actions.
  */
+@NullMarked
 public abstract class ExplorationAction extends MainWindowAction {
 
     private static final long serialVersionUID = -1662459714803539089L;
@@ -32,9 +36,18 @@ public abstract class ExplorationAction extends MainWindowAction {
     public void actionPerformed(ActionEvent e) {
     }
 
-    JTerm promptForTerm(MainWindow window, JTerm term) {
-        final String initialValue =
-            term == null ? "" : LogicPrinter.quickPrintTerm(term, getMediator().getServices());
+    @Nullable
+    JTerm promptForTerm(MainWindow window, @Nullable JTerm term) {
+        final String initialValue;
+        if (term == null) {
+            initialValue = "";
+        } else {
+            Services services = getMediator().getServices();
+            if (services == null) {
+                throw new NullPointerException("No services available.");
+            }
+            initialValue = LogicPrinter.quickPrintTerm(term, services);
+        }
 
         JTerm result = null;
 
@@ -44,7 +57,11 @@ public abstract class ExplorationAction extends MainWindowAction {
                 return null;
             }
 
-            KeyIO io = new KeyIO(window.getMediator().getServices());
+            Services services = window.getMediator().getServices();
+            if (services == null) {
+                throw new NullPointerException("No services available.");
+            }
+            KeyIO io = new KeyIO(services);
             try {
                 result = io.parseExpression(input);
 
@@ -65,6 +82,10 @@ public abstract class ExplorationAction extends MainWindowAction {
     }
 
     public ExplorationModeModel getModel() {
-        return Objects.requireNonNull(getMediator().lookup(ExplorationModeModel.class));
+        ExplorationModeModel model = getMediator().lookup(ExplorationModeModel.class);
+        if (model == null) {
+            throw new NullPointerException("Exploration mode model is not registered.");
+        }
+        return model;
     }
 }

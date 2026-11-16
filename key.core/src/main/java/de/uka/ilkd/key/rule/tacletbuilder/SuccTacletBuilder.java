@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.tacletbuilder;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.SuccTaclet;
@@ -14,8 +16,11 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /** class builds SuccTaclet objects. */
+@NullMarked
 public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
     /**
      * sets the <I>find</I> of the Taclet that is to build to the given sequent.
@@ -92,7 +97,14 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
         return getSuccTaclet();
     }
 
+    /**
+     * {@code attrs.trigger()} is {@code null} for builders without a trigger; this is a legitimate
+     * state {@link org.key_project.prover.rules.TacletAttributes} preserves and tolerates
+     * downstream. {@link TacletBuilder#setTrigger} is {@code @NonNull}-typed, so the assignment is
+     * suppressed.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public SuccTacletBuilder copy() {
         var rb = new SuccTacletBuilder().setFind((Sequent) getFind());
         rb.setAnnotations(tacletAnnotations);
@@ -112,7 +124,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
         for (var vc : varsNewDependingOn) {
             rb.addVarsNewDependingOn(vc.first(), vc.second());
         }
-        rb.setFind((Sequent) find);
+        rb.setFind((Sequent) Objects.requireNonNull(find, "find sequent of " + name));
         rb.setChoices(choices);
         if (goal2Choices != null)
             rb.goal2Choices =

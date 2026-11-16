@@ -8,9 +8,13 @@ import java.util.List;
 
 import de.uka.ilkd.key.logic.TermServices;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A factory for creating {@link SymbolicExecutionTermLabel} objects.
  */
+@NullMarked
 public class SymbolicExecutionTermLabelFactory
         implements TermLabelFactory<SymbolicExecutionTermLabel> {
     /**
@@ -20,7 +24,8 @@ public class SymbolicExecutionTermLabelFactory
      * This method accepts single arguments which can be parsed as an integer.
      */
     @Override
-    public SymbolicExecutionTermLabel parseInstance(List<String> parameters, TermServices services)
+    public SymbolicExecutionTermLabel parseInstance(@Nullable List<String> parameters,
+            TermServices services)
             throws TermLabelException {
         if (parameters == null || parameters.size() != 1) {
             throw new TermLabelException("Label " + SymbolicExecutionTermLabel.NAME

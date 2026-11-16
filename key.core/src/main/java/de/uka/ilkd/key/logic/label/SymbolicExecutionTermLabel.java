@@ -9,11 +9,15 @@ import de.uka.ilkd.key.java.Services;
 import org.key_project.logic.Name;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Label attached to a symbolic execution thread.
  *
  * @param id The unique ID of this term label in the {@link Sequent}.
  */
+@NullMarked
 public record SymbolicExecutionTermLabel(int id) implements TermLabel {
     /**
      * The unique name of this label.
@@ -36,7 +40,7 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
     /**
      * {@inheritDoc}
      */
-    public boolean equals(Object o) { return this == o; }
+    public boolean equals(@Nullable Object o) { return this == o; }
 
     /**
      * {@inheritDoc}
@@ -47,7 +51,7 @@ public record SymbolicExecutionTermLabel(int id) implements TermLabel {
      * {@inheritDoc}
      */
     @Override
-    public Object getTLChild(int i) {
+    public @Nullable Object getTLChild(int i) {
         if (i == 0) {
             return id();
         }

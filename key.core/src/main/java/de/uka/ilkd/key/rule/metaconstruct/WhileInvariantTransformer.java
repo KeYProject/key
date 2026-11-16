@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.ast.JavaNonTerminalProgramElement;
@@ -40,7 +41,10 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.ast.key.KeyTransactionStmt;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public final class WhileInvariantTransformer {
     /** the outer label that is used to leave the while loop ('l1') */
     private final SchemaVariable outerLabel = SchemaVariableFactory
@@ -49,7 +53,7 @@ public final class WhileInvariantTransformer {
     private final SchemaVariable innerLabel = SchemaVariableFactory
             .createProgramSV(new ProgramElementName("inner_label"), ProgramSVSort.LABEL, false);
     /** list of the labels */
-    private ImmutableList<SchemaVariable> instantiations = null;
+    private ImmutableList<SchemaVariable> instantiations;
 
     /**
      * list of breaks that lead to abrupt termination of the loop to be transformed. Is initialised
@@ -69,8 +73,10 @@ public final class WhileInvariantTransformer {
     private JavaNonTerminalProgramElement root;
     private Modality modality;
 
-    private KeYJavaType returnType;
+    private @Nullable KeYJavaType returnType;
 
+    // all fields are set by init()/neededInstantiations() before they are used
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     public WhileInvariantTransformer() {
     }
 
@@ -88,7 +94,7 @@ public final class WhileInvariantTransformer {
         ReplaceWhileLoop removeWhile = new ReplaceWhileLoop(root, null, services);
         removeWhile.start();
 
-        body = removeWhile.getTheLoop();
+        body = Objects.requireNonNull(removeWhile.getTheLoop(), "no loop in " + root);
 
         // some initialisations...
 
@@ -146,7 +152,8 @@ public final class WhileInvariantTransformer {
                 getNewLocalvariable("break_" + breakCounter++, "boolean", services);
             b.setProgramVariable(newVar);
             stmnt.add(KeYJavaASTFactory.declare(newVar, BooleanLiteral.FALSE,
-                new TypeRef(javaInfo.getKeYJavaType("boolean"))));
+                new TypeRef(Objects.requireNonNull(
+                    javaInfo.getKeYJavaType("boolean"), "no boolean type"))));
             numberOfBreaks++;
             Statement s;
             if (b.getBreak().getLabel() != null) {
@@ -184,7 +191,9 @@ public final class WhileInvariantTransformer {
                 post, rule, ruleApp, goal, applicationPos, services));
 
             if (returnType != null) {
-                stmnt.add(KeYJavaASTFactory.declare(returnExpression, new TypeRef(returnType)));
+                stmnt.add(KeYJavaASTFactory.declare(
+                    Objects.requireNonNull(returnExpression, "no return expression"),
+                    new TypeRef(returnType)));
             }
         }
 
@@ -198,10 +207,12 @@ public final class WhileInvariantTransformer {
 
         // we catch all exceptions
         stmnt.add(KeYJavaASTFactory.declare(excFlag, BooleanLiteral.FALSE,
-            new TypeRef(javaInfo.getKeYJavaType("boolean"))));
+            new TypeRef(Objects.requireNonNull(
+                javaInfo.getKeYJavaType("boolean"), "no boolean type"))));
         excFlagTerm = typeConv.convertToLogicElement(excFlag);
         stmnt.add(KeYJavaASTFactory.declare(thrownException,
-            new TypeRef(javaInfo.getKeYJavaType("java.lang.Throwable"))));
+            new TypeRef(Objects.requireNonNull(
+                javaInfo.getKeYJavaType("java.lang.Throwable"), "no Throwable type"))));
 
         resultSubterms.add(normalCaseAndContinue(termLabelState, services, applicationPos, rule,
             ruleApp, goal, applicationSequent, contFlagTerm, returnFlagTerm, breakFlagTerm,
@@ -272,7 +283,9 @@ public final class WhileInvariantTransformer {
     private ProgramVariable getNewLocalvariable(String varNameBase, String varType,
             Services services) {
 
-        return getNewLocalvariable(varNameBase, javaInfo.getKeYJavaType(varType), services);
+        return getNewLocalvariable(varNameBase,
+            Objects.requireNonNull(javaInfo.getKeYJavaType(varType), "no type for " + varType),
+            services);
 
     }
 
@@ -301,8 +314,7 @@ public final class WhileInvariantTransformer {
      */
     public ImmutableList<SchemaVariable> neededInstantiations(ProgramElement originalLoop,
             SVInstantiations svInst) {
-        WhileInvariantTransformation w = new WhileInvariantTransformation(originalLoop, svInst,
-            javaInfo == null ? null : javaInfo.getServices());
+        WhileInvariantTransformation w = checkMode(originalLoop, svInst);
         w.start();
         instantiations = ImmutableList.nil();
         if (w.innerLabelNeeded()) {
@@ -313,6 +325,15 @@ public final class WhileInvariantTransformer {
         }
         breakList = w.breakList();
         return instantiations;
+    }
+
+    // neededInstantiations may run before init(); then javaInfo (and its services) is null,
+    // which the check-mode constructor tolerates
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    private WhileInvariantTransformation checkMode(ProgramElement originalLoop,
+            SVInstantiations svInst) {
+        return new WhileInvariantTransformation(originalLoop, svInst,
+            javaInfo == null ? null : javaInfo.getServices());
     }
 
     // ---------------------------------------------------------------
@@ -333,11 +354,13 @@ public final class WhileInvariantTransformer {
 
     private Statement returnFlagDecl(ProgramVariable returnFlag, SVInstantiations svInst) {
         return KeYJavaASTFactory.declare(returnFlag, BooleanLiteral.FALSE,
-            new TypeRef(javaInfo.getKeYJavaType("boolean")));
+            new TypeRef(Objects.requireNonNull(
+                javaInfo.getKeYJavaType("boolean"), "no boolean type")));
     }
 
     private JTerm returnCase(TermLabelState termLabelState, ProgramVariable returnFlag,
-            KeYJavaType returnType, ProgramVariable returnExpression, JTerm post, Rule rule,
+            @Nullable KeYJavaType returnType, @Nullable ProgramVariable returnExpression,
+            JTerm post, Rule rule,
             RuleApp ruleApp, Goal goal,
             PosInOccurrence applicationPos, Services services) {
         JavaBlock returnJavaBlock =
@@ -356,12 +379,14 @@ public final class WhileInvariantTransformer {
 
     private Statement breakFlagDecl(ProgramVariable breakFlag) {
         return KeYJavaASTFactory.declare(breakFlag, BooleanLiteral.FALSE,
-            new TypeRef(javaInfo.getKeYJavaType("boolean")));
+            new TypeRef(Objects.requireNonNull(
+                javaInfo.getKeYJavaType("boolean"), "no boolean type")));
     }
 
     private Statement contFlagDecl(ProgramVariable contFlag) {
         return KeYJavaASTFactory.declare(contFlag, BooleanLiteral.FALSE,
-            new TypeRef(javaInfo.getKeYJavaType("boolean")));
+            new TypeRef(Objects.requireNonNull(
+                javaInfo.getKeYJavaType("boolean"), "no boolean type")));
     }
 
     private JTerm breakCase(TermLabelState termLabelState, ProgramVariable breakFlag, JTerm post,
@@ -384,8 +409,8 @@ public final class WhileInvariantTransformer {
     private JTerm normalCaseAndContinue(TermLabelState termLabelState, Services services,
             PosInOccurrence applicationPos, Rule rule,
             RuleApp ruleApp, Goal goal,
-            Sequent applicationSequent, JTerm contFlagTerm, JTerm returnFlagTerm,
-            JTerm breakFlagTerm,
+            Sequent applicationSequent, @Nullable JTerm contFlagTerm,
+            @Nullable JTerm returnFlagTerm, @Nullable JTerm breakFlagTerm,
             JTerm excFlagTerm, JTerm inv) {
 
         final TermBuilder TB = services.getTermBuilder();
@@ -472,7 +497,9 @@ public final class WhileInvariantTransformer {
         ReplaceWhileLoop replaceWhile = new ReplaceWhileLoop(root, block, javaInfo.getServices());
         replaceWhile.start();
 
-        return JavaBlock.createJavaBlock((StatementBlock) replaceWhile.result());
+        return JavaBlock.createJavaBlock(
+            (StatementBlock) Objects.requireNonNull(replaceWhile.result(),
+                "no replacement result"));
 
     }
 }

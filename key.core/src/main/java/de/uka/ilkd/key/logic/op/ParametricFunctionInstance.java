@@ -21,12 +21,14 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.WeakValueInterner;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static org.key_project.logic.op.Function.FunctionKind.ORDINARY;
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
 /// A concrete instance of a [ParametricFunctionDecl].
+@NullMarked
 public class ParametricFunctionInstance extends JFunction {
     /**
      * Interns parametric function instances so that equal instances are the same object.
@@ -108,12 +110,12 @@ public class ParametricFunctionInstance extends JFunction {
     }
 
     @Override
-    public @NonNull SyntaxElement getChild(int n) {
+    public SyntaxElement getChild(int n) {
         return Objects.requireNonNull(args.get(n));
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == null || getClass() != o.getClass())
             return false;
         ParametricFunctionInstance that = (ParametricFunctionInstance) o;

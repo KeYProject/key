@@ -16,11 +16,15 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Determines conflicts relevant for a delayed cut application.
  *
  * @author Benjamin Niedermann
  */
+@NullMarked
 public interface ApplicationCheck {
 
     /**
@@ -29,6 +33,7 @@ public interface ApplicationCheck {
      * @return A String representation of a possible conflict affecting a delayed cut application
      *         for the given node and cut formula or null if there is no conflict.
      */
+    @Nullable
     String check(Node cutNode, JTerm cutFormula);
 
     /**
@@ -40,7 +45,7 @@ public interface ApplicationCheck {
      * @author Benjamin Niedermann
      */
     class NoNewSymbolsCheck implements ApplicationCheck {
-        private Node node;
+        private @Nullable Node node;
         private final Set<String> names = new TreeSet<>();
 
         private static final String INFORMATION1 =
@@ -57,24 +62,39 @@ public interface ApplicationCheck {
                     as required by the corresponding rule definitions.""";
 
         @Override
-        public String check(Node cutNode, JTerm cutFormula) {
+        public @Nullable String check(Node cutNode, JTerm cutFormula) {
             if (cutNode == null) {
                 throw new IllegalArgumentException("cutNode is null");
             }
             if (node != cutNode) {
                 node = cutNode;
                 clearCaches();
-                buildCaches(node);
+                buildCaches(cutNode);
             }
 
             return checkFormula(cutFormula);
         }
 
+        /**
+         * Clears the cached name cache of the currently checked cut node.
+         * <p>
+         * {@link #check(Node, JTerm)} installs the cut node before this method is invoked; the
+         * dereference of the (nullable) node field is suppressed with a scoped key.
+         */
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
         private void clearCaches() {
             names.clear();
             node.clearNameCache();
         }
 
+        /**
+         * Collects all symbols proposed by name recorders of the subtree below the given cut node.
+         * <p>
+         * Every non-leaf node of the walk carries a name recorder; the dereferences of the
+         * (nullable) polled node and of its (nullable) name recorder are suppressed with a scoped
+         * key.
+         */
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
         private void buildCaches(Node cutNode) {
             LinkedList<Node> queue = new LinkedList<>();
             queue.add(cutNode);
@@ -92,7 +112,19 @@ public interface ApplicationCheck {
             }
         }
 
-        private String checkFormula(JTerm formula) {
+        /**
+         * Checks the given cut formula for symbols that are newly introduced in the subtree below
+         * the cut node.
+         *
+         * @param formula The cut formula to check.
+         * @return A {@code String} describing the conflict, or {@code null} if there is none.
+         *         <p>
+         *         {@link #check(Node, JTerm)} installs the cut node before this method is invoked;
+         *         the
+         *         dereferences of the (nullable) node field are suppressed with a scoped key.
+         */
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
+        private @Nullable String checkFormula(JTerm formula) {
             final List<String> newSymbols = new LinkedList<>();
             formula.execPreOrder((DefaultVisitor) visited -> {
                 String name = visited.op().name().toString();
@@ -121,7 +153,14 @@ public interface ApplicationCheck {
             return buf.toString();
         }
 
+        /**
+         * Returns a textual description of this check, anchoring it at the cut node.
+         * <p>
+         * The node is installed before a check is described; the dereference of the (nullable)
+         * node field is suppressed with a scoped key.
+         */
         @Override
+        @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
         public String toString() {
             return "NoNewSymbolsCheck [node=" + node.serialNr() + ", names=" + names + "]";
         }

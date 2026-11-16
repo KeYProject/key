@@ -5,6 +5,8 @@
 package de.uka.ilkd.key.speclang.jml.pretranslation;
 
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
@@ -14,28 +16,35 @@ import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Objects of this type represent the various JML specification constructs in textual, unprocessed
  * form.
  */
+@NullMarked
 public abstract class TextualJMLConstruct {
 
     protected final ImmutableList<JMLModifier> modifiers;
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
+    // initial value until the real location is assigned; Location's fileUri tolerates null
+    // (cf. UNDEFINED and fromToken); main initializes with a null file directly.
     private Location location = new Location(null, Position.UNDEFINED);
     private boolean loopContract;
 
     /**
      * A user-provided identifier to keep an overview over large specification collections
      */
-    protected String name;
+    protected @Nullable String name;
 
     protected TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers) {
         assert specModifiers != null;
         this.modifiers = specModifiers;
     }
 
-    protected TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers, String name) {
+    protected TextualJMLConstruct(ImmutableList<JMLModifier> specModifiers,
+            @Nullable String name) {
         this(specModifiers);
         this.name = name;
     }
@@ -87,7 +96,7 @@ public abstract class TextualJMLConstruct {
     }
 
     protected void setPosition(LabeledParserRuleContext ps) {
-        setPosition(ps.first);
+        setPosition(Objects.requireNonNull(ps.first, "no parser rule context"));
     }
 
 }

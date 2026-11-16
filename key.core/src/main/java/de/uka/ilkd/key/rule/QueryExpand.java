@@ -43,7 +43,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +60,7 @@ import static de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignm
  *
  * @author Richard Bubel
  */
+@NullMarked
 public class QueryExpand implements BuiltInRule {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(QueryExpand.class);
@@ -85,9 +86,10 @@ public class QueryExpand implements BuiltInRule {
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
-        final PosInOccurrence pio = ruleApp.posInOccurrence();
+        final PosInOccurrence pio = Objects.requireNonNull(ruleApp.posInOccurrence(),
+            "query expand rule application needs an occurrence");
         final JTerm query = (JTerm) pio.subTerm();
 
         // new goal
@@ -137,12 +139,14 @@ public class QueryExpand implements BuiltInRule {
      * @author gladisch
      */
     public Pair<JTerm, JTerm> queryEvalTerm(Services services, JTerm query,
-            LogicVariable[] instVars) {
+            LogicVariable @Nullable [] instVars) {
 
         final IProgramMethod method = (IProgramMethod) query.op();
 
+        final ImmutableArray<ParameterDeclaration> params =
+            Objects.requireNonNull(method.getParameters(), "query method has no parameters");
         final ImmutableArray<ProgramVariable> args =
-            getRegisteredArgumentVariables(method.getParameters(), services);
+            getRegisteredArgumentVariables(params, services);
 
         final TermBuilder tb = services.getTermBuilder();
 
@@ -157,10 +161,13 @@ public class QueryExpand implements BuiltInRule {
         // LogicVariable logicResultQV = new LogicVariable(new
         // Name("res_"+method.getName()),query.sort())
 
-        KeYJavaType calleeType = services.getJavaInfo().getKeYJavaType(query.arity() == 1 ? // static
-                                                                                            // query
-                query.sort() : query.sub(1).sort());
-        KeYJavaType progResultType = method.getReturnType();
+        // For an arity-1 (static) query the receiver is absent and the term sort is the callee
+        // type; otherwise the sort of the first argument is the callee type.
+        KeYJavaType calleeType = Objects.requireNonNull(services.getJavaInfo().getKeYJavaType(
+            query.arity() == 1 ? query.sort() : query.sub(1).sort()),
+            "no callee type for the query method");
+        KeYJavaType progResultType =
+            Objects.requireNonNull(method.getReturnType(), "query method has no return type");
 
 
         final ProgramVariable callee;
@@ -201,8 +208,12 @@ public class QueryExpand implements BuiltInRule {
             ImmutableArray<Sort> imArrlvSorts = new ImmutableArray<>(lvSorts);
             placeHolderResult =
                 new JFunction(new Name(logicResultName), query.sort(), imArrlvSorts);
-            placeHolderResultTrm = tb.func(placeHolderResult, lvTrms, null); // I'm not sure about
-                                                                             // the third parameter!
+            // The master {@code TermFactory.createTerm} maps a {@code null} bound-variable list to
+            // an empty one; {@code TermBuilder.func} (outside this package) forwards to it without
+            // declaring the parameter @Nullable. I'm not sure about the third parameter!
+            @SuppressWarnings("NullAway")
+            final JTerm funcTrm = tb.func(placeHolderResult, lvTrms, null);
+            placeHolderResultTrm = funcTrm;
         }
 
         services.getNamespaces().functions().addSafely(placeHolderResult);
@@ -222,7 +233,8 @@ public class QueryExpand implements BuiltInRule {
 
 
         final MethodFrame mf = new MethodFrame(null,
-            new ExecutionContext(new TypeRef(method.getContainerType()), method, null),
+            new ExecutionContext(new TypeRef(Objects.requireNonNull(method.getContainerType(),
+                "query method has no container type")), method, null),
             // new StatementBlock(assignment)
             s);
         final JavaBlock jb = JavaBlock.createJavaBlock(new StatementBlock(mf));
@@ -232,7 +244,8 @@ public class QueryExpand implements BuiltInRule {
             tb.dia(jb, tb.not(tb.equals(tb.var(result), placeHolderResultTrm)));
 
         JTerm update =
-            tb.elementary(services.getTypeConverter().getHeapLDT().getHeap(), query.sub(0));
+            tb.elementary(Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                "no heap LDT for query expansion").getHeap(), query.sub(0));
         if (callee != null) {
             update = tb.parallel(tb.elementary(tb.var(callee), query.sub(1)), update);
         }
@@ -266,11 +279,13 @@ public class QueryExpand implements BuiltInRule {
         final ProgramVariable[] args = new ProgramVariable[paramDecls.size()];
         int i = 0;
         for (final ParameterDeclaration pdecl : paramDecls) {
-            final String baseName = pdecl.getVariableSpecification().getName();
+            final String baseName = Objects.requireNonNull(
+                pdecl.getVariableSpecification().getName(), "method parameter has no name");
             final String newName = services.getTermBuilder().newName(baseName);
             final ProgramElementName argVarName = new ProgramElementName(newName);
-            args[i] = new LocationVariable(argVarName,
-                pdecl.getVariableSpecification().getProgramVariable().getTypeReference());
+            args[i] = new LocationVariable(argVarName, Objects.requireNonNull(
+                pdecl.getVariableSpecification().getProgramVariable().getTypeReference(),
+                "method parameter variable has no type reference"));
             progvarsNS.addSafely(args[i]);
             i++;
         }
@@ -352,8 +367,8 @@ public class QueryExpand implements BuiltInRule {
      */
     @SuppressWarnings("unchecked")
     private void findQueriesAndEvaluationPositions(JTerm t, int level, int[] pathInTerm,
-            ImmutableList<QuantifiableVariable> instVars, boolean curPosIsPositive, int qepLevel,
-            boolean qepIsPositive, List<QueryEvalPos> qeps) {
+            @Nullable ImmutableList<QuantifiableVariable> instVars, boolean curPosIsPositive,
+            int qepLevel, boolean qepIsPositive, List<QueryEvalPos> qeps) {
         if (t == null) {
             return;
         }
@@ -499,8 +514,8 @@ public class QueryExpand implements BuiltInRule {
 
         public final LogicVariable[] instVars;
 
-        public QueryEvalPos(JTerm query, int[] path, ImmutableList<QuantifiableVariable> iVars,
-                boolean isPositive) {
+        public QueryEvalPos(JTerm query, int[] path,
+                @Nullable ImmutableList<QuantifiableVariable> iVars, boolean isPositive) {
             this.query = query;
             pathInTerm = path;
             positivePosition = isPositive;
@@ -597,8 +612,13 @@ public class QueryExpand implements BuiltInRule {
 
         final JTerm result;
         if (changedSubTerm) {
-            result =
-                services.getTermFactory().createTerm(term.op(), newSubTerms, newBoundVars, null);
+            // A {@code null} label list denotes an unlabelled term and is accepted by the master
+            // {@code TermFactory.createTerm}; the {@code JTerm[]} overload used here declares the
+            // parameter @NonNull.
+            @SuppressWarnings("NullAway")
+            final JTerm rebuilt = services.getTermFactory().createTerm(term.op(), newSubTerms,
+                newBoundVars, null);
+            result = rebuilt;
         } else {
             result = term;
         }
@@ -638,7 +658,7 @@ public class QueryExpand implements BuiltInRule {
      * is useful for <code>QueryExpandCost</cost>.
      */
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         if (pio != null && pio.subTerm().op() instanceof IProgramMethod
                 && pio.subTerm().freeVars().isEmpty()) {
             final var pmTerm = pio.subTerm();
@@ -656,7 +676,9 @@ public class QueryExpand implements BuiltInRule {
                             && !pmTerm.sub(1).sort().extendsTrans(nullSort))) {
                 PIOPathIterator it = pio.iterator();
                 while (it.next() != -1) {
-                    var focus = it.getSubTerm();
+                    // The iterator contract guarantees a subterm after {@code next() != -1}.
+                    var focus =
+                        Objects.requireNonNull(it.getSubTerm(), "no subterm at iterator position");
                     if (focus.op() instanceof UpdateApplication
                             || focus.op() instanceof JModality) {
                         return false;
@@ -685,7 +707,7 @@ public class QueryExpand implements BuiltInRule {
             strategyInfos -> strategyInfos.put(QUERY_INTRODUCTION_TIMES, previous));
     }
 
-    public Long getTimeOfQuery(JTerm t, Goal goal) {
+    public @Nullable Long getTimeOfQuery(@Nullable JTerm t, Goal goal) {
         if (t == null || !(t.op() instanceof IProgramMethod)) {
             LOGGER.warn(
                 "QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is: {}",
@@ -697,7 +719,7 @@ public class QueryExpand implements BuiltInRule {
     }
 
     @Override
-    public DefaultBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public DefaultBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services) {
         return new DefaultBuiltInRuleApp(this, pos);
     }
 

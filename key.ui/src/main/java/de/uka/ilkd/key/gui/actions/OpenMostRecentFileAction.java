@@ -16,9 +16,12 @@ import de.uka.ilkd.key.gui.ProofSelectionDialog;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Loads the last opened file
  */
+@NullMarked
 public final class OpenMostRecentFileAction extends MainWindowAction
         implements KeYSelectionListener {
     private static final long serialVersionUID = 4855372503837208313L;

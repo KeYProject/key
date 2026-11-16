@@ -8,10 +8,13 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * @author Alexander Weigl
  * @version 1 (07.04.19)
  */
+@NullMarked
 public interface ContextMenuKind<T> {
     ContextMenuKind<Proof> PROOF_LIST = new ContextMenuKind<>() {
     };

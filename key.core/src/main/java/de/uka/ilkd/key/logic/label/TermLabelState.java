@@ -13,6 +13,8 @@ import de.uka.ilkd.key.rule.label.TermLabelUpdate;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A {@link TermLabelState} is used to share information between participants which manage
  * {@link TermLabel}s during rule application. Participants are:
@@ -29,6 +31,7 @@ import org.key_project.logic.Name;
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class TermLabelState {
     /**
      * Stores for each {@link TermLabel} {@link Name} the state.

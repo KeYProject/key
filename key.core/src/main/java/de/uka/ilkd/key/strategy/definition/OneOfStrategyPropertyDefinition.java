@@ -8,6 +8,9 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Defines that a user interface control which edits a single key-value-pair of the
  * {@link StrategyProperties} allows the user to select predefined values. It might be realized via
@@ -17,6 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
  * @see AbstractStrategyPropertyDefinition
  * @see StrategyPropertyValueDefinition
  */
+@NullMarked
 public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDefinition {
     /**
      * The possible {@link StrategyPropertyValueDefinition} which the user can select.
@@ -36,7 +40,7 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
      * @param name The human readable name of the property.
      * @param values The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
-    public OneOfStrategyPropertyDefinition(String apiKey, String name,
+    public OneOfStrategyPropertyDefinition(@Nullable String apiKey, String name,
             StrategyPropertyValueDefinition... values) {
         this(apiKey, name, new AbstractStrategyPropertyDefinition[0], values);
     }
@@ -49,7 +53,7 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
      * @param columnsPerRow Defines optionally how many columns are shown per row.
      * @param values The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
-    public OneOfStrategyPropertyDefinition(String apiKey, String name, int columnsPerRow,
+    public OneOfStrategyPropertyDefinition(@Nullable String apiKey, String name, int columnsPerRow,
             StrategyPropertyValueDefinition... values) {
         this(apiKey, name, null, columnsPerRow, new AbstractStrategyPropertyDefinition[0], values);
     }
@@ -62,7 +66,7 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
      * @param subProperties Optional children which edits related properties to this.
      * @param values The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
-    public OneOfStrategyPropertyDefinition(String apiKey, String name,
+    public OneOfStrategyPropertyDefinition(@Nullable String apiKey, String name,
             AbstractStrategyPropertyDefinition[] subProperties,
             StrategyPropertyValueDefinition... values) {
         this(apiKey, name, null, -1, subProperties, values);
@@ -78,7 +82,8 @@ public class OneOfStrategyPropertyDefinition extends AbstractStrategyPropertyDef
      * @param subProperties Optional children which edits related properties to this.
      * @param values The possible {@link StrategyPropertyValueDefinition} which the user can select.
      */
-    public OneOfStrategyPropertyDefinition(String apiKey, String name, String tooltip,
+    public OneOfStrategyPropertyDefinition(@Nullable String apiKey, String name,
+            @Nullable String tooltip,
             int columnsPerRow, AbstractStrategyPropertyDefinition[] subProperties,
             StrategyPropertyValueDefinition... values) {
         super(apiKey, name, tooltip, subProperties);

@@ -7,6 +7,7 @@ package de.uka.ilkd.key.prover.mt;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -96,7 +97,8 @@ public class ConcurrentMatchingStressTest {
         KeYEnvironment<?> env =
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), keyFile, null, null, null, true);
         try {
-            Proof proof = env.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
             starter.start();

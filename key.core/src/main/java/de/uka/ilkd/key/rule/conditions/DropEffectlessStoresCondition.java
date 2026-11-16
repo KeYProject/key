@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
@@ -22,7 +23,11 @@ import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+
+@NullMarked
 public final class DropEffectlessStoresCondition implements VariableCondition {
     private final TermSV h;
     private final TermSV o;
@@ -39,7 +44,7 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }
 
 
-    private static JTerm dropEffectlessStoresHelper(JTerm heapTerm, TermServices services,
+    private static @Nullable JTerm dropEffectlessStoresHelper(JTerm heapTerm, TermServices services,
             Set<Pair<JTerm, JTerm>> overwrittenLocs, Function store) {
         if (heapTerm.op() == store) {
             final JTerm subHeapTerm = heapTerm.sub(0);
@@ -64,15 +69,17 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     }
 
 
-    private static JTerm dropEffectlessStores(JTerm t, Services services) {
-        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+    private static @Nullable JTerm dropEffectlessStores(JTerm t, Services services) {
+        HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "heap theory not registered");
         assert t.sort() == heapLDT.targetSort();
         return dropEffectlessStoresHelper(t, services, new LinkedHashSet<>(), heapLDT.getStore());
     }
 
 
     @Override
-    public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable var,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo mc,
             LogicServices p_services) {
         final Services services = (Services) p_services;

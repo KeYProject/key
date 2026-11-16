@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.proof.reference.ClosedBy;
 import de.uka.ilkd.key.rule.*;
@@ -19,6 +20,8 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.EnhancedStringBuffer;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Instances of this class encapsulate statistical information about proofs, such as the number of
  * nodes, or the number of interactions.
@@ -26,6 +29,7 @@ import org.key_project.util.collection.Pair;
  * @author bruns
  *
  */
+@NullMarked
 public class Statistics {
     public final int nodes;
     public final int branches;
@@ -74,6 +78,12 @@ public class Statistics {
         this.timePerStepInMillis = timePerStepInMillis;
     }
 
+    /**
+     * The summary generation operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because all statistics fields were
+     * assigned just above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public Statistics(List<Node> startNodes) {
         if (startNodes.isEmpty()) {
             throw new IllegalArgumentException("can't generate statistics on zero nodes");
@@ -146,6 +156,12 @@ public class Statistics {
         generateSummary(startNodes.get(0).proof());
     }
 
+    /**
+     * The summary generation operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because all statistics fields were
+     * assigned just above, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     Statistics(Node startNode) {
         final Iterator<Node> it = startNode.subtreeIterator();
 
@@ -179,7 +195,7 @@ public class Statistics {
     }
 
     Statistics(Proof proof) {
-        this(proof.root());
+        this(Objects.requireNonNull(proof.root(), "proof must have a root node"));
     }
 
     protected static Statistics create(Statistics side, long creationTime) {
@@ -363,7 +379,9 @@ public class Statistics {
             final int res;
             if (node.getNodeInfo().getInteractiveRuleApplication()) {
                 res = 1;
-                final String ruleAppName = node.getAppliedRuleApp().rule().name().toString();
+                final RuleApp ruleApp = Objects.requireNonNull(node.getAppliedRuleApp(),
+                    "node with an interactive rule application must have an applied rule app");
+                final String ruleAppName = ruleApp.rule().name().toString();
                 if (!intAppsDetails.containsKey(ruleAppName)) {
                     intAppsDetails.put(ruleAppName, 1);
                 } else {

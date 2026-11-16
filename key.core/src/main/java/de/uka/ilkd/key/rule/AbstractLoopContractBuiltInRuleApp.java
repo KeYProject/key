@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
@@ -20,13 +21,16 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * Application of {@link AbstractLoopContractRule}.
  *
  * @author lanzinger
  */
+@NullMarked
 public abstract class AbstractLoopContractBuiltInRuleApp<T extends BuiltInRule>
         extends AbstractAuxiliaryContractBuiltInRuleApp<T> {
 
@@ -63,8 +67,10 @@ public abstract class AbstractLoopContractBuiltInRuleApp<T extends BuiltInRule>
             return this;
         }
         final Services services = goal.proof().getServices();
+        final JTerm posTerm = (JTerm) Objects.requireNonNull(posInOccurrence(),
+            "loop contract app requires an occurrence").subTerm();
         final AbstractLoopContractRule.Instantiation instantiation =
-            rule.instantiate((JTerm) posInOccurrence().subTerm(), goal);
+            Objects.requireNonNull(rule.instantiate(posTerm, goal), "no loop instantiation");
         final var lcir = LoopContractInternalRule.INSTANCE;
         final ImmutableSet<LoopContract> contracts =
             lcir.getApplicableContracts(instantiation, goal, services);

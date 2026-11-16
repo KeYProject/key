@@ -9,6 +9,7 @@ import java.util.Properties;
 import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author lanzinger
  */
+@NullMarked
 public class TermLabelSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(TermLabelSettings.class);
 
@@ -53,7 +55,7 @@ public class TermLabelSettings extends AbstractSettings {
         } catch (Exception e) {
             LOGGER.debug("TermLabelSettings: Failure while reading the setting \"UseOriginLabels\"."
                 + "Using the default value: true." + "The string read was: {}",
-                category.get(USE_ORIGIN_LABELS), e);
+                String.valueOf(category.get(USE_ORIGIN_LABELS)), e);
             setUseOriginLabels(true);
         }
     }

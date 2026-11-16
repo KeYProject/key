@@ -273,7 +273,8 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnProgramMethod(IProgramMethod x) {
-        layouter.print(x.getMethodDeclaration().getProgramElementName().toString());
+        layouter.print(Objects.requireNonNull(x.getMethodDeclaration(),
+            "program method has no declaration").getProgramElementName().toString());
     }
 
     @Override
@@ -411,10 +412,11 @@ public class PrettyPrinter implements Visitor {
 
         x.getCondition().visit(this);
 
-        if (x.getMessage() != null) {
+        final var message = x.getMessage();
+        if (message != null) {
             layouter.print(" :");
             layouter.brk();
-            x.getMessage().visit(this);
+            message.visit(this);
         }
     }
 
@@ -549,7 +551,11 @@ public class PrettyPrinter implements Visitor {
         if (type == null) {
             layouter.print("unknown");
         } else if (type instanceof ArrayDeclaration arr) {
-            performActionOnType(arr.getBaseType().getKeYJavaType().getJavaType());
+            // main passes the base Java type through to performActionOnType even when
+            // absent; null is printed as "unknown". Only a missing KeYJavaType itself
+            // (which main would dereference) is treated as an error here.
+            performActionOnType(Objects.requireNonNull(arr.getBaseType().getKeYJavaType(),
+                "array base type has no KeY Java type").getJavaType());
             layouter.print("[]");
         } else {
             layouter.print(type.getFullName());
@@ -567,26 +573,27 @@ public class PrettyPrinter implements Visitor {
     }
 
     public void performActionOnTypeReference(TypeReference x, boolean fullTypeNames) {
-        if (x.getKeYJavaType() != null
-                && x.getKeYJavaType().getJavaType() instanceof ArrayDeclaration) {
+        final var keYJavaType = x.getKeYJavaType();
+        final var javaType = keYJavaType == null ? null : keYJavaType.getJavaType();
+        if (javaType instanceof ArrayDeclaration) {
             for (Annotation annot : x.getAnnotations()) {
                 performActionOnAnnotation(annot);
                 layouter.print(" ");
             }
 
-            performActionOnArrayDeclaration((ArrayDeclaration) x.getKeYJavaType().getJavaType());
+            performActionOnArrayDeclaration((ArrayDeclaration) javaType);
         } else if (x.getProgramElementName() != null) {
             for (Annotation expr : x.getAnnotations()) {
                 performActionOnAnnotation(expr);
                 layouter.print(" ");
             }
 
-            printTypeReference(x.getReferencePrefix(), x.getKeYJavaType(),
+            printTypeReference(x.getReferencePrefix(), keYJavaType,
                 x.getProgramElementName(), fullTypeNames);
         }
     }
 
-    private void printTypeReference(ReferencePrefix prefix, @Nullable KeYJavaType type,
+    private void printTypeReference(@Nullable ReferencePrefix prefix, @Nullable KeYJavaType type,
             ProgramElementName name, boolean fullTypeNames) {
         printReferencePrefix(prefix);
         if (fullTypeNames && type != null) {
@@ -618,9 +625,10 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnThrows(Throws x) {
-        if (x.getExceptions() != null) {
+        final var exceptions = x.getExceptions();
+        if (exceptions != null) {
             layouter.keyWord("throws").print(" ");
-            writeCommaList(x.getExceptions());
+            writeCommaList(exceptions);
         }
     }
 
@@ -637,7 +645,9 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnCompilationUnit(CompilationUnit x) {
         boolean hasPackageSpec = x.getPackageSpecification() != null;
         if (hasPackageSpec) {
-            performActionOnPackageSpecification(x.getPackageSpecification());
+            performActionOnPackageSpecification(
+                Objects.requireNonNull(x.getPackageSpecification(),
+                    "compilation unit is missing its package specification"));
         }
         boolean hasImports = (x.getImports() != null) && (!x.getImports().isEmpty());
         if (hasImports) {
@@ -680,14 +690,16 @@ public class PrettyPrinter implements Visitor {
             performActionOnProgramElementName(x.getProgramElementName());
         }
         layouter.end();
-        if (x.getExtendedTypes() != null && x.getExtendedTypes().getChildCount() != 0) {
+        final var extendedTypes = x.getExtendedTypes();
+        if (extendedTypes != null && extendedTypes.getChildCount() != 0) {
             layouter.brk().beginC(0);
-            performActionOnExtends(x.getExtendedTypes());
+            performActionOnExtends(extendedTypes);
             layouter.end();
         }
-        if (x.getImplementedTypes() != null && x.getImplementedTypes().getChildCount() != 0) {
+        final var implementedTypes = x.getImplementedTypes();
+        if (implementedTypes != null && implementedTypes.getChildCount() != 0) {
             layouter.brk();
-            performActionOnImplements(x.getImplementedTypes());
+            performActionOnImplements(implementedTypes);
         }
         // not an anonymous class
         if (x.getProgramElementName() != null) {
@@ -773,9 +785,10 @@ public class PrettyPrinter implements Visitor {
             layouter.keyWord("interface").print(" ");
             performActionOnProgramElementName(x.getProgramElementName());
         }
-        if (x.getExtendedTypes() != null && x.getExtendedTypes().getChildCount() != 0) {
+        final var extendedTypes = x.getExtendedTypes();
+        if (extendedTypes != null && extendedTypes.getChildCount() != 0) {
             layouter.print(" ");
-            performActionOnExtends(x.getExtendedTypes());
+            performActionOnExtends(extendedTypes);
         }
         layouter.print(" ");
         layouter.end();
@@ -795,15 +808,18 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnVariableDeclaration(@Nullable VariableDeclaration x) {
+        final VariableDeclaration varDecl =
+            Objects.requireNonNull(x, "variable declaration must not be null");
         layouter.beginI();
-        ImmutableArray<Modifier> modifiers = x.getModifiers();
+        ImmutableArray<Modifier> modifiers = varDecl.getModifiers();
         if (modifiers != null && !modifiers.isEmpty()) {
             writeKeywordList(modifiers);
             layouter.print(" ");
         }
-        x.getTypeReference().visit(this);
+        Objects.requireNonNull(varDecl.getTypeReference(),
+            "variable declaration has no type").visit(this);
         layouter.print(" ");
-        ImmutableArray<? extends VariableSpecification> varSpecs = x.getVariables();
+        ImmutableArray<? extends VariableSpecification> varSpecs = varDecl.getVariables();
         if (varSpecs != null) {
             writeCommaList(varSpecs);
         }
@@ -819,10 +835,11 @@ public class PrettyPrinter implements Visitor {
             writeKeywordList(mods);
             layouter.print(" ");
         }
-        if (x.getTypeReference() != null) {
-            x.getTypeReference().visit(this);
+        final var typeReference = x.getTypeReference();
+        if (typeReference != null) {
+            typeReference.visit(this);
             layouter.print(" ");
-        } else if (x.getTypeReference() == null && !(x instanceof ConstructorDeclaration)) {
+        } else if (typeReference == null && !(x instanceof ConstructorDeclaration)) {
             layouter.keyWord("void");
             layouter.print(" ");
         }
@@ -834,12 +851,14 @@ public class PrettyPrinter implements Visitor {
             writeCommaList(x.getParameters());
         }
         endMultilineBracket();
-        if (x.getThrown() != null) {
-            performActionOnThrows(x.getThrown());
+        final var thrown = x.getThrown();
+        if (thrown != null) {
+            performActionOnThrows(thrown);
         }
-        if (x.getBody() != null) {
+        final var body = x.getBody();
+        if (body != null) {
             layouter.print(" ").end();
-            printStatementBlock(x.getBody());
+            printStatementBlock(body);
         } else {
             layouter.print(";").end();
         }
@@ -853,8 +872,9 @@ public class PrettyPrinter implements Visitor {
             layouter.print(" ");
         }
         layouter.end();
-        if (x.getBody() != null) {
-            printStatementBlock(x.getBody());
+        final var body = x.getBody();
+        if (body != null) {
+            printStatementBlock(body);
         }
     }
 
@@ -912,36 +932,40 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnBreak(Break x) {
         layouter.keyWord("break");
-        if (x.getLabel() != null) {
+        final var label = x.getLabel();
+        if (label != null) {
             layouter.brk();
-            x.getLabel().visit(this);
+            label.visit(this);
         }
     }
 
     @Override
     public void performActionOnContinue(Continue x) {
         layouter.keyWord("continue");
-        if (x.getLabel() != null) {
+        final var label = x.getLabel();
+        if (label != null) {
             layouter.brk();
-            x.getLabel().visit(this);
+            label.visit(this);
         }
     }
 
     @Override
     public void performActionOnReturn(Return x) {
         layouter.keyWord("return");
-        if (x.getExpression() != null) {
+        final var expression = x.getExpression();
+        if (expression != null) {
             layouter.brk();
-            x.getExpression().visit(this);
+            expression.visit(this);
         }
     }
 
     @Override
     public void performActionOnThrow(Throw x) {
         layouter.keyWord("throw");
-        if (x.getExpression() != null) {
+        final var expression = x.getExpression();
+        if (expression != null) {
             layouter.brk();
-            x.getExpression().visit(this);
+            expression.visit(this);
         }
     }
 
@@ -1012,7 +1036,8 @@ public class PrettyPrinter implements Visitor {
         layouter.print(" :");
         layouter.brk();
 
-        x.getGuardExpression().visit(this);
+        Objects.requireNonNull(x.getGuardExpression(),
+            "enhanced for has no iterated expression").visit(this);
 
         endMultilineBracket();
 
@@ -1037,8 +1062,9 @@ public class PrettyPrinter implements Visitor {
             init.visit(this);
         }
         layouter.print(";").brk();
-        if (x.getGuardExpression() != null) {
-            x.getGuardExpression().visit(this);
+        final var guardExpression = x.getGuardExpression();
+        if (guardExpression != null) {
+            guardExpression.visit(this);
         }
         layouter.print(";").brk();
 
@@ -1060,8 +1086,9 @@ public class PrettyPrinter implements Visitor {
         layouter.keyWord("while");
         layouter.print(" ");
         beginMultilineBracket();
-        if (x.getGuardExpression() != null) {
-            x.getGuardExpression().visit(this);
+        final var guardExpression = x.getGuardExpression();
+        if (guardExpression != null) {
+            guardExpression.visit(this);
         }
         endMultilineBracket();
 
@@ -1091,12 +1118,13 @@ public class PrettyPrinter implements Visitor {
         endMultilineBracket();
 
         if (includeBranches) {
-            boolean newBlock = handleBlockOrSingleStatement(x.getThen().getBody());
+            boolean newBlock = handleBlockOrSingleStatement(Objects.requireNonNull(
+                x.getThen().getBody(), "then branch requires a body"));
             if (x.getElse() != null) {
                 handleContinuationAfterNewBlock(newBlock);
             }
             Else e = x.getElse();
-            if (x.getElse() != null) {
+            if (e != null) {
                 performActionOnElse(e);
             }
         }
@@ -1111,8 +1139,9 @@ public class PrettyPrinter implements Visitor {
         layouter.keyWord("switch");
         layouter.print(" ");
         beginMultilineBracket();
-        if (x.getExpression() != null) {
-            x.getExpression().visit(this);
+        final var expression = x.getExpression();
+        if (expression != null) {
+            expression.visit(this);
         }
         endMultilineBracket();
 
@@ -1229,9 +1258,10 @@ public class PrettyPrinter implements Visitor {
     @Override
     public void performActionOnSynchronizedBlock(SynchronizedBlock x) {
         layouter.print("synchronized");
-        if (x.getExpression() != null) {
+        final var expression = x.getExpression();
+        if (expression != null) {
             beginMultilineBracket();
-            x.getExpression().visit(this);
+            expression.visit(this);
             endMultilineBracket();
         }
         if (x.getBody() != null) {
@@ -1245,8 +1275,9 @@ public class PrettyPrinter implements Visitor {
         layouter.keyWord("loop-scope");
         layouter.print(" ");
         beginMultilineBracket();
-        if (x.getIndexPV() != null) {
-            x.getIndexPV().visit(this);
+        final var indexPV = x.getIndexPV();
+        if (indexPV != null) {
+            indexPV.visit(this);
         }
         endMultilineBracket();
         layouter.print(" ");
@@ -1266,20 +1297,22 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnExtends(Extends x) {
-        if (x.getSupertypes() != null) {
+        final var supertypes = x.getSupertypes();
+        if (supertypes != null) {
             layouter.beginC();
             layouter.keyWord("extends").brk();
-            writeCommaList(x.getSupertypes());
+            writeCommaList(supertypes);
             layouter.end();
         }
     }
 
     @Override
     public void performActionOnImplements(Implements x) {
-        if (x.getSupertypes() != null) {
+        final var supertypes = x.getSupertypes();
+        if (supertypes != null) {
             layouter.beginC();
             layouter.keyWord("implements").brk();
-            writeCommaList(x.getSupertypes());
+            writeCommaList(supertypes);
             layouter.end();
         }
     }
@@ -1290,9 +1323,10 @@ public class PrettyPrinter implements Visitor {
         for (int i = 0; i < x.getDimensions(); i += 1) {
             layouter.print("[]");
         }
-        if (x.getInitializer() != null) {
+        final var initializer = x.getInitializer();
+        if (initializer != null) {
             layouter.print(" = ");
-            x.getInitializer().visit(this);
+            initializer.visit(this);
         }
     }
 
@@ -1336,8 +1370,9 @@ public class PrettyPrinter implements Visitor {
         for (; i < x.getDimensions(); i += 1) {
             layouter.print("[]");
         }
-        if (x.getArrayInitializer() != null) {
-            performActionOnArrayInitializer(x.getArrayInitializer());
+        final var arrayInitializer = x.getArrayInitializer();
+        if (arrayInitializer != null) {
+            performActionOnArrayInitializer(arrayInitializer);
         }
         if (addParentheses) {
             layouter.print(")");
@@ -1385,8 +1420,9 @@ public class PrettyPrinter implements Visitor {
 
         x.getTypeReference().visit(this);
         printArguments(x.getArguments());
-        if (x.getClassDeclaration() != null) {
-            performActionOnClassDeclaration(x.getClassDeclaration());
+        final var classDeclaration = x.getClassDeclaration();
+        if (classDeclaration != null) {
+            performActionOnClassDeclaration(classDeclaration);
         }
         if (addParentheses) {
             layouter.print(")");
@@ -1425,8 +1461,9 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnMetaClassReference(MetaClassReference x) {
-        if (x.getTypeReference() != null) {
-            x.getTypeReference().visit(this);
+        final var typeReference = x.getTypeReference();
+        if (typeReference != null) {
+            typeReference.visit(this);
             layouter.print(".");
         }
         layouter.print("class");
@@ -1450,13 +1487,16 @@ public class PrettyPrinter implements Visitor {
         layouter.print(x.getName());
         layouter.print("(");
         boolean afterFirst = false;
-        for (ParameterDeclaration pd : x.getParameters()) {
+        ImmutableArray<ParameterDeclaration> parameters = Objects.requireNonNull(x.getParameters(),
+            "method has no parameter list");
+        for (ParameterDeclaration pd : parameters) {
             if (afterFirst) {
                 layouter.print(", ");
             } else {
                 afterFirst = true;
             }
-            performActionOnTypeReference(pd.getTypeReference(), true);
+            performActionOnTypeReference(Objects.requireNonNull(pd.getTypeReference(),
+                "parameter " + pd + " has no type"), true);
         }
         layouter.print(")");
     }
@@ -1465,16 +1505,18 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnExecutionContext(ExecutionContext x) {
         layouter.beginRelativeC();
         layouter.print("source=");
-        if (x.getMethodContext() == null) {
+        final var methodContext = x.getMethodContext();
+        if (methodContext == null) {
             layouter.print("null");
         } else {
-            writeFullMethodSignature(x.getMethodContext());
+            writeFullMethodSignature(methodContext);
         }
         layouter.print("@");
         x.getTypeReference().visit(this);
-        if (x.getRuntimeInstance() != null) {
+        final var runtimeInstance = x.getRuntimeInstance();
+        if (runtimeInstance != null) {
             layouter.print(",").end().brk().beginRelativeC().print("this=");
-            x.getRuntimeInstance().visit(this);
+            runtimeInstance.visit(this);
             layouter.end();
         } else {
             layouter.end();
@@ -1514,7 +1556,8 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnThen(Then x) {
-        handleBlockOrSingleStatement(x.getBody());
+        handleBlockOrSingleStatement(
+            Objects.requireNonNull(x.getBody(), "then branch requires a body"));
     }
 
     @Override
@@ -1531,7 +1574,8 @@ public class PrettyPrinter implements Visitor {
             layouter.print(" ");
             performActionOnIf((If) body);
         } else {
-            handleBlockOrSingleStatement(body);
+            handleBlockOrSingleStatement(
+                Objects.requireNonNull(body, "else body must not be null"));
         }
     }
 
@@ -1560,8 +1604,9 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnCase(Case x) {
         layouter.beginRelativeC();
         layouter.keyWord("case").brk();
-        if (x.getExpression() != null) {
-            x.getExpression().visit(this);
+        final var expression = x.getExpression();
+        if (expression != null) {
+            expression.visit(this);
         }
         layouter.print(":").end();
         printCaseBody(x.getBody());
@@ -1578,8 +1623,9 @@ public class PrettyPrinter implements Visitor {
         }
         endMultilineBracket();
         layouter.print(" ");
-        if (x.getBody() != null) {
-            printStatementBlock(x.getBody());
+        final var body = x.getBody();
+        if (body != null) {
+            printStatementBlock(body);
         }
     }
 
@@ -1594,8 +1640,9 @@ public class PrettyPrinter implements Visitor {
         layouter.print(" ");
         layouter.keyWord("finally");
         layouter.print(" ");
-        if (x.getBody() != null) {
-            printStatementBlock(x.getBody());
+        final var body = x.getBody();
+        if (body != null) {
+            printStatementBlock(body);
         }
     }
 
@@ -1679,7 +1726,8 @@ public class PrettyPrinter implements Visitor {
         if (x.hasParameterDeclaration()) {
             performActionOnParameterDeclaration(x.getParameterDeclaration());
         } else if (x.hasNonStdParameterDeclaration()) {
-            x.getNonStdParameterDeclaration().visit(this);
+            Objects.requireNonNull(x.getNonStdParameterDeclaration(),
+                "ccatch non-standard parameter declaration must not be null").visit(this);
         }
         endMultilineBracket();
         layouter.print(" ");
@@ -1718,8 +1766,9 @@ public class PrettyPrinter implements Visitor {
             CcatchBreakLabelParameterDeclaration x) {
         layouter.keyWord("\\Break");
         layouter.print(" ");
-        if (x.getLabel() != null) {
-            x.getLabel().visit(this);
+        final var label = x.getLabel();
+        if (label != null) {
+            label.visit(this);
         }
     }
 
@@ -1728,8 +1777,9 @@ public class PrettyPrinter implements Visitor {
             CcatchContinueLabelParameterDeclaration x) {
         layouter.keyWord("\\Continue");
         layouter.print(" ");
-        if (x.getLabel() != null) {
-            x.getLabel().visit(this);
+        final var label = x.getLabel();
+        if (label != null) {
+            label.visit(this);
         }
     }
 

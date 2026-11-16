@@ -10,24 +10,24 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Inspects whether a given string can be translated into a formula.
  */
+@NullMarked
 public class InspectorForFormulas implements CheckedUserInputInspector {
 
     private final Services services;
-
-
 
     public InspectorForFormulas(Services services) {
         super();
         this.services = services;
     }
 
-
-
     @Override
-    public String check(String toBeChecked) {
+    public @Nullable String check(String toBeChecked) {
         if (toBeChecked.isEmpty()) {
             return NO_USER_INPUT;
         }
@@ -44,7 +44,7 @@ public class InspectorForFormulas implements CheckedUserInputInspector {
 
     }
 
-    public static JTerm translate(Services services, String toBeChecked) {
+    public static @Nullable JTerm translate(Services services, String toBeChecked) {
         try {
             return new KeyIO(services).parseExpression(toBeChecked);
         } catch (Throwable e) {

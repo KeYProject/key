@@ -15,6 +15,7 @@ import de.uka.ilkd.key.nparser.builder.ExpressionBuilder;
 import org.key_project.prover.sequent.Sequent;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,7 +112,8 @@ class ExprEvaluator extends JavaKeYParserBaseVisitor<Object> {
     }
 
     @Override
-    protected Object aggregateResult(Object aggregate, Object nextResult) {
+    protected @Nullable Object aggregateResult(@Nullable Object aggregate,
+            @Nullable Object nextResult) {
         return nextResult == null ? aggregate : nextResult;
     }
 }

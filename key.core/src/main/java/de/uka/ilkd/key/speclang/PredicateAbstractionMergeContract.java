@@ -20,11 +20,15 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 
 import org.key_project.util.java.MapUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A {@link MergeContract} for the {@link MergeWithPredicateAbstraction} {@link MergeProcedure}.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class PredicateAbstractionMergeContract implements MergeContract {
 
     private final static String NAME = "Predicate Abstraction Merge Contract";
@@ -91,13 +95,15 @@ public class PredicateAbstractionMergeContract implements MergeContract {
      * @return
      */
     public ArrayList<AbstractionPredicate> getAbstractionPredicates(
-            Map<LocationVariable, JTerm> atPres, Services services) {
+            @Nullable Map<LocationVariable, JTerm> atPres, Services services) {
         final Map<JTerm, JTerm> replaceMap = getReplaceMap(atPres, services);
         final OpReplacer or =
             new OpReplacer(replaceMap, services.getTermFactory(), services.getProof());
 
         return abstractionPredicates.stream().map(pred -> {
-            final JTerm newPred = or.replace(pred.getPredicateFormWithPlaceholder().second);
+            final JTerm newPred = Objects.requireNonNull(
+                or.replace(pred.getPredicateFormWithPlaceholder().second),
+                "no replaced predicate term");
             return AbstractionPredicate.create(newPred,
                 pred.getPredicateFormWithPlaceholder().first, services);
         }).collect(Collectors.toCollection(ArrayList::new));
@@ -129,7 +135,7 @@ public class PredicateAbstractionMergeContract implements MergeContract {
      * @param services
      * @return
      */
-    private Map<JTerm, JTerm> getReplaceMap(Map<LocationVariable, JTerm> atPres,
+    private Map<JTerm, JTerm> getReplaceMap(@Nullable Map<LocationVariable, JTerm> atPres,
             Services services) {
         final Map<JTerm, JTerm> result = new LinkedHashMap<>();
 

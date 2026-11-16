@@ -35,10 +35,12 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.CollectionUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 
+@NullMarked
 public class HelperClassForTests {
     public static final Path TESTCASE_DIRECTORY =
         Objects.requireNonNull(FindResources.getTestCasesDirectory());
@@ -72,6 +74,10 @@ public class HelperClassForTests {
     }
 
 
+    // A null monitor is allowed: KeYUserProblemFile's javadoc documents a "possibly null" monitor
+    // that KeYFile stores in a @Nullable field; the constructor's @NonNull annotation lags the
+    // runtime contract, so pass null through exactly as main does.
+    @SuppressWarnings("NullAway")
     public static ProofAggregate parseThrowException(Path file, Profile profile)
             throws ProofInputException {
         KeYUserProblemFile po =
@@ -96,7 +102,8 @@ public class HelperClassForTests {
                 ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
         }
 
-        return props.get(StrategyProperties.OSS_OPTIONS_KEY).equals(StrategyProperties.OSS_ON);
+        return Objects.requireNonNull(props.get(StrategyProperties.OSS_OPTIONS_KEY), "OSS option")
+                .equals(StrategyProperties.OSS_ON);
     }
 
     /**
@@ -182,15 +189,17 @@ public class HelperClassForTests {
                 // Load java file
                 environment = KeYEnvironment.load(javaFile, null, null, null);
                 // Search type
-                KeYJavaType containerKJT =
-                    environment.getJavaInfo().getTypeByClassName(containerTypeName);
+                KeYJavaType containerKJT = Objects.requireNonNull(
+                    environment.getJavaInfo().getTypeByClassName(containerTypeName),
+                    "container type " + containerTypeName + " not found");
                 // Assert.assertNotNull(containerKJT);
                 // Search observer function
                 ImmutableSet<IObserverFunction> targets =
                     environment.getSpecificationRepository().getContractTargets(containerKJT);
-                IObserverFunction target =
+                IObserverFunction target = Objects.requireNonNull(
                     CollectionUtil.search(targets,
-                        element -> targetName.equals(element.toString()));
+                        element -> targetName.equals(element.toString())),
+                    "observer target " + targetName + " not found");
                 // Assert.assertNotNull(target);
                 // Find first contract.
                 ImmutableSet<Contract> contracts =
@@ -240,7 +249,7 @@ public class HelperClassForTests {
      *
      * @param options The taclet options to restore.
      */
-    public static void restoreTacletOptions(Map<String, String> options) {
+    public static void restoreTacletOptions(@Nullable Map<String, String> options) {
         if (options != null) {
             // Assert.assertTrue(ProofSettings.isChoiceSettingInitialised());
             ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().setDefaultChoices(options);
@@ -259,12 +268,14 @@ public class HelperClassForTests {
      * @param services The {@link Services} to search in.
      * @param containerTypeName The name of the type which contains the method.
      * @param methodFullName The method name to search.
-     * @return The first found {@link IProgramMethod} in the type.
+     * @return The first found {@link IProgramMethod} in the type, or {@code null} if none matches.
      */
-    public static IProgramMethod searchProgramMethod(Services services, String containerTypeName,
-            final String methodFullName) {
+    public static @Nullable IProgramMethod searchProgramMethod(Services services,
+            String containerTypeName, final String methodFullName) {
         JavaInfo javaInfo = services.getJavaInfo();
-        KeYJavaType containerKJT = javaInfo.getTypeByClassName(containerTypeName);
+        KeYJavaType containerKJT = Objects.requireNonNull(
+            javaInfo.getTypeByClassName(containerTypeName),
+            "container type " + containerTypeName + " not found");
         // Assert.assertNotNull(containerKJT);
         Iterable<IProgramMethod> pms = javaInfo.getAllProgramMethods(containerKJT);
         IProgramMethod pm =
@@ -279,7 +290,8 @@ public class HelperClassForTests {
     }
 
     public static Services createServices(Path keyFile) {
-        return HelperClassForTests.parse(keyFile).getFirstProof().getServices();
+        return Objects.requireNonNull(HelperClassForTests.parse(keyFile).getFirstProof(), "proof")
+                .getServices();
     }
 
     public static Services createServices() {

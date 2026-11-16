@@ -14,12 +14,15 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Saves the currently selected proof as a zip archive with file extension "zproof". The bundle
  * contains all files needed to successfully reload the proof.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public final class SaveBundleAction extends MainWindowAction {
 
     private static final long serialVersionUID = 5275664295885839738L;
@@ -62,6 +65,11 @@ public final class SaveBundleAction extends MainWindowAction {
         if (mainWindow.getMediator().ensureProofLoaded()) {
             // Try to save back to file where proof was initially loaded from
             final Proof selectedProof = mainWindow.getMediator().getSelectedProof();
+            if (selectedProof == null) {
+                // A proof is ensured to be loaded above; a {@code null} here is a concurrent
+                // state change, crash-equivalent to the previous NPE in the saver.
+                throw new NullPointerException("No proof loaded to save.");
+            }
             mainWindow.getUserInterface().saveProofBundle(selectedProof);
         } else {
             mainWindow.popupWarning("No proof.", "Oops...");

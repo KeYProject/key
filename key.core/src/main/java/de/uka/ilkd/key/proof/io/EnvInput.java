@@ -93,6 +93,7 @@ public interface EnvInput {
      *
      * @return The initial {@link Path} which is loaded or {@code null} otherwise.
      */
+    @Nullable
     Path getInitialFile();
 
     /**

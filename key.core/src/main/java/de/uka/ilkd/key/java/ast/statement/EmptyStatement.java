@@ -11,12 +11,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Empty statement.
  *
  * @author <TT>AutoDoc</TT>
  */
+@NullMarked
 public class EmptyStatement extends JavaProgramElement
         implements Statement, TerminalProgramElement {
 

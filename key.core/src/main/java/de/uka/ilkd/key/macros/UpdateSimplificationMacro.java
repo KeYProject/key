@@ -8,11 +8,14 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This macro applies only update simplification rules.
  *
  * @author Richard Bubel
  */
+@NullMarked
 public class UpdateSimplificationMacro extends AbstractPropositionalExpansionMacro {
 
     public static final String UPDATE_SIMPLIFICATION_ONLY = "Update Simplification Only";

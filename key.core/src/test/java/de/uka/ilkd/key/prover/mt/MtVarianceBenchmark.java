@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -17,6 +18,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.util.helper.FindResources;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +60,8 @@ public class MtVarianceBenchmark {
      * {@code .key} mutates {@link ProofSettings#DEFAULT_SETTINGS}; restoring the snapshot before
      * every load keeps every repetition identical (and isolates proofs from each other).
      */
-    private String settingsBaseline;
+    // captured by measure() before any proof is loaded; null if the test never ran
+    private @Nullable String settingsBaseline;
 
     @Test
     void measure() throws Exception {
@@ -123,7 +126,8 @@ public class MtVarianceBenchmark {
         }
         final KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
         try {
-            final Proof proof = env.getLoadedProof();
+            final Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             final ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
             if (maxSteps > 0) {

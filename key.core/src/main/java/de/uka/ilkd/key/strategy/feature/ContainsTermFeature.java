@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Term;
@@ -19,6 +21,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
@@ -27,6 +30,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  * Feature for checking if the term of the first projection contains the term of the second
  * projection.
  */
+@NullMarked
 public class ContainsTermFeature implements Feature {
 
     /** Constant that represents the boolean value true */
@@ -63,8 +67,8 @@ public class ContainsTermFeature implements Feature {
     public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, G goal,
             MutableState mState) {
-        final Term t1 = proj1.toTerm(app, pos, (Goal) goal, mState);
-        final Term t2 = proj2.toTerm(app, pos, (Goal) goal, mState);
+        final Term t1 = Objects.requireNonNull(proj1.toTerm(app, pos, (Goal) goal, mState));
+        final Term t2 = Objects.requireNonNull(proj2.toTerm(app, pos, (Goal) goal, mState));
         ContainsTermVisitor visitor = new ContainsTermVisitor(t2);
         t1.execPreOrder(visitor);
         if (visitor.found) {

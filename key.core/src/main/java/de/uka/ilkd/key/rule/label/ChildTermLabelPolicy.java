@@ -18,6 +18,9 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A {@link ChildTermLabelPolicy} is used by
@@ -34,6 +37,7 @@ import org.key_project.prover.sequent.Sequent;
  * @see TermLabel
  * @see TermLabelManager
  */
+@NullMarked
 public interface ChildTermLabelPolicy extends RuleSpecificTask {
     /**
      * Decides if the currently active {@link Rule} application is supported or not. If it is not
@@ -64,7 +68,7 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
     boolean isRuleApplicationSupported(TermServices services,
             PosInOccurrence applicationPosInOccurrence,
             JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm, JTerm newTerm);
+            Object hint, @Nullable JTerm tacletTerm, JTerm newTerm);
 
     /**
      * <p>
@@ -101,6 +105,6 @@ public interface ChildTermLabelPolicy extends RuleSpecificTask {
      */
     boolean addLabel(TermServices services,
             PosInOccurrence applicationPosInOccurrence,
-            JTerm applicationTerm, Rule rule, Goal goal, Object hint, JTerm tacletTerm,
+            JTerm applicationTerm, Rule rule, Goal goal, Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm, JTerm childTerm, TermLabel label);
 }

@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Statement container. taken from COMPOST and changed to achieve an immutable structure
  */
 
+@NullMarked
 public interface StatementContainer extends NonTerminalProgramElement {
 
     /**
@@ -27,5 +30,6 @@ public interface StatementContainer extends NonTerminalProgramElement {
      *
      * @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
+    @Nullable
     Statement getStatementAt(int index);
 }

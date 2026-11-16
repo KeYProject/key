@@ -8,6 +8,9 @@ import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public record ParserConfig(Services services, NamespaceSet nss) {
 
     public NamespaceSet namespaces() {

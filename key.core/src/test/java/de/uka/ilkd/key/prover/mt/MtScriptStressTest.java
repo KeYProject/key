@@ -6,6 +6,7 @@ package de.uka.ilkd.key.prover.mt;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * Stress test: a real, position-sensitive proof script must still close the proof when the
@@ -75,6 +77,7 @@ public class MtScriptStressTest {
     @Test
     void sortScriptClosesUnderMultiCore() throws Exception {
         Path examples = FindResources.getExampleDirectory();
+        assumeTrue(examples != null, "examples directory not found");
         Path keyFile = examples.resolve("heap/quicksort/sort.key");
         String scriptText = Files.readString(examples.resolve("heap/quicksort/sort.script"));
 
@@ -100,6 +103,7 @@ public class MtScriptStressTest {
     @Test
     void multiCoreProofSavesAndReloadsSingleCore() throws Exception {
         Path examples = FindResources.getExampleDirectory();
+        assumeTrue(examples != null, "examples directory not found");
         Path keyFile = examples.resolve("heap/quicksort/sort.key");
         String scriptText = Files.readString(examples.resolve("heap/quicksort/sort.script"));
         // Save next to sort.key so the proof's relative \javaSource "." resolves on reload. The
@@ -115,7 +119,8 @@ public class MtScriptStressTest {
             System.setProperty(ParallelProver.THREADS_PROPERTY, Integer.toString(MT_WORKERS));
             KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
             try {
-                Proof proof = env.getLoadedProof();
+                Proof proof =
+                    Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
                 new ProofScriptEngine(proof).execute(env.getUi(),
                     ParsingFacade.parseScript(scriptText));
                 assertTrue(proof.closed(), "the multi-core proof did not close before saving");
@@ -173,7 +178,8 @@ public class MtScriptStressTest {
         ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         try {
-            Proof proof = env.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             var script = ParsingFacade.parseScript(scriptText);
             new ProofScriptEngine(proof).execute(env.getUi(), script);
             return proof.closed();

@@ -27,6 +27,7 @@ import de.uka.ilkd.key.settings.ViewSettings;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
  * Dialog to choose an example to load.
  * May be opened automatically when KeY starts.
  */
+@NullMarked
 public final class ExampleChooser extends JDialog {
     /**
      * This path is also accessed by the Eclipse integration of KeY to find the right examples.
@@ -48,11 +50,10 @@ public final class ExampleChooser extends JDialog {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExampleChooser.class);
 
-
     /**
      * This class is a singleton class and this its only instance.
      */
-    private static ExampleChooser instance;
+    private static @Nullable ExampleChooser instance;
 
     private final JTree exampleList;
     private final JButton loadButton;
@@ -63,18 +64,27 @@ public final class ExampleChooser extends JDialog {
     /**
      * The result value of the dialog. <code>null</code> if nothing to be loaded
      */
-    private Path fileToLoad = null;
+    private @Nullable Path fileToLoad = null;
 
     /**
      * The currently selected example. <code>null</code> if none selected
      */
-    private Example selectedExample;
-
+    private @Nullable Example selectedExample;
 
     // -------------------------------------------------------------------------
     // constructors
     // -------------------------------------------------------------------------
 
+    /**
+     * Creates the example chooser dialog.
+     *
+     * <p>
+     * The dialog builds its list, description pane and buttons and shows itself while the
+     * receiver is still under initialization (EISOP initialization check); the listeners only
+     * fire once the dialog is displayed at the end of construction, suppressed with a scoped
+     * key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private ExampleChooser(Path examplesDir) {
         super(MainWindow.getInstance(), "Load Example", true);
         assert examplesDir != null;
@@ -172,7 +182,6 @@ public final class ExampleChooser extends JDialog {
         buttonPanel.add(cancelButton);
         GuiUtilities.attachClickOnEscListener(cancelButton);
 
-
         // select first example
         DefaultMutableTreeNode firstLeaf =
             ((DefaultMutableTreeNode) model.getRoot()).getFirstLeaf();
@@ -184,7 +193,6 @@ public final class ExampleChooser extends JDialog {
         getContentPane().setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         setSize(800, 400);
     }
-
 
     // -------------------------------------------------------------------------
     // internal methods
@@ -213,7 +221,6 @@ public final class ExampleChooser extends JDialog {
         }
     }
 
-
     private void updateDescription() {
 
         TreePath selectionPath = exampleList.getSelectionModel().getSelectionPath();
@@ -236,7 +243,16 @@ public final class ExampleChooser extends JDialog {
                         addTab(fileAsString.substring(p), "Proof Obligation", false);
                     }
                     for (Path file : example.getAdditionalFiles()) {
-                        addTab(fileAsString(file), file.getFileName().toString(), false);
+                        if (file == null) {
+                            // an examples' additional-file list never contains null entries
+                            throw new NullPointerException("No additional file available.");
+                        }
+                        Path fileName = file.getFileName();
+                        if (fileName == null) {
+                            // a file in an example directory always has a name
+                            throw new NullPointerException("No file name available.");
+                        }
+                        addTab(fileAsString(file), fileName.toString(), false);
                     }
                     loadButton.setEnabled(true);
                     loadProofButton.setEnabled(example.hasProof());
@@ -257,7 +273,12 @@ public final class ExampleChooser extends JDialog {
     private void addTab(String string, String name, boolean wrap) {
         JTextArea area = new JTextArea();
         area.setText(string);
-        area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, area.getFont().getSize()));
+        Font font = area.getFont();
+        if (font == null) {
+            // a newly created text area is never realized without a font
+            throw new NullPointerException("No area font available.");
+        }
+        area.setFont(new Font(Font.MONOSPACED, Font.PLAIN, font.getSize()));
         area.setCaretPosition(0);
         area.setEditable(false);
         area.setWrapStyleWord(true);
@@ -269,7 +290,7 @@ public final class ExampleChooser extends JDialog {
      * Shows the dialog, using the passed examples directory. If null is passed, tries to find
      * examples directory on its own.
      */
-    public static @Nullable Path showInstance(Path examplesDirString) {
+    public static @Nullable Path showInstance(@Nullable Path examplesDirString) {
         // get examples directory
         Path examplesDir;
         if (examplesDirString == null) {

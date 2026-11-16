@@ -142,6 +142,12 @@ public class AssumesInputTest {
     }
 
     @Test
+    /**
+     * Deliberate nulls into the {@link BuildingException} constructor (null reclamation token and
+     * null position) exercise the "no position" message path. key.core declares the parameters
+     * {@code @NonNull}, so the legacy-API nulls are suppressed scoped to this test.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void extractPrefersRawMessageOfBuildingException() {
         // BuildingException.getMessage() appends " at <pos>"; extract must use the raw message
         BuildingException be =
@@ -152,13 +158,23 @@ public class AssumesInputTest {
     }
 
     @Test
+    /**
+     * The {@link Location} constructor receives a deliberate null fileUri (an undefined
+     * location), declared {@code @NonNull} in key.core and suppressed scoped to this test; the
+     * present position is then asserted via an explicit guard.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public void extractTakesPositionFromHasLocation() {
         Location loc = new Location(null, Position.newOneBased(2, 5));
         AssumesInput.SyntaxError err = AssumesInput.extract(new LocatedException("oops", loc));
         assertEquals("oops", err.message());
-        assertNotNull(err.position());
-        assertEquals(2, err.position().line());
-        assertEquals(5, err.position().column());
+        Position pos = err.position();
+        if (pos == null) {
+            // the located exception declares a hasLocation position
+            throw new AssertionError("expected a position, got none");
+        }
+        assertEquals(2, pos.line());
+        assertEquals(5, pos.column());
     }
 
     @Test

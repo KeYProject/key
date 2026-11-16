@@ -17,11 +17,14 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.rules.instantiation.InstantiationEntry;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Abstract superclass for conditions controlling the instantiations of generic sorts
  */
+@NullMarked
 public abstract class GenericSortCondition {
 
     private final GenericSort gs;
@@ -35,7 +38,7 @@ public abstract class GenericSortCondition {
      *         are either always compatible (no generic sorts) or never compatible (non generic
      *         sorts that don't match)
      */
-    public static ImmutableList<GenericSortCondition> createCondition(
+    public static @Nullable ImmutableList<GenericSortCondition> createCondition(
             SchemaVariable sv,
             InstantiationEntry<?> p_entry) {
 
@@ -66,7 +69,8 @@ public abstract class GenericSortCondition {
      *         always compatible (no generic sorts) or never compatible (e.g. non generic sorts that
      *         don't match)
      */
-    protected static ImmutableList<GenericSortCondition> createCondition(Sort s0, Sort s1,
+    protected static @Nullable ImmutableList<GenericSortCondition> createCondition(Sort s0,
+            Sort s1,
             boolean p_identity) {
         while (s0 instanceof ArraySort) {
             // Currently the sort hierarchy is not inherited by
@@ -120,7 +124,7 @@ public abstract class GenericSortCondition {
      *        GenericSortInstantiations)
      * @return the resulting condition, or null if "p_s" is not generic
      */
-    public static GenericSortCondition forceInstantiation(Sort p_s, boolean p_maximum) {
+    public static @Nullable GenericSortCondition forceInstantiation(Sort p_s, boolean p_maximum) {
 
         if (p_s instanceof GenericSort) {
             return createForceInstantiationCondition((GenericSort) p_s, p_maximum);
@@ -143,7 +147,7 @@ public abstract class GenericSortCondition {
      * @return a condition that specifies the given generic sort to be instantiated (exactly) with
      *         the given concrete sort
      */
-    public static @NonNull GenericSortCondition createIdentityCondition(GenericSort p_gs,
+    public static GenericSortCondition createIdentityCondition(GenericSort p_gs,
             Sort p_s) {
         return new GSCIdentity(p_gs, p_s);
     }

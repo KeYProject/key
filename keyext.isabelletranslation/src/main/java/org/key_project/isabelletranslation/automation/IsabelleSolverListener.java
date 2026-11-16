@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.isabelletranslation.automation;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Listener for {@link IsabelleSolver}s.
  */
+@NullMarked
 public interface IsabelleSolverListener {
     /**
      * Solver has started. Called after finishing preparations.

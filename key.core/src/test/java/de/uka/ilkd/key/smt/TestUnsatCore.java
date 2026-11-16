@@ -42,7 +42,8 @@ class TestUnsatCore {
         Proof p = env.getLoadedProof();
         Node n = p.findAny(node -> node.getAppliedRuleApp() instanceof SMTRuleApp);
         assertNotNull(n);
-        SMTRuleApp app = ((SMTRuleApp) n.getAppliedRuleApp());
+        SMTRuleApp app =
+            Objects.requireNonNull((SMTRuleApp) n.getAppliedRuleApp(), "expected an SMTRuleApp");
         System.out.println(app);
         assertEquals("Z3", app.getSuccessfulSolverName());
         ImmutableList<PosInOccurrence> ifs = app.assumesInsts();

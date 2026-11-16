@@ -10,7 +10,10 @@ import de.uka.ilkd.key.util.Debug;
 import org.key_project.prover.rules.instantiation.AssumesFormulaInstantiation;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 
+
+@NullMarked
 public class IfMatchResult {
 
     /**

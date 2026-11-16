@@ -6,6 +6,7 @@ package de.uka.ilkd.key.rule.merge.procedures;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
@@ -22,6 +23,9 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstantForPrefix;
 
 /**
@@ -31,6 +35,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.getNewSkolemConstant
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class MergeWithLatticeAbstraction extends MergeProcedure
         implements ParametricMergeProcedure {
 
@@ -43,7 +48,8 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
      * @return The abstract domain lattice suitable for the given sort. Return null if there is no
      *         abstract domain for that sort; in this case, an if-then-else merge will be performed.
      */
-    protected abstract AbstractDomainLattice getAbstractDomainForSort(Sort s, Services services);
+    protected abstract @Nullable AbstractDomainLattice getAbstractDomainForSort(Sort s,
+            Services services);
 
     /**
      * @return Manually chosen lattice elements for program variables.
@@ -79,7 +85,8 @@ public abstract class MergeWithLatticeAbstraction extends MergeProcedure
             assert v.op() instanceof ProgramVariable;
 
             if (getUserChoices().containsKey((ProgramVariable) v.op())) {
-                mergeElem = getUserChoices().get((ProgramVariable) v.op());
+                mergeElem = Objects.requireNonNull(getUserChoices().get((ProgramVariable) v.op()),
+                    "no lattice element for a user-chosen merge variable");
 
                 sideConditions.add(
                     AbstractDomainLattice.getSideConditionForAxiom(state1, v, mergeElem, services));

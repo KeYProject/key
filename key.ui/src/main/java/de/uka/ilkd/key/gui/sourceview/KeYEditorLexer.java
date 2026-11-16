@@ -15,6 +15,7 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.nparser.JavaKeYLexer;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.nparser.JavaKeYLexer.*;
 
@@ -27,6 +28,7 @@ import static de.uka.ilkd.key.nparser.JavaKeYLexer.*;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class KeYEditorLexer implements SourceHighlightDocument.EditorLexer {
 
     /** highight color for KeY keywords (dark red/violet) */

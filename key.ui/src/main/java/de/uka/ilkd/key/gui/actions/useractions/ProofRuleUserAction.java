@@ -8,12 +8,15 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * User action that represents the manual application of a rule.
  * Only used for action history purposes, {@link #apply()} has no functionality.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ProofRuleUserAction extends ProofModifyingUserAction {
     /**
      * Rule name.

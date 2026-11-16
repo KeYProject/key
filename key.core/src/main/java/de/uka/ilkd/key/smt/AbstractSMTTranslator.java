@@ -29,6 +29,8 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +48,7 @@ import static de.uka.ilkd.key.smt.SMTProblem.sequentToTerm;
  * @author Simon Greiner
  *
  */
+@NullMarked
 public abstract class AbstractSMTTranslator implements SMTTranslator {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSMTTranslator.class);
 
@@ -55,7 +58,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private final StringBuilder standardSort = new StringBuilder("u");
 
     /** The translation result is stored in this variable. */
-    protected String text;
+    protected @Nullable String text;
 
     /** remember all function declarations */
     protected static class FunctionWrapper {
@@ -154,7 +157,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     private final ArrayList<StringBuilder> assumptions = new ArrayList<>();
 
     /** Formulae made of taclets, used for assumptions. */
-    private TacletSetTranslation tacletSetTranslation = null;
+    private @Nullable TacletSetTranslation tacletSetTranslation = null;
 
     private final Collection<Throwable> exceptionsForTacletTranslation = new LinkedList<>();
 
@@ -163,19 +166,19 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     private ArrayList<StringBuilder> tacletAssumptions = new ArrayList<>();
 
-    private SMTSettings smtSettings = null;
+    private @Nullable SMTSettings smtSettings = null;
 
     /**
      * If the solver supports only simple multiplications, complex multiplications are translated
      * into a uninterpreted function. The name of the function is stored here.
      */
-    private Function multiplicationFunction = null;
+    private @Nullable Function multiplicationFunction = null;
 
     private static final String BSUM_STRING = "bsum";
 
     private static final String BPROD_STRING = "bprod";
 
-    public TacletSetTranslation getTacletSetTranslation() {
+    public @Nullable TacletSetTranslation getTacletSetTranslation() {
         return tacletSetTranslation;
     }
 
@@ -204,7 +207,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         return exceptionsForTacletTranslation;
     }
 
-    protected final SMTSettings getSettings() {
+    protected final @Nullable SMTSettings getSettings() {
         return smtSettings;
     }
 
@@ -323,7 +326,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 varList.add(var);
                 ArrayList<StringBuilder> templist = new ArrayList<>();
                 templist.add(var);
-                StringBuilder temppred = this.typePredicates.get(o.argSort(i));
+                StringBuilder temppred =
+                    Objects.requireNonNull(this.typePredicates.get(o.argSort(i)));
                 predList.add(this.translatePredicate(temppred, templist));
             }
 
@@ -347,7 +351,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 rightForm = this.translateIntegerDiv(varList.get(0), varList.get(1));
             }
 
-            StringBuilder rightPred = this.typePredicates.get(o.sort());
+            StringBuilder rightPred = Objects.requireNonNull(this.typePredicates.get(o.sort()));
             ArrayList<StringBuilder> tempList = new ArrayList<>();
             tempList.add(rightForm);
             rightForm = this.translatePredicate(rightPred, tempList);
@@ -394,7 +398,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      */
     private ArrayList<StringBuilder> getSortHierarchyPredicates(Services services,
             SMTSettings settings) {
-        Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
+        Function nullOp =
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT()).getNull();
         SortHierarchy sh = this.buildSortHierarchy(services, settings);
         ArrayList<StringBuilder> toReturn = new ArrayList<>();
         List<SortWrapper> list = sh.getSorts();
@@ -421,8 +426,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         StringBuilder var = this.translateLogicalVar(new StringBuilder("tvar2"));
         ArrayList<StringBuilder> varlist = new ArrayList<>();
         varlist.add(var);
-        StringBuilder leftForm = this.translatePredicate(child.getPredicateName(), varlist);
-        StringBuilder rightForm = this.translatePredicate(parent.getPredicateName(), varlist);
+        StringBuilder leftForm = this.translatePredicate(
+            Objects.requireNonNull(child.getPredicateName()), varlist);
+        StringBuilder rightForm = this.translatePredicate(
+            Objects.requireNonNull(parent.getPredicateName()), varlist);
 
         StringBuilder form = this.translateLogicalImply(leftForm, rightForm);
         if (this.isMultiSorted()) {
@@ -438,7 +445,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         ArrayList<StringBuilder> varlist = new ArrayList<>();
         varlist.add(constant);
 
-        return this.translatePredicate(parent.getPredicateName(), varlist);
+        return this.translatePredicate(Objects.requireNonNull(parent.getPredicateName()), varlist);
     }
 
     /**
@@ -452,8 +459,9 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
 
         // add the type definitions for functions
         for (Operator op : functionDecls.keySet()) {
-            StringBuilder currentForm = this.getSingleFunctionDef(this.usedFunctionNames.get(op),
-                functionDecls.get(op), services);
+            StringBuilder currentForm = this.getSingleFunctionDef(
+                Objects.requireNonNull(this.usedFunctionNames.get(op)), functionDecls.get(op),
+                services);
             if (currentForm.length() > 0) {
                 // Do not add it, if an empty result was
                 // returned.
@@ -549,7 +557,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             // built the forall around it
             for (int i = qVar.size() - 1; i >= 0; i--) {
                 toReturn = this.translateLogicalAll(qVar.get(i),
-                    this.usedDisplaySort.get(sorts.get(i)), toReturn);
+                    Objects.requireNonNull(this.usedDisplaySort.get(sorts.get(i))), toReturn);
             }
 
             return toReturn;
@@ -1323,7 +1331,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * @param distinct the set of functions, that should be distinct.
      * @return the translation of the unique function
      */
-    protected StringBuilder translateUniqueness(FunctionWrapper function,
+    protected @Nullable StringBuilder translateUniqueness(FunctionWrapper function,
             Collection<FunctionWrapper> distinct, Services services)
             throws IllegalFormulaException {
         if (!function.getFunction().isUnique()) {
@@ -1599,8 +1607,10 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             return this.translateLogicalTrue();
         } else if (op == Junctor.FALSE) {
             return this.translateLogicalFalse();
-        } else if (op == services.getTypeConverter().getHeapLDT().getNull()) {
-            Function nullOp = services.getTypeConverter().getHeapLDT().getNull();
+        } else if (op == Objects.requireNonNull(services.getTypeConverter().getHeapLDT())
+                .getNull()) {
+            Function nullOp = Objects.requireNonNull(services.getTypeConverter().getHeapLDT())
+                    .getNull();
 
             addFunction(nullOp, new ArrayList<>(), nullOp.sort(), services);
             translateSort(nullOp.sort(), services);
@@ -1732,7 +1742,8 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                     return this.translateIntegerDiv(arg1, arg2);
                 } else if (isNumberSymbol(services, fun)) {
                     Debug.assertTrue(term.arity() == 1);
-                    long num = NumberTranslation.translate(term.sub(0)).longValue();
+                    long num = Objects.requireNonNull(NumberTranslation.translate(term.sub(0)))
+                            .longValue();
                     StringBuilder numVal;
 
                     /*
@@ -1861,10 +1872,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
                 }
             }
 
-            return translateFunction(uninterpretedBindingPredicateNames.get(used), subterms);
+            return translateFunction(
+                Objects.requireNonNull(uninterpretedBindingPredicateNames.get(used)), subterms);
         } else {
             // create a new functionname
-            StringBuilder newName = null;
+            StringBuilder newName = new StringBuilder();
             int i = 0;
             boolean alreadyContains = true;
             while (alreadyContains) {
@@ -1973,10 +1985,11 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
             }
 
 
-            return translateFunction(uninterpretedBindingFunctionNames.get(used), subterms);
+            return translateFunction(
+                Objects.requireNonNull(uninterpretedBindingFunctionNames.get(used)), subterms);
         } else {
             // create a new functionname
-            StringBuilder newName = null;
+            StringBuilder newName = new StringBuilder();
             int i = 0;
             boolean alreadyContains = true;
             while (alreadyContains) {
@@ -2049,7 +2062,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     /**
      * This StringBuilder is used as predicate name for casts from int-valued to u-valued obects
      */
-    private StringBuilder castPredicate;
+    private @Nullable StringBuilder castPredicate;
 
     /**
      * This method adds a type cast to a translated formula, if neccessary. It is neccesary, if the
@@ -2171,7 +2184,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
     protected StringBuilder getTypePredicate(Sort s, StringBuilder arg) {
         ArrayList<StringBuilder> arguments = new ArrayList<>();
         arguments.add(arg);
-        return this.translatePredicate(typePredicates.get(s), arguments);
+        return this.translatePredicate(Objects.requireNonNull(typePredicates.get(s)), arguments);
     }
 
     /**
@@ -2525,7 +2538,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
         }
 
         for (Sort sort : tempSorts) {
-            HeapLDT ldt = services.getTypeConverter().getHeapLDT();
+            HeapLDT ldt = Objects.requireNonNull(services.getTypeConverter().getHeapLDT());
             // Several special sorts should not be added to the collection
             if (ldt.getHeap().sort() != sort && ldt.getFieldSort() != sort
                     && services.getJavaInfo().nullSort() != sort && JavaDLTheory.FORMULA != sort) {
@@ -2564,7 +2577,7 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * <code>hasNumberLimit</code> returns <code>true</code>.
      */
     private long getMaxNumber() {
-        return smtSettings.getMaximumInteger();
+        return Objects.requireNonNull(smtSettings).getMaximumInteger();
     }
 
     /**
@@ -2572,6 +2585,6 @@ public abstract class AbstractSMTTranslator implements SMTTranslator {
      * <code>hasNumberLimit</code> returns <code>true</code>.
      */
     private long getMinNumber() {
-        return smtSettings.getMinimumInteger();
+        return Objects.requireNonNull(smtSettings).getMinimumInteger();
     }
 }

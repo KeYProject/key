@@ -7,13 +7,21 @@ package de.uka.ilkd.key.java;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+/**
+ * Utility for extracting essential information from {@link ProgramPrefix} chains, such as the
+ * prefix length needed for debugging output and the innermost method frame of a program fragment.
+ */
+@NullMarked
 public class ProgramPrefixUtil {
 
     public static class ProgramPrefixInfo {
         private final int length;
-        private final MethodFrame mf;
+        private final @Nullable MethodFrame mf;
 
-        public ProgramPrefixInfo(int length, MethodFrame mf) {
+        public ProgramPrefixInfo(int length, @Nullable MethodFrame mf) {
             this.length = length;
             this.mf = mf;
         }
@@ -22,7 +30,7 @@ public class ProgramPrefixUtil {
             return length;
         }
 
-        public MethodFrame getInnerMostMethodFrame() {
+        public @Nullable MethodFrame getInnerMostMethodFrame() {
             return mf;
         }
     }

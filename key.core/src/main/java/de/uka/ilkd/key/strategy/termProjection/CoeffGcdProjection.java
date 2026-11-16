@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy.termProjection;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.Goal;
@@ -18,11 +19,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Given a monomial and a polynomial, this projection computes the gcd of all numerical
  * coefficients. The constant term of the polynomial is ignored. The result is guaranteed to be
  * non-negative.
  */
+@NullMarked
 @StableCost
 public class CoeffGcdProjection implements ProjectionToTerm<Goal> {
 
@@ -44,8 +48,8 @@ public class CoeffGcdProjection implements ProjectionToTerm<Goal> {
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
 
-        final Term monoT = monomialLeft.toTerm(app, pos, goal, mState);
-        final Term polyT = polynomialRight.toTerm(app, pos, goal, mState);
+        final Term monoT = Objects.requireNonNull(monomialLeft.toTerm(app, pos, goal, mState));
+        final Term polyT = Objects.requireNonNull(polynomialRight.toTerm(app, pos, goal, mState));
 
         final Monomial mono = Monomial.create(monoT, services);
         final Polynomial poly = Polynomial.create(polyT, services);

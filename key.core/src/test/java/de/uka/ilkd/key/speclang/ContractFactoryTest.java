@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -45,12 +46,14 @@ public class ContractFactoryTest {
     private JavaInfo javaInfo;
 
     /** services needed for translation */
+    @SuppressWarnings("NullAway") // assigned in setUp() before any test reads it
     private Services services;
 
     /** service for JML translation */
     private PreParser preParser;
 
     /** context information needed for JmlIO/parser */
+    @SuppressWarnings("NullAway") // assigned in setUp() before any test reads it
     private KeYJavaType testClassType;
 
     /**
@@ -59,10 +62,15 @@ public class ContractFactoryTest {
     @BeforeEach
     public synchronized void setUp() {
         if (javaInfo == null) {
-            javaInfo = HelperClassForTests.parse(TEST_FILE).getFirstProof().getJavaInfo();
+            javaInfo = Objects
+                    .requireNonNull(HelperClassForTests.parse(TEST_FILE).getFirstProof(),
+                        "the test file must contain a proof")
+                    .getJavaInfo();
             services = javaInfo.getServices();
             services.setOriginFactory(new OriginTermLabelFactory());
-            testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");
+            testClassType = Objects
+                    .requireNonNull(javaInfo.getKeYJavaType("testPackage.TestClass"),
+                        "the test class type must exist");
         }
         preParser = new PreParser();
     }
@@ -169,8 +177,13 @@ public class ContractFactoryTest {
         ImmutableList<TextualJMLConstruct> constructs = preParser.parseClassLevel(contractStr);
 
         ImmutableList<KeYJavaType> signature = ImmutableList.nil();
-        signature = signature.append(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT));
-        IProgramMethod pm = javaInfo.getProgramMethod(testClassType, "m", signature, testClassType);
+        signature = signature.append(
+            Objects.requireNonNull(javaInfo.getKeYJavaType(PrimitiveType.JAVA_INT),
+                "the int type must exist"));
+        IProgramMethod pm = Objects
+                .requireNonNull(
+                    javaInfo.getProgramMethod(testClassType, "m", signature, testClassType),
+                    "the method must exist");
 
         ImmutableSet<Contract> contractSet = ImmutableSet.empty();
         for (TextualJMLConstruct c : constructs) {
@@ -189,7 +202,8 @@ public class ContractFactoryTest {
 
         // combine exceptional with normal contract
         ContractFactory cf = new ContractFactory(services);
-        FunctionalOperationContract singleContract = cf.union(cs);
+        FunctionalOperationContract singleContract =
+            Objects.requireNonNull(cf.union(cs), "the contracts must be joinable");
 
         // remove origin labels
         JTerm combinedModifiable = singleContract.getModifiable();

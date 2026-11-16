@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.axiom_abstraction;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * <p>
  * A comparison function, which imposes a <i>partial ordering</i> on some collection of objects.
@@ -20,6 +22,7 @@ package de.uka.ilkd.key.axiom_abstraction;
  * @author Dominic Scheurer
  * @see java.util.Comparator
  */
+@NullMarked
 public interface PartialComparator<T> {
 
     /**

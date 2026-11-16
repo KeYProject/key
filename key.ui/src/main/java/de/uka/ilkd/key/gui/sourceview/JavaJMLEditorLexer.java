@@ -15,7 +15,10 @@ import java.util.regex.Pattern;
 import javax.swing.text.*;
 
 import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.speclang.njml.JmlLexer;
 import de.uka.ilkd.key.speclang.njml.JmlMarkerDecision;
+
+import org.jspecify.annotations.NullMarked;
 
 import static de.uka.ilkd.key.gui.sourceview.JavaDocument.*;
 
@@ -27,6 +30,7 @@ import static de.uka.ilkd.key.gui.sourceview.JavaDocument.*;
  * @see JavaDocument
  * @author Wolfram Pfeifer, Mattias Ulbrich
  */
+@NullMarked
 public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
     /**
      * Enum to indicate the current mode (environment) of the parser. Examples are STRING ("..."),
@@ -244,7 +248,13 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
 
     /**
      * The settings listener of this document (registered in the static listener list).
+     *
+     * <p>
+     * The listener refreshes the highlight styles while the receiver is still under
+     * initialization (EISOP initialization check); the styles only take effect once the lexer is
+     * used for highlighting after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final transient PropertyChangeListener listener = e -> updateStyles();
 
     private final List<SourceHighlightDocument.Token> result = new ArrayList<>();
@@ -252,7 +262,13 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
     /**
      * Creates a new JavaDocument and sets the syntax highlighting styles (as in eclipse default
      * settings).
+     *
+     * <p>
+     * The lexer refreshes its highlight styles and registers its settings listener while the
+     * receiver is still under initialization (EISOP initialization check); both only take effect
+     * once the lexer is used for highlighting after construction, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public JavaJMLEditorLexer() {
         updateStyles();
         ColorSettings.getInstance().addPropertyChangeListener(listener);
@@ -307,6 +323,16 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
         StyleConstants.setBold(jmlkeyword, true);
     }
 
+    /**
+     * Extends the current token by '@' and decides whether the annotated comment is a JML
+     * specification.
+     *
+     * <p>
+     * The {@link JmlMarkerDecision} is only used for its string-based test, which does not
+     * consult the lexer, so a {@code null} lexer is passed although the constructor declares a
+     * non-null parameter; suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     private void checkAt() {
         token += '@';
         if (state == CommentState.COMMENT) { // "/*@"
@@ -324,7 +350,9 @@ public class JavaJMLEditorLexer implements SourceHighlightDocument.EditorLexer {
             state = CommentState.NO;
             String features = token.substring(2, token.length() - 1); // cut-off '//' or '/*' and
                                                                       // '@'
-            var jmlMarkerDecision = new JmlMarkerDecision(null);
+            // the decision object is only used for its string-based test which does not
+            // consult the lexer, so the lexer is not needed here
+            var jmlMarkerDecision = new JmlMarkerDecision((JmlLexer) null);
             if (jmlMarkerDecision.isActiveJmlSpec(features)) {
                 mode = lineComment ? Mode.LINE_JML : Mode.JML;
             } else {

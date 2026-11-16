@@ -12,12 +12,15 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Provides some helper methods used by classes outside the logic package Please be careful with
  * putting things here. This class has been mainly created to give getMaxSort a home which is
  * scheduled to become obsolete soon (see method comment)
  */
+@NullMarked
 public class TermHelper {
 
     private TermHelper() {}

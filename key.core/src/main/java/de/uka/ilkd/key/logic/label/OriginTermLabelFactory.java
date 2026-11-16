@@ -17,11 +17,14 @@ import de.uka.ilkd.key.logic.label.OriginTermLabel.NodeOrigin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.Origin;
 import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Factory for {@link OriginTermLabel}s.
  *
  * @author lanzinger
  */
+@NullMarked
 public class OriginTermLabelFactory implements TermLabelFactory<OriginTermLabel> {
 
     public OriginTermLabel createOriginTermLabel(Origin origin) {

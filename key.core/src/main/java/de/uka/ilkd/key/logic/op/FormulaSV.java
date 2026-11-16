@@ -9,10 +9,13 @@ import de.uka.ilkd.key.ldt.JavaDLTheory;
 import org.key_project.logic.Name;
 import org.key_project.logic.TerminalSyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * A schema variable that is used as placeholder for formulas.
  */
+@NullMarked
 public final class FormulaSV extends JOperatorSV implements TerminalSyntaxElement {
 
     /**

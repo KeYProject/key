@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.java.Services;
@@ -16,21 +17,27 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This SMT translation handler takes care of cast expressions <code>T::cast(term)</code>.
  *
  * @author Jonas Schiffl
  * @see CastingFunctionsHandler
  */
+@NullMarked
 public class CastHandler implements SMTHandler {
 
-    private ParametricFunctionDecl anyCast;
+    private @Nullable ParametricFunctionDecl anyCast;
 
     @Override
-    public void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) throws IOException {
+    public void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
         this.anyCast = services.getJavaDLTheory().getCastSymbol(services);
-        masterHandler.addDeclarationsAndAxioms(handlerSnippets);
+        // the master always loads the snippets for every handler
+        masterHandler.addDeclarationsAndAxioms(
+            Objects.requireNonNull(handlerSnippets, "handler snippets"));
     }
 
     @Override

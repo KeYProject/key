@@ -16,6 +16,7 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowLoopInvariantTacletBuilder;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
@@ -45,6 +46,7 @@ import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
@@ -59,7 +61,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
     }
 
     @Override
-    public InfFlowLoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos,
+    public InfFlowLoopInvariantBuiltInRuleApp createApp(@Nullable PosInOccurrence pos,
             TermServices services) {
         return new InfFlowLoopInvariantBuiltInRuleApp(this, pos, services);
     }
@@ -93,7 +95,8 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
 
         // prepare data
         LoopSpecification inv = inst.inv();
-        final JTerm guard = ruleApp.getGuard();
+        final JTerm guard =
+            Objects.requireNonNull(ruleApp.getGuard(), "guard of the rule app");
         InfFlowData infFlowData = prepareSetUpOfInfFlowValidityGoal(infFlowGoal, anonUpdateData,
             guard, inst, inv, services, ruleApp, localIns, localOuts, anonUpdate, guardJb);
 
@@ -103,11 +106,16 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         ruleApp.setInformationFlowProofObligationVars(ifVars);
 
         // set execution context
-        ruleApp.setExecutionContext(inst.innermostExecutionContext());
+        final ExecutionContext execContext = inst.innermostExecutionContext();
+        if (execContext == null) {
+            throw new NullPointerException(
+                "No innermost execution context for the information flow loop rule application.");
+        }
+        ruleApp.setExecutionContext(execContext);
 
         // create proof obligation
         InfFlowPOSnippetFactory f = POSnippetFactory.getInfFlowFactory(inv, ifVars.c1, ifVars.c2,
-            inst.innermostExecutionContext(), guard, services);
+            execContext, guard, services);
         final JTerm selfComposedExec =
             f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_LOOP_WITH_INV_RELATION);
         final JTerm post = f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
@@ -178,6 +186,10 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
 
         // create heap_Before_LOOP
         HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException(
+                "No heap type defined in the services type converter.");
+        }
         Name heapAtPreName = new Name(tb.newName(baseHeap + "_Before_LOOP"));
         final Function heapAtPreFunc =
             new JFunction(heapAtPreName, heapLDT.targetSort(), SKOLEM);
@@ -189,9 +201,9 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         final JTerm guardAtPost = buildAfterVar(guardTerm, services);
         final JTerm selfAtPost = buildAtPostVar(selfTerm, "LOOP", services);
         // The set of local variables which are read in the loop body.
-        final ImmutableList<JTerm> localInTerms = MiscTools.toTermList(localIns, tb);
+        final ImmutableList<JTerm> localInTerms = toTermList(localIns, tb);
         // The set of local variables which are written in the loop body.
-        final ImmutableList<JTerm> localOutTerms = MiscTools.toTermList(localOuts, tb);
+        final ImmutableList<JTerm> localOutTerms = toTermList(localOuts, tb);
         // For every local variable which is written we need a pre and a post variable.
         final ImmutableList<JTerm> localOutsAtPre = buildLocalOutsAtPre(localOutTerms, services);
         final ImmutableList<JTerm> localOutsAtPost = buildLocalOutsAtPost(localOutTerms, services);
@@ -229,10 +241,15 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         // generate information flow invariant application predicate
         // and associated taclet
         final Pair<JTerm, JTerm> updates = new Pair<>(inst.u(), anonUpdate);
+        final ExecutionContext innermostExecContext = inst.innermostExecutionContext();
+        if (innermostExecContext == null) {
+            throw new NullPointerException(
+                "No innermost execution context for the information flow loop invariant taclet.");
+        }
         final InfFlowLoopInvariantTacletBuilder ifInvariantBuilder =
             new InfFlowLoopInvariantTacletBuilder(services);
         ifInvariantBuilder.setInvariant(spec);
-        ifInvariantBuilder.setExecutionContext(inst.innermostExecutionContext());
+        ifInvariantBuilder.setExecutionContext(innermostExecContext);
         ifInvariantBuilder.setContextUpdate(/* inst.u */);
         ifInvariantBuilder.setProofObligationVars(instantiationVars);
         ifInvariantBuilder.setGuard(guardTerm);
@@ -241,12 +258,32 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         final Taclet informationFlowInvariantApp = ifInvariantBuilder.buildTaclet(infFlowGoal);
 
         // return information flow data
-        return new InfFlowData(instantiationVars, guardAtPre, guardAtPost,
+        return new InfFlowData(instantiationVars,
+            requireTerm(guardAtPre, "guard-at-pre term"),
+            requireTerm(guardAtPost, "guard-at-post term"),
             guardJb, guardTerm, localOutTerms, localOutsAtPre, localOutsAtPost, updates,
             loopInvApplPredTerm, informationFlowInvariantApp);
     }
 
-    private static JTerm buildAtPostVar(JTerm varTerm, String suffix, Services services) {
+    private static ImmutableList<JTerm> toTermList(Iterable<LocationVariable> pvs,
+            TermBuilder tb) {
+        ImmutableList<JTerm> result = ImmutableList.nil();
+        for (final LocationVariable pv : pvs) {
+            result = result.append(tb.var(pv));
+        }
+        return result;
+    }
+
+
+    private static JTerm requireTerm(@Nullable JTerm t, String what) {
+        if (t == null) {
+            throw new NullPointerException("No " + what + ".");
+        }
+        return t;
+    }
+
+    private static @Nullable JTerm buildAtPostVar(@Nullable JTerm varTerm, String suffix,
+            Services services) {
         if (varTerm == null) {
             return null;
         }
@@ -254,6 +291,9 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
 
         final TermBuilder tb = services.getTermBuilder();
         final TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
+        if (resultType == null) {
+            throw new NullPointerException("No type for the variable " + varTerm + ".");
+        }
         if (!suffix.equalsIgnoreCase("")) {
             suffix = "_" + suffix;
         }
@@ -264,7 +304,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         return tb.var(varAtPostVar);
     }
 
-    private static JTerm buildBeforeVar(JTerm varTerm, Services services) {
+    private static @Nullable JTerm buildBeforeVar(@Nullable JTerm varTerm, Services services) {
         if (varTerm == null) {
             return null;
         }
@@ -272,6 +312,9 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
 
         final TermBuilder tb = services.getTermBuilder();
         final TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
+        if (resultType == null) {
+            throw new NullPointerException("No type for the variable " + varTerm + ".");
+        }
         final String name = tb.newName(varTerm + "_Before");
         final LocationVariable varAtPreVar =
             new LocationVariable(new ProgramElementName(name), resultType);
@@ -279,7 +322,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         return tb.var(varAtPreVar);
     }
 
-    private static JTerm buildAfterVar(JTerm varTerm, Services services) {
+    private static @Nullable JTerm buildAfterVar(@Nullable JTerm varTerm, Services services) {
         if (varTerm == null) {
             return null;
         }
@@ -287,6 +330,9 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
 
         final TermBuilder tb = services.getTermBuilder();
         final TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
+        if (resultType == null) {
+            throw new NullPointerException("No type for the variable " + varTerm + ".");
+        }
         final String name = tb.newName(varTerm + "_After");
         final LocationVariable varAtPostVar =
             new LocationVariable(new ProgramElementName(name), resultType);
@@ -294,10 +340,11 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         return tb.var(varAtPostVar);
     }
 
-    private static ImmutableList<JTerm> buildLocalOutsAtPre(ImmutableList<JTerm> varTerms,
+    private static ImmutableList<JTerm> buildLocalOutsAtPre(
+            @Nullable ImmutableList<JTerm> varTerms,
             Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
-            return varTerms;
+            return ImmutableList.nil();
         }
         final TermBuilder tb = services.getTermBuilder();
         ImmutableList<JTerm> localOuts = ImmutableList.nil();
@@ -305,6 +352,9 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
             assert varTerm.op() instanceof LocationVariable;
 
             final TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
+            if (resultType == null) {
+                throw new NullPointerException("No type for the variable " + varTerm + ".");
+            }
 
             final String name = tb.newName(varTerm + "_Before");
             final LocationVariable varAtPostVar =
@@ -316,10 +366,11 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
         return localOuts;
     }
 
-    private static ImmutableList<JTerm> buildLocalOutsAtPost(ImmutableList<JTerm> varTerms,
+    private static ImmutableList<JTerm> buildLocalOutsAtPost(
+            @Nullable ImmutableList<JTerm> varTerms,
             Services services) {
         if (varTerms == null || varTerms.isEmpty()) {
-            return varTerms;
+            return ImmutableList.nil();
         }
         final TermBuilder tb = services.getTermBuilder();
         ImmutableList<JTerm> localOuts = ImmutableList.nil();
@@ -327,6 +378,9 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
             assert varTerm.op() instanceof LocationVariable;
 
             final TypeReference resultType = ((LocationVariable) varTerm.op()).getTypeReference();
+            if (resultType == null) {
+                throw new NullPointerException("No type for the variable " + varTerm + ".");
+            }
 
             final String name = tb.newName(varTerm + "_After");
             final LocationVariable varAtPostVar =
@@ -370,7 +424,9 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
                 // set up information flow validity goal
                 InfFlowData infFlowData = setUpInfFlowValidityGoal(preserve,
                     (InfFlowLoopInvariantBuiltInRuleApp) ruleApp, inst, guardJb,
-                    localIns, localOuts, anonUpdateDatas, anonUpdate, services);
+                    localIns, localOuts, anonUpdateDatas,
+                    Objects.requireNonNull(anonUpdate, "anonymous update of the rule app"),
+                    services);
 
                 // set up information flow part of useGoal:
                 // add infFlowAssumptions, add term and taclet to post goal

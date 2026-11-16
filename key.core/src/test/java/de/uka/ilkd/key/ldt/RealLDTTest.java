@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.ldt;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.expression.literal.RealLiteral;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.rule.TacletForTests;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class RealLDTTest {
 
-    private static RealLiteral roundTrip(Services services, RealLiteral in) {
+    private static @Nullable RealLiteral roundTrip(Services services, RealLiteral in) {
         final JTerm term = services.getTermBuilder().rTerm(in.getUnscaledValue(), in.getScale());
         return (RealLiteral) services.getTypeConverter().getRealLDT()
                 .translateTerm(term, new ExtList(), services);
@@ -43,7 +45,8 @@ public class RealLDTTest {
 
         for (String s : values) {
             final RealLiteral in = new RealLiteral(s);
-            final RealLiteral out = roundTrip(services, in);
+            final RealLiteral out = Objects.requireNonNull(roundTrip(services, in),
+                "real literal term must decode back to a real literal");
             assertEquals(in, out, () -> "real literal '" + s + "' did not round-trip");
             assertEquals(in.getValue(), out.getValue(),
                 () -> "printed form of '" + s + "' changed on round-trip");
@@ -73,7 +76,8 @@ public class RealLDTTest {
         final BigInteger hugeScale = BigInteger.valueOf(Integer.MAX_VALUE).add(BigInteger.TEN);
         final RealLiteral in = new RealLiteral(BigInteger.valueOf(7), hugeScale);
 
-        final RealLiteral out = roundTrip(services, in);
+        final RealLiteral out = Objects.requireNonNull(roundTrip(services, in),
+            "huge-scale real term must decode back to a real literal");
 
         assertEquals(in, out, "huge-scale real did not round-trip");
         assertEquals(hugeScale, out.getScale(), "scale was truncated");

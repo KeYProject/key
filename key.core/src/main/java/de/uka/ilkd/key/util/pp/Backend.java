@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util.pp;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The backend for a {@link Layouter}. An object satisfying this interface can act as a receiver for
  * the layed out text produced by a {@link Layouter}. A <code>Backend</code> must also provide the
@@ -17,6 +20,7 @@ package de.uka.ilkd.key.util.pp;
  *
  */
 
+@NullMarked
 public interface Backend<M> {
     /**
      * Append a String <code>s</code> to the output. <code>s</code> contains no newlines.
@@ -33,7 +37,7 @@ public interface Backend<M> {
     void flush();
 
     /** Gets called to record a <code>mark()</code> call in the input. */
-    void mark(M o);
+    void mark(@Nullable M o);
 
     /** Returns the available space per line */
     int lineWidth();

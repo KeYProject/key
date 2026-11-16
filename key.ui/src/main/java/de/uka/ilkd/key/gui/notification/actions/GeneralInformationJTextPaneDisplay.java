@@ -10,11 +10,14 @@ import javax.swing.JOptionPane;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Displays a string in a {@link javax.swing.JOptionPane} information message window.
  *
  * @author bubel
  */
+@NullMarked
 public class GeneralInformationJTextPaneDisplay extends ShowDisplayPane {
 
     /**

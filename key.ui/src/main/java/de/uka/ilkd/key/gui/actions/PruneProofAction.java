@@ -16,6 +16,9 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This action is one part of the previous UndoLastStepAction: It prunes the proof tree below the
  * selected node. It now also works on closed branches if not the flag "--no-pruning-closed" is set
@@ -25,6 +28,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
  *
  * @author Pfeifer (enabled pruning in closed branches)
  */
+@NullMarked
 public final class PruneProofAction extends MainWindowAction {
 
     /**
@@ -58,7 +62,7 @@ public final class PruneProofAction extends MainWindowAction {
                 handleProof(proof);
             }
 
-            private void handleProof(Proof proof) {
+            private void handleProof(@Nullable Proof proof) {
                 boolean enabled = false;
                 if (proof != null) {
                     final Node selNode = getMediator().getSelectedNode();
@@ -100,6 +104,8 @@ public final class PruneProofAction extends MainWindowAction {
             }
 
             @Override
+            @SuppressWarnings("NullAway") // deliberate null event: the listener re-queries the
+                                          // selection model and ignores the event itself
             public void autoModeStopped(ProofEvent e) {
                 getMediator().addKeYSelectionListener(selListener);
                 selListener.selectedNodeChanged(null);
@@ -110,6 +116,10 @@ public final class PruneProofAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        getMediator().setBack(getMediator().getSelectedNode());
+        Node selectedNode = getMediator().getSelectedNode();
+        if (selectedNode == null) {
+            throw new NullPointerException("No node selected to prune.");
+        }
+        getMediator().setBack(selectedNode);
     }
 }

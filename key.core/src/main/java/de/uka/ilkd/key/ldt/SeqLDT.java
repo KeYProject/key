@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.ldt;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.abstraction.Type;
@@ -26,9 +28,11 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
+@NullMarked
 public final class SeqLDT extends LDT {
 
     public static final Name NAME = new Name("Seq");
@@ -169,7 +173,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(Operator op, JTerm sub,
+    public boolean isResponsible(Operator op, @Nullable JTerm sub,
             TermServices services, ExecutionContext ec) {
         if (!(op instanceof LogicFunctionalOperator lfo)) {
             return false;
@@ -202,7 +206,9 @@ public final class SeqLDT extends LDT {
             case SeqReverse -> seqReverse;
             case SeqPut -> seqUpd;
             case SeqIndexOf -> seqIndexOf;
-            case SeqGet -> getSeqGet(op.getKeYJavaType(serv, ec).getSort(), serv);
+            case SeqGet -> getSeqGet(Objects.requireNonNull(
+                op.getKeYJavaType(serv, ec).getSort(),
+                "SeqLDT: seqGet operator has no sort"), serv);
             case SeqLength -> seqLen;
             default -> throw new AssertionError();
         };
@@ -224,7 +230,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public Expression translateTerm(JTerm t, ExtList children, Services services) {
+    public @Nullable Expression translateTerm(JTerm t, ExtList children, Services services) {
         if (t.op().equals(seqEmpty)) {
             return EmptySeqLiteral.INSTANCE;
         }
@@ -234,7 +240,7 @@ public final class SeqLDT extends LDT {
 
 
     @Override
-    public Type getType(JTerm t) {
+    public @Nullable Type getType(JTerm t) {
         assert false;
         return null;
     }

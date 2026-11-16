@@ -7,4 +7,7 @@
  * @author Mihai Herda
  * @version 1 (9/16/20)
  */
+@NullMarked
 package de.uka.ilkd.key.gui.testgen;
+
+import org.jspecify.annotations.NullMarked;

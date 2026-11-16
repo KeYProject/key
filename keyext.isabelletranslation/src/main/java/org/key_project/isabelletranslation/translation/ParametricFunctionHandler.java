@@ -15,14 +15,18 @@ import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Handles translation of parametric functions
  */
+@NullMarked
 public class ParametricFunctionHandler implements IsabelleHandler {
 
     @Override
     public void init(IsabelleMasterHandler masterHandler, Services services,
-            Properties handlerSnippets, String[] handlerOptions) throws IOException {
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException {
 
     }
 

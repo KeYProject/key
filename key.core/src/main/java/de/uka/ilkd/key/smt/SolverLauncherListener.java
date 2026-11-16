@@ -8,9 +8,12 @@ import java.util.Collection;
 
 import de.uka.ilkd.key.smt.solvertypes.SolverType;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This interface can be used to observe a launcher.
  */
+@NullMarked
 public interface SolverLauncherListener {
 
     void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> finishedSolvers);

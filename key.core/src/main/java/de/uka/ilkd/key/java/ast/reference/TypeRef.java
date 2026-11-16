@@ -15,8 +15,10 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class TypeRef extends TypeReferenceImp {
 
     private final KeYJavaType kjt;
@@ -27,7 +29,7 @@ public class TypeRef extends TypeReferenceImp {
      * TypeRef(ProgramElementName, ImmutableList<Annotation>, int, ReferencePrefix, KeYJavaType)
      * and take null as last argument.
      */
-    public TypeRef(@NonNull KeYJavaType kjt) {
+    public TypeRef(KeYJavaType kjt) {
         this(kjt, ImmutableList.of(), 0);
     }
 
@@ -37,7 +39,7 @@ public class TypeRef extends TypeReferenceImp {
      * constructor TypeRef(ProgramElementName, ImmutableList<Annotation>, int, ReferencePrefix,
      * KeYJavaType) and take null as last argument.
      */
-    public TypeRef(@NonNull KeYJavaType kjt, ImmutableList<Annotation> annotations,
+    public TypeRef(KeYJavaType kjt, ImmutableList<Annotation> annotations,
             int dim) {
         super(new ProgramElementName(kjt.getName()), annotations, dim, kjt.createPackagePrefix());
         this.kjt = kjt;
@@ -50,7 +52,7 @@ public class TypeRef extends TypeReferenceImp {
     }
 
     public TypeRef(ProgramElementName name, ImmutableList<Annotation> annotations,
-            int dimension, ReferencePrefix prefix,
+            int dimension, @Nullable ReferencePrefix prefix,
             KeYJavaType kjt) {
         super(name, annotations, dimension, prefix);
         this.kjt = kjt;
@@ -68,7 +70,7 @@ public class TypeRef extends TypeReferenceImp {
      * @param obj the Object to compare with
      * @return true if and only if both type references refer to the same type
      */
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj == this)
             return true;
         if (obj instanceof TypeRef tr) {

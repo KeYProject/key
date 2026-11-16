@@ -12,10 +12,13 @@ import org.key_project.logic.TerminalSyntaxElement;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.SortedOperator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * TermTransformer perform complex term transformation which cannot be (efficiently or at all)
  * described by taclets.
  */
+@NullMarked
 public interface TermTransformer extends SortedOperator,
         /* TODO: check */ TerminalSyntaxElement, Operator {
 

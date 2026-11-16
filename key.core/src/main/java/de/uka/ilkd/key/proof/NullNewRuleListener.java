@@ -9,9 +9,12 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.NewRuleListener;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Implementation of the NewRuleListener interface that does nothing
  */
+@NullMarked
 public class NullNewRuleListener implements NewRuleListener {
 
     @Override

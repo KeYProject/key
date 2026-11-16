@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Token;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This program is a little for debugging KeY Lexer.
@@ -27,6 +28,7 @@ import org.antlr.v4.runtime.Token;
  * @author weigl
  * @version 2019-12-09
  */
+@NullMarked
 public class DebugJmlLexer {
     private static final String DEFAULT_FORMAT = "%02d:%02d %15s %-40s [%d->%d] C:%d\n";
     private final PrintStream stream;

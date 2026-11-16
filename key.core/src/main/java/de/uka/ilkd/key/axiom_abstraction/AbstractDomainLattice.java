@@ -12,6 +12,8 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.util.mergerule.SymbolicExecutionState;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitting;
 
 /**
@@ -21,6 +23,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.isProvableWithSplitt
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class AbstractDomainLattice
         implements PartialComparator<AbstractDomainElement>, Iterable<AbstractDomainElement> {
 

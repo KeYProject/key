@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
@@ -17,14 +19,18 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * Walks through a java AST in depth-left-fist-order. This walker is used to transform a program
  * according to the given SVInstantiations.
  */
+@NullMarked
 public class ProgramReplaceVisitor extends CreatingASTVisitor {
 
-    private ProgramElement result = null;
+    private @Nullable ProgramElement result = null;
 
     private final SVInstantiations svinsts;
 
@@ -58,7 +64,7 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
     /**
      * @return The result.
      */
-    public ProgramElement result() {
+    public @Nullable ProgramElement result() {
         return result;
     }
 
@@ -96,16 +102,20 @@ public class ProgramReplaceVisitor extends CreatingASTVisitor {
         final ExtList changeList = stack.peek();
 
         ProgramElement body = null;
-        for (Object element : changeList) {
-            if (element instanceof SourceElement) {
-                body = (ProgramElement) element;
+        if (changeList != null) {
+            for (Object element : changeList) {
+                if (element instanceof SourceElement) {
+                    body = (ProgramElement) element;
+                }
             }
         }
 
         assert body != null : "A program transformer without program to transform?";
 
-        final ProgramElement[] transformResult = //
-            x.transform(body, services, svinsts);
+        // The assertion documents that transformers always come with a program element;
+        // requireNonNull preserves the failure mode (an NPE) if the invariant were violated.
+        final ProgramElement[] transformResult = x.transform(Objects.requireNonNull(body), services,
+            svinsts);
         if (transformResult == null) {
             /*
              * NOTE (DS, 2018-10-19): This is awkward... But there are transformers returning null

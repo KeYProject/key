@@ -6,13 +6,17 @@ package de.uka.ilkd.key.pp;
 
 
 import java.util.ArrayDeque;
+import java.util.Objects;
 
 import de.uka.ilkd.key.util.pp.Layouter;
 import de.uka.ilkd.key.util.pp.StringBackend;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PosTableLayouter.class);
 
@@ -200,7 +204,7 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
      * LogicPrinter. Subclasses may overwrite this method with a null returning body if position
      * information is not computed there.
      */
-    public InitialPositionTable getInitialPositionTable() {
+    public @Nullable InitialPositionTable getInitialPositionTable() {
         if (pure) {
             return null;
         }
@@ -341,11 +345,17 @@ public class PosTableLayouter extends Layouter<PosTableLayouter.Mark> {
 
         /**
          * Receive a mark and act appropriately.
+         * <p>
+         * The stack bookkeeping below is balanced: a start mark always precedes the end mark that
+         * pops the stack, so the peeked entry is present; the dereference of the (nullable) entry
+         * is suppressed with a scoped key.
          */
         @Override
-        public void mark(Mark pair) {
-            MarkType markType = pair.type;
-            int parameter = pair.parameter;
+        @SuppressWarnings("nullness:dereference.of.nullable")
+        public void mark(@Nullable Mark pair) {
+            Mark mark = Objects.requireNonNull(pair, "a mark must be present");
+            MarkType markType = mark.type;
+            int parameter = mark.parameter;
 
             // IMPLEMENTATION NOTE
             //

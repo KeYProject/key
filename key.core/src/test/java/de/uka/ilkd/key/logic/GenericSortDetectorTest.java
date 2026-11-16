@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -108,7 +109,9 @@ class GenericSortDetectorTest {
     void concreteTermHasNoGenericSort() {
         Services services = TacletForTests.services().copy(false);
         var tb = services.getTermBuilder();
-        Sort intSort = services.getNamespaces().sorts().lookup(new Name("int"));
+        Sort intSort = Objects
+                .requireNonNull(services.getNamespaces().sorts().lookup(new Name("int")),
+                    "the int sort exists");
         JFunction g = new JFunction(new Name("myConcreteConst"), intSort);
         JTerm t = tb.equals(tb.func(g), tb.func(g));
 

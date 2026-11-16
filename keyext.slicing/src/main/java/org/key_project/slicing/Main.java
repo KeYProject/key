@@ -24,6 +24,8 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 import org.key_project.slicing.analysis.AnalysisResults;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
@@ -37,6 +39,7 @@ import picocli.CommandLine.Parameters;
  *
  * @author Arne Keller
  */
+@NullMarked
 public final class Main implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
@@ -99,17 +102,32 @@ public final class Main implements Callable<Integer> {
     }
 
     private void processFile(Path proofFile, boolean overwrite) throws Exception {
-        LOGGER.info("Processing proof: {}", proofFile.getFileName());
+        Path fileName = proofFile.getFileName();
+        if (fileName == null) {
+            throw new NullPointerException("No file name for proof file " + proofFile + ".");
+        }
+        LOGGER.info("Processing proof: {}", fileName);
         GeneralSettings.noPruningClosed = false;
-        AtomicReference<DependencyTracker> tracker = new AtomicReference<>();
+        AtomicReference<@Nullable DependencyTracker> tracker = new AtomicReference<>();
         KeYEnvironment<?> environment =
             KeYEnvironment.load(JavaProfile.getDefaultInstance(), proofFile, null, null, null, null,
                 null, proof -> tracker.set(new DependencyTracker(proof)), true);
         try {
             // get loaded proof
             Proof proof = environment.getLoadedProof();
+            if (proof == null) {
+                throw new NullPointerException("No proof loaded from " + proofFile + ".");
+            }
             // analyze proof
-            AnalysisResults results = tracker.get().analyze(true, false);
+            DependencyTracker dependencyTracker = tracker.get();
+            if (dependencyTracker == null) {
+                throw new NullPointerException(
+                    "No dependency tracker set while loading the proof " + proofFile + ".");
+            }
+            AnalysisResults results = dependencyTracker.analyze(true, false);
+            if (results == null) {
+                throw new NullPointerException("No analysis results for the loaded proof.");
+            }
             // slice proof
             ProblemLoaderControl control = new DefaultUserInterfaceControl();
             Path saved = SlicingProofReplayer
@@ -118,6 +136,10 @@ public final class Main implements Callable<Integer> {
                 KeYEnvironment.load(JavaProfile.getDefaultInstance(), saved, null, null,
                     null, null, null, null, true);
             Proof slicedProof = environment2.getLoadedProof();
+            if (slicedProof == null) {
+                throw new NullPointerException("No proof loaded from the sliced proof " + saved
+                    + ".");
+            }
 
             try {
                 LOGGER.info("Original proof: {} steps, {} branch(es)",

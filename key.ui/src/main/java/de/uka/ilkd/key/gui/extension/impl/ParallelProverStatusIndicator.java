@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.gui.extension.impl;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
@@ -18,6 +19,8 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Status-line indicator showing the active prover mode: {@code SC} for the single-core (legacy)
@@ -33,6 +36,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  */
 @KeYGuiExtension.Info(experimental = false, name = "Prover Mode in Status Line", optional = false,
     description = "Shows and toggles the single-core / multi-core prover mode in the status line.")
+@NullMarked
 public class ParallelProverStatusIndicator
         implements KeYGuiExtension, KeYGuiExtension.StatusLine, KeYGuiExtension.Startup {
 
@@ -75,7 +79,12 @@ public class ParallelProverStatusIndicator
      * sizing it for the widest possible label.
      */
     private void fixSize() {
-        FontMetrics fm = button.getFontMetrics(button.getFont());
+        Font font = button.getFont();
+        if (font == null) {
+            // a realized button always carries a font
+            throw new NullPointerException("No button font available.");
+        }
+        FontMetrics fm = button.getFontMetrics(font);
         Insets in = button.getInsets();
         int w = fm.stringWidth("MT " + cores() + "x") + in.left + in.right + 12;
         int h = fm.getHeight() + in.top + in.bottom + 4;

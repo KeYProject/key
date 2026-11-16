@@ -15,20 +15,25 @@ import org.key_project.logic.op.Operator;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This {@link TermLabelPolicy} maintains a {@link TermLabel} as long the new {@link JTerm} has the
  * same {@link Operator} as the previous best matching {@link JTerm} from which it was created.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public class StayOnOperatorTermLabelPolicy implements TermLabelPolicy {
     /**
      * {@inheritDoc}
      */
     @Override
-    public TermLabel keepLabel(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm,
+    public @Nullable TermLabel keepLabel(TermLabelState state, Services services,
+            PosInOccurrence applicationPosInOccurrence,
+            @Nullable JTerm applicationTerm, Rule rule, @Nullable Goal goal,
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm, TermLabel label) {
         return applicationTerm != null
                 && JavaDLOperatorUtil.opEquals(newTerm.op(), applicationTerm.op())

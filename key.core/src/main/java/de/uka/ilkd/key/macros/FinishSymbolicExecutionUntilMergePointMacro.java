@@ -6,6 +6,7 @@ package de.uka.ilkd.key.macros;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.*;
@@ -35,6 +36,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * The macro FinishSymbolicExecutionUntilJionPointMacro continues automatic rule application until a
@@ -49,12 +52,13 @@ import org.jspecify.annotations.NonNull;
  * @author Dominic Scheurer
  * @see FinishSymbolicExecutionMacro
  */
+@NullMarked
 public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMacro {
 
     private HashSet<ProgramElement> blockElems = new HashSet<>();
     private final HashSet<JavaBlock> alreadySeen = new HashSet<>();
 
-    private UserInterfaceControl uic = null;
+    private @Nullable UserInterfaceControl uic = null;
 
     public FinishSymbolicExecutionUntilMergePointMacro() {
     }
@@ -81,8 +85,8 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc,
-            ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws InterruptedException {
         this.uic = uic;
         return super.applyTo(uic, proof, goals, posInOcc, listener);
@@ -99,16 +103,24 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
     @Override
     protected Strategy<@NonNull Goal> createStrategy(Proof proof,
-            PosInOccurrence posInOcc) {
+            @Nullable PosInOccurrence posInOcc) {
         // Need to clear the data structures since no new instance of this
         // macro is created across multiple calls, so sometimes it would have
         // no effect in a successive call.
         blockElems.clear();
         alreadySeen.clear();
 
-        return new FilterSymbexStrategy(proof.getActiveStrategy());
+        // The active strategy is configured and set before createStrategy() runs; without it
+        // the symbolic execution below would have nothing to steer rule application.
+        return new FilterSymbexStrategy(Objects.requireNonNull(proof.getActiveStrategy()));
     }
 
+    /**
+     * The macro may run headless with a null {@link UserInterfaceControl} (e.g. when started from
+     * tests); the single-step macro and the prover core tolerate that, hence the scoped
+     * suppression.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     @Override
     protected void doPostProcessing(Proof proof) {
         // This hack was introduced since in a "while loop with break"
@@ -142,7 +154,9 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
             // Undo until a break condition is the first active statement again.
             while (!hasBreakPoint(lastNode.sequent().succedent())) {
-                lastNode = lastNode.parent();
+                // Climbing towards the root; an absent parent would equally have crashed the
+                // old code path (pruneProof(null)), so requireNonNull preserves the crash shape.
+                lastNode = Objects.requireNonNull(lastNode.parent());
                 proof.pruneProof(lastNode);
             }
 
@@ -381,8 +395,11 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
 
             LinkedList<StatementBlock> result = new LinkedList<>(getBodies(elem.getThen()));
 
-            if (elem.getElse() != null) {
-                result.addAll(getBodies(elem.getElse()));
+            // Hoisted into a local: the checker does not refine nullness across the two
+            // separate getElse() calls, so the null guard must be applied to the local itself.
+            Else elseElem = elem.getElse();
+            if (elseElem != null) {
+                result.addAll(getBodies(elseElem));
             }
 
             return result;
@@ -508,9 +525,11 @@ public class FinishSymbolicExecutionUntilMergePointMacro extends StrategyProofMa
             LinkedList<StatementBlock> result = new LinkedList<>();
 
             ImmutableArray<Statement> caseBodies = elem.getBody();
-            for (Statement body : caseBodies) {
-                if (body instanceof StatementBlock) {
-                    result.add((StatementBlock) body);
+            if (caseBodies != null) {
+                for (Statement body : caseBodies) {
+                    if (body instanceof StatementBlock) {
+                        result.add((StatementBlock) body);
+                    }
                 }
             }
 

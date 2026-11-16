@@ -10,6 +10,9 @@ import javax.swing.JCheckBoxMenuItem;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ToggleConfirmExitAction extends MainWindowAction {
 
     /**
@@ -17,6 +20,11 @@ public class ToggleConfirmExitAction extends MainWindowAction {
      */
     private static final long serialVersionUID = 3453843972242689758L;
 
+    /**
+     * The action-configuration setters are called on {@code this} while the receiver is still
+     * under initialization (EISOP initialization check); safe here, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ToggleConfirmExitAction(MainWindow mainWindow) {
         super(mainWindow);
         setTooltip("Ask for extra confirmation when trying to exit the prover");

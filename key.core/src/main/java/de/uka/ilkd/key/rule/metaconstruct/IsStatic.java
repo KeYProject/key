@@ -12,6 +12,8 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Creates a true or false literal if the given program element is or is not a static variable
  * reference.
@@ -19,6 +21,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author N/A
  */
 @TransformerMeta(name = "#isstatic")
+@NullMarked
 public class IsStatic extends ProgramTransformer {
 
     /**

@@ -17,20 +17,35 @@ import javax.swing.event.AncestorListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.CopyToClipboardAction;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Central part of MainWindow. Its main purpose is to serve as container for SequentView instances.
  *
  * @author Kai Wallisch
  */
+@NullMarked
 public final class MainFrame extends JPanel {
 
     private static final long serialVersionUID = -2412537422601138379L;
 
     private final JScrollPane scrollPane = new JScrollPane();
-    private SequentView sequentView;
+    private @Nullable SequentView sequentView;
     private boolean showTacletInfo = false;
 
-    public void setSequentView(SequentView component) {
+    /**
+     * Sets the sequent view displayed in this frame.
+     *
+     * @param component the view to display, or {@code null} to clear the frame.
+     *
+     *        <p>
+     *        Clearing the frame passes {@code null} to {@link JScrollPane#setViewportView},
+     *        which clears the viewport at run time; the JDK declares a non-null argument, so
+     *        the deliberate {@code null} is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    public void setSequentView(@Nullable SequentView component) {
         SequentView oldSequentView = sequentView;
         sequentView = component;
         if (component != null) {
@@ -40,7 +55,8 @@ public final class MainFrame extends JPanel {
 
             setShowTacletInfo(showTacletInfo);
         } else {
-            scrollPane.setViewportView(component);
+            // passing null clears the viewport, which renders an empty scroll pane
+            scrollPane.setViewportView((Component) null);
         }
 
         if (oldSequentView != null) {
@@ -114,7 +130,7 @@ public final class MainFrame extends JPanel {
         scrollPane.getVerticalScrollBar().setValue(y);
     }
 
-    public SequentView getSequentView() {
+    public @Nullable SequentView getSequentView() {
         return sequentView;
     }
 }

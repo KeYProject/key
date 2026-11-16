@@ -6,6 +6,8 @@ package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Interface for prefix checkers. Each checker is called on initialisation, on every operator of the
@@ -13,6 +15,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  *
  * @author christoph
  */
+@NullMarked
 interface Checker {
 
     /**

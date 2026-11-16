@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * A {@link TeeReader} writes everything it reads to a separated writer.
@@ -16,6 +17,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (10/3/21)
  */
+@NullMarked
 public class TeeReader extends Reader {
 
     private final @NonNull Reader source;

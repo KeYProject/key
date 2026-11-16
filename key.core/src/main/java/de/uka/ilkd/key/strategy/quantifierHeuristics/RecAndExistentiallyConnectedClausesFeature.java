@@ -12,11 +12,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Binary Term Feature return zero if root is a CNF quantifier formula with several clauses. And all
  * the clause are CS-Related.
  */
+@NullMarked
 public class RecAndExistentiallyConnectedClausesFeature extends BinaryTermFeature {
     public static final TermFeature INSTANCE = new RecAndExistentiallyConnectedClausesFeature();
 

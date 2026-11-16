@@ -31,6 +31,8 @@ public class Z3Test extends SMTSolverTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(Z3Test.class);
     private static final String SOLVER_NAME = "Z3";
 
+    // orElse(null): the registry always contains this solver type
+    @SuppressWarnings("NullAway")
     private static final SolverType Z3_SOLVER = SolverTypes.getSolverTypes().stream()
             .filter(it -> it.getClass().equals(SolverTypeImplementation.class)
                     && it.getName().equals(SOLVER_NAME))

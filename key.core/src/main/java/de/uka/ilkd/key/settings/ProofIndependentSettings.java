@@ -12,6 +12,8 @@ import java.util.*;
 
 import de.uka.ilkd.key.pp.NotationInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,14 +25,17 @@ import org.slf4j.LoggerFactory;
  *
  * @see Settings
  */
+@NullMarked
 public class ProofIndependentSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(ProofIndependentSettings.class);
 
     public static final ProofIndependentSettings DEFAULT_INSTANCE;
 
     static {
-        var write = PathConfig.currentPaths.proofIndependentSettings;
-        var read = PathConfig.previousPaths.proofIndependentSettings;
+        var write = Objects.requireNonNull(PathConfig.currentPaths,
+            "KeY paths are not initialized").proofIndependentSettings;
+        var read = Objects.requireNonNull(PathConfig.previousPaths,
+            "KeY paths are not initialized").proofIndependentSettings;
 
         if (Files.exists(write)) {
             read = write;
@@ -38,8 +43,13 @@ public class ProofIndependentSettings {
 
         // change to props file, if json file does not exists
         if (!Files.exists(read)) {
-            read = read.getParent()
-                    .resolve(read.getFileName().toString().replace(".json", ".props"));
+            // the file name is guaranteed present: a root path has no parent, so the
+            // requireNonNull below would throw first; fall back to the (non-null) path itself
+            var settingsFileName = read.getFileName();
+            read = Objects.requireNonNull(read.getParent(),
+                "settings file has no parent directory").resolve(
+                    (settingsFileName != null ? settingsFileName : read).toString()
+                            .replace(".json", ".props"));
         }
 
         // read from the old/new place
@@ -59,15 +69,29 @@ public class ProofIndependentSettings {
     private final FeatureSettings featureSettings = new FeatureSettings();
     private final StrategyPresetsSettings strategyPresetsSettings = new StrategyPresetsSettings();
 
-    private File filename;
+    // always overwritten before any use (in the ProofIndependentSettings(File)
+    // constructor or the static initializer), so the default value is never observed
+    private File filename = new File("");
 
 
     private final List<Settings> settings = new LinkedList<>();
 
+    /**
+     * The listener lambda calls {@link #saveSettings()} on {@code this} while the receiver is
+     * still being constructed (EISOP initialization check); safe here because the listener only
+     * fires on later property-change events, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private final PropertyChangeListener settingsListener = e -> saveSettings();
-    private Properties lastReadProperties;
-    private Configuration lastReadConfiguration;
+    private @Nullable Properties lastReadProperties;
+    private @Nullable Configuration lastReadConfiguration;
 
+    /**
+     * The settings registrations operate on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here because each settings object is
+     * fully constructed before registration, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private ProofIndependentSettings() {
         addSettings(smtSettings);
         addSettings(lemmaGeneratorSettings);
@@ -77,6 +101,12 @@ public class ProofIndependentSettings {
         addSettings(strategyPresetsSettings);
     }
 
+    /**
+     * The settings persistence is reloaded while the receiver is still under initialization
+     * (EISOP initialization check); the registered settings objects are all complete, so the
+     * difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private ProofIndependentSettings(File filename) {
         this();
         this.filename = filename;
@@ -122,13 +152,22 @@ public class ProofIndependentSettings {
                 lastReadProperties = properties;
             }
         } else {
-            this.lastReadConfiguration = Configuration.load(file.toPath());
+            Configuration config = Configuration.load(file.toPath());
+            this.lastReadConfiguration = config;
             for (Settings settings : settings) {
-                settings.readSettings(lastReadConfiguration);
+                settings.readSettings(config);
             }
         }
     }
 
+    /**
+     * Writes the properties and configuration of all registered settings to the settings file.
+     * <p>
+     * The settings file is created at its configured location, whose parent directory always
+     * exists by then; the dereferences of the (nullable) parent of the filename are suppressed
+     * with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void saveSettings() {
         if (!filename.getName().endsWith(".json")) {
             Properties result = lastReadProperties == null

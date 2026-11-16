@@ -6,10 +6,12 @@ package de.uka.ilkd.key.settings;
 
 import java.util.*;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+@NullMarked
 public class GeneralSettings extends AbstractSettings {
     private static final Logger LOGGER = LoggerFactory.getLogger(GeneralSettings.class);
 

@@ -12,12 +12,15 @@ import de.uka.ilkd.key.rule.Taclet;
 import org.key_project.prover.rules.ApplicationRestriction;
 import org.key_project.prover.rules.TacletApplPart;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Due to the immutability of {@link Taclet}s, they are created in the parsers using
  * {@link TacletBuilder}s. This builder is used for {@link NoFindTaclet} rules. Besides this some
  * tests are performed that avoid some common errors on applicability of taclets.
  */
+@NullMarked
 public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
 
 
@@ -82,7 +85,14 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
         return getNoFindTaclet();
     }
 
+    /**
+     * {@code attrs.trigger()} is {@code null} for builders without a trigger; this is a legitimate
+     * state {@link org.key_project.prover.rules.TacletAttributes} preserves and tolerates
+     * downstream. {@link TacletBuilder#setTrigger} is {@code @NonNull}-typed, so the assignment is
+     * suppressed.
+     */
     @Override
+    @SuppressWarnings({ "NullAway", "nullness:argument.type.incompatible" })
     public NoFindTacletBuilder copy() {
         var rb = new NoFindTacletBuilder();
         rb.setAnnotations(tacletAnnotations);

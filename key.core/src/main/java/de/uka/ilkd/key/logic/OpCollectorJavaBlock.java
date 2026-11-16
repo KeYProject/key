@@ -12,12 +12,15 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 
 import org.key_project.logic.Term;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Extended {@link OpCollector} that also descends into Java blocks
  * and collects all {@link LocationVariable} there.
  *
  * @author Arne Keller
  */
+@NullMarked
 public class OpCollectorJavaBlock extends OpCollector {
     @Override
     public void visit(Term t) {

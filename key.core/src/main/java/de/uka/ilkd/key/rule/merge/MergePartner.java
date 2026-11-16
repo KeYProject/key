@@ -8,6 +8,8 @@ import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A {@link MergePartner} consists of a {@link Goal} and a {@link PosInOccurrence}; the
  * {@link PosInOccurrence} part indicates the portion of the sequent in the {@link Goal} which
@@ -15,6 +17,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class MergePartner {
     private Goal goal;
     private PosInOccurrence pio;

@@ -8,9 +8,12 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopApplyHeadBuiltInRuleApp;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Interactive completion for {@link LoopApplyHeadBuiltInRuleApp}.
  */
+@NullMarked
 public class LoopApplyHeadCompletion implements InteractiveRuleApplicationCompletion {
 
     LoopApplyHeadCompletion(MainWindow mainWindow) {}

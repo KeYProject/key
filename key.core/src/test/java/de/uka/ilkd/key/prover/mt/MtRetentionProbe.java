@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -81,7 +82,8 @@ public class MtRetentionProbe {
             KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
             Proof proof = null;
             try {
-                proof = env.getLoadedProof();
+                proof = Objects.requireNonNull(
+                    env.getLoadedProof(), "the proof must have been loaded");
                 ProofStarter starter = new ProofStarter(false);
                 starter.init(proof);
                 starter.start();

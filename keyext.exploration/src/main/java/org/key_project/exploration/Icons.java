@@ -9,12 +9,15 @@ import javax.swing.*;
 
 import de.uka.ilkd.key.gui.fonticons.*;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Icons of the Exploration Extension
  *
  * @author Alexander Weigl
  * @version 1 (22.07.19)
  */
+@NullMarked
 public class Icons {
     public static final IconFontProvider WARNING =
         new IconFontProvider(MaterialDesignRegular.WARNING, Color.yellow);

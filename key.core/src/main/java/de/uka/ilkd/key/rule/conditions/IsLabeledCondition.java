@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.statement.JavaStatement;
@@ -19,12 +20,16 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Checks whether the given statement is labeled, i.e., actual a LabeledStatement. This information
  * is obtained from the program prefix.
  *
  * @author Dominic Steinhoefel
  */
+@NullMarked
 public class IsLabeledCondition implements VariableCondition {
     private final boolean negated;
     private final ProgramSV stmtSV;
@@ -35,7 +40,8 @@ public class IsLabeledCondition implements VariableCondition {
     }
 
     @Override
-    public MatchResultInfo check(SchemaVariable sv, SyntaxElement instCandidate,
+    public @Nullable MatchResultInfo check(@Nullable SchemaVariable sv,
+            @Nullable SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices services) {
         final var svInst =
             (SVInstantiations) matchCond.getInstantiations();
@@ -44,7 +50,8 @@ public class IsLabeledCondition implements VariableCondition {
 
         final ArrayList<ProgramElement> labels = new ArrayList<>();
         ProgramPrefix prefix = //
-            (ProgramPrefix) svInst.getContextInstantiation().program();
+            (ProgramPrefix) Objects.requireNonNull(svInst.getContextInstantiation(),
+                "no context instantiation").program();
         do {
             if (prefix instanceof LabeledStatement
                     && ((LabeledStatement) prefix).getBody().equals(stmt)) {

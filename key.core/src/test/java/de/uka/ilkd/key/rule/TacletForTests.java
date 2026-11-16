@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.JavaService;
@@ -33,6 +34,7 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.proof.io.RuleSource.ldtFile;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -52,13 +54,14 @@ public class TacletForTests {
     public static AbbrevMap scm = new AbbrevMap();
 
     public static NamespaceSet nss = new NamespaceSet();
-    public static TacletIndex rules = null;
-    public static Services services;
-    public static InitConfig initConfig;
-    public static Path lastFile = null;
+    // lazily set by parse() and reset by clear(); null until then
+    public static @Nullable TacletIndex rules = null;
+    public static @Nullable Services services;
+    public static @Nullable InitConfig initConfig;
+    public static @Nullable Path lastFile = null;
 
-    private static Namespace<QuantifiableVariable> variables = null;
-    private static Namespace<SchemaVariable> schemaVariables;
+    private static @Nullable Namespace<QuantifiableVariable> variables = null;
+    private static @Nullable Namespace<SchemaVariable> schemaVariables;
 
     public static final Profile profile = new JavaProfile() {
         // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
@@ -103,14 +106,15 @@ public class TacletForTests {
         if (initConfig == null) {
             parse();
         }
-        return initConfig.deepCopy();
+        return Objects.requireNonNull(initConfig, "the init config must have been parsed")
+                .deepCopy();
     }
 
     public static Services services() {
         if (services == null) {
             parse();
         }
-        return services.copy(false);
+        return Objects.requireNonNull(services, "the services must have been parsed").copy(false);
     }
 
 
@@ -126,7 +130,7 @@ public class TacletForTests {
         standardFile = filename;
     }
 
-    public static ProofAggregate problems() {
+    public static @Nullable ProofAggregate problems() {
         return null;
     }
 
@@ -139,7 +143,11 @@ public class TacletForTests {
     }
 
     public static NoPosTacletApp getTaclet(String name) {
-        return rules.lookup(new Name(name));
+        var result =
+            Objects.requireNonNull(rules, "the taclets must have been parsed")
+                    .lookup(new Name(name));
+        assertNotNull(result, "Failed to find taclet " + name);
+        return result;
     }
 
     public static AbbrevMap getAbbrevs() {
@@ -151,7 +159,7 @@ public class TacletForTests {
     }
 
     public static TacletIndex getRules() {
-        return rules;
+        return Objects.requireNonNull(rules, "the taclets must have been parsed");
     }
 
     @NonNull
@@ -171,11 +179,12 @@ public class TacletForTests {
 
 
     public static Namespace<QuantifiableVariable> getVariables() {
-        return variables;
+        return Objects.requireNonNull(variables, "the variables must have been parsed");
     }
 
     public static Namespace<SchemaVariable> getSchemaVariables() {
-        return schemaVariables;
+        return Objects.requireNonNull(schemaVariables,
+            "the schema variables must have been parsed");
     }
 
     public static Namespace<IProgramVariable> getProgramVariables() {
@@ -187,17 +196,22 @@ public class TacletForTests {
     }
 
     public static Function funcLookup(String name) {
-        return getFunctions().lookup(new Name(name));
+        return Objects.requireNonNull(getFunctions().lookup(new Name(name)), "function " + name);
     }
 
     public static SchemaVariable svLookup(String name) {
-        return getSchemaVariables().lookup(new Name(name));
+        return Objects
+                .requireNonNull(getSchemaVariables().lookup(new Name(name)), "schema variable "
+                    + name);
     }
 
     public static Sort sortLookup(String name) {
-        return getSorts().lookup(new Name(name));
+        return Objects.requireNonNull(getSorts().lookup(new Name(name)), "sort " + name);
     }
 
+    // an empty term string yields null (no caller passes one) and the return after fail() is
+    // unreachable; the @NonNull return type is kept so the ~130 call sites stay unaffected
+    @SuppressWarnings("NullAway")
     public static JTerm parseTerm(String termstr, Services services, NamespaceSet nss) {
         if (termstr.isEmpty()) {
             return null;
@@ -214,6 +228,7 @@ public class TacletForTests {
 
     }
 
+    @SuppressWarnings("NullAway") // see parseTerm(String, Services, NamespaceSet)
     public static JTerm parseTerm(String termstr, Services services) {
         if (termstr.isEmpty()) {
             return null;
@@ -230,6 +245,7 @@ public class TacletForTests {
 
     }
 
+    @SuppressWarnings("NullAway") // see parseTerm(String, Services, NamespaceSet)
     public static JTerm parseTerm(String termstr, NamespaceSet set) {
         if (termstr.isEmpty()) {
             return null;

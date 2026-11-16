@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
@@ -16,11 +18,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Ordering used to sort the clauses in a quantified formula. This ordering should only be applied
  * if at least one of the two clauses contains more than one literal (otherwise, use
  * <code>LiteralsSmallerThanFeature</code>).
  */
+@NullMarked
 public class ClausesSmallerThanFeature extends SmallerThanFeature {
 
     private final ProjectionToTerm<Goal> left, right;
@@ -49,9 +54,9 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
         final ClauseCollector m1 = new ClauseCollector();
-        m1.collect(leftTerm);
+        m1.collect(Objects.requireNonNull(leftTerm));
         final ClauseCollector m2 = new ClauseCollector();
-        m2.collect(rightTerm);
+        m2.collect(Objects.requireNonNull(rightTerm));
 
         return lessThan(m1.getResult(), m2.getResult(), pos, goal);
     }

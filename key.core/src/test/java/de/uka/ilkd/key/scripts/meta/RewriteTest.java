@@ -7,6 +7,7 @@ package de.uka.ilkd.key.scripts.meta;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -42,7 +43,7 @@ public class RewriteTest {
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
         assertNotNull(env);
 
-        Proof p = env.getLoadedProof();
+        Proof p = Objects.requireNonNull(env.getLoadedProof(), "no proof loaded");
         ProofScriptEngine engine = new ProofScriptEngine(p);
         engine.execute(env.getUi(), script);
 
@@ -69,7 +70,7 @@ public class RewriteTest {
         assumeTrue(Files.exists(keyFile), "Required KeY file not found: " + keyFile);
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(keyFile);
-        Proof proof = env.getLoadedProof();
+        Proof proof = Objects.requireNonNull(env.getLoadedProof(), "no proof loaded");
         ProofScriptEngine engine = new ProofScriptEngine(proof);
         engine.execute(env.getUi(), script);
 

@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -17,11 +19,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This feature checks that an equation is not applied to itself. This means that the focus of the
  * rule application must not be one side of an equation that is the instantiation of the first
  * if-formula. If the rule application is admissible, zero is returned.
  */
+@NullMarked
 @StableCost
 public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
@@ -33,7 +38,8 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
     protected boolean filter(TacletApp p_app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Need to know the position of " + "the application of the taclet";
 
-        AssumesFormulaInstantiation ifInst = p_app.assumesFormulaInstantiations().head();
+        AssumesFormulaInstantiation ifInst =
+            Objects.requireNonNull(p_app.assumesFormulaInstantiations()).head();
 
         assert ifInst != null : "Need to know the equation the taclet is used with";
 
@@ -58,14 +64,14 @@ public class CheckApplyEqFeature extends BinaryTacletAppFeature {
         it.next();
 
         // leading updates are not interesting
-        while (it.getSubTerm().op() instanceof UpdateApplication) {
+        while (Objects.requireNonNull(it.getSubTerm()).op() instanceof UpdateApplication) {
             if (!it.hasNext()) {
                 return true;
             }
             it.next();
         }
 
-        if (!(it.getSubTerm().op() instanceof Equality) || !it.hasNext()) {
+        if (!(Objects.requireNonNull(it.getSubTerm()).op() instanceof Equality) || !it.hasNext()) {
             return true;
         }
 

@@ -17,12 +17,14 @@ import ch.qos.logback.classic.spi.LoggerContextListener;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.spi.LifeCycle;
+import org.jspecify.annotations.NullMarked;
 
 /// This class provides the `LOG_DIR` [de.uka.ilkd.key.settings.PathConfig.KeyPaths#logDirectory] to
 /// the
 /// `logback.xml` configuration.
 ///
 /// @author weigl
+@NullMarked
 public class LoggerStartupListener extends ContextAwareBase
         implements LoggerContextListener, LifeCycle {
     private boolean started = false;
@@ -31,9 +33,14 @@ public class LoggerStartupListener extends ContextAwareBase
     public void start() {
         if (started)
             return;
+        PathConfig.KeyPaths currentPaths = PathConfig.currentPaths;
+        if (currentPaths == null) {
+            // the log directory is only defined once the configuration paths are known
+            throw new NullPointerException("No configuration paths available.");
+        }
         Context context = getContext();
         context.putProperty("LOG_DIR",
-            PathConfig.currentPaths.logDirectory.toAbsolutePath().toString());
+            currentPaths.logDirectory.toAbsolutePath().toString());
         started = true;
     }
 

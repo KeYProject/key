@@ -23,6 +23,7 @@ import org.key_project.util.collection.Pair;
 
 import org.antlr.v4.runtime.CharStream;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -36,6 +37,7 @@ import org.jspecify.annotations.Nullable;
  * @author Alexander Weigl
  * @version 1 (03.04.23)
  */
+@NullMarked
 public class Configuration {
     private final Map<String, Object> data;
     private final Map<String, ConfigurationMeta> meta = new HashMap<>();
@@ -118,7 +120,7 @@ public class Configuration {
 
     public <T> @NonNull T get(String name, Class<T> clazz, @NonNull T defaultValue) {
         if (exists(name, defaultValue.getClass()))
-            return clazz.cast(data.get(name));
+            return Objects.requireNonNull(clazz.cast(data.get(name)));
         else
             return defaultValue;
     }
@@ -163,7 +165,8 @@ public class Configuration {
      * @throws NullPointerException if no such value entry exists
      */
     public long getLong(String name) {
-        return get(name, Long.class);
+        return Objects.requireNonNull(get(name, Long.class),
+            "No entry in configuration: " + name);
     }
 
     /**
@@ -207,7 +210,8 @@ public class Configuration {
      * @throws NullPointerException if no such value entry exists
      */
     public double getDouble(String name) {
-        return get(name, Double.class);
+        return Objects.requireNonNull(get(name, Double.class),
+            "No entry in configuration: " + name);
     }
 
     /**
@@ -236,8 +240,7 @@ public class Configuration {
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link Configuration}
      */
-    @Nullable
-    public Configuration getTable(String name) {
+    public @Nullable Configuration getTable(String name) {
         return get(name, Configuration.class);
     }
 
@@ -247,8 +250,7 @@ public class Configuration {
      * @param name property name
      * @throws ClassCastException if the entry is not a {@link List}
      */
-    @Nullable
-    public List<Object> getList(String name) {
+    public @Nullable List<Object> getList(String name) {
         return getList(name, Object.class);
     }
 
@@ -304,8 +306,7 @@ public class Configuration {
      * @param defaultValue a default value
      * @throws ClassCastException if the given entry has non-string elements
      */
-    @NonNull
-    public String[] getStringArray(String name, @NonNull String[] defaultValue) {
+    public @NonNull String[] getStringArray(String name, @NonNull String[] defaultValue) {
         if (exists(name)) {
             return getStringList(name).toArray(String[]::new);
         } else
@@ -342,16 +343,14 @@ public class Configuration {
     /**
      * Returns the meta data corresponding to the given entry.
      */
-    @Nullable
-    public ConfigurationMeta getMeta(String name) {
+    public @Nullable ConfigurationMeta getMeta(String name) {
         return meta.get(name);
     }
 
     /**
      * Returns the meta data corresponding to the given entry, creates the entry if not existing.
      */
-    @NonNull
-    private ConfigurationMeta getOrCreateMeta(String name) {
+    private @NonNull ConfigurationMeta getOrCreateMeta(String name) {
         return Objects.requireNonNull(meta.putIfAbsent(name, new ConfigurationMeta()));
     }
 
@@ -363,16 +362,24 @@ public class Configuration {
     }
 
     public Configuration getOrCreateSection(String name) {
-        return getSection(name, true);
+        return Objects.requireNonNull(getSection(name, true),
+            "Could not create configuration section: " + name);
     }
 
-    public Configuration getSection(String name, boolean createIfNotExists) {
+    public @Nullable Configuration getSection(String name, boolean createIfNotExists) {
         if (!exists(name) && createIfNotExists) {
             set(name, new Configuration());
         }
         return getSection(name);
     }
 
+    /**
+     * The value may legitimately be {@code null}: this public API deliberately accepts an absent
+     * value which is stored as {@code null} in the backing map, and the typed accessors treat a
+     * {@code null} value like a missing entry. The map's value type stays non-null for those
+     * accessors, hence the scoped suppression on the {@link Map#put} call.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public @Nullable Object set(String name, @Nullable Object obj) {
         return data.put(name, obj);
     }
@@ -409,6 +416,11 @@ public class Configuration {
         return set(name, (Object) Arrays.asList(seq));
     }
 
+    /**
+     * The map view carries {@code @KeyFor} annotations on its keys which the declared return
+     * type does not; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public Set<Map.Entry<String, Object>> getEntries() {
         return data.entrySet();
     }
@@ -454,6 +466,11 @@ public class Configuration {
     }
 
     /// Returns the set of known keys
+    /**
+     * The key view carries {@code @KeyFor} annotations on its elements which the declared return
+     * type does not; the difference is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:return.type.incompatible")
     public Set<String> keys() {
         return this.data.keySet();
     }
@@ -464,12 +481,12 @@ public class Configuration {
      */
     public static class ConfigurationMeta {
         /** Position of declaration within a file */
-        private Position position;
+        private @Nullable Position position;
 
         /** documentation given in the file */
-        private String documentation;
+        private @Nullable String documentation;
 
-        public Position getPosition() {
+        public @Nullable Position getPosition() {
             return position;
         }
 
@@ -477,7 +494,7 @@ public class Configuration {
             this.position = position;
         }
 
-        public String getDocumentation() {
+        public @Nullable String getDocumentation() {
             return documentation;
         }
 
@@ -516,7 +533,7 @@ public class Configuration {
             return this;
         }
 
-        private ConfigurationWriter printKeyValue(String key, Object value) {
+        private ConfigurationWriter printKeyValue(String key, @Nullable Object value) {
             return printKey(key).printValue(value);
         }
 
@@ -525,7 +542,11 @@ public class Configuration {
             return this;
         }
 
-        public ConfigurationWriter printValue(Object value) {
+        /**
+         * A {@code null} value is serialized as the literal {@code "null"}, see the final branch; a
+         * map entry or collection element may legitimately be absent.
+         */
+        public ConfigurationWriter printValue(@Nullable Object value) {
             if (value instanceof String) {
                 // TODO What about '"' inside value?
                 out.format("\"%s\"", value);
@@ -557,7 +578,7 @@ public class Configuration {
             for (Iterator<? extends Map.Entry<?, ?>> iterator =
                 value.entrySet().iterator(); iterator.hasNext();) {
                 Map.Entry<?, ?> entry = iterator.next();
-                String k = entry.getKey().toString();
+                String k = String.valueOf(entry.getKey());
                 Object v = entry.getValue();
                 printKeyValue(k, v);
                 if (iterator.hasNext()) {
@@ -609,7 +630,7 @@ public class Configuration {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o)
             return true;
         if (!(o instanceof Configuration that))

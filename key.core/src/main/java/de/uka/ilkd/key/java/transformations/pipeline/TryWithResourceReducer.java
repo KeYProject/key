@@ -16,6 +16,7 @@ import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.type.ClassOrInterfaceType;
 import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
+import org.jspecify.annotations.NullMarked;
 
 /// Rewrites every try-with-resources statement into the equivalent nested
 /// try/finally form that javac itself generates, i.e. for
@@ -51,6 +52,7 @@ import com.github.javaparser.ast.visitor.Visitable;
 /// javac does it.
 ///
 /// @author weigl, Claude Sonnet
+@NullMarked
 public class TryWithResourceReducer implements JavaTransformer {
     private final AtomicInteger counter = new AtomicInteger();
 

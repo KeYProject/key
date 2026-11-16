@@ -24,30 +24,37 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.parsing.Position;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
  * Statement block. taken from COMPOST and changed to achieve an immutable structure
  */
+@NullMarked
 public class StatementBlock extends JavaStatement implements StatementContainer,
         TypeDeclarationContainer, VariableScope, TypeScope, ProgramPrefix {
 
     /**
      * Body.
      */
-    @NonNull
     private final ImmutableArray<? extends Statement> body;
 
     private final int prefixLength;
 
-    @Nullable
-    private final MethodFrame innerMostMethodFrame;
+    private @Nullable MethodFrame innerMostMethodFrame;
     private final ImmutableList<TextualJMLConstruct> attachedJML;
 
+    /**
+     * Constructs a statement block with the given body and attached JML constructs.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public StatementBlock(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<? extends Statement> body,
+            ImmutableArray<? extends Statement> body,
             ImmutableList<TextualJMLConstruct> attachedJML) {
         super(pi, comments);
         this.body = body;
@@ -67,10 +74,15 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
 
     /**
      * Statement block.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
      *
      * @param children
      *        an ExtList that contains the children
      */
+    @SuppressWarnings("nullness:argument.type.incompatible")
     public StatementBlock(ExtList children) {
         super(children);
         body = new ImmutableArray<>(children.collect(Statement.class));
@@ -81,8 +93,16 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             ImmutableList.fromList(Arrays.asList(children.collect(TextualJMLConstruct.class)));
     }
 
-    public StatementBlock(@NonNull ImmutableArray<? extends Statement> as) {
-        super((PositionInfo) null, null);
+    /**
+     * Constructs a statement block over the given (deeply non-null) body.
+     * <p>
+     * The {@code computeEssentials(this)} call hands the partially constructed instance to a
+     * read-only utility that traverses the prefix chain without retaining it; the EISOP
+     * initialization check treats this as a {@code this}-escape and is suppressed scoped.
+     */
+    @SuppressWarnings("nullness:argument.type.incompatible")
+    public StatementBlock(ImmutableArray<? extends Statement> as) {
+        super(PositionInfo.UNDEFINED, List.of());
         // check for non-null elements (bug fix)
         Debug.assertDeepNonNull(as, "statement block contructor");
         body = as;
@@ -112,7 +132,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         }
@@ -163,7 +183,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      *
      * @return the statement array wrapper.
      */
-    @NonNull
     public ImmutableArray<? extends Statement> getBody() {
         return body;
     }
@@ -272,7 +291,6 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
 
-    @NonNull
     public SourceElement getFirstElement() {
         if (isEmpty()) {
             return this;
@@ -314,9 +332,8 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         return prefixLength;
     }
 
-    @Nullable
     @Override
-    public MethodFrame getInnerMostMethodFrame() {
+    public @Nullable MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;
     }
 

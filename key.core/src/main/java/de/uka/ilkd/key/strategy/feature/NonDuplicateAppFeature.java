@@ -11,10 +11,13 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Binary feature that returns zero iff a certain Taclet app has not already been performed
  */
+@NullMarked
 public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppFeature();

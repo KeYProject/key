@@ -7,7 +7,6 @@ package de.uka.ilkd.key.wd;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
@@ -26,6 +25,7 @@ import org.key_project.logic.Choice;
 import org.key_project.logic.Name;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author Alexander Weigl
  * @version 1 (7/27/25)
  */
+@NullMarked
 public class WdProfile extends JavaProfile {
     private static final Logger LOGGER = LoggerFactory.getLogger(WdProfile.class);
 
@@ -45,6 +46,12 @@ public class WdProfile extends JavaProfile {
 
     private final RuleCollection wdStandardRules;
 
+    /**
+     * The call to {@code super.getStandardRules()} happens while {@code this} is still under
+     * construction; safe here since the method is resolved non-virtually, suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public WdProfile() {
         super();
 
@@ -52,10 +59,12 @@ public class WdProfile extends JavaProfile {
 
         final URL wdDotKey =
             KeYResourceManager.getManager().getResourceFile(Proof.class, "rules/wd.key");
+        if (wdDotKey == null) {
+            throw new NullPointerException(
+                "Could not find rule file 'rules/wd.key' in classpath");
+        }
 
-        RuleSource tacletBaseWd = RuleSourceFactory.initRuleFile(
-            Objects.requireNonNull(wdDotKey,
-                "Could not find rule file 'rules/wd.key' in classpath"));
+        RuleSource tacletBaseWd = RuleSourceFactory.initRuleFile(wdDotKey);
 
         wdStandardRules = new RuleCollection(defRules.getTacletBase()
                 .append(tacletBaseWd),
@@ -132,6 +141,10 @@ public class WdProfile extends JavaProfile {
                 "wdChecks:off was set by in the init config, probably given in KeY file. This setting will be ignored";
             warnings.add(message);
             LOGGER.warn(message); // this logging is for finding the spot.
+        }
+        if (wdChoiceOn == null) {
+            throw new NullPointerException(
+                "No choice 'wdChecks:on' in the profile's choice namespace.");
         }
         baseConfig.activateChoice(wdChoiceOn);
 

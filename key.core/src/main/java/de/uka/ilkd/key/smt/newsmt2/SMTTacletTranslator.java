@@ -22,11 +22,14 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class uses the existing taclet translation technology to translate taclets to smt axioms.
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class SMTTacletTranslator {
 
     private final SkeletonGenerator tacletTranslator = new DefaultTacletTranslator() {
@@ -67,7 +70,8 @@ public class SMTTacletTranslator {
 
         JTerm[] subs = { smt };
         ImmutableArray<QuantifiableVariable> bvars = new ImmutableArray<>(variables.values());
-        return services.getTermFactory().createTerm(Quantifier.ALL, subs, bvars, null);
+        return services.getTermFactory().createTerm(Quantifier.ALL, new ImmutableArray<>(subs),
+            bvars, null);
     }
 
     private JTerm variablify(JTerm term, Map<JOperatorSV, LogicVariable> variables)

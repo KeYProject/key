@@ -4,10 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui.configuration;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * An event that indicates that the users focused node or proof has changed
  */
 
+@NullMarked
 public class ConfigChangeEvent {
 
     /** the source of this event */

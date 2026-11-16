@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
+import org.jspecify.annotations.NullMarked;
+
+
 /**
  * A theory that contributes to quantifier instantiation on both counts: it selects which of its
  * subterms make a trigger, and it answers the questions the heuristic asks about terms.
@@ -12,5 +15,6 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
  * the theories of its own terms through {@link QuantifierTheorySupports}; one without a heap
  * implements {@link TheoryReasoning} alone.
  */
+@NullMarked
 public interface QuantifierTheorySupport extends TriggerSupport, TheoryReasoning {
 }

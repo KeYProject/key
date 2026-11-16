@@ -44,7 +44,10 @@ public class TestProofUserManager {
         Object secondUser = new Object();
         Object thirdUser = new Object();
         DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
+        // headless test environments that are never asked for their init config
+        @SuppressWarnings("NullAway")
         KeYEnvironment<?> firstEnv = new KeYEnvironment<>(ui, null);
+        @SuppressWarnings("NullAway")
         KeYEnvironment<?> secondEnv = new KeYEnvironment<>(ui, null);
         // Add firstProof with firstEnv
         ProofUserManager.getInstance().addUser(firstProof, firstEnv, firstUser);
@@ -149,6 +152,9 @@ public class TestProofUserManager {
      */
     @Test
     @Disabled("weigl: Unknown why it fails. Seems to be a strange GC test.")
+    // nulls are deliberately passed to exercise the user manager's null-rejection paths and
+    // its no-environment semantics
+    @SuppressWarnings("NullAway")
     public void testUserManagement_NoEnvironment() throws Exception {
         Proof firstProof = new Proof("TestProofUserManager NoEnv 1",
             new InitConfig(new Services(AbstractProfile.getDefaultProfile())));

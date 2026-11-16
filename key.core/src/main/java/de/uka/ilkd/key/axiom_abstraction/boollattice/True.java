@@ -10,11 +10,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The True element of the boolean lattice, representing exactly the boolean true.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public class True extends BooleanDomainElem {
 
     private static final True INSTANCE = new True();

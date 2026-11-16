@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -31,9 +32,12 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 /**
  * A rule for JML assert/assume statements.
@@ -59,6 +63,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author Benjamin Takacs
  */
+@NullMarked
 public final class JmlAssertRule implements BuiltInRule {
 
     /**
@@ -84,8 +89,13 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal,
-            PosInOccurrence occurrence) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence occurrence) {
+        // a {@code null} occurrence is not an occurrence at the top level of the succedent, i.e.
+        // the same outcome {@code occursNotAtTopLevelInSuccedent} computes below; making it
+        // explicit lets the flow analysis refine the occurrence for the subsequent lookups
+        if (occurrence == null) {
+            return false;
+        }
         if (AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -109,19 +119,21 @@ public final class JmlAssertRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence occurrence, TermServices services) {
-        return new JmlAssertBuiltInRuleApp(this, occurrence);
+    public IBuiltInRuleApp createApp(@Nullable PosInOccurrence occurrence, TermServices services) {
+        return new JmlAssertBuiltInRuleApp(this,
+            Objects.requireNonNull(occurrence, "rule application needs a position"));
     }
 
     @Override
-    public @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
+    public ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
             throws RuleAbortException {
         if (!(ruleApp instanceof JmlAssertBuiltInRuleApp)) {
             throw new IllegalArgumentException("can only apply JmlAssertBuiltInRuleApp");
         }
         final var services = goal.getOverlayServices();
         final TermBuilder tb = services.getTermBuilder();
-        final PosInOccurrence occurrence = ruleApp.posInOccurrence();
+        final PosInOccurrence occurrence = Objects.requireNonNull(ruleApp.posInOccurrence(),
+            "rule application needs a position");
 
         final JTerm formula = (JTerm) occurrence.subTerm();
         final JTerm update = UpdateApplication.getUpdate(formula);
@@ -136,10 +148,12 @@ public final class JmlAssertRule implements BuiltInRule {
                     .filter(JmlAssert.class::isInstance).map(JmlAssert.class::cast)
                     .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
 
-        final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
+        final MethodFrame frame = Objects.requireNonNull(
+            JavaTools.getInnermostMethodFrame(target.javaBlock(), services),
+            "no method frame for jml assert statement");
         final JTerm self = MiscTools.getSelfTerm(frame, services);
 
-        final SpecificationRepository.JmlStatementSpec spec =
+        final SpecificationRepository.@Nullable JmlStatementSpec spec =
             services.getSpecificationRepository().getStatementSpec(jmlAssert);
 
         if (spec == null) {
@@ -178,14 +192,15 @@ public final class JmlAssertRule implements BuiltInRule {
         goal.changeFormula(new SequentFormula(tb.apply(update, condition)), occurrence);
     }
 
-    private void setUpUsageGoal(Goal goal, String label, PosInOccurrence occurrence,
+    private void setUpUsageGoal(Goal goal, @Nullable String label, PosInOccurrence occurrence,
             JTerm update, JTerm target,
             JTerm condition, TermBuilder tb, Services services) {
         goal.setBranchLabel("Usage");
         final JavaBlock javaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
         final JTerm newTerm = tb.apply(update,
             tb.imp(condition,
-                tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0), null)));
+                tb.prog(((Modality) target.op()).kind(), javaBlock, target.sub(0),
+                    new ImmutableArray<>())));
 
         goal.changeFormula(new SequentFormula(newTerm), occurrence);
         if (label != null) {

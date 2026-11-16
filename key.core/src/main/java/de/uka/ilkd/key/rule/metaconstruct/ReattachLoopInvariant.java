@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -12,10 +14,13 @@ import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Construct for re-attaching a loop invariant that otherwise would get lost after a transformation,
@@ -26,6 +31,7 @@ import org.key_project.util.collection.ImmutableList;
  * @author Richard Bubel
  */
 @TransformerMeta(name = "#reattachLoopInvariant")
+@NullMarked
 public class ReattachLoopInvariant extends ProgramTransformer {
     public ReattachLoopInvariant(LoopStatement ls) {
         super("#reattachLoopInvariant", ls);
@@ -34,13 +40,15 @@ public class ReattachLoopInvariant extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        final ProgramElement context = //
-            svInst.getContextInstantiation().program();
+        final ContextStatementBlockInstantiation contextInstantiation =
+            Objects.requireNonNull(svInst.getContextInstantiation(),
+                "no context instantiation");
+        final ProgramElement context = contextInstantiation.program();
 
         if (context != null) {
             final Statement activeStmt =
                 (Statement) JavaTools.getActiveStatement(JavaBlock.createJavaBlock(
-                    (StatementBlock) svInst.getContextInstantiation().program()));
+                    (StatementBlock) contextInstantiation.program()));
             assert activeStmt instanceof LoopStatement;
 
             final LoopStatement loop = (LoopStatement) activeStmt;

@@ -14,6 +14,9 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ViewSettings;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public final class HidePackagePrefixToggleAction extends MainWindowAction {
     public static final String NAME = "Hide Package Prefix";
 
@@ -27,9 +30,20 @@ public final class HidePackagePrefixToggleAction extends MainWindowAction {
      * <p>
      * Such changes can occur in the Eclipse context when settings are changed in for instance the
      * KeYIDE.
+     *
+     * The bound method reference binds {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since the listener only ever fires
+     * after construction completes, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:methodref.receiver.bound.invalid")
     private final PropertyChangeListener viewSettingsListener = this::handleViewSettingsChanged;
 
+    /**
+     * The action-configuration calls and the listener registration below operate on {@code this}
+     * while the receiver is still under initialization (EISOP initialization check); safe here
+     * since these configure the local action only, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public HidePackagePrefixToggleAction(MainWindow mainWindow) {
         super(mainWindow);
         setName(NAME);

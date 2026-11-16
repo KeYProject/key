@@ -14,19 +14,22 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.KeYConstants;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import picocli.CommandLine;
 
+@NullMarked
 public class LemmataAutoModeOptions {
     public static final int DEFAULT_TIMEOUT = -1;
     public static final int DEFAULT_MAXRULES = 10000;
     private static final String PROOF_POSTFIX = ".key.proof";
 
     /**
-     * The path of the file containing the rules that should be proven.
+     * The path of the file containing the rules that should be proven. May be {@code null} if
+     * {@code --jr-rules} is not given.
      */
     @CommandLine.Option(names = "--jr-rules", paramLabel = "FILE")
-    private Path pathOfRuleFile;
+    private @Nullable Path pathOfRuleFile;
 
     /**
      * The maximum number of rules that are used within a proof.
@@ -66,7 +69,6 @@ public class LemmataAutoModeOptions {
         description = "read definitions from given file")
     public @Nullable Path signature = null;
 
-
     private final Collection<String> filesForAxioms = new LinkedList<>();
 
     /**
@@ -76,9 +78,25 @@ public class LemmataAutoModeOptions {
     private final Path homePath;
 
     public LemmataAutoModeOptions() {
-        this(KeYConstants.INTERNAL_VERSION, PathConfig.currentPaths.keyConfigDir);
+        this(KeYConstants.INTERNAL_VERSION, getKeyConfigDir());
     }
 
+    private static Path getKeyConfigDir() {
+        PathConfig.KeyPaths paths = PathConfig.currentPaths;
+        if (paths == null) {
+            // PathConfig is initialized during KeY startup; a missing instance here is an
+            // inconsistent state in which the previous code crashed with an NPE
+            throw new NullPointerException("PathConfig is not initialized.");
+        }
+        return paths.keyConfigDir;
+    }
+
+    /**
+     * {@code checkForValidity()} operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); it only reads the just-assigned options
+     * fields to validate them, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public LemmataAutoModeOptions(String internalVersion, Path homePath) {
         this.internalVersion = internalVersion;
         this.homePath = homePath;
@@ -97,7 +115,7 @@ public class LemmataAutoModeOptions {
         return saveResultsToFile;
     }
 
-    public Path getPathOfRuleFile() {
+    public @Nullable Path getPathOfRuleFile() {
         return pathOfRuleFile;
     }
 
@@ -149,6 +167,5 @@ public class LemmataAutoModeOptions {
     public Collection<String> getFilesForAxioms() {
         return filesForAxioms;
     }
-
 
 }

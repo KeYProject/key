@@ -34,6 +34,9 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
 
@@ -46,6 +49,7 @@ import static org.key_project.logic.op.Function.FunctionKind.SKOLEM;
  * @see WhileInvariantRule
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
 
@@ -74,11 +78,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final LoopInvariantBuiltInRuleApp loopRuleApp = (LoopInvariantBuiltInRuleApp) ruleApp;
 
         // Get the Instantiation object
-        final Instantiation inst = instantiate(loopRuleApp, services);
+        final Instantiation inst = Objects.requireNonNull(instantiate(loopRuleApp, services),
+            "loop invariant rule application produced no instantiation");
 
         // Get necessary parts of invariant and sequent
         final Map<LocationVariable, JTerm> atPres = inst.inv.getInternalAtPres();
-        final List<LocationVariable> heapContext = ((IBuiltInRuleApp) ruleApp).getHeapContext();
+        final List<LocationVariable> heapContext = Objects.requireNonNull(
+            ((IBuiltInRuleApp) ruleApp).getHeapContext(),
+            "loop invariant rule application has no heap context");
 
         final JTerm invTerm = conjunctInv(services, inst, atPres, heapContext);
         final JTerm invFreeTerm = conjunctFreeInv(services, inst, atPres, heapContext);
@@ -129,7 +136,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio) {
         if (pio == null || !pio.isTopLevel() || pio.isInAntec() || Transformer.inTransformer(pio)) {
             return false;
         }
@@ -147,8 +154,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services) {
-        return new LoopInvariantBuiltInRuleApp(this, pos, services);
+    public IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services) {
+        return new LoopInvariantBuiltInRuleApp(this, Objects.requireNonNull(pos,
+            "rule application needs a position"), services);
     }
 
     @Override
@@ -198,15 +206,21 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             final String pvBeforeLoopName = tb.newName(pv.name() + "Before_LOOP");
             final LocationVariable pvBeforeLoop =
                 new LocationVariable(new ProgramElementName(pvBeforeLoopName),
-                    pv.getTypeReference());
+                    Objects.requireNonNull(pv.getTypeReference(),
+                        "loop variable has no type reference"));
             progVarNS.addSafely(pvBeforeLoop);
             beforeLoopUpdate =
-                tb.parallel(beforeLoopUpdate, tb.elementary(pvBeforeLoop, tb.var(pv)));
-            heapToBeforeLoop.get(services.getTypeConverter().getHeapLDT().getHeap()).put(tb.var(pv),
-                tb.var(pvBeforeLoop));
+                tb.parallel(Objects.requireNonNull(beforeLoopUpdate,
+                    "no update before loop available"),
+                    tb.elementary(pvBeforeLoop, tb.var(pv)));
+            Objects.requireNonNull(heapToBeforeLoop.get(
+                Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+                    "no heap LDT for loop invariant rule").getHeap()),
+                "no before-loop map for the default heap")
+                    .put(tb.var(pv), tb.var(pvBeforeLoop));
         }
 
-        return beforeLoopUpdate;
+        return Objects.requireNonNull(beforeLoopUpdate, "no update before loop available");
     }
 
     /**
@@ -345,7 +359,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @param t2 The second formula of the conjunction; may <em>not</em> be null.
      * @return returns {@code t2} if {@code t1} is null and {@code t1 & t2} if both aren't null.
      */
-    protected static JTerm and(TermBuilder tb, JTerm t1, JTerm t2) {
+    protected static JTerm and(TermBuilder tb, @Nullable JTerm t1, JTerm t2) {
         assert t2 != null;
         return t1 == null ? t2 : tb.and(t1, t2);
     }
@@ -362,7 +376,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * @throws RuleAbortException If the {@link LoopInvariantBuiltInRuleApp} does not contain a
      *         {@link LoopSpecification}.
      */
-    protected static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
+    protected static @Nullable Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
             Services services) throws RuleAbortException {
         // Use the instantiation cached on this (thread-confined) rule app if it is still valid,
         // i.e.
@@ -373,7 +387,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             return cached;
         }
 
-        final JTerm focusTerm = (JTerm) app.posInOccurrence().subTerm();
+        final JTerm focusTerm = (JTerm) Objects.requireNonNull(app.posInOccurrence(),
+            "rule application needs a position").subTerm();
 
         // leading update?
         final Pair<JTerm, JTerm> update = splitUpdates(focusTerm, services);
@@ -399,7 +414,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final MethodFrame innermostMethodFrame =
             JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
         if (innermostMethodFrame != null) {
-            spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
+            // getProgramMethod() is declared @Nullable, but setTarget simply forwards the method
+            // reference without dereferencing it (see speclang.LoopSpecImpl); a null program
+            // method is tolerated there, so requireNonNull would not be crash-equivalent.
+            // Widening belongs to the speclang wave, hence the scoped suppression.
+            @SuppressWarnings("NullAway")
+            final LoopSpecification retargeted =
+                spec.setTarget(innermostMethodFrame.getProgramMethod());
+            spec = retargeted;
         }
 
         final JTerm selfTerm = innermostMethodFrame == null ? null
@@ -432,7 +454,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     protected static AnonUpdateData createAnonUpdate(LocationVariable heap, JTerm modifiable,
             LoopSpecification inv, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT(),
+            "no heap LDT for loop invariant rule");
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
         final Function loopHeapFunc =
             new JFunction(loopHeapName, heapLDT.targetSort(), SKOLEM);
@@ -508,25 +531,35 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
             wellFormedAnon = and(tb, wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
 
-            final JTerm modifiable = modifiables.get(heap);
-            final JTerm freeModifiable = freeModifiables.get(heap);
+            final JTerm modifiable = Objects.requireNonNull(modifiables.get(heap),
+                "no modifiable clause for heap " + heap);
+            final JTerm freeModifiable = Objects.requireNonNull(freeModifiables.get(heap),
+                "no free modifiable clause for heap " + heap);
             final JTerm strictlyNothing = tb.strictlyNothing();
             final JTerm currentFrame;
             if (strictlyNothing.equalsModProperty(modifiable, IRRELEVANT_TERM_LABELS_PROPERTY)) {
                 if (strictlyNothing.equalsModProperty(freeModifiable,
                     IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                    currentFrame = tb.frameStrictlyEmpty(tb.var(heap), heapToBeforeLoop.get(heap));
+                    currentFrame = tb.frameStrictlyEmpty(tb.var(heap),
+                        Objects.requireNonNull(heapToBeforeLoop.get(heap),
+                            "no before-loop map for heap " + heap));
                 } else {
-                    currentFrame =
-                        tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), freeModifiable);
+                    currentFrame = tb.frame(tb.var(heap),
+                        Objects.requireNonNull(heapToBeforeLoop.get(heap),
+                            "no before-loop map for heap " + heap),
+                        freeModifiable);
                 }
             } else {
                 if (strictlyNothing.equalsModProperty(freeModifiable,
                     IRRELEVANT_TERM_LABELS_PROPERTY)) {
-                    currentFrame = tb.frame(tb.var(heap), heapToBeforeLoop.get(heap), modifiable);
+                    currentFrame = tb.frame(tb.var(heap),
+                        Objects.requireNonNull(heapToBeforeLoop.get(heap),
+                            "no before-loop map for heap " + heap),
+                        modifiable);
                 } else {
-                    currentFrame = tb.frame(
-                        tb.var(heap), heapToBeforeLoop.get(heap),
+                    currentFrame = tb.frame(tb.var(heap),
+                        Objects.requireNonNull(heapToBeforeLoop.get(heap),
+                            "no before-loop map for heap " + heap),
                         tb.union(modifiable, freeModifiable));
                 }
             }
@@ -535,8 +568,10 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             reachableState = and(tb, reachableState, tb.wellFormed(heap));
         }
 
-        return new AdditionalHeapTerms(anonUpdate, wellFormedAnon, frameCondition, reachableState,
-            anonUpdateData);
+        return new AdditionalHeapTerms(anonUpdate,
+            Objects.requireNonNull(wellFormedAnon, "no well-formedness formula"),
+            Objects.requireNonNull(frameCondition, "no frame condition"),
+            Objects.requireNonNull(reachableState, "no reachable state formula"), anonUpdateData);
     }
 
     // -------------------------------------------------------------------------
@@ -565,8 +600,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *        rule. Could be needed for the information flow validity goal.
      */
     public record Instantiation(JTerm u, JTerm progPost, While loop, LoopSpecification inv,
-            JTerm selfTerm,
-            ExecutionContext innermostExecutionContext) {
+            @Nullable JTerm selfTerm,
+            @Nullable ExecutionContext innermostExecutionContext) {
         public Instantiation {
             assert u != null;
             assert u.sort() == JavaDLTheory.UPDATE;

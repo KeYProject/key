@@ -13,12 +13,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -54,6 +56,7 @@ public class ProveSMTLemmasTest {
     }
 
     @AfterAll
+    @SuppressWarnings("NullAway") // deliberate null reset of HEADER after all tests
     public static void tearDownClass() {
         HEADER = null;
     }
@@ -75,8 +78,10 @@ public class ProveSMTLemmasTest {
 
         KeYEnvironment<DefaultUserInterfaceControl> env = KeYEnvironment.load(path);
         try {
-            Proof loadedProof = env.getLoadedProof();
-            env.getProofControl().startAndWaitForAutoMode(loadedProof);
+            Proof loadedProof = Objects.requireNonNull(env.getLoadedProof(),
+                "the proof must have been loaded");
+            Objects.requireNonNull(env.getProofControl(), "the proof control must be available")
+                    .startAndWaitForAutoMode(loadedProof);
             if (!loadedProof.closed()) {
                 var saveFile = Paths.get(path.toAbsolutePath() + ".proof");
                 ProofSaver saver = new ProofSaver(loadedProof, saveFile);
@@ -90,7 +95,9 @@ public class ProveSMTLemmasTest {
                     // and check if proofs are actually for the right theorem!
                     KeyIO io = new KeyIO(loadedProof.getServices());
                     JTerm parsedLemma = io.parseExpression(lemmaString);
-                    var actual = loadedProof.root().sequent().succedent().get(0).formula();
+                    Node actualRoot =
+                        Objects.requireNonNull(loadedProof.root(), "the proof has a root");
+                    var actual = actualRoot.sequent().succedent().get(0).formula();
                     if (!RENAMING_TERM_PROPERTY.equalsModThisProperty(actual, parsedLemma)) {
                         LOGGER.info("Stored : {}", parsedLemma);
                         LOGGER.warn("Proven : {}", actual);

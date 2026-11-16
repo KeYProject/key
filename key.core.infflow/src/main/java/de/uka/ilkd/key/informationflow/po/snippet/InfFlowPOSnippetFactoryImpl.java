@@ -17,6 +17,7 @@ import de.uka.ilkd.key.speclang.infflow.InformationFlowContract;
 
 import org.key_project.logic.TermCreationException;
 
+import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author christoph
  */
+@NullMarked
 class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
     private static final Logger LOGGER =
         LoggerFactory.getLogger(InfFlowPOSnippetFactoryImpl.class);
@@ -51,7 +53,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         this.data = new BasicSnippetData(contract, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
-        registerFactoryMethods();
+        registerFactoryMethods(this.factoryMethods);
     }
 
     InfFlowPOSnippetFactoryImpl(BlockContract contract, ProofObligationVars vars1,
@@ -59,7 +61,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         this.data = new BasicSnippetData(contract, context, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
-        registerFactoryMethods();
+        registerFactoryMethods(this.factoryMethods);
     }
 
     InfFlowPOSnippetFactoryImpl(LoopSpecification invariant, ProofObligationVars vars1,
@@ -68,7 +70,7 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         this.data = new BasicSnippetData(invariant, context, guardTerm, services);
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
-        registerFactoryMethods();
+        registerFactoryMethods(this.factoryMethods);
     }
 
     InfFlowPOSnippetFactoryImpl(BasicSnippetData d, ProofObligationVars vars1,
@@ -76,11 +78,12 @@ class InfFlowPOSnippetFactoryImpl implements InfFlowPOSnippetFactory {
         this.data = d;
         this.poVars1 = vars1.labelHeapAtPreAsAnonHeapFunc();
         this.poVars2 = vars2.labelHeapAtPreAsAnonHeapFunc();
-        registerFactoryMethods();
+        registerFactoryMethods(this.factoryMethods);
     }
 
 
-    private void registerFactoryMethods() {
+    private static void registerFactoryMethods(
+            EnumMap<Snippet, InfFlowFactoryMethod> factoryMethods) {
         try {
             for (Snippet s : Snippet.values()) {
                 InfFlowFactoryMethod fm =

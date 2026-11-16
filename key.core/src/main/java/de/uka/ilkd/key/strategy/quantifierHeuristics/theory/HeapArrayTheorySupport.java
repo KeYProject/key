@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -18,6 +19,9 @@ import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Support for the heap theory and array reads.
  *
@@ -28,6 +32,7 @@ import org.key_project.util.collection.ImmutableSet;
  * writes as candidate
  * instances for the index it reads.
  */
+@NullMarked
 final class HeapArrayTheorySupport implements QuantifierTheorySupport {
 
     /**
@@ -47,8 +52,9 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
      * @return the verdict
      */
     @Override
-    public CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+    public CandidateVerdict verdictOn(JTerm candidate, @Nullable JTerm enclosing,
+            Services services) {
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT());
         if (heapLDT.isSelectOp(candidate.op())
                 && candidate.sub(2).op() == heapLDT.getCreated()) {
             // a created read holds of every allocated object alike, so it selects nothing
@@ -108,7 +114,7 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
     @Override
     public List<JTerm> provideInstances(JTerm subterm, QuantifiableVariable variable,
             Services services) {
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT());
         // isSelectOp tests the operator directly. Do not build getSelect(subterm.sort()): that
         // constructs a select of the subterm's sort, which fails for e.g. the Null sort.
         if (!heapLDT.isSelectOp(subterm.op())) {
@@ -180,7 +186,7 @@ final class HeapArrayTheorySupport implements QuantifierTheorySupport {
         if (TriggerUtils.intersect(term.freeVars(), clauseVariables).isEmpty()) {
             return term;
         }
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final HeapLDT heapLDT = Objects.requireNonNull(services.getTypeConverter().getHeapLDT());
         final TermBuilder tb = services.getTermBuilder();
         if (heapLDT.isSelectOp(term.op()) && term.sub(0).freeVars().isEmpty()) {
             final JTerm field = freeHeaps(term.sub(2), false, clauseVariables, innerReads,

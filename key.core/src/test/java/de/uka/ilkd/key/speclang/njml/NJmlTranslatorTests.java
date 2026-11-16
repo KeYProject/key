@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
@@ -38,8 +39,10 @@ public class NJmlTranslatorTests {
     private final PreParser preParser;
 
     public NJmlTranslatorTests() {
-        JavaInfo javaInfo =
-            HelperClassForTests.parse(testFile).getFirstProof().getJavaInfo();
+        JavaInfo javaInfo = Objects
+                .requireNonNull(HelperClassForTests.parse(testFile).getFirstProof(),
+                    "the test file must contain a proof")
+                .getJavaInfo();
         Services services = javaInfo.getServices();
         services.setOriginFactory(new OriginTermLabelFactory());
         KeYJavaType testClassType = javaInfo.getKeYJavaType("testPackage.TestClass");

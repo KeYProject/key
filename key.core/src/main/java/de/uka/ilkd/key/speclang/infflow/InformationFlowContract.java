@@ -17,12 +17,16 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 
 
 /**
  * A contract about the dependencies of an observer symbol, consisting of a precondition, a depends
  * clause, and a measured-by clause.
  */
+@NullMarked
 public interface InformationFlowContract extends Contract {
 
     String getBaseName();
@@ -68,6 +72,7 @@ public interface InformationFlowContract extends Contract {
      * Returns the original measured_by clause of the contract.
      */
     @Override
+    @Nullable
     JTerm getMby();
 
 
@@ -76,6 +81,7 @@ public interface InformationFlowContract extends Contract {
      *
      * @return used exception-variable
      */
+    @Nullable
     JTerm getExc();
 
     JTerm getAtPre();
@@ -111,6 +117,7 @@ public interface InformationFlowContract extends Contract {
      *
      * @return originally used self-variable
      */
+    @Nullable
     JTerm getSelf();
 
 
@@ -135,6 +142,7 @@ public interface InformationFlowContract extends Contract {
      *
      * @return used result-variable
      */
+    @Nullable
     JTerm getResult();
 
 

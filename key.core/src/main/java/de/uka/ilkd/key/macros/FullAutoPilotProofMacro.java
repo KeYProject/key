@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.macros;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class captures a proof macro which is meant to fully automise KeY proof workflow.
  *
@@ -19,6 +21,7 @@ package de.uka.ilkd.key.macros;
  *
  * @author mattias ulbrich
  */
+@NullMarked
 public class FullAutoPilotProofMacro extends SequentialProofMacro {
 
     /**

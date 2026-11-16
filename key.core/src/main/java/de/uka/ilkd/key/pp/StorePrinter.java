@@ -10,12 +10,15 @@ import de.uka.ilkd.key.logic.JTerm;
 
 import org.key_project.logic.op.Function;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * This class is used by LogicPrinter.java to print out store-terms, i.e. terms of the following
  * form: store(heap, object, field, value)
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 class StorePrinter extends FieldPrinter {
 
     StorePrinter(Services services) {

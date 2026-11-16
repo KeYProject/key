@@ -9,6 +9,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A caret that does nothing.
  *
@@ -19,6 +21,7 @@ import javax.swing.text.JTextComponent;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public class DoNothingCaret implements Caret {
     public static final Caret INSTANCE = new DoNothingCaret();
 

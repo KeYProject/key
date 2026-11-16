@@ -8,11 +8,14 @@ import java.util.EventListener;
 
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Observes changes on a {@link TermLabelVisibilityManager}.
  *
  * @author Martin Hentschel
  */
+@NullMarked
 public interface TermLabelVisibilityManagerListener extends EventListener {
     /**
      * When the visible term labels have changed.

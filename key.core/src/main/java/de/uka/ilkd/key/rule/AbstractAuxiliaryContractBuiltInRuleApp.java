@@ -15,13 +15,16 @@ import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
 
 /**
  * Application for {@link AbstractAuxiliaryContractRule}.
  *
  * @author wacker, lanzinger
  */
+@NullMarked
 public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInRule>
         extends AbstractBuiltInRuleApp<T> {
 
@@ -47,7 +50,12 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
      * @param rule the rule being applied.
      * @param occurrence the position at which the rule is applied.
      * @param ifInstantiations if instantiations.
+     *        <p>
+     *        The execution context is supplied by the concrete application builders via
+     *        {@code setExecutionContext(...)} after construction; the difference is suppressed with
+     *        a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:initialization.fields.uninitialized" })
     protected AbstractAuxiliaryContractBuiltInRuleApp(T rule, PosInOccurrence occurrence,
             @Nullable ImmutableList<PosInOccurrence> ifInstantiations) {
         super(rule, occurrence, ifInstantiations);
@@ -65,6 +73,12 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
      *
      * @return the statement (block or loop) which the applied contract belongs to.
      */
+    /**
+     * The statement is {@code @Nullable} until {@link #setStatement(JavaStatement)} is called by
+     * the instantiating code, so the difference from the non-null result is suppressed with a
+     * scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:return.type.incompatible" })
     public JavaStatement getStatement() {
         return statement;
     }
@@ -73,7 +87,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
      *
      * @return the contract being applied.
      */
-    public abstract AuxiliaryContract getContract();
+    public abstract @Nullable AuxiliaryContract getContract();
 
 
     /**
@@ -85,7 +99,7 @@ public abstract class AbstractAuxiliaryContractBuiltInRuleApp<T extends BuiltInR
     }
 
     @Override
-    public List<LocationVariable> getHeapContext() {
+    public @Nullable List<LocationVariable> getHeapContext() {
         return heaps;
     }
 

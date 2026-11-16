@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.Field;
@@ -24,6 +25,8 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -65,7 +68,7 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
     }
 
     @Override
-    public boolean check(SchemaVariable var, SyntaxElement subst,
+    public boolean check(@Nullable SchemaVariable var, @Nullable SyntaxElement subst,
             SVInstantiations svInst, Services services) {
 
         if (var != variable)
@@ -86,7 +89,7 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
         return false;
     }
 
-    private TypeReference getFieldType(Services services, Function op) {
+    private @Nullable TypeReference getFieldType(Services services, Function op) {
         HeapLDT.SplitFieldName name = HeapLDT.trySplitFieldName(op);
 
         if (name == null)
@@ -99,7 +102,8 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
             ImmutableList<Field> fields = classDecl.getAllFields(services);
 
             return fields.stream()
-                    .filter(f -> f.getName().split("::")[1].equals(name.attributeName()))
+                    .filter(f -> Objects.requireNonNull(f.getName(), "unnamed field " + f)
+                            .split("::")[1].equals(name.attributeName()))
                     .findFirst()
                     .map(f -> f.getProgramVariable().getTypeReference())
                     .orElse(null);
@@ -108,7 +112,7 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
         return null;
     }
 
-    private boolean matchesTypeAnnots(TypeReference typeRef) {
+    private boolean matchesTypeAnnots(@Nullable TypeReference typeRef) {
         if (typeRef == null)
             return false;
 

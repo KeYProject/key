@@ -7,6 +7,7 @@ package de.uka.ilkd.key.prover.mt;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -83,7 +84,8 @@ public class ListenerSuspensionTest {
     void proofClosedIsRedeliveredToSuspendedListenersAfterTheRun() throws Exception {
         KeYEnvironment<?> env = load("prop_chain.key");
         try {
-            Proof proof = env.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             CountingTreeObserver observer = new CountingTreeObserver();
             proof.addProofTreeListener(observer);
 
@@ -105,7 +107,8 @@ public class ListenerSuspensionTest {
     void nonEssentialObserverIsSilencedWhileSuspended() throws Exception {
         KeYEnvironment<?> env = load("prop_chain.key");
         try {
-            Proof proof = env.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             CountingObserver observer = new CountingObserver();
             proof.addRuleAppListener(observer);
 
@@ -125,7 +128,8 @@ public class ListenerSuspensionTest {
     void observerIsReattachedAfterSuspensionScope() throws Exception {
         KeYEnvironment<?> env = load("prop_chain.key");
         try {
-            Proof proof = env.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             CountingObserver observer = new CountingObserver();
             proof.addRuleAppListener(observer);
 
@@ -148,7 +152,8 @@ public class ListenerSuspensionTest {
     void essentialObserverKeepsFiringWhileSuspended() throws Exception {
         KeYEnvironment<?> env = load("prop_chain.key");
         try {
-            Proof proof = env.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env.getLoadedProof(), "the proof must have been loaded");
             EssentialCountingObserver essential = new EssentialCountingObserver();
             proof.addRuleAppListener(essential);
 
@@ -170,7 +175,8 @@ public class ListenerSuspensionTest {
         ProofFingerprint baseline;
         KeYEnvironment<?> env1 = load("prop_split.key");
         try {
-            Proof proof = env1.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env1.getLoadedProof(), "the proof must have been loaded");
             try (var ignored = proof.suspendNonEssentialListeners()) {
                 runToCompletion(proof);
             }
@@ -183,7 +189,8 @@ public class ListenerSuspensionTest {
         ProofFingerprint withSuspendedObserver;
         KeYEnvironment<?> env2 = load("prop_split.key");
         try {
-            Proof proof = env2.getLoadedProof();
+            Proof proof =
+                Objects.requireNonNull(env2.getLoadedProof(), "the proof must have been loaded");
             proof.addRuleAppListener(new CountingObserver());
             try (var ignored = proof.suspendNonEssentialListeners()) {
                 runToCompletion(proof);

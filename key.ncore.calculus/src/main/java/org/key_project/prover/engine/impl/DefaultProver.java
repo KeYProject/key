@@ -97,6 +97,7 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
             final GoalChooser<Proof, Goal> goalChooser,
             final StopCondition<Goal> stopCondition) {
         assert proof != null : "@AssumeAssertion(nullness): proof cannot be null";
+        final Proof proofNonNull = Objects.requireNonNull(proof, "proof cannot be null");
         long time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
 
@@ -106,14 +107,14 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, time,
                 countApplied, srInfo);
             while (!shouldStop) {
-                if (proof.isErroneous()) {
+                if (proofNonNull.isErroneous()) {
                     // The proof is flagged as erroneous (an essential proof listener failed --
                     // possibly during the previous step of this very run): stop before applying
                     // anything further. The proof refuses new searches but stays saveable.
                     return new ApplyStrategyInfo<>(
                         "Proof search stopped: the proof is marked erroneous "
                             + "(an essential proof listener failed).",
-                        proof, null, srInfo == null ? null : srInfo.getGoal(),
+                        proofNonNull, null, srInfo == null ? null : srInfo.getGoal(),
                         System.currentTimeMillis() - time, countApplied, closedGoals);
                 }
                 var applyAutomaticTime = System.nanoTime();
@@ -124,7 +125,7 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
                     applyAutomatic += System.nanoTime() - applyAutomaticTime;
                 }
                 if (!srInfo.isSuccess()) {
-                    return new ApplyStrategyInfo<>(srInfo.message(), proof,
+                    return new ApplyStrategyInfo<>(srInfo.message(), proofNonNull,
                         null, srInfo.getGoal(),
                         System.currentTimeMillis() - time, countApplied, closedGoals);
                 }
@@ -139,16 +140,16 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
             return new ApplyStrategyInfo<>(
                 stopCondition.getStopMessage(maxApplications, timeout, time,
                     countApplied, srInfo),
-                proof, null, null, System.currentTimeMillis() - time, countApplied,
+                proofNonNull, null, null, System.currentTimeMillis() - time, countApplied,
                 closedGoals);
         } catch (InterruptedException e) {
             cancelled = true;
-            return new ApplyStrategyInfo<Proof, Goal>("Interrupted.", proof, null,
+            return new ApplyStrategyInfo<Proof, Goal>("Interrupted.", proofNonNull, null,
                 goalChooser.getNextGoal(),
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
             LOGGER.warn("doWork exception", t);
-            return new ApplyStrategyInfo<>("Error.", proof, t, null,
+            return new ApplyStrategyInfo<>("Error.", proofNonNull, t, null,
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } finally {
             time = (System.currentTimeMillis() - time);
@@ -200,7 +201,7 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
         } else {
             try {
                 @SuppressWarnings({ "nullness", "unused" })
-                final var result = g.apply(app);
+                final var result = Objects.requireNonNull(g).apply(app);
             } finally {
                 PERF_GOAL_APPLY.getAndAdd(System.nanoTime() - time);
             }

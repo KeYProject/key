@@ -5,8 +5,12 @@
 package de.uka.ilkd.key.smt.newsmt2;
 
 import java.util.Map;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * SMT handler properties are properties for the new modular smt handler.
@@ -20,6 +24,7 @@ import de.uka.ilkd.key.java.Services;
  *
  * @author Mattias Ulbrich
  */
+@NullMarked
 public abstract class SMTHandlerProperty<T> {
 
     /**
@@ -62,7 +67,7 @@ public abstract class SMTHandlerProperty<T> {
      * @param s String to parse into a value
      * @return the value represented by s.
      */
-    public abstract T fromString(String s);
+    public abstract @Nullable T fromString(String s);
 
     /**
      * The default value for the stored data type in case there is no value stored
@@ -97,10 +102,12 @@ public abstract class SMTHandlerProperty<T> {
      * smtsetting.
      *
      * @param services non-null services object
-     * @return the value read from the services.
+     * @return the value read from the services, or null if the stored setting is not a valid
+     *         representation of this property
      */
-    public T get(Services services) {
-        String val = services.getProof().getSettings().getNewSMTSettings().get(getIdentifier());
+    public @Nullable T get(Services services) {
+        String val = Objects.requireNonNull(services.getProof(), "proof").getSettings()
+                .getNewSMTSettings().get(getIdentifier());
         if (val == null) {
             return defaultValue();
         }
@@ -111,9 +118,10 @@ public abstract class SMTHandlerProperty<T> {
      * Extract a value of this property from a string property table.
      *
      * @param properties non-null map to look up the value
-     * @return the value read from the table.
+     * @return the value read from the table, or null if the stored value is not a valid
+     *         representation of this property
      */
-    public T get(Map<String, Object> properties) {
+    public @Nullable T get(Map<String, Object> properties) {
         Object val = properties.get(getIdentifier());
         if (val == null) {
             return defaultValue();
@@ -256,7 +264,7 @@ public abstract class SMTHandlerProperty<T> {
             this.enumType = enumType;
         }
 
-        public E fromString(String value) {
+        public @Nullable E fromString(String value) {
             for (E enumConstant : enumType.getEnumConstants()) {
                 if (value.equalsIgnoreCase(enumConstant.toString())) {
                     return enumConstant;

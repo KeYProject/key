@@ -1,0 +1,19 @@
+package com.github.javaparser.ast.stmt;
+
+import com.github.javaparser.ast.NodeList;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+/**
+ * Re-specification of the {@code TryStmt} constructor for the nullness checker. JavaParser treats
+ * the {@code finallyBlock} as optional: a {@code null} finally block denotes a {@code try} with
+ * only catch clauses and no {@code finally}. The KeY code base deliberately passes {@code null}
+ * when generating such statements (e.g. the initializer-execution try block of the
+ * class-initializer builder). Widening the parameter nullness matches the library's actual
+ * behavior without any source changes.
+ */
+public class TryStmt {
+
+    public TryStmt(BlockStmt tryBlock, NodeList<CatchClause> catchClauses,
+        @Nullable BlockStmt finallyBlock);
+}

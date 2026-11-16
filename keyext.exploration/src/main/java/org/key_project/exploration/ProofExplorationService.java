@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.exploration;
 
-import java.util.Objects;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.java.Services;
@@ -13,14 +12,18 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.rules.TacletMatcher;
+import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -56,6 +59,7 @@ import org.jspecify.annotations.Nullable;
  * @version 1 (20.08.19)
  */
 
+@NullMarked
 @SuppressWarnings("ClassCanBeRecord")
 public class ProofExplorationService {
     private final @NonNull Proof proof;
@@ -67,7 +71,11 @@ public class ProofExplorationService {
     }
 
     public static @NonNull ProofExplorationService get(KeYMediator mediator) {
-        return get(mediator.getSelectedProof());
+        Proof selectedProof = mediator.getSelectedProof();
+        if (selectedProof == null) {
+            throw new NullPointerException("No proof selected.");
+        }
+        return get(selectedProof);
     }
 
     private static @NonNull ProofExplorationService get(Proof selectedProof) {
@@ -82,7 +90,15 @@ public class ProofExplorationService {
 
 
     private Taclet getTaclet(String name) {
-        return proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(name));
+        ProofEnvironment env = proof.getEnv();
+        if (env == null) {
+            throw new NullPointerException("Proof has no proof environment: " + proof);
+        }
+        Taclet taclet = env.getInitConfigForEnvironment().lookupActiveTaclet(new Name(name));
+        if (taclet == null) {
+            throw new NullPointerException("No active taclet '" + name + "' in " + proof);
+        }
+        return taclet;
     }
 
     private FindTaclet getHideTaclet(boolean inAntec) {
@@ -93,8 +109,15 @@ public class ProofExplorationService {
      * Finds the `cut` taclet in the current proof environment.
      */
     public @NonNull Taclet getCutTaclet() {
-        return Objects.requireNonNull(
-            proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut")));
+        ProofEnvironment env = proof.getEnv();
+        if (env == null) {
+            throw new NullPointerException("Proof has no proof environment: " + proof);
+        }
+        Taclet cut = env.getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
+        if (cut == null) {
+            throw new NullPointerException("No active 'cut' taclet in " + proof);
+        }
+        return cut;
     }
 
     /**
@@ -105,11 +128,21 @@ public class ProofExplorationService {
      * @param antecedent whether to add teh term to antecedent
      */
     public @NonNull Node soundAddition(@NonNull Goal g, @NonNull JTerm t, boolean antecedent) {
-        Taclet cut =
-            g.proof().getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
+        ProofEnvironment env = g.proof().getEnv();
+        if (env == null) {
+            throw new NullPointerException("Proof has no proof environment: " + g.proof());
+        }
+        Taclet cut = env.getInitConfigForEnvironment().lookupActiveTaclet(new Name("cut"));
+        if (cut == null) {
+            throw new NullPointerException("No active 'cut' taclet in " + g.proof());
+        }
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        app = app.addCheckedInstantiation(sv, t, services, true);
+        TacletApp instantiated = app.addCheckedInstantiation(sv, t, services, true);
+        if (instantiated == null) {
+            throw new NullPointerException("Could not instantiate the 'cut' taclet with " + t);
+        }
+        app = instantiated;
         ExplorationNodeData explorationNodeData = new ExplorationNodeData();
         if (antecedent) {
             explorationNodeData.setExplorationAction("Added " + t + " ==>");
@@ -119,7 +152,11 @@ public class ProofExplorationService {
 
         g.node().register(explorationNodeData, ExplorationNodeData.class);
 
-        ImmutableList<Goal> result = g.apply(app);
+        ImmutableList<Goal> applied = g.apply(app);
+        if (applied == null) {
+            throw new NullPointerException("Could not apply the 'cut' rule to " + g);
+        }
+        ImmutableList<Goal> result = applied;
 
         // set the actions flag
         result.forEach(goal -> {
@@ -133,7 +170,12 @@ public class ProofExplorationService {
         String labelPostfix = antecedent ? "FALSE" : "TRUE";
         Goal first = result.head();
 
-        if (first.node().getNodeInfo().getBranchLabel().endsWith(labelPostfix)) {
+        String branchLabel = first.node().getNodeInfo().getBranchLabel();
+        if (branchLabel == null) {
+            throw new NullPointerException(
+                "First goal of the cut application has no branch label.");
+        }
+        if (branchLabel.endsWith(labelPostfix)) {
             first.setEnabled(false);
             toBeSelected = result.tail().head().node();
         } else {
@@ -143,7 +185,7 @@ public class ProofExplorationService {
         return toBeSelected;
     }
 
-    public Node applyChangeFormula(@NonNull Goal g,
+    public @Nullable Node applyChangeFormula(@NonNull Goal g,
             @NonNull PosInOccurrence pio,
             @NonNull JTerm term, @NonNull JTerm newTerm) {
         TacletApp app = soundChange(pio, term, newTerm);
@@ -156,7 +198,11 @@ public class ProofExplorationService {
                 LogicPrinter.quickPrintTerm(newTerm, services)));
 
         // apply cut
-        ImmutableList<Goal> result = g.apply(app);
+        ImmutableList<Goal> applied = g.apply(app);
+        if (applied == null) {
+            throw new NullPointerException("Could not apply the change ('cut') rule to " + g);
+        }
+        ImmutableList<Goal> result = applied;
 
         result.forEach(goal -> {
             ExplorationNodeData.get(goal.node()); // taint as exploration effected
@@ -167,17 +213,37 @@ public class ProofExplorationService {
 
         // region hide
         FindTaclet tap = getHideTaclet(pio.isInAntec());
-        TacletApp weakening = PosTacletApp.createPosTacletApp(tap,
-            tap.getMatcher().matchFind(pio.subTerm(), MatchConditions.EMPTY_MATCHCONDITIONS,
-                services),
-            pio, services);
+        TacletMatcher matcher = tap.getMatcher();
+        if (matcher == null) {
+            throw new NullPointerException("The taclet '" + tap.name() + "' has no matcher.");
+        }
+        MatchResultInfo matchingConditions = matcher.matchFind(pio.subTerm(),
+            MatchConditions.EMPTY_MATCHCONDITIONS, services);
+        if (matchingConditions == null) {
+            throw new NullPointerException(
+                "Could not match the find term of '" + tap.name() + "'.");
+        }
+        TacletApp weakening = PosTacletApp.createPosTacletApp(tap, matchingConditions, pio,
+            services);
+        if (weakening == null) {
+            throw new NullPointerException("Could not create the weakening rule application.");
+        }
         String posToWeakening = pio.isInAntec() ? "TRUE" : "FALSE";
 
         Node toBeSelected = null;
         for (Goal goal : result) {
-            if (goal.node().getNodeInfo().getBranchLabel().contains(posToWeakening)) {
+            String branchLabel = goal.node().getNodeInfo().getBranchLabel();
+            if (branchLabel == null) {
+                throw new NullPointerException(
+                    "Goal of the change application has no branch label.");
+            }
+            if (branchLabel.contains(posToWeakening)) {
                 goal.apply(weakening);
-                goal.node().parent().register(new ExplorationNodeData(), ExplorationNodeData.class);
+                Node parent = goal.node().parent();
+                if (parent == null) {
+                    throw new NullPointerException("The weakening goal has no parent node.");
+                }
+                parent.register(new ExplorationNodeData(), ExplorationNodeData.class);
                 toBeSelected = goal.node();
             } else {
                 goal.setEnabled(false);
@@ -192,22 +258,41 @@ public class ProofExplorationService {
         Taclet cut = getCutTaclet();
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(cut);
         SchemaVariable sv = app.uninstantiatedVars().iterator().next();
-        app = app.addCheckedInstantiation(sv, newTerm, services, true);
-        return app;
+        TacletApp instantiated = app.addCheckedInstantiation(sv, newTerm, services, true);
+        if (instantiated == null) {
+            throw new NullPointerException(
+                "Could not instantiate the 'cut' taclet with " + newTerm);
+        }
+        return instantiated;
     }
 
     public void soundHide(Goal g, PosInOccurrence pio, JTerm term) {
         TacletApp app = createHideTerm(pio);
         ExplorationNodeData explorationNodeData = ExplorationNodeData.get(g.node());
         explorationNodeData.setExplorationAction("Hide " + term);
-        ImmutableList<Goal> result = g.apply(app);
-        result.forEach(goal -> ExplorationNodeData.get(goal.node()));
+        ImmutableList<Goal> applied = g.apply(app);
+        if (applied == null) {
+            throw new NullPointerException("Could not apply the hide rule to " + g);
+        }
+        applied.forEach(goal -> ExplorationNodeData.get(goal.node()));
     }
 
     private TacletApp createHideTerm(PosInOccurrence pio) {
         FindTaclet tap = getHideTaclet(pio.isInAntec());
-        final var matchingConditions = tap.getMatcher().matchFind(pio.subTerm(),
+        TacletMatcher matcher = tap.getMatcher();
+        if (matcher == null) {
+            throw new NullPointerException("The taclet '" + tap.name() + "' has no matcher.");
+        }
+        MatchResultInfo matchingConditions = matcher.matchFind(pio.subTerm(),
             MatchConditions.EMPTY_MATCHCONDITIONS, services);
-        return PosTacletApp.createPosTacletApp(tap, matchingConditions, pio, services);
+        if (matchingConditions == null) {
+            throw new NullPointerException(
+                "Could not match the find term of '" + tap.name() + "'.");
+        }
+        TacletApp app = PosTacletApp.createPosTacletApp(tap, matchingConditions, pio, services);
+        if (app == null) {
+            throw new NullPointerException("Could not create the hide rule application.");
+        }
+        return app;
     }
 }

@@ -8,10 +8,13 @@ import de.uka.ilkd.key.java.Services;
 
 import org.key_project.prover.sequent.Sequent;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Classes that implement this interface provide a translation of a KeY-problem into a specific
  * format.
  */
+@NullMarked
 public interface SMTTranslator {
 
     /**

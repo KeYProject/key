@@ -7,15 +7,17 @@ package de.uka.ilkd.key.java.transformations.pipeline;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Modifier;
 import com.github.javaparser.ast.jml.doc.*;
-import org.jspecify.annotations.NonNull;
+
+import org.jspecify.annotations.NullMarked;
 
 /**
  *
  * @author Alexander Weigl
  * @version 1 (3/3/26)
  */
+@NullMarked
 public class JmlDocRemoval extends JavaTransformerAbstract {
-    public JmlDocRemoval(@NonNull TransformationPipelineServices services) {
+    public JmlDocRemoval(TransformationPipelineServices services) {
         super(services);
     }
 

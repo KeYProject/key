@@ -22,6 +22,7 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 
@@ -32,6 +33,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author christoph
  */
+@NullMarked
 public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
     public static final Feature INSTANCE = new FocusIsSubFormulaOfInfFlowContractAppFeature();

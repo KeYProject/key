@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.declaration;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.abstraction.*;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
@@ -13,6 +15,9 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * KeY used to model arrays using only the {@link ArrayType}. As
@@ -25,6 +30,7 @@ import org.key_project.util.collection.ImmutableList;
  * array declarations may be added at runtime.
  */
 
+@NullMarked
 public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
 
 
@@ -40,8 +46,14 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
 
     private final KeYJavaType superType;
 
-    private String altNameRepresentation;
+    private @Nullable String altNameRepresentation;
 
+    /**
+     * The dimension computation operates on {@code this} while the receiver is still under
+     * initialization (EISOP initialization check); safe here since it only reads the
+     * {@link #children} provided by {@code super(...)}, suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     private ArrayDeclaration(ExtList children, TypeReference baseType, ProgramElementName name,
             KeYJavaType superType) {
         super(addLength(children, superType), name, name, false);
@@ -52,7 +64,10 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
     }
 
     private static ExtList addLength(ExtList children, KeYJavaType superType) {
-        children.add(((SuperArrayDeclaration) superType.getJavaType()).length());
+        final SuperArrayDeclaration superArray = (SuperArrayDeclaration) Objects.requireNonNull(
+            superType.getJavaType(), "no Java type for array super type");
+        children.add(Objects.requireNonNull(superArray.length(),
+            "arrays always have a length field"));
         return children;
     }
 
@@ -63,7 +78,8 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      *        an ExtList with the basetype and member declarations of this type
      */
     public ArrayDeclaration(ExtList children, TypeReference baseType, KeYJavaType superType) {
-        this(children, baseType, createName(baseType), superType);
+        this(children, baseType, Objects.requireNonNull(createName(baseType),
+            "base type must be a valid Java type"), superType);
     }
 
     /**
@@ -89,7 +105,10 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
     }
 
     public FieldDeclaration length() {
-        return ((SuperArrayDeclaration) superType.getJavaType()).length();
+        final SuperArrayDeclaration superArray =
+            (SuperArrayDeclaration) Objects.requireNonNull(superType.getJavaType(),
+                "no Java type for array super type");
+        return Objects.requireNonNull(superArray.length(), "arrays always have a length field");
     }
 
     /**
@@ -185,7 +204,8 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
      * computes the dimension of this array
      */
     private int dimension() {
-        Type javaType = baseType.getKeYJavaType().getJavaType();
+        Type javaType = Objects.requireNonNull(baseType.getKeYJavaType(),
+            "no KeYJavaType for base type").getJavaType();
         if (javaType instanceof ArrayType) {
             return 1 + ((ArrayType) javaType).getDimension();
         } else {
@@ -193,9 +213,10 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
         }
     }
 
-    public static ProgramElementName createName(TypeReference basetype) {
+    public static @Nullable ProgramElementName createName(TypeReference basetype) {
 
-        Type javaBasetype = basetype.getKeYJavaType().getJavaType();
+        Type javaBasetype = Objects.requireNonNull(basetype.getKeYJavaType(),
+            "no KeYJavaType for base type").getJavaType();
 
         if (javaBasetype == null) {
             // entered only if base type is class type
@@ -215,9 +236,14 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
 
 
     public String getAlternativeNameRepresentation() {
-        if (altNameRepresentation == null) {
+        String result = altNameRepresentation;
+        if (result == null) {
             final StringBuilder alt = new StringBuilder();
-            Type baseType = this.baseType.getKeYJavaType().getJavaType();
+            final Type baseType = Objects.requireNonNull(
+                Objects.requireNonNull(this.baseType.getKeYJavaType(),
+                    "no KeYJavaType for base type")
+                        .getJavaType(),
+                "no Java type for base type");
 
             if (baseType instanceof ArrayType) {
                 alt.append(((ArrayType) baseType).getAlternativeNameRepresentation());
@@ -229,9 +255,10 @@ public class ArrayDeclaration extends TypeDeclaration implements ArrayType {
                 }
             }
             alt.append("[]");
-            altNameRepresentation = alt.toString();
+            result = alt.toString();
+            altNameRepresentation = result;
         }
-        return altNameRepresentation;
+        return result;
     }
 
 

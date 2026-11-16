@@ -11,6 +11,8 @@ import de.uka.ilkd.key.rule.conditions.TypeResolver;
 import org.key_project.logic.op.ParsableVariable;
 import org.key_project.logic.sort.Sort;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Argument types for {@link TacletBuilderCommand}s.
  *
@@ -18,6 +20,7 @@ import org.key_project.logic.sort.Sort;
  * @version 1 (12/9/19)
  * @see TacletBuilderCommand
  */
+@NullMarked
 public enum ArgumentType {
     TYPE_RESOLVER(TypeResolver.class), SORT(Sort.class), TERM(JTerm.class),
     JAVA_TYPE(KeYJavaType.class), VARIABLE(ParsableVariable.class), STRING(String.class);

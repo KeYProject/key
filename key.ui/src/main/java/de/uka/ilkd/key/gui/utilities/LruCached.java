@@ -8,12 +8,15 @@ import java.util.function.Function;
 
 import org.key_project.util.ConcurrentLruCache;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Caches a computation using a lru cache
  *
  * @param <A> arguments for the computation
  * @param <T> return type
  */
+@NullMarked
 public class LruCached<A, T> {
     private final ConcurrentLruCache<A, T> lru = new ConcurrentLruCache<>(32);
     private final Function<A, T> update;

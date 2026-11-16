@@ -10,8 +10,11 @@ import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 
 @TransformerMeta(name = "#BinaryAnd")
+
+@NullMarked
 public final class MetaBinaryAnd extends MetaArithBitMaskOp {
 
     public MetaBinaryAnd() {

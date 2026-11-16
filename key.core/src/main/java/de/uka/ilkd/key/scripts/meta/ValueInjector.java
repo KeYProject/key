@@ -265,7 +265,7 @@ public class ValueInjector {
         if (meta.isPositionalVarArgs()) {
             var source = (List<?>) val;
             var seq = new ArrayList<>();
-            var targetType = meta.getPositionalVarargs().as();
+            var targetType = Objects.requireNonNull(meta.getPositionalVarargs()).as();
             for (var o : source) {
                 seq.add(convert(o, targetType));
             }
@@ -275,7 +275,7 @@ public class ValueInjector {
         if (meta.isOptionalVarArgs()) {
             var source = (Map<String, ?>) val;
             var seq = new TreeMap<String, Object>();
-            var targetType = meta.getOptionalVarArgs().as();
+            var targetType = Objects.requireNonNull(meta.getOptionalVarArgs()).as();
             for (var o : source.entrySet()) {
                 seq.put(o.getKey(), convert(o.getValue(), targetType));
             }

@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Optional;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -100,8 +101,10 @@ public class TestParser {
         var problemLoaderException = assertThrows(ProblemLoaderException.class, () -> {
             KeYEnvironment.load(file, null, null, null);
         });
-        var error = (HasLocation) problemLoaderException.getCause();
-        var location = error.getLocation();
+        var error = Objects
+                .requireNonNull((HasLocation) problemLoaderException.getCause(),
+                    "the exception has a cause");
+        var location = Objects.requireNonNull(error.getLocation(), "the error has a location");
         assertEquals(4, location.getPosition().line());
         assertEquals(9, location.getPosition().column());
         assertEquals(Optional.of(file.toUri()), location.getFileURI());

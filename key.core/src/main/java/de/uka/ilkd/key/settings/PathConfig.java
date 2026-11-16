@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.util.KeYResourceManager;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +47,7 @@ import org.slf4j.LoggerFactory;
 /// upgrading.
 ///
 /// @author weigl
+@NullMarked
 public final class PathConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(PathConfig.class);
 
@@ -77,8 +80,12 @@ public final class PathConfig {
 
     ///
     public static Path getSettingsFile(String fileName) {
-        var path = currentPaths.keyConfigDir.resolve(fileName);
-        var old = previousPaths.keyConfigDir.resolve(fileName);
+        KeyPaths current = Objects.requireNonNull(currentPaths,
+            "key configuration paths not set; call setBaseKeyConfigDir first");
+        KeyPaths previous = Objects.requireNonNull(previousPaths,
+            "key configuration paths not set; call setBaseKeyConfigDir first");
+        var path = current.keyConfigDir.resolve(fileName);
+        var old = previous.keyConfigDir.resolve(fileName);
         if (!Files.exists(path) && Files.exists(old)) {
             try {
                 Files.copy(old, path);
@@ -112,9 +119,9 @@ public final class PathConfig {
         }
     }
 
-    public static KeyPaths currentPaths;
+    public static @Nullable KeyPaths currentPaths;
 
-    public static KeyPaths previousPaths;
+    public static @Nullable KeyPaths previousPaths;
 
     private PathConfig() {
     }
@@ -192,12 +199,15 @@ public final class PathConfig {
 
     private static KeyPaths getReadingPath(Path base) {
         Path prev = base;
+        // setBaseKeyConfigDir assigns currentPaths directly before calling this method
+        KeyPaths current = Objects.requireNonNull(currentPaths,
+            "key configuration paths not set; call setBaseKeyConfigDir first");
         try (Stream<Path> stream = Files.list(base)) {
             prev = stream
                     .filter(Objects::nonNull)
                     .filter(it -> it.getFileName().toString().matches("v\\d+\\.\\d+"))
                     .filter(Files::isDirectory)
-                    .filter(it -> !Objects.equals(it, currentPaths.keyConfigDir))
+                    .filter(it -> !Objects.equals(it, current.keyConfigDir))
                     .filter(it -> {
                         try (Stream<Path> entries = Files.list(it)) {
                             return entries.findAny().isPresent();
@@ -215,6 +225,10 @@ public final class PathConfig {
 
 
     public static boolean isDifferentReadWriteDirectories() {
-        return !Objects.equals(currentPaths.keyConfigDir, previousPaths.keyConfigDir);
+        Path current = Objects.requireNonNull(currentPaths,
+            "key configuration paths not set; call setBaseKeyConfigDir first").keyConfigDir;
+        Path previous = Objects.requireNonNull(previousPaths,
+            "key configuration paths not set; call setBaseKeyConfigDir first").keyConfigDir;
+        return !Objects.equals(current, previous);
     }
 }

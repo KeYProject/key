@@ -14,6 +14,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class ForUpdates extends JavaNonTerminalProgramElement
         implements ExpressionContainer, IForUpdates {
 

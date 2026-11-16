@@ -7,6 +7,9 @@ package de.uka.ilkd.key.informationflow.po.snippet;
 import de.uka.ilkd.key.informationflow.ProofObligationVars;
 import de.uka.ilkd.key.logic.JTerm;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class BasicFreeInvSnippet implements FactoryMethod {
 
     @Override

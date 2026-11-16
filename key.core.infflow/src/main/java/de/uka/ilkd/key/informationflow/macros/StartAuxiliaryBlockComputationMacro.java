@@ -16,8 +16,10 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 
@@ -26,6 +28,9 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 
 
@@ -33,6 +38,7 @@ import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_
  *
  * @author christoph
  */
+@NullMarked
 public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
         implements StartSideProofMacro {
 
@@ -57,9 +63,13 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
 
     @Override
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals,
-            PosInOccurrence posInOcc) {
-        if (goals == null || posInOcc == null || goals.isEmpty() || goals.head().node() == null
-                || goals.head().node().parent() == null) {
+            @Nullable PosInOccurrence posInOcc) {
+        if (goals == null || posInOcc == null || goals.isEmpty()) {
+            return false;
+        }
+        final Goal goal = goals.head();
+        final Node parent = goal.node().parent();
+        if (parent == null) {
             return false;
         }
         JTerm subTerm = (JTerm) posInOcc.subTerm();
@@ -70,11 +80,14 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
 
         final Services services = proof.getServices();
 
-        final RuleApp app = goals.head().node().parent().getAppliedRuleApp();
+        final RuleApp app = parent.getAppliedRuleApp();
         if (!(app instanceof BlockContractInternalBuiltInRuleApp blockRuleApp)) {
             return false;
         }
         final BlockContract contract = blockRuleApp.getContract();
+        if (contract == null) {
+            return false;
+        }
         var ifRuleApp = (InfFlowBlockContractInternalBuiltInRuleApp) blockRuleApp;
         final IFProofObligationVars ifVars = ifRuleApp.getInformationFlowProofObligationVars();
         if (ifVars == null) {
@@ -91,16 +104,35 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro
 
     @Override
     public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
-            ImmutableList<Goal> goals, PosInOccurrence posInOcc, ProverTaskListener listener)
+            ImmutableList<Goal> goals, @Nullable PosInOccurrence posInOcc,
+            @Nullable ProverTaskListener listener)
             throws Exception {
+        final Node parent = goals.head().node().parent();
+        if (parent == null) {
+            throw new NullPointerException("No parent node of the goal.");
+        }
+        final RuleApp ruleApp = parent.getAppliedRuleApp();
+        if (ruleApp == null) {
+            throw new NullPointerException("No applied rule app on the parent node.");
+        }
         final var blockRuleApp =
-            (InfFlowBlockContractInternalBuiltInRuleApp) goals.head().node().parent()
-                    .getAppliedRuleApp();
+            (InfFlowBlockContractInternalBuiltInRuleApp) ruleApp;
 
-        final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
+        final ProofEnvironment env = proof.getEnv();
+        if (env == null) {
+            throw new NullPointerException("No proof environment.");
+        }
+        final InitConfig initConfig = env.getInitConfigForEnvironment();
 
         final BlockContract contract = blockRuleApp.getContract();
+        if (contract == null) {
+            throw new NullPointerException("No block contract for the rule application.");
+        }
         final IFProofObligationVars ifVars = blockRuleApp.getInformationFlowProofObligationVars();
+        if (ifVars == null) {
+            throw new NullPointerException("No information flow proof obligation variables for "
+                + "the rule application.");
+        }
 
         final BlockExecutionPO blockExecPO = new BlockExecutionPO(initConfig, contract,
             ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(), goals.head(),

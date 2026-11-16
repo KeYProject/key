@@ -14,8 +14,11 @@ import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 
 @TransformerMeta(name = "#less")
+
+@NullMarked
 public class MetaLess extends AbstractTermTransformer {
 
     public MetaLess() {

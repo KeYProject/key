@@ -15,6 +15,9 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * General interface for routines that translate particular KeY data structures to SMT.
  *
@@ -40,6 +43,7 @@ import org.key_project.logic.op.Operator;
  * @author Mattias Ulbrich
  * @author Jonas Schiffl
  */
+@NullMarked
 public interface SMTHandler {
 
     /**
@@ -70,8 +74,8 @@ public interface SMTHandler {
      * @param handlerOptions arbitrary options for the handler to take into account
      * @throws IOException if resources cannot be read.
      */
-    void init(MasterHandler masterHandler, Services services, Properties handlerSnippets,
-            String[] handlerOptions) throws IOException;
+    void init(MasterHandler masterHandler, Services services,
+            @Nullable Properties handlerSnippets, String[] handlerOptions) throws IOException;
 
     /**
      * Query if this handler can translate a term.

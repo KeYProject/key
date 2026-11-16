@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.antlr.v4.runtime.IntStream;
 import org.antlr.v4.runtime.Token;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -27,7 +28,8 @@ import org.jspecify.annotations.NonNull;
  * @param position The position in the file
  * @author Hubert Schmid
  */
-public record Location(URI fileUri, Position position) implements Comparable<Location> {
+public record Location(@Nullable URI fileUri, Position position) implements Comparable<Location> {
+
     public static final Location UNDEFINED = new Location(null, Position.UNDEFINED);
 
     public static Location fromToken(Token token) {
@@ -35,7 +37,7 @@ public record Location(URI fileUri, Position position) implements Comparable<Loc
             Position.fromToken(token));
     }
 
-    public URI getFileUri() { return fileUri; }
+    public @Nullable URI getFileUri() { return fileUri; }
 
     /// @deprecated weigl: Usage of {@link Optional} is discourage.
     /// @see [#getFileUri()]

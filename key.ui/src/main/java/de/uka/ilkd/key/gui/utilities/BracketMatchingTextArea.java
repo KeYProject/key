@@ -15,6 +15,8 @@ import javax.swing.text.Document;
 import javax.swing.text.Highlighter.HighlightPainter;
 import javax.swing.text.JTextComponent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author mulbrich
  */
+@NullMarked
 public class BracketMatchingTextArea extends JTextArea implements CaretListener {
     private static final Logger LOGGER = LoggerFactory.getLogger(BracketMatchingTextArea.class);
 
@@ -80,18 +83,21 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
     /**
      * The highlighter stores the highlights in an object which is used to denote the highlighting.
      */
-    private Object theSameParensHighlight;
+    private Object theSameParensHighlight = new Object();
 
     /**
      * The highlighter stores the highlights in an object which is used to denote the highlighting.
      */
-    private Object theDiffParensHighlight;
-
+    private Object theDiffParensHighlight = new Object();
 
     /**
      * Constructs a new TextArea. A default model is set, the initial string is null, and
      * rows/columns are set to 0.
+     * <p>
+     * The text area configures itself and its highlighting while the receiver is still under
+     * initialization (EISOP initialization check); suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public BracketMatchingTextArea() {
         super();
         init();
@@ -106,8 +112,19 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * @param rows the number of rows >= 0
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns arguments are negative.
+     *            <p>
+     *            The text area delegates a possibly {@code null} model and text to
+     *            {@link JTextArea}, which
+     *            accepts {@code null} for both per the Swing contract, and configures itself and
+     *            its
+     *            highlighting while the receiver is still under initialization (EISOP
+     *            initialization
+     *            check); suppressed with scoped keys.
      */
-    public BracketMatchingTextArea(Document doc, String text, int rows, int columns) {
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
+    public BracketMatchingTextArea(@Nullable Document doc, @Nullable String text, int rows,
+            int columns) {
         super(doc, text, rows, columns);
         init();
     }
@@ -117,8 +134,17 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * arguments (null, 0, 0).
      *
      * @param doc the model to use
+     *        <p>
+     *        The text area delegates a possibly {@code null} model to {@link JTextArea}, which
+     *        accepts
+     *        {@code null} per the Swing contract, and configures itself and its highlighting while
+     *        the
+     *        receiver is still under initialization (EISOP initialization check); suppressed with
+     *        scoped keys.
      */
-    public BracketMatchingTextArea(Document doc) {
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
+    public BracketMatchingTextArea(@Nullable Document doc) {
         super(doc);
         init();
     }
@@ -130,7 +156,12 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * @param rows the number of rows >= 0
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns arguments are negative.
+     *            <p>
+     *            The text area configures itself and its highlighting while the receiver is still
+     *            under
+     *            initialization (EISOP initialization check); suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public BracketMatchingTextArea(int rows, int columns) {
         super(rows, columns);
         init();
@@ -144,8 +175,18 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * @param rows the number of rows >= 0
      * @param columns the number of columns >= 0
      * @exception IllegalArgumentException if the rows or columns arguments are negative.
+     *            <p>
+     *            The text area delegates a possibly {@code null} text to {@link JTextArea}, which
+     *            accepts
+     *            {@code null} per the Swing contract, and configures itself and its highlighting
+     *            while the
+     *            receiver is still under initialization (EISOP initialization check); suppressed
+     *            with
+     *            scoped keys.
      */
-    public BracketMatchingTextArea(String text, int rows, int columns) {
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
+    public BracketMatchingTextArea(@Nullable String text, int rows, int columns) {
         super(text, rows, columns);
         init();
     }
@@ -155,8 +196,17 @@ public class BracketMatchingTextArea extends JTextArea implements CaretListener 
      * rows/columns are set to 0.
      *
      * @param text the text to be displayed, or null
+     *        <p>
+     *        The text area delegates a possibly {@code null} text to {@link JTextArea}, which
+     *        accepts
+     *        {@code null} per the Swing contract, and configures itself and its highlighting while
+     *        the
+     *        receiver is still under initialization (EISOP initialization check); suppressed with
+     *        scoped keys.
      */
-    public BracketMatchingTextArea(String text) {
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
+    public BracketMatchingTextArea(@Nullable String text) {
         super(text);
         init();
     }

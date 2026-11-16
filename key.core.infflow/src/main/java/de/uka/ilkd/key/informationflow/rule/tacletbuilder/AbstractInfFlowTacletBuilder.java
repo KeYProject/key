@@ -20,12 +20,15 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Visitor;
+import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 
 /**
@@ -34,6 +37,7 @@ import org.jspecify.annotations.NonNull;
  *
  * @author christoph
  */
+@NullMarked
 abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
 
     /**
@@ -55,13 +59,19 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
             Services services) {
         ImmutableList<JTerm> result = ImmutableList.nil();
         for (JTerm t : ts) {
-            result = result.append(createTermSV(t, schemaPrefix, services));
+            final JTerm sv = createTermSV(t, schemaPrefix, services);
+            if (sv == null) {
+                throw new NullPointerException(
+                    "Schema variable creation failed for the non-null term " + t + ".");
+            }
+            result = result.append(sv);
         }
         return result;
     }
 
 
-    JTerm createTermSV(JTerm t, String schemaPrefix, Services services) {
+    @Nullable
+    JTerm createTermSV(@Nullable JTerm t, String schemaPrefix, Services services) {
         if (t == null) {
             return null;
         }
@@ -73,6 +83,7 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
     }
 
 
+    @Nullable
     VariableSV createVariableSV(QuantifiableVariable v, String schemaPrefix,
             Services services) {
         if (v == null) {
@@ -109,7 +120,12 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
         final Map<QuantifiableVariable, VariableSV> quantifiableVarsToSchemaVars =
             new LinkedHashMap<>();
         for (QuantifiableVariable qv : quantifiableVariables) {
-            quantifiableVarsToSchemaVars.put(qv, createVariableSV(qv, "", services));
+            final VariableSV sv = createVariableSV(qv, "", services);
+            if (sv == null) {
+                throw new NullPointerException(
+                    "Schema variable creation failed for the quantified variable " + qv + ".");
+            }
+            quantifiableVarsToSchemaVars.put(qv, sv);
         }
         return quantifiableVarsToSchemaVars;
     }
@@ -130,9 +146,15 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      */
     public JTerm eqAtLocs(Services services, JTerm heap1, JTerm locset1, JTerm heap2,
             JTerm locset2) {
-        return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
-                : func(services.getNamespaces().functions().lookup(EQUAL_LOCS), heap1,
-                    locset1, heap2, locset2);
+        if (locset1.equals(empty()) && locset2.equals(empty())) {
+            return tt();
+        }
+        final Function eqLocs = services.getNamespaces().functions().lookup(EQUAL_LOCS);
+        if (eqLocs == null) {
+            throw new NullPointerException(
+                "Function '" + EQUAL_LOCS + "' is not registered in the namespaces.");
+        }
+        return func(eqLocs, heap1, locset1, heap2, locset2);
     }
 
     /**
@@ -149,9 +171,15 @@ abstract class AbstractInfFlowTacletBuilder extends TermBuilder {
      */
     public JTerm eqAtLocsPost(Services services, JTerm heap1Pre, JTerm heap1Post, JTerm locset1,
             JTerm heap2Pre, JTerm heap2Post, JTerm locset2) {
-        return (locset1.equals(empty()) && locset2.equals(empty())) ? tt()
-                : func(services.getNamespaces().functions().lookup(EQUAL_LOCS_POST),
-                    heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
+        if (locset1.equals(empty()) && locset2.equals(empty())) {
+            return tt();
+        }
+        final Function eqLocsPost = services.getNamespaces().functions().lookup(EQUAL_LOCS_POST);
+        if (eqLocsPost == null) {
+            throw new NullPointerException(
+                "Function '" + EQUAL_LOCS_POST + "' is not registered in the namespaces.");
+        }
+        return func(eqLocsPost, heap1Pre, heap1Post, locset1, heap2Pre, heap2Post, locset2);
     }
 
     static class QuantifiableVariableVisitor implements Visitor<@NonNull JTerm> {

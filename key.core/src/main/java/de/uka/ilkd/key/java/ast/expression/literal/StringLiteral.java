@@ -31,9 +31,10 @@ import de.uka.ilkd.key.ldt.CharListLDT;
 import org.key_project.logic.Name;
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-
+@NullMarked
 public final class StringLiteral extends Literal implements ReferencePrefix {
     private final String value;
 
@@ -100,7 +101,7 @@ public final class StringLiteral extends Literal implements ReferencePrefix {
      *
      * @author VK
      */
-    public ReferencePrefix getReferencePrefix() {
+    public @Nullable ReferencePrefix getReferencePrefix() {
         return null;
     }
 
@@ -108,7 +109,7 @@ public final class StringLiteral extends Literal implements ReferencePrefix {
         return this;
     }
 
-    public KeYJavaType getKeYJavaType(Services javaServ) {
+    public @Nullable KeYJavaType getKeYJavaType(Services javaServ) {
         return javaServ.getJavaInfo().getKeYJavaType("java.lang.String");
     }
 

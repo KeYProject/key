@@ -7,6 +7,8 @@ package de.uka.ilkd.key.util.pp;
 import java.util.*;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This class pretty-prints information using line breaks and indentation. For instance, it can be
@@ -159,6 +161,7 @@ import org.jspecify.annotations.NonNull;
  *
  */
 
+@NullMarked
 public class Layouter<M> {
 
     /** The Printer used for output. */
@@ -378,7 +381,7 @@ public class Layouter<M> {
      * @return this
      *
      */
-    public Layouter<M> mark(M o) {
+    public Layouter<M> mark(@Nullable M o) {
         if (delimStack.isEmpty()) {
             out.mark(o);
         } else {
@@ -631,7 +634,9 @@ public class Layouter<M> {
      */
     private void advanceLeft() {
         StreamToken<M> t;
-        while (!queue.isEmpty() && ((t = queue.peek()).followingSizeKnown())) {
+        // the queue is non-empty, so the peeked token is present; the extra null check keeps the
+        // flow analysis sound
+        while (!queue.isEmpty() && (t = queue.peek()) != null && t.followingSizeKnown()) {
             t.print(out);
             queue.poll();
             totalOutput += t.size();
@@ -800,9 +805,9 @@ public class Layouter<M> {
 
     /** A token corresponding to a <code>mark</code> call. */
     private static class MarkToken<M> extends StreamToken<M> {
-        protected final M o;
+        protected final @Nullable M o;
 
-        MarkToken(M o) {
+        MarkToken(@Nullable M o) {
             this.o = o;
         }
 

@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -53,7 +54,11 @@ public abstract class AbstractCounterExampleGenerator {
      * @return {@code true} solver is available, {@code false} solver is not available.
      */
     public static boolean isSolverAvailable() {
-        return SolverTypes.Z3_CE_SOLVER.isInstalled(true);
+        SolverType z3ce = SolverTypes.Z3_CE_SOLVER;
+        if (z3ce == null) {
+            throw new NullPointerException("Z3 counter-example solver is not registered.");
+        }
+        return z3ce.isInstalled(true);
     }
 
     /**
@@ -65,14 +70,17 @@ public abstract class AbstractCounterExampleGenerator {
      * @throws ProofInputException Occurred Exception.
      */
     public void searchCounterExample(UserInterfaceControl ui, Proof oldProof, Sequent oldSequent)
-            throws ProofInputException, InterruptedException {
+            throws ProofInputException, Exception {
+        SolverType z3ce = SolverTypes.Z3_CE_SOLVER;
+        if (z3ce == null) {
+            throw new NullPointerException("Z3 counter-example solver is not registered.");
+        }
         if (!isSolverAvailable()) {
-            throw new IllegalStateException(
-                "Can't find SMT solver " + SolverTypes.Z3_CE_SOLVER.getName());
+            throw new IllegalStateException("Can't find SMT solver " + z3ce.getName());
         }
         final Proof proof =
             createProof(ui, oldProof, oldSequent, "Semantics Blasting: " + oldProof.name());
-        final SemanticsBlastingMacro macro = new SemanticsBlastingMacro();
+        final ProofMacro macro = new SemanticsBlastingMacro();
         TaskFinishedInfo info = ProofMacroFinishedInfo.getDefaultInfo(macro, proof);
         final ProverTaskListener ptl = ui.getProofControl().getDefaultProverTaskListener();
         ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Macro, macro.getName(), 0));
@@ -94,7 +102,7 @@ public abstract class AbstractCounterExampleGenerator {
         launcher.addListener(createSolverListener(settings, proof));
 
         List<SolverType> solvers = new LinkedList<>();
-        solvers.add(SolverTypes.Z3_CE_SOLVER);
+        solvers.add(z3ce);
 
         launcher.launch(solvers, SMTProblem.createSMTProblems(proof), proof.getServices());
     }

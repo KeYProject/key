@@ -11,6 +11,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -39,6 +40,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author KeY developers
  */
+@NullMarked
 public final class UserInputValidator {
 
     /**

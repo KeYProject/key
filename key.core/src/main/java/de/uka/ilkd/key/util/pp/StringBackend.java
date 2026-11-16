@@ -4,12 +4,16 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.util.pp;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * A {@link Backend} which appends all output to a StringBuffer. The {@link #mark(Object o)} method
  * does nothing in this implementation. There is a method {@link #count()} which returns the number
  * of characters written by this so far. The method {@link #toString()} gets the output written so
  * far.
  */
+@NullMarked
 public class StringBackend<M> {
     protected final StringBuilder out;
 
@@ -33,7 +37,7 @@ public class StringBackend<M> {
     }
 
     /** Gets called to record a <code>mark()</code> call in the input. */
-    public void mark(M o) {}
+    public void mark(@Nullable M o) {}
 
     /** Returns the number of characters written through this backend. */
     public int count() {

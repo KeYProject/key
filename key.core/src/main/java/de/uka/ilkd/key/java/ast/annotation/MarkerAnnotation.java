@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.annotation;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 
@@ -30,6 +32,6 @@ public class MarkerAnnotation extends Annotation {
 
     @Override
     public String toString() {
-        return "@" + type.getJavaType().toString();
+        return "@" + Objects.requireNonNull(type.getJavaType()).toString();
     }
 }

@@ -12,6 +12,9 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 class ArithTermFeatures extends StaticFeatureCollection {
 
     public ArithTermFeatures(IntegerLDT numbers) {

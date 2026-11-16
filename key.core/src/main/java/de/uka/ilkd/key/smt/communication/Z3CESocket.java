@@ -5,15 +5,19 @@
 package de.uka.ilkd.key.smt.communication;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTSolverResult;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class Z3CESocket extends AbstractSolverSocket {
 
-    public Z3CESocket(String name, ModelExtractor query) {
+    public Z3CESocket(String name, @Nullable ModelExtractor query) {
         super(name, query);
     }
 
@@ -59,7 +63,8 @@ public class Z3CESocket extends AbstractSolverSocket {
             // not work in future, it may be that we have to forcibly close the pipe.
             case WAIT_FOR_QUERY -> {
                 if (!msg.equals("success")) {
-                    getQuery().messageIncoming(pipe, msg);
+                    // the WAIT_FOR_QUERY state is only entered with a query attached
+                    Objects.requireNonNull(getQuery(), "query").messageIncoming(pipe, msg);
                 }
             }
             case WAIT_FOR_MODEL -> {

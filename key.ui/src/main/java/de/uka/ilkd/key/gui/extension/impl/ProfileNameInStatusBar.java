@@ -14,8 +14,11 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 @KeYGuiExtension.Info(experimental = false, name = "Profile Name in Status Line", optional = false,
     description = "Shows the profile name of the current selected proof in the status line.")
+@NullMarked
 public class ProfileNameInStatusBar
         implements KeYGuiExtension, KeYGuiExtension.StatusLine, KeYGuiExtension.Startup {
     private final JLabel lblProfileName = new JLabel();

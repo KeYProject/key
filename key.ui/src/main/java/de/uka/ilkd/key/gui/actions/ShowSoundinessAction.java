@@ -10,16 +10,27 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.soundiness.SoundinessDialog;
 import de.uka.ilkd.key.proof.Proof;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Action to show the soundiness report for the currently selected proof.
  *
  * @author opencode
  * @since 3.0
  */
+@NullMarked
 public class ShowSoundinessAction extends MainWindowAction {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * The action-configuration calls and the {@code enableWhenProofLoaded(this)} registration
+     * operate on {@code this} while the receiver is still under initialization (EISOP
+     * initialization check); safe here since the listener only reacts to later selection events,
+     * suppressed with scoped keys.
+     */
+    @SuppressWarnings({ "nullness:method.invocation.invalid",
+        "nullness:argument.type.incompatible" })
     public ShowSoundinessAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Show Soundiness Report");

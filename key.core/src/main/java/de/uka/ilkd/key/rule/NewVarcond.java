@@ -9,14 +9,18 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * variable condition used if a new variable is introduced
  */
+@NullMarked
 public class NewVarcond implements org.key_project.prover.rules.conditions.NewVarcond {
 
     private final SchemaVariable sv;
-    private final SchemaVariable peerSV;
-    private final KeYJavaType type;
+    private final @Nullable SchemaVariable peerSV;
+    private final @Nullable KeYJavaType type;
 
     /*
      * @param sv the SchemaVariable representing a new variable.
@@ -49,17 +53,24 @@ public class NewVarcond implements org.key_project.prover.rules.conditions.NewVa
     }
 
 
-    public SchemaVariable getPeerSchemaVariable() {
+    /**
+     * The peer schema variable is {@code null} whenever the type-based constructor was used; the
+     * interface {@link org.key_project.prover.rules.conditions.NewVarcond} declares a non-null
+     * result, so the difference is suppressed with a scoped key. Callers (e.g.
+     * {@code VariableNamer}, {@code LogicPrinter}) handle the nullable result.
+     */
+    @SuppressWarnings("NullAway")
+    public @Nullable SchemaVariable getPeerSchemaVariable() {
         return peerSV;
     }
 
 
-    public KeYJavaType getType() {
+    public @Nullable KeYJavaType getType() {
         return type;
     }
 
 
-    public Object getTypeDefiningObject() {
+    public @Nullable Object getTypeDefiningObject() {
         return type != null ? type : peerSV;
     }
 

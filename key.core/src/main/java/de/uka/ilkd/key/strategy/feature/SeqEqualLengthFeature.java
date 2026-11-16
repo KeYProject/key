@@ -53,9 +53,13 @@ public final class SeqEqualLengthFeature extends BinaryFeature {
             PosInOccurrence pos, G goal, MutableState mState) {
         final Goal g = (Goal) goal;
         final Services services = g.proof().getServices();
-        final Polynomial firstAsPoly = length(first.toTerm(app, pos, g, mState), mState, services);
-        final Polynomial secondAsPoly =
-            length(second.toTerm(app, pos, g, mState), mState, services);
+        final Term firstTerm = first.toTerm(app, pos, g, mState);
+        final Term secondTerm = second.toTerm(app, pos, g, mState);
+        if (firstTerm == null || secondTerm == null) {
+            return false;
+        }
+        final Polynomial firstAsPoly = length(firstTerm, mState, services);
+        final Polynomial secondAsPoly = length(secondTerm, mState, services);
         return firstAsPoly != null && secondAsPoly != null && firstAsPoly.valueEq(secondAsPoly);
     }
 

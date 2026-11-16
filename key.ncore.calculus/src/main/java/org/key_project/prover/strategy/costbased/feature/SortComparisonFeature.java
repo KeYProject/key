@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.strategy.costbased.feature;
 
+import java.util.Objects;
+
 import org.key_project.logic.Term;
 import org.key_project.logic.sort.Sort;
 import org.key_project.prover.proof.ProofGoal;
@@ -43,7 +45,7 @@ public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
         final Term term2 = s2.toTerm(app, pos, (Goal) goal, mState);
         assert term1 != null && term2 != null
                 : "@AssumeAssertion(nullness): When using this comparison feature, term1 and term2 must be non-null";
-        return compare(term1.sort(), term2.sort());
+        return compare(Objects.requireNonNull(term1).sort(), Objects.requireNonNull(term2).sort());
     }
 
     /// @param sort1

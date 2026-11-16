@@ -6,11 +6,21 @@ package de.uka.ilkd.key.gui.notification.events;
 
 import de.uka.ilkd.key.gui.notification.NotificationEventID;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class ExceptionFailureEvent extends GeneralFailureEvent {
 
     private final Throwable error;
 
-    public ExceptionFailureEvent(String string, Throwable throwable) {
+    /**
+     * Creates an event for an exception that caused a failure.
+     *
+     * @param message the exception message, possibly {@code null} if the exception has none
+     * @param throwable the exception that caused the failure
+     */
+    public ExceptionFailureEvent(@Nullable String message, Throwable throwable) {
         super(NotificationEventID.EXCEPTION_CAUSED_FAILURE);
         this.error = throwable;
     }

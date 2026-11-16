@@ -6,6 +6,7 @@ package de.uka.ilkd.key.prover.mt;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
@@ -103,7 +104,8 @@ public class MtMacroStressTest {
                 ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
                 final KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
                 try {
-                    final Proof proof = env.getLoadedProof();
+                    final Proof proof = Objects.requireNonNull(
+                        env.getLoadedProof(), "the proof must have been loaded");
 
                     // Tiny budget: the parallel run cannot close this proof, leaving a partial
                     // subtree built by many workers.
@@ -118,7 +120,8 @@ public class MtMacroStressTest {
                         () -> "the budgeted parallel run made no progress (rep " + r + ")");
 
                     // Prune the parallel subtree -- the tree-shrinking mutation under guard.
-                    proof.pruneProof(proof.root());
+                    proof.pruneProof(
+                        Objects.requireNonNull(proof.root(), "the proof has a root node"));
                     assertEquals(1, proof.openGoals().size(),
                         () -> "pruning the parallel subtree corrupted the goal set (rep " + r
                             + ")");
@@ -151,7 +154,9 @@ public class MtMacroStressTest {
      * program's execution-path structure, so it must be identical across reps regardless of worker
      * scheduling; a differing count means a race left symbolic execution inconsistent.
      */
+    // the null user interface control in applyTo is deliberate: the macro runs headlessly
     @Test
+    @SuppressWarnings("NullAway")
     void finishSymbolicExecutionStaysSafeUnderManyWorkers() throws Exception {
         final Path examples = FindResources.getExampleDirectory();
         assumeTrue(examples != null, "examples directory not found");
@@ -169,8 +174,11 @@ public class MtMacroStressTest {
                 ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
                 final KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
                 try {
-                    final Proof proof = env.getLoadedProof();
-                    new FinishSymbolicExecutionMacro().applyTo(null, proof.root(), null, null);
+                    final Proof proof = Objects.requireNonNull(
+                        env.getLoadedProof(), "the proof must have been loaded");
+                    new FinishSymbolicExecutionMacro().applyTo(null,
+                        Objects.requireNonNull(proof.root(), "the proof has a root node"),
+                        null, null);
                     assertTrue(proof.countNodes() > 1,
                         () -> "finishSymbolicExecution made no progress (rep " + r + ")");
                     final int open = proof.openGoals().size();

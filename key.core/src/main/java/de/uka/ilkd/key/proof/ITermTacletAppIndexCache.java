@@ -6,17 +6,22 @@ package de.uka.ilkd.key.proof;
 
 import org.key_project.logic.Term;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * The general interface for caches for accelerating <code>TermTacletAppIndex</code>.
  *
  * @see TermTacletAppIndexCacheSet
  */
+@NullMarked
 public interface ITermTacletAppIndexCache {
 
     /**
      * @return the taclet app index for the term <code>t</code>, or <code>null</code> if no index
      *         for this term was found in the cache
      */
+    @Nullable
     TermTacletAppIndex getIndexForTerm(Term t);
 
     /**

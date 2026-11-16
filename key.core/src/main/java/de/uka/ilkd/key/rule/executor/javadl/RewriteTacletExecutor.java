@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.executor.javadl;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
@@ -26,6 +28,10 @@ import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.prover.sequent.SequentFormula;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public class RewriteTacletExecutor extends FindTacletExecutor {
 
     public RewriteTacletExecutor(RewriteTaclet taclet) {
@@ -78,8 +84,12 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
 
         JTerm formula = replace(term, rwTemplate, termLabelState, new TacletLabelHint(rwTemplate),
             posOfFind, posOfFind.posInTerm(), 0, matchCond, term.sort(), goal, services, ruleApp);
-        formula = TermLabelManager.refactorSequentFormula(termLabelState, services, formula,
-            posOfFind, taclet, goal, null, rwTemplate);
+        // The hint argument is deliberately absent; the label refactoring is fully determined by
+        // the taclet term passed as last argument.
+        @SuppressWarnings("NullAway")
+        final JTerm refactoredFormula = TermLabelManager.refactorSequentFormula(termLabelState,
+            services, formula, posOfFind, taclet, goal, null, rwTemplate);
+        formula = refactoredFormula;
         if (term == formula) {
             return posOfFind.sequentFormula();
         } else {
@@ -98,8 +108,10 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
         assert app.complete();
         final RewriteTacletGoalTemplate gt =
             (RewriteTacletGoalTemplate) taclet.goalTemplates().head();
-        return applyReplacewithHelper(goal, termLabelState, gt, app.posInOccurrence(), services,
-            app.matchConditions(), app);
+        return applyReplacewithHelper(goal, termLabelState, gt,
+            Objects.requireNonNull(app.posInOccurrence(),
+                "a complete rewrite taclet application has a position"),
+            services, app.matchConditions(), app);
     }
 
 
@@ -121,6 +133,9 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
             // This is strange in a RewriteTaclet, but who knows...
             // However, term label refactorings have to be performed.
             final JTerm oldFormula = (JTerm) posOfFind.sequentFormula().formula();
+            // The hint and taclet term arguments are deliberately absent; no label refactoring
+            // applies to a replacewith-less rewrite taclet.
+            @SuppressWarnings("NullAway")
             final JTerm newFormula = TermLabelManager.refactorSequentFormula(termLabelState,
                 services, oldFormula, posOfFind, taclet, goal, null, null);
             if (oldFormula != newFormula) {
@@ -145,12 +160,17 @@ public class RewriteTacletExecutor extends FindTacletExecutor {
      * @param ruleApp the rule application to apply
      * @param services the Services encapsulating all java information
      */
+    // The base addToAntec/addToSucc document a "null for head" position; whereToAdd (possibly
+    // null) and null are the intended positions for the added semisequents.
+    @SuppressWarnings("NullAway")
     @Override
     protected void applyAdd(Sequent add, TermLabelState termLabelState,
             SequentChangeInfo currentSequent,
-            PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
+            @Nullable PosInOccurrence whereToAdd, PosInOccurrence posOfFind,
             MatchResultInfo matchCond, Goal goal, TacletApp ruleApp, Services services) {
         if (posOfFind.isInAntec()) {
+            // The base addToAntec/addToSucc document a "null for head" position; whereToAdd
+            // (possibly null) and null are the intended positions for the added semisequents.
             addToAntec(add.antecedent(), currentSequent, whereToAdd, posOfFind, matchCond, goal,
                 ruleApp, services, termLabelState,
                 new TacletLabelHint(TacletOperation.ADD_ANTECEDENT, add));

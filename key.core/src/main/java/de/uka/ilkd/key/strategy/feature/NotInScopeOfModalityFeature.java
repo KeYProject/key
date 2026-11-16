@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.logic.op.JModality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 
@@ -16,6 +18,7 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 
 /**
@@ -23,6 +26,7 @@ import org.jspecify.annotations.NonNull;
  * program block or an update). Note that terms and formulas within (but not behind) updates are not
  * in the scope of the update
  */
+@NullMarked
 public class NotInScopeOfModalityFeature extends BinaryFeature {
 
     public static final Feature INSTANCE = new NotInScopeOfModalityFeature();
@@ -41,7 +45,7 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
         final PIOPathIterator it = pos.iterator();
 
         while (it.next() != -1) {
-            final var op = it.getSubTerm().op();
+            final var op = Objects.requireNonNull(it.getSubTerm()).op();
 
             if (op instanceof JModality) {
                 return true;

@@ -14,6 +14,8 @@ import de.uka.ilkd.key.proof.reference.ClosedBy;
 
 import org.key_project.util.java.SwingUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Arne Keller
  */
+@NullMarked
 public class ReferenceSearchDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
@@ -34,15 +37,15 @@ public class ReferenceSearchDialog extends JDialog {
     /**
      * Button to copy the relevant proof steps.
      */
-    private JButton applyButton;
+    private @Nullable JButton applyButton;
     /**
      * Button to close the dialog.
      */
-    private JButton closeDialog;
+    private @Nullable JButton closeDialog;
     /**
      * Scroll pane listing the open goals and the results of running each SMT solver on them.
      */
-    private JScrollPane scrollPane;
+    private @Nullable JScrollPane scrollPane;
     /**
      * Overall progress of the search / copy.
      */
@@ -57,10 +60,16 @@ public class ReferenceSearchDialog extends JDialog {
      *
      * @param proof the proof
      * @param listener control listener
+     *        <p>
+     *        The component-building calls are made on {@code this} while the receiver is still
+     *        under initialization (EISOP initialization check); safe here since all members are
+     *        initialized before the calls, suppressed with a scoped key.
      */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     public ReferenceSearchDialog(Proof proof, ReferenceSearchDialogListener listener) {
         super(MainWindow.getInstance());
         table = new ReferenceSearchTable(proof, MainWindow.getInstance().getMediator());
+        table.init();
         table.getTableHeader().setReorderingAllowed(false);
         this.setTitle("Proof Caching");
         this.listener = listener;
@@ -111,8 +120,16 @@ public class ReferenceSearchDialog extends JDialog {
             applyButton.setEnabled(false);
             applyButton.addActionListener(e -> {
                 try {
-                    applyButton.setEnabled(false);
-                    closeDialog.setEnabled(false);
+                    JButton apply = applyButton;
+                    JButton close = closeDialog;
+                    if (apply == null) {
+                        throw new NullPointerException("apply button not initialized.");
+                    }
+                    if (close == null) {
+                        throw new NullPointerException("close button not initialized.");
+                    }
+                    apply.setEnabled(false);
+                    close.setEnabled(false);
                     listener.copyButtonClicked(this);
                 } catch (Exception exception) {
                     // There may be exceptions during rule application that should not be lost.

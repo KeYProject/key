@@ -4,11 +4,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.proofmanagement.io;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A logger for printing messages of given severity levels.
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public interface Logger {
     /**
      * Prints a message to the logger.

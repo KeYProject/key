@@ -12,8 +12,10 @@ import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public interface ITacletIndex {
     /**
      * get all Taclets for the antecedent.

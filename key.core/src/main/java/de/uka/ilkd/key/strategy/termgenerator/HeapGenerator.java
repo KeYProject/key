@@ -6,6 +6,7 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
@@ -20,6 +21,8 @@ import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * The heap generator returns an iterator over all terms of sort heap that
  * <ol>
@@ -28,6 +31,7 @@ import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
  * <li>depending on the mode: heaps just occurring in updates are included or ignored</li>
  * </ol>
  */
+@NullMarked
 public class HeapGenerator implements TermGenerator<Goal> {
 
     public static final TermGenerator<Goal> INSTANCE = new HeapGenerator(true);
@@ -51,7 +55,8 @@ public class HeapGenerator implements TermGenerator<Goal> {
     }
 
     private void collectHeaps(Term term, LinkedHashSet<Term> heaps, Services services) {
-        if (term.sort().equals(services.getTypeConverter().getHeapLDT().targetSort())) {
+        if (term.sort().equals(
+            Objects.requireNonNull(services.getTypeConverter().getHeapLDT()).targetSort())) {
             heaps.add(term);
         } else {
             if (!includeUpdates && term.op() instanceof UpdateApplication) {

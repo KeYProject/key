@@ -7,6 +7,7 @@ package de.uka.ilkd.key.smt.communication;
 import java.io.IOException;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -15,6 +16,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Wolfram Pfeifer
  */
+@NullMarked
 public interface Pipe {
     /**
      * Sends a message to the external process the Pipe is connected to.

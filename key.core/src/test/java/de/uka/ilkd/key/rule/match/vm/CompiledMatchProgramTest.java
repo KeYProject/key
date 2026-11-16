@@ -4,9 +4,12 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.match.vm;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -17,6 +20,7 @@ import org.key_project.logic.Name;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.MatchProgram;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -52,15 +56,18 @@ public class CompiledMatchProgramTest {
         final ProofAggregate pa = HelperClassForTests.parse(
             HelperClassForTests.TESTCASE_DIRECTORY.resolve("tacletmatch")
                     .resolve("tacletMatch1.key"));
-        services = pa.getFirstProof().getServices();
-        propositional = findTaclet(pa, "taclet_match_rule_1");
-        function = findTaclet(pa, "taclet_match_rule_2");
-        binder = findTaclet(pa, "taclet_match_rule_3");
+        final Proof proof =
+            Objects.requireNonNull(pa.getFirstProof(), "the archive has the test proof");
+        services = proof.getServices();
+        propositional = findTaclet(proof, "taclet_match_rule_1");
+        function = findTaclet(proof, "taclet_match_rule_2");
+        binder = findTaclet(proof, "taclet_match_rule_3");
     }
 
-    private static FindTaclet findTaclet(ProofAggregate pa, String name) {
-        final Taclet t =
-            pa.getFirstProof().getInitConfig().lookupActiveTaclet(new Name(name));
+    private static FindTaclet findTaclet(Proof proof, String name) {
+        final Taclet t = Objects
+                .requireNonNull(proof.getInitConfig(), "the proof has an init config")
+                .lookupActiveTaclet(new Name(name));
         assertTrue(t instanceof FindTaclet, name + " must be a find taclet");
         return (FindTaclet) t;
     }
@@ -72,7 +79,8 @@ public class CompiledMatchProgramTest {
         return p;
     }
 
-    private MatchResultInfo match(MatchProgram p, String term) throws ParserException {
+    // returns null if the term does not match
+    private @Nullable MatchResultInfo match(MatchProgram p, String term) throws ParserException {
         return p.match(services.getTermBuilder().parseTerm(term), EMPTY, services);
     }
 

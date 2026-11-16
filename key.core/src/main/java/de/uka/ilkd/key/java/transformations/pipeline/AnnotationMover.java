@@ -21,6 +21,7 @@ import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.declarations.ResolvedAnnotationDeclaration;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,7 @@ public class AnnotationMover extends JavaTransformerAbstract {
         cu.walk(VariableDeclarator.class, it -> {
             var d = (VariableDeclarator) it;
             Node parent = d.getParentNode().get();
+            @Nullable
             NodeList<AnnotationExpr> annots = null;
             switch (parent) {
                 case FieldDeclaration f:
@@ -79,7 +81,7 @@ public class AnnotationMover extends JavaTransformerAbstract {
         });
     }
 
-    private void move(NodeList<AnnotationExpr> declList, Type type) {
+    private void move(@Nullable NodeList<AnnotationExpr> declList, Type type) {
         if (declList == null)
             return;
 

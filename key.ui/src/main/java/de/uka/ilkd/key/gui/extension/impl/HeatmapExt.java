@@ -21,6 +21,8 @@ import de.uka.ilkd.key.settings.ViewSettings;
 
 import net.miginfocom.layout.CC;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extension adapter for Heatmap
@@ -31,11 +33,16 @@ import org.jspecify.annotations.NonNull;
     description = "Colorize the formulae on the sequence based on the most recent changes\n"
         + "Developer: Jonas Schiffl <jonas.schiffl@kit.edu>",
     experimental = false)
+@NullMarked
 public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
         KeYGuiExtension.Toolbar, KeYGuiExtension.Settings {
     private final List<Action> actions = new ArrayList<>(2);
-    private HeatmapToggleAction toggleAction;
-    private HeatmapSettingsAction settingsAction;
+
+    /** The main-menu actions; created lazily by {@link #getActions(MainWindow)}. */
+    private @Nullable HeatmapToggleAction toggleAction;
+
+    /** The main-menu actions; created lazily by {@link #getActions(MainWindow)}. */
+    private @Nullable HeatmapSettingsAction settingsAction;
 
     @Override
     public @NonNull List<Action> getMainMenuActions(MainWindow mainWindow) {
@@ -53,11 +60,17 @@ public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         getActions(mainWindow);// initialize
+        HeatmapToggleAction currentToggle = toggleAction;
+        HeatmapSettingsAction currentSettings = settingsAction;
+        if (currentToggle == null || currentSettings == null) {
+            // getActions always registers both actions
+            throw new NullPointerException("Heatmap actions not initialized.");
+        }
         JToolBar tb = new JToolBar("Heatmap Options");
-        JToggleButton comp = new JToggleButton(toggleAction);
+        JToggleButton comp = new JToggleButton(currentToggle);
         comp.setHideActionText(true);
         tb.add(comp);
-        tb.add(settingsAction);
+        tb.add(currentSettings);
         return tb;
     }
 
@@ -75,6 +88,7 @@ public class HeatmapExt implements KeYGuiExtension, KeYGuiExtension.MainMenu,
  *
  * @author weigl, jschiffl
  */
+@NullMarked
 class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider {
     private static final long serialVersionUID = 7783431483026950930L;
 
@@ -140,7 +154,6 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
         final boolean sequent;
         final boolean newest;
 
-
         HeatmapMode(String shortText, String description, boolean enableHeatmap, boolean sequent,
                 boolean newest) {
             desc = description;
@@ -157,6 +170,12 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
 
     private final Map<HeatmapMode, JRadioButton> map = new HashMap<>();
 
+    /**
+     * The ctor builds all fields while the receiver is still under initialization (EISOP
+     * initialization check); the components are only used after construction completes,
+     * suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:method.invocation.invalid")
     HeatmapSettingsProvider() {
         setHeaderText("Heatmap Options");
 
@@ -186,6 +205,10 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
 
     private void addRadio(HeatmapMode mode) {
         JRadioButton radio = map.get(mode);
+        if (radio == null) {
+            // the map is fully populated before any radio row is added
+            throw new NullPointerException("No radio button for the mode.");
+        }
         addRowWithHelp(mode.desc, new JLabel(), radio);
     }
 
@@ -221,7 +244,6 @@ class HeatmapSettingsProvider extends SettingsPanel implements SettingsProvider 
             }
         }
     }
-
 
     @Override
     public int getPriorityOfSettings() {

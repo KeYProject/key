@@ -9,6 +9,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Annotate the help page for your component.
  *
@@ -18,6 +20,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
+@NullMarked
 public @interface HelpInfo {
     /**
      * The relative part of the URL to the {@link HelpFacade#HELP_BASE_URL}.

@@ -4,12 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.smt.model;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A Location is a pair (objectID, fieldID)
  *
  * @author mihai
  *
  */
+@NullMarked
 public class Location {
 
     private String objectID;

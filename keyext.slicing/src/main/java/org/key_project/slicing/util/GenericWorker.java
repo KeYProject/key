@@ -8,12 +8,16 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import javax.swing.*;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Generic background thread worker.
  *
  * @param <T> result of running the provided task
  * @author Arne Keller
  */
+@NullMarked
 public class GenericWorker<T> extends SwingWorker<Void, Void> {
     /**
      * Task executed in this worker.
@@ -44,7 +48,7 @@ public class GenericWorker<T> extends SwingWorker<Void, Void> {
     }
 
     @Override
-    protected Void doInBackground() throws Exception {
+    protected @Nullable Void doInBackground() throws Exception {
         try {
             T result = backgroundTask.call();
             SwingUtilities.invokeLater(() -> callback.accept(result));

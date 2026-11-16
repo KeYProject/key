@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -221,7 +222,9 @@ public class QueueRuleApplicationManagerSelfWakeTest {
             }
         }
         assertNotNull(sv, "schema variable " + svName + " not found in " + tacletName);
-        return (NoPosTacletApp) app.addCheckedInstantiation(sv, term, services, true);
+        return (NoPosTacletApp) Objects
+                .requireNonNull(app.addCheckedInstantiation(sv, term, services, true),
+                    "the checked instantiation must succeed");
     }
 
     /** The single park key of the given application, asserting its {@code WakeKind}. */

@@ -9,12 +9,15 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.IntegerProperty;
 import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.StringProperty;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Visitor pattern for {@link SMTHandlerProperty} objects.
  *
  * @param <A> argument type
  * @param <R> return type
  */
+@NullMarked
 public interface SMTHandlerPropertyVisitor<A, R> {
     R visit(EnumProperty<?> enumProp, A arg);
 

@@ -10,6 +10,9 @@ import java.io.StringWriter;
 
 import org.key_project.util.java.IOUtil;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Wraps BufferedReader in order to provide different message delimiters.
  *
@@ -34,6 +37,7 @@ import org.key_project.util.java.IOUtil;
  * @author Benjamin Niedermann (original version)
  * @author Mattias Ulbrich (complete overhaul)
  */
+@NullMarked
 class BufferedMessageReader {
 
     /** the wrapped reader */
@@ -60,7 +64,7 @@ class BufferedMessageReader {
      * @return a string between two delimiters or until the EOF.
      * @throws IOException if reading fails
      */
-    public String readMessage() throws IOException {
+    public @Nullable String readMessage() throws IOException {
 
         StringBuilder sb = new StringBuilder();
         int c;

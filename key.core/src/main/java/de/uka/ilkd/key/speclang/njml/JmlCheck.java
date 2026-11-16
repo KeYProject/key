@@ -10,6 +10,7 @@ import de.uka.ilkd.key.speclang.PositionedString;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Interface describes a syntactical check on JML parse trees.
@@ -17,6 +18,7 @@ import org.jspecify.annotations.NonNull;
  * @author Alexander Weigl
  * @version 1 (6/8/21)
  */
+@NullMarked
 public interface JmlCheck {
     /**
      * Checks for the given parse tree and returns warnings if necessary.

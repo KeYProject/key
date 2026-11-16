@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.termProjection;
 
+import java.util.Objects;
+
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -14,11 +16,14 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import org.jspecify.annotations.NullMarked;
+
 
 /**
  * Term projection that delivers the assumptions of a taclet application (the formulas that the
  * \assumes clause of the taclet refers to).
  */
+@NullMarked
 @StableCost
 public class AssumptionProjection implements ProjectionToTerm<Goal> {
 
@@ -43,6 +48,7 @@ public class AssumptionProjection implements ProjectionToTerm<Goal> {
                     + " but got "
                     + app;
 
-        return tapp.assumesFormulaInstantiations().get(no).getSequentFormula().formula();
+        return Objects.requireNonNull(tapp.assumesFormulaInstantiations()).get(no)
+                .getSequentFormula().formula();
     }
 }

@@ -6,7 +6,11 @@ package de.uka.ilkd.key.smt.lang;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
+import org.jspecify.annotations.NullMarked;
+
+@NullMarked
 public class SMTFunctionDef extends SMTFunction {
 
     private final SMTTerm sub;
@@ -84,7 +88,8 @@ public class SMTFunctionDef extends SMTFunction {
 
         buff.append(" )");
         buff.append(" ");
-        buff.append(imageSort.getId());
+        // the image sort is set by all constructors; a missing sort would have failed here before
+        buff.append(Objects.requireNonNull(this.imageSort, "image sort").getId());
         buff.append("\n");
         buff.append(sub.toString(3));
 

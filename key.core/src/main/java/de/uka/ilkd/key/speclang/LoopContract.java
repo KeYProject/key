@@ -24,6 +24,9 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * <p>
  * A contract for a block that begins with a loop.
@@ -36,12 +39,14 @@ import org.key_project.util.collection.ImmutableList;
  *
  * @author lanzinger
  */
+@NullMarked
 public interface LoopContract extends AuxiliaryContract {
 
     /**
      *
      * @return this loop contract's decreases clause.
      */
+    @Nullable
     JTerm getDecreases();
 
     /**
@@ -51,7 +56,8 @@ public interface LoopContract extends AuxiliaryContract {
      * @param services services.
      * @return this loop contract's decreases clause on the specified heap.
      */
-    JTerm getDecreases(JTerm heap, JTerm self, Services services);
+    @Nullable
+    JTerm getDecreases(JTerm heap, @Nullable JTerm self, Services services);
 
     /**
      *
@@ -59,6 +65,7 @@ public interface LoopContract extends AuxiliaryContract {
      * @param services services.
      * @return this loop contract's decreases clause.
      */
+    @Nullable
     JTerm getDecreases(Variables variables, Services services);
 
     /**
@@ -72,6 +79,7 @@ public interface LoopContract extends AuxiliaryContract {
      *
      * @return statements to execute before the loop.
      */
+    @Nullable
     StatementBlock getHead();
 
     /**
@@ -125,8 +133,8 @@ public interface LoopContract extends AuxiliaryContract {
             Map<LocationVariable, JTerm> newFreePostconditions,
             Map<LocationVariable, JTerm> newModifiableClauses,
             Map<LocationVariable, JTerm> newFreeModifiableClauses,
-            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, JTerm newMeasuredBy,
-            JTerm newDecreases);
+            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables,
+            @Nullable JTerm newMeasuredBy, @Nullable JTerm newDecreases);
 
     /**
      *
@@ -147,8 +155,8 @@ public interface LoopContract extends AuxiliaryContract {
             Map<LocationVariable, JTerm> newFreePostconditions,
             Map<LocationVariable, JTerm> newModifiableClauses,
             Map<LocationVariable, JTerm> newFreeModifiableClauses,
-            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, JTerm newMeasuredBy,
-            JTerm newDecreases);
+            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables,
+            @Nullable JTerm newMeasuredBy, @Nullable JTerm newDecreases);
 
     /**
      *
@@ -156,6 +164,7 @@ public interface LoopContract extends AuxiliaryContract {
      *         otherwise.
      * @see EnhancedForElimination.TransformationData#indexVariable()
      */
+    @Nullable
     ProgramVariable getIndexVariable();
 
     /**
@@ -164,6 +173,7 @@ public interface LoopContract extends AuxiliaryContract {
      *         otherwise.
      * @see EnhancedForElimination.TransformationData#valuesVariable()
      */
+    @Nullable
     ProgramVariable getValuesVariable();
 
     /**

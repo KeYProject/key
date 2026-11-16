@@ -4,14 +4,13 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.testgen.oracle;
 
-import java.util.Objects;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -29,11 +28,18 @@ public record OracleInvariantTranslator(Services services) {
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
         SpecificationRepository spec = services.getSpecificationRepository();
 
-        Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+        HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        if (heapLDT == null) {
+            throw new NullPointerException("No heap type defined in the services type converter.");
+        }
+        Sort heapSort = heapLDT.targetSort();
 
         LogicVariable h = new LogicVariable(new Name("h"), heapSort);
 
-        KeYJavaType kjt = Objects.requireNonNull(info.getKeYJavaType(s));
+        KeYJavaType kjt = info.getKeYJavaType(s);
+        if (kjt == null) {
+            throw new NullPointerException("No KeY Java type for sort " + s + ".");
+        }
 
         if (!(kjt.getJavaType() instanceof ClassDeclaration
                 || kjt.getJavaType() instanceof InterfaceDeclaration
@@ -41,7 +47,11 @@ public record OracleInvariantTranslator(Services services) {
             return tb.tt();
         }
 
-        LogicVariable o = new LogicVariable(new Name("o"), kjt.getSort());
+        Sort kjtSort = kjt.getSort();
+        if (kjtSort == null) {
+            throw new NullPointerException("KeY Java type for sort " + s + " has no sort.");
+        }
+        LogicVariable o = new LogicVariable(new Name("o"), kjtSort);
 
         JTerm result = tb.tt();
 
@@ -53,8 +63,7 @@ public record OracleInvariantTranslator(Services services) {
 
                 if (t.op().equals(Equality.EQV)) {
 
-                    JTerm[] heaps = new JTerm[1];
-                    heaps[0] = tb.var(h);
+                    JTerm[] heaps = { tb.var(h) };
 
                     JTerm inv = tb.inv(heaps, tb.var(o));
                     JTerm left = t.sub(0);

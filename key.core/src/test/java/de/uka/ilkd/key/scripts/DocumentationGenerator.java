@@ -11,8 +11,8 @@ import de.uka.ilkd.key.util.KeYResourceManager;
 
 public class DocumentationGenerator {
 
-    private static String branch;
-    private static String sha1;
+    private static String branch = "";
+    private static String sha1 = "";
 
     public static void main(String[] args) throws FileNotFoundException {
 
@@ -41,7 +41,9 @@ public class DocumentationGenerator {
         Collections.sort(categories);
 
         for (String category : categories) {
-            listCategory(category, commandsByCategory.get(category));
+            List<Map.Entry<String, ProofScriptCommand>> proofScriptCommands =
+                Objects.requireNonNull(commandsByCategory.get(category), "category must exist");
+            listCategory(category, proofScriptCommands);
         }
 
         List<Map.Entry<String, ProofScriptCommand>> uncategorized =

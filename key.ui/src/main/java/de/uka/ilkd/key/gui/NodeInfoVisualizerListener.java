@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.gui;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A listener to the {@link NodeInfoVisualizer} class. Listeners are notified whenever a visualizer
  * is registered or unregistered from
@@ -11,6 +13,7 @@ package de.uka.ilkd.key.gui;
  *
  * @author lanzinger
  */
+@NullMarked
 public interface NodeInfoVisualizerListener {
 
     /**

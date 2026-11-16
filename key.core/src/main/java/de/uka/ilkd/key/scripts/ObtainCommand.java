@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.scripts.meta.*;
@@ -88,7 +89,7 @@ public class ObtainCommand extends AbstractCommand {
     }
 
     private JTerm executeFromGoal(LocationVariable var) throws ScriptException {
-        Goal goal = state.getFirstOpenAutomaticGoal();
+        Goal goal = state().getFirstOpenAutomaticGoal();
 
         // This works under the assumption that the last succedent formula is the "goal" formula.
         SequentFormula sequentFormula = goal.node().sequent().succedent().getLast();
@@ -102,27 +103,38 @@ public class ObtainCommand extends AbstractCommand {
         }
 
         Services services = state().getProof().getServices();
-        Taclet intro = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(ALL_RIGHT_TACLET_NAME);
+        ProofEnvironment env = Objects.requireNonNull(state().getProof().getEnv(),
+            "proof environment is null");
+        Taclet intro = Objects.requireNonNull(
+            env.getInitConfigForEnvironment().lookupActiveTaclet(ALL_RIGHT_TACLET_NAME),
+            "taclet 'allRight' not found");
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(intro);
 
         SchemaVariable sk = getSV(app.uninstantiatedVars(), "sk");
+        // the name proposal method ignores its third argument; passing null preserves the original
+        // behaviour
         String name =
             VariableNameProposer.DEFAULT.getNameProposal(var.name().toString(), services, null);
-        app = app.createSkolemConstant(name, sk, var.sort(), true, goal);
+        app = Objects.requireNonNull(
+            app.createSkolemConstant(name, sk, var.sort(), true, goal),
+            "could not create a skolem constant");
 
         SchemaVariable b = getSV(app.uninstantiatedVars(), "b");
-        app = app.addCheckedInstantiation(b, formula.sub(0), services, true);
+        app = Objects.requireNonNull(
+            app.addCheckedInstantiation(b, formula.sub(0), services, true),
+            "could not add the instantiation");
 
         SchemaVariable u = getSV(app.uninstantiatedVars(), "u");
-        app = app.addCheckedInstantiation(u,
+        app = Objects.requireNonNull(app.addCheckedInstantiation(u,
             services.getTermBuilder().var((LogicVariable) formula.boundVars().get(0)), services,
-            true);
-        app = app.setPosInOccurrence(
-            new PosInOccurrence(sequentFormula, PosInTerm.getTopLevel(), false), services);
+            true), "could not add the instantiation");
+        app = Objects.requireNonNull(app.setPosInOccurrence(
+            new PosInOccurrence(sequentFormula, PosInTerm.getTopLevel(), false), services),
+            "could not set the position in occurrence");
 
         goal.apply(app);
-        return app.instantiations().getInstantiation(sk);
+        return Objects.requireNonNull(app.instantiations().getInstantiation(sk),
+            "no instantiation for the skolem variable");
     }
 
     private SequentFormula identifySequentFormula(Node node) {
@@ -150,18 +162,26 @@ public class ObtainCommand extends AbstractCommand {
     private JTerm executeEquals(LocationVariable var, @Nullable JTerm equals)
             throws ScriptException {
         Services services = state().getProof().getServices();
-        Taclet intro = state.getProof().getEnv().getInitConfigForEnvironment()
-                .lookupActiveTaclet(INTRO_TACLET_NAME);
+        ProofEnvironment env = Objects.requireNonNull(state().getProof().getEnv(),
+            "proof environment is null");
+        Taclet intro = Objects.requireNonNull(
+            env.getInitConfigForEnvironment().lookupActiveTaclet(INTRO_TACLET_NAME),
+            "taclet 'intro' not found");
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(intro);
         SchemaVariable sk = getSV(app.uninstantiatedVars(), "sk");
         SchemaVariable t = getSV(app.uninstantiatedVars(), "t");
+        // the name proposal method ignores its third argument; passing null preserves the original
+        // behaviour
         String name =
             VariableNameProposer.DEFAULT.getNameProposal(var.name().toString(), services, null);
-        app = app.createSkolemConstant(name, sk, var.sort(), true,
-            state.getFirstOpenAutomaticGoal());
-        app = app.addCheckedInstantiation(t, equals, services, true);
-        state.getFirstOpenAutomaticGoal().apply(app);
-        return app.instantiations().getInstantiation(sk);
+        app = Objects.requireNonNull(app.createSkolemConstant(name, sk, var.sort(), true,
+            state().getFirstOpenAutomaticGoal()), "could not create a skolem constant");
+        app = Objects.requireNonNull(app.addCheckedInstantiation(t,
+            Objects.requireNonNull(equals, "equals term must be given"), services, true),
+            "could not add the instantiation");
+        state().getFirstOpenAutomaticGoal().apply(app);
+        return Objects.requireNonNull(app.instantiations().getInstantiation(sk),
+            "no instantiation for the skolem variable");
     }
 
     private static SchemaVariable getSV(ImmutableSet<SchemaVariable> schemaVars, String name) {

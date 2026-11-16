@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
@@ -38,6 +39,7 @@ public class TestGoal {
     }
 
     @AfterEach
+    @SuppressWarnings("NullAway") // deliberate null reset after each test
     public void tearDown() {
         proof.dispose();
         proof = null;
@@ -122,7 +124,7 @@ public class TestGoal {
         assertNotNull(initConfig.getJustifInfo().getJustification(onFirst));
         assertNotNull(initConfig.getJustifInfo().getJustification(onResidual));
 
-        proof.pruneProof(proof.root());
+        proof.pruneProof(Objects.requireNonNull(proof.root(), "the proof has a root node"));
 
         assertNull(initConfig.getJustifInfo().getJustification(onFirst),
             "justification of taclet introduced on the firstLeaf branch must be removed on prune");

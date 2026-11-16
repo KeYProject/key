@@ -22,6 +22,7 @@ import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 
@@ -32,6 +33,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Alexander Weigl
  */
+@NullMarked
 public interface SolverType {
 
     /**
@@ -67,6 +69,7 @@ public interface SolverType {
      *
      * @return the solver-type-specific information, null if there is none
      */
+    @Nullable
     String getInfo();
 
     /**
@@ -167,6 +170,7 @@ public interface SolverType {
     /**
      * @return the current version that is installed, if it has already been checked, otherwise null
      */
+    @Nullable
     String getInstalledVersion();
 
     /**
@@ -203,6 +207,6 @@ public interface SolverType {
      * @return the newly created socket
      */
     @NonNull
-    AbstractSolverSocket getSocket(ModelExtractor query);
+    AbstractSolverSocket getSocket(@Nullable ModelExtractor query);
 
 }

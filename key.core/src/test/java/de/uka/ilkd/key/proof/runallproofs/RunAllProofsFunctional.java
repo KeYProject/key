@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.proof.runallproofs;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DynamicTest;
@@ -29,7 +30,8 @@ public final class RunAllProofsFunctional {
     @TestFactory
     Stream<DynamicTest> data() throws IOException {
         var proofCollection = ProofCollections.automaticJavaDL();
-        var statisticsFile = proofCollection.getSettings().getStatisticsFile();
+        var statisticsFile = Objects.requireNonNull(
+            proofCollection.getSettings().getStatisticsFile(), "statistics file");
         statisticsFile.setUp();
 
         return RunAllProofsTest.data(proofCollection);

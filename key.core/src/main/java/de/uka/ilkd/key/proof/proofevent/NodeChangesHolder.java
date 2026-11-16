@@ -7,7 +7,9 @@ package de.uka.ilkd.key.proof.proofevent;
 import org.key_project.prover.sequent.SequentChangeInfo;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public class NodeChangesHolder {
     public ImmutableList<SequentChangeInfo> scis;
 

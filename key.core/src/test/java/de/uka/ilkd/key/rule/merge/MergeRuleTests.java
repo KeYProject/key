@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -95,7 +96,8 @@ public class MergeRuleTests {
 
         assertTrue(proof.closed());
 
-        Iterator<Node> it = proof.root().subtreeIterator();
+        Node root = Objects.requireNonNull(proof.root(), "the proof has a root");
+        Iterator<Node> it = root.subtreeIterator();
         int mergeAppsCnt = 0;
         while (it.hasNext()) {
             if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
@@ -117,7 +119,8 @@ public class MergeRuleTests {
 
         assertTrue(proof.closed());
 
-        Iterator<Node> it = proof.root().subtreeIterator();
+        Node root = Objects.requireNonNull(proof.root(), "the proof has a root");
+        Iterator<Node> it = root.subtreeIterator();
         int mergeAppsCnt = 0;
         while (it.hasNext()) {
             if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
@@ -138,7 +141,8 @@ public class MergeRuleTests {
 
         assertTrue(proof.closed());
 
-        Iterator<Node> it = proof.root().subtreeIterator();
+        Node root = Objects.requireNonNull(proof.root(), "the proof has a root");
+        Iterator<Node> it = root.subtreeIterator();
         int mergeAppsCnt = 0;
         while (it.hasNext()) {
             if (it.next().getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
@@ -199,7 +203,8 @@ public class MergeRuleTests {
 
         // locate the merge application
         Node mergeNode = null;
-        for (Iterator<Node> it = proof.root().subtreeIterator(); it.hasNext();) {
+        Node root = Objects.requireNonNull(proof.root(), "the proof has a root");
+        for (Iterator<Node> it = root.subtreeIterator(); it.hasNext();) {
             final Node n = it.next();
             if (n.getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp) {
                 mergeNode = n;
@@ -216,8 +221,9 @@ public class MergeRuleTests {
         // merge partner's sequent were introduced by the merge application itself.
         final Set<Name> before = new HashSet<>();
         collectOpNames(mergeNode.sequent(), before);
-        for (MergePartner partner : ((MergeRuleBuiltInRuleApp) mergeNode.getAppliedRuleApp())
-                .getMergePartners()) {
+        final MergeRuleBuiltInRuleApp mergeApp = (MergeRuleBuiltInRuleApp) Objects
+                .requireNonNull(mergeNode.getAppliedRuleApp(), "the merge node has a rule app");
+        for (MergePartner partner : mergeApp.getMergePartners()) {
             collectOpNames(partner.getGoal().node().sequent(), before);
         }
         final Set<Name> after = new HashSet<>();
@@ -426,6 +432,8 @@ public class MergeRuleTests {
      * @param macro The macro to execute.
      * @param node The node to execute the macro on.
      */
+    @SuppressWarnings("NullAway") // null UserInterfaceControl is intentional: the macro runs
+                                  // headless
     private void runMacro(AbstractProofMacro macro, Node node) {
         try {
             macro.applyTo(null, node, null, null);
@@ -456,7 +464,9 @@ public class MergeRuleTests {
                     proofFile, null, null, null, true));
         Proof proof = environment.getLoadedProof();
         Assertions.assertNotNull(proof, "Loaded proof should not be null");
-        var errors = environment.getReplayResult().getErrorList();
+        var replayResult = Objects
+                .requireNonNull(environment.getReplayResult(), "the load has a replay result");
+        var errors = replayResult.getErrorList();
         if (!errors.isEmpty()) {
             LOGGER.warn("There were errors during load");
             for (int i = 0; i < errors.size(); i++) {

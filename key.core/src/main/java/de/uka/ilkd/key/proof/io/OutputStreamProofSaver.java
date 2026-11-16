@@ -62,6 +62,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,7 @@ import static org.key_project.util.java.IOUtil.safePathRelativeTo;
  *
  * @author Kai Wallisch
  */
+@NullMarked
 public class OutputStreamProofSaver {
     private static final Logger LOGGER = LoggerFactory.getLogger(OutputStreamProofSaver.class);
 
@@ -117,7 +119,11 @@ public class OutputStreamProofSaver {
      * Write users and KeY versions to buffer.
      *
      * @return a buffer containing user and KeY version.
+     *         <p>
+     *         The log lists are lazily created at the entry of this method; the dereferences of the
+     *         (nullable) log fields are suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public StringBuffer writeLog() {
         final StringBuffer logstr = new StringBuffer();
         // Advance the Log entries
@@ -146,6 +152,17 @@ public class OutputStreamProofSaver {
         return String.format("\\settings %s \n", ps.settingsToString());
     }
 
+    /**
+     * Writes the proof in the intermediate proof format to the given output stream.
+     *
+     * @param basePath The path against which relative paths are resolved.
+     * @param out The output stream to write to.
+     * @throws IOException If writing fails.
+     *         <p>
+     *         Every saved proof has a root node; the dereference of the (nullable) root node is
+     *         suppressed with a scoped key.
+     */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     public void save(Path basePath, OutputStream out) throws IOException {
         CopyReferenceResolver.copyCachedGoals(proof, null, null, null);
         try (PrintWriter ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
@@ -201,7 +218,9 @@ public class OutputStreamProofSaver {
                 ps.println("\\proof {");
                 ps.println(writeLog());
                 ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");
-                node2Proof(proof.root(), ps);
+                final Node root =
+                    Objects.requireNonNull(proof.root(), "Every saved proof has a root node");
+                node2Proof(root, ps);
                 ps.println("}");
             }
         }
@@ -237,7 +256,7 @@ public class OutputStreamProofSaver {
             out.println();
             Path bootClassPath = jm.getBootClassPath();
             if (bootClassPath != null) {
-                if (!bootClassPath.toUri().getScheme().equals("file")) {
+                if (!"file".equals(bootClassPath.toUri().getScheme())) {
                     /*
                      * This happens if JavaRedux (the default bootclasspath) is read from a zip.
                      * Since we do not support non-file includes, we need to skip it ...
@@ -413,11 +432,14 @@ public class OutputStreamProofSaver {
         output.append("\")");
 
         if (mergeApp.getDistinguishingFormula() != null) {
+            final String distFormula =
+                printAnything(mergeApp.getDistinguishingFormula(), proof.getServices(), false);
             output.append(" (").append(ProofElementID.MERGE_DIST_FORMULA.getRawName())
                     .append(" \"");
-            output.append(escapeCharacters(
-                printAnything(mergeApp.getDistinguishingFormula(), proof.getServices(), false)
-                        .trim().replaceAll("(\\r|\\n|\\r\\n)+", "")));
+            if (distFormula != null) {
+                output.append(escapeCharacters(
+                    distFormula.trim().replaceAll("(\\r|\\n|\\r\\n)+", "")));
+            }
             output.append("\")");
         }
 
@@ -447,7 +469,11 @@ public class OutputStreamProofSaver {
      * @param output the writer in which the rule is printed
      *
      * @throws IOException an exception thrown when printing fails
+     * <p>
+     * The merge node corresponding to a close-after-merge application is always present at save
+     * time; the dereference of the (nullable) merge node is suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void printSingleCloseAfterMergeRuleApp(CloseAfterMergeRuleBuiltInRuleApp closeApp,
             Node node, String prefix, Appendable output) throws IOException {
 
@@ -471,7 +497,14 @@ public class OutputStreamProofSaver {
      * @param appliedRuleApp the rule application to be printed
      * @param output the writer in which the rule is printed
      * @throws IOException an exception thrown when printing fails
+     *         <p>
+     *         The proof's init config and its rule justification are always present at save time;
+     *         the
+     *         dereferences of the (nullable) init config and justification are suppressed with a
+     *         scoped
+     *         key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void printRuleJustification(IBuiltInRuleApp appliedRuleApp, Appendable output)
             throws IOException {
         final RuleJustification ruleJusti = proof.getInitConfig().getJustifInfo()
@@ -493,7 +526,11 @@ public class OutputStreamProofSaver {
      * @param prefix a string which the printed rule is concatenated to
      * @param output the writer in which the rule is printed
      * @throws IOException an exception thrown when printing fails
+     *         <p>
+     *         A contract-rule application always carries a program term; the dereference of the
+     *         (nullable) program term is suppressed with a scoped key.
      */
+    @SuppressWarnings({ "NullAway", "nullness:dereference.of.nullable" })
     private void printSingleBuiltInRuleApp(IBuiltInRuleApp appliedRuleApp, Node node, String prefix,
             Appendable output) throws IOException {
         output.append(prefix);
@@ -660,7 +697,7 @@ public class OutputStreamProofSaver {
     }
 
     public static String posInOccurrence2Proof(Sequent seq,
-            PosInOccurrence pos) {
+            @Nullable PosInOccurrence pos) {
         if (pos == null) {
             return "";
         }
@@ -788,21 +825,21 @@ public class OutputStreamProofSaver {
         return printer.result();
     }
 
-    public static String printTerm(JTerm t, Services serv) {
+    public static String printTerm(JTerm t, @Nullable Services serv) {
         return printTerm(t, serv, false);
     }
 
-    public static String printTerm(JTerm t, Services serv, boolean shortAttrNotation) {
+    public static String printTerm(JTerm t, @Nullable Services serv, boolean shortAttrNotation) {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         logicPrinter.printTerm(t);
         return logicPrinter.result();
     }
 
-    public static String printAnything(Object val, Services services) {
+    public static @Nullable String printAnything(Object val, Services services) {
         return printAnything(val, services, true);
     }
 
-    public static String printAnything(Object val, Services services,
+    public static @Nullable String printAnything(Object val, Services services,
             boolean shortAttrNotation) {
         switch (val) {
             case ProgramElement programElement -> {
@@ -831,17 +868,18 @@ public class OutputStreamProofSaver {
         }
     }
 
-    private static String printSequent(Sequent val, Services services) {
+    private static String printSequent(Sequent val, @Nullable Services services) {
         final LogicPrinter printer = createLogicPrinter(services, services == null);
         printer.printSequent(val);
         return printer.result();
     }
 
-    private static LogicPrinter createLogicPrinter(Services serv, boolean shortAttrNotation) {
+    private static LogicPrinter createLogicPrinter(@Nullable Services serv,
+            boolean shortAttrNotation) {
 
         final NotationInfo ni = new NotationInfo(false, false, false);
 
-        return LogicPrinter.purePrinter(ni, (shortAttrNotation ? serv : null));
+        return LogicPrinter.purePrinter(ni, shortAttrNotation ? serv : null);
     }
 
 }

@@ -16,6 +16,10 @@ import javax.swing.*;
 import de.uka.ilkd.key.gui.nodeviews.SequentView;
 import de.uka.ilkd.key.pp.PosInSequent;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+@NullMarked
 public final class GuiUtilities {
 
     private GuiUtilities() {
@@ -32,7 +36,6 @@ public final class GuiUtilities {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         toolkit.getSystemClipboard().setContents(ss, ss);
     }
-
 
     /**
      * Center a component on the screen.
@@ -64,7 +67,7 @@ public final class GuiUtilities {
      * @param parent center relative to what. <code>null</code> to center relative to screen.
      * @see #setCenter(Component)
      */
-    public static void setCenter(Component comp, Component parent) {
+    public static void setCenter(Component comp, @Nullable Component parent) {
         if (parent == null) {
             setCenter(comp);
             return;

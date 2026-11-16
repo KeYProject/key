@@ -32,12 +32,15 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 import org.key_project.prover.strategy.costbased.termfeature.*;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * Collection of strategy features that can be accessed statically. This class is essentially a
  * collection of constructors for various features.
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
+@NullMarked
 public abstract class StaticFeatureCollection {
 
     protected static Feature loopInvFeature(Feature costStdInv) {

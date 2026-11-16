@@ -5,10 +5,13 @@
 package de.uka.ilkd.key.scripts;
 
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -70,7 +73,7 @@ public class FocusCommand extends AbstractCommand {
     @Override
     public void execute(ScriptCommandAst args) throws ScriptException, InterruptedException {
         var s = state().getValueInjector().inject(new Parameters(), args);
-        hideAll(s.toKeep);
+        hideAll(Objects.requireNonNull(s.toKeep, "formulas to keep must be given"));
     }
 
     @Override
@@ -85,7 +88,7 @@ public class FocusCommand extends AbstractCommand {
      * @throws ScriptException if no goal is currently open
      */
     private void hideAll(SequentWithHoles toKeep) throws ScriptException {
-        Goal goal = state.getFirstOpenAutomaticGoal();
+        Goal goal = state().getFirstOpenAutomaticGoal();
         assert goal != null : "not null by contract of the method";
 
         for (SequentFormula seqFormula : goal.sequent().antecedent().asList()) {
@@ -106,7 +109,12 @@ public class FocusCommand extends AbstractCommand {
     // determine where formula in sequent and apply either hide_left or hide_right
     private Taclet getHideTaclet(String pos) {
         String ruleName = "hide_" + pos;
-        return proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(ruleName));
+        ProofEnvironment env = Objects.requireNonNull(
+            Objects.requireNonNull(proof, "proof is not set").getEnv(),
+            "proof environment is null");
+        return Objects.requireNonNull(env.getInitConfigForEnvironment()
+                .lookupActiveTaclet(new Name(ruleName)),
+            "taclet '" + ruleName + "' not found");
     }
 
     /**
@@ -131,11 +139,13 @@ public class FocusCommand extends AbstractCommand {
 
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
-        TacletApp app =
-            PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, proof.getServices());
+        Proof proof = Objects.requireNonNull(this.proof, "proof is not set");
+        TacletApp app = Objects.requireNonNull(
+            PosTacletApp.createPosTacletApp((FindTaclet) tac, inst, pio, proof.getServices()),
+            "could not create a taclet application for the hide rule");
         app = app.addCheckedInstantiation(sv, (JTerm) toHide.formula(),
             proof.getServices(), true);
-        g.apply(app);
+        g.apply(Objects.requireNonNull(app, "taclet application is null"));
 
     }
 

@@ -10,11 +10,14 @@ import de.uka.ilkd.key.rule.TacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
+import org.jspecify.annotations.NullMarked;
+
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 /**
  * Binary feature that returns zero iff a certain Taclet app has not already been performed
  */
+@NullMarked
 public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature();

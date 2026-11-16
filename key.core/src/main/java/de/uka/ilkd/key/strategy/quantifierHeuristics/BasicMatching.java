@@ -19,6 +19,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Matches a trigger against a ground term of the sequent by descending both in step, binding a
  * quantified variable to whatever ground subterm stands at its position. Operators and arities
@@ -39,6 +42,7 @@ import org.key_project.util.collection.ImmutableSet;
  * {@code base + i = x} for {@code i} (see {@link TheoryReasoning#solveForVariable}) and
  * the match continues with {@code i = x - base}.
  */
+@NullMarked
 class BasicMatching {
 
     private BasicMatching() {}
@@ -64,7 +68,7 @@ class BasicMatching {
      * @return all substitutions found
      */
     static ImmutableSet<Substitution> getSubstitutions(Term trigger, Term targetTerm,
-            Services services) {
+            @Nullable Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.nil();
         if (targetTerm.freeVars().size() > 0 || targetTerm.op() instanceof Quantifier) {
             return allsubs;
@@ -88,7 +92,8 @@ class BasicMatching {
      * @return all substitution that a given pattern(ex: a term of a uniTrigger) match in the
      *         instance.
      */
-    private static Substitution match(Term pattern, Term instance, Services services) {
+    private static @Nullable Substitution match(Term pattern, Term instance,
+            @Nullable Services services) {
         final Bindings bindings =
             matchRec(Bindings.EMPTY, pattern, instance, services, false);
         if (bindings == null) {
@@ -111,6 +116,7 @@ class BasicMatching {
         static final Bindings EMPTY = new Bindings(DefaultImmutableMap.nilMap(),
             DefaultImmutableMap.nilMap(), false);
 
+        @Nullable
         Bindings withVariable(QuantifiableVariable var, Term instance) {
             final Term bound = variables.get(var);
             if (bound == null) {
@@ -119,6 +125,7 @@ class BasicMatching {
             return bound.equals(instance) ? this : null;
         }
 
+        @Nullable
         Bindings withMetavariable(Metavariable metavariable, Term instance) {
             final Term bound = metavariables.get(metavariable);
             if (bound == null) {
@@ -136,8 +143,8 @@ class BasicMatching {
     /**
      * match the pattern to instance recursively.
      */
-    private static Bindings matchRec(Bindings bindings, Term pattern, Term instance,
-            Services services, boolean nested) {
+    private static @Nullable Bindings matchRec(Bindings bindings, Term pattern, Term instance,
+            @Nullable Services services, boolean nested) {
         final var patternOp = pattern.op();
 
         if (patternOp instanceof QuantifiableVariable var) {
@@ -181,8 +188,8 @@ class BasicMatching {
      * A pattern that holds a metavariable is not solved: the solution is built from the
      * pattern's other parts, and an instance is a term of the proof, which a metavariable is not.
      */
-    private static Bindings solveByTheory(Bindings bindings, Term pattern, Term instance,
-            Services services) {
+    private static @Nullable Bindings solveByTheory(Bindings bindings, Term pattern, Term instance,
+            @Nullable Services services) {
         // No services means the caller asked to compare the structures alone.
         if (services == null || !(pattern instanceof JTerm patternTerm)
                 || !(instance instanceof JTerm instanceTerm) || containsMetavariable(pattern)) {

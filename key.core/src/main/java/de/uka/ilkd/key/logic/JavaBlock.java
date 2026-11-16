@@ -13,9 +13,12 @@ import de.uka.ilkd.key.pp.PrettyPrinter;
 import org.key_project.logic.Program;
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@NullMarked
 public final class JavaBlock implements Program {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaBlock.class);
 
@@ -73,7 +76,7 @@ public final class JavaBlock implements Program {
     }
 
     /** returns true iff the program elements are equal */
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (o == this) {
             return true;
         } else if (!(o instanceof JavaBlock block)) {

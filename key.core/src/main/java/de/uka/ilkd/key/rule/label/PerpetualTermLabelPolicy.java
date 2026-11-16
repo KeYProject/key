@@ -13,17 +13,22 @@ import de.uka.ilkd.key.proof.Goal;
 import org.key_project.prover.rules.Rule;
 import org.key_project.prover.sequent.PosInOccurrence;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * This policy always maintains a label.
  *
  * @author lanzinger
  */
+@NullMarked
 public class PerpetualTermLabelPolicy implements TermLabelPolicy {
 
     @Override
     public TermLabel keepLabel(TermLabelState state, Services services,
-            PosInOccurrence applicationPosInOccurrence, JTerm applicationTerm, Rule rule, Goal goal,
-            Object hint, JTerm tacletTerm,
+            PosInOccurrence applicationPosInOccurrence,
+            @Nullable JTerm applicationTerm, Rule rule, @Nullable Goal goal,
+            @Nullable Object hint, @Nullable JTerm tacletTerm,
             JTerm newTerm, TermLabel label) {
         return label;
     }

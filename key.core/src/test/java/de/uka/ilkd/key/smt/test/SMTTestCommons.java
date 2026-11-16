@@ -20,6 +20,7 @@ import de.uka.ilkd.key.smt.solvertypes.SolverType;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Tag;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,12 +34,14 @@ public abstract class SMTTestCommons {
     protected static final Path FOLDER = HelperClassForTests.TESTCASE_DIRECTORY
             .resolve("smt")
             .resolve("tacletTranslation");
-    protected static ProblemInitializer initializer = null;
+    // set lazily by parse(); null until the first call
+    protected static @Nullable ProblemInitializer initializer = null;
     protected static final Profile profile = new JavaProfile();
 
-    private TermServices services;
+    // set by parse(); null until the first call
+    private @Nullable TermServices services;
 
-    protected TermServices getServices() {
+    protected @Nullable TermServices getServices() {
         return services;
     }
 
@@ -132,8 +135,9 @@ public abstract class SMTTestCommons {
             if (initializer == null) {
                 initializer = new ProblemInitializer(po.getProfile());
             }
-            InitConfig initConfig = initializer.prepare(po);
-            result = initializer.startProver(initConfig, po);
+            ProblemInitializer init = initializer;
+            InitConfig initConfig = init.prepare(po);
+            result = init.startProver(initConfig, po);
             services = initConfig.getServices();
             // po.close();
         } catch (Exception e) {

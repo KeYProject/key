@@ -36,6 +36,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -43,6 +44,7 @@ import org.jspecify.annotations.Nullable;
  * functions, heuristics, and variables namespaces, information on the underlying java model, and a
  * set of rules.
  */
+@NullMarked
 public class InitConfig {
 
     /**
@@ -80,16 +82,16 @@ public class InitConfig {
     private Map<Taclet, TacletBuilder<? extends Taclet>> taclet2Builder = new LinkedHashMap<>();
 
     /** HashMap for quick lookups taclet name->taclet */
-    private Map<Name, Taclet> activatedTacletCache = null;
+    private @Nullable Map<Name, Taclet> activatedTacletCache = null;
     private boolean defaultsComputed;
 
     /** the fileRepo which is responsible for consistency between source code and proof */
-    private FileRepo fileRepo;
+    private @Nullable FileRepo fileRepo;
 
     // weigl this field is never set
-    private String originalKeYFileName;
+    private @Nullable String originalKeYFileName;
 
-    private ProofSettings settings;
+    private @Nullable ProofSettings settings;
 
     private KeyAst.@Nullable Declarations header;
 
@@ -103,8 +105,14 @@ public class InitConfig {
         category2DefaultChoice = new TreeMap<>();
     }
 
-    /// combines the found choices in KeY files, together with the current settings.
-    /// The namespace of choices has to be filled.
+    /**
+     * Combines the found choices in KeY files, together with the current settings. The namespace
+     * of choices has to be filled.
+     * <p>
+     * The choice settings of this init config are present whenever the defaults are computed; the
+     * dereference of the (nullable) settings is suppressed with a scoped key.
+     */
+    @SuppressWarnings("nullness:dereference.of.nullable")
     public void computeDefaults(ChoiceInformation ci) {
         if (defaultsComputed) {
             return;
@@ -164,7 +172,7 @@ public class InitConfig {
     }
 
 
-    public Profile getProfile() {
+    public @Nullable Profile getProfile() {
         return services.getProfile();
     }
 
@@ -257,11 +265,13 @@ public class InitConfig {
         return taclets;
     }
 
-    public Taclet lookupActiveTaclet(Name name) {
+    public @Nullable Taclet lookupActiveTaclet(Name name) {
         if (activatedTacletCache == null) {
             fillActiveTacletCache();
         }
-        return activatedTacletCache.get(name);
+        final Map<Name, Taclet> cache = Objects.requireNonNull(activatedTacletCache,
+            "activated taclet cache is not filled");
+        return cache.get(name);
     }
 
     /**
@@ -271,7 +281,9 @@ public class InitConfig {
         if (activatedTacletCache == null) {
             fillActiveTacletCache();
         }
-        return activatedTacletCache.values();
+        final Map<Name, Taclet> cache = Objects.requireNonNull(activatedTacletCache,
+            "activated taclet cache is not filled");
+        return cache.values();
     }
 
 
@@ -419,12 +431,12 @@ public class InitConfig {
     }
 
 
-    public void setSettings(ProofSettings newSettings) {
+    public void setSettings(@Nullable ProofSettings newSettings) {
         this.settings = newSettings;
     }
 
 
-    public ProofSettings getSettings() {
+    public @Nullable ProofSettings getSettings() {
         return settings;
     }
 
@@ -475,7 +487,7 @@ public class InitConfig {
             + getTaclets() + "\n" + "Built-In:" + builtInRules() + "\n";
     }
 
-    public FileRepo getFileRepo() {
+    public @Nullable FileRepo getFileRepo() {
         return fileRepo;
     }
 

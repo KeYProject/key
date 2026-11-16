@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
@@ -53,7 +54,7 @@ class ScriptLineParser {
     /**
      * the file URL from which the script is taken.
      */
-    private URI fileURI;
+    private @Nullable URI fileURI;
 
     /**
      * While within a string literal, this stores the character with which the string has started.
@@ -87,7 +88,7 @@ class ScriptLineParser {
         }
     }
 
-    public ParsedCommand parseCommand() throws IOException, ScriptException {
+    public @Nullable ParsedCommand parseCommand() throws IOException, ScriptException {
         Map<String, String> result = new HashMap<>();
 
         StringBuilder cmdBuilder = new StringBuilder();
@@ -150,7 +151,8 @@ class ScriptLineParser {
                         }
                         case IN_COMMENT -> {
                             if (c == '\n') {
-                                state = stateBeforeComment;
+                                state = Objects.requireNonNull(stateBeforeComment,
+                                    "No state before comment");
                             }
                         }
                         default -> {
@@ -256,13 +258,18 @@ class ScriptLineParser {
 
     private Location getLocation() {
         Position pos = line >= 1 ? Position.newOneBased(line, col) : Position.UNDEFINED;
-        return new Location(fileURI, pos);
+        // fileURI may be null if the source is unknown; Location supports that but does not
+        // annotate the component, so a scoped suppression keeps the constructor call honest.
+        @SuppressWarnings("NullAway")
+        Location result = new Location(fileURI, pos);
+        return result;
     }
 
     public int getOffset() {
         return pos;
     }
 
-    public record ParsedCommand(Map<String, String> args, Location start, Location end) {
+    public record ParsedCommand(Map<String, String> args, @Nullable Location start,
+            Location end) {
     }
 }

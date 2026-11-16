@@ -6,6 +6,7 @@ package de.uka.ilkd.key.prover.mt;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
@@ -106,7 +107,8 @@ public class MtStressTest {
                 ProofSettings.DEFAULT_SETTINGS.loadSettingsFromPropertyString(settingsSnapshot);
                 final KeYEnvironment<?> env = KeYEnvironment.load(keyFile);
                 try {
-                    final Proof proof = env.getLoadedProof();
+                    final Proof proof = Objects.requireNonNull(
+                        env.getLoadedProof(), "the proof must have been loaded");
                     final ProofStarter starter = new ProofStarter(false);
                     starter.init(proof);
                     // init() copies the proof's modest maxSteps; override it so benign parallel

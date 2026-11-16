@@ -15,10 +15,14 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 /**
  * Null literal. Is used as singleton.
  */
 
+@NullMarked
 public final class NullLiteral extends Literal implements ReferencePrefix {
 
     public static final NullLiteral NULL = new NullLiteral();
@@ -35,7 +39,7 @@ public final class NullLiteral extends Literal implements ReferencePrefix {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         return o != null && o.getClass() == this.getClass();
     }
 

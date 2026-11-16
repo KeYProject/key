@@ -17,12 +17,15 @@ import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactor
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.Pair;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A completion class for merge procedures. Certain procedures, such as
  * {@link MergeWithPredicateAbstraction}, may not be complete initially and need additional input.
  *
  * @author Dominic Scheurer
  */
+@NullMarked
 public abstract class MergeProcedureCompletion<C extends MergeProcedure> {
 
     /**

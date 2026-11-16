@@ -18,11 +18,14 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 import org.key_project.logic.SyntaxElement;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * A type that implement this interface can be used in all java programs instead of an expression or
  * statement. For example class SchemaVariable implements this interface to be able to stand for
  * program constructs.
  */
+@NullMarked
 public interface ProgramConstruct extends ILoopInit, IForUpdates, IGuard,
         Label, ExpressionStatement, TypeReference, IProgramVariable,
         IProgramMethod, Branch, IExecutionContext, MethodName {

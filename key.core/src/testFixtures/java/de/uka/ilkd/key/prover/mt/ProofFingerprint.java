@@ -80,7 +80,8 @@ public final class ProofFingerprint {
     public static ProofFingerprint of(Proof proof) {
         Objects.requireNonNull(proof, "proof");
         StringBuilder ordered = new StringBuilder();
-        String canonical = digest(proof.root(), ordered);
+        String canonical = digest(Objects.requireNonNull(proof.root(), "root of " + proof),
+            ordered);
         return new ProofFingerprint(proof.closed(), proof.openGoals().size(),
             proof.closedGoals().size(), proof.countNodes(), proof.countBranches(),
             sha256(ordered.toString()), canonical);
@@ -134,7 +135,7 @@ public final class ProofFingerprint {
                 }
             }
         }
-        return rootDigest;
+        return Objects.requireNonNull(rootDigest, "no digest computed for " + root);
     }
 
     /** Per-node bookkeeping for the explicit-stack traversal in {@link #digest}. */

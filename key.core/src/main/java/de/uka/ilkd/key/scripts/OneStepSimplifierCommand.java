@@ -38,7 +38,7 @@ public class OneStepSimplifierCommand extends AbstractCommand {
 
         var arguments = state().getValueInjector().inject(new Parameters(), command);
 
-        final Goal goal = state.getFirstOpenAutomaticGoal();
+        final Goal goal = state().getFirstOpenAutomaticGoal();
 
         if (Boolean.TRUE.equals(arguments.recentOnly)) {
             SequentChangeInfo sci = goal.node().getNodeInfo().getSequentChangeInfo();

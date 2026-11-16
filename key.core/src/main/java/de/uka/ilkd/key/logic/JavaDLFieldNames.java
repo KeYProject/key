@@ -7,8 +7,10 @@ package de.uka.ilkd.key.logic;
 
 import org.key_project.logic.Name;
 
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+@NullMarked
 public class JavaDLFieldNames {
     public static final char FIELD_PREFIX = '#';
     public static final char IMPLICIT_NAME_PREFIX = '$';

@@ -8,10 +8,13 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 
 import org.key_project.util.ExtList;
 
+import org.jspecify.annotations.NullMarked;
+
 /**
  * represents something in logic that originates from a program like queries, program variables and
  * therefore has a KeYJavaType
  */
+@NullMarked
 public interface ProgramInLogic {
 
     Expression convertToProgram(JTerm t, ExtList list);
