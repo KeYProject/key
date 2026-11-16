@@ -45,6 +45,7 @@ class InstanceOfPatternFlowScopingTest {
             Proof proof =
                 environment.createProof(contract.createProofObl(environment.getInitConfig()));
             ProofStarter starter = new ProofStarter(false);
+            starter.setMaxRuleApplications(50_000);
             starter.init(proof);
             starter.start();
 

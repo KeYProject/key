@@ -62,7 +62,6 @@ REMOVE_ANNOTATION : '\\removeAnnotation';
 NOTFREEIN : '\\notFreeIn';
 ISBINDINGEXPR : '\\isBindingExpr';
 RECORD_PATTERN_INSTANCEOF : '\\isRecordPatternInstanceof';
-ALWAYS_ABNORMALLY_TERMINATES: '\\alwaysAbnormallyTerminates';
 STATIC : '\\static';
 STATICMETHODREFERENCE : '\\staticMethodReference';
 MAXEXPANDMETHOD : '\\mayExpandMethod';

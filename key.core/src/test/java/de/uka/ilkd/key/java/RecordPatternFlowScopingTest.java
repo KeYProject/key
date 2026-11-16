@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.util.ProofStarter;
 
 import org.junit.jupiter.api.Test;
@@ -20,6 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /// pattern is definitely matched, and the proof closes.
 class RecordPatternFlowScopingTest {
 
+    @org.junit.jupiter.api.BeforeEach
+    void enableJml() {
+        // keep the proof independent of test ordering: another test may have disabled JML
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setUseJML(true);
+    }
+
     private static void prove(Path source) throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(source);
         try {
@@ -27,6 +34,7 @@ class RecordPatternFlowScopingTest {
             Proof proof =
                 environment.createProof(contract.createProofObl(environment.getInitConfig()));
             ProofStarter starter = new ProofStarter(false);
+            starter.setMaxRuleApplications(50_000);
             starter.init(proof);
             starter.start();
 

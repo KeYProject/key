@@ -249,7 +249,6 @@ varexpId: // weigl, 2021-03-12: This will be later just an arbitrary identifier.
   | NOTFREEIN
   | ISBINDINGEXPR
   | RECORD_PATTERN_INSTANCEOF
-  | ALWAYS_ABNORMALLY_TERMINATES
   | HASSORT
   | NEWLABEL
   | ISREFERENCE
