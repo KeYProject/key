@@ -410,7 +410,7 @@ public class TestTacletParser {
         JTerm find = taclet.find();
         JavaBlock jb = find.javaBlock();
         ContextStatementBlock ct = (ContextStatementBlock) jb.program();
-        Assignment ca = (Assignment) ct.getChildAt(0);
+        Assignment<?> ca = (Assignment<?>) ct.getChildAt(0);
         assertInstanceOf(IsStatic.class, ca.getChildAt(1));
     }
 
