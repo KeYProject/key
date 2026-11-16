@@ -47,8 +47,8 @@ class HeadlessProverErrorClassificationTest {
             Contract contract = ContractIndex.fromEnvironment(env).byName(CONTRACT).orElseThrow();
 
             ObligationCreationException error = catchThrowableOfType(
-                () -> HeadlessProver.createProof(failingEnvironment(env), contract),
-                ObligationCreationException.class);
+                ObligationCreationException.class,
+                () -> HeadlessProver.createProof(failingEnvironment(env), contract));
 
             assertThat(error).as("createProof must throw an ObligationCreationException")
                     .isNotNull();
