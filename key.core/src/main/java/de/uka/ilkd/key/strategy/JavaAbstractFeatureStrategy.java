@@ -18,9 +18,6 @@ import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.strategy.AbstractFeatureStrategy;
 import org.key_project.prover.strategy.costbased.feature.ConditionalFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
-import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
-import org.key_project.prover.strategy.costbased.feature.instantiator.SVInstantiationCP;
-import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.collection.ImmutableList;
 
@@ -80,30 +77,6 @@ public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrateg
         return h;
     }
 
-    protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, Feature f) {
-        d.add(ruleSet, f);
-    }
-
-    protected void bindRuleSet(RuleSetDispatchFeature d, RuleSet ruleSet, long cost) {
-        bindRuleSet(d, ruleSet, longConst(cost));
-    }
-
-    protected void bindRuleSet(RuleSetDispatchFeature d, String ruleSet, Feature f) {
-        bindRuleSet(d, getHeuristic(ruleSet), f);
-    }
-
-    protected void bindRuleSet(RuleSetDispatchFeature d, String ruleSet, long cost) {
-        bindRuleSet(d, getHeuristic(ruleSet), longConst(cost));
-    }
-
-    protected void clearRuleSetBindings(RuleSetDispatchFeature d, RuleSet ruleSet) {
-        d.clear(ruleSet);
-    }
-
-    protected void clearRuleSetBindings(RuleSetDispatchFeature d, String ruleSet) {
-        d.clear(getHeuristic(ruleSet));
-    }
-
     /**
      * returns the service instance for access to {@link de.uka.ilkd.key.ldt.LDT}s
      *
@@ -120,19 +93,4 @@ public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrateg
             not(applyTF(superTerm, t))));
     }
 
-    protected Feature oneOf(Feature feature0, Feature feature1) {
-        return oneOf(new Feature[] { feature0, feature1 });
-    }
-
-    protected Feature instantiate(Name sv, ProjectionToTerm value) {
-        if (instantiateActive != 0) {
-            return SVInstantiationCP.create(sv, value);
-        } else {
-            return longConst(0);
-        }
-    }
-
-    protected Feature instantiate(String sv, ProjectionToTerm value) {
-        return instantiate(new Name(sv), value);
-    }
 }

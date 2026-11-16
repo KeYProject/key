@@ -84,7 +84,7 @@ public abstract class AbstractFeatureStrategy<G extends ProofGoal<G>>
         return ForEachCP.create(x, gen, body);
     }
 
-    protected Feature oneOf(Feature[] features) {
+    protected Feature oneOf(Feature... features) {
         return OneOfCP.create(features);
     }
 
