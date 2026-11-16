@@ -323,14 +323,12 @@ public abstract class StaticFeatureCollection {
 
     protected static ProjectionToTerm opTerm(Operator op,
             ProjectionToTerm subTerm) {
-        // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm });
     }
 
     protected static ProjectionToTerm opTerm(Operator op,
             ProjectionToTerm subTerm0,
             ProjectionToTerm subTerm1) {
-        // noinspection unchecked
         return opTerm(op, new ProjectionToTerm[] { subTerm0, subTerm1 });
     }
 

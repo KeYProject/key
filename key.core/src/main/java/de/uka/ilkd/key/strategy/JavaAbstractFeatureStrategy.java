@@ -124,16 +124,7 @@ public abstract class JavaAbstractFeatureStrategy extends AbstractFeatureStrateg
             not(applyTF(superTerm, t))));
     }
 
-    protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {
-        return ForEachCP.create(x, gen, body);
-    }
-
-    protected Feature oneOf(Feature[] features) {
-        return OneOfCP.create(features);
-    }
-
     protected Feature oneOf(Feature feature0, Feature feature1) {
-        // noinspection unchecked
         return oneOf(new Feature[] { feature0, feature1 });
     }
 
