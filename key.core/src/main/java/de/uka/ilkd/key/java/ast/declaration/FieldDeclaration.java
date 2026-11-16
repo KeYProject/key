@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 
@@ -26,7 +27,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      * Field specs.
      */
 
-    protected final ImmutableList<FieldSpecification> fieldSpecs;
+    protected final ImmutableListArray<FieldSpecification> fieldSpecs;
 
     /**
      * Field declaration.
@@ -44,7 +45,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     public FieldDeclaration(Modifier[] mods, TypeReference typeRef, FieldSpecification[] vars,
             boolean parentIsInterfaceDeclaration) {
         super(mods, typeRef, parentIsInterfaceDeclaration);
-        fieldSpecs = ImmutableList.of(vars);
+        fieldSpecs = ImmutableList.asArray(vars);
     }
 
     /**
@@ -60,14 +61,15 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     public FieldDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
         super(children, parentIsInterfaceDeclaration);
         fieldSpecs =
-            ImmutableList.of(children.collect(FieldSpecification.class));
+            ImmutableList
+                    .asArray(children.collect(FieldSpecification.class));
     }
 
     public FieldDeclaration(PositionInfo pi, List<Comment> c, ImmutableList<Modifier> modArray,
             TypeReference type,
             boolean parentIsInferface, ImmutableList<FieldSpecification> fieldSpecs) {
         super(pi, c, modArray, type, parentIsInferface);
-        this.fieldSpecs = fieldSpecs;
+        this.fieldSpecs = ImmutableList.asArray(fieldSpecs);
     }
 
     @Override

@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * Operator base class.
@@ -22,7 +23,7 @@ import org.key_project.util.collection.ImmutableList;
 
 public abstract class Operator extends JavaNonTerminalProgramElement
         implements Expression, ExpressionContainer {
-    protected final ImmutableList<Expression> children;
+    protected final ImmutableListArray<Expression> children;
 
     /**
      * Relative positioning of the operator.
@@ -44,7 +45,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      *        an expression.
      */
     protected Operator(Expression lhs, Expression rhs) {
-        this.children = ImmutableList.of(lhs, rhs);
+        this.children = ImmutableList.asArray(lhs, rhs);
     }
 
     /**
@@ -58,7 +59,8 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
     protected Operator(ExtList children) {
         super(children);
-        this.children = ImmutableList.ofFixedSize(children.collect(Expression.class));
+        this.children =
+            ImmutableList.asArray(children.collect(Expression.class));
     }
 
     /**
@@ -69,7 +71,7 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     protected Operator(Expression unaryChild) {
-        this.children = ImmutableList.ofFixedSize(unaryChild);
+        this.children = ImmutableList.asArray(unaryChild);
     }
 
     /**
@@ -80,12 +82,13 @@ public abstract class Operator extends JavaNonTerminalProgramElement
      */
 
     protected Operator(Expression[] arguments) {
-        this.children = ImmutableList.ofFixedSize(arguments);
+        this.children = ImmutableList.asArray(arguments);
     }
 
     public Operator(PositionInfo pi, List<Comment> comments, ImmutableList<Expression> children) {
         super(pi, comments);
-        this.children = children;
+        // NewArray passes no argument list; the field then stays null as it did before
+        this.children = children == null ? null : ImmutableList.asArray(children);
     }
 
     public Operator(PositionInfo pi, List<Comment> c, Expression lhs, Expression rhs) {

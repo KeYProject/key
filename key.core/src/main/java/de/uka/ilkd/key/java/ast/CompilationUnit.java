@@ -13,6 +13,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +39,12 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * Imports.
      */
 
-    protected final ImmutableList<Import> imports;
+    protected final ImmutableListArray<Import> imports;
 
     /**
      * Type declarations.
      */
-    protected final ImmutableList<TypeDeclaration> typeDeclarations;
+    protected final ImmutableListArray<TypeDeclaration> typeDeclarations;
 
     /**
      * creates a compilation unit
@@ -58,8 +59,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public CompilationUnit(PackageSpecification packageSpec, Import[] imports,
             TypeDeclaration[] typeDeclarations) {
         this.packageSpec = packageSpec;
-        this.imports = ImmutableList.of(imports);
-        this.typeDeclarations = ImmutableList.of(typeDeclarations);
+        this.imports = ImmutableList.asArray(imports);
+        this.typeDeclarations = ImmutableList.asArray(typeDeclarations);
     }
 
 
@@ -72,9 +73,11 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public CompilationUnit(ExtList children) {
         super(children);
         packageSpec = children.get(PackageSpecification.class);
-        this.imports = ImmutableList.of(children.collect(Import.class));
+        this.imports =
+            ImmutableList.asArray(children.collect(Import.class));
         this.typeDeclarations =
-            ImmutableList.of(children.collect(TypeDeclaration.class));
+            ImmutableList
+                    .asArray(children.collect(TypeDeclaration.class));
     }
 
     public CompilationUnit(
@@ -83,8 +86,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
             ImmutableList<TypeDeclaration> map1) {
         super(pi, c);
         this.packageSpec = accepto;
-        this.imports = map;
-        this.typeDeclarations = map1;
+        this.imports = ImmutableList.asArray(map);
+        this.typeDeclarations = ImmutableList.asArray(map1);
     }
 
 

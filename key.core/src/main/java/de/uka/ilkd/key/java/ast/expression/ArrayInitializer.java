@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 
 /**
@@ -27,7 +28,7 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         implements Expression, ExpressionContainer {
 
 
-    protected final ImmutableList<Expression> children;
+    protected final ImmutableListArray<Expression> children;
     protected final KeYJavaType kjt;
 
     /**
@@ -41,7 +42,8 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         super(list);
         assert kjt != null;
         this.kjt = kjt;
-        this.children = ImmutableList.ofFixedSize(list.collect(Expression.class));
+        this.children =
+            ImmutableList.asArray(list.collect(Expression.class));
     }
 
 
@@ -55,14 +57,14 @@ public class ArrayInitializer extends JavaNonTerminalProgramElement
         super();
         assert kjt != null;
         this.kjt = kjt;
-        this.children = ImmutableList.ofFixedSize(expressions);
+        this.children = ImmutableList.asArray(expressions);
     }
 
     public ArrayInitializer(PositionInfo pi, List<Comment> c, ImmutableList<Expression> children,
             KeYJavaType keyJavaType) {
         super(pi, c);
         this.kjt = keyJavaType;
-        this.children = children;
+        this.children = ImmutableList.asArray(children);
     }
 
 

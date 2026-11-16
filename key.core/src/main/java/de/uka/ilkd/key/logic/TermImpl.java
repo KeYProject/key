@@ -21,6 +21,7 @@ import org.key_project.logic.sort.Sort;
 import org.key_project.util.Strings;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 import org.key_project.util.collection.ImmutableSet;
 
 import org.jspecify.annotations.NonNull;
@@ -35,27 +36,28 @@ class TermImpl implements JTerm {
     /**
      * A static empty list of terms used for memory reasons.
      */
-    private static final ImmutableList<JTerm> EMPTY_TERM_LIST = ImmutableList.of();
+    private static final ImmutableListArray<JTerm> EMPTY_TERM_LIST =
+        ImmutableList.asArray();
 
     /**
      * A static empty list of quantifiable variables used for memory reasons.
      */
-    private static final ImmutableList<QuantifiableVariable> EMPTY_VAR_LIST =
-        ImmutableList.of();
+    private static final ImmutableListArray<QuantifiableVariable> EMPTY_VAR_LIST =
+        ImmutableList.asArray();
 
     /**
      * A static empty list of term labels used for memory reasons.
      */
-    private static final ImmutableList<TermLabel> EMPTY_LABEL_LIST =
-        ImmutableList.of();
+    private static final ImmutableListArray<TermLabel> EMPTY_LABEL_LIST =
+        ImmutableList.asArray();
 
     private static final AtomicInteger serialNumberCounter = new AtomicInteger();
     private final int serialNumber = serialNumberCounter.incrementAndGet();
 
     // content
     private final Operator op;
-    private final ImmutableList<JTerm> subs;
-    private final ImmutableList<QuantifiableVariable> boundVars;
+    private final ImmutableListArray<JTerm> subs;
+    private final ImmutableListArray<QuantifiableVariable> boundVars;
 
     // caches
 
@@ -130,8 +132,8 @@ class TermImpl implements JTerm {
         assert op != null;
         assert subs != null;
         this.op = op;
-        this.subs = subs.isEmpty() ? EMPTY_TERM_LIST : subs;
-        this.boundVars = boundVars == null ? EMPTY_VAR_LIST : boundVars;
+        this.subs = ImmutableList.asArray(subs.isEmpty() ? EMPTY_TERM_LIST : subs);
+        this.boundVars = ImmutableList.asArray(boundVars == null ? EMPTY_VAR_LIST : boundVars);
     }
 
     private ImmutableSet<QuantifiableVariable> determineFreeVars() {

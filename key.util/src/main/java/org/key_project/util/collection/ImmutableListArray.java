@@ -16,12 +16,25 @@ import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * The fixed-size [ImmutableList]: a flat array, `get` and `size` in O(1). The fields that
+ * the prover indexes (subterms, bound variables, labels, argument sorts, AST children) hold
+ * this class, so that their call sites see one receiver class;
+ * [ImmutableList#asArray(ImmutableList)]
+ * converts any other list into it.
  *
  * @author Alexander Weigl
  * @version 1 (25.04.26)
  */
-final class ImmutableListArray<T extends @Nullable Object> implements ImmutableList<T> {
+public final class ImmutableListArray<T extends @Nullable Object> implements ImmutableList<T> {
+    private static final ImmutableListArray<?> EMPTY = new ImmutableListArray<>(new Object[0]);
+
     private final T[] data;
+
+    /// The empty fixed-size list, one shared instance.
+    @SuppressWarnings("unchecked")
+    static <T extends @Nullable Object> ImmutableListArray<T> empty() {
+        return (ImmutableListArray<T>) EMPTY;
+    }
 
     /**
      * Caution: This constructor does *not* the argument array but refers to it directly.
@@ -192,8 +205,12 @@ final class ImmutableListArray<T extends @Nullable Object> implements ImmutableL
 
     @Override
     public int hashCode() {
-        // must be consistent with the hashCode of the list-based implementations
-        // (e.g. ImmutableSLList), otherwise equal lists have different hashes
-        return ImmutableList.hash(this);
+        // the formula of ImmutableList.hash, so that equal lists of different classes hash alike;
+        // written as a loop over the array because subs().hashCode() runs on every term creation
+        int hash = 0;
+        for (T e : data) {
+            hash = 31 * hash + (e == null ? 0 : e.hashCode());
+        }
+        return hash;
     }
 }

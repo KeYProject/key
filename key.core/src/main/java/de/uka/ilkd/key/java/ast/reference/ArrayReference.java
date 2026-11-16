@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * Array reference.
@@ -35,7 +36,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Inits.
      */
-    protected final ImmutableList<Expression> inits;
+    protected final ImmutableListArray<Expression> inits;
 
 
     /**
@@ -56,7 +57,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
     public ArrayReference(ReferencePrefix accessPath, Expression[] initializers) {
         this.prefix = accessPath;
-        this.inits = ImmutableList.ofFixedSize(initializers);
+        this.inits = ImmutableList.asArray(initializers);
     }
 
     /**
@@ -79,10 +80,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
             this.prefix = new ArrayReference(e1, accessPath);
             e1 = new Expression[1];
             e1[0] = e[e.length - 1];
-            this.inits = ImmutableList.ofFixedSize(e1);
+            this.inits = ImmutableList.asArray(e1);
         } else {
             this.prefix = accessPath;
-            this.inits = ImmutableList.ofFixedSize(e);
+            this.inits = ImmutableList.asArray(e);
         }
     }
 
@@ -107,10 +108,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
             System.arraycopy(e, 0, e1, 0, e1.length);
             this.prefix = new ArrayReference(e1, accessPath);
             e1[0] = e[e.length - 1];
-            this.inits = ImmutableList.ofFixedSize(e1);
+            this.inits = ImmutableList.asArray(e1);
         } else {
             this.prefix = accessPath;
-            this.inits = ImmutableList.ofFixedSize(e);
+            this.inits = ImmutableList.asArray(e);
         }
     }
 
@@ -118,7 +119,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
             ImmutableList<Expression> inits) {
         super(pi, c);
         this.prefix = prefix;
-        this.inits = inits;
+        this.inits = ImmutableList.asArray(inits);
     }
 
     /**

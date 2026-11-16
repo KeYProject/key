@@ -14,13 +14,14 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 
 
 public class Exec extends BranchStatement implements StatementContainer, ProgramPrefix {
     private final StatementBlock body;
-    private final ImmutableList<Branch> branches;
+    private final ImmutableListArray<Branch> branches;
     private final MethodFrame innerMostMethodFrame;
     private final int prefixLength;
 
@@ -29,7 +30,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
             MethodFrame innerMostMethodFrame, int prefixLength) {
         super(pi, comments);
         this.body = body;
-        this.branches = branches;
+        this.branches = ImmutableList.asArray(branches);
         this.innerMostMethodFrame = innerMostMethodFrame;
         this.prefixLength = prefixLength;
     }
@@ -60,7 +61,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     public Exec(StatementBlock body, Branch[] branches) {
         super(null, null);
         this.body = body;
-        this.branches = ImmutableList.ofFixedSize(branches);
+        this.branches = ImmutableList.asArray(branches);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -78,7 +79,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     public Exec(StatementBlock body, ImmutableList<Branch> branches) {
         super(null, null);
         this.body = body;
-        this.branches = branches;
+        this.branches = ImmutableList.asArray(branches);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -94,7 +95,8 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     public Exec(ExtList children) {
         super(children);
         this.body = children.get(StatementBlock.class);
-        this.branches = ImmutableList.ofFixedSize(children.collect(Branch.class));
+        this.branches =
+            ImmutableList.asArray(children.collect(Branch.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();

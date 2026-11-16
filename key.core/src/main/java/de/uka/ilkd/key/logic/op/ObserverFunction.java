@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 
 /**
@@ -27,7 +28,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
 
     private final KeYJavaType container;
     private final boolean isStatic;
-    private final ImmutableList<KeYJavaType> paramTypes;
+    private final ImmutableListArray<KeYJavaType> paramTypes;
     private final KeYJavaType type;
     private final int heapCount;
     private final int stateCount;
@@ -47,7 +48,7 @@ public class ObserverFunction extends JFunction implements IObserverFunction {
         this.type = type;
         this.container = container;
         this.isStatic = isStatic;
-        this.paramTypes = paramTypes;
+        this.paramTypes = ImmutableList.asArray(paramTypes);
         this.heapCount = heapCount;
         this.stateCount = stateCount;
     }

@@ -13,14 +13,15 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 public class ForUpdates extends JavaNonTerminalProgramElement
         implements ExpressionContainer, IForUpdates {
 
-    final ImmutableList<Expression> updates;
+    final ImmutableListArray<Expression> updates;
 
     public ForUpdates(ImmutableList<Expression> exprarr) {
-        updates = exprarr;
+        updates = ImmutableList.asArray(exprarr);
     }
 
     public ForUpdates(ExtList ups, PositionInfo pos) {
@@ -29,7 +30,7 @@ public class ForUpdates extends JavaNonTerminalProgramElement
         for (int i = 0; i < exps.length; i++) {
             exps[i] = (Expression) ups.get(i);
         }
-        updates = ImmutableList.ofFixedSize(exps);
+        updates = ImmutableList.asArray(exps);
     }
 
 

@@ -43,6 +43,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ public final class MethodCall extends ProgramTransformer {
     protected ProgramVariable pvar;
     private final IExecutionContext execContextSV;
     private ExecutionContext execContext;
-    protected ImmutableList<Expression> arguments;
+    protected ImmutableListArray<Expression> arguments;
     protected KeYJavaType staticPrefixType;
 
     /**
@@ -291,7 +292,7 @@ public final class MethodCall extends ProgramTransformer {
 
         VariableSpecification[] paramSpecs = createParamSpecs(services);
         Statement[] paramDecl = createParamAssignments(paramSpecs);
-        arguments = getVariables(paramSpecs);
+        arguments = ImmutableList.asArray(getVariables(paramSpecs));
 
         Statement result = null;
         if (pm.isStatic()) { // Static invocation mode

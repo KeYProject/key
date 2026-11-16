@@ -25,6 +25,7 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * This class implements custom instantiation of if-formulas.
@@ -33,8 +34,8 @@ public class AssumesInstantiator {
     private final Goal goal;
     private final AssumesInstantiationCache ifInstCache;
 
-    private ImmutableList<AssumesFormulaInstantiation> allAntecFormulas;
-    private ImmutableList<AssumesFormulaInstantiation> allSuccFormulas;
+    private ImmutableListArray<AssumesFormulaInstantiation> allAntecFormulas;
+    private ImmutableListArray<AssumesFormulaInstantiation> allSuccFormulas;
 
     private ImmutableList<NoPosTacletApp> results = ImmutableList.nil();
 
@@ -73,8 +74,10 @@ public class AssumesInstantiator {
             addResult(tacletAppContainer.getTacletApp());
         } else {
             final Services services = getServices();
-            allAntecFormulas = AssumesFormulaInstSeq.createList(p_seq, true, services);
-            allSuccFormulas = AssumesFormulaInstSeq.createList(p_seq, false, services);
+            allAntecFormulas =
+                ImmutableList.asArray(AssumesFormulaInstSeq.createList(p_seq, true, services));
+            allSuccFormulas =
+                ImmutableList.asArray(AssumesFormulaInstSeq.createList(p_seq, false, services));
             findIfFormulaInstantiationsHelp(ifSequent.succedent().asList().reverse(), //// Matching
                                                                                       //// with the
                                                                                       //// last

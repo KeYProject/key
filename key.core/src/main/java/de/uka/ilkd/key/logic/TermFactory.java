@@ -14,6 +14,7 @@ import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.GenerationalCache;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 
@@ -29,7 +30,8 @@ import org.jspecify.annotations.NonNull;
 public final class TermFactory {
 
 
-    private static final ImmutableList<JTerm> NO_SUBTERMS = ImmutableList.of();
+    private static final ImmutableListArray<JTerm> NO_SUBTERMS =
+        ImmutableList.asArray();
     private final GenerationalCache<JTerm, JTerm> cache;
 
 

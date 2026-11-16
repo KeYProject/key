@@ -21,6 +21,7 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 import org.key_project.util.parsing.Position;
 
 import org.jspecify.annotations.NonNull;
@@ -36,7 +37,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      * Body.
      */
     @NonNull
-    private final ImmutableList<? extends Statement> body;
+    private final ImmutableListArray<? extends Statement> body;
 
     private final int prefixLength;
 
@@ -49,7 +50,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
             @NonNull ImmutableList<? extends Statement> body,
             ImmutableList<TextualJMLConstruct> attachedJML) {
         super(pi, comments);
-        this.body = body;
+        this.body = ImmutableList.asArray(body);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -57,7 +58,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
     }
 
     public StatementBlock() {
-        body = ImmutableList.of();
+        body = ImmutableList.asArray();
         prefixLength = 1;
         innerMostMethodFrame = null;
         attachedJML = ImmutableList.of();
@@ -72,7 +73,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
      */
     public StatementBlock(ExtList children) {
         super(children);
-        body = ImmutableList.ofFixedSize(children.collect(Statement.class));
+        body = ImmutableList.asArray(children.collect(Statement.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -84,7 +85,7 @@ public class StatementBlock extends JavaStatement implements StatementContainer,
         super((PositionInfo) null, null);
         // check for non-null elements (bug fix)
         Debug.assertDeepNonNull(as, "statement block contructor");
-        body = as;
+        body = ImmutableList.asArray(as);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();

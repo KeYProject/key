@@ -29,6 +29,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 import org.key_project.util.parsing.Position;
 
 import org.slf4j.Logger;
@@ -42,8 +43,8 @@ public final class ProgramSV extends JOperatorSV
         implements ProgramConstruct, UpdateableOperator {
     public static final Logger LOGGER = LoggerFactory.getLogger(ProgramSV.class);
 
-    private static final ImmutableList<ProgramElement> EMPTY_LIST_INSTANTIATION =
-        ImmutableList.of(new ProgramElement[0]);
+    private static final ImmutableListArray<ProgramElement> EMPTY_LIST_INSTANTIATION =
+        ImmutableList.asArray(new ProgramElement[0]);
 
     private final boolean isListSV;
 

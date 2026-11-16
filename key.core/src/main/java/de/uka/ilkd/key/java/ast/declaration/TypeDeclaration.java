@@ -18,6 +18,7 @@ import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     protected final ProgramElementName fullName;
 
-    protected final ImmutableList<MemberDeclaration> members;
+    protected final ImmutableListArray<MemberDeclaration> members;
 
     protected final boolean parentIsInterfaceDeclaration;
 
@@ -66,7 +67,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         super(pi, comments, modArray, jmlAttachments);
         this.name = name;
         this.fullName = fullName;
-        this.members = members;
+        this.members = ImmutableList.asArray(members);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
         this.isLibrary = isLibrary;
         this.jmlModifiers = JMLInfoExtractor.parseClass(this);
@@ -94,7 +95,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         super(mods);
         this.name = name;
         this.fullName = fullName;
-        this.members = ImmutableList.of(members);
+        this.members = ImmutableList.asArray(members);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
         this.isLibrary = isLibrary;
         this.jmlModifiers = JMLInfoExtractor.parseClass(this);
@@ -111,7 +112,9 @@ public abstract class TypeDeclaration extends JavaDeclaration
         super(children);
         this.name = name;
         this.fullName = fullName;
-        this.members = ImmutableList.of(children.collect(MemberDeclaration.class));
+        this.members =
+            ImmutableList
+                    .asArray(children.collect(MemberDeclaration.class));
         ParentIsInterfaceDeclaration piid = children.get(ParentIsInterfaceDeclaration.class);
         if (piid != null) {
             this.parentIsInterfaceDeclaration = (piid).getValue();

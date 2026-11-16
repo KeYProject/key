@@ -15,6 +15,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * For.
@@ -23,8 +24,8 @@ import org.key_project.util.collection.ImmutableList;
 
 public class For extends LoopStatement implements VariableScope {
 
-    private static final ImmutableList<VariableSpecification> EMPTY_VARSPECS =
-        ImmutableList.of(new VariableSpecification[0]);
+    private static final ImmutableListArray<VariableSpecification> EMPTY_VARSPECS =
+        ImmutableList.asArray(new VariableSpecification[0]);
 
     /**
      * For. Used for the Recoder2KeY transformation

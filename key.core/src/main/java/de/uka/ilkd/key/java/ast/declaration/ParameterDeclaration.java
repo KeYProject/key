@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * Formal parameters require a VariableSpecificationList of {@code size() <= 1} ({@code size() == 0}
@@ -26,7 +27,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     /**
      * Var spec.
      */
-    protected final ImmutableList<VariableSpecification> varSpec;
+    protected final ImmutableListArray<VariableSpecification> varSpec;
 
 
     /**
@@ -64,7 +65,7 @@ public class ParameterDeclaration extends VariableDeclaration {
     public ParameterDeclaration(Modifier[] mods, TypeReference typeRef, VariableSpecification var,
             boolean parentIsInterfaceDeclaration, boolean parameterIsVarArg) {
         super(mods, typeRef, parentIsInterfaceDeclaration);
-        this.varSpec = ImmutableList.of(var);
+        this.varSpec = ImmutableList.asArray(var);
         this.varArgParameter = parameterIsVarArg;
     }
 
@@ -106,7 +107,8 @@ public class ParameterDeclaration extends VariableDeclaration {
             boolean parameterIsVarArg) {
         super(children, parentIsInterfaceDeclaration);
         this.varSpec =
-            ImmutableList.of(children.get(VariableSpecification.class));
+            ImmutableList
+                    .asArray(children.get(VariableSpecification.class));
         this.varArgParameter = parameterIsVarArg;
     }
 
@@ -116,7 +118,7 @@ public class ParameterDeclaration extends VariableDeclaration {
             TypeReference type, boolean parentIsInterfaceDeclaration,
             boolean parameterIsVarArg) {
         super(pi, c, modArray, type, parentIsInterfaceDeclaration);
-        this.varSpec = specs;
+        this.varSpec = ImmutableList.asArray(specs);
         this.varArgParameter = parameterIsVarArg;
     }
 

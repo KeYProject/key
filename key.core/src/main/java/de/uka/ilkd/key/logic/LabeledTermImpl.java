@@ -16,6 +16,7 @@ import org.key_project.logic.Property;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 import org.key_project.util.java.CollectionUtil;
 
 /**
@@ -39,7 +40,7 @@ public class LabeledTermImpl extends TermImpl {
     /**
      * @see #getLabels()
      */
-    private final ImmutableList<TermLabel> labels;
+    private final ImmutableListArray<TermLabel> labels;
 
     /**
      * creates an instance of a labeled term.
@@ -56,7 +57,7 @@ public class LabeledTermImpl extends TermImpl {
         super(op, subs, boundVars);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
-        this.labels = labels;
+        this.labels = ImmutableList.asArray(labels);
     }
 
     /**
@@ -73,7 +74,7 @@ public class LabeledTermImpl extends TermImpl {
         super(op, subs, boundVars);
         assert labels != null : "Term labels must not be null";
         assert !labels.isEmpty() : "There must be at least one term label";
-        this.labels = labels;
+        this.labels = ImmutableList.asArray(labels);
     }
 
     /**

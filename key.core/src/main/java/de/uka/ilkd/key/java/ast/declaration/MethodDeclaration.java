@@ -19,6 +19,7 @@ import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 
@@ -46,7 +47,7 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Parameters of the method.
      */
-    protected final ImmutableList<ParameterDeclaration> parameters;
+    protected final ImmutableListArray<ParameterDeclaration> parameters;
     /**
      * 'throws' part of the method. Indicates which exceptions the method may throw.
      * May be null.
@@ -99,7 +100,7 @@ public class MethodDeclaration extends JavaDeclaration
         this.returnType = returnType;
         this.voidComments = voidComments;
         this.name = name;
-        this.parameters = parameters;
+        this.parameters = ImmutableList.asArray(parameters);
         this.exceptions = exceptions;
         this.body = body;
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
@@ -128,7 +129,8 @@ public class MethodDeclaration extends JavaDeclaration
         returnType = children.get(TypeReference.class);
         this.voidComments = voidComments;
         name = children.get(ProgramElementName.class);
-        this.parameters = ImmutableList.of(children.collect(ParameterDeclaration.class));
+        this.parameters =
+            ImmutableList.asArray(children.collect(ParameterDeclaration.class));
         exceptions = children.get(Throws.class);
         body = children.get(StatementBlock.class);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
@@ -205,7 +207,7 @@ public class MethodDeclaration extends JavaDeclaration
         this.returnType = returnType;
         this.voidComments = null;
         this.name = name;
-        this.parameters = parameters;
+        this.parameters = ImmutableList.asArray(parameters);
         this.exceptions = exceptions;
         this.body = body;
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;

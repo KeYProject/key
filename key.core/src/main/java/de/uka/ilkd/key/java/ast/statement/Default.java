@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * Default.
@@ -24,7 +25,7 @@ public class Default extends BranchImp {
     /**
      * Body.
      */
-    protected final ImmutableList<Statement> body;
+    protected final ImmutableListArray<Statement> body;
 
     /**
      * Default.
@@ -41,7 +42,7 @@ public class Default extends BranchImp {
      */
 
     public Default(Statement[] body) {
-        this.body = ImmutableList.ofFixedSize(body);
+        this.body = ImmutableList.asArray(body);
     }
 
     /**
@@ -53,12 +54,13 @@ public class Default extends BranchImp {
      */
     public Default(ExtList children) {
         super(children);
-        this.body = ImmutableList.ofFixedSize(children.collect(Statement.class));
+        this.body =
+            ImmutableList.asArray(children.collect(Statement.class));
     }
 
     public Default(ImmutableList<Statement> body, PositionInfo pi, List<Comment> comments) {
         super(pi, comments);
-        this.body = body;
+        this.body = ImmutableList.asArray(body);
     }
 
     /**

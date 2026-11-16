@@ -22,6 +22,7 @@ import de.uka.ilkd.key.util.Debug;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * Method reference.
@@ -45,14 +46,15 @@ public class MethodReference extends JavaNonTerminalProgramElement
     /**
      * Arguments.
      */
-    protected final ImmutableList<? extends Expression> arguments;
+    protected final ImmutableListArray<? extends Expression> arguments;
 
     public MethodReference(ExtList args, MethodName n, ReferencePrefix p, PositionInfo pos) {
         super(pos);
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-        this.arguments = ImmutableList.of(args.collect(Expression.class));
+        this.arguments =
+            ImmutableList.asArray(args.collect(Expression.class));
     }
 
     public MethodReference(ImmutableList<? extends Expression> args, MethodName n,
@@ -60,7 +62,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-        this.arguments = args;
+        this.arguments = ImmutableList.asArray(args);
         checkArguments();
     }
 
@@ -70,7 +72,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
         this.prefix = p;
         name = n;
         Debug.assertTrue(name != null, "Tried to reference unnamed method.");
-        this.arguments = args;
+        this.arguments = ImmutableList.asArray(args);
         checkArguments();
     }
 
@@ -87,7 +89,7 @@ public class MethodReference extends JavaNonTerminalProgramElement
     public MethodReference(PositionInfo pi, List<Comment> c, ReferencePrefix prefix,
             MethodName name, ImmutableList<Expression> args) {
         super(pi, c);
-        this.arguments = args;
+        this.arguments = ImmutableList.asArray(args);
         this.name = name;
         this.prefix = prefix;
     }

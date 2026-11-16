@@ -14,6 +14,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * Matches the term labels of a labelled pattern term, in place (the cursor does not move; the
@@ -24,10 +25,10 @@ import org.key_project.util.collection.ImmutableList;
  */
 public class MatchTermLabelInstruction implements MatchInstruction {
 
-    private final ImmutableList<TermLabel> labels;
+    private final ImmutableListArray<TermLabel> labels;
 
     public MatchTermLabelInstruction(ImmutableList<TermLabel> labels) {
-        this.labels = labels;
+        this.labels = ImmutableList.asArray(labels);
     }
 
     private MatchResultInfo match(TermLabelSV sv, JTerm instantiationCandidate,

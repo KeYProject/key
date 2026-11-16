@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * Local variable declaration. taken from COMPOST and changed to achieve an immutable structure
@@ -27,7 +28,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
      * Var specs.
      */
 
-    protected final ImmutableList<VariableSpecification> varSpecs;
+    protected final ImmutableListArray<VariableSpecification> varSpecs;
 
     /**
      * Local variable declaration.
@@ -52,7 +53,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(Modifier[] mods, TypeReference typeRef,
             VariableSpecification[] vars) {
         super(mods, typeRef, false);
-        this.varSpecs = ImmutableList.of(vars);
+        this.varSpecs = ImmutableList.asArray(vars);
     }
 
     /**
@@ -81,7 +82,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(ImmutableList<Modifier> mods, TypeReference typeRef,
             VariableSpecification var) {
         super(mods, typeRef, false);
-        this.varSpecs = ImmutableList.of(var);
+        this.varSpecs = ImmutableList.asArray(var);
     }
 
     /**
@@ -97,7 +98,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(ImmutableList<Modifier> mods, TypeReference typeRef,
             VariableSpecification[] vars) {
         super(mods, typeRef, false);
-        this.varSpecs = ImmutableList.of(vars);
+        this.varSpecs = ImmutableList.asArray(vars);
     }
 
     public LocalVariableDeclaration(PositionInfo pi, List<Comment> comments,
@@ -105,7 +106,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
             TypeReference type, boolean parentIsInterface,
             ImmutableList<VariableSpecification> vars) {
         super(pi, comments, mods, type, parentIsInterface);
-        this.varSpecs = vars;
+        this.varSpecs = ImmutableList.asArray(vars);
     }
 
     /**
@@ -121,7 +122,7 @@ public class LocalVariableDeclaration extends VariableDeclaration implements Loo
     public LocalVariableDeclaration(ExtList children) {
         super(children, false);
 
-        this.varSpecs = ImmutableList.of(
+        this.varSpecs = ImmutableList.asArray(
             children.collect(VariableSpecification.class));
     }
 

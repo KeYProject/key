@@ -18,6 +18,7 @@ import org.key_project.prover.rules.matcher.vm.instruction.GotoNextSiblingInstru
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
 import org.key_project.prover.rules.matcher.vm.instruction.VMInstruction;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.Nullable;
 
@@ -35,7 +36,7 @@ public final class OperatorPlan implements MatchPlan {
 
     private final MatchHead head;
     private final List<MatchPlan> children;
-    private final ImmutableList<? extends QuantifiableVariable> boundVars;
+    private final ImmutableListArray<? extends QuantifiableVariable> boundVars;
     private final BinderMatcher binder;
 
     /**
@@ -49,7 +50,7 @@ public final class OperatorPlan implements MatchPlan {
             ImmutableList<? extends QuantifiableVariable> boundVars, BinderMatcher binder) {
         this.head = head;
         this.children = children;
-        this.boundVars = boundVars;
+        this.boundVars = ImmutableList.asArray(boundVars);
         this.binder = binder;
     }
 

@@ -20,6 +20,7 @@ import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.compiler.ListSVMatcher;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.Nullable;
 
@@ -39,8 +40,8 @@ public final class JavaListSVMatcher implements ListSVMatcher {
     public static final JavaListSVMatcher INSTANCE = new JavaListSVMatcher();
 
     /** the instantiation of a list schema variable that matched no source children */
-    private static final ImmutableList<ProgramElement> EMPTY_LIST_INSTANTIATION =
-        ImmutableList.of(new ProgramElement[0]);
+    private static final ImmutableListArray<ProgramElement> EMPTY_LIST_INSTANTIATION =
+        ImmutableList.asArray(new ProgramElement[0]);
 
     private JavaListSVMatcher() {}
 

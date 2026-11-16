@@ -12,6 +12,7 @@ import org.key_project.logic.Named;
 import org.key_project.logic.Sorted;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -23,9 +24,9 @@ import org.jspecify.annotations.Nullable;
 public final class ParametricFunctionDecl implements Named, Sorted, HasMetaSpaceKey {
     private final Name name;
     private final ImmutableList<GenericParameter> parameters;
-    private final ImmutableList<Sort> argSorts;
+    private final ImmutableListArray<Sort> argSorts;
     private final Sort sort;
-    private final @Nullable ImmutableList<Boolean> whereToBind;
+    private final @Nullable ImmutableListArray<Boolean> whereToBind;
     private final boolean unique;
     private final boolean isRigid;
     private final boolean isSkolemConstant;
@@ -36,9 +37,9 @@ public final class ParametricFunctionDecl implements Named, Sorted, HasMetaSpace
             boolean isSkolemConstant) {
         this.name = name;
         this.parameters = parameters;
-        this.argSorts = argSorts;
+        this.argSorts = ImmutableList.asArray(argSorts);
         this.sort = sort;
-        this.whereToBind = whereToBind;
+        this.whereToBind = whereToBind == null ? null : ImmutableList.asArray(whereToBind);
         this.unique = unique;
         this.isRigid = isRigid;
         this.isSkolemConstant = isSkolemConstant;
