@@ -28,17 +28,17 @@ import org.jspecify.annotations.Nullable;
 /// with the term that is returned by a `ProjectionToTerm`. This feature is useful in
 /// particular combined with `ForEachCP`. Although the feature formally is a choice point,
 /// it will always have exactly one branch
-public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
+public class SVInstantiationCP implements Feature {
     private final @Nullable Name svToInstantiate;
     private final ProjectionToTerm value;
 
-    public static <G extends ProofGoal<G>> Feature create(Name svToInstantiate,
+    public static Feature create(Name svToInstantiate,
             ProjectionToTerm value) {
-        return new SVInstantiationCP<G>(svToInstantiate, value);
+        return new SVInstantiationCP(svToInstantiate, value);
     }
 
-    public static <G extends ProofGoal<G>> Feature createTriggeredVarCP(ProjectionToTerm value) {
-        return new SVInstantiationCP<G>(null, value);
+    public static Feature createTriggeredVarCP(ProjectionToTerm value) {
+        return new SVInstantiationCP(null, value);
     }
 
     private SVInstantiationCP(@Nullable Name svToInstantiate, ProjectionToTerm value) {
@@ -51,7 +51,7 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
             PosInOccurrence pos,
             ProofGoal<?> goal, MutableState mState) {
         final BackTrackingManager manager = mState.getBacktrackingManager();
-        manager.passChoicePoint(new CP(app, pos, (G) goal, mState), this);
+        manager.passChoicePoint(new CP(app, pos, goal, mState), this);
         return NumberRuleAppCost.getZeroCost();
     }
 
@@ -78,10 +78,10 @@ public class SVInstantiationCP<G extends ProofGoal<G>> implements Feature {
     private class CP implements ChoicePoint {
         private final PosInOccurrence pos;
         private final RuleApp app;
-        private final G goal;
+        private final ProofGoal<?> goal;
         private final MutableState mState;
 
-        private CP(RuleApp app, PosInOccurrence pos, G goal,
+        private CP(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
                 MutableState mState) {
             this.pos = pos;
             this.app = app;

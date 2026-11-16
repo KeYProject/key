@@ -10,6 +10,10 @@ import org.key_project.prover.sequent.PosInOccurrence;
 
 import org.jspecify.annotations.NonNull;
 
+// The default getExecutor() implements the generic <G>getExecutor() from Rule by returning this,
+// which is a RuleExecutor<GOAL> by contract. The unchecked override warning cannot be silenced at
+// method scope.
+@SuppressWarnings("unchecked")
 public interface IBuiltInRule<GOAL extends ProofGoal<GOAL>> extends Rule, RuleExecutor<GOAL> {
     /**
      * returns true iff a rule is applicable at the given position. This does not necessarily mean
@@ -20,7 +24,7 @@ public interface IBuiltInRule<GOAL extends ProofGoal<GOAL>> extends Rule, RuleEx
 
     boolean isApplicableOnSubTerms();
 
-    IBuiltInRuleApp createApp(PosInOccurrence pos, LogicServices services);
+    IBuiltInRuleApp<GOAL> createApp(PosInOccurrence pos, LogicServices services);
 
     @Override
     default @NonNull RuleExecutor<@NonNull GOAL> getExecutor() {

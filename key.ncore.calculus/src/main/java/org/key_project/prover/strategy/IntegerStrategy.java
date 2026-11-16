@@ -51,9 +51,6 @@ public abstract class IntegerStrategy<G extends ProofGoal<G>> extends AbstractFe
 
     private static final int POLY_DIVISION_COST = -2250;
 
-    /// The features defining the three phases: cost computation, approval,
-    /// additionalInstanceCreationAndEvaluation
-
     /// Useful [TermFeature] collections
     protected final ArithTermFeatures tf;
     protected final IFormulaTermFeatures ff;
