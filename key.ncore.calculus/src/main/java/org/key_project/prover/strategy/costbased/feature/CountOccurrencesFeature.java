@@ -48,11 +48,10 @@ public class CountOccurrencesFeature<Goal extends ProofGoal<@NonNull Goal>> impl
         return new CountOccurrencesFeature<Goal>(target, equalsProp);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <G extends ProofGoal<@NonNull G>> RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos, G goal, MutableState mState) {
-        final Term targetTerm = target.toTerm(app, pos, (Goal) goal, mState);
+        final Term targetTerm = target.toTerm(app, pos, goal, mState);
         if (targetTerm == null) {
             assert false : "CountOccurrencesFeature: got undefined argument (null)";
             return TopRuleAppCost.INSTANCE;

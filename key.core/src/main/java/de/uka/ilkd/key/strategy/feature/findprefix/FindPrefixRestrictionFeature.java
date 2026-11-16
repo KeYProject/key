@@ -20,7 +20,7 @@ import org.key_project.prover.strategy.costbased.feature.findprefix.TopLevelChec
  *
  * @author christoph
  */
-public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature<Goal> {
+public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
 
     public enum PrefixChecker {
         // checks, whether the position in occurrence is in the antecedent

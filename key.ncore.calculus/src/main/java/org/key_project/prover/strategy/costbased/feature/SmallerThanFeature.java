@@ -13,7 +13,7 @@ import org.key_project.util.collection.ImmutableList;
 /// Abstract superclass for features comparing terms (in particular polynomials or monomials) using
 /// the term ordering
 public abstract class SmallerThanFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature<GOAL> {
+        extends BinaryTacletAppFeature {
 
     private final TermOrdering termOrdering;
 

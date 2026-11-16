@@ -21,7 +21,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 /// iff it is divided by it ([#createDivides]).
 @StableCost
 public final class ReducibleMonomialsFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature<GOAL> {
+        extends BinaryTacletAppFeature {
     /// Which monomial relation an instance checks.
     private enum Check {
         REDUCIBLE, DIVIDES

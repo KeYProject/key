@@ -10,10 +10,8 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-import org.jspecify.annotations.NonNull;
-
 /// Abstract superclass for features of TacletApps that have either zero or top cost.
-public abstract class BinaryTacletAppFeature<G extends ProofGoal<G>> extends BinaryFeature {
+public abstract class BinaryTacletAppFeature extends BinaryFeature {
     private final boolean nonTacletValue;
 
     protected BinaryTacletAppFeature() {
@@ -27,11 +25,11 @@ public abstract class BinaryTacletAppFeature<G extends ProofGoal<G>> extends Bin
     }
 
     @Override
-    final protected <PGoal extends ProofGoal<@NonNull PGoal>> boolean filter(RuleApp app,
+    final protected boolean filter(RuleApp app,
             PosInOccurrence pos,
-            PGoal goal, MutableState mState) {
+            ProofGoal<?> goal, MutableState mState) {
         if (app instanceof ITacletApp tacletApp) {
-            return filter(tacletApp, pos, (G) goal, mState);
+            return filter(tacletApp, pos, goal, mState);
         }
         return nonTacletValue;
     }
@@ -44,6 +42,6 @@ public abstract class BinaryTacletAppFeature<G extends ProofGoal<G>> extends Bin
     /// @param goal the goal on which `app` is to be applied
     /// @param mState the MutableState used to store modifiable information
     /// @return true iff the result of the feature is supposed to be zero.
-    protected abstract boolean filter(ITacletApp app, PosInOccurrence pos, G goal,
+    protected abstract boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState);
 }

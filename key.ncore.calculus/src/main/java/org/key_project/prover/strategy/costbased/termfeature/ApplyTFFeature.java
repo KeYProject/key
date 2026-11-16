@@ -19,7 +19,7 @@ import org.jspecify.annotations.NonNull;
 
 /// Feature for invoking a term feature on the instantiation of a schema variable
 @StableCost
-public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Feature {
+public class ApplyTFFeature implements Feature {
     private final ProjectionToTerm proj;
     private final TermFeature termFeature;
     private final RuleAppCost noInstCost;
@@ -39,15 +39,13 @@ public class ApplyTFFeature<Goal extends ProofGoal<@NonNull Goal>> implements Fe
         this.demandInst = demandInst;
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature createNonStrict(
-            ProjectionToTerm proj,
-            TermFeature tf, RuleAppCost noInstCost) {
-        return new ApplyTFFeature<>(proj, tf, noInstCost, false);
+    public static Feature createNonStrict(ProjectionToTerm proj, TermFeature tf,
+            RuleAppCost noInstCost) {
+        return new ApplyTFFeature(proj, tf, noInstCost, false);
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
-            ProjectionToTerm proj, TermFeature tf) {
-        return new ApplyTFFeature<>(proj, tf, TopRuleAppCost.INSTANCE, true);
+    public static Feature create(ProjectionToTerm proj, TermFeature tf) {
+        return new ApplyTFFeature(proj, tf, TopRuleAppCost.INSTANCE, true);
     }
 
     @Override

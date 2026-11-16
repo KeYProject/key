@@ -26,7 +26,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
  * if-formula. If the rule application is admissible, zero is returned.
  */
 @StableCost
-public class CheckApplyEqFeature extends BinaryTacletAppFeature<Goal> {
+public class CheckApplyEqFeature extends BinaryTacletAppFeature {
 
     public static final Feature INSTANCE = new CheckApplyEqFeature();
 

@@ -26,7 +26,7 @@ import org.key_project.util.Properties;
  * pilot prune heavily.
  * </p>
  */
-public final class BranchMultiplicationCountFeature extends BinaryTacletAppFeature<Goal> {
+public final class BranchMultiplicationCountFeature extends BinaryTacletAppFeature {
 
     /**
      * The count as computed for one node. The serial number records which node that was, so a goal

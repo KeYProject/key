@@ -11,17 +11,16 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.termProjection.SVInstantiationProjection;
 
-public class TriggerVarInstantiatedFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature<GOAL> {
-    public static <GOAL extends ProofGoal<GOAL>> TriggerVarInstantiatedFeature<GOAL> create() {
-        return new TriggerVarInstantiatedFeature<>();
+public class TriggerVarInstantiatedFeature extends BinaryTacletAppFeature {
+    public static TriggerVarInstantiatedFeature create() {
+        return new TriggerVarInstantiatedFeature();
     }
 
     private TriggerVarInstantiatedFeature() {
     }
 
     @Override
-    protected boolean filter(ITacletApp app, PosInOccurrence pos, GOAL goal,
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         final Trigger trigger = app.taclet().getTrigger();
         assert trigger != null : "@AssumeAssertion(nullness): Trigger should not be null";

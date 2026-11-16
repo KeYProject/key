@@ -109,7 +109,7 @@ public class JFOLStrategy extends FOLStrategy<Goal> implements ComponentStrategy
                         ifZero(notBelowQuantifier(fc, ff),
                             add(
                                 // prefer cuts over "something = null"
-                                ifZero(applyTF(FocusProjection.<Goal>create(),
+                                ifZero(applyTF(FocusProjection.create(),
                                     opSub(tf.eq, any(), vf.nullTerm)),
                                     longConst(-5), longConst(0)),
                                 // punish cuts over formulas containing anon heap functions

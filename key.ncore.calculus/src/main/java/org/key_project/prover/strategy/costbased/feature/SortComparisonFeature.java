@@ -39,8 +39,8 @@ public class SortComparisonFeature<Goal extends ProofGoal<@NonNull Goal>>
     @Override
     protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app, PosInOccurrence pos,
             G goal, MutableState mState) {
-        final Term term1 = s1.toTerm(app, pos, (Goal) goal, mState);
-        final Term term2 = s2.toTerm(app, pos, (Goal) goal, mState);
+        final Term term1 = s1.toTerm(app, pos, goal, mState);
+        final Term term2 = s2.toTerm(app, pos, goal, mState);
         assert term1 != null && term2 != null
                 : "@AssumeAssertion(nullness): When using this comparison feature, term1 and term2 must be non-null";
         return compare(term1.sort(), term2.sort());

@@ -15,7 +15,7 @@ import org.key_project.util.collection.ImmutableList;
 /// rule application is admissible, zero is returned.
 @StableCost
 public class NoSelfApplicationFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature<GOAL> {
+        extends BinaryTacletAppFeature {
     public static <GOAL extends ProofGoal<GOAL>> NoSelfApplicationFeature<GOAL> create() {
         return new NoSelfApplicationFeature<>();
     }

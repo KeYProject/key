@@ -19,7 +19,7 @@ import org.jspecify.annotations.Nullable;
 @StableCost
 public class TriggerVariableInstantiationProjection implements ProjectionToTerm {
     @Override
-    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal goal,
+    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         assert app.rule() instanceof Taclet;
         final Taclet t = (Taclet) app.rule();

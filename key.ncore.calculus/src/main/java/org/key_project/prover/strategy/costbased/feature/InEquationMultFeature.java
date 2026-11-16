@@ -20,7 +20,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 /// inequations has factors in common with the left side of some other inequation, similarly to how
 /// it is decided in the Buchberger algorithm.
 public abstract class InEquationMultFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature<GOAL> {
+        extends BinaryTacletAppFeature {
     protected final ProjectionToTerm targetCandidate;
     protected final ProjectionToTerm mult1Candidate;
     protected final ProjectionToTerm mult2Candidate;

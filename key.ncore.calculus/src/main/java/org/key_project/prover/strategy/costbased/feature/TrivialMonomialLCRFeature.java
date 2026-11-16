@@ -22,7 +22,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 /// "A critical-pair/completion algorithm for finitely generated ideals in rings"
 @StableCost
 public class TrivialMonomialLCRFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature<GOAL> {
+        extends BinaryTacletAppFeature {
     private final ProjectionToTerm a, b;
     // creates a monomial from a given term
     private final BiFunction<Term, LogicServices, Monomial> builder;

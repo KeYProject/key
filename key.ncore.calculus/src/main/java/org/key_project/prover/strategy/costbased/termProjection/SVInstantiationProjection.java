@@ -35,7 +35,7 @@ public class SVInstantiationProjection implements ProjectionToTerm {
     }
 
     @Override
-    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal goal,
+    public @Nullable Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mutableState) {
         if (!(app instanceof final ITacletApp tapp)) {
             throw new IllegalArgumentException(

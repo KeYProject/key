@@ -30,7 +30,7 @@ import org.key_project.util.collection.ImmutableMapEntry;
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 
 
-public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature<Goal> {
+public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeature {
     protected AbstractNonDuplicateAppFeature() {}
 
     /**

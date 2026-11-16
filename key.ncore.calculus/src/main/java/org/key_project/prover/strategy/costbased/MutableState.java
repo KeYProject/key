@@ -7,7 +7,6 @@ package org.key_project.prover.strategy.costbased;
 import java.util.HashMap;
 
 import org.key_project.logic.Term;
-import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.strategy.costbased.feature.instantiator.BackTrackingManager;
 import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 
@@ -37,15 +36,14 @@ public class MutableState {
     /// multi-core prover's worker threads.
     private final HashMap<Object, Integer> choicePointIndex = HashMap.newHashMap(8);
 
-    /// manages backtracking for features that create [ChoicePoint]s
+    /// manages backtracking for features that create `ChoicePoint`s
     private @MonotonicNonNull BackTrackingManager btManager;
 
     /// assign the given [TermBuffer] the provided value
     ///
     /// @param v the [TermBuffer]
     /// @param value the Term which is assigned as the value
-    public <Goal extends ProofGoal<Goal>> void assign(@NonNull TermBuffer v,
-            @Nullable Term value) {
+    public void assign(@NonNull TermBuffer v, @Nullable Term value) {
         content.put(v, value);
     }
 
@@ -53,7 +51,7 @@ public class MutableState {
     ///
     /// @param v the TermBuffer whose value is asked for
     /// @return the current value of the [TermBuffer] or `null` if there is none
-    public <Goal extends @NonNull ProofGoal<Goal>> @Nullable Term read(TermBuffer v) {
+    public @Nullable Term read(TermBuffer v) {
         return content.get(v);
     }
 
@@ -74,7 +72,7 @@ public class MutableState {
         return index == null ? 0 : index;
     }
 
-    /// returns the backtracking manager to access [ChoicePoint]s
+    /// returns the backtracking manager to access `ChoicePoint`s
     ///
     /// @return the backtracking manager
     public BackTrackingManager getBacktrackingManager() {

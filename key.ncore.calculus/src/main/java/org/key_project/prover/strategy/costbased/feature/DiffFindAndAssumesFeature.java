@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 // while the find subterm survives. Reusable only while the find formula is unchanged.
 @WeakStableCost
 public class DiffFindAndAssumesFeature<GOAL extends ProofGoal<GOAL>>
-        extends BinaryTacletAppFeature<GOAL> {
+        extends BinaryTacletAppFeature {
     public static <GOAL extends ProofGoal<GOAL>> DiffFindAndAssumesFeature<GOAL> create() {
         return new DiffFindAndAssumesFeature<>();
     }

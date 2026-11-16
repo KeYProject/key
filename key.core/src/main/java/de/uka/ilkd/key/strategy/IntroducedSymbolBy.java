@@ -21,7 +21,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-public class IntroducedSymbolBy extends BinaryTacletAppFeature<Goal> {
+public class IntroducedSymbolBy extends BinaryTacletAppFeature {
     private final Name ruleSetName;
     private final Name schemaVar;
     private final ProjectionToTerm term;

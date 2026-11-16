@@ -21,7 +21,7 @@ import org.key_project.prover.strategy.costbased.feature.StableCost;
  * variants also accept a focus that sits below a prefix of update applications only.
  */
 @StableCost
-public final class TopLevelFindFeature extends BinaryTacletAppFeature<Goal> {
+public final class TopLevelFindFeature extends BinaryTacletAppFeature {
 
     /** Whether a focus below a pure update prefix still counts as top-level. */
     private enum Update {

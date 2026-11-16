@@ -28,7 +28,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  * some constant before comparison.
  */
 @StableCost
-public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature<Goal> {
+public final class PolynomialValuesCmpFeature extends BinaryTacletAppFeature {
 
     /** Which polynomial-value relation an instance checks. */
     private enum Cmp {

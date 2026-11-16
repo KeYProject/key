@@ -36,8 +36,7 @@ public class ImplicitCastNecessary<Goal extends ProofGoal<@NonNull Goal>> extend
         return projection.toTerm(app, pos, (Goal) goal, mState).sort().extendsTrans(maxSort);
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
-            ProjectionToTerm s1) {
+    public static Feature create(ProjectionToTerm s1) {
         return new ImplicitCastNecessary<>(s1);
     }
 

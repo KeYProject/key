@@ -28,7 +28,7 @@ import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELE
 // Stable: compares the find term against the taclet's replacewith template, both fixed for a given
 // rule application.
 @StableCost
-public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature<Goal> {
+public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
 
     /** the single instance of this feature */
     public static final Feature INSTANCE = new DiffFindAndReplacewithFeature();

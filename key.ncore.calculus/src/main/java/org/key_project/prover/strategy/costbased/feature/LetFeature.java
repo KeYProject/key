@@ -28,8 +28,7 @@ public class LetFeature<Goal extends ProofGoal<@NonNull Goal>> implements Featur
     private final ProjectionToTerm value;
     private final Feature body;
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(TermBuffer var,
-            ProjectionToTerm value, Feature body) {
+    public static Feature create(TermBuffer var, ProjectionToTerm value, Feature body) {
         return new LetFeature<>(var, value, body);
     }
 

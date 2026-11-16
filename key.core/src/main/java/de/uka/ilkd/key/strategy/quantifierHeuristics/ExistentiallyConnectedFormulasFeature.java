@@ -16,7 +16,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 /**
  * Binary feature that return zero if two given projection term is CS-Releated.
  */
-public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeature<Goal> {
+public class ExistentiallyConnectedFormulasFeature extends BinaryTacletAppFeature {
 
     private final ProjectionToTerm for0, for1;
 
