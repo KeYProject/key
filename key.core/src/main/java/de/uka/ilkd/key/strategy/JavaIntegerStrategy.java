@@ -110,6 +110,6 @@ public class JavaIntegerStrategy extends IntegerStrategy<Goal> implements Compon
 
     @Override
     protected TermOrdering createTermOrdering() {
-        return StaticFeatureCollection.createTermOrdering();
+        return JavaStaticFeatureCollection.createTermOrdering();
     }
 }

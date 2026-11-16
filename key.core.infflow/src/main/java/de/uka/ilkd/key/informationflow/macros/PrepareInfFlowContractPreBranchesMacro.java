@@ -24,7 +24,7 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
 import org.jspecify.annotations.NonNull;
 
-import static de.uka.ilkd.key.strategy.StaticFeatureCollection.hasLabel;
+import static de.uka.ilkd.key.strategy.JavaStaticFeatureCollection.hasLabel;
 
 
 /**

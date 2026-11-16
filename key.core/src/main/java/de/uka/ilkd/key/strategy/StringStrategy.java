@@ -133,8 +133,8 @@ public class StringStrategy extends JavaAbstractFeatureStrategy implements Compo
 
         bindRuleSet(d, "stringsConcatNotBothLiterals",
             ifZero(MatchedAssumesFeature.create(), ifZero(
-                add(applyTF(StaticFeatureCollection.instOf("leftStr"), seqLiteral),
-                    applyTF(StaticFeatureCollection.instOf("rightStr"), seqLiteral)),
+                add(applyTF(JavaStaticFeatureCollection.instOf("leftStr"), seqLiteral),
+                    applyTF(JavaStaticFeatureCollection.instOf("rightStr"), seqLiteral)),
                 inftyConst()), inftyConst()));
 
         bindRuleSet(d, "stringsReduceConcat", CostBand.DEFER.at(-400));

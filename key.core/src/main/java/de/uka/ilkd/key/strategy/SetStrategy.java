@@ -74,7 +74,7 @@ public class SetStrategy extends AbstractFeatureStrategy<Goal> implements Compon
             add(applyTF("commLeft", not(or(stf.unionF, stf.intersectF))),
                 applyTF("commRight", not(or(stf.unionF, stf.intersectF))),
                 SetsSmallerThanFeature.create(instOf("commRight"), instOf("commLeft"), stf,
-                    StaticFeatureCollection.createTermOrdering()),
+                    JavaStaticFeatureCollection.createTermOrdering()),
                 longConst(COMMUTE)));
     }
 

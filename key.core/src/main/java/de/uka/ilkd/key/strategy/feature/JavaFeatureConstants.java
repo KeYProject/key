@@ -6,7 +6,7 @@ package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.equality.RenamingTermProperty;
-import de.uka.ilkd.key.strategy.StaticFeatureCollection;
+import de.uka.ilkd.key.strategy.JavaStaticFeatureCollection;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
@@ -80,7 +80,7 @@ public class JavaFeatureConstants implements FeatureConstants {
 
     @Override
     public Feature directlyBelowSymbolAtIndex(Operator symbol, int index) {
-        return StaticFeatureCollection.directlyBelowSymbolAtIndex(op(symbol), index);
+        return JavaStaticFeatureCollection.directlyBelowSymbolAtIndex(op(symbol), index);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class JavaFeatureConstants implements FeatureConstants {
 
     @Override
     public TermFeature selectSkolemConstant() {
-        return StaticFeatureCollection.selectSkolemConstantTermFeature();
+        return JavaStaticFeatureCollection.selectSkolemConstantTermFeature();
     }
 
     @Override

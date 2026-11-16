@@ -10,7 +10,7 @@ import de.uka.ilkd.key.logic.op.ParametricFunctionDecl;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 /// Term features for the theory of sets.
-public class SetTermFeatures extends StaticFeatureCollection {
+public class SetTermFeatures extends JavaStaticFeatureCollection {
 
     SetTermFeatures(SetLDT sets) {
         empty = sets.getEmpty();

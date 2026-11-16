@@ -12,7 +12,6 @@ import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
@@ -25,9 +24,10 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termgenerator.SuperTermGenerator;
 
-import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
+import static de.uka.ilkd.key.strategy.JavaStaticFeatureCollection.*;
 import static de.uka.ilkd.key.strategy.SymExCost.*;
 
 /// Strategy for symbolic execution rules.

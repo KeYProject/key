@@ -26,6 +26,7 @@ import org.key_project.prover.proof.rulefilter.RuleFilter;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.*;
 
 /**
@@ -34,7 +35,7 @@ import org.key_project.prover.strategy.costbased.termfeature.*;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public abstract class StaticFeatureCollection
+public abstract class JavaStaticFeatureCollection
         extends org.key_project.prover.strategy.StaticFeatureCollection {
 
     public static TermOrdering createTermOrdering() {

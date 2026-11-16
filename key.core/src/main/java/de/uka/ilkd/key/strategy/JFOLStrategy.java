@@ -38,7 +38,7 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 
 import org.jspecify.annotations.NonNull;
 
-import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
+import static de.uka.ilkd.key.strategy.JavaStaticFeatureCollection.*;
 import static org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment.*;
 
 /// This strategy extends the classical [FOLStrategy] with heuristics
@@ -221,7 +221,7 @@ public class JFOLStrategy extends FOLStrategy<Goal> implements ComponentStrategy
 
     @Override
     protected TermOrdering createTermOrdering() {
-        return StaticFeatureCollection.createTermOrdering();
+        return JavaStaticFeatureCollection.createTermOrdering();
     }
 
     @Override

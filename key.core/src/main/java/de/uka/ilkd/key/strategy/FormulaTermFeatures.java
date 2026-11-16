@@ -15,7 +15,7 @@ import org.key_project.prover.strategy.IFormulaTermFeatures;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
-class FormulaTermFeatures extends StaticFeatureCollection implements IFormulaTermFeatures {
+class FormulaTermFeatures extends JavaStaticFeatureCollection implements IFormulaTermFeatures {
 
     public FormulaTermFeatures(JavaArithTermFeatures tf) {
         forF = extendsTrans(JavaDLTheory.FORMULA);
@@ -67,7 +67,7 @@ class FormulaTermFeatures extends StaticFeatureCollection implements IFormulaTer
             rec(any(), longTermConst(1)));
         // directCutAllowed = add ( tf.intInEquation, notContainsQuery );
 
-        quantiferF = OperatorClassTF.create(Quantifier.class);
+        quantifierF = OperatorClassTF.create(Quantifier.class);
     }
 
     final TermFeature forF;
@@ -102,7 +102,7 @@ class FormulaTermFeatures extends StaticFeatureCollection implements IFormulaTer
     final TermFeature cutAllowed;
     final TermFeature cutAllowedBelowQuantifier;
     final TermFeature cutPriority;
-    final TermFeature quantiferF;
+    final TermFeature quantifierF;
 
     @Override
     public TermFeature forF() {
@@ -256,6 +256,6 @@ class FormulaTermFeatures extends StaticFeatureCollection implements IFormulaTer
 
     @Override
     public TermFeature quantifierF() {
-        return quantiferF;
+        return quantifierF;
     }
 }

@@ -35,6 +35,7 @@ import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
 import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermPredicateTermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
@@ -44,7 +45,7 @@ import org.jspecify.annotations.NonNull;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static de.uka.ilkd.key.strategy.HeapSelectCost.*;
 import static de.uka.ilkd.key.strategy.JavaCardDLCost.*;
-import static de.uka.ilkd.key.strategy.StaticFeatureCollection.*;
+import static de.uka.ilkd.key.strategy.JavaStaticFeatureCollection.*;
 
 /// This strategy is the catch-all for Java related features that are either
 /// cross-cutting or one of the features that do not fit well into any other
@@ -268,7 +269,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             bindRuleSet(d, "induction_var", inftyConst());
         } else {
             bindRuleSet(d, "induction_var", ifZero(
-                applyTF(StaticFeatureCollection.instOf("uSub"), IsInductionVariable.INSTANCE),
+                applyTF(JavaStaticFeatureCollection.instOf("uSub"), IsInductionVariable.INSTANCE),
                 longConst(0), inftyConst()));
         }
 
@@ -400,7 +401,7 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
         final TermBuffer sf = new TermBuffer();
         return add(sequentContainsNoPrograms(),
             sum(sf, SequentFormulasGenerator.<Goal>sequent(),
-                or(StaticFeatureCollection.eq(sf, FocusFormulaProjection.create()),
+                or(JavaStaticFeatureCollection.eq(sf, FocusFormulaProjection.create()),
                     not(ContainsTermFeature.create(sf, instOf("auxiliarySK"),
                         RENAMING_TERM_PROPERTY)))));
     }
@@ -485,10 +486,10 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
             let(firstObject, instOf("o"), let(secondObject, instOf("o2"),
                 sum(succedentFormula, SequentFormulasGenerator.<Goal>succedent(),
                     not(applyTF(succedentFormula,
-                        or(opSub(Equality.EQUALS, StaticFeatureCollection.eq(firstObject),
-                            StaticFeatureCollection.eq(secondObject)),
-                            opSub(Equality.EQUALS, StaticFeatureCollection.eq(secondObject),
-                                StaticFeatureCollection.eq(firstObject)))))))));
+                        or(opSub(Equality.EQUALS, JavaStaticFeatureCollection.eq(firstObject),
+                            JavaStaticFeatureCollection.eq(secondObject)),
+                            opSub(Equality.EQUALS, JavaStaticFeatureCollection.eq(secondObject),
+                                JavaStaticFeatureCollection.eq(firstObject)))))))));
         bindRuleSet(d, "inReachableStateImplication", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "limitObserver", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "partialInvAxiom", NonDuplicateAppModPositionFeature.INSTANCE);
@@ -534,7 +535,8 @@ public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
                  * the latter case
                  */
                 not(sum(tb, HeapGenerator.INSTANCE, not(
-                    StaticFeatureCollection.eq(StaticFeatureCollection.instOf("sv_heap"), tb)))));
+                    JavaStaticFeatureCollection.eq(JavaStaticFeatureCollection.instOf("sv_heap"),
+                        tb)))));
 
             if (classAxiomDelayedApplication()) {
                 bindRuleSet(d, "classAxiom", add(sequentContainsNoPrograms(),

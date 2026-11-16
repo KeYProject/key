@@ -34,8 +34,8 @@ import org.key_project.prover.strategy.costbased.feature.ScaleFeature;
 import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
+import static de.uka.ilkd.key.strategy.JavaStaticFeatureCollection.directlyBelowSymbolAtIndex;
 import static de.uka.ilkd.key.strategy.SeqCost.*;
-import static de.uka.ilkd.key.strategy.StaticFeatureCollection.directlyBelowSymbolAtIndex;
 
 /// Strategy for reasoning about sequences
 public class SeqStrategy extends JavaAbstractFeatureStrategy implements ComponentStrategy<Goal> {
