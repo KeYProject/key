@@ -22,7 +22,7 @@ import org.jspecify.annotations.NonNull;
 /// Feature representing a `ChoicePoint` that iterates over the terms returned by a
 /// `TermGenerator`. The terms are stored in a `TermBuffer` one after the other
 /// and can subsequently be used to instantiate a rule application
-public class ForEachCP<G extends ProofGoal<G>> implements Feature {
+public class ForEachCP implements Feature {
     private final TermBuffer var;
     private final TermGenerator generator;
     private final Feature body;
@@ -31,14 +31,11 @@ public class ForEachCP<G extends ProofGoal<G>> implements Feature {
     /// @param generator the terms that are to be iterated over
     /// @param body a feature that is supposed to be evaluated repeatedly for the possible values of
     /// `var`
-    public static <G extends ProofGoal<G>> Feature create(TermBuffer var,
-            TermGenerator generator,
-            Feature body) {
-        return new ForEachCP<>(var, generator, body);
+    public static Feature create(TermBuffer var, TermGenerator generator, Feature body) {
+        return new ForEachCP(var, generator, body);
     }
 
-    private ForEachCP(TermBuffer var, TermGenerator generator,
-            Feature body) {
+    private ForEachCP(TermBuffer var, TermGenerator generator, Feature body) {
         this.var = var;
         this.generator = generator;
         this.body = body;
@@ -52,7 +49,7 @@ public class ForEachCP<G extends ProofGoal<G>> implements Feature {
         var.setContent(null, mState);
 
         final BackTrackingManager manager = mState.getBacktrackingManager();
-        manager.passChoicePoint(new CP(app, pos, (G) goal, mState), this);
+        manager.passChoicePoint(new CP(app, pos, goal, mState), this);
 
         final RuleAppCost res;
         if (var.getContent(mState) != null) {
@@ -108,10 +105,10 @@ public class ForEachCP<G extends ProofGoal<G>> implements Feature {
 
         private final PosInOccurrence pos;
         private final RuleApp app;
-        private final @NonNull G goal;
+        private final @NonNull ProofGoal<?> goal;
         private final MutableState mState;
 
-        private CP(RuleApp app, PosInOccurrence pos, G goal,
+        private CP(RuleApp app, PosInOccurrence pos, @NonNull ProofGoal<?> goal,
                 MutableState mState) {
             this.pos = pos;
             this.app = app;
