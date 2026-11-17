@@ -28,7 +28,6 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Setup SMT solvers
         uses: keyproject/setup-smt@v0.3.0
@@ -84,7 +83,6 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Setup SMT solvers
         uses: keyproject/setup-smt@v0.3.0
@@ -130,7 +128,6 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Setup SMT solvers
         uses: keyproject/setup-smt@v0.3.0

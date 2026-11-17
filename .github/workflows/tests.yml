@@ -75,6 +75,9 @@ jobs:
 
       - name: Test with Gradle
         shell: bash
+        # matrix.tasks is intentionally interpolated UNQUOTED: it is a whitespace-separated
+        # list of task selectors, and quoting would hand Gradle a single argument it cannot
+        # resolve ("Cannot locate tasks that match ':a:test :b:test'").
         # Retry once when a leg fails on a transient dependency-resolution error (e.g. a
         # sporadic Maven Central 404, see run 43979238012). --refresh-dependencies also
         # discards Gradle's locally cached "module is missing" entries. Genuine test
@@ -82,10 +85,10 @@ jobs:
         run: |
           set -o pipefail
           OUT=$(mktemp)
-          if ! ./gradlew --continue "${{ matrix.tasks }}" | tee "$OUT"; then
+          if ! ./gradlew --continue ${{ matrix.tasks }} | tee "$OUT"; then
             if grep -qE "Could not (find|resolve|download|GET) " "$OUT"; then
               echo "::warning::Transient dependency resolution failure; retrying with --refresh-dependencies"
-              ./gradlew --refresh-dependencies --continue "${{ matrix.tasks }}"
+              ./gradlew --refresh-dependencies --continue ${{ matrix.tasks }}
             else
               exit 1
             fi

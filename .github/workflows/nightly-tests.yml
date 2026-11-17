@@ -20,6 +20,10 @@ jobs:
         test: [ testRunAllFunProofs, testRunAllInfProofs ]
     runs-on: ubuntu-24.04
     timeout-minutes: 240
+    # A manual workflow_dispatch must not stack on top of the scheduled 03:00 UTC run.
+    concurrency:
+      group: ${{ github.workflow }}-${{ matrix.test }}
+      cancel-in-progress: true
     env:
       GH_TOKEN: ${{ github.token }}
     steps:

@@ -180,6 +180,12 @@ subprojects {
             outputs.upToDateWhen { false }
             showStandardStreams = true
         }
+
+        // Test results must never be served from the build cache: the cache key cannot capture
+        // the prover environment (SMT solver binaries, $HOME/.key state), and CI legs restore
+        // caches from main. upToDateWhen { false } above already forces re-execution; this
+        // guard keeps that property explicit even if the line above is ever removed.
+        outputs.cacheIf { false }
     }
 
     tasks.register('testFast', Test) {
