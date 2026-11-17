@@ -58,7 +58,7 @@ public class TestTestgen extends TestCommons {
                 }
             }
         }
-        return isInstalled;
+        return !isInstalled;
     }
 
     public SolverType getSolverType() {

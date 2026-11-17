@@ -23,27 +23,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-24.04, windows-latest ]
         java: [ 21 ]
         modules: [
           keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
           key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
           key.util, key.core.example, keyext.caching, key.core.wd, key.core.infflow,
           keyext.proofmanagement]
-    continue-on-error: true
     runs-on: ${{ matrix.os }}
+    # Bounded runtime: a hung job must not occupy a runner for the default 360 minutes.
+    timeout-minutes: 40
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v7
 
       - name: Setup SMT solvers
-        uses: keyproject/setup-smt@v0
+        uses: keyproject/setup-smt@v0.3.0
         with:
-          # Pin Z3 so CI is reproducible: an unpinned solver makes the SMT-dependent tests
-          # (e.g. key.core.testgen) a moving target that fails intermittently when the action's
-          # default version changes.
+          # Pin both solvers so CI is reproducible: an unpinned solver makes the SMT-dependent
+          # tests (e.g. key.core.testgen) a moving target that fails intermittently when the
+          # action's default version changes.
           z3Version: 4.13.0
+          cvc5Version: 1.2.1
 
       - name: z3 version
         run: z3 --version
@@ -62,7 +64,22 @@ jobs:
         uses: gradle/actions/setup-gradle@v6
 
       - name: Test with Gradle
-        run: ./gradlew --continue :${{ matrix.modules }}:test
+        shell: bash
+        # Retry once when a leg fails on a transient dependency-resolution error (e.g. a
+        # sporadic Maven Central 404, see run 43979238012). --refresh-dependencies also
+        # discards Gradle's locally cached "module is missing" entries. Genuine test
+        # failures abort without a second run.
+        run: |
+          set -o pipefail
+          OUT=$(mktemp)
+          if ! ./gradlew --continue ":${{ matrix.modules }}:test" | tee "$OUT"; then
+            if grep -qE "Could not (find|resolve|download|GET) " "$OUT"; then
+              echo "::warning::Transient dependency resolution failure; retrying with --refresh-dependencies"
+              ./gradlew --refresh-dependencies --continue ":${{ matrix.modules }}:test"
+            else
+              exit 1
+            fi
+          fi
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
@@ -85,9 +102,12 @@ jobs:
       fail-fast: false
       matrix:
         test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs, testMtStress, testMt2w, testMt4w ]
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-24.04 ]
         java: [ 21 ]
     runs-on: ${{ matrix.os }}
+    # Bounded runtime: the long proof regression legs take ~25 minutes; a hung job must not
+    # occupy a runner for the default 360 minutes.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v7
       - name: Set up JDK 21
@@ -98,14 +118,27 @@ jobs:
           cache: 'gradle'
 
       - name: Setup SMT solvers
-        uses: keyproject/setup-smt@v0
+        uses: keyproject/setup-smt@v0.3.0
         with:
           z3Version: 4.13.0
+          cvc5Version: 1.2.1
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
       - name: "Running tests: ${{ matrix.test }}"
-        run: ./gradlew --continue ${{ matrix.test }}
+        shell: bash
+        # See the unit-tests job: retry once on transient dependency-resolution failures.
+        run: |
+          set -o pipefail
+          OUT=$(mktemp)
+          if ! ./gradlew --continue "${{ matrix.test }}" | tee "$OUT"; then
+            if grep -qE "Could not (find|resolve|download|GET) " "$OUT"; then
+              echo "::warning::Transient dependency resolution failure; retrying with --refresh-dependencies"
+              ./gradlew --refresh-dependencies --continue "${{ matrix.test }}"
+            else
+              exit 1
+            fi
+          fi
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
