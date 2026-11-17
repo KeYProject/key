@@ -18,6 +18,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -110,5 +111,77 @@ class InstanceOfPatternFlowScopingTest {
                 """);
 
         prove(source);
+    }
+
+    @Test
+    void fieldAccessOnPatternVariable(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("FieldAccess.java");
+        Files.writeString(source, """
+                public class FieldAccess {
+                    static class A {
+                        int g;
+                    }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m(Object o) {
+                        if (o instanceof A a) {
+                            return a.g;
+                        }
+                        return 0;
+                    }
+                }
+                """);
+
+        prove(source);
+    }
+
+    @Test
+    void patternVariableInTernaryTrueBranch(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("Conditional.java");
+        Files.writeString(source, """
+                public class Conditional {
+                    static class A {
+                        int g;
+                    }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static boolean m(Object o) {
+                        return (o instanceof A a) ? a.g > 0 : false;
+                    }
+                }
+                """);
+
+        prove(source);
+    }
+
+    @Test
+    void reviewConditionalSourceIsAccepted(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("ReviewConditional.java");
+        Files.writeString(source, """
+                public class ReviewConditional {
+                    static class A { }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static Object m(Object o) {
+                        return (o instanceof A a) ? a : null;
+                    }
+                }
+                """);
+
+        KeYEnvironment<?> environment = KeYEnvironment.load(source);
+        try {
+            assertNotNull(environment.getProofContracts().getFirst());
+        } finally {
+            environment.dispose();
+        }
     }
 }
