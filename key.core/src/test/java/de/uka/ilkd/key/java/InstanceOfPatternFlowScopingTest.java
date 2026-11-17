@@ -20,6 +20,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+
 /// Tests the JLS 6.3.1.5 flow scoping of pattern variables. A pattern variable introduced in an
 /// `instanceof` pattern is in scope after an `if` statement if the then branch cannot complete
 /// normally.
@@ -33,6 +34,23 @@ class InstanceOfPatternFlowScopingTest {
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setUseJML(true);
     }
 
+
+    private static void prove(Path source) throws Exception {
+        KeYEnvironment<?> environment = KeYEnvironment.load(source);
+        try {
+            var contract = environment.getProofContracts().getFirst();
+            Proof proof =
+                environment.createProof(contract.createProofObl(environment.getInitConfig()));
+            ProofStarter starter = new ProofStarter(false);
+            starter.init(proof);
+            starter.start();
+
+            assertTrue(proof.closed(),
+                () -> "Proof did not close. Open goals: " + proof.openGoals());
+        } finally {
+            environment.dispose();
+        }
+    }
 
     @Test
     void patternVariableIsInScopeAfterAbortingThenBranch(@TempDir Path tempDir) throws Exception {
@@ -52,20 +70,7 @@ class InstanceOfPatternFlowScopingTest {
                 }
                 """);
 
-        KeYEnvironment<?> environment = KeYEnvironment.load(source);
-        try {
-            var contract = environment.getProofContracts().getFirst();
-            Proof proof =
-                environment.createProof(contract.createProofObl(environment.getInitConfig()));
-            ProofStarter starter = new ProofStarter(false);
-            starter.init(proof);
-            starter.start();
-
-            assertTrue(proof.closed(),
-                () -> "Proof did not close. Open goals: " + proof.openGoals());
-        } finally {
-            environment.dispose();
-        }
+        prove(source);
     }
 
     @Test
@@ -84,19 +89,26 @@ class InstanceOfPatternFlowScopingTest {
                 }
                 """);
 
-        KeYEnvironment<?> environment = KeYEnvironment.load(source);
-        try {
-            var contract = environment.getProofContracts().getFirst();
-            Proof proof =
-                environment.createProof(contract.createProofObl(environment.getInitConfig()));
-            ProofStarter starter = new ProofStarter(false);
-            starter.init(proof);
-            starter.start();
+        prove(source);
+    }
 
-            assertTrue(proof.closed(),
-                () -> "Proof did not close. Open goals: " + proof.openGoals());
-        } finally {
-            environment.dispose();
-        }
+    @Test
+    void laterLocalMayReuseThePatternVariableName(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("LaterLocal.java");
+        Files.writeString(source, """
+                public class LaterLocal {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static boolean m(Object o) {
+                        if (o instanceof String x) { }
+                        String x = "fresh";
+                        return x.isEmpty();
+                    }
+                }
+                """);
+
+        prove(source);
     }
 }
