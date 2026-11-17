@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 
 import org.key_project.logic.Term;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.Origin;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 

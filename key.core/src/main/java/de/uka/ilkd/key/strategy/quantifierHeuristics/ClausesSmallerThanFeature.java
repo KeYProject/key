@@ -6,14 +6,16 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.feature.SmallerThanFeature;
+import de.uka.ilkd.key.strategy.JavaStaticFeatureCollection;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.SmallerThanFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 /**
@@ -23,28 +25,30 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
  */
 public class ClausesSmallerThanFeature extends SmallerThanFeature {
 
-    private final ProjectionToTerm<Goal> left, right;
+    private final ProjectionToTerm left, right;
 
     private final QuanEliminationAnalyser quanAnalyser = new QuanEliminationAnalyser();
 
     private final LiteralsSmallerThanFeature litComparator;
 
-    private ClausesSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IntegerLDT numbers) {
+    private ClausesSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+            TermOrdering termOrdering, IntegerLDT numbers) {
+        super(termOrdering);
         this.left = left;
         this.right = right;
         this.litComparator =
-            (LiteralsSmallerThanFeature) LiteralsSmallerThanFeature.create(left, right, numbers);
+            (LiteralsSmallerThanFeature) LiteralsSmallerThanFeature.create(left, right,
+                JavaStaticFeatureCollection.createTermOrdering(), numbers);
     }
 
-    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            IntegerLDT numbers) {
-        return new ClausesSmallerThanFeature(left, right, numbers);
+    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+            TermOrdering termOrdering, IntegerLDT numbers) {
+        return new ClausesSmallerThanFeature(left, right, termOrdering, numbers);
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos,
+            ProofGoal<?> goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
@@ -60,7 +64,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal goal) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, ProofGoal<?> goal) {
 
         final int t1Def = quanAnalyser.eliminableDefinition(t1, focus);
         final int t2Def = quanAnalyser.eliminableDefinition(t2, focus);

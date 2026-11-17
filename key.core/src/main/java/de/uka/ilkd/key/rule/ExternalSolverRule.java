@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
@@ -28,7 +28,7 @@ public interface ExternalSolverRule extends BuiltInRule {
             String successfulSolverName, ImmutableList<PosInOccurrence> unsatCore);
 
     @Override
-    IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);
+    IBuiltInRuleApp createApp(PosInOccurrence pos, LogicServices services);
 
 
     @Override

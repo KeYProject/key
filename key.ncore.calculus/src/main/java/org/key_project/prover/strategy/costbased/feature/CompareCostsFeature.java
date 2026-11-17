@@ -9,11 +9,8 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-import org.jspecify.annotations.NonNull;
-
 public abstract class CompareCostsFeature
         extends BinaryFeature {
-
     protected final Feature a, b;
 
     private CompareCostsFeature(Feature a, Feature b) {
@@ -24,8 +21,8 @@ public abstract class CompareCostsFeature
     public static Feature less(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
             @Override
-            protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-                    PosInOccurrence pos, Goal goal, MutableState mState) {
+            protected boolean filter(RuleApp app,
+                    PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
                 return a.computeCost(app, pos, goal, mState)
                         .compareTo(b.computeCost(app, pos, goal, mState)) < 0;
             }
@@ -35,8 +32,8 @@ public abstract class CompareCostsFeature
     public static Feature leq(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
             @Override
-            protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-                    PosInOccurrence pos, Goal goal, MutableState mState) {
+            protected boolean filter(RuleApp app,
+                    PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
                 return a.computeCost(app, pos, goal, mState)
                         .compareTo(b.computeCost(app, pos, goal, mState)) <= 0;
             }
@@ -46,12 +43,11 @@ public abstract class CompareCostsFeature
     public static Feature eq(Feature a, Feature b) {
         return new CompareCostsFeature(a, b) {
             @Override
-            protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-                    PosInOccurrence pos, Goal goal, MutableState mState) {
+            protected boolean filter(RuleApp app,
+                    PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
                 return a.computeCost(app, pos, goal, mState)
                         .equals(b.computeCost(app, pos, goal, mState));
             }
         };
     }
-
 }

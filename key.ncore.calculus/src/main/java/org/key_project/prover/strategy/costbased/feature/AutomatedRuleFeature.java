@@ -11,13 +11,9 @@ import org.key_project.prover.rules.Taclet;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-import org.jspecify.annotations.NonNull;
-
 /// This feature checks if a rule may be applied automatically. Currently, this does not apply to
 /// rules which are not member of any rule set.
-public class AutomatedRuleFeature
-        extends BinaryFeature {
-
+public class AutomatedRuleFeature extends BinaryFeature {
     private static final Feature INSTANCE = new AutomatedRuleFeature();
 
     private AutomatedRuleFeature() {}
@@ -27,8 +23,8 @@ public class AutomatedRuleFeature
     }
 
     @Override
-    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return !(app.rule() instanceof Taclet)
                 || AnyRuleSetTacletFilter.INSTANCE.filter(app.rule());
     }

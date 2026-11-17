@@ -4,13 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 
-import org.key_project.prover.rules.RuleApp;
+import org.key_project.logic.LogicServices;
 import org.key_project.prover.rules.RuleExecutor;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -25,21 +23,9 @@ import org.jspecify.annotations.Nullable;
 // which is a RuleExecutor<Goal> by contract. The unchecked override warning cannot be silenced at
 // method scope, and the generic signature cannot be replicated without an unchecked cast.
 @SuppressWarnings("unchecked")
-public interface BuiltInRule extends Rule, RuleExecutor<Goal> {
+public interface BuiltInRule extends org.key_project.prover.rules.IBuiltInRule<Goal>, Rule {
 
-    /**
-     * Returning true iff a rule is applicable at the given position.
-     * This does not necessarily mean that a rule application will change the goal
-     * (this decision is made due to performance reasons)
-     */
-    boolean isApplicable(Goal goal, @Nullable PosInOccurrence pio);
-
-    boolean isApplicableOnSubTerms();
-
-    IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, TermServices services);
-
-    @Override
-    ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp);
+    IBuiltInRuleApp createApp(@Nullable PosInOccurrence pos, LogicServices services);
 
     @Override
     default RuleExecutor<Goal> getExecutor() {

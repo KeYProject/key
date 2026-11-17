@@ -19,8 +19,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
-import org.jspecify.annotations.NonNull;
-
 public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
     private SplittableQuantifiedFormulaFeature() {}
@@ -28,8 +26,8 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
     public static final Feature INSTANCE = new SplittableQuantifiedFormulaFeature();
 
     @Override
-    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Analyser analyser = new Analyser();

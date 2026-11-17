@@ -38,5 +38,4 @@ public class IsInductionVariable extends BinaryTermFeature {
         }
         return false;
     }
-
 }

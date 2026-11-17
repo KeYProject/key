@@ -19,13 +19,11 @@ import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Trivial implementation of the Strategy interface that uses only the goal time to determine the
  * cost of a RuleApp. A TacletFilter is used to filter out RuleApps.
  */
-public class SimpleFilteredStrategy implements Strategy<Goal> {
+public class SimpleFilteredStrategy implements JavaStrategy {
 
     private static final Name NAME = new Name("Simple ruleset");
 
@@ -54,9 +52,9 @@ public class SimpleFilteredStrategy implements Strategy<Goal> {
      *         all (it is discarded by the strategy).
      */
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+    public RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pio,
-            Goal goal,
+            ProofGoal<?> goal,
             MutableState mState) {
         if (app instanceof TacletApp && !ruleFilter.filter(app.rule())) {
             return TopRuleAppCost.INSTANCE;
@@ -93,7 +91,7 @@ public class SimpleFilteredStrategy implements Strategy<Goal> {
 
     @Override
     public void instantiateApp(RuleApp app, PosInOccurrence pio, Goal goal,
-            RuleAppCostCollector collector) {}
+            org.key_project.prover.strategy.RuleAppCostCollector collector) {}
 
     @Override
     public boolean isStopAtFirstNonCloseableGoal() {

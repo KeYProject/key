@@ -79,8 +79,8 @@ public class SingleRuleApplicationInfo {
     /// @param <G> the type of the proof goal.
     /// @return the proof goal associated with this rule application.
     @SuppressWarnings("unchecked") // stored goal always has the requested type at runtime
-    public <G extends @Nullable ProofGoal<G>> G getGoal() {
-        return (G) goal;
+    public <G extends ProofGoal<G>> @Nullable G getGoal() {
+        return (@Nullable G) goal;
     }
 
     /// Retrieves the message explaining the result of the rule application.

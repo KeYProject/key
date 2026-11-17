@@ -216,7 +216,7 @@ public class TacletInstantiationModel {
     }
 
     /**
-     * replaces the TacletApp of this ApplyTacletDialogModel by an TacletApp where all name
+     * replaces the ITacletApp of this ApplyTacletDialogModel by an ITacletApp where all name
      * conflicts are resolved and thus the parser is enabled to accept variables from the context or
      * the prefix of the Taclet.
      *

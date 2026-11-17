@@ -30,7 +30,7 @@ import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
-import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
+import static org.key_project.prover.indexing.RuleAppIndexMode.INTERACTIVE;
 
 /**
  * This class provides the command <code>rewrite</code>.

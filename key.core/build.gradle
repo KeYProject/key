@@ -158,6 +158,9 @@ tasks.register('testMt2w', Test) {
         // order-dependence (e.g. HashMap iteration reaching rule selection) without any threading
         includeTestsMatching "ScDeterminismTest"
     }
+    systemProperty 'key.rap.reload',
+        (project.findProperty('rapReload')
+                ?: System.getProperty('key.rap.reload', 'true'))
 }
 
 // The 4-worker variant of testMt2w. Kept as its own task so CI can drop it if a runner cannot
@@ -167,6 +170,9 @@ tasks.register('testMt4w', Test) {
     group = 'verification'
     forkEvery = 1
     filter { includeTestsMatching "RunSmallProofsMt4wTest" }
+    systemProperty 'key.rap.reload',
+        (project.findProperty('rapReload')
+                ?: System.getProperty('key.rap.reload', 'true'))
 }
 
 // Stress test for the goal-level parallel prover: run a few large splitting proofs many times at a
@@ -409,6 +415,11 @@ tasks.register("testRAP", Test) {
     it.filter {
         it.includeTestsMatching "de.uka.ilkd.key.proof.runallproofs.gen.*"
     }
+    // forward the save-and-reload switch to the proof runs in each fork; default on, skip the
+    // reload with -PrapReload=false (or -Dkey.rap.reload=false)
+    systemProperty 'key.rap.reload',
+        (project.findProperty('rapReload')
+                ?: System.getProperty('key.rap.reload', 'true'))
     // forward the compiled-matcher switch to the (in-process) proof runs in each fork; default
     // off, enable with -Pmatcher.compiled=true (or -Dkey.matcher.compiled=true)
     systemProperty 'key.matcher.compiled',

@@ -1,0 +1,42 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+package org.key_project.prover.strategy.costbased.feature;
+
+import org.key_project.logic.Name;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.ITacletApp;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.costbased.MutableState;
+
+/// Feature that returns zero iff the schema variable is one of the uninstantiated variables of
+/// the taclet application, and infinity otherwise.
+public class SVNeedsInstantiation
+        extends InstantiatedSVFeature {
+    public static Feature create(String svName) {
+        return new SVNeedsInstantiation(new Name(svName));
+    }
+
+    private final Name svName;
+
+    protected SVNeedsInstantiation(Name svName) {
+        super(svName);
+        this.svName = svName;
+    }
+
+    @Override
+    protected boolean filter(ITacletApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
+        boolean res = super.filter(app, pos, goal, mState);
+        if (!res) {
+            for (SchemaVariable sv : app.uninstantiatedVars()) {
+                if (sv.name().equals(svName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}

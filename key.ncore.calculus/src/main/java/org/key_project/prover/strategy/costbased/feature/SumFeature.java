@@ -21,8 +21,8 @@ import org.jspecify.annotations.NonNull;
 public class SumFeature implements Feature {
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal,
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         // We require that there is at least one feature (in method
         // <code>createSum</code>)
@@ -60,8 +60,7 @@ public class SumFeature implements Feature {
         LinkedHashSet<Feature> featureSet = new LinkedHashSet<>();
         flatten(fs, featureSet);
 
-        // noinspection unchecked
-        return new SumFeature(featureSet.<Feature>toArray(new Feature[0]));
+        return new SumFeature(featureSet.toArray(new Feature[0]));
     }
 
     private final Feature[] features;

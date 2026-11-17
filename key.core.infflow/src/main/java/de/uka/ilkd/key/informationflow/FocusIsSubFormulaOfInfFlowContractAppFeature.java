@@ -21,9 +21,6 @@ import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
-
-
 
 /**
  * Checks whether the focus of the ruleApp is contained in one of the formulas added by information
@@ -42,8 +39,8 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
 
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp ruleApp,
-            PosInOccurrence pos, Goal p_goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp ruleApp,
+            PosInOccurrence pos, ProofGoal<?> p_goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " + "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;

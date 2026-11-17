@@ -9,31 +9,33 @@ import java.math.BigInteger;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm<Goal> {
-    private final ProjectionToTerm<Goal> leftCoefficient, polynomial;
+public abstract class AbstractDividePolynomialsProjection implements ProjectionToTerm {
+    private final ProjectionToTerm leftCoefficient, polynomial;
 
-    protected AbstractDividePolynomialsProjection(ProjectionToTerm<Goal> leftCoefficient,
-            ProjectionToTerm<Goal> polynomial) {
+    protected AbstractDividePolynomialsProjection(ProjectionToTerm leftCoefficient,
+            ProjectionToTerm polynomial) {
         this.leftCoefficient = leftCoefficient;
         this.polynomial = polynomial;
     }
 
     @Override
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    public Term toTerm(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         final Term coeffT = leftCoefficient.toTerm(app, pos, goal, mState);
         final Term polyT = polynomial.toTerm(app, pos, goal, mState);
 
-        final Services services = goal.proof().getServices();
+        final Services services = ((Proof) goal.proof()).getServices();
         final BigInteger coeff =
             new BigInteger(AbstractTermTransformer.convertToDecimalString(coeffT, services));
 
@@ -51,7 +53,7 @@ public abstract class AbstractDividePolynomialsProjection implements ProjectionT
             return services.getTermBuilder().func(add, left, right);
         }
 
-        final Monomial rightMono = Monomial.create(rightPoly, services);
+        final Monomial rightMono = JMonomial.create(rightPoly, services);
         return (JTerm) divide(rightMono, monoCoeff, services);
     }
 

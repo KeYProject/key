@@ -13,7 +13,7 @@ import org.key_project.prover.strategy.costbased.termfeature.SubTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
 /// Term features for the sequence theories `Seq` and `PSeq`
-public class SeqTermFeatures extends StaticFeatureCollection {
+public class SeqTermFeatures extends JavaStaticFeatureCollection {
 
     public final TermFeature get;
     public final TermFeature empty;

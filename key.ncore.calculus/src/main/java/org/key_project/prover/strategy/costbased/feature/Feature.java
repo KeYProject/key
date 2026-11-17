@@ -11,8 +11,6 @@ import org.key_project.prover.strategy.costbased.CostClassifiable;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-
 /// A [Feature] is a class that is able to compute the cost of a [RuleApp].
 @FunctionalInterface
 public interface Feature extends CostClassifiable {
@@ -23,11 +21,11 @@ public interface Feature extends CostClassifiable {
     /// @param pos position where <code>app</code> is to be applied
     /// @param goal the goal on which <code>app</code> is to be applied
     /// @param mState variable bank / local storage for feature who might require to store temporary
-    /// information that changes during computation, e.g. [TermBuffer]s
+    /// information that changes during computation, e.g. `TermBuffer`s
     /// @return the cost of the rule application expressed as a <code>RuleAppCost</code> object.
     /// <code>TopRuleAppCost.INSTANCE</code> indicates that the rule shall not be applied at
     /// all (it is discarded by the strategy).
-    <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
+    RuleAppCost computeCost(RuleApp app,
             PosInOccurrence pos,
-            Goal goal, MutableState mState);
+            ProofGoal<?> goal, MutableState mState);
 }

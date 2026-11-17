@@ -7,31 +7,30 @@ package de.uka.ilkd.key.strategy.termProjection;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.LexPathOrdering;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 @StableCost
 public class MonomialColumnOp extends AbstractDividePolynomialsProjection {
 
-    private MonomialColumnOp(ProjectionToTerm<Goal> leftCoefficient,
-            ProjectionToTerm<Goal> polynomial) {
+    private MonomialColumnOp(ProjectionToTerm leftCoefficient,
+            ProjectionToTerm polynomial) {
         super(leftCoefficient, polynomial);
     }
 
-    public static ProjectionToTerm<Goal> create(ProjectionToTerm<Goal> leftCoefficient,
-            ProjectionToTerm<Goal> polynomial) {
+    public static ProjectionToTerm create(ProjectionToTerm leftCoefficient,
+            ProjectionToTerm polynomial) {
         return new MonomialColumnOp(leftCoefficient, polynomial);
     }
 
     @Override
     protected Term divide(Monomial numerator, BigInteger denominator, Services services) {
         final BigInteger newRightCoeff =
-            LexPathOrdering.divide(numerator.getCoefficient(), denominator);
-        return numerator.setCoefficient(newRightCoeff).toTerm(services);
+            Monomial.divide(numerator.getCoefficient(), denominator);
+        return JMonomial.toTerm(numerator.setCoefficient(newRightCoeff), services);
     }
 }

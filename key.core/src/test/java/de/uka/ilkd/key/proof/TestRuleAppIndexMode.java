@@ -13,6 +13,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.util.ProofStarter;
 
 import org.key_project.logic.PosInTerm;
+import org.key_project.prover.indexing.RuleAppIndexMode;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;

@@ -37,7 +37,7 @@ import org.jspecify.annotations.Nullable;
 
 import static de.uka.ilkd.key.logic.equality.IrrelevantTermLabelsProperty.IRRELEVANT_TERM_LABELS_PROPERTY;
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
-import static de.uka.ilkd.key.proof.RuleAppIndexMode.INTERACTIVE;
+import static org.key_project.prover.indexing.RuleAppIndexMode.INTERACTIVE;
 
 /**
  * Command that applies a calculus rule All parameters are passed as strings and converted by the

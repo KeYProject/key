@@ -10,12 +10,10 @@ import org.key_project.prover.rules.RuleApp;
 /// the <code>BackTrackingManager</code> decides to take this branch, and can be asked for the
 /// current rule application.
 public interface CPBranch {
-
     /// Invoked by branch manager when this branch of a choice point has been chosen
     void choose();
 
     /// @return the updated <code>RuleApp</code> that results when this branch of a choice point has
     /// been chosen
     RuleApp getRuleAppForBranch();
-
 }

@@ -367,7 +367,7 @@ public class DelayedCutProcessor implements Runnable {
                 throw new RuntimeException("Cannot apply taclet-app");
             }
             return;
-            // ImmutableList<TacletApp> list =
+            // ImmutableList<ITacletApp> list =
             // goal.ruleAppIndex().getTacletAppAt(new TacletFilter() {
             //
             // @Override

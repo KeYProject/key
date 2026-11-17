@@ -9,13 +9,10 @@ import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-import org.jspecify.annotations.NonNull;
-
 // Stable: the cost depends only on whether the find position is in the antecedent, which is fixed
 // for a given rule application.
 @StableCost
 public class FocusInAntecFeature extends BinaryFeature {
-
     private static final Feature INSTANCE = new FocusInAntecFeature();
 
     private FocusInAntecFeature() {}
@@ -25,8 +22,8 @@ public class FocusInAntecFeature extends BinaryFeature {
     }
 
     @Override
-    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
         return pos.isInAntec();
     }

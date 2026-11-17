@@ -33,7 +33,7 @@ import org.jspecify.annotations.Nullable;
 ///
 ///
 /// @see ProofSearchInformation
-public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends @Nullable ProofGoal<Goal>>
+public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends ProofGoal<Goal>>
         implements ProofSearchInformation<Proof, Goal> {
 
     /// The reason why the strategy stopped, for example, proof finished, maximal number of rule

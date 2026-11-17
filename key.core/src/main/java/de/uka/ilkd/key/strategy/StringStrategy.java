@@ -4,8 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.CharListLDT;
@@ -13,63 +11,55 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.feature.*;
 
 import org.key_project.logic.Name;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
 import org.key_project.prover.strategy.costbased.feature.SumFeature;
 import org.key_project.prover.strategy.costbased.termfeature.OperatorClassTF;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
-
-import org.jspecify.annotations.NonNull;
 
 import static de.uka.ilkd.key.strategy.StringCost.*;
 
 /// Strategy for string related rules.
 ///
 /// Do not create directly; use [StringStrategyFactory] instead.
-public class StringStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class StringStrategy extends JavaAbstractFeatureStrategy implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("String Strategy");
 
     /// The features defining the three phases: cost computation, approval,
     /// additionalInstanceCreationAndEvaluation
-    private final RuleSetDispatchFeature costComputationDispatcher;
 
     /// Useful [TermFeature] collections
-    private final ArithTermFeatures tf;
+    private final JavaArithTermFeatures tf;
     private final FormulaTermFeatures ff;
 
     private final boolean stopAtFirstNonCloseableGoal;
 
     public StringStrategy(Proof proof, StrategyProperties strategyProperties) {
         super(proof);
-        this.tf = new ArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
+        this.tf = new JavaArithTermFeatures(proof.getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
 
-        costComputationDispatcher = setupCostComputationF();
+        setupCostComputationF(costComputationDispatcher);
 
         stopAtFirstNonCloseableGoal =
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
-    @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null;
-    }
-
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupCostComputationF(RuleSetDispatchFeature d) {
         setUpStringNormalisation(d);
-        return d;
     }
 
     private void setUpStringNormalisation(RuleSetDispatchFeature d) {
@@ -142,9 +132,9 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
         bindRuleSet(d, "defOpsStartsEndsWith", CostBand.DEFER.at(-250));
 
         bindRuleSet(d, "stringsConcatNotBothLiterals",
-            ifZero(MatchedAssumesFeature.INSTANCE, ifZero(
-                add(applyTF(instOf("leftStr"), seqLiteral),
-                    applyTF(instOf("rightStr"), seqLiteral)),
+            ifZero(MatchedAssumesFeature.create(), ifZero(
+                add(applyTF(JavaStaticFeatureCollection.instOf("leftStr"), seqLiteral),
+                    applyTF(JavaStaticFeatureCollection.instOf("rightStr"), seqLiteral)),
                 inftyConst()), inftyConst()));
 
         bindRuleSet(d, "stringsReduceConcat", CostBand.DEFER.at(-400));
@@ -190,31 +180,13 @@ public class StringStrategy extends AbstractFeatureStrategy implements Component
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
     }
 
     @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        RuleSetDispatchFeature dispatcher = getDispatcher(aspect);
-        if (dispatcher != null) {
-            set.addAll(dispatcher.ruleSets());
-        }
-        return set;
-    }
-
-    @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return switch (aspect) {
-            case StrategyAspect.Cost -> costComputationDispatcher;
-            default -> null;
-        };
-    }
-
-    @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule rule) {
         return false;
     }
 }
