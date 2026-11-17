@@ -1,0 +1,61 @@
+name: NightlyTests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * *' # every night at 03:00 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  proof-regressions:
+    # The full fun/inf proof regression corpora take ~25 minutes each and are advisory
+    # (continue-on-error) by project decision. Running them nightly keeps them off the
+    # critical path of every PR while still producing artifacts for triage.
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        test: [ testRunAllFunProofs, testRunAllInfProofs ]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6.1.0
+        with:
+          java-version: 21
+          distribution: 'corretto'
+      - name: Setup SMT solvers
+        uses: keyproject/setup-smt@v0.3.0
+        with:
+          z3Version: 4.13.0
+          cvc5Version: 1.2.1
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+      - name: "Running tests: ${{ matrix.test }}"
+        shell: bash
+        run: |
+          set -o pipefail
+          OUT=$(mktemp)
+          if ! ./gradlew --continue "${{ matrix.test }}" | tee "$OUT"; then
+            if grep -qE "Could not (find|resolve|download|GET) " "$OUT"; then
+              echo "::warning::Transient dependency resolution failure; retrying with --refresh-dependencies"
+              ./gradlew --refresh-dependencies --continue "${{ matrix.test }}"
+            else
+              exit 1
+            fi
+          fi
+      - name: Upload test results
+        uses: actions/upload-artifact@v7
+        if: success() || failure()
+        with:
+          name: test-results-nightly-${{ matrix.test }}
+          path: |
+            key.core/proofs/**
+            **/build/test-results/*/*.xml
+            key.core/build/reports/runallproofs/*
+            **/build/reports/

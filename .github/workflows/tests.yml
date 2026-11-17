@@ -11,12 +11,15 @@ on:
       - "releases/*"
   merge_group:
 
+# Superseded PR runs are cancelled: a quick follow-up push would otherwise queue a full
+# duplicate run (~40 jobs). Merge-queue and main-branch runs are never cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
-  id-token: write
-  checks: write
+  # Read-only: the workflow only builds, tests and uploads artifacts to its own run.
+  contents: read
 
 jobs:
   unit-tests:
@@ -25,11 +28,17 @@ jobs:
       matrix:
         os: [ ubuntu-24.04, windows-latest ]
         java: [ 21 ]
-        modules: [
-          keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
-          key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
-          key.util, key.core.example, keyext.caching, key.core.wd, key.core.infflow,
-          keyext.proofmanagement]
+        group: [ core, rest ]
+        include:
+          # Compile coverage of the dropped test-less legs is preserved: the core leg builds
+          # key.util, key.ncore, key.ncore.calculus and key.ncore.matcher (api dependencies of
+          # key.core), the rest leg builds every keyext.* plugin via key.ui's runtimeOnly
+          # dependencies. key.core.example has no dependents, so its sources are compiled
+          # explicitly. The fun/inf proof regression legs run nightly in nightly-tests.yml.
+          - group: core
+            tasks: ":key.core:test"
+          - group: rest
+            tasks: ":key.util:test :key.ncore:test :key.ui:test :key.core.testgen:test :key.core.wd:test :key.core.infflow:test :keyext.exploration:test :keyext.slicing:test :keyext.caching:test :key.core.example:classes"
     runs-on: ${{ matrix.os }}
     # Bounded runtime: a hung job must not occupy a runner for the default 360 minutes.
     timeout-minutes: 40
@@ -58,7 +67,8 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'corretto'
-          cache: 'gradle'
+          # Gradle caching is provided by setup-gradle below; do not also set `cache: gradle`
+          # here (double restore/save of the same paths, and the save fails on Windows).
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
@@ -72,10 +82,10 @@ jobs:
         run: |
           set -o pipefail
           OUT=$(mktemp)
-          if ! ./gradlew --continue ":${{ matrix.modules }}:test" | tee "$OUT"; then
+          if ! ./gradlew --continue "${{ matrix.tasks }}" | tee "$OUT"; then
             if grep -qE "Could not (find|resolve|download|GET) " "$OUT"; then
               echo "::warning::Transient dependency resolution failure; retrying with --refresh-dependencies"
-              ./gradlew --refresh-dependencies --continue ":${{ matrix.modules }}:test"
+              ./gradlew --refresh-dependencies --continue "${{ matrix.tasks }}"
             else
               exit 1
             fi
@@ -85,7 +95,7 @@ jobs:
         uses: actions/upload-artifact@v7
         if: success() || failure()
         with:
-          name: test-results-${{ matrix.os }}-${{ matrix.modules }}
+          name: test-results-${{ matrix.os }}-${{ matrix.group }}
           path: |
             **/build/test-results/*/*.xml
             **/build/reports/
@@ -94,14 +104,16 @@ jobs:
   integration-tests:
     env:
       GH_TOKEN: ${{ github.token }}
-    # The multi-core prover gates (testMt*) must be able to fail CI; the long-running proof
+    # The multi-core prover gates (testMt*) must be able to fail CI; the remaining proof
     # regression legs keep their historical advisory (continue-on-error) status. fail-fast is
-    # off, so a red MT leg never cancels the sibling legs either way.
+    # off, so a red MT leg never cancels the sibling legs either way. The long fun/inf proof
+    # regression legs (~25 min each) run nightly in nightly-tests.yml to bound the PR
+    # turnaround by the gating tests.
     continue-on-error: ${{ !startsWith(matrix.test, 'testMt') }}
     strategy:
       fail-fast: false
       matrix:
-        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs, testMtStress, testMt2w, testMt4w ]
+        test: [ testProveRules, testRunAllWdProofs, testMtStress, testMt2w, testMt4w ]
         os: [ ubuntu-24.04 ]
         java: [ 21 ]
     runs-on: ${{ matrix.os }}
@@ -115,7 +127,8 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'corretto'
-          cache: 'gradle'
+          # Gradle caching is provided by setup-gradle below; do not also set `cache: gradle`
+          # here (double restore/save of the same paths, and the save fails on Windows).
 
       - name: Setup SMT solvers
         uses: keyproject/setup-smt@v0.3.0

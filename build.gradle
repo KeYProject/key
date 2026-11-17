@@ -166,13 +166,13 @@ subprojects {
 
         addTestListener(new TestListener() {
             void afterTest(TestDescriptor desc, TestResult result) {
-                logger.error("${result.getResultType()}: ${desc.getClassName()}#${desc.getName()}")
+                logger.lifecycle("${result.getResultType()}: ${desc.getClassName()}#${desc.getName()}")
             }
         })
 
         addTestListener(new TestListener() {
             void beforeTest(TestDescriptor descriptor) {
-                logger.error("> ${descriptor.getClassName()}#${descriptor.getName()}")
+                logger.lifecycle("> ${descriptor.getClassName()}#${descriptor.getName()}")
             }
         })
 
