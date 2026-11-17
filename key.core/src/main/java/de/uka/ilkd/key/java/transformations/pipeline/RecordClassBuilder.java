@@ -75,6 +75,11 @@ public class RecordClassBuilder extends JavaTransformerAbstract {
                 getter.getBody().get()
                         .addStatement(new ReturnStmt(parameter.getNameAsExpression()));
                 addGenerated(getter);
+                // only generated accessors are guaranteed not to throw; record patterns over a
+                // record with an explicit accessor need MatchException handling and are rejected
+                field.setData(PipelineConstants.IMPLICIT_RECORD_ACCESSOR, true);
+                field.getVariables().forEach(
+                    it -> it.setData(PipelineConstants.IMPLICIT_RECORD_ACCESSOR, true));
             }
         }
 
