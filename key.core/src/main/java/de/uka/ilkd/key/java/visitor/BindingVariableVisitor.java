@@ -95,6 +95,52 @@ public class BindingVariableVisitor {
     }
 
 
+    /**
+     * Collects every pattern variable declared anywhere in the expression, independent of the
+     * truth value under which it is matched. This is the set of variables that has to be declared
+     * before a guard is evaluated: different subexpressions may bind their variables only on
+     * different branches, and the guard evaluation is compiled into nested {@code if}s.
+     *
+     * @param e the expression to inspect
+     * @return the pattern variables in source order
+     */
+    public static Set<LocationVariable> allPatternVariables(Expression e) {
+        Set<LocationVariable> result = new LinkedHashSet<>();
+        collectPatternVariables(e, result);
+        return result;
+    }
+
+    private static void collectPatternVariables(Expression e, Set<LocationVariable> result) {
+        if (e instanceof InstanceofPattern io) {
+            collectPatternVariables(io.getPattern(), result);
+        } else if (e instanceof BinaryOperator bo) {
+            collectPatternVariables(bo.getExpressionAt(0), result);
+            collectPatternVariables(bo.getExpressionAt(1), result);
+        } else if (e instanceof UnaryOperator not && not.kind == UnaryOperatorKind.LOGICAL_NOT) {
+            collectPatternVariables(not.getExpressionAt(0), result);
+        } else if (e instanceof Conditional c) {
+            collectPatternVariables(c.getExpressionAt(0), result);
+            collectPatternVariables(c.getExpressionAt(1), result);
+            collectPatternVariables(c.getExpressionAt(2), result);
+        } else if (e instanceof ParenthesizedExpression p) {
+            collectPatternVariables(p.getExpressionAt(0), result);
+        }
+    }
+
+    private static void collectPatternVariables(Pattern pattern, Set<LocationVariable> result) {
+        if (pattern instanceof TypePattern typePattern) {
+            result.add(variable(typePattern.getVariable()));
+        } else if (pattern instanceof AnyPattern anyPattern) {
+            if (anyPattern.getVariable() != null) {
+                result.add(variable(anyPattern.getVariable()));
+            }
+        } else if (pattern instanceof RecordPattern recordPattern) {
+            for (RecordPatternComponent component : recordPattern.getComponents()) {
+                collectPatternVariables(component.getPattern(), result);
+            }
+        }
+    }
+
     public static Bindings analyze(Expression e) {
         if (e instanceof InstanceofPattern io) {
             // §6.3.1.5 — a instanceof p

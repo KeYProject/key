@@ -9,8 +9,12 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -19,6 +23,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /// Tests record patterns end to end: the guard is evaluated, the components are declared where the
 /// pattern is definitely matched, and the proof closes.
 class RecordPatternFlowScopingTest {
+    @BeforeAll
+    static void enableJml() {
+        // keep the test independent of test ordering: other tests may have changed the global
+        // proof settings (strategy) or disabled JML
+        ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
+                .setActiveStrategyProperties(new StrategyProperties());
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setUseJML(true);
+    }
+
 
     private static void prove(Path source) throws Exception {
         KeYEnvironment<?> environment = KeYEnvironment.load(source);

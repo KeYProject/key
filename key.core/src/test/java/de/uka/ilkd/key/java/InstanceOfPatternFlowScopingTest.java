@@ -9,17 +9,49 @@ import java.nio.file.Path;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ProofStarter;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 /// Tests the JLS 6.3.1.5 flow scoping of pattern variables. A pattern variable introduced in an
 /// `instanceof` pattern is in scope after an `if` statement if the then branch cannot complete
 /// normally.
 class InstanceOfPatternFlowScopingTest {
+    @BeforeAll
+    static void enableJml() {
+        // keep the test independent of test ordering: other tests may have changed the global
+        // proof settings (strategy) or disabled JML
+        ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
+                .setActiveStrategyProperties(new StrategyProperties());
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setUseJML(true);
+    }
+
+
+    private static void prove(Path source) throws Exception {
+        KeYEnvironment<?> environment = KeYEnvironment.load(source);
+        try {
+            var contract = environment.getProofContracts().getFirst();
+            Proof proof =
+                environment.createProof(contract.createProofObl(environment.getInitConfig()));
+            ProofStarter starter = new ProofStarter(false);
+            starter.init(proof);
+            starter.start();
+
+            assertTrue(proof.closed(),
+                () -> "Proof did not close. Open goals: " + proof.openGoals());
+        } finally {
+            environment.dispose();
+        }
+    }
 
     @Test
     void patternVariableIsInScopeAfterAbortingThenBranch(@TempDir Path tempDir) throws Exception {
@@ -39,17 +71,115 @@ class InstanceOfPatternFlowScopingTest {
                 }
                 """);
 
+        prove(source);
+    }
+
+    @Test
+    void declarationInitializerUsesTheBinding(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("DeclarationInitializer.java");
+        Files.writeString(source, """
+                public class DeclarationInitializer {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static boolean m(Object o) {
+                        boolean b = o instanceof String s && s.length() > 0;
+                        return b;
+                    }
+                }
+                """);
+
+        prove(source);
+    }
+
+    @Test
+    void laterLocalMayReuseThePatternVariableName(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("LaterLocal.java");
+        Files.writeString(source, """
+                public class LaterLocal {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static boolean m(Object o) {
+                        if (o instanceof String x) { }
+                        String x = "fresh";
+                        return x.isEmpty();
+                    }
+                }
+                """);
+
+        prove(source);
+    }
+
+    @Test
+    void fieldAccessOnPatternVariable(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("FieldAccess.java");
+        Files.writeString(source, """
+                public class FieldAccess {
+                    static class A {
+                        int g;
+                    }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m(Object o) {
+                        if (o instanceof A a) {
+                            return a.g;
+                        }
+                        return 0;
+                    }
+                }
+                """);
+
+        prove(source);
+    }
+
+    @Test
+    void patternVariableInTernaryTrueBranch(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("Conditional.java");
+        Files.writeString(source, """
+                public class Conditional {
+                    static class A {
+                        int g;
+                    }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static boolean m(Object o) {
+                        return (o instanceof A a) ? a.g > 0 : false;
+                    }
+                }
+                """);
+
+        prove(source);
+    }
+
+    @Test
+    void reviewConditionalSourceIsAccepted(@TempDir Path tempDir) throws Exception {
+        Path source = tempDir.resolve("ReviewConditional.java");
+        Files.writeString(source, """
+                public class ReviewConditional {
+                    static class A { }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static Object m(Object o) {
+                        return (o instanceof A a) ? a : null;
+                    }
+                }
+                """);
+
         KeYEnvironment<?> environment = KeYEnvironment.load(source);
         try {
-            var contract = environment.getProofContracts().getFirst();
-            Proof proof =
-                environment.createProof(contract.createProofObl(environment.getInitConfig()));
-            ProofStarter starter = new ProofStarter(false);
-            starter.init(proof);
-            starter.start();
-
-            assertTrue(proof.closed(),
-                () -> "Proof did not close. Open goals: " + proof.openGoals());
+            assertNotNull(environment.getProofContracts().getFirst());
         } finally {
             environment.dispose();
         }
