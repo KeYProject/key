@@ -1028,9 +1028,9 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                     return pattern;
                 }
             } else if (parent instanceof MethodDeclaration
-                    || parent instanceof ClassOrInterfaceDeclaration
-                    || parent instanceof LambdaExpr) {
-                // do not leak a pattern from an enclosing declaration into a nested one
+                    || parent instanceof ClassOrInterfaceDeclaration) {
+                // do not leak a pattern from an enclosing declaration into a nested method/class;
+                // a lambda, in contrast, may capture an effectively final pattern variable
                 return null;
             }
             current = parent;
