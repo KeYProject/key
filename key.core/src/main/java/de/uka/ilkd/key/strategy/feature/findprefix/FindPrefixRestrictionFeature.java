@@ -4,13 +4,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature.findprefix;
 
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
-
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
-
+import org.key_project.prover.strategy.costbased.feature.BinaryTacletAppFeature;
+import org.key_project.prover.strategy.costbased.feature.findprefix.AntecChecker;
+import org.key_project.prover.strategy.costbased.feature.findprefix.Checker;
+import org.key_project.prover.strategy.costbased.feature.findprefix.SuccChecker;
+import org.key_project.prover.strategy.costbased.feature.findprefix.TopLevelChecker;
 
 /**
  * Feature for investigating whether some restrictions to the prefix of the find formula apply.
@@ -109,8 +111,8 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos,
+            ProofGoal<?> goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         // apply the position modifiers

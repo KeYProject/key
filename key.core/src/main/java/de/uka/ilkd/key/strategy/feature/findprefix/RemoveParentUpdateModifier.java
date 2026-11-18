@@ -8,7 +8,6 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
-
 /**
  * If the parent operator of the find term is an update application, then change the position (on
  * which the checkers are applied) to the parent operator. Repeat until parent is no update
@@ -17,8 +16,6 @@ import org.key_project.prover.sequent.PosInOccurrence;
  * @author christoph
  */
 public class RemoveParentUpdateModifier implements Modifier {
-
-
     @Override
     public PosInOccurrence modifyPosition(PosInOccurrence pos) {
         if (!pos.isTopLevel() && pos.up().subTerm().op() instanceof UpdateApplication) {
@@ -27,5 +24,4 @@ public class RemoveParentUpdateModifier implements Modifier {
             return pos;
         }
     }
-
 }

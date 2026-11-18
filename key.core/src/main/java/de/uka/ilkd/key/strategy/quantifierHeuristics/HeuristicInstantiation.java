@@ -12,24 +12,25 @@ import java.util.Map;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.proof.Goal;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
+import org.key_project.prover.strategy.costbased.quantifierHeuristics.TriggerTreatment;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 
 
-public class HeuristicInstantiation implements TermGenerator<Goal> {
+public class HeuristicInstantiation implements TermGenerator {
 
     /** One generator per treatment, so the option costs no allocation per instantiation. */
-    private static final Map<TriggerTreatment, TermGenerator<Goal>> GENERATORS;
+    private static final Map<TriggerTreatment, TermGenerator> GENERATORS;
     static {
-        final EnumMap<TriggerTreatment, TermGenerator<Goal>> generators =
+        final EnumMap<TriggerTreatment, TermGenerator> generators =
             new EnumMap<>(TriggerTreatment.class);
         for (final TriggerTreatment t : TriggerTreatment.values()) {
             generators.put(t, new HeuristicInstantiation(t));
@@ -52,21 +53,22 @@ public class HeuristicInstantiation implements TermGenerator<Goal> {
      * @param treatment how much the heuristic is told about the theories
      * @return the generator
      */
-    public static TermGenerator<Goal> forOption(TriggerTreatment treatment) {
+    public static TermGenerator forOption(TriggerTreatment treatment) {
         return GENERATORS.get(treatment);
     }
 
     @Override
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
+        final var services = (Services) goal.proof().getServices();
         final Term qf = pos.sequentFormula().formula();
         final Instantiation ia =
-            Instantiation.create(qf, goal.sequent(), goal.proof().getServices(), treatment);
+            Instantiation.create(qf, goal.sequent(), services, treatment);
         final QuantifiableVariable var = qf.varsBoundHere(0).last();
         assert var != null;
-        return new HIIterator(ia.getSubstitution().iterator(), var, goal.proof().getServices());
+        return new HIIterator(ia.getSubstitution().iterator(), var, services);
     }
 
 

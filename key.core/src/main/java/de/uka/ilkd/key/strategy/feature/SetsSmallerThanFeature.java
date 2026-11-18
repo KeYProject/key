@@ -5,41 +5,44 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.SetTermFeatures;
 
 import org.key_project.logic.Term;
+import org.key_project.logic.TermOrdering;
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+import org.key_project.prover.strategy.costbased.feature.SmallerThanFeature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 import org.key_project.util.collection.ImmutableList;
 
 
 public class SetsSmallerThanFeature extends SmallerThanFeature {
 
-    private final ProjectionToTerm<Goal> left, right;
+    private final ProjectionToTerm left, right;
     private final SetTermFeatures setFeatures;
 
 
-    private SetsSmallerThanFeature(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            SetTermFeatures setFeatures) {
+    private SetsSmallerThanFeature(ProjectionToTerm left, ProjectionToTerm right,
+            SetTermFeatures setFeatures, TermOrdering termOrdering) {
+        super(termOrdering);
         this.left = left;
         this.right = right;
         this.setFeatures = setFeatures;
     }
 
 
-    public static Feature create(ProjectionToTerm<Goal> left, ProjectionToTerm<Goal> right,
-            SetTermFeatures setFeatures) {
-        return new SetsSmallerThanFeature(left, right, setFeatures);
+    public static Feature create(ProjectionToTerm left, ProjectionToTerm right,
+            SetTermFeatures setFeatures, TermOrdering termOrdering) {
+        return new SetsSmallerThanFeature(left, right, setFeatures, termOrdering);
     }
 
 
     @Override
-    protected boolean filter(TacletApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+    protected boolean filter(ITacletApp app, PosInOccurrence pos,
+            ProofGoal<?> goal, MutableState mState) {
         final Term leftTerm = left.toTerm(app, pos, goal, mState);
         final Term rightTerm = right.toTerm(app, pos, goal, mState);
 
@@ -47,7 +50,8 @@ public class SetsSmallerThanFeature extends SmallerThanFeature {
     }
 
 
-    protected boolean origLessThan(Term leftTerm, Term rightTerm, PosInOccurrence pos, Goal goal) {
+    protected boolean origLessThan(Term leftTerm, Term rightTerm, PosInOccurrence pos,
+            ProofGoal<?> goal) {
         // TODO: Why is this method needed?
         final LiteralCollector m1 = new LiteralCollector();
         m1.collect(leftTerm);

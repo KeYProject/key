@@ -13,45 +13,39 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.prover.strategy.costbased.MutableState;
 
-import org.jspecify.annotations.NonNull;
 
 /// Term generator that enumerates the formulas of the current sequent/antecedent/succedent.
-public abstract class SequentFormulasGenerator<Goal extends ProofGoal<@NonNull Goal>>
-        implements TermGenerator<Goal> {
+public abstract class SequentFormulasGenerator implements TermGenerator {
 
     protected SequentFormulasGenerator() {}
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> SequentFormulasGenerator<Goal> antecedent() {
-        return new SequentFormulasGenerator<>() {
-            protected Iterator<SequentFormula> generateForIt(
-                    Goal goal) {
+    public static SequentFormulasGenerator antecedent() {
+        return new SequentFormulasGenerator() {
+            protected Iterator<SequentFormula> generateForIt(ProofGoal<?> goal) {
                 return goal.sequent().antecedent().iterator();
             }
         };
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> SequentFormulasGenerator<Goal> succedent() {
-        return new SequentFormulasGenerator<>() {
-            protected Iterator<SequentFormula> generateForIt(
-                    Goal goal) {
+    public static SequentFormulasGenerator succedent() {
+        return new SequentFormulasGenerator() {
+            protected Iterator<SequentFormula> generateForIt(ProofGoal<?> goal) {
                 return goal.sequent().succedent().iterator();
             }
         };
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> SequentFormulasGenerator<Goal> sequent() {
-        return new SequentFormulasGenerator<>() {
-            protected Iterator<SequentFormula> generateForIt(
-                    Goal goal) {
+    public static SequentFormulasGenerator sequent() {
+        return new SequentFormulasGenerator() {
+            protected Iterator<SequentFormula> generateForIt(ProofGoal<?> goal) {
                 return goal.sequent().iterator();
             }
         };
     }
 
-    protected abstract Iterator<SequentFormula> generateForIt(
-            Goal goal);
+    protected abstract Iterator<SequentFormula> generateForIt(ProofGoal<?> goal);
 
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal,
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
             MutableState mState) {
         return new SFIterator(generateForIt(goal));
     }

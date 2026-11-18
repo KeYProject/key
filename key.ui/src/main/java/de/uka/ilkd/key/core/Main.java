@@ -10,6 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
@@ -233,7 +234,7 @@ public final class Main implements Callable<Integer> {
      * The file names provided on the command line
      */
     @Parameters(arity = "*")
-    private List<Path> inputFiles = List.of();
+    private List<Path> inputFiles = new ArrayList<>();
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);

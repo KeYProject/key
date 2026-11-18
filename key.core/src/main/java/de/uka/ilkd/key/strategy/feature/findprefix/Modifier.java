@@ -6,7 +6,6 @@ package de.uka.ilkd.key.strategy.feature.findprefix;
 
 import org.key_project.prover.sequent.PosInOccurrence;
 
-
 /**
  * Interface for position modifiers. A position modifier is a function which gets a position and
  * delivers a (new) position as result.

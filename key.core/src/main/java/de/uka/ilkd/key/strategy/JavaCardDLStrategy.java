@@ -4,51 +4,57 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.termProjection.*;
 import de.uka.ilkd.key.strategy.termfeature.*;
 import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
+import de.uka.ilkd.key.util.PerfScope;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.rulefilter.SetRuleFilter;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
-import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.CostBand;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.instantiator.ChoicePoint;
+import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
+import org.key_project.prover.strategy.costbased.termProjection.FocusProjection;
+import org.key_project.prover.strategy.costbased.termProjection.TermBuffer;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermPredicateTermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.SequentFormulasGenerator;
 
 import org.jspecify.annotations.NonNull;
 
-import static de.uka.ilkd.key.strategy.HeapSelectCost.*;
-import static de.uka.ilkd.key.strategy.JavaCardDLCost.*;
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+import static de.uka.ilkd.key.strategy.JavaStaticFeatureCollection.*;
 
 /// This strategy is the catch-all for Java related features that are either
 /// cross-cutting or one of the features that do not fit well into any other
 /// strategy.
 ///
 /// Do not create directly, instead use [JavaCardDLStrategyFactory].
-public class JavaCardDLStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+@SuppressWarnings("auxiliaryclass") // cost constants are read from the auxiliary holder classes
+// HeapSelectCost / JavaCardDLCost in JavaCardDLCosts.java, see the qualified references
+// below (the javac lint cannot be suppressed on the import statements themselves)
+public class JavaCardDLStrategy extends JavaAbstractFeatureStrategy
+        implements ComponentStrategy<Goal> {
     public static final AtomicLong PERF_COMPUTE = new AtomicLong();
     public static final AtomicLong PERF_APPROVE = new AtomicLong();
     public static final AtomicLong PERF_INSTANTIATE = new AtomicLong();
@@ -57,16 +63,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     protected final StrategyProperties strategyProperties;
 
-    private final RuleSetDispatchFeature costComputationDispatcher;
     private final Feature costComputationF;
-    private final RuleSetDispatchFeature approvalDispatcher;
     private final Feature approvalF;
-    private final RuleSetDispatchFeature instantiationDispatcher;
     private final Feature instantiationF;
 
     private final HeapLDT heapLDT;
 
-    private final ArithTermFeatures tf;
+    private final JavaArithTermFeatures tf;
     private final FormulaTermFeatures ff;
 
 
@@ -76,12 +79,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
         this.strategyProperties = strategyProperties.clone();
 
-        this.tf = new ArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
+        this.tf = new JavaArithTermFeatures(getServices().getTypeConverter().getIntegerLDT());
         this.ff = new FormulaTermFeatures(this.tf);
 
-        costComputationDispatcher = setupCostComputationF();
-        approvalDispatcher = setupApprovalDispatcher();
-        instantiationDispatcher = setupInstantiationF();
+        setupCostComputationF(costComputationDispatcher);
+        setupApprovalDispatcher(approvalDispatcher);
+        setupInstantiationF(instantiationDispatcher);
 
         costComputationF = setupGlobalF(costComputationDispatcher);
         instantiationF = setupGlobalF(instantiationDispatcher);
@@ -91,28 +94,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
     protected final RuleSetDispatchFeature getCostComputationDispatcher() {
         return costComputationDispatcher;
-    }
-
-    @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        set.addAll(getDispatcher(aspect).ruleSets());
-        return set;
-    }
-
-    @Override
-    public RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return switch (aspect) {
-            case StrategyAspect.Cost -> costComputationDispatcher;
-            case StrategyAspect.Instantiation -> instantiationDispatcher;
-            case StrategyAspect.Approval -> approvalDispatcher;
-        };
-    }
-
-    @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null || instantiationDispatcher.get(rs) != null
-                || approvalDispatcher.get(rs) != null;
     }
 
     protected Feature setupGlobalF(@NonNull Feature dispatcher) {
@@ -139,7 +120,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
         if (depProp.equals(StrategyProperties.DEP_ON)) {
             depSpecF = ConditionalFeature.createConditional(depFilter,
-                longConst(DEPENDENCY_CONTRACT));
+                longConst(JavaCardDLCost.DEPENDENCY_CONTRACT));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter, inftyConst());
         }
@@ -178,22 +159,21 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         };
     }
 
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupCostComputationF(RuleSetDispatchFeature d) {
 
         bindRuleSet(d, "semantics_blasting", inftyConst());
 
         final int pullOutHeapSize = getHeapSizeBound();
         bindRuleSet(d, "pull_out_heap",
             pullOutHeapSize <= 0 ? inftyConst() : pullOutHeap(pullOutHeapSize));
-        bindRuleSet(d, "derive_inequality", longConst(DERIVE_INEQUALITY));
+        bindRuleSet(d, "derive_inequality", longConst(HeapSelectCost.DERIVE_INEQUALITY));
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
 
         bindRuleSet(d, "javaIntegerSemantics",
-            ifZero(sequentContainsNoPrograms(), longConst(JAVA_INTEGER_SEMANTICS),
+            ifZero(sequentContainsNoPrograms(), longConst(JavaCardDLCost.JAVA_INTEGER_SEMANTICS),
                 ifZero(
                     leq(CountBranchFeature.INSTANCE, longConst(1)),
-                    longConst(JAVA_INTEGER_SEMANTICS), inftyConst())));
+                    longConst(JavaCardDLCost.JAVA_INTEGER_SEMANTICS), inftyConst())));
 
         setupSelectSimplification(d);
 
@@ -212,15 +192,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         // TODO: rename rule set?
         bindRuleSet(d, "comprehensions",
             add(NonDuplicateAppModPositionFeature.INSTANCE,
-                longConst(COMPREHENSION)));
+                longConst(JavaCardDLCost.COMPREHENSION)));
 
         bindRuleSet(d, "comprehensions_high_costs",
             add(NonDuplicateAppModPositionFeature.INSTANCE,
-                longConst(COMPREHENSION_ENLARGE)));
+                longConst(JavaCardDLCost.COMPREHENSION_ENLARGE)));
 
         bindRuleSet(d, "comprehensions_low_costs",
             add(NonDuplicateAppModPositionFeature.INSTANCE,
-                longConst(COMPREHENSION_SIMPLIFY)));
+                longConst(JavaCardDLCost.COMPREHENSION_SIMPLIFY)));
 
         // features influenced by the strategy options
         /*
@@ -238,7 +218,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         }
 
         if (classAxiomApplicationEnabled()) {
-            bindRuleSet(d, "classAxiom", longConst(CLASS_AXIOM));
+            bindRuleSet(d, "classAxiom", longConst(JavaCardDLCost.CLASS_AXIOM));
         } else {
             bindRuleSet(d, "classAxiom", inftyConst());
         }
@@ -255,12 +235,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         // inReachableState
         bindRuleSet(d, "inReachableStateImplication",
             add(NonDuplicateAppModPositionFeature.INSTANCE,
-                longConst(IN_REACHABLE_STATE)));
+                longConst(JavaCardDLCost.IN_REACHABLE_STATE)));
 
         // limit observer (must have better priority than "classAxiom")
         bindRuleSet(d, "limitObserver",
             add(NonDuplicateAppModPositionFeature.INSTANCE,
-                longConst(LIMIT_OBSERVER)));
+                longConst(JavaCardDLCost.LIMIT_OBSERVER)));
 
         setupUserTaclets(d);
 
@@ -268,7 +248,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
 
         // chrisg: The following rule, if active, must be applied delta rules.
         if (autoInductionEnabled()) {
-            bindRuleSet(d, "auto_induction", AUTO_INDUCTION); // chrisg
+            bindRuleSet(d, "auto_induction", JavaCardDLCost.AUTO_INDUCTION); // chrisg
         } else {
             bindRuleSet(d, "auto_induction", inftyConst()); // chrisg
         }
@@ -276,7 +256,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         // chrisg: The following rule is a beta rule that, if active, must have
         // a higher priority than other beta rules.
         if (autoInductionLemmaEnabled()) {
-            bindRuleSet(d, "auto_induction_lemma", AUTO_INDUCTION_LEMMA);
+            bindRuleSet(d, "auto_induction_lemma", JavaCardDLCost.AUTO_INDUCTION_LEMMA);
         } else {
             bindRuleSet(d, "auto_induction_lemma", inftyConst());
         }
@@ -290,10 +270,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             bindRuleSet(d, "induction_var", inftyConst());
         } else {
             bindRuleSet(d, "induction_var", ifZero(
-                applyTF(instOf("uSub"), IsInductionVariable.INSTANCE), longConst(0), inftyConst()));
+                applyTF(JavaStaticFeatureCollection.instOf("uSub"), IsInductionVariable.INSTANCE),
+                longConst(0), inftyConst()));
         }
 
-        return d;
     }
 
     private void setupSelectSimplification(final RuleSetDispatchFeature d) {
@@ -303,9 +283,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             // function symbol)
             add(applyTF("h",
                 not(or(PrimitiveHeapTermFeature.create(heapLDT), anonHeapTermFeature()))),
-                ifZero(applyTF(FocusFormulaProjection.INSTANCE, ff.update),
-                    longConst(PULL_OUT_SELECT_BELOW_UPDATE),
-                    longConst(PULL_OUT_SELECT)),
+                ifZero(applyTF(FocusFormulaProjection.create(), ff.update),
+                    longConst(HeapSelectCost.PULL_OUT_SELECT_BELOW_UPDATE),
+                    longConst(HeapSelectCost.PULL_OUT_SELECT)),
                 NonDuplicateAppModPositionFeature.INSTANCE));
         bindRuleSet(d, "apply_select_eq",
             // replace non-simplified select by the skolem constant
@@ -314,8 +294,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             // in isApproved()
             ifZero(applyTF("s", not(rec(any(), SimplifiedSelectTermFeature.create(heapLDT)))),
                 // the applyEq taclet also carries apply_equations, so the dispatch sums the
-                // bindings; the tuned sum is CombinationCost.APPLY_SELECT_EQ_EFFECTIVE
-                longConst(APPLY_SELECT_EQ)));
+                // bindings; the tuned sum is HeapSelectCost.APPLY_SELECT_EQ_EFFECTIVE
+                longConst(HeapSelectCost.APPLY_SELECT_EQ)));
         bindRuleSet(d, "simplify_select",
             // simplify_select term in pulled out equation (right hand
             // side has to be a skolem constant which has been
@@ -323,25 +303,26 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             // to be a select term on a non-base- and
             // non-anon-heap)
             add(isSelectSkolemConstantTerm("sk"),
-                applyTF(sub(FocusProjection.INSTANCE, 0),
+                applyTF(sub(FocusProjection.create(), 0),
                     not(SimplifiedSelectTermFeature.create(heapLDT))),
-                longConst(SIMPLIFY_SELECT)));
+                longConst(HeapSelectCost.SIMPLIFY_SELECT)));
         bindRuleSet(d, "simplify_select_concrete", longConst(-6000));
         bindRuleSet(d, "simplify_select_elim_store", longConst(-7000));
         bindRuleSet(d, "apply_auxiliary_eq",
             // replace a skolem constant by its computed value
-            add(isSelectSkolemConstantTerm("t1"), longConst(APPLY_AUXILIARY_EQ)));
+            add(isSelectSkolemConstantTerm("t1"), longConst(HeapSelectCost.APPLY_AUXILIARY_EQ)));
         // hide an auxiliary equation once the skolem constant has been replaced by its value
         final Feature hideReplacedAuxiliaryEq = add(isSelectSkolemConstantTerm("auxiliarySK"),
             applyTF("result",
                 rec(any(),
                     add(SimplifiedSelectTermFeature.create(heapLDT), not(ff.ifThenElse)))),
-            not(ContainsTermFeature.create(instOf("result"), instOf("auxiliarySK"))));
+            not(ContainsTermFeature.create(instOf("result"), instOf("auxiliarySK"),
+                RENAMING_TERM_PROPERTY)));
 
         final int pullOutHeapBound = getHeapSizeBound();
         bindRuleSet(d, "hide_auxiliary_eq",
             pullOutHeapBound <= 0 ? add(hideReplacedAuxiliaryEq, longConst(-5400))
-                    : ifZero(hideReplacedAuxiliaryEq, longConst(HIDE_AUXILIARY_EQ),
+                    : ifZero(hideReplacedAuxiliaryEq, longConst(HeapSelectCost.HIDE_AUXILIARY_EQ),
                         ifZero(isTermAPulledOutHeap(),
                             ifZero(isSkolemConstantUsedElsewhereInSequent(), longConst(-5400),
                                 longConst(HIDE_DEFERRAL_COST)),
@@ -350,7 +331,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             // hide an auxiliary equation once the skolem constant has been replaced by its
             // value
             add(isSelectSkolemConstantTerm("auxiliarySK"),
-                longConst(HIDE_AUXILIARY_EQ_CONST)));
+                longConst(HeapSelectCost.HIDE_AUXILIARY_EQ_CONST)));
     }
 
     private void setupUserTaclets(RuleSetDispatchFeature d) {
@@ -358,9 +339,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             final String userTacletsProbs =
                 strategyProperties.getProperty(StrategyProperties.userTacletsOptionsKey(i));
             if (StrategyProperties.USER_TACLETS_LOW.equals(userTacletsProbs)) {
-                bindRuleSet(d, "userTaclets" + i, USER_TACLET_LOW_PRIORITY);
+                bindRuleSet(d, "userTaclets" + i, JavaCardDLCost.USER_TACLET_LOW_PRIORITY);
             } else if (StrategyProperties.USER_TACLETS_HIGH.equals(userTacletsProbs)) {
-                bindRuleSet(d, "userTaclets" + i, USER_TACLET_HIGH_PRIORITY);
+                bindRuleSet(d, "userTaclets" + i, JavaCardDLCost.USER_TACLET_HIGH_PRIORITY);
             } else {
                 bindRuleSet(d, "userTaclets" + i, inftyConst());
             }
@@ -372,7 +353,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             TermPredicateTermFeature.create(
                 t -> getHeapTermSize(t, minHeapSizeForPullout) >= minHeapSizeForPullout);
         final Feature updateValue = applyTF(FocusProjection.create(1), ff.elemUpdate);
-        return add(applyTF(FocusProjection.INSTANCE, chain), updateValue, longConst(-30000));
+        return add(applyTF(FocusProjection.create(), chain), updateValue, longConst(-30000));
     }
 
 
@@ -414,21 +395,21 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     }
 
     /**
-     * expensive check ensuring that the Skolem constant of teh equation to be hidden is no longer
-     * in the
-     * sequent
+     * expensive check ensuring that the Skolem constant of the equation to be hidden is no longer
+     * in the sequent
      */
     private Feature isSkolemConstantUsedElsewhereInSequent() {
         final TermBuffer sf = new TermBuffer();
         return add(sequentContainsNoPrograms(),
             sum(sf, SequentFormulasGenerator.sequent(),
-                or(eq(sf, FocusFormulaProjection.INSTANCE),
-                    not(ContainsTermFeature.create(sf, instOf("auxiliarySK"))))));
+                or(JavaStaticFeatureCollection.eq(sf, FocusFormulaProjection.create()),
+                    not(ContainsTermFeature.create(sf, instOf("auxiliarySK"),
+                        RENAMING_TERM_PROPERTY)))));
     }
 
     private void setupSystemInvariantSimp(RuleSetDispatchFeature d) {
         bindRuleSet(d, "system_invariant",
-            ifZero(MatchedAssumesFeature.INSTANCE, add(applyTF("negLit", tf.negLiteral),
+            ifZero(MatchedAssumesFeature.create(), add(applyTF("negLit", tf.negLiteral),
                 applyTFNonStrict("nonNegLit", tf.nonNegLiteral))));
     }
 
@@ -485,7 +466,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         if (depProp.equals(StrategyProperties.DEP_ON)) {
             depSpecF = ConditionalFeature.createConditional(depFilter,
                 ifZero(new DependencyContractFeature(),
-                    longConst(DEPENDENCY_CONTRACT), inftyConst()));
+                    longConst(JavaCardDLCost.DEPENDENCY_CONTRACT), inftyConst()));
         } else {
             depSpecF = ConditionalFeature.createConditional(depFilter, inftyConst());
         }
@@ -493,8 +474,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         return depSpecF; // add(NonDuplicateAppFeature.INSTANCE, depSpecF);
     }
 
-    private RuleSetDispatchFeature setupApprovalDispatcher() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupApprovalDispatcher(RuleSetDispatchFeature d) {
 
         // Only derive a disequality that is not known yet. The same disequality follows from
         // every location the two objects read differently, so a duplicate-application check does
@@ -507,8 +487,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
             let(firstObject, instOf("o"), let(secondObject, instOf("o2"),
                 sum(succedentFormula, SequentFormulasGenerator.succedent(),
                     not(applyTF(succedentFormula,
-                        or(opSub(Equality.EQUALS, eq(firstObject), eq(secondObject)),
-                            opSub(Equality.EQUALS, eq(secondObject), eq(firstObject)))))))));
+                        or(opSub(Equality.EQUALS, JavaStaticFeatureCollection.eq(firstObject),
+                            JavaStaticFeatureCollection.eq(secondObject)),
+                            opSub(Equality.EQUALS, JavaStaticFeatureCollection.eq(secondObject),
+                                JavaStaticFeatureCollection.eq(firstObject)))))))));
         bindRuleSet(d, "inReachableStateImplication", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "limitObserver", NonDuplicateAppModPositionFeature.INSTANCE);
         bindRuleSet(d, "partialInvAxiom", NonDuplicateAppModPositionFeature.INSTANCE);
@@ -525,15 +507,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
         bindRuleSet(d, "apply_select_eq",
             add(isInstantiated("s"), isInstantiated("t1"),
                 or(applyTF("s", rec(any(), SimplifiedSelectTermFeature.create(heapLDT))),
-                    add(NoSelfApplicationFeature.INSTANCE, isSelectSkolemConstantTerm("t1")))));
+                    add(NoSelfApplicationFeature.create(), isSelectSkolemConstantTerm("t1")))));
         bindRuleSet(d, "apply_auxiliary_eq",
-            add(NoSelfApplicationFeature.INSTANCE, isInstantiated("s"),
+            add(NoSelfApplicationFeature.create(), isInstantiated("s"),
                 applyTF("s",
                     rec(any(),
                         add(SimplifiedSelectTermFeature.create(heapLDT), not(ff.ifThenElse)))),
-                not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
+                not(ContainsTermFeature.create(instOf("s"), instOf("t1"),
+                    RENAMING_TERM_PROPERTY))));
 
-        return d;
     }
 
     private void setupClassAxiomApproval(final RuleSetDispatchFeature d) {
@@ -553,7 +535,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
                  * the outer 'not' then ensures that the costs are infinite in the first and 0 in
                  * the latter case
                  */
-                not(sum(tb, HeapGenerator.INSTANCE, not(eq(instOf("sv_heap"), tb)))));
+                not(sum(tb, HeapGenerator.INSTANCE, not(
+                    JavaStaticFeatureCollection.eq(JavaStaticFeatureCollection.instOf("sv_heap"),
+                        tb)))));
 
             if (classAxiomDelayedApplication()) {
                 bindRuleSet(d, "classAxiom", add(sequentContainsNoPrograms(),
@@ -582,14 +566,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     // //////////////////////////////////////////////////////////////////////////
     // //////////////////////////////////////////////////////////////////////////
 
-    private RuleSetDispatchFeature setupInstantiationF() {
+    private void setupInstantiationF(RuleSetDispatchFeature d) {
         enableInstantiate();
 
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         setClassAxiomInstantiation(d);
 
         disableInstantiate();
-        return d;
     }
 
     private void setClassAxiomInstantiation(final RuleSetDispatchFeature d) {
@@ -628,15 +610,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
      *         all (it is discarded by the strategy).
      */
     @Override
-    public <GOAL extends ProofGoal<@NonNull GOAL>> RuleAppCost computeCost(@NonNull RuleApp app,
+    public RuleAppCost computeCost(@NonNull RuleApp app,
             @NonNull PosInOccurrence pio,
-            @NonNull GOAL goal,
+            ProofGoal<?> goal,
             @NonNull MutableState mState) {
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         try {
             return costComputationF.computeCost(app, pio, goal, mState);
         } finally {
-            PERF_COMPUTE.addAndGet(System.nanoTime() - time);
+            PerfScope.stop(PERF_COMPUTE, time);
         }
     }
 
@@ -652,12 +634,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     @Override
     public final boolean isApprovedApp(RuleApp app,
             PosInOccurrence pio, Goal goal) {
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         try {
             return !(approvalF.computeCost(app, pio, goal,
                 new MutableState()) == TopRuleAppCost.INSTANCE);
         } finally {
-            PERF_APPROVE.addAndGet(System.nanoTime() - time);
+            PerfScope.stop(PERF_APPROVE, time);
         }
     }
 
@@ -665,11 +647,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     public RuleAppCost instantiateApp(RuleApp app,
             PosInOccurrence pio, Goal goal,
             MutableState mState) {
-        var time = System.nanoTime();
+        final long time = PerfScope.start();
         try {
             return instantiationF.computeCost(app, pio, goal, mState);
         } finally {
-            PERF_INSTANTIATE.addAndGet(System.nanoTime() - time);
+            PerfScope.stop(PERF_INSTANTIATE, time);
         }
     }
 
@@ -688,7 +670,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy implements Compo
     }
 
     @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule<Goal> rule) {
         return rule instanceof QueryExpand || rule instanceof UseDependencyContractRule;
     }
 }

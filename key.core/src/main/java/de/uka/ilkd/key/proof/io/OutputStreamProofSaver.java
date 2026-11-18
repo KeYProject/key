@@ -674,7 +674,7 @@ public class OutputStreamProofSaver {
             return "";
         }
         String s = " (term \"";
-        final String list = pos.integerList(pos.reverseIterator()); // cheaper to read
+        final String list = PosInTerm.integerList(pos.reverseIterator()); // cheaper to read
         // in
         s = s + list.substring(1, list.length() - 1); // chop off "[" and "]"
         s = s + "\")";

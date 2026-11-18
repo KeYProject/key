@@ -13,11 +13,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.strategy.feature.AbstractNonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 
 import org.key_project.prover.rules.Taclet;
+import org.key_project.prover.strategy.Strategy;
 import org.key_project.prover.strategy.costbased.CostClassifiable;
 import org.key_project.prover.strategy.costbased.CostLocality;
+import org.key_project.prover.strategy.costbased.feature.*;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
 import org.key_project.prover.strategy.costbased.feature.VolatileCost;
@@ -123,7 +124,7 @@ public final class CostReuse {
         final ConditionalEligibility cached = cache.get(taclet);
         if (cached instanceof ConditionalEligibility c &&
                 c.strategy() == strategy) { // cached result only valid if strategy did not change
-            return c.verdict() == INELIGIBLE ? null : (Eligibility) c.verdict();
+            return c.verdict() == INELIGIBLE ? null : c.verdict();
         }
         final Eligibility res = classify(disp, taclet);
         cache.put(taclet, new ConditionalEligibility(strategy, res == null ? INELIGIBLE : res));

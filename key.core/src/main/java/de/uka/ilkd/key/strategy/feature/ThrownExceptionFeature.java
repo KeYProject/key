@@ -27,7 +27,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.jspecify.annotations.NonNull;
 
 public class ThrownExceptionFeature extends BinaryFeature {
 
@@ -68,8 +67,8 @@ public class ThrownExceptionFeature extends BinaryFeature {
     }
 
     @Override
-    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return app instanceof TacletApp tacletApp
                 && filter((JTerm) pos.subTerm(), (Services) goal.proof().getServices(),
                     tacletApp.instantiations().getExecutionContext());

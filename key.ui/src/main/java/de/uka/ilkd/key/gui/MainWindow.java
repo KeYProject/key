@@ -332,15 +332,7 @@ public final class MainWindow extends JFrame {
 
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(this);
-        // Postpone load for faster UI creation.
-        SwingUtilities.invokeLater(() -> {
-            recentFileMenu.loadEntries();
-            // otherwise open most recent cannot be used with a fresh started KeY
-            if (openMostRecentFileAction != null) {
-                // should always be the case, but better safe than sorry
-                openMostRecentFileAction.updateEnabledStatus();
-            }
-        });
+        recentFileMenu.loadEntries();
 
         proofTreeView = new ProofTreeView(mediator);
         infoView = new InfoView(mediator);
@@ -404,7 +396,7 @@ public final class MainWindow extends JFrame {
         // https://stackoverflow.com/questions/50403677/changing-the-default-java-coffee-dock-icon-to-something-else
         try {
             Class<?> appClass = Class.forName("com.apple.eawt.Application");
-            Class<?>[] params = new Class[] { Image.class };
+            Class<?>[] params = new Class<?>[] { Image.class };
             Method getApplication = appClass.getMethod("getApplication");
             Object application = getApplication.invoke(appClass);
             Method setDockIconImage = appClass.getMethod("setDockIconImage", params);
@@ -1754,6 +1746,9 @@ public final class MainWindow extends JFrame {
             return false;
         }
 
+        // getModifiers() is deliberately kept: getModifiersEx() would freeze the stop button
+        // while the modal state is active (see comment on the call below).
+        @SuppressWarnings("deprecation")
         private void dispatchForCurrentComponent(MouseEvent e) {
             Point glassPanePoint = e.getPoint();
             Point componentPoint =

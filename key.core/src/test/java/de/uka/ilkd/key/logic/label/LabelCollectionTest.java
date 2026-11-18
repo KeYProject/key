@@ -19,6 +19,8 @@ class LabelCollectionTest {
     private ParameterlessTermLabel paramB;
 
     @BeforeEach
+    // LabelCollection is instantiated with the deprecated ImmutableArray label container
+    @SuppressWarnings("deprecation")
     void setup() {
         paramA = new ParameterlessTermLabel(new Name("A"));
         paramB = new ParameterlessTermLabel(new Name("B"));

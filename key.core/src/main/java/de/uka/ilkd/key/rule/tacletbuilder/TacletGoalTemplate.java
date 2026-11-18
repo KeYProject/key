@@ -69,6 +69,8 @@ public class TacletGoalTemplate
      *
      * @return IList<Taclet> contains new introduced rules
      */
+    @SuppressWarnings("unchecked") // the rules are built generically in the builder chain; the
+    // element type cannot be re-checked at this erasure boundary
     public final ImmutableList<Taclet> rules() {
         return (ImmutableList<Taclet>) super.rules();
     }

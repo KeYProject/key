@@ -30,6 +30,7 @@ import de.uka.ilkd.key.rule.metaconstruct.WhileInvariantTransformer;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Modality;
@@ -131,8 +132,8 @@ public class WhileInvariantRule implements BuiltInRule {
 
 
     @Override
-    public LoopInvariantBuiltInRuleApp<?> createApp(PosInOccurrence pos, TermServices services) {
-        return new LoopInvariantBuiltInRuleApp<>(this, pos, services);
+    public LoopInvariantBuiltInRuleApp<?> createApp(PosInOccurrence pos, LogicServices services) {
+        return new LoopInvariantBuiltInRuleApp<>(this, pos, (TermServices) services);
     }
 
     /**
@@ -603,7 +604,7 @@ public class WhileInvariantRule implements BuiltInRule {
         }
 
         protected Guard prepareGuard(final Instantiation inst,
-                final KeYJavaType booleanKJT, LoopInvariantBuiltInRuleApp loopRuleApp,
+                final KeYJavaType booleanKJT, LoopInvariantBuiltInRuleApp<?> loopRuleApp,
                 final TermServices services) {
             final TermBuilder tb = services.getTermBuilder();
             final ProgramElementName guardVarName = new ProgramElementName(tb.newName("b"));

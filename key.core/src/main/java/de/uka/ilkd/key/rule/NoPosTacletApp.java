@@ -90,7 +90,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     /**
-     * Create TacletApp with immutable "instantiations", i.e. this instantiations must not be
+     * Create ITacletApp with immutable "instantiations", i.e. this instantiations must not be
      * modified later (e.g. by "addInstantiation"). However, this information is currently only used
      * to decide about introduction of metavariables. Immutable instantiations are important for the
      * "addrules" part of taclets.
@@ -129,7 +129,7 @@ public class NoPosTacletApp extends TacletApp {
     }
 
     /**
-     * adds a new instantiation to this TacletApp
+     * adds a new instantiation to this ITacletApp
      *
      * @param sv the SchemaVariable to be instantiated
      * @param se the SyntaxElement (usually a {@link Term} or {@link ProgramElement})
@@ -138,7 +138,7 @@ public class NoPosTacletApp extends TacletApp {
      *        saving a proof; this is usually needed for new names as their creation
      *        is not always deterministic
      * @param services the Services for access to the logic signature and more
-     * @return the new TacletApp
+     * @return the new ITacletApp
      */
     @Override
     public TacletApp addInstantiation(SchemaVariable sv, SyntaxElement se, boolean interesting,
@@ -167,7 +167,7 @@ public class NoPosTacletApp extends TacletApp {
 
     /**
      * creates a new Taclet application containing all the instantiations given by the
-     * SVInstantiations and forget the ones in this TacletApp
+     * SVInstantiations and forget the ones in this ITacletApp
      *
      * @param svi the SVInstantiations whose entries are the needed instantiations
      * @return the new Taclet application
@@ -225,7 +225,7 @@ public class NoPosTacletApp extends TacletApp {
      * }
      * </pre>
      *
-     * @return TacletApp with the resulting instantiations or null
+     * @return ITacletApp with the resulting instantiations or null
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos, LogicServices services) {
         return matchFind(null, pos, services);

@@ -23,7 +23,8 @@ import java.util.function.Function;
  * worse, two threads can create two distinct instances for the same key, silently breaking the
  * identity invariant. This class encapsulates that idiom correctly:
  * <ul>
- * <li><b>weak keys</b> (a {@link WeakHashMap}) so entries vanish once the key is unreachable;
+ * <li><b>weak keys</b> (a {@link WeakHashMap}) so entries <strong>vanish once the key is
+ * unreachable</strong>;
  * <li><b>weak values</b> ({@link WeakReference}) so an interned instance can still be collected;
  * <li><b>atomic</b> get-or-create, so exactly one canonical instance exists per key.
  * </ul>

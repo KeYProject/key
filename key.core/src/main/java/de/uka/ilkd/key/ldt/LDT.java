@@ -87,7 +87,6 @@ public abstract class LDT extends AbstractLDT {
         ret.put(SeqLDT.NAME, new SeqLDT(s));
         ret.put(SortLDT.NAME, new SortLDT(s));
         ret.put(FreeLDT.NAME, new FreeLDT(s));
-        ret.put(MapLDT.NAME, new MapLDT(s));
         ret.put(FloatLDT.NAME, new FloatLDT(s));
         ret.put(DoubleLDT.NAME, new DoubleLDT(s));
         ret.put(RealLDT.NAME, new RealLDT(s));

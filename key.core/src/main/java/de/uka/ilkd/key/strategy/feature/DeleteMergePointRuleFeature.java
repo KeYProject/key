@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 
@@ -17,13 +16,12 @@ import org.key_project.prover.strategy.costbased.RuleAppCost;
 import org.key_project.prover.strategy.costbased.TopRuleAppCost;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * Costs for the {@link DeleteMergePointRuleFeature}; incredibly cheap if the previous rule
  * application was
  * a {@link MergeRule} app, infinitely expensive otherwise. The alternative would be to always check
- * whether there's another {@link ProofGoal} around with the same {@link MergePointStatement} (then
+ * whether there's another {@link ProofGoal} around with the same
+ * {@link de.uka.ilkd.key.java.ast.statement.MergePointStatement} (then
  * we
  * may not delete), which is much more time intensive.
  *
@@ -37,8 +35,8 @@ public class DeleteMergePointRuleFeature implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return ((de.uka.ilkd.key.proof.Goal) goal).node().parent()
                 .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
                         ? NumberRuleAppCost.create(-50000)

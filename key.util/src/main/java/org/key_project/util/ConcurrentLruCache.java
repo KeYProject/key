@@ -44,8 +44,10 @@ import org.jspecify.annotations.Nullable;
  * store a <em>different</em> (later) step, so losing an entry changes results -- eviction must
  * follow one exact, reproducible order.</li>
  * <li>No, the value only depends on the key (same key &rarr; always the same value) &rarr; use
- * {@link StripedLruCache}. Losing an entry there only costs time, never correctness, so it can
- * drop the single global lock and run much faster under many threads.</li>
+ * {@link GenerationalCache} when the prover's workers read the cache far more often than they
+ * insert into it (its reads take no lock and write an entry's generation stamp at most once per
+ * generation), {@link StripedLruCache} otherwise. Losing an entry in either only costs time,
+ * never correctness.</li>
  * </ul>
  *
  * <p>

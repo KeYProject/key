@@ -11,8 +11,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-
 
 /// A feature that computes the depth of the find-position of a taclet (top-level positions have
 /// depth zero or if not a find taclet)
@@ -30,8 +28,8 @@ public class FindDepthFeature implements Feature {
     private FindDepthFeature() {}
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         // assert pos != null : "Feature is only applicable to rules with find";
         return NumberRuleAppCost.create(pos == null ? 0 : pos.depth());
     }

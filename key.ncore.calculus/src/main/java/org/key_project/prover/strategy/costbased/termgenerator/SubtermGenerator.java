@@ -17,30 +17,28 @@ import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
 
 /// Term generator that enumerates the sub-terms or sub-formulas of a given term. Similarly to
 /// [org.key_project.prover.strategy.costbased.termfeature.RecSubTermFeature], a term feature
 /// can be given that determines when traversal should
 /// be stopped, i.e., when one should not descend further into a term.
-public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
-        implements TermGenerator<Goal> {
+public abstract class SubtermGenerator
+        implements TermGenerator {
 
     private final TermFeature cond;
-    private final ProjectionToTerm<Goal> completeTerm;
+    private final ProjectionToTerm completeTerm;
 
-    private SubtermGenerator(ProjectionToTerm<Goal> completeTerm, TermFeature cond) {
+    private SubtermGenerator(ProjectionToTerm completeTerm, TermFeature cond) {
         this.cond = cond;
         this.completeTerm = completeTerm;
     }
 
     /// Left-traverse the subterms of a term in depth-first order. Each term is returned before its
     /// proper subterms.
-    public static <Goal extends ProofGoal<@NonNull Goal>> TermGenerator<Goal> leftTraverse(
-            ProjectionToTerm<Goal> cTerm, TermFeature cond) {
-        return new SubtermGenerator<>(cTerm, cond) {
+    public static TermGenerator leftTraverse(ProjectionToTerm cTerm, TermFeature cond) {
+        return new SubtermGenerator(cTerm, cond) {
             public Iterator<Term> generate(RuleApp app,
-                    PosInOccurrence pos, Goal goal,
+                    PosInOccurrence pos, ProofGoal<?> goal,
                     MutableState mState) {
                 return new LeftIterator(getTermInst(app, pos, goal, mState), mState,
                     goal.proof().getServices());
@@ -50,11 +48,9 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
 
     /// Right-traverse the subterms of a term in depth-first order. Each term is returned before its
     /// proper subterms.
-    public static <Goal extends ProofGoal<@NonNull Goal>> TermGenerator<Goal> rightTraverse(
-            ProjectionToTerm<Goal> cTerm, TermFeature cond) {
-        return new SubtermGenerator<>(cTerm, cond) {
-            public Iterator<Term> generate(RuleApp app,
-                    PosInOccurrence pos, Goal goal,
+    public static TermGenerator rightTraverse(ProjectionToTerm cTerm, TermFeature cond) {
+        return new SubtermGenerator(cTerm, cond) {
+            public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
                     MutableState mState) {
                 return new RightIterator(getTermInst(app, pos, goal, mState), mState,
                     goal.proof().getServices());
@@ -62,7 +58,8 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
         };
     }
 
-    protected Term getTermInst(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected Term getTermInst(RuleApp app, PosInOccurrence pos, ProofGoal<?> goal,
+            MutableState mState) {
         final Term completeTermInst = completeTerm.toTerm(app, pos, goal, mState);
         assert completeTermInst != null : "@AssumeAssertion(nullness): Term should not be null";
         return completeTermInst;
@@ -78,7 +75,7 @@ public abstract class SubtermGenerator<Goal extends ProofGoal<@NonNull Goal>>
         protected final LogicServices services;
 
         protected SubIterator(Term t, MutableState mState, LogicServices services) {
-            termStack = ImmutableList.<Term>singleton(t);
+            termStack = ImmutableList.singleton(t);
             this.mState = mState;
             this.services = services;
         }

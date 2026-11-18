@@ -26,6 +26,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
@@ -649,13 +650,14 @@ public final class UseDependencyContractRule implements BuiltInRule, ComplexJust
         return displayName();
     }
 
-    public UseDependencyContractApp createApp(PosInOccurrence pos) {
+    public UseDependencyContractApp<UseDependencyContractRule> createApp(PosInOccurrence pos) {
         return createApp(pos, null);
     }
 
     @Override
-    public UseDependencyContractApp createApp(PosInOccurrence pos, TermServices services) {
-        return new UseDependencyContractApp(this, pos);
+    public UseDependencyContractApp<UseDependencyContractRule> createApp(PosInOccurrence pos,
+            LogicServices services) {
+        return new UseDependencyContractApp<>(this, pos);
     }
 
     /**

@@ -83,7 +83,7 @@ public class PosInOccurrence {
     ///
     /// @return A new [PosInOccurrence] one level higher in the term structure.
     /// @throws IllegalStateException If the position is already at the top level.
-    public @Nullable PosInOccurrence up() {
+    public PosInOccurrence up() {
         final var up = posInTerm.up();
         if (up != null) {
             return new PosInOccurrence(sequentFormula, up, inAntec);

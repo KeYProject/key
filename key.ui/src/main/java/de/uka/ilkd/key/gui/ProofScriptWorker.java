@@ -94,7 +94,7 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
     }
 
     private void makeDialog() {
-        URI uri = script.getStartLocation().getFileURI().orElse(null);
+        URI uri = script.getStartLocation().getFileUri();
         Container cp = monitor.getContentPane();
         logArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         logArea.setEditable(false);
@@ -123,8 +123,9 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
                 if (exec.command().startsWith("'echo ")) {
                     continue;
                 }
-                if (exec.location().getFileURI().isPresent()) {
-                    message.append(exec.location().getFileURI().get()).append(":");
+                URI fileUri = exec.location().getFileUri();
+                if (fileUri != null) {
+                    message.append(fileUri).append(":");
                 }
                 message.append(exec.location().getPosition().line())
                         .append(": Executing on goal ").append(exec.nodeSerial()).append('\n')
@@ -144,7 +145,7 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
     public void init() {
         mediator.initiateAutoMode(initiallySelectedGoal != null ? initiallySelectedGoal.proof()
                 : mediator.getSelectedProof(),
-            true, false);
+            true);
         mediator.addInterruptedListener(this);
         makeDialog();
         monitor.setVisible(true);
@@ -170,7 +171,7 @@ public class ProofScriptWorker extends SwingWorker<@Nullable Object, ProofScript
 
         final Proof proof = initiallySelectedGoal != null ? initiallySelectedGoal.proof()
                 : mediator.getSelectedProof();
-        mediator.finishAutoMode(proof, true, true, this::selectGoalOrNode);
+        mediator.finishAutoMode(proof, true, this::selectGoalOrNode);
     }
 
     private void selectGoalOrNode() {

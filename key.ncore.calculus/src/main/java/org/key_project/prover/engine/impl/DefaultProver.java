@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 ///
 /// @param <Proof> the type of [ProofObject] that the prover constructs
 /// @param <Goal> the type of [ProofGoal] instances manipulated by this prover
-public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extends @Nullable ProofGoal<Goal>>
+public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extends ProofGoal<Goal>>
         extends AbstractProverCore<Proof, Goal> {
 
     /// Logger for tracing and debugging the prover's execution.
@@ -196,7 +196,7 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
         }
         if (app == null) {
             return new SingleRuleApplicationInfo(
-                "No more rules automatically applicable to any goal.", g, app);
+                "No more rules automatically applicable to any goal.", null, app);
         } else {
             try {
                 @SuppressWarnings({ "nullness", "unused" })

@@ -7,42 +7,42 @@ package de.uka.ilkd.key.strategy.termProjection;
 import java.math.BigInteger;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JMonomial;
 
 import org.key_project.logic.Term;
 import org.key_project.prover.strategy.costbased.feature.StableCost;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
 @StableCost
 public abstract class DividePolynomialsProjection extends AbstractDividePolynomialsProjection {
 
-    private DividePolynomialsProjection(ProjectionToTerm<Goal> leftCoefficient,
-            ProjectionToTerm<Goal> polynomial) {
+    private DividePolynomialsProjection(ProjectionToTerm leftCoefficient,
+            ProjectionToTerm polynomial) {
         super(leftCoefficient, polynomial);
     }
 
-    public static ProjectionToTerm<Goal> createRoundingDown(ProjectionToTerm<Goal> leftCoefficient,
-            ProjectionToTerm<Goal> polynomial) {
+    public static ProjectionToTerm createRoundingDown(ProjectionToTerm leftCoefficient,
+            ProjectionToTerm polynomial) {
         return new DividePolynomialsProjection(leftCoefficient, polynomial) {
             @Override
             protected Term divide(Monomial numerator, BigInteger denominator, Services services) {
                 final BigInteger newRightCoeff = divide(numerator.getCoefficient(), denominator);
-                return numerator.setCoefficient(newRightCoeff).toTerm(services);
+                return JMonomial.toTerm(numerator.setCoefficient(newRightCoeff), services);
             }
 
         };
     }
 
-    public static ProjectionToTerm<Goal> createRoundingUp(ProjectionToTerm<Goal> leftCoefficient,
-            ProjectionToTerm<Goal> polynomial) {
+    public static ProjectionToTerm createRoundingUp(ProjectionToTerm leftCoefficient,
+            ProjectionToTerm polynomial) {
         return new DividePolynomialsProjection(leftCoefficient, polynomial) {
             @Override
             protected Term divide(Monomial numerator, BigInteger denominator,
                     Services services) {
                 final BigInteger newRightCoeff =
                     divide(numerator.getCoefficient().negate(), denominator).negate();
-                return numerator.setCoefficient(newRightCoeff).toTerm(services);
+                return JMonomial.toTerm(numerator.setCoefficient(newRightCoeff), services);
             }
 
         };

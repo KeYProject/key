@@ -39,7 +39,9 @@ import org.jspecify.annotations.Nullable;
  * harmless when the value depends on when it was first stored -- for such caches the eviction
  * order can change results, and {@link ConcurrentLruCache} (exact, single-lock) must be used.
  * One-question test: <em>"if this entry were thrown away and computed again later, could the new
- * value be different?"</em> No &rarr; this class. Yes &rarr; {@link ConcurrentLruCache}.
+ * value be different?"</em> No &rarr; this class, or {@link GenerationalCache} for a cache that
+ * the workers read far more often than they insert into: it reads without any lock and keeps
+ * every entry that is in use. Yes &rarr; {@link ConcurrentLruCache}.
  *
  * <p>
  * The total capacity is still hard-bounded (each of the {@code stripes} segments holds at most
@@ -81,14 +83,14 @@ public final class StripedLruCache<K, V> {
      * @param maxEntries the approximate total capacity (across all segments)
      * @param stripes the desired number of segments; rounded up to the next power of two, min 1
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public StripedLruCache(int maxEntries, int stripes) {
         int n = 1;
         while (n < stripes) {
             n <<= 1;
         }
         this.mask = n - 1;
-        this.segments = new EvictingMap[n];
+        this.segments = (EvictingMap<K, V>[]) new EvictingMap<?, ?>[n];
         this.locks = new Object[n];
         final int perSegment = Math.max(1, (maxEntries + n - 1) / n);
         for (int i = 0; i < n; i++) {

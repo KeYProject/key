@@ -309,7 +309,13 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         fireTaskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy,
             PROCESSING_STRATEGY, -1));
 
-        final ApplyStrategyInfo<Proof, Goal> result = runParallel(goals, perTaskSteps);
+        final ApplyStrategyInfo<Proof, Goal> result;
+        try (var ignored =
+            proof.setRuleAppIndexMode(proof.getActiveStrategy().getRuleAppIndexMode())) {
+            result = runParallel(goals, perTaskSteps);
+        } catch (Exception e) { // should never be reached
+            throw new RuntimeException(e);
+        }
 
         proof.addAutoModeTime(result.getTime());
         fireTaskFinished(new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
@@ -362,6 +368,8 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
      * @param perTaskSteps the budget each goal is assigned, or {@code 0} when the
      *        step budget applies to all as a whole
      */
+    @SuppressWarnings("try") // the binding is deliberately unused: suspending the listeners is the
+    // whole point and close() restores them, so the resource is a pure scoping handle
     private ApplyStrategyInfo<Proof, Goal> runParallel(ImmutableList<Goal> goals,
             int perTaskSteps) {
         final long startTime = System.currentTimeMillis();

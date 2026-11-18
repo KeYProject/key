@@ -24,6 +24,7 @@ import org.key_project.logic.Name;
  *
  * @author gladisch
  */
+@TransformerMeta(name = "#ExpandQueries")
 public class ExpandQueriesMetaConstruct extends AbstractTermTransformer {
 
     public static final String name = "#ExpandQueries";

@@ -7,6 +7,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics.theory;
 import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.PSeqLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.JTerm;
 
@@ -26,7 +27,8 @@ import org.key_project.util.collection.ImmutableSet;
  *
  * Compound indices are the normal case for sequences. The rules for subsequence, concatenation
  * and reversal rewrite a read into a read of the underlying sequence at {@code idx + from},
- * {@code idx - seqLen(first)} and {@code seqLen(seq) - 1 - idx}.
+ * {@code idx - seqLen(first)} and {@code seqLen(seq) - 1 - idx}. Reads {@code pseqGet} of
+ * typed sequences are registered in the same way.
  *
  * This support provides no derived triggers and decides no literals.
  */
@@ -49,8 +51,10 @@ final class SequenceTheorySupport implements QuantifierTheorySupport {
     @Override
     public CandidateVerdict verdictOn(JTerm candidate, JTerm enclosing, Services services) {
         final SeqLDT seqLDT = services.getTypeConverter().getSeqLDT();
-        // the index is the second argument of seqGet
-        if (enclosing != null && seqLDT.isSeqGetOp(enclosing.op())
+        final PSeqLDT pseqLDT = services.getTypeConverter().getPSeqLDT();
+        // the index is the second argument of seqGet and of pseqGet
+        if (enclosing != null
+                && (seqLDT.isSeqGetOp(enclosing.op()) || pseqLDT.isPseqGetOp(enclosing.op()))
                 && enclosing.sub(1) == candidate) {
             return CandidateVerdict.PREFER_ENCLOSING;
         }

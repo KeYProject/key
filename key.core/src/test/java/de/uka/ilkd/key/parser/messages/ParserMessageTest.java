@@ -61,6 +61,8 @@ public class ParserMessageTest {
         return data;
     }
 
+    // uses the deprecated Location#getFileURI() accessor of the legacy location API
+    @SuppressWarnings("deprecation")
     public ParserMessageTest(Path sourceDir) throws Exception {
         // retrieve the Java file contained in the given source directory:
 
@@ -99,7 +101,7 @@ public class ParserMessageTest {
 
         assertNotNull(location, "Cannot recover error location from Exception: " + exception);
 
-        assertNotNull(location.getFileURI().orElse(null),
+        assertNotNull(location.getFileUri(),
             "Couldn't recreate file URL from received exception.");
 
         assertEquals(javaFile.toAbsolutePath(), Paths.get(location.getFileUri()),

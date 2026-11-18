@@ -388,6 +388,8 @@ tryclose branch;
 // tryclose branch;
 // established: r4 is permutation
 // established: r4 fixes v_y_0
+instantiate hide var=v_r with=(seqSwap(seqSwap(s_0, jv_1, v_y_0), jv_1, v_x_0));
+tryclose steps=20000;
 // from now on  v_x_0 != v_y_0 and s_0[v_x_0]!= v_x_0 and
 // s_0[v_y_0]!= v_y_0  and s_0[v_x_0]!= v_y_0 and  s_0[v_y_0]!=v_x_0;
 // this corresponds to case B4iv in the Notes
@@ -397,21 +399,11 @@ tryclose branch;
 rule seqNPermSwapNPerm formula=(seqNPerm(s_0));
 instantiate hide var=iv with=(v_x_0);
 instantiate hide var=jv with=(jv_0);
-rule impLeft;
+rule impLeft formula=(0 <= v_x_0 & 0 <= jv_0 & v_x_0 < seqLen(s_0) & jv_0 < seqLen(s_0) -> seqNPerm(seqSwap(s_0, v_x_0, jv_0)));
 tryclose branch;
 rule seqNPermSwapNPerm formula=(seqNPerm(seqSwap(s_0,v_x_0,jv_0)));
 instantiate hide var=iv with=(v_y_0);
 instantiate hide var=jv with=(jv_1);
 instantiate hide var=v_r with=(seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1));
-tryclose branch;
-rule seqNPermSwapNPerm formula=(seqNPerm(s_0));
-instantiate hide var=iv with=(v_x_0);
-instantiate hide var=jv with=(jv_0);
-rule impLeft;
-tryclose branch;
-rule seqNPermSwapNPerm formula=(seqNPerm(seqSwap(s_0,v_x_0,jv_0)));
-instantiate hide var=iv with=(v_y_0);
-instantiate hide var=jv with=(jv_1);
-instantiate hide var=v_r with=(seqSwap(seqSwap(s_0, v_x_0, jv_0), v_y_0, jv_1));
-tryclose branch;
+tryclose steps=20000;
 }

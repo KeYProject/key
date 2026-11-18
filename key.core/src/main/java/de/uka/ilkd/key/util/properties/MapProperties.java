@@ -6,6 +6,8 @@ package de.uka.ilkd.key.util.properties;
 
 import java.util.IdentityHashMap;
 
+import org.key_project.util.Properties;
+
 import org.jspecify.annotations.Nullable;
 
 public class MapProperties extends AbstractProperties {

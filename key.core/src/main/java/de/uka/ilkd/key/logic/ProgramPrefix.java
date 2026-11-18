@@ -30,6 +30,8 @@ public interface ProgramPrefix extends NonTerminalProgramElement {
     /**
      * returns an array with all prefix elements starting at this element
      */
+    @SuppressWarnings("deprecation") // getPrefixElements() declaration references deprecated
+                                     // elements
     ImmutableArray<ProgramPrefix> getPrefixElements();
 
     /** returns the position of the first active child */

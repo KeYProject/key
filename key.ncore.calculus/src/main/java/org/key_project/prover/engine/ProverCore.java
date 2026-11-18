@@ -8,7 +8,6 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.Nullable;
 
 /// The `ProverCore` interface defines the core operations for managing
 /// and executing automated proof strategies in the KeY framework. Implementations
@@ -17,7 +16,7 @@ import org.jspecify.annotations.Nullable;
 ///
 /// @param <P> type of proof object, which extends [ProofObject].
 /// @param <G> The type of proof goal, which extends [ProofGoal].
-public interface ProverCore<P extends ProofObject<G>, G extends @Nullable ProofGoal<G>> {
+public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
 
     /// A constant used by some listeners to identify that a proof macro is running.
     String PROCESSING_STRATEGY = "Processing Strategy";

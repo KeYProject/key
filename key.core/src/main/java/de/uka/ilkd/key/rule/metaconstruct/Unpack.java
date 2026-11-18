@@ -12,6 +12,9 @@ import de.uka.ilkd.key.java.ast.statement.For;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Debug;
 
+import org.key_project.util.collection.ImmutableList;
+
+@TransformerMeta(name = "#unpack")
 public class Unpack extends ProgramTransformer {
 
     /**
@@ -21,7 +24,7 @@ public class Unpack extends ProgramTransformer {
      *        the instance of expression contained by the meta construct
      */
     public Unpack(For loop) {
-        super("unpack", loop);
+        super("#unpack", loop);
     }
 
     @Override
@@ -38,5 +41,10 @@ public class Unpack extends ProgramTransformer {
         loopInitStatementList[loopInitStatementList.length - 1] =
             KeYJavaASTFactory.forLoop(astFor.getGuard(), astFor.getIForUpdates(), astFor.getBody());
         return new ProgramElement[] { KeYJavaASTFactory.block(loopInitStatementList) };
+    }
+
+    @Override
+    public ImmutableList<ProgramElement> getArguments() {
+        return ImmutableList.of(body());
     }
 }

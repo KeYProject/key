@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import java.util.*;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.util.AssertionFailure;
@@ -14,7 +13,7 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Term;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
-import org.key_project.util.ConcurrentLruCache;
+import org.key_project.util.GenerationalCache;
 
 import org.jspecify.annotations.NonNull;
 
@@ -39,17 +38,14 @@ import org.jspecify.annotations.NonNull;
  * @author Julian Wiesler
  */
 public class AppliedRuleAppsNameCache {
-    /** cache of all applied rules of a node, by rule name and then by application fingerprint */
-    private final ConcurrentLruCache<Node, HashMap<Name, HashMap<Integer, List<RuleApp>>>> cache =
-        new ConcurrentLruCache<>(32);
-
-    // Only the structural cache-fill in fillCacheForNode needs mutual exclusion (it does a compound
-    // read-modify-write across parent and child entries). Plain reads go straight to the
-    // already-thread-safe ConcurrentLruCache and re-check under the write lock on a miss, so no
-    // read
-    // lock is needed.
-    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    private final ReentrantReadWriteLock.WriteLock writeLock = lock.writeLock();
+    /**
+     * The applied rules of a leaf node, by rule name and then by application fingerprint. A leaf
+     * is queried only by the worker that owns its goal, and a parent's entry is read only by its
+     * children after the split, so the entries need no lock; {@link GenerationalCache} reads
+     * without one and keeps the entries in use.
+     */
+    private final GenerationalCache<Node, HashMap<Name, HashMap<Integer, List<RuleApp>>>> cache =
+        new GenerationalCache<>(256);
 
     public AppliedRuleAppsNameCache() {}
 
@@ -94,58 +90,56 @@ public class AppliedRuleAppsNameCache {
      */
     private @NonNull HashMap<Name, HashMap<Integer, List<RuleApp>>> fillCacheForNode(
             Node node) {
-        HashMap<Name, HashMap<Integer, List<RuleApp>>> nodeCache;
-        try {
-            writeLock.lock();
-            nodeCache = cache.get(node);
-            if (nodeCache == null) {
-                // Try to use parent cache to initialize the new cache
-                HashMap<Name, HashMap<Integer, List<RuleApp>>> parentCache =
-                    node.root() ? null : cache.get(node.parent());
-                nodeCache = new HashMap<>();
+        HashMap<Name, HashMap<Integer, List<RuleApp>>> nodeCache = cache.get(node);
+        if (nodeCache == null) {
+            // Try to use parent cache to initialize the new cache
+            HashMap<Name, HashMap<Integer, List<RuleApp>>> parentCache =
+                node.root() ? null : cache.get(node.parent());
+            nodeCache = new HashMap<>();
 
-                if (parentCache != null) {
-                    if (node.parent().childrenCount() <= 1) {
-                        // Parent cache will be removed, reuse it
-                        nodeCache = parentCache;
-                    } else {
-                        // Copy the parent cache
-                        for (Map.Entry<Name, HashMap<Integer, List<RuleApp>>> entry : parentCache
-                                .entrySet()) {
-                            HashMap<Integer, List<RuleApp>> buckets = new HashMap<>();
-                            for (Map.Entry<Integer, List<RuleApp>> bucket : entry.getValue()
-                                    .entrySet()) {
-                                buckets.put(bucket.getKey(), new ArrayList<>(bucket.getValue()));
-                            }
-                            nodeCache.put(entry.getKey(), buckets);
-                        }
-                    }
-
-                    // Parent did not have a rule applied when we calculated this, add the rule
-                    // applied
-                    // there
-                    add(nodeCache, node.parent().getAppliedRuleApp());
-
-                    // If this is an inner node, we hope we will never revisit it, remove it from
-                    // the
-                    // cache
-                    if (node.parent().childrenCount() <= 1) {
-                        cache.remove(node.parent());
-                    }
+            if (parentCache != null) {
+                if (node.parent().childrenCount() <= 1) {
+                    // Parent cache will be removed, reuse it
+                    nodeCache = parentCache;
                 } else {
-                    // Check all earlier rule applications
-                    Node current = node;
-                    while (!current.root()) {
-                        final Node par = current.parent();
-                        add(nodeCache, par.getAppliedRuleApp());
-                        current = par;
+                    // Copy the parent cache
+                    for (Map.Entry<Name, HashMap<Integer, List<RuleApp>>> entry : parentCache
+                            .entrySet()) {
+                        HashMap<Integer, List<RuleApp>> buckets = new HashMap<>();
+                        for (Map.Entry<Integer, List<RuleApp>> bucket : entry.getValue()
+                                .entrySet()) {
+                            buckets.put(bucket.getKey(), new ArrayList<>(bucket.getValue()));
+                        }
+                        nodeCache.put(entry.getKey(), buckets);
                     }
                 }
 
-                cache.put(node, nodeCache);
+                // Parent did not have a rule applied when we calculated this, add the rule
+                // applied
+                // there
+                add(nodeCache, node.parent().getAppliedRuleApp());
+
+                // If this is an inner node, we hope we will never revisit it, remove it from
+                // the
+                // cache
+                if (node.parent().childrenCount() <= 1) {
+                    cache.remove(node.parent());
+                }
+            } else {
+                // Check all earlier rule applications
+                Node current = node;
+                while (!current.root()) {
+                    final Node par = current.parent();
+                    add(nodeCache, par.getAppliedRuleApp());
+                    current = par;
+                }
             }
-        } finally {
-            writeLock.unlock();
+
+            final HashMap<Name, HashMap<Integer, List<RuleApp>>> present =
+                cache.putIfAbsent(node, nodeCache);
+            if (present != null) {
+                nodeCache = present;
+            }
         }
 
         return nodeCache;

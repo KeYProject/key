@@ -5,11 +5,14 @@
 package de.uka.ilkd.key.strategy.feature;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
 
+import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.ITacletApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.Feature;
+
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
 
 /**
@@ -20,19 +23,18 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
     public static final Feature INSTANCE = new NonDuplicateAppFeature();
 
     @Override
-    public boolean filter(TacletApp app, PosInOccurrence pos,
-            Goal goal, MutableState mState) {
+    public boolean filter(@MonotonicNonNull ITacletApp app, PosInOccurrence pos,
+            ProofGoal<?> goal, MutableState mState) {
         if (!app.assumesInstantionsComplete()) {
             return true;
         }
 
-        return noDuplicateFindTaclet(app, pos, goal);
+        return noDuplicateFindTaclet(app, pos, (Goal) goal);
     }
 
     @Override
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
-            PosInOccurrence newPio,
-            PosInOccurrence oldPio) {
+    protected boolean comparePio(ITacletApp newApp, ITacletApp oldApp,
+            PosInOccurrence newPio, PosInOccurrence oldPio) {
         return oldPio.equals(newPio);
     }
 }

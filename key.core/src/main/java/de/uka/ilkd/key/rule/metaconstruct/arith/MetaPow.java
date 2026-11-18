@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 
 import org.key_project.logic.Name;
 
@@ -20,6 +21,7 @@ import org.key_project.logic.Name;
  * exceeds Integer.MAX_VALUE (the latter due to restrictions of class BigInteger).
  *
  */
+@TransformerMeta(name = "#pow")
 public final class MetaPow extends AbstractTermTransformer {
 
     public MetaPow() {

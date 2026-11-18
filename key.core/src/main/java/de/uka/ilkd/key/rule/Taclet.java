@@ -52,7 +52,7 @@ import org.jspecify.annotations.NonNull;
  * The find part of a taclet is used to attached the rule to a term in the sequent of the current
  * goal. Therefore the term of the sequent has to match the schema as found in the taclet's find
  * part. The taclet is then attached to this term, more precise not the taclet itself, but an
- * application object of this taclet (see {@link TacletApp TacletApp}. When
+ * application object of this taclet (see {@link TacletApp ITacletApp}. When
  * this attached taclet application object is applied, the new goals are constructed as described by
  * the goal descriptions. For example <br>
  * </br>
@@ -74,9 +74,15 @@ import org.jspecify.annotations.NonNull;
  * looking where it can be applied, these tasks have to be done in advance. For example by one of
  * the following classes {@link de.uka.ilkd.key.proof.RuleAppIndex RuleAppIndex} or
  * {@link de.uka.ilkd.key.proof.TacletAppIndex TacletAppIndex} or
- * {@link TacletApp TacletApp}
+ * {@link TacletApp ITacletApp}
  * </p>
  */
+// The non-generic executor override (see getExecutor()) necessarily deviates from the generic
+// Rule.getExecutor() contract: callers chain getExecutor().apply(...) and rely on the raw
+// RuleExecutor type (inference through the chain fails with a generic signature, e.g. in
+// TestApplyTaclet). Method-scope suppression cannot silence unchecked-override warnings, so the
+// unchecked/rawtypes warnings are suppressed at class level.
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public abstract class Taclet extends org.key_project.prover.rules.Taclet implements Rule {
     /**
      * This map contains (a, b) if there is a substitution {b a} somewhere in this taclet

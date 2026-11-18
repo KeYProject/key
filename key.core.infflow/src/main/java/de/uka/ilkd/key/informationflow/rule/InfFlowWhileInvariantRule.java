@@ -33,6 +33,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.Namespace;
 import org.key_project.logic.op.Function;
@@ -60,8 +61,8 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
 
     @Override
     public InfFlowLoopInvariantBuiltInRuleApp createApp(PosInOccurrence pos,
-            TermServices services) {
-        return new InfFlowLoopInvariantBuiltInRuleApp(this, pos, services);
+            LogicServices services) {
+        return new InfFlowLoopInvariantBuiltInRuleApp(this, pos, (TermServices) services);
     }
 
     @Override
@@ -164,7 +165,7 @@ public class InfFlowWhileInvariantRule extends WhileInvariantRule {
     private static InfFlowData prepareSetUpOfInfFlowValidityGoal(final Goal infFlowGoal,
             final AnonUpdateData anonUpdateData,
             final JTerm guardTerm, final Instantiation inst,
-            LoopSpecification spec, Services services, LoopInvariantBuiltInRuleApp ruleApp,
+            LoopSpecification spec, Services services, LoopInvariantBuiltInRuleApp<?> ruleApp,
             final ImmutableSet<LocationVariable> localIns,
             final ImmutableSet<LocationVariable> localOuts, final JTerm anonUpdate,
             final JavaBlock guardJb) throws RuleAbortException {

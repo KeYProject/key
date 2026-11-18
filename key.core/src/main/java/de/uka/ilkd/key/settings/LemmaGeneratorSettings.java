@@ -36,6 +36,7 @@ public class LemmaGeneratorSettings extends AbstractSettings {
         firePropertyChange(SHOW_DIALOG_USING_AXIOMS, old, showDialogUsingAxioms);
     }
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void readSettings(Properties props) {
         setShowDialogAddingAxioms(SettingsConverter.read(props,
@@ -44,6 +45,7 @@ public class LemmaGeneratorSettings extends AbstractSettings {
             "[" + CATEGORY + "]" + SHOW_DIALOG_USING_AXIOMS, true));
     }
 
+    // Legacy Properties-based Settings API: kept for loading .key/.props settings sections.
     @Override
     public void writeSettings(Properties props) {
         SettingsConverter.store(props, "[" + CATEGORY + "]" + SHOW_DIALOG_ADDING_AXIOMS,

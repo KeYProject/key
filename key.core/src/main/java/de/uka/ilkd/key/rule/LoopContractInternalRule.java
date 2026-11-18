@@ -9,7 +9,6 @@ import java.util.Map;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -21,6 +20,7 @@ import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.util.MiscTools;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleAbortException;
@@ -261,17 +261,17 @@ public class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public LoopContractInternalBuiltInRuleApp createApp(final PosInOccurrence occurrence,
-            TermServices services) {
-        return new LoopContractInternalBuiltInRuleApp(this, occurrence);
+    public LoopContractInternalBuiltInRuleApp<LoopContractInternalRule> createApp(
+            final PosInOccurrence occurrence, LogicServices services) {
+        return new LoopContractInternalBuiltInRuleApp<>(this, occurrence);
     }
 
     @Override
     public @NonNull ImmutableList<Goal> apply(final Goal goal,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractInternalBuiltInRuleApp;
-        LoopContractInternalBuiltInRuleApp application =
-            (LoopContractInternalBuiltInRuleApp) ruleApp;
+        LoopContractInternalBuiltInRuleApp<?> application =
+            (LoopContractInternalBuiltInRuleApp<?>) ruleApp;
 
         final Instantiation instantiation =
             instantiate((JTerm) application.posInOccurrence().subTerm(), goal);

@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+// This test class exercises the deprecated Strings helpers (containsWholeWord, isJMLComment)
+// on purpose; the tests themselves are the usage contract, so the deprecated API is kept.
+@SuppressWarnings("deprecation")
 class StringsTest {
 
     @Test

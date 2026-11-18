@@ -4,52 +4,57 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.strategy;
 
-import java.util.HashSet;
-import java.util.Set;
 
+import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.strategy.feature.MatchedAssumesFeature;
 import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
+import org.key_project.logic.Namespace;
 import org.key_project.prover.proof.ProofGoal;
+import org.key_project.prover.rules.IBuiltInRule;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.rules.RuleSet;
 import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.strategy.AbstractFeatureStrategy;
+import org.key_project.prover.strategy.ComponentStrategy;
 import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
+import org.key_project.prover.strategy.costbased.feature.MatchedAssumesFeature;
+import org.key_project.prover.strategy.costbased.feature.RuleSetDispatchFeature;
+import org.key_project.prover.strategy.costbased.termProjection.FocusFormulaProjection;
 
-import org.jspecify.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 /// Strategy for location sets
 /// Do not create directly; use [SetStrategyFactory] instead.
-public class LocSetStrategy extends AbstractFeatureStrategy implements ComponentStrategy {
+public class LocSetStrategy extends AbstractFeatureStrategy<Goal>
+        implements ComponentStrategy<Goal> {
     public static final Name NAME = new Name("LocSet Strategy");
 
-    private final RuleSetDispatchFeature costComputationDispatcher;
 
     private final boolean stopAtFirstNonCloseableGoal;
     private final LocSetTermFeatures lsf;
+    private final Proof proof;
 
     public LocSetStrategy(Proof proof, StrategyProperties strategyProperties) {
-        super(proof);
+        this.proof = proof;
+        TypeConverter typeConverter = proof.getServices().getTypeConverter();
         this.lsf = new LocSetTermFeatures(
-            getServices().getTypeConverter().getLDT(de.uka.ilkd.key.ldt.SetLDT.class),
-            getServices().getTypeConverter().getLocSetLDT(),
-            getServices().getTypeConverter().getHeapLDT());
-        costComputationDispatcher = setupCostComputationF();
+            typeConverter.getLDT(de.uka.ilkd.key.ldt.SetLDT.class),
+            typeConverter.getLocSetLDT(),
+            typeConverter.getHeapLDT());
+        setupCostComputationF(costComputationDispatcher);
 
         stopAtFirstNonCloseableGoal =
             strategyProperties.getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)
                     .equals(StrategyProperties.STOPMODE_NONCLOSE);
     }
 
-    private RuleSetDispatchFeature setupCostComputationF() {
-        final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
+    private void setupCostComputationF(RuleSetDispatchFeature d) {
         /// ensures that blasting rules are only applied if the focus formula
         /// contains a constructor whose rules need to decompose a locations
         /// avoid split up
@@ -57,11 +62,11 @@ public class LocSetStrategy extends AbstractFeatureStrategy implements Component
         /// rest of the sequent (e.g, ==> l \in allObjects(f) would lead to an application but
         /// allObjects(f) = EQ ==> l \in EQ not)
         bindRuleSet(d, "locSetEqualityBlastingRight",
-            ifZero(applyTF(FocusFormulaProjection.INSTANCE, lsf.requireLocationDecomposition),
+            ifZero(applyTF(FocusFormulaProjection.create(), lsf.requireLocationDecomposition),
                 longConst(-100), longConst(-80)));
 
         bindRuleSet(d, "locSetArrayRangeMerge",
-            add(ifZero(MatchedAssumesFeature.INSTANCE,
+            add(ifZero(MatchedAssumesFeature.create(),
                 add(PolynomialValuesCmpFeature.leq(instOf("lower"), instOf("upper")),
                     PolynomialValuesCmpFeature.lt(instOf("upper"), instOf("lower2")),
                     PolynomialValuesCmpFeature.leq(instOf("lower2"), instOf("upper2"))),
@@ -69,36 +74,30 @@ public class LocSetStrategy extends AbstractFeatureStrategy implements Component
                 longConst(-4000)));
 
         bindRuleSet(d, "locSetArrayRangeInterNested",
-            add(ifZero(MatchedAssumesFeature.INSTANCE,
+            add(ifZero(MatchedAssumesFeature.create(),
                 add(PolynomialValuesCmpFeature.leq(instOf("lower"), instOf("lower2")),
                     PolynomialValuesCmpFeature.leq(instOf("upper2"), instOf("upper"))),
                 longConst(0)),
                 longConst(-4000)));
 
         bindRuleSet(d, "locSetArrayRangeInterNested2",
-            add(ifZero(MatchedAssumesFeature.INSTANCE,
+            add(ifZero(MatchedAssumesFeature.create(),
                 add(PolynomialValuesCmpFeature.leq(instOf("lower2"), instOf("lower")),
                     PolynomialValuesCmpFeature.leq(instOf("upper"), instOf("upper2"))),
                 longConst(0)),
                 longConst(-4000)));
 
         bindRuleSet(d, "locSetArrayRangeInterDisjoint",
-            add(ifZero(MatchedAssumesFeature.INSTANCE,
+            add(ifZero(MatchedAssumesFeature.create(),
                 PolynomialValuesCmpFeature.lt(instOf("upper"), instOf("lower2")),
                 longConst(0)),
                 longConst(-4000)));
 
         bindRuleSet(d, "locSetArrayRangeInterDisjoint2",
-            add(ifZero(MatchedAssumesFeature.INSTANCE,
+            add(ifZero(MatchedAssumesFeature.create(),
                 PolynomialValuesCmpFeature.lt(instOf("upper2"), instOf("lower")),
                 longConst(0)),
                 longConst(-4000)));
-        return d;
-    }
-
-    @Override
-    public boolean isResponsibleFor(RuleSet rs) {
-        return costComputationDispatcher.get(rs) != null;
     }
 
     @Override
@@ -123,28 +122,30 @@ public class LocSetStrategy extends AbstractFeatureStrategy implements Component
     }
 
     @Override
-    public <GOAL extends ProofGoal<GOAL>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, GOAL goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         return this.costComputationDispatcher.computeCost(app, pos, goal, mState);
     }
 
     @Override
-    public Set<RuleSet> getResponsibilities(StrategyAspect aspect) {
-        var set = new HashSet<RuleSet>();
-        RuleSetDispatchFeature dispatcher = getDispatcher(aspect);
-        if (dispatcher != null) {
-            set.addAll(dispatcher.ruleSets());
-        }
-        return set;
-    }
-
-    @Override
-    public @Nullable RuleSetDispatchFeature getDispatcher(StrategyAspect aspect) {
-        return aspect == StrategyAspect.Cost ? costComputationDispatcher : null;
-    }
-
-    @Override
-    public boolean isResponsibleFor(BuiltInRule rule) {
+    public boolean isResponsibleFor(IBuiltInRule<Goal> rule) {
         return false;
+    }
+
+
+    @Override
+    protected RuleSet getHeuristic(String p_name) {
+        final NamespaceSet nss = proof.getNamespaces();
+        final Namespace<@NonNull RuleSet> ns = nss.ruleSets();
+        final RuleSet h = ns.lookup(new Name(p_name));
+
+        assert h != null : "Did not find the rule set " + p_name;
+
+        return h;
+    }
+
+    @Override
+    protected LogicServices getServices() {
+        return proof.getServices();
     }
 }

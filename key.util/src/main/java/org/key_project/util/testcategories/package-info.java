@@ -4,7 +4,7 @@
  * Please define own categories on demand, and adopt the <code>build.gradle</code> files.
  *
  * @author weigl
- * @date 2019-04-18
+ *         Date: 2019-04-18
  * @see "https://dzone.com/articles/closer-look-junit-categories"
  */
 @NullMarked

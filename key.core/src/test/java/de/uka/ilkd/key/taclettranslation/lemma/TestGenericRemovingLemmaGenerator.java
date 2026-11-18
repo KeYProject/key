@@ -35,7 +35,7 @@ public class TestGenericRemovingLemmaGenerator {
         Set<Sort> sorts = new HashSet<>();
         collectSorts(result.getFormula(TacletForTests.services()), sorts);
 
-        Name nameG = new Name("G");
+        Name nameG = new Name("P_G");
         boolean found = false;
         for (Sort sort : sorts) {
             Assertions.assertFalse(sort instanceof GenericSort, "No generic sorts must survive");
@@ -44,7 +44,7 @@ public class TestGenericRemovingLemmaGenerator {
                 found = true;
             }
         }
-        Assertions.assertTrue(found, "There is a proxy sort of the name 'G'");
+        Assertions.assertTrue(found, "There is a proxy sort of the name 'P_G'");
     }
 
     private void collectSorts(JTerm term, Set<Sort> sorts) {

@@ -10,13 +10,14 @@ import java.util.List;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
-import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.rule.metaconstruct.arith.JPolynomial;
 
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Monomial;
+import org.key_project.prover.strategy.costbased.feature.helper.arith.Polynomial;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
@@ -97,7 +98,7 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
      * tolerate. A number literal is never rewritten away: it is the concrete value the comparisons
      * in {@link HandleArith} are decided on. A term built by the polynomial operators is left in
      * place in both directions: rewriting it away collapses the structure that
-     * {@link de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial} decomposes, and rewriting other
+     * {@link JPolynomial} decomposes, and rewriting other
      * terms into it makes it a class representative, which the one-pass normalisation of
      * {@code Congruence} does not rewrite further. Rewriting an atom to a number literal or to
      * another atom stays permitted: that only identifies atoms, which the assumed equality
@@ -117,15 +118,6 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
         return !hasPolynomialStructure(from, integerLDT) && !hasPolynomialStructure(to, integerLDT);
     }
 
-    /**
-     * Whether the term's top operator is one the polynomial decomposition takes apart. Besides the
-     * sum and product this covers difference and negation, which the proof search rewrites into
-     * them.
-     *
-     * @param t a term
-     * @param integerLDT the integer theory operators
-     * @return whether the top operator carries polynomial structure
-     */
     /**
      * Solves {@code pattern = instance} for the single variable the pattern is affine in.
      *
@@ -161,7 +153,7 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
             }
         }
 
-        final Polynomial patternPoly = Polynomial.create(pattern, services);
+        final Polynomial patternPoly = JPolynomial.create(pattern, services);
         Polynomial rest = Polynomial.ZERO.add(patternPoly.getConstantTerm());
         Monomial linear = null;
         QuantifiableVariable variable = null;
@@ -183,8 +175,9 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
         }
 
         final Polynomial solution = divideExactly(
-            Polynomial.create(instance, services).sub(rest), linear.getCoefficient());
-        return solution == null ? null : varMap.put(variable, solution.toTerm(services));
+            JPolynomial.create(instance, services).sub(rest), linear.getCoefficient());
+        return solution == null ? null
+                : varMap.put(variable, JPolynomial.toTerm(solution, services));
     }
 
     /** Divides every coefficient by the divisor, or returns null when a division is not exact. */
@@ -202,6 +195,15 @@ final class IntegerTheorySupport implements QuantifierTheorySupport {
         return result;
     }
 
+    /**
+     * Whether the term's top operator is one the polynomial decomposition takes apart. Besides the
+     * sum and product this covers difference and negation, which the proof search rewrites into
+     * them.
+     *
+     * @param t a term
+     * @param integerLDT the integer theory operators
+     * @return whether the top operator carries polynomial structure
+     */
     private static boolean hasPolynomialStructure(JTerm t, IntegerLDT integerLDT) {
         final Operator op = t.op();
         return op == integerLDT.getAdd() || op == integerLDT.getMul()

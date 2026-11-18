@@ -12,12 +12,9 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.NumberRuleAppCost;
 import org.key_project.prover.strategy.costbased.RuleAppCost;
 
-import org.jspecify.annotations.NonNull;
-
 /// A feature that evaluates one of two given features, depending on the result of a
 /// <code>RuleFilter</code>
 public class ConditionalFeature implements Feature {
-
     private ConditionalFeature(RuleFilter p_cond, Feature p_thenFeature,
             Feature p_elseFeature) {
         cond = p_cond;
@@ -26,8 +23,8 @@ public class ConditionalFeature implements Feature {
     }
 
     @Override
-    public <Goal extends ProofGoal<@NonNull Goal>> RuleAppCost computeCost(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    public RuleAppCost computeCost(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         if (cond.filter(app.rule())) {
             return thenFeature.computeCost(app, pos, goal, mState);
         } else {

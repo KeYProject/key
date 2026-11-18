@@ -12,7 +12,6 @@ import de.uka.ilkd.key.proof.Node;
 
 import org.key_project.exploration.ProofExplorationService;
 
-import org.jspecify.annotations.NonNull;
 
 /**
  * @author Alexander Weigl
@@ -36,7 +35,6 @@ public class AddFormulaToAntecedentAction extends ExplorationAction {
             return;
         }
         ProofExplorationService service = ProofExplorationService.get(getMediator());
-        @NonNull
         Node toBeSelected = service.soundAddition(getMediator().getSelectedGoal(), t, true);
         getMediator().getSelectionModel().setSelectedNode(toBeSelected);
     }

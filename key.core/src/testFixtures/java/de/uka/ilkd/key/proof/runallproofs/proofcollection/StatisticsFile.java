@@ -214,7 +214,7 @@ public class StatisticsFile implements Serializable {
 
             // Convert statistics table into an array of lists.
             @SuppressWarnings("unchecked")
-            List<String>[] lists = new List[columns.length];
+            List<String>[] lists = (List<String>[]) new List<?>[columns.length];
             for (int i = 0; i < lists.length; i++) {
                 lists[i] = new LinkedList<>();
             }

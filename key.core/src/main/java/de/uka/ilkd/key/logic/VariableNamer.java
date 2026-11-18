@@ -445,7 +445,7 @@ public abstract class VariableNamer implements InstantiationProposer {
     @Override
     public String getProposal(TacletApp app, SchemaVariable var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
-        // determine posOfDeclaration from TacletApp
+        // determine posOfDeclaration from ITacletApp
         ContextStatementBlockInstantiation cie = app.instantiations().getContextInstantiation();
         PosInProgram posOfDeclaration = (cie == null ? null : cie.prefix());
 
@@ -599,7 +599,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                             app.instantiations(), services);
                         name = ProofSaver.printProgramElement(rhs);
                         break;
-                    } else if (c.getStatementAt(1) instanceof Assignment p2
+                    } else if (c.getStatementAt(1) instanceof Assignment<?> p2
                             && JavaAstUtils.isCopyAssignment(p2)) {
                         Expression lhs = p2.getExpressionAt(0);
                         if (lhs.equals(sv)) {

@@ -15,7 +15,6 @@ import org.key_project.prover.strategy.costbased.MutableState;
 import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 
-import org.jspecify.annotations.NonNull;
 
 
 /**
@@ -30,8 +29,8 @@ public class NotInScopeOfModalityFeature extends BinaryFeature {
     private NotInScopeOfModalityFeature() {}
 
     @Override
-    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         return !inScopeOfModality(pos);

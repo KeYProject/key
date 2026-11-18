@@ -35,6 +35,7 @@ import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.prover.rules.RuleApp;
@@ -111,7 +112,8 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
                 && ((New) activeStatement).getTypeDeclarationCount() == 0) {
             actualResult = null;
             mr = (New) activeStatement;
-        } else if (activeStatement instanceof Assignment ca && JavaAstUtils.isCopyAssignment(ca)) {
+        } else if (activeStatement instanceof Assignment<?> ca
+                && JavaAstUtils.isCopyAssignment(ca)) {
             final Expression lhs = ca.getExpressionAt(0);
             final Expression rhs = ca.getExpressionAt(1);
             if ((rhs instanceof MethodReference
@@ -576,7 +578,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
     }
 
     @Override
-    public ContractRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public ContractRuleApp createApp(PosInOccurrence pos, LogicServices services) {
         return new ContractRuleApp(this, pos);
     }
 
@@ -951,7 +953,7 @@ public class UseOperationContractRule implements BuiltInRule, ComplexJustificati
             if (inst.actualResult == null) {
                 resultAssign = new StatementBlock();
             } else {
-                final Assignment ca =
+                final Assignment<?> ca =
                     new BinaryAssignment(COPY, inst.actualResult,
                         resultVar);
                 resultAssign = new StatementBlock(ca);

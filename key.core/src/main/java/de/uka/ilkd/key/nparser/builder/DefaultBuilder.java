@@ -96,6 +96,8 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
         return doLookup(n, lookups);
     }
 
+    @SuppressWarnings("unchecked") // the namespace lookup is untyped; T is the caller-chosen
+    // target type and enforced by the try/catch ClassCastException below
     protected <T> T doLookup(Name n, Namespace<?>... lookups) {
         for (Namespace<?> lookup : lookups) {
             Object l;
@@ -158,11 +160,15 @@ public class DefaultBuilder extends AbstractBuilder<Object> {
                 programVariables().lookup(new ProgramElementName(varfuncName)),
                 functions().lookup(name),
                 AbstractTermTransformer.name2metaop(varfuncName),
-
             };
 
         for (Operator op : operators) {
             if (op != null) {
+                if (genericArgsCtxt != null) {
+                    semanticError(genericArgsCtxt,
+                        "The operator %s expect no generic arguments; got %s", op.name(),
+                        genericArgsCtxt.getText());
+                }
                 return op;
             }
         }

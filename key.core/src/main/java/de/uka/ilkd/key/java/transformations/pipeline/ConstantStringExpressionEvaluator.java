@@ -558,6 +558,7 @@ public class ConstantStringExpressionEvaluator extends JavaTransformerAbstract {
         }
 
         @Override
+        @SuppressWarnings("rawtypes") // VoidVisitorAdapter declares the NodeList parameter raw
         public void visit(NodeList n, Object arg) {
             super.visit(n, arg);
             for (Object nodeObj : n) {
@@ -773,12 +774,6 @@ public class ConstantStringExpressionEvaluator extends JavaTransformerAbstract {
 
         @Override
         public void visit(KeyJumpLabelSV n, Object arg) {
-            super.visit(n, arg);
-            defaultAction(n, arg);
-        }
-
-        @Override
-        public void visit(KeyMetaConstructExpression n, Object arg) {
             super.visit(n, arg);
             defaultAction(n, arg);
         }

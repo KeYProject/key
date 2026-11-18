@@ -4,11 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.isabelletranslation.automation;
 
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractExternalSolverRuleApp;
 import de.uka.ilkd.key.rule.ExternalSolverRule;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
@@ -23,6 +23,9 @@ import org.jspecify.annotations.NullMarked;
  * @version 1 (8/7/25)
  */
 @NullMarked
+@SuppressWarnings("unchecked") // createApp(String) is a non-generic override of the interface's
+                               // generic method; the AbstractExternalSolverRuleApp casts below are
+                               // unchecked by design
 public class IsabelleRule implements ExternalSolverRule {
     public static final IsabelleRule INSTANCE = new IsabelleRule();
 
@@ -46,7 +49,7 @@ public class IsabelleRule implements ExternalSolverRule {
     }
 
     @Override
-    public IsabelleRuleApp createApp(PosInOccurrence pos, TermServices services) {
+    public IsabelleRuleApp createApp(PosInOccurrence pos, LogicServices services) {
         return new IsabelleRuleApp(this, null, "", "");
     }
 

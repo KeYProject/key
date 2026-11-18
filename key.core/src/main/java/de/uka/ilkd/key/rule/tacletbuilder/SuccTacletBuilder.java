@@ -92,6 +92,8 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
         return getSuccTaclet();
     }
 
+    @SuppressWarnings("unchecked") // the cloned map preserves HashMap<TacletGoalTemplate,
+    // ChoiceExpr>; the clone() API only exposes Object
     @Override
     public SuccTacletBuilder copy() {
         var rb = new SuccTacletBuilder().setFind((Sequent) getFind());

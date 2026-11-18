@@ -15,30 +15,27 @@ import org.key_project.prover.strategy.costbased.feature.BinaryFeature;
 import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termProjection.ProjectionToTerm;
 
-import org.jspecify.annotations.NonNull;
+public class ImplicitCastNecessary extends BinaryFeature {
 
-public class ImplicitCastNecessary<Goal extends ProofGoal<@NonNull Goal>> extends BinaryFeature {
+    private final ProjectionToTerm projection;
 
-    private final ProjectionToTerm<Goal> projection;
-
-    private ImplicitCastNecessary(ProjectionToTerm<Goal> projection) {
+    private ImplicitCastNecessary(ProjectionToTerm projection) {
         this.projection = projection;
     }
 
     @Override
-    protected <G extends ProofGoal<@NonNull G>> boolean filter(RuleApp app, PosInOccurrence pos,
-            G goal, MutableState mState) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos,
+            ProofGoal<?> goal, MutableState mState) {
         assert pos != null && pos.depth() >= 1;
 
         int subPos = pos.getIndex();
 
         final Sort maxSort = TermHelper.getMaxSort(pos.up().subTerm(), subPos);
-        return projection.toTerm(app, pos, (Goal) goal, mState).sort().extendsTrans(maxSort);
+        return projection.toTerm(app, pos, goal, mState).sort().extendsTrans(maxSort);
     }
 
-    public static <Goal extends ProofGoal<@NonNull Goal>> Feature create(
-            ProjectionToTerm<Goal> s1) {
-        return new ImplicitCastNecessary<>(s1);
+    public static Feature create(ProjectionToTerm s1) {
+        return new ImplicitCastNecessary(s1);
     }
 
 }

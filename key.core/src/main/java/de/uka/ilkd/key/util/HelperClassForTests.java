@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.strategy.Strategy;
+import de.uka.ilkd.key.strategy.JavaStrategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 import org.key_project.util.collection.ImmutableList;
@@ -45,6 +45,8 @@ public class HelperClassForTests {
     public static final Path DUMMY_KEY_FILE = TESTCASE_DIRECTORY.resolve("dummyTrue.key");
 
 
+    @SuppressWarnings("unchecked") // the anonymous profile inherits the specialized goal-chooser
+    // builders, see AbstractProfile
     private static final Profile profile = new JavaProfile() {
         // we do not want normal standard rules, but ruleSetsDeclarations is needed for string
         // library (HACK)
@@ -122,7 +124,7 @@ public class HelperClassForTests {
                 proof.getSettings().getStrategySettings().getActiveStrategyProperties();
             newProps.setProperty(StrategyProperties.OSS_OPTIONS_KEY, newVal);
 
-            Strategy.updateStrategySettings(proof, newProps);
+            JavaStrategy.updateStrategySettings(proof, newProps);
             OneStepSimplifier.refreshOSS(proof);
         }
     }
@@ -297,6 +299,8 @@ public class HelperClassForTests {
         return field;
     }
 
+    @SuppressWarnings("unchecked") // reflection cannot be checked statically; callers declare the
+    // expected type via the type parameter
     public static <T> T get(Object o, String fieldName)
             throws NoSuchFieldException, IllegalAccessException {
         final Field field = field(o, fieldName);

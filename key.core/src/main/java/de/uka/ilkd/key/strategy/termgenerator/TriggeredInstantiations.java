@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.sort.GenericSort;
-import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
@@ -31,6 +30,7 @@ import de.uka.ilkd.key.strategy.quantifierHeuristics.constraint.Metavariable;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
+import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.*;
 import org.key_project.prover.strategy.costbased.MutableState;
@@ -40,9 +40,9 @@ import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
-public class TriggeredInstantiations implements TermGenerator<Goal> {
+public class TriggeredInstantiations implements TermGenerator {
 
-    public static TermGenerator<Goal> create(boolean skipConditions) {
+    public static TermGenerator create(boolean skipConditions) {
         return new TriggeredInstantiations(skipConditions);
     }
 
@@ -75,11 +75,11 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
      */
     @Override
     public Iterator<org.key_project.logic.Term> generate(RuleApp app, PosInOccurrence pos,
-            Goal goal,
+            ProofGoal<?> goal,
             MutableState mState) {
         if (app instanceof TacletApp tapp) {
 
-            final Services services = goal.proof().getServices();
+            final Services services = (Services) goal.proof().getServices();
             final Taclet taclet = tapp.taclet();
 
             final Set<JTerm> terms;
@@ -180,6 +180,9 @@ public class TriggeredInstantiations implements TermGenerator<Goal> {
         return cost == -1;
     }
 
+    // Constraint is deprecated wholesale (quantifierHeuristics.constraint); no replacement API
+    // exists.
+    @SuppressWarnings("deprecation")
     private HashSet<org.key_project.logic.Term> computeInstances(Services services,
             final JTerm comprehension,
             final Metavariable mv, final JTerm trigger, Set<JTerm> terms,

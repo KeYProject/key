@@ -19,7 +19,6 @@ import org.key_project.prover.strategy.costbased.feature.Feature;
 import org.key_project.prover.strategy.costbased.termfeature.BinaryTermFeature;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 
-import org.jspecify.annotations.NonNull;
 
 public class SeqContainsExecutableCodeFeature extends BinaryFeature {
 
@@ -38,8 +37,8 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
         new SeqContainsExecutableCodeFeature(true);
 
     @Override
-    protected <Goal extends ProofGoal<@NonNull Goal>> boolean filter(RuleApp app,
-            PosInOccurrence pos, Goal goal, MutableState mState) {
+    protected boolean filter(RuleApp app,
+            PosInOccurrence pos, ProofGoal<?> goal, MutableState mState) {
         final Services services = (Services) goal.proof().getServices();
         return containsExec(goal.sequent().succedent().iterator(), mState, services)
                 || containsExec(goal.sequent().antecedent().iterator(), mState, services);
