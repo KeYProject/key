@@ -10,7 +10,6 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -77,10 +76,6 @@ public final class JMLInfoExtractor {
                 : (specSafeMath ? SpecMathMode.SAFE : (specJavaMath ? SpecMathMode.JAVA : null));
 
         return specMathMode;
-    }
-
-    private static ImmutableList<TextualJMLConstruct> getJMLComments(TypeDeclaration decl) {
-        return decl.getAttachedJml();
     }
 
     private static ImmutableList<Comment> getJMLComments(MethodDeclaration method) {
@@ -211,8 +206,6 @@ public final class JMLInfoExtractor {
      * @return modifiers
      */
     public static TypeDeclaration.JMLModifiers parseClass(TypeDeclaration td) {
-        var comments = getJMLComments(td);
-
         var pure = td.containsModifier(ModifierKind.JML_PURE);
         var strictlyPure = td.containsModifier(ModifierKind.JML_STRICTLY_PURE);
         var nullableByDefault = td.containsModifier(ModifierKind.JML_NULLABLE_BY_DEFAULT);

@@ -178,6 +178,7 @@ debug_statement: DEBUG expression;
 set_statement: SET (assignee=expression) EQUAL_SINGLE (value=expression) SEMI_TOPLEVEL;
 merge_point_statement:
   MERGE_POINT
+  (LPAREN expression RPAREN)?
   (MERGE_PROC (proc=STRING_LITERAL))?
   (mergeparamsspec)?
   SEMI_TOPLEVEL

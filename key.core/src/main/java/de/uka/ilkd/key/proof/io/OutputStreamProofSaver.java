@@ -150,7 +150,7 @@ public class OutputStreamProofSaver {
         CopyReferenceResolver.copyCachedGoals(proof, null, null, null);
         try (PrintWriter ps = new PrintWriter(out, true, StandardCharsets.UTF_8)) {
             final ProofOblInput po =
-                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+                proof.getServices().getProofRegistry().getProofOblInput(proof);
             LogicPrinter printer = createLogicPrinter(proof.getServices(), false);
 
             // profile

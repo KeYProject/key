@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -34,7 +35,7 @@ public class LoopVariantCondition implements VariableCondition {
     @Override
     public MatchResultInfo check(SchemaVariable var, SyntaxElement instCandidate,
             MatchResultInfo matchCond, LogicServices p_services) {
-        final var svInst = matchCond.getInstantiations();
+        final SVInstantiations svInst = (SVInstantiations) matchCond.getInstantiations();
         final var services = (Services) p_services;
 
         if (svInst.getInstantiation(variantSV) != null) {
@@ -42,7 +43,8 @@ public class LoopVariantCondition implements VariableCondition {
         }
 
         final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
-        final LoopSpecification loopSpec = services.getSpecificationRepository().getLoopSpec(loop);
+        final StatementBlock program = (StatementBlock) svInst.getContextInstantiation().program();
+        final LoopSpecification loopSpec = loop.getLoopInvariant(program);
 
         if (loopSpec == null) {
             return null;
@@ -55,7 +57,7 @@ public class LoopVariantCondition implements VariableCondition {
         }
 
         return matchCond.setInstantiations(//
-            ((SVInstantiations) svInst).add(variantSV, variant,
+            svInst.add(variantSV, variant,
                 services));
     }
 

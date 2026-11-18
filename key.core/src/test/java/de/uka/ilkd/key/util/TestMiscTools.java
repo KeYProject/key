@@ -24,8 +24,8 @@ import de.uka.ilkd.key.java.ast.statement.SetStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.nparser.KeyAst;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.speclang.JmlStatementSpec;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.njml.JmlFacade;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
@@ -211,9 +211,8 @@ public class TestMiscTools {
         var objKjt = services.getJavaInfo().getJavaLangObject();
         var io = new JmlIO(services).classType(objKjt).specMathMode(SpecMathMode.BIGINT);
         var value = io.translateTerm(stmt2.getParserContext().getValue());
-        services.getSpecificationRepository().addStatementSpec(stmt2,
-            new SpecificationRepository.JmlStatementSpec(pv,
-                ImmutableList.of(services.getTermBuilder().var(z), value)));
+        stmt2.setSpec(new JmlStatementSpec(pv,
+            ImmutableList.of(services.getTermBuilder().var(z), value)));
         var block = new StatementBlock(stmt1, stmt2);
         var outs = MiscTools.getLocalOuts(block, services);
         assertEquals(2, outs.size());

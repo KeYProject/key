@@ -319,8 +319,8 @@ public abstract class AbstractTestGenerator {
             new Choice("ban", "runtimeExceptions"));
         ProofStarter starter = SideProofUtil.createSideProof(env, newSequent, newName);
         Proof proof = starter.getProof();
-        proof.getServices().getSpecificationRepository().registerProof(
-            proof.getServices().getSpecificationRepository().getProofOblInput(oldProof), proof);
+        proof.getServices().getProofRegistry().registerProof(
+            proof.getServices().getProofRegistry().getProofOblInput(oldProof), proof);
         OneStepSimplifier.refreshOSS(proof);
         return proof;
     }

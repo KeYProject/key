@@ -1,8 +1,7 @@
 // verbose: true
 // broken: false
-// exceptionClass: BuildingException
-// msgContains: Model modifier on variable declaration detected, only model fields are allowed
-// position: 11/19
+// exceptionClass: ProofInputException
+// msgContains: Model field modelMethod is not allowed within methods
 
 class ModelFieldinMethod {
 
@@ -14,5 +13,3 @@ class ModelFieldinMethod {
     }
 }
 
-
-// Minssing position information :(

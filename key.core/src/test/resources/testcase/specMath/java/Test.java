@@ -1,6 +1,9 @@
 // This test uses method resolution to return BigIntMarker or IntMarker from the accept model method
 // Test failure is indicated by method resolution failing
-public /*@ spec_java_math @*/ class Test {
+// Class-level spec math mode pragma: drives the math mode for the whole class (in particular the
+// ghost field initializer Test.accept(1 + 2).isInt() resolves to accept(int) in JAVA mode).
+/*@ spec_java_math @*/
+public class Test {
 	public static class BigIntMarker {
 		public boolean isBigint() {
 			return true;

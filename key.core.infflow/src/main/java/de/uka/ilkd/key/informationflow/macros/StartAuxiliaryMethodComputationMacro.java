@@ -61,7 +61,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
             return false;
         }
         final Services services = proof.getServices();
-        ProofOblInput poForProof = services.getSpecificationRepository().getProofOblInput(proof);
+        ProofOblInput poForProof = services.getProofRegistry().getProofOblInput(proof);
         if (!(poForProof instanceof InfFlowContractPO po)) {
             return false;
         }
@@ -80,7 +80,7 @@ public class StartAuxiliaryMethodComputationMacro extends AbstractProofMacro
             throws Exception {
         final Services services = proof.getServices();
         final InfFlowContractPO po =
-            (InfFlowContractPO) services.getSpecificationRepository().getProofOblInput(proof);
+            (InfFlowContractPO) services.getProofRegistry().getProofOblInput(proof);
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 

@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.smt.communication.AbstractSolverSocket;
 import de.uka.ilkd.key.smt.communication.ExternalProcessLauncher;
 import de.uka.ilkd.key.smt.communication.SolverCommunication;
@@ -319,18 +318,17 @@ public final class SMTSolverImplementation implements SMTSolver, Runnable {
     private String[] translateToCommand(Sequent sequent) throws IllegalFormulaException {
         if (getType() == SolverTypes.Z3_CE_SOLVER) {
             Proof proof = problem.getGoal().proof();
-            SpecificationRepository specrep = proof.getServices().getSpecificationRepository();
 
             Proof originalProof = null;
-            for (Proof pr : specrep.getAllProofs()) {
+            for (Proof pr : proof.getServices().getProofRegistry().getAllProofs()) {
                 if (proof.name().toString().endsWith(pr.name().toString())) {
                     originalProof = pr;
                     break;
                 }
             }
 
-            KeYJavaType typeOfClassUnderTest =
-                specrep.getProofOblInput(originalProof).getContainerType();
+            KeYJavaType typeOfClassUnderTest = proof.getServices().getProofRegistry()
+                    .getProofOblInput(originalProof).getContainerType();
 
             SMTObjTranslator objTrans =
                 new SMTObjTranslator(smtSettings, services, typeOfClassUnderTest);

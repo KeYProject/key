@@ -21,6 +21,7 @@ import java.util.zip.ZipFile;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Assignment;
@@ -77,11 +78,14 @@ public final class MiscTools {
      * otherwise results in undefined behavior in that case.
      *
      * @param loopTerm The term for which to return the {@link LoopSpecification}.
+     * @param program The program to search for a structurally equal loop in case the loop in the
+     *        term itself carries no invariant (e.g. because it was freshly created by a rule); a
+     *        {@code null} value disables the search
      * @return The {@link LoopSpecification} for the loop statement in the given term or an empty
      *         optional if there is no specified invariant for the loop.
      */
     public static @Nullable LoopSpecification getSpecForTermWithLoopStmt(final JTerm loopTerm,
-            final Services services) {
+            final Statement program, final Services services) {
         assert loopTerm.op() instanceof JModality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
 
@@ -92,7 +96,7 @@ public final class MiscTools {
 
         final LoopStatement loop = (LoopStatement) pe.getFirstElement();
 
-        return services.getSpecificationRepository().getLoopSpec(loop);
+        return loop.getLoopInvariant(program);
     }
 
     /**
@@ -626,7 +630,7 @@ public final class MiscTools {
                     declaredPVs = declaredPVs.add(pv);
                 }
             } else if (node instanceof SetStatement s) {
-                var spec = services.getSpecificationRepository().getStatementSpec(s);
+                var spec = s.getSpec();
                 if (spec != null) {
                     var targetTerm = spec.getTerm(services, null, SetStatement.INDEX_TARGET);
                     if (targetTerm.op() instanceof LocationVariable lv) {

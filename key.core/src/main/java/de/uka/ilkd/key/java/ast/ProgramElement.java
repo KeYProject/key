@@ -6,9 +6,6 @@ package de.uka.ilkd.key.java.ast;
 
 
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-
-import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -25,12 +22,6 @@ public interface ProgramElement extends SourceElement, ModelElement {
      * @return the comments.
      */
     Comment[] getComments();
-
-    ///
-    default ImmutableList<TextualJMLConstruct> getAttachedJml() {
-        return ImmutableList.nil();
-    }
-
 
     /**
      * matches the source "text" (@link SourceData#getSource()) against the pattern represented by
