@@ -65,9 +65,9 @@ public class UniverseMethodContractAdder extends JavaTransformerAbstract {
                 params = cons.getParameters();
             }
 
-            AnnotationExpr returnAnnot = returnT != null 
-                ? filterAnnots(returnT.getAnnotations(), OWNERSHIP)
-                : null;
+            AnnotationExpr returnAnnot = returnT != null
+                    ? filterAnnots(returnT.getAnnotations(), OWNERSHIP)
+                    : null;
 
             List<TextualJMLConstruct> specList = TransformationPipelineServices.getSpec(it);
             for (TextualJMLConstruct spec : specList) {
