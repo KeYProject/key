@@ -48,7 +48,6 @@ public class UniverseMethodContractAdder extends JavaTransformerAbstract {
                 return;
 
             Type returnT = null;
-            AnnotationExpr returnAnnot = null;
             boolean isRepOnly = false;
             NodeList<Parameter> params = null;
 
@@ -57,7 +56,6 @@ public class UniverseMethodContractAdder extends JavaTransformerAbstract {
                 if (returnT.isVoidType())
                     returnT = null;
 
-                returnAnnot = filterAnnots(meth.getAnnotations(), OWNERSHIP);
                 isRepOnly = filterAnnots(meth.getAnnotations(), REPONLY) != null;
                 params = meth.getParameters();
             }
@@ -66,6 +64,10 @@ public class UniverseMethodContractAdder extends JavaTransformerAbstract {
                 isRepOnly = filterAnnots(cons.getAnnotations(), REPONLY) != null;
                 params = cons.getParameters();
             }
+
+            AnnotationExpr returnAnnot = returnT != null 
+                ? filterAnnots(returnT.getAnnotations(), OWNERSHIP)
+                : null;
 
             List<TextualJMLConstruct> specList = TransformationPipelineServices.getSpec(it);
             for (TextualJMLConstruct spec : specList) {
@@ -89,7 +91,7 @@ public class UniverseMethodContractAdder extends JavaTransformerAbstract {
                 }
 
                 for (Parameter param : params) {
-                    AnnotationExpr annot = filterAnnots(param.annotations(), OWNERSHIP);
+                    AnnotationExpr annot = filterAnnots(param.type().annotations(), OWNERSHIP);
                     if (annot == null)
                         continue;
 

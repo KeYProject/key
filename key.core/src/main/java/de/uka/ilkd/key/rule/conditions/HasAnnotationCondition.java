@@ -34,7 +34,9 @@ import org.key_project.util.collection.ImmutableList;
  */
 public final class HasAnnotationCondition extends VariableConditionAdapter {
     private static final Sort[] ALLOWED = {
-        ProgramSVSort.SIMPLE_NEW, ProgramSVSort.VARIABLE };
+        ProgramSVSort.SIMPLE_NEW,
+        ProgramSVSort.LOCALVARIABLE, ProgramSVSort.VARIABLE,
+    };
 
     private final SchemaVariable variable;
     private final String annot;
@@ -43,8 +45,8 @@ public final class HasAnnotationCondition extends VariableConditionAdapter {
      * create an instance of the variable condition.
      *
      * @param variable the variable whos {@link TypeReference} is to check for
-     *        {@link Annotation}s, which can be a `Variable`, a `SimpleInstanceCreation`
-     *        or a `Field`.
+     *        {@link Annotation}s, which can be a `Variable`, a `LocalVariable`,
+     *        a `SimpleInstanceCreation` or a `Field`.
      * @param annot the fully qualified name of the {@link Annotation} to check for.
      *
      * @throws IllegalArgumentException if <code>variable</code> is not supported.
