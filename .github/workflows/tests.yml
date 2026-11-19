@@ -70,6 +70,12 @@ jobs:
           # Gradle caching is provided by setup-gradle below; do not also set `cache: gradle`
           # here (double restore/save of the same paths, and the save fails on Windows).
 
+      # Cross-run cache sharing (see gradle.properties, org.gradle.caching): setup-gradle saves
+      # Gradle User Home incl. the local build cache to the Actions cache; only default-branch
+      # runs write, PR/merge-queue legs restore the nearest entry and compile only their delta.
+      # Sharing BETWEEN this run's parallel matrix legs is deliberately not attempted: they
+      # overlap in wall time and the critical leg compiles the delta first, so intra-run
+      # sharing cannot shorten the run. Verify effectiveness via the Setup Gradle job summary.
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
