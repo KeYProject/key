@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 public class MethodStackInfo implements NameCreationInfo {
@@ -30,7 +29,7 @@ public class MethodStackInfo implements NameCreationInfo {
     public ImmutableList<IProgramMethod> getMethodStack() {
         ImmutableList<IProgramMethod> list = ImmutableList.nil();
         if (element instanceof ProgramPrefix) {
-            final ImmutableArray<ProgramPrefix> prefix =
+            final ImmutableList<ProgramPrefix> prefix =
                 ((ProgramPrefix) element).getPrefixElements();
             for (int i = prefix.size() - 1; i >= 0; i--) {
                 if (prefix.get(i) instanceof MethodFrame frame) {

@@ -11,7 +11,8 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * Case.
@@ -27,7 +28,7 @@ public class Case extends BranchImp implements ExpressionContainer {
     /**
      * Body.
      */
-    protected final ImmutableArray<Statement> body;
+    protected final ImmutableListArray<Statement> body;
 
     /**
      * Case.
@@ -57,7 +58,7 @@ public class Case extends BranchImp implements ExpressionContainer {
      *        a statement mutable list.
      */
     public Case(Expression e, Statement[] body) {
-        this.body = new ImmutableArray<>(body);
+        this.body = ImmutableList.asArray(body);
         this.expression = e;
     }
 
@@ -77,14 +78,15 @@ public class Case extends BranchImp implements ExpressionContainer {
     public Case(ExtList children, Expression expr, PositionInfo pos) {
         super(children, pos);
         this.expression = expr;
-        this.body = new ImmutableArray<>(children.collect(Statement.class));
+        this.body =
+            ImmutableList.asArray(children.collect(Statement.class));
     }
 
-    public Case(Expression expr, ImmutableArray<Statement> body, PositionInfo pi,
+    public Case(Expression expr, ImmutableList<Statement> body, PositionInfo pi,
             List<Comment> comments) {
         super(pi, comments);
         this.expression = expr;
-        this.body = body;
+        this.body = ImmutableList.asArray(body);
     }
 
     /**
@@ -193,7 +195,7 @@ public class Case extends BranchImp implements ExpressionContainer {
      * The body may be empty (null), to define a fall-through. Attaching an {@link EmptyStatement}
      * would create a single ";".
      */
-    public ImmutableArray<Statement> getBody() {
+    public ImmutableList<Statement> getBody() {
         return body;
     }
 

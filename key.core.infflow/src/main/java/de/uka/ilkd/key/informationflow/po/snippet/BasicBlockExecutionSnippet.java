@@ -20,7 +20,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.AuxiliaryContractBuilders;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -99,7 +98,7 @@ class BasicBlockExecutionSnippet extends ReplaceAndRegisterMethod implements Fac
 
         // create block call
         final Label[] labelsArray = (Label[]) d.get(BasicSnippetData.Key.LABELS);
-        final ImmutableArray<Label> labels = new ImmutableArray<>(labelsArray);
+        final ImmutableList<Label> labels = ImmutableList.of(labelsArray);
         final AuxiliaryContract.Variables variables =
             (AuxiliaryContract.Variables) d.get(BasicSnippetData.Key.BLOCK_VARS);
         final StatementBlock block = (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);

@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Super constructor reference.
@@ -69,7 +69,7 @@ public class SuperConstructorReference extends SpecialConstructorReference
      *        an expression mutable list.
      */
     public SuperConstructorReference(ReferencePrefix accessPath,
-            ImmutableArray<Expression> arguments) {
+            ImmutableList<Expression> arguments) {
         super(arguments);
         this.prefix = accessPath;
     }
@@ -110,7 +110,7 @@ public class SuperConstructorReference extends SpecialConstructorReference
         this.prefix = accessPath;
     }
 
-    public SuperConstructorReference(ImmutableArray<Expression> arguments, PositionInfo pi,
+    public SuperConstructorReference(ImmutableList<Expression> arguments, PositionInfo pi,
             List<Comment> c) {
         super(arguments, pi, c);
         this.prefix = null;

@@ -17,8 +17,8 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     protected final ProgramElementName fullName;
 
-    protected final ImmutableArray<MemberDeclaration> members;
+    protected final ImmutableListArray<MemberDeclaration> members;
 
     protected final boolean parentIsInterfaceDeclaration;
 
@@ -60,14 +60,14 @@ public abstract class TypeDeclaration extends JavaDeclaration
 
     public TypeDeclaration(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray,
+            @NonNull ImmutableList<Modifier> modArray,
             ProgramElementName name, ProgramElementName fullName,
-            ImmutableArray<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
+            ImmutableList<MemberDeclaration> members, boolean parentIsInterfaceDeclaration,
             boolean isLibrary, ImmutableList<TextualJMLConstruct> jmlAttachments) {
         super(pi, comments, modArray, jmlAttachments);
         this.name = name;
         this.fullName = fullName;
-        this.members = members;
+        this.members = ImmutableList.asArray(members);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
         this.isLibrary = isLibrary;
         this.jmlModifiers = JMLInfoExtractor.parseClass(this);
@@ -95,7 +95,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
         super(mods);
         this.name = name;
         this.fullName = fullName;
-        this.members = new ImmutableArray<>(members);
+        this.members = ImmutableList.asArray(members);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
         this.isLibrary = isLibrary;
         this.jmlModifiers = JMLInfoExtractor.parseClass(this);
@@ -112,7 +112,9 @@ public abstract class TypeDeclaration extends JavaDeclaration
         super(children);
         this.name = name;
         this.fullName = fullName;
-        this.members = new ImmutableArray<>(children.collect(MemberDeclaration.class));
+        this.members =
+            ImmutableList
+                    .asArray(children.collect(MemberDeclaration.class));
         ParentIsInterfaceDeclaration piid = children.get(ParentIsInterfaceDeclaration.class);
         if (piid != null) {
             this.parentIsInterfaceDeclaration = (piid).getValue();
@@ -183,7 +185,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
      *
      * @return the member declaration array.
      */
-    public ImmutableArray<MemberDeclaration> getMembers() {
+    public ImmutableList<MemberDeclaration> getMembers() {
         return members;
     }
 
@@ -302,7 +304,7 @@ public abstract class TypeDeclaration extends JavaDeclaration
     }
 
     @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
+    public @NonNull ImmutableList<Modifier> getModifiers() {
         return modArray;
     }
 

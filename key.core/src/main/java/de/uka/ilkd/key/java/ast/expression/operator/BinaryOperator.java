@@ -22,7 +22,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 public final class BinaryOperator extends Operator
         implements ProgramElementWithKind<BinaryOperatorKind> {
@@ -43,7 +43,7 @@ public final class BinaryOperator extends Operator
     public BinaryOperator(PositionInfo pi, List<Comment> c,
             BinaryOperatorKind kind, Expression lhs, Expression rhs) {
         super(pi, c,
-            new ImmutableArray<>(Objects.requireNonNull(lhs), Objects.requireNonNull(rhs)));
+            ImmutableList.of(Objects.requireNonNull(lhs), Objects.requireNonNull(rhs)));
         this.kind = Objects.requireNonNull(kind);
         assert getChildCount() == 2;
     }

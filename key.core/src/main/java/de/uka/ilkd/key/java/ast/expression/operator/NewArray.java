@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The array allocation operator. There are two variants for NewArray:
@@ -99,7 +99,7 @@ public class NewArray extends TypeOperator implements Reference, ReferencePrefix
         assert dimensions > 0;
     }
 
-    public NewArray(PositionInfo pi, List<Comment> c, ImmutableArray<Expression> children,
+    public NewArray(PositionInfo pi, List<Comment> c, ImmutableList<Expression> children,
             TypeReference type, KeYJavaType keyJavaType, int dimensions, ArrayInitializer ai) {
         super(pi, c, children, type);
         this.keyJavaType = keyJavaType;

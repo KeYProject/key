@@ -13,19 +13,20 @@ import de.uka.ilkd.key.java.ast.StatementContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 public class LoopInit extends JavaNonTerminalProgramElement
         implements StatementContainer, ILoopInit {
 
-    final ImmutableArray<LoopInitializer> inits;
+    final ImmutableListArray<LoopInitializer> inits;
 
-    public LoopInit(ImmutableArray<LoopInitializer> exprarr) {
-        inits = exprarr;
+    public LoopInit(ImmutableList<LoopInitializer> exprarr) {
+        inits = ImmutableList.asArray(exprarr);
     }
 
     public LoopInit(LoopInitializer[] exprarr) {
-        inits = new ImmutableArray<>(exprarr);
+        inits = ImmutableList.asArray(exprarr);
     }
 
     public LoopInit(ExtList ups, PositionInfo pos) {
@@ -34,7 +35,7 @@ public class LoopInit extends JavaNonTerminalProgramElement
         for (int i = 0; i < exps.length; i++) {
             exps[i] = (LoopInitializer) ups.get(i);
         }
-        inits = new ImmutableArray<>(exps);
+        inits = ImmutableList.asArray(exps);
     }
 
 
@@ -64,7 +65,7 @@ public class LoopInit extends JavaNonTerminalProgramElement
         return getStatementCount();
     }
 
-    public ImmutableArray<LoopInitializer> getInits() {
+    public ImmutableList<LoopInitializer> getInits() {
         return inits;
     }
 

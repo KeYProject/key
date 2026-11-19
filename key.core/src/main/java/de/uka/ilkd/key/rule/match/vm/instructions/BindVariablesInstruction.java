@@ -16,7 +16,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.prover.rules.matcher.vm.instruction.MatchInstruction;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Opens a binding scope for a term with bound variables (a quantifier, a substitution, ...): it
@@ -30,7 +30,7 @@ public class BindVariablesInstruction implements MatchInstruction {
 
     private final VariableBinderSubinstruction[] boundVarBinders;
 
-    public BindVariablesInstruction(ImmutableArray<QuantifiableVariable> boundVars) {
+    public BindVariablesInstruction(ImmutableList<QuantifiableVariable> boundVars) {
         boundVarBinders = new VariableBinderSubinstruction[boundVars.size()];
         int i = 0;
         for (QuantifiableVariable boundVar : boundVars) {
@@ -106,7 +106,7 @@ public class BindVariablesInstruction implements MatchInstruction {
     public MatchResultInfo match(SyntaxElement actualElement, MatchResultInfo matchResult,
             LogicServices services) {
         MatchConditions matchConditions = (MatchConditions) matchResult;
-        final ImmutableArray<QuantifiableVariable> variablesToMatchAndBind =
+        final ImmutableList<QuantifiableVariable> variablesToMatchAndBind =
             ((JTerm) actualElement).boundVars();
         matchConditions = matchConditions.extendRenameTable();
         if (variablesToMatchAndBind.size() == boundVarBinders.length) {

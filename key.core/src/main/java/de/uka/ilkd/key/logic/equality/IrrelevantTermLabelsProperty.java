@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.util.EqualityUtils;
 
 import org.key_project.logic.Property;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A property that can be used in
@@ -49,8 +49,7 @@ public class IrrelevantTermLabelsProperty implements Property<JTerm> {
      * @see TermLabel#isProofRelevant() isStrategyRelevant
      */
     @Override
-    // Varargs parameter cannot be made safe; uses deprecated ImmutableArray via JTerm API.
-    @SuppressWarnings({ "unchecked", "deprecation" })
+    @SuppressWarnings("unchecked") // the vararg value is never read, so no heap pollution occurs
     public <V> boolean equalsModThisProperty(JTerm term1, JTerm term2, V... v) {
         if (term2 == term1) {
             return true;
@@ -61,8 +60,8 @@ public class IrrelevantTermLabelsProperty implements Property<JTerm> {
             return false;
         }
 
-        final ImmutableArray<TermLabel> term1Labels = term1.getLabels();
-        final ImmutableArray<TermLabel> term2Labels = term2.getLabels();
+        final ImmutableList<TermLabel> term1Labels = term1.getLabels();
+        final ImmutableList<TermLabel> term2Labels = term2.getLabels();
         for (TermLabel label : term1Labels) {
             if (label.isProofRelevant() && !term2Labels.contains(label)) {
                 return false;
@@ -74,8 +73,8 @@ public class IrrelevantTermLabelsProperty implements Property<JTerm> {
             }
         }
 
-        final ImmutableArray<JTerm> termSubs = term1.subs();
-        final ImmutableArray<JTerm> term2Subs = term2.subs();
+        final ImmutableList<JTerm> termSubs = term1.subs();
+        final ImmutableList<JTerm> term2Subs = term2.subs();
         final int numOfSubs = termSubs.size();
         for (int i = 0; i < numOfSubs; ++i) {
             if (!termSubs.get(i).equalsModProperty(term2Subs.get(i),
@@ -102,7 +101,7 @@ public class IrrelevantTermLabelsProperty implements Property<JTerm> {
         hashcode = hashcode * 17 + term.boundVars().hashCode();
         hashcode = hashcode * 17 + term.javaBlock().hashCode();
 
-        final ImmutableArray<TermLabel> labels = term.getLabels();
+        final ImmutableList<TermLabel> labels = term.getLabels();
         for (int i = 0, sz = labels.size(); i < sz; i++) {
             final TermLabel currentLabel = labels.get(i);
             if (currentLabel.isProofRelevant()) {

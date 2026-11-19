@@ -411,6 +411,9 @@ abstract class ImmutableSLList<T extends @Nullable Object> implements ImmutableL
 
         @Override
         public S get(int idx) {
+            if (idx < 0 || idx >= size()) {
+                throw new IndexOutOfBoundsException("Index: " + idx + ", Size: " + size());
+            }
             return skip(idx).head();
         }
 
@@ -611,7 +614,7 @@ abstract class ImmutableSLList<T extends @Nullable Object> implements ImmutableL
 
         @Override
         public S get(int idx) {
-            throw new NoSuchElementException("No element in NIL()");
+            throw new IndexOutOfBoundsException("Index: " + idx + ", Size: 0");
         }
 
         @Override

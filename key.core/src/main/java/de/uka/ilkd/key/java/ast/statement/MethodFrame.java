@@ -16,7 +16,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.util.Debug;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * The statement inserted by KeY if a method call is executed.
@@ -147,7 +147,7 @@ public class MethodFrame extends JavaStatement
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+    public ImmutableList<ProgramPrefix> getPrefixElements() {
         return StatementBlock.computePrefixElements(body.getBody(), this);
     }
 

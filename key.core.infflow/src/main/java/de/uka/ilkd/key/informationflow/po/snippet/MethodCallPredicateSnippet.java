@@ -11,7 +11,6 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 
@@ -36,7 +35,7 @@ class MethodCallPredicateSnippet extends TwoStateMethodPredicateSnippet {
             IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
-        ImmutableArray<Sort> pmSorts = pm.argSorts();
+        ImmutableList<Sort> pmSorts = pm.argSorts();
 
         int i = 0;
         for (final JTerm arg : termList) {

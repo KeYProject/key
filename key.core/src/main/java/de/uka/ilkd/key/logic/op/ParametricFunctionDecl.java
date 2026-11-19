@@ -11,8 +11,8 @@ import org.key_project.logic.Name;
 import org.key_project.logic.Named;
 import org.key_project.logic.Sorted;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -24,22 +24,22 @@ import org.jspecify.annotations.Nullable;
 public final class ParametricFunctionDecl implements Named, Sorted, HasMetaSpaceKey {
     private final Name name;
     private final ImmutableList<GenericParameter> parameters;
-    private final ImmutableArray<Sort> argSorts;
+    private final ImmutableListArray<Sort> argSorts;
     private final Sort sort;
-    private final @Nullable ImmutableArray<Boolean> whereToBind;
+    private final @Nullable ImmutableListArray<Boolean> whereToBind;
     private final boolean unique;
     private final boolean isRigid;
     private final boolean isSkolemConstant;
 
     public ParametricFunctionDecl(Name name, ImmutableList<GenericParameter> parameters,
-            ImmutableArray<Sort> argSorts, Sort sort,
-            @Nullable ImmutableArray<Boolean> whereToBind, boolean unique, boolean isRigid,
+            ImmutableList<Sort> argSorts, Sort sort,
+            @Nullable ImmutableList<Boolean> whereToBind, boolean unique, boolean isRigid,
             boolean isSkolemConstant) {
         this.name = name;
         this.parameters = parameters;
-        this.argSorts = argSorts;
+        this.argSorts = ImmutableList.asArray(argSorts);
         this.sort = sort;
-        this.whereToBind = whereToBind;
+        this.whereToBind = whereToBind == null ? null : ImmutableList.asArray(whereToBind);
         this.unique = unique;
         this.isRigid = isRigid;
         this.isSkolemConstant = isSkolemConstant;
@@ -56,11 +56,11 @@ public final class ParametricFunctionDecl implements Named, Sorted, HasMetaSpace
         return sort;
     }
 
-    public ImmutableArray<Sort> argSorts() {
+    public ImmutableList<Sort> argSorts() {
         return argSorts;
     }
 
-    public @Nullable ImmutableArray<Boolean> getWhereToBind() {
+    public @Nullable ImmutableList<Boolean> getWhereToBind() {
         return whereToBind;
     }
 

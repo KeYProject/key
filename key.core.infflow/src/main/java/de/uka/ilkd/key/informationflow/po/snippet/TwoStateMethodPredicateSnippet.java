@@ -53,7 +53,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
             IProgramMethod pm) {
 
         Sort[] argSorts = new Sort[termList.size()];
-        // ImmutableArray<Sort> pmSorts = pm.argSorts();
+        // ImmutableList<Sort> pmSorts = pm.argSorts();
 
         int i = 0;
         for (final JTerm arg : termList) {

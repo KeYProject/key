@@ -18,7 +18,7 @@ import de.uka.ilkd.key.smt.newsmt2.SMTHandlerProperty.EnumProperty;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * @author Rosa Abbasi, Jonas Schiffl, Mattias Ulbrich
@@ -162,7 +162,7 @@ public class FloatHandler implements SMTHandler {
             Sort sort = term.sort();
             Type exprType = getType(sort);
 
-            ImmutableArray<? extends Term> subs = term.subs();
+            ImmutableList<? extends Term> subs = term.subs();
 
             List<SExpr> translatedSubs = new LinkedList<>();
 

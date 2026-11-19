@@ -33,7 +33,6 @@ import de.uka.ilkd.key.util.MiscTools;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.UpdateableOperator;
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -108,7 +107,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     @Override
     protected void walk(ProgramElement node) {
         if (node instanceof LocalVariableDeclaration vd && replaceallbynew) {
-            ImmutableArray<VariableSpecification> vspecs = vd.getVariableSpecifications();
+            ImmutableList<VariableSpecification> vspecs = vd.getVariableSpecifications();
             for (int i = 0; i < vspecs.size(); i++) {
                 var pv = (LocationVariable) vspecs.get(i).getProgramVariable();
                 if (!replaceMap.containsKey(pv)) {

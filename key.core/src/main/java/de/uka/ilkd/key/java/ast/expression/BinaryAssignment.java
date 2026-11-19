@@ -20,7 +20,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -76,7 +76,7 @@ public final class BinaryAssignment extends Operator
     public BinaryAssignment(PositionInfo pi, List<Comment> c, BinaryAssignmentKind kind,
             Expression target,
             Expression expr) {
-        super(pi, c, new ImmutableArray<>(target, expr));
+        super(pi, c, ImmutableList.of(target, expr));
         this.kind = Objects.requireNonNull(kind);
     }
 

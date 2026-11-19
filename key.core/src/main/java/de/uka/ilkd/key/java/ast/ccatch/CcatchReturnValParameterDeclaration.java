@@ -13,7 +13,7 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.rule.MatchConditions;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * A "\Return int v" parameter declaration of a ccatch clause.
@@ -44,7 +44,7 @@ public class CcatchReturnValParameterDeclaration extends CcatchNonstandardParame
         return delegate.getVariableSpecification();
     }
 
-    public ImmutableArray<VariableSpecification> getVariables() {
+    public ImmutableList<VariableSpecification> getVariables() {
         return delegate.getVariables();
     }
 
