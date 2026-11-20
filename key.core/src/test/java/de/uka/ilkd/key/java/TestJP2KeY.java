@@ -12,6 +12,8 @@ import java.util.stream.Stream;
 
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Operator;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -108,7 +110,14 @@ public class TestJP2KeY {
         " class circ2_A {   static final int a = circ2_B.b;   } " +
             "class circ2_B {   static final int b = circ2_A.a;   }",
         "class Cycle1 { void m(Cycle2 c) {} } class Cycle2 { void m(Cycle1 c) {} }",
-        "class EmptyConstr { EmptyConstr(); } "
+        "class EmptyConstr { EmptyConstr(); } ",
+        """
+                class MultiDecl {
+                    int a = 3, b = a + 1;
+                    static int A = 3, B = A + 1;
+                    void m() { int x = 3, y = x + 1; }
+                }
+                """
     };
 
     /**
@@ -138,6 +147,16 @@ public class TestJP2KeY {
             (ProgramVariable) ((Operator) ((StatementBlock) block.program()).getStatementAt(0))
                     .getChildAt(0);
         assertSame(prgVarCmp, pv, "ProgramVariables should be the same ones.");
+    }
+
+    @Test
+    public void testReferenceToEarlierVariableInSameDeclaration() {
+        JavaBlock block = c2k.readBlockWithEmptyContext("{ int a = 3, b = a; }", null);
+        LocalVariableDeclaration decl =
+            (LocalVariableDeclaration) ((StatementBlock) block.program()).getStatementAt(0);
+        VariableSpecification a = decl.getVariables().get(0);
+        VariableSpecification b = decl.getVariables().get(1);
+        assertSame(a.getProgramVariable(), b.getInitializer());
     }
 
     /**

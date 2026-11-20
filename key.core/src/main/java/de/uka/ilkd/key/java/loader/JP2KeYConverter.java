@@ -1177,16 +1177,26 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
 
         Node ast = target.toAst().get();
-        // Make sure the field is already converted
-        VariableDeclaration tmp = (VariableDeclaration) mapping.nodeToKeY(ast);
-        VariableDeclaration other = tmp == null ? accept(ast) : tmp;
+        VariableDeclarator decl = null;
+        if (target instanceof JavaParserFieldDeclaration field) {
+            decl = field.getVariableDeclarator();
+        } else if (target instanceof JavaParserVariableDeclaration localVar) {
+            decl = localVar.getVariableDeclarator();
+        } ;
+        VariableDeclaration other = null;
+        // The declarator of an earlier declared variable is already present if
+        // referencing a later initializer of the same declaration. In that case
+        // we must not revisit the declaration itself.
+        if (decl == null || mapping.nodeToKeY(decl) == null) {
+            VariableDeclaration tmp = (VariableDeclaration) mapping.nodeToKeY(ast);
+            other = tmp == null ? accept(ast) : tmp;
+        }
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        if (target instanceof JavaParserFieldDeclaration) {
+        if (target instanceof JavaParserFieldDeclaration f) {
             // Field declarations can have multiple variables
-            VariableDeclarator decl = ((JavaParserFieldDeclaration) target).getVariableDeclarator();
-            VariableSpecification keyDecl =
-                (VariableSpecification) Objects.requireNonNull(mapping.nodeToKeY(decl));
+            VariableSpecification keyDecl = (VariableSpecification) Objects
+                    .requireNonNull(mapping.nodeToKeY(f.getVariableDeclarator()));
             ProgramVariable pv = (ProgramVariable) keyDecl.getProgramVariable();
             if (pv.isMember()) {
                 // TODO javaparser prefix null? should we add default this?
@@ -1195,15 +1205,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             // This seems to happen when we create a fake field in JavaService::createContext
             return pv;
         }
-        if (target instanceof JavaParserVariableDeclaration) {
+        if (target instanceof JavaParserVariableDeclaration v) {
             // Variable declarations can have multiple variables
-            VariableDeclarator decl =
-                ((JavaParserVariableDeclaration) target).getVariableDeclarator();
-            VariableSpecification keyDecl =
-                (VariableSpecification) Objects.requireNonNull(mapping.nodeToKeY(decl));
+            VariableSpecification keyDecl = (VariableSpecification) Objects
+                    .requireNonNull(mapping.nodeToKeY(v.getVariableDeclarator()));
             return keyDecl.getProgramVariable();
         }
-        if (other.getVariables().size() == 1) {
+        if (other != null && other.getVariables().size() == 1) {
             IProgramVariable var = other.getVariables().get(0).getProgramVariable();
             if (other instanceof de.uka.ilkd.key.java.ast.declaration.FieldDeclaration) {
                 if (var instanceof ProgramVariable pv) {
