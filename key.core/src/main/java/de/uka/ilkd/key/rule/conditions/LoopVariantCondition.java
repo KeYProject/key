@@ -26,6 +26,13 @@ public class LoopVariantCondition implements VariableCondition {
     private final SchemaVariable loopStmtSV;
     private final SchemaVariable variantSV;
 
+    /**
+     * Instantiates a new loop-variant condition.
+     *
+     * @param loopStmtSV the program schema variable which must be instantiated with a loop
+     *        statement
+     * @param variantSV the schema variable to which the loop variant is bound
+     */
     public LoopVariantCondition(ProgramSV loopStmtSV, SchemaVariable variantSV) {
         this.loopStmtSV = loopStmtSV;
         this.variantSV = variantSV;

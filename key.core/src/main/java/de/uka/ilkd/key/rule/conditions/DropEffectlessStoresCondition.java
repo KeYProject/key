@@ -23,6 +23,13 @@ import org.key_project.prover.rules.instantiation.MatchResultInfo;
 import org.key_project.util.collection.Pair;
 
 
+/**
+ * A variable condition for the taclet construct {@code \dropEffectlessStores}: it removes all
+ * {@code store} operations from a heap term that are overwritten by later {@code store} operations
+ * on the same location, and binds the simplified heap to a result schema variable.
+ *
+ * @author Michael Kirsten
+ */
 public final class DropEffectlessStoresCondition implements VariableCondition {
     private final TermSV h;
     private final TermSV o;
@@ -30,6 +37,16 @@ public final class DropEffectlessStoresCondition implements VariableCondition {
     private final TermSV x;
     private final TermSV result;
 
+    /**
+     * Instantiates a new drop-effectless-stores condition.
+     *
+     * @param h the term schema variable for the heap on which the store operation is performed
+     * @param o the term schema variable for the object of the store operation
+     * @param f the term schema variable for the field of the store operation
+     * @param x the term schema variable for the value written by the store operation
+     * @param result the term schema variable to which the heap with all effectless stores removed
+     *        is bound
+     */
     public DropEffectlessStoresCondition(TermSV h, TermSV o, TermSV f, TermSV x, TermSV result) {
         this.h = h;
         this.o = o;
