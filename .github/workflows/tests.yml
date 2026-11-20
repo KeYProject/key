@@ -29,7 +29,7 @@ jobs:
           keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
           key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
           key.util, key.core.example, keyext.caching, key.core.wd, key.core.infflow,
-          keyext.proofmanagement]
+          keyext.proofmanagement, keyext.llm]
     continue-on-error: true
     runs-on: ${{ matrix.os }}
     env:

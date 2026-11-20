@@ -50,7 +50,22 @@ public class SimpleSettingsPanel extends JPanel {
     private static final IconProvider HELP_ICON =
         new IconFontProvider(FontAwesomeSolid.QUESTION_CIRCLE, Color.black, Color.white);
 
-    protected final Box pNorth = new Box(BoxLayout.Y_AXIS);
+    protected final Box pNorth = new Box(BoxLayout.Y_AXIS) {
+        @Override
+        public Dimension getMinimumSize() {
+            // A long single-line header must not dictate the panel's minimum width: it is
+            // stretched to the panel width by the surrounding BorderLayout and clipped there,
+            // so it contributes nothing to the width (the center pane governs the width).
+            return new Dimension(0, super.getMinimumSize().height);
+        }
+
+        @Override
+        public Dimension getPreferredSize() {
+            var d = super.getPreferredSize();
+            d.width = Math.min(d.width, 600);
+            return d;
+        }
+    };
     protected final JPanel pCenter = new JPanel();
     protected final JLabel lblHead = new JLabel();
     protected final JLabel lblSubhead = new JLabel();
@@ -68,7 +83,9 @@ public class SimpleSettingsPanel extends JPanel {
         pNorth.add(new JSeparator());
         add(pNorth, BorderLayout.NORTH);
         JScrollPane scrollPane = new JScrollPane(pCenter);
-        scrollPane.getHorizontalScrollBar().setUnitIncrement(10);
+        // The settings panels must never scroll horizontally: a too-wide content would be
+        // clipped; the panels keep their content shrinkable (wrapping texts, minWidth 0).
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(10);
         add(scrollPane, BorderLayout.CENTER);
     }
