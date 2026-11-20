@@ -1284,6 +1284,17 @@ public final class JmlTermFactory {
             }
         }
 
+        if (symbol == null) {
+            // Lazy symbol registration for lambda-application escapes such as
+            // \dl_wp_apply (Csiky, ch. 5): the predicate is created on first use, so a
+            // JML contract may contain \dl_wp_apply(this, arg) without a pre-declared
+            // JavaDL symbol. The predicate is created as wp_apply(Heap, <arg sorts>);
+            // the shared term-building code below automatically injects the base heap.
+            // Only a fixed set of names is registered dynamically so that misspelled
+            // \dl_ escapes still fail loudly instead of silently becoming new symbols.
+            symbol = createDlEscapeOnDemand(functName, list);
+        }
+
         if (symbol != null) {
             // Function or predicate symbol found
 
@@ -1345,6 +1356,55 @@ public final class JmlTermFactory {
         } catch (TermCreationException ex) {
             throw exc.createException0("Cannot create term " + pv.name(), ex);
         }
+    }
+
+    /**
+     * Creates JavaDL predicate symbols for {@code \dl_} escapes on first use.
+     * <p>
+     * Currently only {@code wp_apply} (weakest precondition of calling the functional
+     * method of a lambda, Csiky bachelor thesis ch. 5) is registered this way: the
+     * predicate {@code wp_apply(Heap, <sorts of the arguments>)} is created with the
+     * concrete argument sorts (e.g. {@code wp_apply(Heap, IntFunction, int)}) and added
+     * to the functions namespace. The usual {@code \dl_} translation then resolves it
+     * and injects the base heap automatically.
+     * <p>
+     * Note: the signature is derived from the *first* use. If one model needs
+     * {@code wp_apply} with several different functional interface sorts, the schema
+     * below must be extended to per-interface predicates (e.g. {@code wp_apply::<Sort>})
+     * -- this is deferred until the pipeline integration needs it.
+     *
+     * @param functName the name after the {@code \dl_} prefix (e.g. {@code wp_apply})
+     * @param list the argument expressions, or {@code null}
+     * @return the newly created predicate, or {@code null} if {@code functName} is not
+     *         eligible for on-demand registration
+     */
+    private @Nullable Named createDlEscapeOnDemand(String functName,
+            ImmutableList<SLExpression> list) {
+        if (!"wp_apply".equals(functName)) {
+            return null;
+        }
+        if (list == null) {
+            list = ImmutableList.nil();
+        }
+        Namespace<Function> funcs = services.getNamespaces().functions();
+        // Re-check: a symbol may have been registered concurrently (e.g. by the taclet
+        // parser when a matching rule file is loaded alongside).
+        Named symbol = funcs.lookup(new Name(functName));
+        if (symbol != null) {
+            return symbol;
+        }
+
+        Sort[] argSorts = new Sort[list.size() + 1];
+        argSorts[0] = tb.getBaseHeap().sort();
+        int i = 1;
+        for (SLExpression expr : list) {
+            KeYJavaType type = expr.getType();
+            argSorts[i++] = type == null ? JavaDLTheory.ANY : type.getSort();
+        }
+        final Function wpPredicate =
+            new JFunction(new Name(functName), JavaDLTheory.FORMULA, argSorts);
+        funcs.add(wpPredicate);
+        return wpPredicate;
     }
 
 
