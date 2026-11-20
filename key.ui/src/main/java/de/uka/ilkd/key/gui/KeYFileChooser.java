@@ -12,9 +12,10 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.java.IOUtil;
+
 
 /**
  * Extends the usual Swing file chooser by a bookmark panel and predefined filters. This class is a
@@ -93,8 +94,6 @@ public final class KeYFileChooser extends JFileChooser {
 
     /** The Constant for the home directory. */
     private final static File HOME_DIR = IOUtil.getHomeDirectory();
-
-    private static KeYFileChooser INSTANCE;
 
     /** indicates whether the dialog is used for saving or loading */
     private boolean saveDialog;
@@ -298,28 +297,30 @@ public final class KeYFileChooser extends JFileChooser {
             JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, null, null);
     }
 
+    /// Gets a fresh file chooser for the prover.
+    /// It points to the directory given by `initDir`.
+    ///
+    /// @param title the title of the key file chooser
+    /// @param initDir the folder to start the selection process
+    ///
+    /// @return the key file chooser
+    public static KeYFileChooser getFileChooser(String title, File initDir) {
+        var fc = new KeYFileChooser(initDir);
+        fc.setDialogTitle(title);
+        fc.prepare();
+        return fc;
+    }
+
     /**
-     * Gets <b>the</b> file chooser for the prover.
-     *
-     * The chooser is created lazily when first requested. It points to the directory of the command
-     * line argument (if present), otherwise to the user's home directory.
+     * Convenience overload of {@link #getFileChooser(String, File)} that starts from the last used
+     * path remembered in the settings instead of an explicit start folder.
      *
      * @param title the title of the key file chooser
-     *
-     * @return the key file chooser
+     * @return the key file chooser, as described in {@link #getFileChooser(String, File)}
+     * @see #getFileChooser(String, File)
      */
     public static KeYFileChooser getFileChooser(String title) {
-        if (INSTANCE == null) {
-            File initDir = Main.getWorkingDir().toFile();
-            INSTANCE = new KeYFileChooser(initDir);
-
-            // not the best design probably: this constructor has the side effect of connecting
-            // the new bookmark panel to the file chooser.
-            INSTANCE.addBookmarkPanel();
-        }
-
-        INSTANCE.setDialogTitle(title);
-        INSTANCE.prepare();
-        return INSTANCE;
+        return getFileChooser(title,
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().getLastUsedPath());
     }
 }
