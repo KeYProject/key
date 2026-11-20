@@ -1683,7 +1683,7 @@ public class ExpressionBuilder extends DefaultBuilder {
         }
 
         // weigl: I am unsure if this is wise.
-        Sort sortId = defaultOnException(null, () -> accept(ctx.sortId()));
+        String sortId = defaultOnException(null, () -> accept(ctx.simple_ident_dots()));
         String firstName = accept(ctx.simple_ident());
 
         ImmutableList<QuantifiableVariable> boundVars = null;
@@ -1712,8 +1712,7 @@ public class ExpressionBuilder extends DefaultBuilder {
             op = UpdateJunctor.SKIP;
         } else if (firstName.endsWith(LIMIT_SUFFIX)) {
             firstName = firstName.substring(0, firstName.length() - 5);
-            op = lookupVarfuncId(ctx, sortId.name().toString() + "::" + firstName,
-                null);
+            op = lookupVarfuncId(ctx, sortId + "::" + firstName, null);
             if (ObserverFunction.class.isAssignableFrom(op.getClass())) {
                 op = getServices().getSpecificationRepository()
                         .limitObs((ObserverFunction) op).first;
@@ -1721,8 +1720,8 @@ public class ExpressionBuilder extends DefaultBuilder {
                 semanticError(ctx, "Cannot can be limited: " + op);
             }
         } else {
-            if (ctx.sortId() != null) {
-                firstName = ctx.sortId().getText() + "::" + firstName;
+            if (ctx.simple_ident_dots() != null) {
+                firstName = ctx.simple_ident_dots().getText() + "::" + firstName;
             }
             op = lookupVarfuncId(ctx, firstName,
                 genericArgsCtxt);
