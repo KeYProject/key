@@ -144,16 +144,20 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 tacletInfo.ifDirectFormulaList = tacletInfo.ifDirectFormulaList.append(str);
             }
             case KeY_USER -> { // UserLog
-                if (proof.userLog == null) {
-                    proof.userLog = new ArrayList<>();
+                if (proof != null) {
+                    if (proof.userLog == null) {
+                        proof.userLog = new ArrayList<>();
+                    }
+                    proof.userLog.add(str);
                 }
-                proof.userLog.add(str);
             }
             case KeY_VERSION -> { // Version log
-                if (proof.keyVersionLog == null) {
-                    proof.keyVersionLog = new ArrayList<>();
+                if (proof != null) {
+                    if (proof.keyVersionLog == null) {
+                        proof.keyVersionLog = new ArrayList<>();
+                    }
+                    proof.keyVersionLog.add(str);
                 }
-                proof.keyVersionLog.add(str);
             }
             case KeY_SETTINGS -> // ProofSettings
                 loadPreferences(str);
@@ -186,9 +190,13 @@ public class IntermediatePresentationProofFileParser implements IProofFileParser
                 }
             }
             case AUTOMODE_TIME -> {
-                try {
-                    proof.addAutoModeTime(Long.parseLong(str));
-                } catch (NumberFormatException ignore) {
+                // the proof may be null when the parser is used to inspect a stored proof
+                // without an interactive proof loaded (see ProofReapplicationView)
+                if (proof != null) {
+                    try {
+                        proof.addAutoModeTime(Long.parseLong(str));
+                    } catch (NumberFormatException ignore) {
+                    }
                 }
             }
             case MERGE_PROCEDURE -> // merge procedure
