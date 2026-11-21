@@ -42,27 +42,6 @@ lexer grammar KeYLexer;
     private Token tokenBackStorage = null;
     @Override
     public void emit(Token token) {
-       int MAX_K = 10;
-       if (token.getType() == INT_LITERAL) {//rewrite INT_LITERALs to identifier when preceded by an '('
-           // fast path: no whitespace in between
-           // NBSP (U+00A0) is intentionally not treated as whitespace here: the
-           // original loop used Character.isWhitespace, which also excludes it.
-           int next = _input.LA(1);
-           if (next == '(') {
-               ((org.antlr.v4.runtime.CommonToken) token).setType(IDENT);
-           } else {
-               boolean blank = next == ' ' || next == '\t' || next == '\n' || next == '\r'
-                       || Character.isWhitespace(next);
-               if (blank) {
-                   for (int k = 2; k <= MAX_K; k++) {
-                       int codePoint = _input.LA(k);
-                       if (Character.isWhitespace(codePoint)) continue;
-                       if (codePoint == '(') ((org.antlr.v4.runtime.CommonToken) token).setType(IDENT);
-                       break;
-                   }
-               }
-           }
-       }
        if(token.getType() == PROOF) {
           tokenBackStorage = super.emitEOF();
           //will later be overwritten the EOF token

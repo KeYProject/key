@@ -12,8 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Pins exact lexer equivalence properties of the KeY grammar: backslash escapes inside
- * modality-body strings survive lexing, and the {@code emit()} INT_LITERAL retype rules around
- * NBSP.
+ * modality-body strings survive lexing, and the lexer does not retype numerals.
  */
 class LexerEquivalenceTest {
 
@@ -39,9 +38,9 @@ class LexerEquivalenceTest {
     }
 
     @Test
-    void intFollowedByParenIsRetypedToIdent() {
+    void intFollowedByParenKeepsItsType() {
         Token first = tokenAt("(123(", 1);
-        assertThat(first.getType()).isEqualTo(JavaKeYLexer.IDENT);
+        assertThat(first.getType()).isEqualTo(JavaKeYLexer.INT_LITERAL);
     }
 
     @Test

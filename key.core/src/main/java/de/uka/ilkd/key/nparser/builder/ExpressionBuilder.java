@@ -1461,7 +1461,11 @@ public class ExpressionBuilder extends DefaultBuilder {
     }
 
     private JTerm visitAccesstermAsJava(JavaKeYParser.AccesstermContext ctx) {
-        String firstName = accept(ctx.firstName);
+        if (ctx.firstName == null) {
+            // a numeric function name can never refer to a Java class or package
+            return null;
+        }
+        String firstName = ctx.firstName.getText();
         if (isPackage(firstName) || isClass(firstName)) {
             // consume suffix as long as it is part of a java class or package
             String javaPackage = isPackage(firstName) ? firstName : "";
@@ -1684,7 +1688,7 @@ public class ExpressionBuilder extends DefaultBuilder {
 
         // weigl: I am unsure if this is wise.
         Sort sortId = defaultOnException(null, () -> accept(ctx.sortId()));
-        String firstName = accept(ctx.simple_ident());
+        String firstName = ctx.num != null ? ctx.num.getText() : ctx.firstName.getText();
 
         ImmutableList<QuantifiableVariable> boundVars = null;
         Namespace<QuantifiableVariable> orig = null;

@@ -5,6 +5,16 @@ simple_ident
    : id = IDENT
    ;
 
+/**
+ * An identifier that cannot be a numeral. Used where a bare {@code INT_LITERAL} has to remain a
+ * literal, e.g. the function name of an access term. Numeric names themselves are admitted by the
+ * root parser's {@code simple_ident}.
+ */
+alpha_ident
+   : id = IDENT
+   | id = MATCH_IDENT
+   ;
+
 simple_ident_comma_list
    : id = simple_ident (COMMA id = simple_ident)*
    ;

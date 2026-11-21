@@ -322,9 +322,16 @@ classPaths
 
 programSource: JAVASOURCE result=oneProgramSource SEMI;
 
+/**
+ * An identifier position. KeY permits numerals as names: the integer literal constructors are
+ * declared as {@code 0(numbers) ... 9(numbers)} and occur applied in terms such as {@code Z(0(#))},
+ * so the lexer keeps numerals as {@code INT_LITERAL} and they are accepted here. Term expression
+ * positions that need to distinguish a numeral literal from a function name use {@code alpha_ident}.
+ */
 simple_ident
    :
      id = IDENT
+   | id = INT_LITERAL
    | /*{allowMatchId}?*/ id=MATCH_IDENT
    ;
 

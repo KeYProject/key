@@ -168,7 +168,8 @@ ifExThenElseTerm
  */ accessterm
    :
    // OLD
-   (sortId DOUBLECOLON)? firstName = simple_ident formal_sort_args?
+   (sortId DOUBLECOLON)? (firstName = alpha_ident formal_sort_args? call?
+                         | num = INT_LITERAL call)
 /*Faster version
   simple_ident_dots
   ( EMPTYBRACKETS*
@@ -176,7 +177,7 @@ ifExThenElseTerm
     simple_ident
   )?*/
    
-   call? (attribute)*
+   (attribute)*
    ;
 
 attribute
