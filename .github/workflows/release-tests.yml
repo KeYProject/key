@@ -28,10 +28,9 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Setup SMT solvers
-        uses: keyproject/setup-smt@v0
+        uses: keyproject/setup-smt@v0.3.0
         with:
           cvc5Version: ${{ env.cvc5 }}
           z3Version: ${{ env.z3 }}
@@ -84,10 +83,9 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Setup SMT solvers
-        uses: keyproject/setup-smt@v0
+        uses: keyproject/setup-smt@v0.3.0
         with:
           cvc5Version: ${{ env.cvc5 }}
           z3Version: ${{ env.z3 }}
@@ -130,7 +128,6 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Setup SMT solvers
         uses: keyproject/setup-smt@v0.3.0
