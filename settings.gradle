@@ -25,6 +25,8 @@ include "key.core.example"
 
 include "key.ui"
 
+include "key.cli"
+
 include "keyext.ui.testgen"
 include "keyext.proofmanagement"
 include "keyext.exploration"

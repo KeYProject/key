@@ -210,6 +210,8 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         KeyAst.File ctx = getParseContext();
         Token token = ctx.findProof();
         if (token != null) {
+            // the leading status marker (§3) is a line comment that the lexer hides, so the
+            // token positions from the parse context stay valid on the raw stream
             CharStream stream = file.getCharStream();
             // also pass the file to be able to produce exceptions with locations
             try {

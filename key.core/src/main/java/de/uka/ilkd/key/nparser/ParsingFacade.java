@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.*;
 
 import de.uka.ilkd.key.nparser.builder.ChoiceFinder;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -171,8 +172,18 @@ public final class ParsingFacade {
         return parseFile(file.toPath());
     }
 
+    /**
+     * Parses a KeY file from the given stream.
+     * <p>
+     * A leading status marker comment (§3 of the headless interface spec, written by
+     * {@link ProofSaver#marker}) is a {@code //} line comment, so the lexer hides it and the token
+     * positions still refer to the original file.
+     *
+     * @param stream the stream to parse
+     * @return the parsed file AST
+     */
     public static KeyAst.File parseFile(CharStream stream) {
-        JavaKeYParser p = createParser(stream);
+        JavaKeYParser p = createParser(createLexer(stream));
 
         p.getInterpreter().setPredictionMode(PredictionMode.SLL);
         p.removeErrorListeners();
@@ -189,7 +200,7 @@ public final class ParsingFacade {
             // there are several. Zero errors means SLL was merely insufficient and the LL parse
             // actually succeeded - fall through and return the tree.
             stream.seek(0);
-            p = createParser(stream);
+            p = createParser(createLexer(stream));
             ctx = p.file();
             if (p.getErrorReporter().errorCount() == 1) {
                 throw ex;
