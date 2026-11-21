@@ -138,7 +138,9 @@ public final class JmlAssertRule implements BuiltInRule {
                     .orElseThrow(() -> new RuleAbortException("not a JML assert statement"));
 
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
-        final JTerm self = MiscTools.getSelfTerm(frame, services);
+        // internal assumptions (e.g. the non-nullness of a pattern variable) can occur in
+        // \problem programs, which have no method frame; their terms do not use `self`
+        final JTerm self = frame == null ? null : MiscTools.getSelfTerm(frame, services);
 
         final SpecificationRepository.JmlStatementSpec spec =
             services.getSpecificationRepository().getStatementSpec(jmlAssert);

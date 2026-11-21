@@ -163,7 +163,6 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
         bindRuleSet(d, "loop_scope_inv_taclet", useLoopInvTaclets ? longConst(0) : inftyConst());
         bindRuleSet(d, "loop_scope_expand",
             useLoopScopeExpand ? longConst(LOOP_SCOPE_EXPAND) : inftyConst());
-        bindRuleSet(d, "pattern_loop_binding", longConst(PATTERN_LOOP_BINDING));
 
 
         final String methProp =
