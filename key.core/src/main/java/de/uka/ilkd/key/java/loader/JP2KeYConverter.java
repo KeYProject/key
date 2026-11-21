@@ -25,12 +25,18 @@ import de.uka.ilkd.key.java.ast.expression.BinaryAssignment.BinaryAssignmentKind
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.pattern.AnyPattern;
+import de.uka.ilkd.key.java.ast.pattern.Pattern;
+import de.uka.ilkd.key.java.ast.pattern.RecordPattern;
+import de.uka.ilkd.key.java.ast.pattern.RecordPatternComponent;
+import de.uka.ilkd.key.java.ast.pattern.TypePattern;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 import de.uka.ilkd.key.java.transformations.MarkerStatementHelper;
 import de.uka.ilkd.key.java.transformations.pipeline.JMLTransformer;
+import de.uka.ilkd.key.java.transformations.pipeline.PipelineConstants;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -72,6 +78,7 @@ import com.github.javaparser.ast.type.*;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
 import com.github.javaparser.ast.visitor.Visitable;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
+import com.github.javaparser.resolution.declarations.ResolvedFieldDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.declarations.ResolvedValueDeclaration;
 import com.github.javaparser.resolution.model.typesystem.ReferenceTypeImpl;
@@ -1080,24 +1087,168 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Expression lhs = accept(n.getExpression());
         TypeReference type = requireTypeReference(n.getType());
 
-        if (n.getName().isPresent()) {
-            final SimpleName nName = n.getName().get();
-
-            PositionInfo piVar = createPositionInfo(nName);
-            List<Comment> cVar = createComments(nName);
-
-            IProgramVariable pvar = getPatternVariable(nName, type);
-
-            final var vs =
-                new VariableSpecification(piVar, cVar, null, pvar, 0, type.getKeYJavaType());
-            return new InstanceofPattern(pi, c, lhs, type, vs);
-        }
-
         if (n.getPattern().isPresent()) {
-            reportUnsupportedElement(n);
+            Pattern pattern = createPattern(n.getPattern().get());
+            return new InstanceofPattern(pi, c, lhs, type, pattern);
         }
 
         return new Instanceof(pi, c, lhs, type);
+    }
+
+    /**
+     * Converts a pattern of an {@code instanceof} expression.
+     *
+     * @param expr the parsed pattern
+     * @return the corresponding KeY pattern
+     */
+    private Pattern createPattern(PatternExpr expr) {
+        if (expr instanceof TypePatternExpr typePattern) {
+            return createTypePattern(typePattern, null);
+        } else if (expr instanceof RecordPatternExpr recordPattern) {
+            return createRecordPattern(recordPattern);
+        }
+        return reportUnsupportedElement(expr);
+    }
+
+    /**
+     * Converts a type pattern.
+     *
+     * @param typePattern the parsed type pattern
+     * @param component the record component the pattern is matched against, or {@code null} if the
+     *        pattern is the top-level pattern of an {@code instanceof} expression
+     * @return a {@link TypePattern} if the pattern has to perform a type test, or an
+     *         {@link AnyPattern} if the pattern is unconditional for the component type (JLS
+     *         14.30.1) or uses {@code var}
+     */
+    private Pattern createTypePattern(TypePatternExpr typePattern,
+            @Nullable ResolvedFieldDeclaration component) {
+        PositionInfo pi = createPositionInfo(typePattern);
+        List<Comment> c = createComments(typePattern);
+        SimpleName name = typePattern.getName();
+        Type declaredType = typePattern.getType();
+
+        if (declaredType.isVarType()) {
+            return reportError(typePattern,
+                "'var' in a record pattern is not supported by the Java parser front-end yet; "
+                    + "use the component type explicitly");
+        }
+
+        TypeReference type = requireTypeReference(declaredType);
+        VariableSpecification specification =
+            specification(pi, c, getPatternVariable(name, type), type);
+
+        if (component != null && isUnconditional(declaredType, component.getType())) {
+            // JLS 14.30.1: an unconditional type pattern is resolved to a match-all pattern, i.e.
+            // it also matches a null component and no type test is needed.
+            return new AnyPattern(pi, c, type, specification);
+        }
+        return new TypePattern(pi, c, type, specification);
+    }
+
+    private Pattern createRecordPattern(RecordPatternExpr recordPattern) {
+        PositionInfo pi = createPositionInfo(recordPattern);
+        List<Comment> c = createComments(recordPattern);
+        TypeReference type = requireTypeReference(recordPattern.getType());
+        NodeList<ComponentPatternExpr> patterns = recordPattern.getPatternList();
+        List<ResolvedFieldDeclaration> components = recordComponents(recordPattern.getType());
+
+        if (components.size() != patterns.size()) {
+            return reportError(recordPattern,
+                "Record pattern has " + patterns.size() + " component pattern(s), but "
+                    + type.getKeYJavaType().getName() + " has " + components.size()
+                    + " component(s)");
+        }
+
+        List<RecordPatternComponent> converted = new ArrayList<>(patterns.size());
+        for (int i = 0; i < patterns.size(); i++) {
+            ResolvedFieldDeclaration component = components.get(i);
+            ComponentPatternExpr componentPattern = patterns.get(i);
+            PositionInfo componentPi = createPositionInfo(componentPattern);
+            List<Comment> componentComments = createComments(componentPattern);
+
+            Pattern pattern;
+            if (componentPattern instanceof MatchAllPatternExpr) {
+                pattern = new AnyPattern(componentPi, componentComments, null, null);
+            } else if (componentPattern instanceof TypePatternExpr typePattern) {
+                pattern = createTypePattern(typePattern, component);
+            } else if (componentPattern instanceof RecordPatternExpr nested) {
+                pattern = createRecordPattern(nested);
+            } else {
+                return reportUnsupportedElement(componentPattern);
+            }
+            converted.add(new RecordPatternComponent(componentPi, componentComments,
+                new ProgramElementName(component.getName()), pattern));
+        }
+        return new RecordPattern(pi, c, type, new ImmutableArray<>(converted));
+    }
+
+    /**
+     * Returns the components of a record type in declaration order.
+     *
+     * <p>
+     * Records are normalized to classes by the transformation pipeline. The generated component
+     * fields are the first instance fields of the resulting class and keep the declaration order of
+     * the record components, so the ordered instance fields are exactly the components. This
+     * mirrors the field order that {@link RecordClassBuilder} produces.
+     */
+    private List<ResolvedFieldDeclaration> recordComponents(ReferenceType type) {
+        ResolvedType resolved = type.resolve();
+        if (!resolved.isReferenceType()) {
+            return reportError(type, "A record pattern requires a record type, but " + type
+                + " is not a reference type");
+        }
+        ResolvedReferenceTypeDeclaration declaration =
+            resolved.asReferenceType().getTypeDeclaration().orElse(null);
+        if (declaration == null) {
+            return reportError(type, "Cannot resolve the record type " + type);
+        }
+        if (!isRecord(declaration)) {
+            return reportError(type,
+                "A record pattern requires a record type, but " + type + " is not a record");
+        }
+        return declaration.getDeclaredFields().stream()
+                .filter(field -> !field.isStatic())
+                .filter(field -> !isImplicitField(field.getName()))
+                .toList();
+    }
+
+    /**
+     * Checks whether a field of the normalized record class is an implicit field added by the
+     * transformation pipeline rather than a record component.
+     */
+    private static boolean isImplicitField(String name) {
+        return name.startsWith("<") || name.equals(PipelineConstants.IMPLICIT_ENCLOSING_THIS);
+    }
+
+    private static boolean isRecord(ResolvedReferenceTypeDeclaration declaration) {
+        return declaration.toAst().map(ast -> ast instanceof RecordDeclaration
+                || (ast instanceof ClassOrInterfaceDeclaration clazz && clazz.getExtendedTypes()
+                        .stream()
+                        .anyMatch(type -> "java.lang.Record".equals(type.getNameWithScope())
+                                || "Record".equals(type.getNameAsString()))))
+                .orElse(false);
+    }
+
+    /**
+     * Checks whether a nested type pattern is unconditional for the type of the record component it
+     * is matched against (JLS 14.30.3), i.e. whether every value of the component type matches the
+     * pattern and the type test can be elided.
+     */
+    private static boolean isUnconditional(Type declaredType, ResolvedType componentType) {
+        ResolvedType declared = declaredType.resolve();
+        if (declared.isPrimitive() || componentType.isPrimitive()) {
+            return declared.isPrimitive() && componentType.isPrimitive()
+                    && declared.describe().equals(componentType.describe());
+        }
+        if (declared.isReferenceType() && componentType.isReferenceType()) {
+            return declared.asReferenceType().isAssignableBy(componentType);
+        }
+        return false;
+    }
+
+    private static VariableSpecification specification(PositionInfo pi, List<Comment> c,
+            IProgramVariable variable, TypeReference type) {
+        return new VariableSpecification(pi, c, null, variable, 0, type.getKeYJavaType());
     }
 
     @Override

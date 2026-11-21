@@ -11,8 +11,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.pattern.Pattern;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -24,28 +24,33 @@ import org.jspecify.annotations.NullMarked;
 
 /**
  * Instanceof with pattern matching (Java 16+).
- * Supports syntax: expr instanceof Type varName
- * where varName is bound as a local variable in the true branch.
+ *
+ * <p>
+ * Supports both a type pattern ({@code expr instanceof Type varName}) and a record pattern
+ * ({@code expr instanceof Record(int x, ...)}). The variables declared by the pattern are bound as
+ * local variables where the pattern is definitely matched.
+ *
+ * @see Pattern
+ * @see TypeOperator
  */
 @NullMarked
 public class InstanceofPattern extends TypeOperator {
-    protected final VariableSpecification patternVariable;
+    protected final Pattern pattern;
 
     public InstanceofPattern(ExtList children) {
         super(children);
-        this.patternVariable =
-            Objects.requireNonNull(children.get(VariableSpecification.class));
+        this.pattern = Objects.requireNonNull(children.get(Pattern.class));
     }
 
-    public InstanceofPattern(Expression lhs, TypeReference type, VariableSpecification patternVar) {
+    public InstanceofPattern(Expression lhs, TypeReference type, Pattern pattern) {
         super(lhs, type);
-        this.patternVariable = Objects.requireNonNull(patternVar);
+        this.pattern = Objects.requireNonNull(pattern);
     }
 
     public InstanceofPattern(PositionInfo pi, List<Comment> c, Expression lhs, TypeReference type,
-            VariableSpecification patternVar) {
+            Pattern pattern) {
         super(pi, c, new ImmutableArray<>(lhs), type);
-        this.patternVariable = Objects.requireNonNull(patternVar);
+        this.pattern = Objects.requireNonNull(pattern);
     }
 
     /**
@@ -68,7 +73,7 @@ public class InstanceofPattern extends TypeOperator {
     }
 
     public SourceElement getLastElement() {
-        return patternVariable;
+        return pattern;
     }
 
     /**
@@ -82,7 +87,7 @@ public class InstanceofPattern extends TypeOperator {
         return switch (index) {
             case 0 -> children.get(0);
             case 1 -> typeReference;
-            case 2 -> patternVariable;
+            case 2 -> pattern;
             default -> throw new IllegalStateException("Unexpected value: " + index);
         };
     }
@@ -115,12 +120,12 @@ public class InstanceofPattern extends TypeOperator {
     }
 
     /**
-     * Get the pattern variable bound by this instanceof expression.
+     * Get the pattern matched by this instanceof expression.
      *
-     * @return the VariableSpecification for the pattern variable
+     * @return the pattern, never {@code null}
      */
-    public VariableSpecification getPatternVariable() {
-        return patternVariable;
+    public Pattern getPattern() {
+        return pattern;
     }
 
     /**

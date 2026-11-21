@@ -61,6 +61,7 @@ REMOVE_ANNOTATION : '\\removeAnnotation';
 // label occurs again for character `!'
 NOTFREEIN : '\\notFreeIn';
 ISBINDINGEXPR : '\\isBindingExpr';
+RECORD_PATTERN_INSTANCEOF : '\\isRecordPatternInstanceof';
 ALWAYS_ABNORMALLY_TERMINATES: '\\alwaysAbnormallyTerminates';
 STATIC : '\\static';
 STATICMETHODREFERENCE : '\\staticMethodReference';

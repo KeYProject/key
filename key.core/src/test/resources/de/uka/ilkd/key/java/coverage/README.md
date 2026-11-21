@@ -35,7 +35,6 @@ the feature under test (verified by loading each and inspecting the error):
 | `switch-expression` | parser rejects `yield` / arrow-switch (syntax error) |
 | `switch-pattern-type` | `Unsupported element: TypePatternExpr` (`case Integer i`) |
 | `switch-pattern-record` | `Unsupported element: TypePatternExpr` (record component of `case Point(...)`) |
-| `record-pattern` | `Unsupported element: TypePatternExpr` (record pattern via `instanceof`) |
 | `switch-enum-unqualified` | KeY cannot resolve the **unqualified** `case RED` label (the enum is declared in the file, so this is the label form, not a missing type) |
 | `module-declaration` | `module-info` currently triggers an internal error (`IndexOutOfBoundsException`) |
 
