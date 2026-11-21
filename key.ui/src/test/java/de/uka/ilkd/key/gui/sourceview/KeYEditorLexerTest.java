@@ -42,6 +42,22 @@ class KeYEditorLexerTest {
         assertThat(tokenAtForall.attributes()).isEqualTo(tokens.get(0).attributes());
     }
 
+    @Test
+    void keywordAfterNonBmpCharacterIsHighlightedAtItsSourcePosition() {
+        // U+1F600 lies outside the BMP: one code point, but two chars in the document
+        String text = "\\sorts { S; }\n// 😀\n\\problem { true }";
+        List<SourceHighlightDocument.Token> tokens = new KeYEditorLexer().applyTo(text);
+
+        int problemPosition = text.indexOf("\\problem");
+        SourceHighlightDocument.Token tokenAtProblem = tokenStartingAt(tokens, problemPosition);
+
+        assertThat(tokenAtProblem.len()).isEqualTo("\\problem".length());
+        // both "\\sorts" and "\\problem" are primary keywords and share one attribute set
+        assertThat(tokenAtProblem.attributes()).isEqualTo(tokens.get(0).attributes());
+        assertThat(tokens.stream().mapToInt(SourceHighlightDocument.Token::len).sum())
+                .isEqualTo(text.length());
+    }
+
     /**
      * Returns the token that starts at the given character position, assuming the tokens tile the
      * text starting at offset zero.

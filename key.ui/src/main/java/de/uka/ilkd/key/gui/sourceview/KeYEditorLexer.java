@@ -147,8 +147,11 @@ public class KeYEditorLexer implements SourceHighlightDocument.EditorLexer {
     public List<SourceHighlightDocument.Token> applyTo(String text) {
         JavaKeYLexer keYLexer = new JavaKeYLexer(CharStreams.fromString(text));
         List<SourceHighlightDocument.Token> result = new ArrayList<>();
-        // the first character that is not yet covered by an emitted token
+        // the first code point that is not yet covered by an emitted token. Token indexes of
+        // the lexer count code points.
         int covered = 0;
+        // the number of chars covered by the emitted tokens. The document counts chars.
+        int emitted = 0;
         var t = keYLexer.nextToken();
         while (t.getType() != Token.EOF) {
             // the lexer skips whitespace, but SourceHighlightDocument positions tokens by
@@ -157,14 +160,17 @@ public class KeYEditorLexer implements SourceHighlightDocument.EditorLexer {
             if (t.getStartIndex() > covered) {
                 result.add(new SourceHighlightDocument.Token(t.getStartIndex() - covered,
                     normalStyle));
+                // skipped characters are whitespace: one char per code point
+                emitted += t.getStartIndex() - covered;
             }
-            result.add(new SourceHighlightDocument.Token(t.getStopIndex() - t.getStartIndex() + 1,
-                getAttributes(t.getType())));
+            int len = t.getText().length();
+            result.add(new SourceHighlightDocument.Token(len, getAttributes(t.getType())));
+            emitted += len;
             covered = t.getStopIndex() + 1;
             t = keYLexer.nextToken();
         }
-        if (covered < text.length()) {
-            result.add(new SourceHighlightDocument.Token(text.length() - covered, normalStyle));
+        if (emitted < text.length()) {
+            result.add(new SourceHighlightDocument.Token(text.length() - emitted, normalStyle));
         }
         return result;
     }
