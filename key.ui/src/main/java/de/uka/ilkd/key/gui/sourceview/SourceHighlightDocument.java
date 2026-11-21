@@ -71,6 +71,10 @@ public class SourceHighlightDocument extends DefaultStyledDocument {
     /**
      * An editor lexer is a function that takes a string and returns a list of tokens that describe
      * the syntax highlighting of the string.
+     * <p>
+     * The tokens are placed consecutively, starting at the first character of the text. A lexer
+     * that skips characters (for instance whitespace) has to emit tokens for them as well, so that
+     * all subsequent tokens keep their source position.
      */
     public interface EditorLexer {
         /**
