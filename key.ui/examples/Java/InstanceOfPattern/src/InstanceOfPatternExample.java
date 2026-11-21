@@ -156,6 +156,39 @@ public class InstanceOfPatternExample {
     }
     
     /**
+     * Pattern matching in a while loop: the variable is bound in the body.
+     */
+    /*@ normal_behavior
+      @ requires true;
+      @ ensures \result >= 0;
+      @*/
+    public static int whilePattern(Object obj) {
+        int n = 0;
+        /*@ loop_invariant n >= 0; @*/
+        while (obj instanceof String s) {
+            n += s.length();
+            obj = null;
+        }
+        return n;
+    }
+
+    /**
+     * Pattern matching after a loop: the variable is bound after the loop exits normally.
+     */
+    /*@ normal_behavior
+      @ requires true;
+      @ ensures \result >= 0;
+      @*/
+    public static int afterLoopPattern() {
+        Object obj = new String("x");
+        /*@ loop_invariant true; @*/
+        while (!(obj instanceof String s)) {
+            obj = null;
+        }
+        return s.length();
+    }
+
+    /**
      * Main method for testing.
      */
     public static void main(String[] args) {

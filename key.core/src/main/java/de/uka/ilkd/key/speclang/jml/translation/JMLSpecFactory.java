@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.BindingVariableVisitor;
+import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.HeapLDT.SplitFieldName;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
@@ -1696,6 +1697,31 @@ public class JMLSpecFactory {
                     result =
                         result.prepend((LocationVariable) variables.get(j).getProgramVariable());
                 }
+            } else if (s instanceof While w) {
+                final ImmutableList<LocationVariable> visibleInBody =
+                    collectLocalVariablesVisibleTo(statement, asContainer(w.getBody()));
+                if (visibleInBody != null) {
+                    result = result.prepend(visibleInBody);
+                    result = result.prepend(collectPatternVariables(true, w.getGuardExpression()));
+                    return result;
+                }
+                result = result.prepend(afterLoopVariables(w));
+            } else if (s instanceof For f) {
+                final ImmutableList<LocationVariable> visibleInBody =
+                    collectLocalVariablesVisibleTo(statement, asContainer(f.getBody()));
+                if (visibleInBody != null) {
+                    result = result.prepend(visibleInBody);
+                    result = result.prepend(collectPatternVariables(true, f.getGuardExpression()));
+                    return result;
+                }
+                result = result.prepend(afterLoopVariables(f));
+            } else if (s instanceof Do d) {
+                final ImmutableList<LocationVariable> visibleInBody =
+                    collectLocalVariablesVisibleTo(statement, asContainer(d.getBody()));
+                if (visibleInBody != null) {
+                    return result.prepend(visibleInBody);
+                }
+                result = result.prepend(afterLoopVariables(d));
             } else if (s instanceof StatementContainer) {
                 final ImmutableList<LocationVariable> visibleLocalVariables =
                     collectLocalVariablesVisibleTo(statement, (StatementContainer) s);
@@ -1950,5 +1976,55 @@ public class JMLSpecFactory {
         var v = BindingVariableVisitor.analyze(condition);
         return ImmutableList.fromList(b ? v.whenTrue().keySet() : v.whenFalse().keySet());
     }
+
+    private ImmutableList<LocationVariable> afterLoopVariables(LoopStatement loop) {
+        if (hasUnlabeledBreak(loop.getBody())) {
+            return ImmutableList.nil();
+        }
+        var bindings = BindingVariableVisitor.analyze(loop.getGuardExpression()).whenFalse();
+        if (bindings.isEmpty()) {
+            return ImmutableList.nil();
+        }
+        if (loop instanceof For forLoop
+                && afterBindingsUseForInitVariables(forLoop, bindings)) {
+            return ImmutableList.nil();
+        }
+        return ImmutableList.fromList(bindings.keySet());
+    }
+
+    private boolean afterBindingsUseForInitVariables(For loop,
+            Map<LocationVariable, Expression> bindings) {
+        var initVariables = new java.util.LinkedHashSet<LocationVariable>();
+        var initializers = loop.getInitializers();
+        if (initializers != null) {
+            for (var init : initializers) {
+                if (init instanceof LocalVariableDeclaration declaration) {
+                    for (var specification : declaration.getVariables()) {
+                        initVariables.add(
+                            (LocationVariable) specification.getProgramVariable());
+                    }
+                }
+            }
+        }
+        for (Expression expression : bindings.values()) {
+            for (LocationVariable read : MiscTools.getLocalIns(expression, services)) {
+                if (initVariables.contains(read)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static StatementContainer asContainer(Statement body) {
+        return body instanceof StatementContainer container ? container : new StatementBlock(body);
+    }
+
+    private boolean hasUnlabeledBreak(Statement body) {
+        var collector = new OuterBreakContinueAndReturnCollector(body, List.of(), services);
+        collector.collect();
+        return collector.getBreaks().stream().anyMatch(b -> b.getLabel() == null);
+    }
+
 
 }

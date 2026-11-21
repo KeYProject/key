@@ -39,6 +39,9 @@ What This Example Shows
 4. Traditional vs pattern matching comparison (traditionalVsPattern)
    - Shows both styles work correctly together
 
+5. Pattern matching in loops (whilePattern / afterLoopPattern)
+   - A pattern variable is bound in a while body and after a negated-guard loop
+
 Key Taclets
 -----------
 The following taclets in javaRules.key handle pattern matching:
@@ -47,6 +50,19 @@ The following taclets in javaRules.key handle pattern matching:
 - ifElseUnfoldPattern: Handles if/else statements and binds pattern variables in both branches
 - ifUnfoldPatternUnreachable: Declares pattern variables after an if whose then branch cannot complete normally
 - instanceofPatternAssignmentSE/NSE: Removes the binding from a plain instanceof assignment
+- patternLoopUnfold / patternLoopUnfoldNested: Rewrites a binding loop before loop treatment
+
+Loops
+-----
+Pattern variables in while and for guards are bound in the body, and in the
+for-update. After a loop, a variable from a negated guard (for example
+`while (!(obj instanceof String s))`) is available if the loop body contains
+no reachable break. A do-while body runs before the guard, so the variable is
+not available in the body; it can be available after the loop.
+
+The loop rewrite happens before the usual loop treatment. It hoists the guard
+into a fresh boolean, declares the pattern variable in the body, and refreshes
+the guard at the end of each iteration.
 
 Loading This Example
 --------------------
