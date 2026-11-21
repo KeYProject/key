@@ -272,9 +272,9 @@ public class TacletBuilderManipulators {
     public static final TacletBuilderCommand DIFFERENT_FIELDS =
         new ConstructorBasedBuilder("differentFields", DifferentFields.class, SV, SV);
     public static final AbstractConditionBuilder ADD_ANNOTATION =
-        new ConstructorBasedBuilder("addAnnotation", AddAnnotation.class, SV, SV, S);
+        new ConstructorBasedBuilder("addAnnotation", AddAnnotationCondition.class, SV, SV, S);
     public static final AbstractConditionBuilder REMOVE_ANNOTATION =
-        new ConstructorBasedBuilder("removeAnnotation", RemoveAnnotation.class, SV, SV, S);
+        new ConstructorBasedBuilder("removeAnnotation", RemoveAnnotationCondition.class, SV, SV, S);
     public static final AbstractConditionBuilder HAS_ANNOTATION =
         new ConstructorBasedBuilder("hasAnnotation", HasAnnotationCondition.class, SV, S);
     public static final AbstractConditionBuilder SAME_OBSERVER =

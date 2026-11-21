@@ -67,6 +67,9 @@ public class HeapSimplificationMacro extends AbstractPropositionalExpansionMacro
         "wellFormedAnonEQ", "wellFormedMemsetArrayObjectEQ", "wellFormedMemsetArrayPrimitiveEQ",
         "wellFormedMemsetObjectEQ", "wellFormedMemsetLocSetEQ", "wellFormedMemsetPrimitiveEQ",
 
+        // universe rules
+        "createdRepfpElement",
+
         // locset rules
         "elementOfEmpty", "elementOfAllLocs", "elementOfSingleton", "elementOfUnion",
         "elementOfIntersect", "elementOfSetMinus", "elementOfAllFields", "elementOfAllObjects",

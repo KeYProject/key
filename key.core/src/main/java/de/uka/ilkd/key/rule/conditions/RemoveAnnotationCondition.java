@@ -32,7 +32,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Daniel Grévent
  */
-public final class RemoveAnnotation implements VariableCondition {
+public final class RemoveAnnotationCondition implements VariableCondition {
     private static final Sort[] ALLOWED = { ProgramSVSort.SIMPLE_NEW };
 
     private final SchemaVariable read, store;
@@ -48,7 +48,7 @@ public final class RemoveAnnotation implements VariableCondition {
      * @throws IllegalArgumentException if <code>read</code> or <code>store</code>
      *         are not a `SimpleInstanceCreation`.
      */
-    public RemoveAnnotation(SchemaVariable store, SchemaVariable read, String annot) {
+    public RemoveAnnotationCondition(SchemaVariable store, SchemaVariable read, String annot) {
         if (!store.sort().equals(read.sort())) {
             throw new IllegalArgumentException("Expected left and right to have the same sort!");
         }
