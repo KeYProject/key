@@ -15,6 +15,7 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.nparser.JavaKeYLexer;
 
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.Token;
 
 import static de.uka.ilkd.key.nparser.JavaKeYLexer.*;
 
@@ -146,11 +147,24 @@ public class KeYEditorLexer implements SourceHighlightDocument.EditorLexer {
     public List<SourceHighlightDocument.Token> applyTo(String text) {
         JavaKeYLexer keYLexer = new JavaKeYLexer(CharStreams.fromString(text));
         List<SourceHighlightDocument.Token> result = new ArrayList<>();
+        // the first character that is not yet covered by an emitted token
+        int covered = 0;
         var t = keYLexer.nextToken();
-        while (t.getType() != -1) {
-            result.add(new SourceHighlightDocument.Token(t.getText().length(),
+        while (t.getType() != Token.EOF) {
+            // the lexer skips whitespace, but SourceHighlightDocument positions tokens by
+            // advancing an offset by their lengths. Emit the skipped characters as
+            // normal-style tokens so that the following tokens keep their source position.
+            if (t.getStartIndex() > covered) {
+                result.add(new SourceHighlightDocument.Token(t.getStartIndex() - covered,
+                    normalStyle));
+            }
+            result.add(new SourceHighlightDocument.Token(t.getStopIndex() - t.getStartIndex() + 1,
                 getAttributes(t.getType())));
+            covered = t.getStopIndex() + 1;
             t = keYLexer.nextToken();
+        }
+        if (covered < text.length()) {
+            result.add(new SourceHighlightDocument.Token(text.length() - covered, normalStyle));
         }
         return result;
     }
