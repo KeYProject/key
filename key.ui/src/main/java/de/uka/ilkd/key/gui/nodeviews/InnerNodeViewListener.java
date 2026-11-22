@@ -20,6 +20,19 @@ import org.jspecify.annotations.Nullable;
 public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
 
     /**
+     * The menu shown on a mouse click in an {@link InnerNodeView}. Provides extension points and
+     * "copy to clipboard" functionality.
+     */
+    private static class InnerNodeViewMenu extends SequentViewMenu<InnerNodeView> {
+        InnerNodeViewMenu(InnerNodeView sequentView, PosInSequent pos) {
+            super(sequentView, pos);
+            addExtensionMenu();
+            addSeparator();
+            addClipboardItem();
+        }
+    }
+
+    /**
      * The menu shown on a mouse click.
      */
     private @Nullable JMenu menu;
@@ -40,7 +53,7 @@ public class InnerNodeViewListener extends SequentViewListener<InnerNodeView> {
             if (mousePos != null) {
                 if (!me.isShiftDown() && !me.isControlDown()
                         && SwingUtilities.isLeftMouseButton(me)) {
-                    menu = new SequentViewMenu<>(this.getSequentView(), mousePos);
+                    menu = new InnerNodeViewMenu(this.getSequentView(), mousePos);
                     showPopup(me, menu);
                 }
             } else {

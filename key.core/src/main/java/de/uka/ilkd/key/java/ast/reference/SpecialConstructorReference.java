@@ -10,7 +10,8 @@ import de.uka.ilkd.key.java.ast.*;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * Occurs in a constructor declaration as the first statement as this(...) or super(...) reference.
@@ -22,7 +23,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
 
 
 
-    protected final ImmutableArray<Expression> arguments;
+    protected final ImmutableListArray<Expression> arguments;
 
 
 
@@ -37,7 +38,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      *        an expression mutable list.
      */
     protected SpecialConstructorReference(Expression[] arguments) {
-        this.arguments = new ImmutableArray<>(arguments);
+        this.arguments = ImmutableList.asArray(arguments);
     }
 
 
@@ -47,8 +48,8 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      * @param arguments
      *        an expression mutable list.
      */
-    protected SpecialConstructorReference(ImmutableArray<Expression> arguments) {
-        this.arguments = arguments;
+    protected SpecialConstructorReference(ImmutableList<Expression> arguments) {
+        this.arguments = ImmutableList.asArray(arguments);
     }
 
 
@@ -61,7 +62,8 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      */
     protected SpecialConstructorReference(ExtList children) {
         super(children);
-        this.arguments = new ImmutableArray<>(children.collect(Expression.class));
+        this.arguments =
+            ImmutableList.asArray(children.collect(Expression.class));
     }
 
     /**
@@ -73,13 +75,14 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      */
     protected SpecialConstructorReference(ExtList children, PositionInfo pi) {
         super(children, pi);
-        this.arguments = new ImmutableArray<>(children.collect(Expression.class));
+        this.arguments =
+            ImmutableList.asArray(children.collect(Expression.class));
     }
 
-    public SpecialConstructorReference(ImmutableArray<Expression> arguments, PositionInfo pi,
+    public SpecialConstructorReference(ImmutableList<Expression> arguments, PositionInfo pi,
             List<Comment> c) {
         super(pi, c);
-        this.arguments = arguments;
+        this.arguments = ImmutableList.asArray(arguments);
     }
 
 
@@ -139,7 +142,7 @@ public abstract class SpecialConstructorReference extends JavaNonTerminalProgram
      *
      * @return the expression mutable list.
      */
-    public ImmutableArray<Expression> getArguments() {
+    public ImmutableList<Expression> getArguments() {
         return arguments;
     }
 }

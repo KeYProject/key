@@ -18,8 +18,8 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.njml.SpecMathMode;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 
@@ -47,7 +47,7 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * Parameters of the method.
      */
-    protected final ImmutableArray<ParameterDeclaration> parameters;
+    protected final ImmutableListArray<ParameterDeclaration> parameters;
     /**
      * 'throws' part of the method. Indicates which exceptions the method may throw.
      * May be null.
@@ -90,17 +90,17 @@ public class MethodDeclaration extends JavaDeclaration
 
     public MethodDeclaration(
             PositionInfo pi, List<Comment> comments,
-            @NonNull ImmutableArray<Modifier> modArray,
+            @NonNull ImmutableList<Modifier> modArray,
             TypeReference returnType,
             Comment[] voidComments, ProgramElementName name,
-            ImmutableArray<ParameterDeclaration> parameters, Throws exceptions,
+            ImmutableList<ParameterDeclaration> parameters, Throws exceptions,
             StatementBlock body, boolean parentIsInterfaceDeclaration,
             ImmutableList<TextualJMLConstruct> attachedJml) {
         super(pi, comments, modArray, attachedJml);
         this.returnType = returnType;
         this.voidComments = voidComments;
         this.name = name;
-        this.parameters = parameters;
+        this.parameters = ImmutableList.asArray(parameters);
         this.exceptions = exceptions;
         this.body = body;
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
@@ -129,7 +129,8 @@ public class MethodDeclaration extends JavaDeclaration
         returnType = children.get(TypeReference.class);
         this.voidComments = voidComments;
         name = children.get(ProgramElementName.class);
-        this.parameters = new ImmutableArray<>(children.collect(ParameterDeclaration.class));
+        this.parameters =
+            ImmutableList.asArray(children.collect(ParameterDeclaration.class));
         exceptions = children.get(Throws.class);
         body = children.get(StatementBlock.class);
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
@@ -168,7 +169,7 @@ public class MethodDeclaration extends JavaDeclaration
         this(modifiers,
             returnType,
             name,
-            new ImmutableArray<>(parameters),
+            ImmutableList.of(parameters),
             exceptions,
             body,
             parentIsInterfaceDeclaration);
@@ -198,7 +199,7 @@ public class MethodDeclaration extends JavaDeclaration
             Modifier[] modifiers,
             TypeReference returnType,
             ProgramElementName name,
-            ImmutableArray<ParameterDeclaration> parameters,
+            ImmutableList<ParameterDeclaration> parameters,
             Throws exceptions,
             StatementBlock body,
             boolean parentIsInterfaceDeclaration) {
@@ -206,7 +207,7 @@ public class MethodDeclaration extends JavaDeclaration
         this.returnType = returnType;
         this.voidComments = null;
         this.name = name;
-        this.parameters = parameters;
+        this.parameters = ImmutableList.asArray(parameters);
         this.exceptions = exceptions;
         this.body = body;
         this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
@@ -365,7 +366,7 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
 
-    public ImmutableArray<ParameterDeclaration> getParameters() {
+    public ImmutableList<ParameterDeclaration> getParameters() {
         return parameters;
     }
 

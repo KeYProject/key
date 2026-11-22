@@ -7,7 +7,6 @@ package org.key_project.util;
 import java.util.Objects;
 import java.util.function.*;
 
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -28,12 +27,9 @@ public final class EqualsModProofIrrelevancyUtil {
      * @param b second array
      * @return whether they are equal (same length, equal elements)
      */
-    // ImmutableArray is deprecated in favor of ImmutableList; kept for callers still passing
-    // the old type (e.g. ProofIrrelevancyProperty on terms whose subs()/boundVars() are arrays).
-    @SuppressWarnings("deprecation")
     public static <T> boolean compareImmutableArrays(
-            ImmutableArray<T> a,
-            ImmutableArray<T> b,
+            ImmutableList<T> a,
+            ImmutableList<T> b,
             BiPredicate<T, T> equalityPredicate) {
         if (a == b) {
             return true;

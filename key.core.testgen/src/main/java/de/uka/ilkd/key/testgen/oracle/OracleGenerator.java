@@ -21,7 +21,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import com.squareup.javapoet.MethodSpec;
 import org.slf4j.Logger;
@@ -603,7 +603,7 @@ public class OracleGenerator {
 
     private OracleMethod createQuantifierMethod(Term term, boolean initialSelect) {
         String methodName = generateMethodName();
-        ImmutableArray<? extends QuantifiableVariable> vars = term.varsBoundHere(0);
+        ImmutableList<? extends QuantifiableVariable> vars = term.varsBoundHere(0);
         QuantifiableVariable qv = vars.get(0);
         OracleVariable var = new OracleVariable(qv.name().toString(), qv.sort());
 

@@ -13,7 +13,8 @@ import org.key_project.logic.TermCreationException;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.util.GenerationalCache;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 
@@ -26,11 +27,11 @@ import org.jspecify.annotations.NonNull;
  * This class is used to encapsulate knowledge about the internal term structures. See
  * {@link TermBuilder} for more convenient methods to create terms.
  */
-@SuppressWarnings("deprecation") // term-creation API is bound to the deprecated ImmutableArray
 public final class TermFactory {
 
 
-    private static final ImmutableArray<JTerm> NO_SUBTERMS = new ImmutableArray<>();
+    private static final ImmutableListArray<JTerm> NO_SUBTERMS =
+        ImmutableList.asArray();
     private final GenerationalCache<JTerm, JTerm> cache;
 
 
@@ -57,9 +58,9 @@ public final class TermFactory {
      * Master method for term creation. Should be the only place where terms are created in the
      * entire system.
      */
-    public JTerm createTerm(@NonNull Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+    public JTerm createTerm(@NonNull Operator op, ImmutableList<JTerm> subs,
+            ImmutableList<QuantifiableVariable> boundVars,
+            ImmutableList<TermLabel> labels) {
         if (op == null) {
             throw new TermCreationException("Given operator is null.");
         }
@@ -71,8 +72,8 @@ public final class TermFactory {
         return doCreateTerm(op, subs, boundVars, labels, "");
     }
 
-    public JTerm createTerm(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars) {
+    public JTerm createTerm(Operator op, ImmutableList<JTerm> subs,
+            ImmutableList<QuantifiableVariable> boundVars) {
 
         return createTerm(op, subs, boundVars, null);
     }
@@ -82,30 +83,30 @@ public final class TermFactory {
     }
 
     public JTerm createTerm(Operator op, JTerm[] subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels) {
+            ImmutableList<QuantifiableVariable> boundVars,
+            ImmutableList<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), boundVars, labels);
     }
 
     public JTerm createTerm(Operator op, JTerm[] subs, TermLabel label) {
-        return createTerm(op, subs, null, new ImmutableArray<>(label));
+        return createTerm(op, subs, null, ImmutableList.ofFixedSize(label));
     }
 
-    public JTerm createTerm(Operator op, JTerm[] subs, ImmutableArray<TermLabel> labels) {
+    public JTerm createTerm(Operator op, JTerm[] subs, ImmutableList<TermLabel> labels) {
         return createTerm(op, createSubtermArray(subs), null, labels);
     }
 
-    public JTerm createTerm(Operator op, JTerm sub, ImmutableArray<TermLabel> labels) {
-        return createTerm(op, new ImmutableArray<>(sub), null, labels);
+    public JTerm createTerm(Operator op, JTerm sub, ImmutableList<TermLabel> labels) {
+        return createTerm(op, ImmutableList.ofFixedSize(sub), null, labels);
     }
 
     public JTerm createTerm(Operator op, JTerm sub1, JTerm sub2,
-            ImmutableArray<TermLabel> labels) {
+            ImmutableList<TermLabel> labels) {
         return createTerm(op, new JTerm[] { sub1, sub2 }, labels);
     }
 
 
-    public JTerm createTerm(Operator op, ImmutableArray<TermLabel> labels) {
+    public JTerm createTerm(Operator op, ImmutableList<TermLabel> labels) {
         return createTerm(op, NO_SUBTERMS, null, labels);
     }
 
@@ -113,13 +114,13 @@ public final class TermFactory {
     // private interface
     // -------------------------------------------------------------------------
 
-    private ImmutableArray<JTerm> createSubtermArray(JTerm[] subs) {
-        return subs == null || subs.length == 0 ? NO_SUBTERMS : new ImmutableArray<>(subs);
+    private ImmutableList<JTerm> createSubtermArray(JTerm[] subs) {
+        return subs == null || subs.length == 0 ? NO_SUBTERMS : ImmutableList.ofFixedSize(subs);
     }
 
-    private JTerm doCreateTerm(Operator op, ImmutableArray<JTerm> subs,
-            ImmutableArray<QuantifiableVariable> boundVars,
-            ImmutableArray<TermLabel> labels, String origin) {
+    private JTerm doCreateTerm(Operator op, ImmutableList<JTerm> subs,
+            ImmutableList<QuantifiableVariable> boundVars,
+            ImmutableList<TermLabel> labels, String origin) {
 
         final TermImpl newTerm =
             (labels == null || labels.isEmpty()

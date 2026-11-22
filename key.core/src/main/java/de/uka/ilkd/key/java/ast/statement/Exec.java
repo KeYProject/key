@@ -13,23 +13,24 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 
 
 public class Exec extends BranchStatement implements StatementContainer, ProgramPrefix {
     private final StatementBlock body;
-    private final ImmutableArray<Branch> branches;
+    private final ImmutableListArray<Branch> branches;
     private final MethodFrame innerMostMethodFrame;
     private final int prefixLength;
 
     public Exec(PositionInfo pi, List<Comment> comments, StatementBlock body,
-            ImmutableArray<Branch> branches,
+            ImmutableList<Branch> branches,
             MethodFrame innerMostMethodFrame, int prefixLength) {
         super(pi, comments);
         this.body = body;
-        this.branches = branches;
+        this.branches = ImmutableList.asArray(branches);
         this.innerMostMethodFrame = innerMostMethodFrame;
         this.prefixLength = prefixLength;
     }
@@ -60,7 +61,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     public Exec(StatementBlock body, Branch[] branches) {
         super(null, null);
         this.body = body;
-        this.branches = new ImmutableArray<>(branches);
+        this.branches = ImmutableList.asArray(branches);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -75,10 +76,10 @@ public class Exec extends BranchStatement implements StatementContainer, Program
      * @param branches
      *        a branch array.
      */
-    public Exec(StatementBlock body, ImmutableArray<Branch> branches) {
+    public Exec(StatementBlock body, ImmutableList<Branch> branches) {
         super(null, null);
         this.body = body;
-        this.branches = branches;
+        this.branches = ImmutableList.asArray(branches);
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -94,7 +95,8 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     public Exec(ExtList children) {
         super(children);
         this.body = children.get(StatementBlock.class);
-        this.branches = new ImmutableArray<>(children.collect(Branch.class));
+        this.branches =
+            ImmutableList.asArray(children.collect(Branch.class));
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -131,7 +133,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
     }
 
     @Override
-    public ImmutableArray<ProgramPrefix> getPrefixElements() {
+    public ImmutableList<ProgramPrefix> getPrefixElements() {
         return StatementBlock.computePrefixElements(body.getBody(), this);
     }
 
@@ -256,7 +258,7 @@ public class Exec extends BranchStatement implements StatementContainer, Program
      *
      * @return the array wrapper of the branches
      */
-    public ImmutableArray<Branch> getBranchList() {
+    public ImmutableList<Branch> getBranchList() {
         return branches;
     }
 

@@ -21,7 +21,7 @@ import org.key_project.prover.strategy.costbased.feature.WeakStableCost;
 import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 import org.key_project.prover.strategy.costbased.termgenerator.SuperTermGenerator;
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Generates the terms upward a given position, like {@link SuperTermGenerator#upwards}, but
@@ -88,7 +88,7 @@ public abstract class SuperTermWithIndexGenerator extends SuperTermGenerator {
         }
 
         @Override
-        public ImmutableArray<Sort> argSorts() {
+        public ImmutableList<Sort> argSorts() {
             return null;
         }
 

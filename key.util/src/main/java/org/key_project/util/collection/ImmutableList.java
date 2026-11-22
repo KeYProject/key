@@ -105,16 +105,15 @@ public interface ImmutableList<T extends @Nullable Object>
 
     /// Creates an [ImmutableList] from a [List].
     ///
-    /// This method wraps the given list in an immutable wrapper. The input list is
-    /// copied to ensure immutability guarantees are maintained.
+    /// The result is the fixed-size list of [#ofFixedSize(Object...)]: `NIL` for an empty list,
+    /// an array-backed list otherwise. The input list is copied, so later changes to it do not
+    /// reach the result.
     ///
     /// @param <T> the element type
-    /// @param list the list to wrap
+    /// @param list the list to copy
     /// @return an ImmutableList containing the elements of the input list
     static <T extends @Nullable Object> ImmutableList<T> fromList(List<T> list) {
-        // Used constructor is public one which copies list into an ArrayList, so
-        // no copy needed here
-        return new ImmutableListList<>(list);
+        return ofFixedSize((T[]) list.toArray());
     }
 
     /// Creates an [ImmutableList] from an array.
@@ -127,6 +126,38 @@ public interface ImmutableList<T extends @Nullable Object>
     /// @return an ImmutableList containing the elements of the input array
     static <T extends @Nullable Object> ImmutableList<T> fromArray(T[] array) {
         return new ImmutableListArray<>(array.clone());
+    }
+
+    /// Returns `list` as a fixed-size list: `list` itself when it is an [ImmutableListArray],
+    /// otherwise a copy of its elements into one. A constructor stores the list it receives
+    /// through this method, so that its field holds one list class and the JIT inlines the
+    /// accesses to it.
+    ///
+    /// @param list the list to return or copy
+    /// @param <T> the entry type of the list.
+    /// @return `list`, or a fixed-size copy of it
+    static <T extends @Nullable Object> ImmutableListArray<T> asArray(ImmutableList<T> list) {
+        if (list instanceof ImmutableListArray<T> array) {
+            return array;
+        }
+        if (list.isEmpty()) {
+            return ImmutableListArray.empty();
+        }
+        return new ImmutableListArray<>(list.toArray((T[]) new Object[list.size()]));
+    }
+
+    /// Returns the fixed-size list of the given elements, a copy of the array; the shared empty
+    /// list for no elements. The array form of [#asArray(ImmutableList)] for a constructor that
+    /// receives an array.
+    ///
+    /// @param elements the elements of the list
+    /// @param <T> the entry type of the list.
+    /// @return (e1, e2, e3, ...) as a fixed-size list
+    static <T extends @Nullable Object> ImmutableListArray<T> asArray(T... elements) {
+        if (elements.length == 0) {
+            return ImmutableListArray.empty();
+        }
+        return new ImmutableListArray<>(elements.clone());
     }
 
     /// Return an empty immutable list.
@@ -149,23 +180,35 @@ public interface ImmutableList<T extends @Nullable Object>
     /// Return an immutable list with the iterated elements.
     /// The iteration order is the order of the arguments.
     ///
-    /// Optimization for `n=0` and `n=1`.
+    /// Optimization for `n=0`.
     ///
     /// @param es the elements to put into the list
     /// @param <T> the entry type of the list.
     /// @return (e1, e2, e3, ...) as immutable list
     static <T extends @Nullable Object> ImmutableList<T> of(T... es) {
+        // an array of one element is still a fixed-size list, not the cons singleton of of(e1):
+        // a cons cell in a field that otherwise holds arrays costs the JIT the inlining of get
+        return ofFixedSize(es);
+    }
+
+    /// Return an immutable list with the iterated elements.
+    ///
+    /// In contrast to [#of(T...)] the result is always backed by the fixed-size array
+    /// implementation `ImmutableListArray` (or `NIL` for an empty sequence). The HotSpot JIT
+    /// cannot inline calls on fields whose possible runtime types are `NIL`, a cons cell and an
+    /// `ImmutableListArray`; restricting the construction of hot paths (e.g. term subterm lists,
+    /// operator argument sorts, Java AST children lists) to this factory leaves only two
+    /// variants and allows inlining.
+    ///
+    /// @param es the elements to put into the list
+    /// @param <T> the entry type of the list.
+    /// @return (e1, e2, e3, ...) as immutable list
+    static <T extends @Nullable Object> ImmutableList<T> ofFixedSize(T... es) {
         if (es.length == 0) {
-            return of();
+            return nil();
         }
-
-        if (es.length == 1) {
-            return of(es[0]);
-        }
-
         // we need to make a copy here since es can be an array that can be modified from the
-        // outside
-        // see ImmutableListArrayTest#immutability3
+        // outside, see ImmutableListArrayTest#immutability3
         return new ImmutableListArray<>(es.clone());
     }
 

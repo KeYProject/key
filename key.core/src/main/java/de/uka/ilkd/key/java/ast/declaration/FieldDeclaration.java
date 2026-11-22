@@ -13,7 +13,8 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.jspecify.annotations.NonNull;
 
@@ -26,7 +27,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
      * Field specs.
      */
 
-    protected final ImmutableArray<FieldSpecification> fieldSpecs;
+    protected final ImmutableListArray<FieldSpecification> fieldSpecs;
 
     /**
      * Field declaration.
@@ -44,7 +45,7 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     public FieldDeclaration(Modifier[] mods, TypeReference typeRef, FieldSpecification[] vars,
             boolean parentIsInterfaceDeclaration) {
         super(mods, typeRef, parentIsInterfaceDeclaration);
-        fieldSpecs = new ImmutableArray<>(vars);
+        fieldSpecs = ImmutableList.asArray(vars);
     }
 
     /**
@@ -60,26 +61,27 @@ public class FieldDeclaration extends VariableDeclaration implements MemberDecla
     public FieldDeclaration(ExtList children, boolean parentIsInterfaceDeclaration) {
         super(children, parentIsInterfaceDeclaration);
         fieldSpecs =
-            new ImmutableArray<>(children.collect(FieldSpecification.class));
+            ImmutableList
+                    .asArray(children.collect(FieldSpecification.class));
     }
 
-    public FieldDeclaration(PositionInfo pi, List<Comment> c, ImmutableArray<Modifier> modArray,
+    public FieldDeclaration(PositionInfo pi, List<Comment> c, ImmutableList<Modifier> modArray,
             TypeReference type,
-            boolean parentIsInferface, ImmutableArray<FieldSpecification> fieldSpecs) {
+            boolean parentIsInferface, ImmutableList<FieldSpecification> fieldSpecs) {
         super(pi, c, modArray, type, parentIsInferface);
-        this.fieldSpecs = fieldSpecs;
+        this.fieldSpecs = ImmutableList.asArray(fieldSpecs);
     }
 
     @Override
-    public @NonNull ImmutableArray<Modifier> getModifiers() {
+    public @NonNull ImmutableList<Modifier> getModifiers() {
         return modArray;
     }
 
-    public ImmutableArray<FieldSpecification> getFieldSpecifications() {
+    public ImmutableList<FieldSpecification> getFieldSpecifications() {
         return fieldSpecs;
     }
 
-    public ImmutableArray<? extends VariableSpecification> getVariables() {
+    public ImmutableList<? extends VariableSpecification> getVariables() {
         return fieldSpecs;
     }
 

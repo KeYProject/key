@@ -12,7 +12,8 @@ import de.uka.ilkd.key.java.ast.declaration.TypeDeclarationContainer;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +39,12 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * Imports.
      */
 
-    protected final ImmutableArray<Import> imports;
+    protected final ImmutableListArray<Import> imports;
 
     /**
      * Type declarations.
      */
-    protected final ImmutableArray<TypeDeclaration> typeDeclarations;
+    protected final ImmutableListArray<TypeDeclaration> typeDeclarations;
 
     /**
      * creates a compilation unit
@@ -58,8 +59,8 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public CompilationUnit(PackageSpecification packageSpec, Import[] imports,
             TypeDeclaration[] typeDeclarations) {
         this.packageSpec = packageSpec;
-        this.imports = new ImmutableArray<>(imports);
-        this.typeDeclarations = new ImmutableArray<>(typeDeclarations);
+        this.imports = ImmutableList.asArray(imports);
+        this.typeDeclarations = ImmutableList.asArray(typeDeclarations);
     }
 
 
@@ -72,19 +73,21 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
     public CompilationUnit(ExtList children) {
         super(children);
         packageSpec = children.get(PackageSpecification.class);
-        this.imports = new ImmutableArray<>(children.collect(Import.class));
+        this.imports =
+            ImmutableList.asArray(children.collect(Import.class));
         this.typeDeclarations =
-            new ImmutableArray<>(children.collect(TypeDeclaration.class));
+            ImmutableList
+                    .asArray(children.collect(TypeDeclaration.class));
     }
 
     public CompilationUnit(
             PositionInfo pi, List<Comment> c,
-            PackageSpecification accepto, ImmutableArray<Import> map,
-            ImmutableArray<TypeDeclaration> map1) {
+            PackageSpecification accepto, ImmutableList<Import> map,
+            ImmutableList<TypeDeclaration> map1) {
         super(pi, c);
         this.packageSpec = accepto;
-        this.imports = map;
-        this.typeDeclarations = map1;
+        this.imports = ImmutableList.asArray(map);
+        this.typeDeclarations = ImmutableList.asArray(map1);
     }
 
 
@@ -169,7 +172,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      * @return the wrapped import array.
      */
 
-    public ImmutableArray<Import> getImports() {
+    public ImmutableList<Import> getImports() {
         return imports;
     }
 
@@ -218,7 +221,7 @@ public class CompilationUnit extends JavaNonTerminalProgramElement
      *
      * @return the wrapped array of type declarations .
      */
-    public ImmutableArray<TypeDeclaration> getDeclarations() {
+    public ImmutableList<TypeDeclaration> getDeclarations() {
         return typeDeclarations;
     }
 

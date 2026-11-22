@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * Walks through a java AST in depth-left-fist-order.
@@ -1071,7 +1071,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         addToTopOfStack(x);
     }
 
-    protected void addChildren(ImmutableArray<ProgramElement> arr) {
+    protected void addChildren(ImmutableList<ProgramElement> arr) {
         stack.pop();
         for (int i = 0, sz = arr.size(); i < sz; i++) {
             addToTopOfStack(arr.get(i));

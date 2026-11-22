@@ -31,7 +31,6 @@ import de.uka.ilkd.key.settings.Configuration;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
 import org.key_project.prover.sequent.Sequent;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -135,7 +134,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             ImmutableList<LocationVariable> formalParVars, ProgramVariable selfVar,
             ProgramVariable resultVar, Services services) {
         final StatementBlock[] result = new StatementBlock[4];
-        final ImmutableArray<Expression> formalArray = new ImmutableArray<>(
+        final ImmutableList<Expression> formalArray = ImmutableList.of(
             formalParVars.toArray(new ProgramVariable[formalParVars.size()]));
 
         if (getContract().getTarget().isConstructor()) {

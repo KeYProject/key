@@ -14,7 +14,8 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableListArray;
 
 /**
  * Array reference.
@@ -35,7 +36,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
     /**
      * Inits.
      */
-    protected final ImmutableArray<Expression> inits;
+    protected final ImmutableListArray<Expression> inits;
 
 
     /**
@@ -56,7 +57,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      */
     public ArrayReference(ReferencePrefix accessPath, Expression[] initializers) {
         this.prefix = accessPath;
-        this.inits = new ImmutableArray<>(initializers);
+        this.inits = ImmutableList.asArray(initializers);
     }
 
     /**
@@ -79,10 +80,10 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
             this.prefix = new ArrayReference(e1, accessPath);
             e1 = new Expression[1];
             e1[0] = e[e.length - 1];
-            this.inits = new ImmutableArray<>(e1);
+            this.inits = ImmutableList.asArray(e1);
         } else {
             this.prefix = accessPath;
-            this.inits = new ImmutableArray<>(e);
+            this.inits = ImmutableList.asArray(e);
         }
     }
 
@@ -107,18 +108,18 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
             System.arraycopy(e, 0, e1, 0, e1.length);
             this.prefix = new ArrayReference(e1, accessPath);
             e1[0] = e[e.length - 1];
-            this.inits = new ImmutableArray<>(e1);
+            this.inits = ImmutableList.asArray(e1);
         } else {
             this.prefix = accessPath;
-            this.inits = new ImmutableArray<>(e);
+            this.inits = ImmutableList.asArray(e);
         }
     }
 
     public ArrayReference(PositionInfo pi, List<Comment> c, ReferencePrefix prefix,
-            ImmutableArray<Expression> inits) {
+            ImmutableList<Expression> inits) {
         super(pi, c);
         this.prefix = prefix;
-        this.inits = inits;
+        this.inits = ImmutableList.asArray(inits);
     }
 
     /**
@@ -240,7 +241,7 @@ public class ArrayReference extends JavaNonTerminalProgramElement implements Ref
      *
      * @return the expression array wrapper.
      */
-    public ImmutableArray<Expression> getDimensionExpressions() {
+    public ImmutableList<Expression> getDimensionExpressions() {
         return inits;
     }
 

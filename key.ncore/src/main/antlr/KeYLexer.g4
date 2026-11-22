@@ -44,11 +44,23 @@ lexer grammar KeYLexer;
     public void emit(Token token) {
        int MAX_K = 10;
        if (token.getType() == INT_LITERAL) {//rewrite INT_LITERALs to identifier when preceded by an '('
-           for (int k = 1; k <= MAX_K; k++) {
-               int codePoint = _input.LA(k);
-               if (Character.isWhitespace(codePoint)) continue;
-               if (codePoint == '(') ((org.antlr.v4.runtime.CommonToken) token).setType(IDENT);
-               break;
+           // fast path: no whitespace in between
+           // NBSP (U+00A0) is intentionally not treated as whitespace here: the
+           // original loop used Character.isWhitespace, which also excludes it.
+           int next = _input.LA(1);
+           if (next == '(') {
+               ((org.antlr.v4.runtime.CommonToken) token).setType(IDENT);
+           } else {
+               boolean blank = next == ' ' || next == '\t' || next == '\n' || next == '\r'
+                       || Character.isWhitespace(next);
+               if (blank) {
+                   for (int k = 2; k <= MAX_K; k++) {
+                       int codePoint = _input.LA(k);
+                       if (Character.isWhitespace(codePoint)) continue;
+                       if (codePoint == '(') ((org.antlr.v4.runtime.CommonToken) token).setType(IDENT);
+                       break;
+                   }
+               }
            }
        }
        if(token.getType() == PROOF) {
@@ -622,7 +634,7 @@ PLUS
  * If it is, we need to parse ">" as a special token indicating the continuation, it is "GREATER" otherwise.
  */
 GREATER_CONTD
-   : '>' { ">=".indexOf((char)_input.LA(1)) >= 0 }?
+   : '>' { ((char)_input.LA(1) == '=' || (char)_input.LA(1) == '>') }?
    ;
 
 // The non-special ">" symbol
@@ -653,7 +665,7 @@ CLOSETYPEPARAMS : ']' '>' {
 };
 
 WS
-   : [ \t\n\r\u00a0]+ -> channel (HIDDEN)
+   : [ \t\n\r\u00a0]+ -> skip
    ; //U+00A0 = non breakable whitespace
    
 STRING_LITERAL
@@ -840,7 +852,15 @@ MODALITYD_BLOCK_COMMENT
    ;
 
 MODALITYD_ANY
-   : . -> more
+   : ~[\\"'/]+ -> more
+   ;
+
+MODALITYD_BACKSLASH
+   : '\\' -> more
+   ;
+
+MODALITYD_SLASH
+   : '/' -> more
    ;
 
 mode modGeneric;
@@ -873,7 +893,15 @@ MODALITYG_BLOCK_COMMENT
    ;
 
 MODALITYG_ANY
-   : . -> more
+   : ~[\\"'/]+ -> more
+   ;
+
+MODALITYG_BACKSLASH
+   : '\\' -> more
+   ;
+
+MODALITYG_SLASH
+   : '/' -> more
    ;
 
 mode modBox;
@@ -906,7 +934,15 @@ MODALITYB_BLOCK_COMMENT
    ;
 
 MODALITYB_ANY
-   : . -> more
+   : ~[\\"'/]+ -> more
+   ;
+
+MODALITYB_BACKSLASH
+   : '\\' -> more
+   ;
+
+MODALITYB_SLASH
+   : '/' -> more
    ;
 
 mode modBoxBox;
@@ -927,7 +963,15 @@ MODALITYBB_COMMENT
    ;
 
 MODALITYBB_ANY
-   : . -> more
+   : ~[\\"'/]+ -> more
+   ;
+
+MODALITYBB_BACKSLASH
+   : '\\' -> more
+   ;
+
+MODALITYBB_SLASH
+   : '/' -> more
    ;
 
 mode modString;
@@ -939,8 +983,12 @@ MOD_STRING_END
    : '"' -> more , popMode
    ;
 
+MOD_STRING_BACKSLASH
+   : '\\' -> more
+   ;
+
 MOD_STRING_ANY
-   : . -> more
+   : ~["\\]+ -> more
    ;
 
 mode modChar;
@@ -949,7 +997,7 @@ MOD_CHAR_END
    ;
 
 MOD_CHAR_ANY
-   : . -> more
+   : ~[']+ -> more
    ;
 
 mode modComment;
@@ -958,7 +1006,11 @@ MOD_COMMENT_END
    ;
 
 MOD_COMMENT_ANY
-   : . -> more
+   : ~[*]+ -> more
+   ;
+
+MOD_COMMENT_STAR
+   : '*' -> more
    ;
 
 // Java line comment inside a modality body: consume up to (and including) the end of line so that
@@ -969,7 +1021,7 @@ MOD_LINE_COMMENT_END
    ;
 
 MOD_LINE_COMMENT_ANY
-   : . -> more
+   : ~[\n]+ -> more
    ;
 
 mode COMMENT;
@@ -978,7 +1030,11 @@ COMMENT_END
    ;
 
 COMMENT_ANY_CHAR
-   : . -> more
+   : ~[*]+ -> more
+   ;
+
+COMMENT_STAR
+   : '*' -> more
    ;
 
 mode docComment;
@@ -987,6 +1043,10 @@ DOC_COMMENT_END
    ;
 
 DOC_COMMENT_ANY_CHAR
-   : . -> more
+   : ~[*]+ -> more
+   ;
+
+DOC_COMMENT_STAR
+   : '*' -> more
    ;
 

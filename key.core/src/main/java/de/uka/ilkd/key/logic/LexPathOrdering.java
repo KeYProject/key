@@ -21,7 +21,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.op.Operator;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.sort.Sort;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  *
@@ -204,8 +204,8 @@ public class LexPathOrdering implements TermOrdering {
      *         or greater than <code>p_b</code>
      */
     private int compare(Operator aOp, Sort aSort,
-            ImmutableArray<TermLabel> aLabels, Operator bOp,
-            Sort bSort, ImmutableArray<TermLabel> bLabels) {
+            ImmutableList<TermLabel> aLabels, Operator bOp,
+            Sort bSort, ImmutableList<TermLabel> bLabels) {
         if (aOp == bOp) {
             return 0;
         }
