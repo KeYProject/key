@@ -18,7 +18,7 @@ import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.Nullable;
 
@@ -66,7 +66,7 @@ final class AlwaysAbnormallyTerminatingAnalysis {
 
     /// Returns whether the given sequence cannot complete normally. This is the case as soon as
     /// one of its statements cannot complete normally.
-    boolean isAlwaysAbnormallyTerminating(@Nullable ImmutableArray<?> body) {
+    boolean isAlwaysAbnormallyTerminating(@Nullable ImmutableList<?> body) {
         if (body == null) {
             return false;
         }

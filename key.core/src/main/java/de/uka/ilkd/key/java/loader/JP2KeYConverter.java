@@ -2369,7 +2369,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         IProgramVariable pvar = getPatternVariable(nName, type);
 
-        ImmutableArray<de.uka.ilkd.key.java.ast.declaration.Modifier> mods = map(n.getModifiers());
+        ImmutableList<de.uka.ilkd.key.java.ast.declaration.Modifier> mods = map(n.getModifiers());
         return new LocalVariableDeclaration(mods, type, new VariableSpecification(pvar));
     }
 

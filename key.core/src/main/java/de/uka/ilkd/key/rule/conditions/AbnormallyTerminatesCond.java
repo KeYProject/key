@@ -12,7 +12,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -49,7 +49,7 @@ public class AbnormallyTerminatesCond implements VariableCondition {
         var analysis = new AlwaysAbnormallyTerminatingAnalysis((Services) services);
 
         final boolean aborts;
-        if (instantiation instanceof ImmutableArray<?> stmts) {
+        if (instantiation instanceof ImmutableList<?> stmts) {
             aborts = analysis.isAlwaysAbnormallyTerminating(stmts);
         } else if (instantiation instanceof Statement stmt) {
             aborts = analysis.isAlwaysAbnormallyTerminating(stmt);
