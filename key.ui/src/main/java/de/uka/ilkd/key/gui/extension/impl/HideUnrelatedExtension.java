@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 @KeYGuiExtension.Info(name = "Hide Unrelated Formulas",
     description = "Hides all formulae that are not transitively related to the clicked term. "
         + "Hidden formulae can be restored via 'Insert Hidden'.",
-    experimental = true, optional = true, priority = 100)
+    experimental = false, optional = true, priority = 100)
 public class HideUnrelatedExtension implements KeYGuiExtension, KeYGuiExtension.ContextMenu {
     private static final Logger LOGGER = LoggerFactory.getLogger(HideUnrelatedExtension.class);
 
