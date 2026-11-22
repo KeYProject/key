@@ -12,7 +12,7 @@ final /*@ nullable */ class MyRecord extends Record {
       @*/
     @javax.annotation.processing.Generated("RecordClassBuilder")
     public MyRecord(String test) {
-        //Created by RecordClassBuilder.java:132
+        //Created by RecordClassBuilder.java:137
         this.test = test;
     }
 
