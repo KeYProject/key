@@ -25,7 +25,7 @@
 
 Input classes/failure modes the spec implies but no single task fully exercises — every line is pinned to a test in the list below:
 
-1. **Click on a sequent-arrow or formula-level position** (`PosInSequent` with `posInOccurrence() == null` or `posInTerm() == null`): no context-menu item at all and no NPE. → key.ui contract test.
+1. **Click on a formula-level position** (`PosInSequent` with `posInOccurrence() == null` or `posInTerm() == null`): no context-menu item at all and no NPE. → key.ui contract test.
 2. **Click in a view whose formula is not part of the selected goal** (e.g. an inner-node view of a different node): the action must be disabled, not silently hide everything. → key.core test (`computeKeptFormulas` returns `Optional.empty()` when the clicked formula is absent from the sequent).
 3. **Seed term occurs only inside the clicked formula**: only that formula is kept; the action stays enabled (there is something to hide). → key.core test.
 4. **Everything is already related**: the action is disabled ("nothing to hide"), and the menu item never hides *all* formulae. → key.core test via the named `hidesNothing` predicate.
