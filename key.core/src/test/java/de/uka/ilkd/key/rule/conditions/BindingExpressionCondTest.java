@@ -26,7 +26,6 @@ import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.SyntaxElement;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

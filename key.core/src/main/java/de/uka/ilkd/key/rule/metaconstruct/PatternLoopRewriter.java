@@ -39,7 +39,6 @@ import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 /**
@@ -83,7 +82,7 @@ public final class PatternLoopRewriter extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        var statements = (ImmutableArray<Statement>) svInst.getInstantiation(statementsSV);
+        var statements = (ImmutableList<Statement>) svInst.getInstantiation(statementsSV);
         var boolVar = freshBoolean(services);
         var result = new ArrayList<Statement>();
         boolean rewritten = false;
