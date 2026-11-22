@@ -15,7 +15,7 @@ import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 import org.key_project.util.ExtList;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NullMarked;
 
@@ -34,21 +34,21 @@ import org.jspecify.annotations.NullMarked;
 public class RecordPattern extends Pattern {
 
     private final TypeReference typeReference;
-    private final ImmutableArray<RecordPatternComponent> components;
+    private final ImmutableList<RecordPatternComponent> components;
 
     public RecordPattern(TypeReference typeReference,
-            ImmutableArray<RecordPatternComponent> components) {
+            ImmutableList<RecordPatternComponent> components) {
         this(PositionInfo.UNDEFINED, List.of(), typeReference, components);
     }
 
     public RecordPattern(ExtList children) {
         super(children);
         this.typeReference = Objects.requireNonNull(children.get(TypeReference.class));
-        this.components = new ImmutableArray<>(children.collect(RecordPatternComponent.class));
+        this.components = ImmutableList.fromArray(children.collect(RecordPatternComponent.class));
     }
 
     public RecordPattern(PositionInfo pi, List<Comment> comments, TypeReference typeReference,
-            ImmutableArray<RecordPatternComponent> components) {
+            ImmutableList<RecordPatternComponent> components) {
         super(pi, comments);
         this.typeReference = Objects.requireNonNull(typeReference);
         this.components = Objects.requireNonNull(components);
@@ -64,7 +64,7 @@ public class RecordPattern extends Pattern {
     /**
      * @return the component patterns in record component declaration order
      */
-    public ImmutableArray<RecordPatternComponent> getComponents() {
+    public ImmutableList<RecordPatternComponent> getComponents() {
         return components;
     }
 

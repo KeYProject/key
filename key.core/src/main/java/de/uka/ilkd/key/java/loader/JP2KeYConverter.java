@@ -1179,7 +1179,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             converted.add(new RecordPatternComponent(componentPi, componentComments,
                 new ProgramElementName(component.getName()), pattern));
         }
-        return new RecordPattern(pi, c, type, new ImmutableArray<>(converted));
+        return new RecordPattern(pi, c, type, ImmutableList.fromList(converted));
     }
 
     /**
