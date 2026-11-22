@@ -122,47 +122,81 @@ public class HideUnrelatedExtension implements KeYGuiExtension, KeYGuiExtension.
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            // The user might have applied a rule or moved the selection while the context menu was
+            // open. Do not act on a goal that is no longer the selected, open goal.
+            if (mediator.getSelectedGoal() != goal) {
+                LOGGER.debug("The goal behind this action is no longer the selected goal;"
+                    + " skipping the hide of unrelated formulas.");
+                return;
+            }
             Optional<Set<SequentFormula>> plan = plan();
             if (plan.isEmpty()) {
                 return;
             }
             Set<SequentFormula> kept = plan.get();
 
-            Goal current = goal;
-            for (SequentFormula sf : goal.sequent().antecedent()) {
-                if (!kept.contains(sf)) {
-                    current = applyHide(current, sf, true);
+            // Batch the rule applications so the sequent view is not repainted after every single
+            // hide (the same wrap the SMT unsat-core focusing uses).
+            mediator.stopInterface(true);
+            try {
+                Goal current =
+                    hideUnrelated(goal, kept, goal.sequent().antecedent(), true);
+                if (current != null) {
+                    current = hideUnrelated(current, kept, goal.sequent().succedent(), false);
+                    if (current != null && mediator.getSelectedNode() == goal.node()) {
+                        mediator.getSelectionModel().setSelectedNode(current.node());
+                    }
                 }
-            }
-            for (SequentFormula sf : goal.sequent().succedent()) {
-                if (!kept.contains(sf)) {
-                    current = applyHide(current, sf, false);
-                }
-            }
-
-            // refresh the sequent view if the selected node was the goal we modified
-            if (mediator.getSelectedNode() == goal.node()) {
-                mediator.getSelectionModel().setSelectedNode(current.node());
+            } finally {
+                mediator.startInterface(true);
             }
         }
 
         /**
-         * Applies {@code hide_left} or {@code hide_right} to the given formula on the current goal
-         * and returns the resulting goal.
+         * Hides every formula of {@code formulas} that is not in {@code kept} on the current goal.
+         *
+         * @return the resulting goal, or {@code null} if a single hide failed (the partial result
+         *         is
+         *         kept; the caller stops)
          */
-        private Goal applyHide(Goal current, SequentFormula sf, boolean inAntec) {
+        private @Nullable Goal hideUnrelated(Goal current, Set<SequentFormula> kept,
+                Iterable<SequentFormula> formulas, boolean inAntec) {
+            for (SequentFormula sf : formulas) {
+                if (!kept.contains(sf)) {
+                    current = applyHide(current, sf, inAntec);
+                    if (current == null) {
+                        LOGGER.error("Hiding formula {} failed; stopping.", sf);
+                        return null;
+                    }
+                }
+            }
+            return current;
+        }
+
+        /**
+         * Applies {@code hide_left} or {@code hide_right} to the given formula on the current goal
+         * and returns the resulting goal, or {@code null} if the rule could not be resolved or the
+         * application failed.
+         */
+        private @Nullable Goal applyHide(Goal current, SequentFormula sf, boolean inAntec) {
             FindTaclet hideTaclet = lookupHideTaclet(inAntec);
             if (hideTaclet == null) {
-                LOGGER.warn("Could not look up the {} rule; cannot hide formula {}.",
+                LOGGER.error("Could not look up the {} rule; cannot hide formula {}.",
                     inAntec ? HIDE_LEFT : HIDE_RIGHT, sf);
-                return current;
+                return null;
             }
-            SchemaVariable schema = hideTaclet.collectSchemaVars().iterator().next();
             var services = goal.proof().getServices();
-            TacletApp app = PosTacletApp.createPosTacletApp(hideTaclet, new MatchConditions(),
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), inAntec), services);
-            app = app.addCheckedInstantiation(schema, (JTerm) sf.formula(), services, true);
-            return current.apply(app).iterator().next();
+            try {
+                SchemaVariable schema = hideTaclet.collectSchemaVars().iterator().next();
+                TacletApp app = PosTacletApp.createPosTacletApp(hideTaclet, new MatchConditions(),
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), inAntec), services);
+                app = app.addCheckedInstantiation(schema, (JTerm) sf.formula(), services, true);
+                return current.apply(app).iterator().next();
+            } catch (RuntimeException ex) {
+                LOGGER.error("Applying the {} rule failed; cannot hide formula {}.",
+                    inAntec ? HIDE_LEFT : HIDE_RIGHT, sf, ex);
+                return null;
+            }
         }
     }
 }
