@@ -14,7 +14,7 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.VariableCondition;
 import org.key_project.prover.rules.instantiation.MatchResultInfo;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
@@ -61,7 +61,7 @@ public class BindingExpressionCond implements VariableCondition {
 
         if (expression != null) {
             isBindingExpr = BindingVariableVisitor.binds(expression);
-        } else if (condition instanceof ImmutableArray<?> list) {
+        } else if (condition instanceof ImmutableList<?> list) {
             for (Object element : list) {
                 if (element instanceof LoopStatement loop
                         && BindingVariableVisitor.binds(loop.getGuardExpression())) {

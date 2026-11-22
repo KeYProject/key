@@ -25,7 +25,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.HelperClassForTests;
 
 import org.key_project.logic.SyntaxElement;
-import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableList;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -69,7 +69,7 @@ class BindingExpressionCondTest {
         SVInstantiations instantiations;
         if (list) {
             instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS.add(
-                sv, (ImmutableArray<Statement>) instantiation, Statement.class, services);
+                sv, (ImmutableList<Statement>) instantiation, Statement.class, services);
         } else {
             instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS.add(
                 sv, (SyntaxElement) instantiation, services);
@@ -99,7 +99,7 @@ class BindingExpressionCondTest {
 
     @Test
     void acceptsStatementListWithBindingLoop() {
-        var list = new ImmutableArray<>(
+        var list = ImmutableList.of(
             firstStatement("int x = 0;"),
             firstStatement("while (new String(\"x\") instanceof String s) { }"));
         assertTrue(isBinding(list, true));
@@ -107,7 +107,7 @@ class BindingExpressionCondTest {
 
     @Test
     void rejectsStatementListWithoutBindingLoop() {
-        var list = new ImmutableArray<>(
+        var list = ImmutableList.of(
             firstStatement("int x = 0;"),
             firstStatement("while (new String(\"x\") != null) { }"));
         assertFalse(isBinding(list, true));
