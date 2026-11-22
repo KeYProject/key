@@ -9,29 +9,31 @@ on:
       - "main"
       - "KeY-*"
       - "releases/*"
+      - "prereleases/*"
   merge_group:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
-  id-token: write
-  checks: write
+  contents: read
 
 jobs:
   unit-tests:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-24.04, windows-latest ]
         java: [ 21 ]
-        modules: [
-          keyext.exploration, keyext.slicing, key.ncore, key.ui, key.core,
-          key.core.testgen, keyext.isabelletranslation,  keyext.ui.testgen,  key.ncore.calculus,
-          key.util, key.core.example, keyext.caching, key.core.wd, key.core.infflow,
-          keyext.proofmanagement]
-    continue-on-error: true
+        group: [ core, rest ]
+        include:
+          - group: core
+            tasks: ":key.core:test"
+          - group: rest
+            tasks: "test -x :key.core:test"
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -40,10 +42,11 @@ jobs:
       - name: Setup SMT solvers
         uses: keyproject/setup-smt@v0
         with:
-          # Pin Z3 so CI is reproducible: an unpinned solver makes the SMT-dependent tests
-          # (e.g. key.core.testgen) a moving target that fails intermittently when the action's
-          # default version changes.
+          # Pin both solvers so CI is reproducible: an unpinned solver makes the SMT-dependent
+          # tests (e.g. key.core.testgen) a moving target that fails intermittently when the
+          # action's default version changes.
           z3Version: 4.13.0
+          cvc5Version: 1.2.1
 
       - name: z3 version
         run: z3 --version
@@ -52,23 +55,28 @@ jobs:
         run: cvc5 --version
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v6.1.0
+        uses: actions/setup-java@v6.3.0
         with:
           java-version: ${{ matrix.java }}
           distribution: 'corretto'
-          cache: 'gradle'
+          # Gradle caching is provided by setup-gradle below; do not also set `cache: gradle`
+          # here (double restore/save of the same paths, and the save fails on Windows).
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
 
       - name: Test with Gradle
-        run: ./gradlew --continue :${{ matrix.modules }}:test
+        shell: bash
+        # matrix.tasks is intentionally interpolated UNQUOTED: it is a whitespace-separated
+        # list of Gradle task/option selectors, and quoting would hand Gradle a single
+        # argument it cannot resolve.
+        run: ./gradlew --continue ${{ matrix.tasks }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
         if: success() || failure()
         with:
-          name: test-results-${{ matrix.os }}-${{ matrix.modules }}
+          name: test-results-${{ matrix.os }}-${{ matrix.group }}
           path: |
             **/build/test-results/*/*.xml
             **/build/reports/
@@ -77,35 +85,40 @@ jobs:
   integration-tests:
     env:
       GH_TOKEN: ${{ github.token }}
-    # The multi-core prover gates (testMt*) must be able to fail CI; the long-running proof
-    # regression legs keep their historical advisory (continue-on-error) status. fail-fast is
-    # off, so a red MT leg never cancels the sibling legs either way.
-    continue-on-error: ${{ !startsWith(matrix.test, 'testMt') }}
+    continue-on-error: ${{ !matrix.gating }}
     strategy:
       fail-fast: false
       matrix:
-        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs, testMtStress, testMt2w, testMt4w ]
-        os: [ ubuntu-latest ]
+        test: [ testProveRules, testRunAllFunProofs, testRunAllInfProofs, testRunAllWdProofs, mt-proofs ]
+        os: [ ubuntu-24.04 ]
         java: [ 21 ]
+        include:
+          - test: mt-proofs
+            tasks: "testMtStress testMt2w testMt4w"
+            gating: true
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v7
       - name: Set up JDK 21
-        uses: actions/setup-java@v6.1.0
+        uses: actions/setup-java@v6.3.0
         with:
           java-version: ${{ matrix.java }}
           distribution: 'corretto'
-          cache: 'gradle'
 
       - name: Setup SMT solvers
         uses: keyproject/setup-smt@v0
         with:
           z3Version: 4.13.0
+          cvc5Version: 1.2.1
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v6
       - name: "Running tests: ${{ matrix.test }}"
-        run: ./gradlew --continue ${{ matrix.test }}
+        shell: bash
+        # matrix.tasks is intentionally interpolated UNQUOTED: it may hold several
+        # whitespace-separated task selectors (the combined MT leg).
+        run: ./gradlew --continue ${{ matrix.tasks || matrix.test }}
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
