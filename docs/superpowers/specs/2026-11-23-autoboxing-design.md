@@ -177,9 +177,10 @@ A committed semantic corpus backs every conversion context:
 
 ## Known limitations
 
-- Enhanced `for` over an **array** is desugared to an indexed loop; enhanced
-  `for` over an `Iterable` is left to the prover's enhanced-for elimination and
-  does not get the conversion.
+- Enhanced `for` over an **array** is desugared to an indexed loop only when the
+  loop variable needs a boxing/unboxing conversion; loops without conversion
+  keep the prover's enhanced-for elimination (and its `\index`/`\values`
+  loop-contract support).
 - Side-effecting enhanced-for iterables are not desugared (they would have to
   be evaluated once).
 - Multi-dimensional array initializers are converted at the AST level, but

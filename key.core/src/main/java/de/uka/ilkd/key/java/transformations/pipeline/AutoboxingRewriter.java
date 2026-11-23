@@ -544,13 +544,18 @@ final class AutoboxingRewriter {
             return;
         }
         VariableDeclarator declarator = variable.getVariable(0);
+        Target target = targetOf(declarator.getType());
+        if (!needsConversion(componentType, target)) {
+            // No boxing/unboxing: keep the enhanced-for so the prover's elimination (and its
+            // loop contracts and \index/\values support) remains intact.
+            return;
+        }
         Expression iterable = forEach.getIterable();
 
         int id = ++freshId;
         String indexName = "$keYIndex" + id;
         ArrayAccessExpr element = new ArrayAccessExpr(iterable.clone(), new NameExpr(indexName));
-        declarator.setInitializer(
-            convertKnown(element, componentType, targetOf(declarator.getType())));
+        declarator.setInitializer(convertKnown(element, componentType, target));
 
         Statement body = forEach.getBody();
         BlockStmt bodyBlock = body instanceof BlockStmt block ? block
@@ -578,6 +583,31 @@ final class AutoboxingRewriter {
         } catch (RuntimeException e) {
             return null;
         }
+    }
+
+    /**
+     * Tells whether the element type needs a boxing or unboxing conversion for the loop variable.
+     * Primitive widening and reference assignments are left to the existing rules.
+     */
+    private static boolean needsConversion(@Nullable ResolvedType componentType, Target target) {
+        if (componentType == null || target.kind() == Kind.NONE) {
+            return false;
+        }
+        if (componentType.isPrimitive()) {
+            String primitive = componentType.asPrimitive().describe();
+            if (target.kind() == Kind.WRAPPER) {
+                return true;
+            }
+            if (target.kind() == Kind.REFERENCE) {
+                return WrapperType.forPrimitive(primitive) != null;
+            }
+            return false;
+        }
+        if (componentType.isReferenceType()) {
+            WrapperType wrapper = wrapperOf(componentType);
+            return wrapper != null && target.kind() == Kind.PRIMITIVE;
+        }
+        return false;
     }
 
     private static Expression unboxBoolean(Expression expression) {
