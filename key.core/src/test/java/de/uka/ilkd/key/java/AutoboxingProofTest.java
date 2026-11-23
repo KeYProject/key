@@ -176,6 +176,90 @@ class AutoboxingProofTest {
     }
 
     @Test
+    void arithmeticPromotion(@TempDir Path dir) throws Exception {
+        prove("ArithmeticPromotion", clazz("ArithmeticPromotion", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = 42;
+                    int i = a + 1;
+                    //@ assert i == 43;
+                }
+                """), dir);
+    }
+
+    @Test
+    void mixedLongPromotion(@TempDir Path dir) throws Exception {
+        prove("MixedLongPromotion", clazz("MixedLongPromotion", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = 42;
+                    long v = a + 1L;
+                    //@ assert v == 43L;
+                }
+                """), dir);
+    }
+
+    @Test
+    void booleanCondition(@TempDir Path dir) throws Exception {
+        prove("BooleanCondition", clazz("BooleanCondition", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Boolean z = true;
+                    int i = 0;
+                    if (z) {
+                        i = 1;
+                    }
+                    //@ assert i == 1;
+                }
+                """), dir);
+    }
+
+    @Test
+    void arrayIndex(@TempDir Path dir) throws Exception {
+        prove("ArrayIndex", clazz("ArrayIndex", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer idx = 1;
+                    int[] values = new int[] { 5, 6, 7 };
+                    int x = values[idx];
+                    //@ assert x == 6;
+                }
+                """), dir);
+    }
+
+    @Test
+    void switchSelector(@TempDir Path dir) throws Exception {
+        prove("SwitchSelector", clazz("SwitchSelector", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = 2;
+                    int r = 0;
+                    switch (a) {
+                        case 1: r = 1; break;
+                        case 2: r = 2; break;
+                        default: r = 0; break;
+                    }
+                    //@ assert r == 2;
+                }
+                """), dir);
+    }
+
+    @Test
     void nullUnboxingSplits(@TempDir Path dir) throws Exception {
         Proof proof = proof("NullUnboxing", clazz("NullUnboxing", """
                 /*@ normal_behavior

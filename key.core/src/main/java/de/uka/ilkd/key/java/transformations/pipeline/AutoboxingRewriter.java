@@ -16,16 +16,26 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
+import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.CastExpr;
+import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.expr.SwitchExpr;
+import com.github.javaparser.ast.expr.UnaryExpr;
+import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.stmt.SwitchStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
@@ -75,6 +85,26 @@ final class AutoboxingRewriter {
         } else if (node instanceof ExplicitConstructorInvocationStmt invocation) {
             rewriteCallArguments(invocation, invocation::resolve, invocation.getArguments(),
                 invocation::setArgument);
+        } else if (node instanceof BinaryExpr binary) {
+            rewriteBinary(binary);
+        } else if (node instanceof UnaryExpr unary) {
+            rewriteUnary(unary);
+        } else if (node instanceof ArrayAccessExpr access) {
+            rewriteArrayIndex(access);
+        } else if (node instanceof IfStmt ifStmt) {
+            ifStmt.setCondition(unboxBoolean(ifStmt.getCondition()));
+        } else if (node instanceof WhileStmt whileStmt) {
+            whileStmt.setCondition(unboxBoolean(whileStmt.getCondition()));
+        } else if (node instanceof DoStmt doStmt) {
+            doStmt.setCondition(unboxBoolean(doStmt.getCondition()));
+        } else if (node instanceof ForStmt forStmt) {
+            forStmt.getCompare().ifPresent(compare -> forStmt.setCompare(unboxBoolean(compare)));
+        } else if (node instanceof ConditionalExpr conditional) {
+            conditional.setCondition(unboxBoolean(conditional.getCondition()));
+        } else if (node instanceof SwitchStmt switchStmt) {
+            switchStmt.setSelector(unboxWrapper(switchStmt.getSelector()));
+        } else if (node instanceof SwitchExpr switchExpr) {
+            switchExpr.setSelector(unboxWrapper(switchExpr.getSelector()));
         }
         for (Node child : new ArrayList<>(node.getChildNodes())) {
             rewriteNode(child);
@@ -103,6 +133,224 @@ final class AutoboxingRewriter {
             return;
         }
         returnStmt.setExpression(convert(expression, targetOf(method.getType())));
+    }
+
+    private void rewriteBinary(BinaryExpr binary) {
+        BinaryExpr.Operator operator = binary.getOperator();
+        if (operator == BinaryExpr.Operator.EQUALS
+                || operator == BinaryExpr.Operator.NOT_EQUALS) {
+            if (isPrimitiveNumeric(binary.getLeft()) || isPrimitiveNumeric(binary.getRight())) {
+                promoteBinary(binary);
+            }
+            return;
+        }
+        if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
+            binary.setLeft(unboxBoolean(binary.getLeft()));
+            binary.setRight(unboxBoolean(binary.getRight()));
+            return;
+        }
+        if (isShift(operator)) {
+            rewriteShift(binary);
+            return;
+        }
+        if (!isNumericBinary(operator) || isStringConcat(binary)) {
+            return;
+        }
+        promoteBinary(binary);
+    }
+
+    private void promoteBinary(BinaryExpr binary) {
+        ResolvedType leftType = typeOf(binary.getLeft());
+        ResolvedType rightType = typeOf(binary.getRight());
+        String leftPrimitive = numericPrimitive(leftType);
+        String rightPrimitive = numericPrimitive(rightType);
+        if (leftPrimitive == null || rightPrimitive == null) {
+            return;
+        }
+        String promoted = promote(leftPrimitive, rightPrimitive);
+        binary.setLeft(widen(binary.getLeft(), leftType, leftPrimitive, promoted));
+        binary.setRight(widen(binary.getRight(), rightType, rightPrimitive, promoted));
+    }
+
+    private void rewriteShift(BinaryExpr binary) {
+        ResolvedType leftType = typeOf(binary.getLeft());
+        ResolvedType rightType = typeOf(binary.getRight());
+        String leftPrimitive = numericPrimitive(leftType);
+        String rightPrimitive = numericPrimitive(rightType);
+        if (leftPrimitive == null || rightPrimitive == null) {
+            return;
+        }
+        String leftPromoted = leftPrimitive.equals("long") ? "long" : "int";
+        String rightPromoted = rightPrimitive.equals("long") ? "long" : "int";
+        binary.setLeft(widen(binary.getLeft(), leftType, leftPrimitive, leftPromoted));
+        binary.setRight(widen(binary.getRight(), rightType, rightPrimitive, rightPromoted));
+    }
+
+    private void rewriteUnary(UnaryExpr unary) {
+        switch (unary.getOperator()) {
+            case PLUS, MINUS, BITWISE_COMPLEMENT -> {
+                ResolvedType type = typeOf(unary.getExpression());
+                String primitive = numericPrimitive(type);
+                if (primitive == null) {
+                    return;
+                }
+                String promoted = switch (primitive) {
+                    case "byte", "short", "char" -> "int";
+                    default -> primitive;
+                };
+                unary.setExpression(widen(unary.getExpression(), type, primitive, promoted));
+            }
+            case LOGICAL_COMPLEMENT -> unary.setExpression(unboxBoolean(unary.getExpression()));
+            default -> {
+            }
+        }
+    }
+
+    private void rewriteArrayIndex(ArrayAccessExpr access) {
+        ResolvedType type = typeOf(access.getIndex());
+        String primitive = numericPrimitive(type);
+        if (primitive == null) {
+            return;
+        }
+        access.setIndex(widen(access.getIndex(), type, primitive, "int"));
+    }
+
+    private static Expression unboxBoolean(Expression expression) {
+        ResolvedType type = typeOf(expression);
+        if (type != null && type.isReferenceType()) {
+            try {
+                WrapperType wrapper = WrapperType
+                        .forWrapper(type.asReferenceType().getQualifiedName());
+                if (wrapper == WrapperType.BOOLEAN) {
+                    return unbox(expression, wrapper, wrapper.primitiveName());
+                }
+            } catch (RuntimeException e) {
+                LOGGER.debug("Cannot resolve boolean operand {}", expression, e);
+            }
+        }
+        return expression;
+    }
+
+    private static Expression unboxWrapper(Expression expression) {
+        ResolvedType type = typeOf(expression);
+        if (type != null && type.isReferenceType()) {
+            try {
+                WrapperType wrapper = WrapperType
+                        .forWrapper(type.asReferenceType().getQualifiedName());
+                if (wrapper != null) {
+                    return unbox(expression, wrapper, null);
+                }
+            } catch (RuntimeException e) {
+                LOGGER.debug("Cannot resolve switch selector {}", expression, e);
+            }
+        }
+        return expression;
+    }
+
+    private static @Nullable ResolvedType typeOf(Expression expression) {
+        try {
+            return expression.calculateResolvedType();
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    private static @Nullable String numericPrimitive(@Nullable ResolvedType type) {
+        if (type == null) {
+            return null;
+        }
+        if (type.isPrimitive()) {
+            String name = type.asPrimitive().describe();
+            return isNumericName(name) ? name : null;
+        }
+        if (type.isReferenceType()) {
+            try {
+                WrapperType wrapper = WrapperType
+                        .forWrapper(type.asReferenceType().getQualifiedName());
+                if (wrapper != null && isNumericName(wrapper.primitiveName())) {
+                    return wrapper.primitiveName();
+                }
+            } catch (RuntimeException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private static boolean isPrimitiveNumeric(Expression expression) {
+        ResolvedType type = typeOf(expression);
+        return type != null && type.isPrimitive() && isNumericName(type.asPrimitive().describe());
+    }
+
+    private static boolean isNumericName(String name) {
+        return switch (name) {
+            case "byte", "short", "char", "int", "long", "float", "double" -> true;
+            default -> false;
+        };
+    }
+
+    private static String promote(String left, String right) {
+        if (left.equals("double") || right.equals("double")) {
+            return "double";
+        }
+        if (left.equals("float") || right.equals("float")) {
+            return "float";
+        }
+        if (left.equals("long") || right.equals("long")) {
+            return "long";
+        }
+        return "int";
+    }
+
+    private static Expression widen(Expression expression, @Nullable ResolvedType actualType,
+            String actualPrimitive, String target) {
+        if (actualType == null) {
+            return expression;
+        }
+        if (actualType.isReferenceType()) {
+            WrapperType wrapper = WrapperType.forPrimitive(actualPrimitive);
+            return wrapper == null ? expression : unbox(expression, wrapper, target);
+        }
+        if (actualPrimitive.equals(target)) {
+            return expression;
+        }
+        if (WrapperType.isWidening(actualPrimitive, target)) {
+            return cast(target, expression.clone());
+        }
+        return expression;
+    }
+
+    private static boolean isShift(BinaryExpr.Operator operator) {
+        return operator == BinaryExpr.Operator.LEFT_SHIFT
+                || operator == BinaryExpr.Operator.SIGNED_RIGHT_SHIFT
+                || operator == BinaryExpr.Operator.UNSIGNED_RIGHT_SHIFT;
+    }
+
+    private static boolean isNumericBinary(BinaryExpr.Operator operator) {
+        return switch (operator) {
+            case PLUS, MINUS, MULTIPLY, DIVIDE, REMAINDER, LESS, GREATER, LESS_EQUALS,
+                    GREATER_EQUALS, BINARY_AND, BINARY_OR, XOR ->
+                true;
+            default -> false;
+        };
+    }
+
+    private static boolean isStringConcat(BinaryExpr binary) {
+        if (binary.getOperator() != BinaryExpr.Operator.PLUS) {
+            return false;
+        }
+        return isString(typeOf(binary.getLeft())) || isString(typeOf(binary.getRight()));
+    }
+
+    private static boolean isString(@Nullable ResolvedType type) {
+        if (type == null || !type.isReferenceType()) {
+            return false;
+        }
+        try {
+            return "java.lang.String".equals(type.asReferenceType().getQualifiedName());
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
     private void rewriteCallArguments(Node node, Resolver resolver, List<Expression> arguments,

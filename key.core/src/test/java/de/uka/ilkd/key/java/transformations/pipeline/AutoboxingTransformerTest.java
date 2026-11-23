@@ -168,6 +168,69 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void unboxesArithmeticOperand() {
+        String out = rewrite("void m() { Integer a = 42; int i = a + 1; }");
+        assertTrue(out.contains("a.value + 1"), out);
+    }
+
+    @Test
+    void promotesMixedArithmetic() {
+        String out = rewrite("void m() { Integer a = 42; long v = a + 1L; }");
+        assertTrue(out.contains("(long) a.value + 1L"), out);
+    }
+
+    @Test
+    void keepsBoxedEqualityByReference() {
+        String out = rewrite(
+            "void m() { Integer a = 42; Integer b = 42; boolean r = a == b; }");
+        assertFalse(out.contains("a.value"), out);
+        assertFalse(out.contains("b.value"), out);
+    }
+
+    @Test
+    void unboxesPrimitiveEquality() {
+        String out = rewrite("void m() { Integer a = 42; boolean r = a == 42; }");
+        assertTrue(out.contains("a.value == 42"), out);
+    }
+
+    @Test
+    void promotesShift() {
+        String out = rewrite("void m() { Integer a = 42; long v = a << 2; }");
+        assertTrue(out.contains("a.value << 2"), out);
+    }
+
+    @Test
+    void unboxesArrayIndex() {
+        String out = rewrite("void m() { int[] arr = new int[3]; Integer a = 1; int x = arr[a]; }");
+        assertTrue(out.contains("arr[a.value]"), out);
+    }
+
+    @Test
+    void unboxesSwitchSelector() {
+        String out = rewrite(
+            "void m() { Integer a = 1; switch (a) { case 1: break; default: break; } }");
+        assertTrue(out.contains("switch(a.value)"), out);
+    }
+
+    @Test
+    void unboxesUnaryOperand() {
+        String out = rewrite("void m() { Integer a = 42; int i = -a; }");
+        assertTrue(out.contains("-a.value"), out);
+    }
+
+    @Test
+    void unboxesBooleanCondition() {
+        String out = rewrite("void m() { Boolean z = true; if (z) { } }");
+        assertTrue(out.contains("if (z.value)"), out);
+    }
+
+    @Test
+    void unboxesBooleanNot() {
+        String out = rewrite("void m() { Boolean z = true; boolean b = !z; }");
+        assertTrue(out.contains("!z.value"), out);
+    }
+
+    @Test
     void explicitCallsAreIdempotent() {
         String out = rewrite(
             "void m() { Integer a = Integer.valueOf(42); int i = a.intValue(); }");

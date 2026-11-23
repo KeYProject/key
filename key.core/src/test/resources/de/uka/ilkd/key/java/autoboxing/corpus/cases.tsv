@@ -9,3 +9,8 @@ return-int	PROVABLE	ReturnInt	m
 arg-int	PROVABLE	ArgInt	m
 arg-null	SPLIT	ArgNull	m
 varargs-int	PROVABLE	VarargsInt	m
+promotion-int	PROVABLE	PromotionInt	m
+promotion-long	PROVABLE	PromotionLong	m
+condition-bool	PROVABLE	ConditionBool	m
+index-int	PROVABLE	IndexInt	m
+switch-int	PROVABLE	SwitchInt	m
