@@ -53,7 +53,7 @@ import org.jspecify.annotations.NonNull;
  * treatment)</li>
  * <li>{@link OneStepSimplifier} applications on updated modalities (for {@code <inv>()} calls)</li>
  * <li>{@link UseOperationContractRule}, {@link JmlAssertRule}, {@link WhileInvariantRule},
- * and {@link LoopScopeInvariantRule}</li>
+ * {@link LoopScopeInvariantRule}, and {@link SetStatementRule}</li>
  * </ul>
  * <p>
  * The macro uses a {@link FilterSymbexStrategy} that filters rule applications based on
@@ -165,7 +165,8 @@ public class SymbolicExecutionOnlyMacro extends StrategyProofMacro {
         if (rule instanceof UseOperationContractRule ||
                 rule instanceof JmlAssertRule ||
                 rule instanceof WhileInvariantRule ||
-                rule instanceof LoopScopeInvariantRule)
+                rule instanceof LoopScopeInvariantRule ||
+                rule instanceof SetStatementRule)
             return true;
 
         return false;
