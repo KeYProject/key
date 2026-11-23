@@ -114,6 +114,60 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void unboxesMethodArgument() {
+        String out = rewrite("""
+                static int f(int x) { return x; }
+                void m() { Integer a = 42; int i = f(a); }
+                """);
+        assertTrue(out.contains("f(a.value)"), out);
+    }
+
+    @Test
+    void boxesMethodArgument() {
+        String out = rewrite("""
+                static void g(Integer x) { }
+                void m() { g(42); }
+                """);
+        assertTrue(out.contains("g(Integer.valueOf(42))"), out);
+    }
+
+    @Test
+    void boxesVarargsElements() {
+        String out = rewrite("""
+                static void h(Integer... xs) { }
+                void m() { h(1, 2); }
+                """);
+        assertTrue(out.contains("h(Integer.valueOf(1), Integer.valueOf(2))"), out);
+    }
+
+    @Test
+    void unboxesVarargsElements() {
+        String out = rewrite("""
+                static void k(int... xs) { }
+                void m() { Integer a = 42; k(a, 2); }
+                """);
+        assertTrue(out.contains("k(a.value, 2)"), out);
+    }
+
+    @Test
+    void boxesConstructorArgument() {
+        String out = rewrite("""
+                static class C { C(Integer x) { } }
+                void m() { C c = new C(42); }
+                """);
+        assertTrue(out.contains("new C(Integer.valueOf(42))"), out);
+    }
+
+    @Test
+    void boxesExplicitConstructorArguments() {
+        String out = rewrite("""
+                static class A { A(Integer x) { } }
+                static class B extends A { B() { super(42); } }
+                """);
+        assertTrue(out.contains("super(Integer.valueOf(42))"), out);
+    }
+
+    @Test
     void explicitCallsAreIdempotent() {
         String out = rewrite(
             "void m() { Integer a = Integer.valueOf(42); int i = a.intValue(); }");

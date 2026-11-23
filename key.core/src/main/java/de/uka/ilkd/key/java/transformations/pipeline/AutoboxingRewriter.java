@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.java.transformations.pipeline;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
@@ -22,9 +23,12 @@ import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedType;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -63,6 +67,14 @@ final class AutoboxingRewriter {
             rewriteAssignment(assign);
         } else if (node instanceof ReturnStmt returnStmt) {
             rewriteReturn(returnStmt);
+        } else if (node instanceof MethodCallExpr call) {
+            rewriteCallArguments(call, call::resolve, call.getArguments(), call::setArgument);
+        } else if (node instanceof ObjectCreationExpr creation) {
+            rewriteCallArguments(creation, creation::resolve, creation.getArguments(),
+                creation::setArgument);
+        } else if (node instanceof ExplicitConstructorInvocationStmt invocation) {
+            rewriteCallArguments(invocation, invocation::resolve, invocation.getArguments(),
+                invocation::setArgument);
         }
         for (Node child : new ArrayList<>(node.getChildNodes())) {
             rewriteNode(child);
@@ -91,6 +103,59 @@ final class AutoboxingRewriter {
             return;
         }
         returnStmt.setExpression(convert(expression, targetOf(method.getType())));
+    }
+
+    private void rewriteCallArguments(Node node, Resolver resolver, List<Expression> arguments,
+            ArgumentSetter setter) {
+        ResolvedMethodLikeDeclaration declaration;
+        try {
+            declaration = resolver.resolve();
+        } catch (RuntimeException e) {
+            LOGGER.debug("Cannot resolve call {} while rewriting autoboxing", node, e);
+            return;
+        }
+        int parameterCount = declaration.getNumberOfParams();
+        boolean variadic = declaration.hasVariadicParameter();
+        for (int i = 0; i < arguments.size(); i++) {
+            ResolvedType parameterType =
+                parameterType(declaration, parameterCount, variadic, i, arguments);
+            if (parameterType == null) {
+                continue;
+            }
+            setter.set(i, convert(arguments.get(i), Target.fromResolved(parameterType)));
+        }
+    }
+
+    private static @Nullable ResolvedType parameterType(ResolvedMethodLikeDeclaration declaration,
+            int parameterCount, boolean variadic, int index, List<Expression> arguments) {
+        if (parameterCount == 0) {
+            return null;
+        }
+        if (variadic && index >= parameterCount - 1) {
+            ResolvedType last = declaration.getParam(parameterCount - 1).getType();
+            if (!last.isArray()) {
+                return last;
+            }
+            if (index == parameterCount - 1 && arguments.size() == parameterCount
+                    && isArrayOf(arguments.get(index), last)) {
+                // The whole array is passed, not one element of the variable arity list.
+                return last;
+            }
+            return last.asArrayType().getComponentType();
+        }
+        if (index >= parameterCount) {
+            return null;
+        }
+        return declaration.getParam(index).getType();
+    }
+
+    private static boolean isArrayOf(Expression expression, ResolvedType arrayType) {
+        try {
+            ResolvedType actual = expression.calculateResolvedType();
+            return actual.isArray() && actual.describe().equals(arrayType.describe());
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
     private static Target targetOf(Type type) {
@@ -236,6 +301,16 @@ final class AutoboxingRewriter {
 
     private enum Kind {
         NONE, PRIMITIVE, WRAPPER, REFERENCE
+    }
+
+    @FunctionalInterface
+    private interface Resolver {
+        ResolvedMethodLikeDeclaration resolve();
+    }
+
+    @FunctionalInterface
+    private interface ArgumentSetter {
+        void set(int index, Expression expression);
     }
 
     private record Target(Kind kind, @Nullable String primitive, @Nullable WrapperType wrapper) {

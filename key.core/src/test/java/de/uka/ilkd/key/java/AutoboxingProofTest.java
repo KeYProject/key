@@ -121,6 +121,61 @@ class AutoboxingProofTest {
     }
 
     @Test
+    void boxesMethodArgument(@TempDir Path dir) throws Exception {
+        prove("ArgumentBoxing", clazz("ArgumentBoxing", """
+                static int id(Integer x) {
+                    return x;
+                }
+
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    int i = id(42);
+                    //@ assert i == 42;
+                }
+                """), dir);
+    }
+
+    @Test
+    void unboxesMethodArgument(@TempDir Path dir) throws Exception {
+        prove("ArgumentUnboxing", clazz("ArgumentUnboxing", """
+                static int id(int x) {
+                    return x;
+                }
+
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = 42;
+                    int i = id(a);
+                    //@ assert i == 42;
+                }
+                """), dir);
+    }
+
+    @Test
+    void boxesVarargsElements(@TempDir Path dir) throws Exception {
+        prove("VarargsBoxing", clazz("VarargsBoxing", """
+                static int first(Integer... xs) {
+                    return xs[0];
+                }
+
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    int i = first(42);
+                    //@ assert i == 42;
+                }
+                """), dir);
+    }
+
+    @Test
     void nullUnboxingSplits(@TempDir Path dir) throws Exception {
         Proof proof = proof("NullUnboxing", clazz("NullUnboxing", """
                 /*@ normal_behavior
