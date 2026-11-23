@@ -42,7 +42,7 @@ lexer grammar KeYLexer;
     private Token tokenBackStorage = null;
     @Override
     public void emit(Token token) {
-       int MAX_K = 10;
+      /* int MAX_K = 10;
        if (token.getType() == INT_LITERAL) {//rewrite INT_LITERALs to identifier when preceded by an '('
            // fast path: no whitespace in between
            // NBSP (U+00A0) is intentionally not treated as whitespace here: the
@@ -62,7 +62,7 @@ lexer grammar KeYLexer;
                    }
                }
            }
-       }
+       }*/
        if(token.getType() == PROOF) {
           tokenBackStorage = super.emitEOF();
           //will later be overwritten the EOF token

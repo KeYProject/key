@@ -1800,6 +1800,16 @@ public class ExpressionBuilder extends DefaultBuilder {
 
     @Override
     public Object visitInteger(JavaKeYParser.IntegerContext ctx) {
+        JavaKeYParser.TermContext child = ctx.term();
+        if(child != null) {
+            Function fct = functions().lookup(new Name(ctx.INT_LITERAL().getText()));
+            if(fct == null) {
+                // TODO find right exception class
+                throw new RuntimeException("Function symbol '" + ctx.INT_LITERAL().getText() + "' not found.");
+            }
+            JTerm childTerm = accept(child);
+            return getTermFactory().createTerm(fct, childTerm);
+        }
         return toZNotation(ctx.getText());
     }
 

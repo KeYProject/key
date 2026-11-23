@@ -145,7 +145,8 @@ argument_list
    ;
 
 integer
-   : (INT_LITERAL | HEX_LITERAL | BIN_LITERAL)
+   : (INT_LITERAL ( LPAREN term RPAREN )?
+     | HEX_LITERAL | BIN_LITERAL)
    ;
 
 floatnum
