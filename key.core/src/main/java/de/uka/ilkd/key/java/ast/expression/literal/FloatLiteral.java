@@ -4,7 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.ast.expression.literal;
 
+import java.util.List;
+
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.Comment;
+import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -61,6 +65,18 @@ public non-sealed class FloatLiteral extends Literal {
      */
 
     public FloatLiteral(String value) {
+        this.value = value;
+    }
+
+    /**
+     * Float literal with position information and comments.
+     *
+     * @param pi the position information
+     * @param c the comments attached to the literal
+     * @param value the textual representation of the value
+     */
+    public FloatLiteral(PositionInfo pi, List<Comment> c, String value) {
+        super(pi, c);
         this.value = value;
     }
 

@@ -164,7 +164,9 @@ public class TransformationPipelineServices {
                 case CHAR:
                     return new CharLiteralExpr((char) 0);
                 case FLOAT:
+                    return new DoubleLiteralExpr("0.0f");
                 case DOUBLE:
+                    return new DoubleLiteralExpr("0.0");
             }
         }
         LOGGER.error("makeImplicitMembersExplicit: unknown primitive type: {}", type);

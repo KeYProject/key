@@ -708,7 +708,15 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(DoubleLiteralExpr n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
+        if (isFloatLiteral(n)) {
+            return new FloatLiteral(pi, c, n.getValue());
+        }
         return new DoubleLiteral(pi, c, n.getValue());
+    }
+
+    private static boolean isFloatLiteral(DoubleLiteralExpr n) {
+        String value = n.getValue();
+        return value.endsWith("f") || value.endsWith("F");
     }
 
     @Override
@@ -1575,8 +1583,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } else if (lit.isCharLiteralExpr()) {
             return new CharLiteral(lit.asCharLiteralExpr().getValue());
         } else if (lit.isDoubleLiteralExpr()) {
-            // TODO javaparser there are only double or float literals in jp
-            return new DoubleLiteral(lit.asDoubleLiteralExpr().getValue());
+            String value = lit.asDoubleLiteralExpr().getValue();
+            if (value.endsWith("f") || value.endsWith("F")) {
+                return new FloatLiteral(value);
+            }
+            return new DoubleLiteral(value);
         } else if (lit.isIntegerLiteralExpr()) {
             // TODO javaparser there are only int literals in jp, not byte short int
             String value = lit.asIntegerLiteralExpr().getValue();

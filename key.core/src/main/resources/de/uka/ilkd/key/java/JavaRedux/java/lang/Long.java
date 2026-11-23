@@ -6,6 +6,25 @@ package java.lang;
 public final class Long implements java.lang.Comparable {
    public final static long MIN_VALUE = 0x8000000000000000L;
    public final static long MAX_VALUE = 0x7fffffffffffffffL;
-   public final static java.lang.Class TYPE;
+   public /*@ nullable @*/ final static java.lang.Class TYPE;
    public final static int SIZE = 64;
+
+   private /*@ spec_public @*/ final long value;
+
+   /*@ public normal_behavior
+     @ ensures \result.value == v;
+     @ assignable \nothing;
+     @*/
+   public static java.lang.Long valueOf(long v);
+
+   /*@ public normal_behavior
+     @ ensures value == v;
+     @*/
+   public Long(long v);
+
+   /*@ public normal_behavior
+     @ ensures \result == value;
+     @ assignable \strictly_nothing;
+     @*/
+   public long longValue();
 }

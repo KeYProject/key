@@ -1,6 +1,27 @@
 package java.lang;
 
 public class Float {
+    public /*@ nullable @*/ final static java.lang.Class TYPE;
+
+    private /*@ spec_public @*/ final float value;
+
+    /*@ public normal_behavior
+      @ ensures Float._isSame(\result.value, v);
+      @ assignable \nothing;
+      @*/
+    public static java.lang.Float valueOf(float v);
+
+    /*@ public normal_behavior
+      @ ensures Float._isSame(value, v);
+      @*/
+    public Float(float v);
+
+    /*@ public normal_behavior
+      @ ensures Float._isSame(\result, value);
+      @ assignable \strictly_nothing;
+      @*/
+    public float floatValue();
+
     /*@ public normal_behaviour
       @ requires true;
       @ ensures \result == Float._isNaN(val);

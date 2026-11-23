@@ -7,7 +7,7 @@ public final class Integer implements java.lang.Comparable
 {
    public final static int MIN_VALUE = -2147483648;
    public final static int MAX_VALUE = 2147483647;
-   public final static java.lang.Class TYPE;
+   public /*@ nullable @*/ final static java.lang.Class TYPE;
    public final static int SIZE = 32;
 
    private /*@ spec_public @*/ final int value;
