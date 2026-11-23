@@ -1238,6 +1238,7 @@ public class ProofCollections {
         g.provable("Java/InstanceOfPattern/whilePattern.key");
         g.provable("Java/InstanceOfPattern/afterLoopPattern.key");
         g.provable("Java/RecordPatterns/Sum.key");
+        g.provable("Java/RecordPatterns/NullMatching.key");
         g.provable("Java/Annotations/test_annotation.key");
 
         g = c.group("StipuLa");
