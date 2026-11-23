@@ -36,6 +36,11 @@ class AutoboxingProofTest {
 
     private static Proof proof(String className, String source, String method, Path dir)
             throws Exception {
+        return proof(className, source, method, dir, false);
+    }
+
+    private static Proof proof(String className, String source, String method, Path dir,
+            boolean expandLoops) throws Exception {
         Path sub = Files.createDirectories(dir.resolve(className));
         Path file = sub.resolve(className + ".java");
         Files.writeString(file, source);
@@ -48,6 +53,14 @@ class AutoboxingProofTest {
                     .findFirst()
                     .orElseThrow(() -> new AssertionError("no contract for " + method));
             Proof proof = env.createProof(contract.createProofObl(env.getInitConfig()));
+            if (expandLoops) {
+                var properties =
+                    proof.getSettings().getStrategySettings().getActiveStrategyProperties();
+                properties.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
+                    StrategyProperties.LOOP_SCOPE_EXPAND);
+                proof.setActiveStrategy(
+                    proof.getActiveStrategyFactory().create(proof, properties));
+            }
             ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
             starter.start();
@@ -58,7 +71,12 @@ class AutoboxingProofTest {
     }
 
     private static void prove(String className, String source, Path dir) throws Exception {
-        Proof proof = proof(className, source, "m", dir);
+        prove(className, source, dir, false);
+    }
+
+    private static void prove(String className, String source, Path dir, boolean expandLoops)
+            throws Exception {
+        Proof proof = proof(className, source, "m", dir, expandLoops);
         assertTrue(proof.closed(), () -> "Proof did not close. Open goals: " + proof.openGoals());
     }
 
@@ -433,6 +451,89 @@ class AutoboxingProofTest {
                     //@ assert i == 42;
                 }
                 """), dir);
+    }
+
+    @Test
+    void arrayInitializer(@TempDir Path dir) throws Exception {
+        prove("ArrayInitializer", clazz("ArrayInitializer", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer[] xs = { 1, 2 };
+                    int i = xs[1];
+                    //@ assert i == 2;
+                }
+                """), dir);
+    }
+
+    @Test
+    void arrayStoreAndRead(@TempDir Path dir) throws Exception {
+        prove("ArrayStoreAndRead", clazz("ArrayStoreAndRead", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer[] xs = new Integer[2];
+                    xs[0] = 42;
+                    int i = xs[0];
+                    //@ assert i == 42;
+                }
+                """), dir);
+    }
+
+    @Test
+    void primitiveArrayStoreFromBoxed(@TempDir Path dir) throws Exception {
+        prove("PrimitiveArrayStore", clazz("PrimitiveArrayStore", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    int[] a = new int[1];
+                    Integer x = 42;
+                    a[0] = x;
+                    //@ assert a[0] == 42;
+                }
+                """), dir);
+    }
+
+    @Test
+    void enhancedForBoxing(@TempDir Path dir) throws Exception {
+        prove("EnhancedForBoxing", clazz("EnhancedForBoxing", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    int[] a = { 1, 2, 3 };
+                    int s = 0;
+                    for (Integer x : a) {
+                        s += x;
+                    }
+                    //@ assert s == 6;
+                }
+                """), dir, true);
+    }
+
+    @Test
+    void enhancedForUnboxing(@TempDir Path dir) throws Exception {
+        prove("EnhancedForUnboxing", clazz("EnhancedForUnboxing", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer[] a = { 1, 2, 3 };
+                    int s = 0;
+                    for (int x : a) {
+                        s += x;
+                    }
+                    //@ assert s == 6;
+                }
+                """), dir, true);
     }
 
     @Test

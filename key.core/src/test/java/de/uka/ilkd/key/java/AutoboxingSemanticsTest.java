@@ -48,8 +48,11 @@ class AutoboxingSemanticsTest {
 
     @BeforeAll
     static void enableJml() {
+        var properties = new StrategyProperties();
+        properties.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
+            StrategyProperties.LOOP_SCOPE_EXPAND);
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
-                .setActiveStrategyProperties(new StrategyProperties());
+                .setActiveStrategyProperties(properties);
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setUseJML(true);
     }
 

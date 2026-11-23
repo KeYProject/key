@@ -336,6 +336,86 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void boxesArrayInitializer() {
+        String out = rewrite("void m() { Integer[] xs = { 1, 2 }; }");
+        assertTrue(out.contains("Integer.valueOf(1)"), out);
+        assertTrue(out.contains("Integer.valueOf(2)"), out);
+    }
+
+    @Test
+    void boxesArrayInitializerToObject() {
+        String out = rewrite("void m() { Object[] xs = { 1 }; }");
+        assertTrue(out.contains("Integer.valueOf(1)"), out);
+    }
+
+    @Test
+    void boxesNestedArrayInitializer() {
+        String out = rewrite("void m() { Integer[][] xs = { { 1 }, { 2 } }; }");
+        assertTrue(out.contains("Integer.valueOf(1)"), out);
+        assertTrue(out.contains("Integer.valueOf(2)"), out);
+    }
+
+    @Test
+    void boxesArrayStore() {
+        String out = rewrite("void m() { Integer[] xs = new Integer[2]; xs[0] = 1; }");
+        assertTrue(out.contains("xs[0] = Integer.valueOf(1)"), out);
+    }
+
+    @Test
+    void unboxesArrayRead() {
+        String out = rewrite("void m() { Integer[] xs = new Integer[1]; int i = xs[0]; }");
+        assertTrue(out.contains("xs[0].value"), out);
+    }
+
+    @Test
+    void unboxesArrayStoreFromBoxed() {
+        String out = rewrite("void m() { int[] a = new int[1]; Integer x = 42; a[0] = x; }");
+        assertTrue(out.contains("a[0] = x.value"), out);
+    }
+
+    @Test
+    void boxesEnhancedForArrayElement() {
+        String out = rewrite("void m() { int[] a = new int[1]; for (Integer x : a) { } }");
+        assertTrue(out.contains("$keYIndex"), out);
+        assertTrue(out.contains("Integer.valueOf"), out);
+        assertTrue(out.contains(".length"), out);
+    }
+
+    @Test
+    void unboxesEnhancedForArrayElement() {
+        String out = rewrite("void m() { Integer[] a = new Integer[1]; for (int x : a) { } }");
+        assertTrue(out.contains("$keYIndex"), out);
+        assertTrue(out.contains(".value"), out);
+    }
+
+    @Test
+    void unboxesCompoundAssignmentRhs() {
+        String out = rewrite("void m() { int s = 0; Integer x = 42; s += x; }");
+        assertTrue(out.contains("x.value"), out);
+    }
+
+    @Test
+    void unboxesEnhancedForBody() {
+        String out = rewrite(
+            "void m() { int[] a = new int[1]; for (Integer x : a) { int s = 0; s += x; } }");
+        assertTrue(out.contains("x.value"), out);
+    }
+
+    @Test
+    void unboxesEnhancedForBodyWithOuterLocal() {
+        String out = rewrite("""
+                void m() {
+                    int[] a = new int[1];
+                    int s = 0;
+                    for (Integer x : a) {
+                        s += x;
+                    }
+                }
+                """);
+        assertTrue(out.contains("x.value"), out);
+    }
+
+    @Test
     void explicitCallsAreIdempotent() {
         String out = rewrite(
             "void m() { Integer a = Integer.valueOf(42); int i = a.intValue(); }");

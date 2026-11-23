@@ -24,3 +24,8 @@ cast-object	PROVABLE	CastObject	m
 number-int	PROVABLE	NumberInt	m
 conditional-int	PROVABLE	ConditionalInt	m
 conditional-box	PROVABLE	ConditionalBox	m
+array-literal	PROVABLE	ArrayLiteral	m
+array-store	PROVABLE	ArrayStore	m
+array-unbox-store	PROVABLE	ArrayUnboxStore	m
+foreach-box	PROVABLE	ForeachBox	m
+foreach-unbox	PROVABLE	ForeachUnbox	m

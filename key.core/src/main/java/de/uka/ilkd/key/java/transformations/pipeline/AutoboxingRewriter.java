@@ -11,12 +11,15 @@ import java.util.Locale;
 import de.uka.ilkd.key.java.transformations.ConstantExpressionEvaluator;
 import de.uka.ilkd.key.java.transformations.EvaluationException;
 
+import com.github.javaparser.ast.ArrayCreationLevel;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.ArrayAccessExpr;
+import com.github.javaparser.ast.expr.ArrayCreationExpr;
+import com.github.javaparser.ast.expr.ArrayInitializerExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.CastExpr;
@@ -31,11 +34,16 @@ import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SwitchExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
+import com.github.javaparser.ast.expr.VariableDeclarationExpr;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.ForEachStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.ReturnStmt;
+import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.type.PrimitiveType;
@@ -63,6 +71,8 @@ import org.slf4j.LoggerFactory;
 final class AutoboxingRewriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoboxingRewriter.class);
     private static final ConstantExpressionEvaluator CONSTANTS = new ConstantExpressionEvaluator();
+
+    private int freshId;
 
     /** Rewrites the given compilation unit in place. */
     void rewrite(CompilationUnit cu) {
@@ -97,6 +107,10 @@ final class AutoboxingRewriter {
             rewriteUnary(unary);
         } else if (node instanceof ArrayAccessExpr access) {
             rewriteArrayIndex(access);
+        } else if (node instanceof ArrayInitializerExpr initializer) {
+            rewriteTopLevelArrayInitializer(initializer);
+        } else if (node instanceof ForEachStmt forEach) {
+            rewriteForEach(forEach);
         } else if (node instanceof CastExpr cast) {
             rewriteCast(cast);
         } else if (node instanceof IfStmt ifStmt) {
@@ -124,7 +138,29 @@ final class AutoboxingRewriter {
         if (initializer == null) {
             return;
         }
+        if (initializer instanceof ArrayInitializerExpr arrayInitializer
+                && declarator.getType().isArrayType()) {
+            List<ArrayCreationLevel> levels = new ArrayList<>();
+            Type elementType = baseElementType(declarator.getType(), levels);
+            if (elementType != null && !levels.isEmpty()) {
+                ArrayCreationExpr creation = new ArrayCreationExpr(elementType,
+                    NodeList.nodeList(levels), arrayInitializer.clone());
+                copyRange(initializer, creation);
+                declarator.setInitializer(creation);
+                return;
+            }
+        }
         declarator.setInitializer(convert(initializer, targetOf(declarator.getType())));
+    }
+
+    private static @Nullable Type baseElementType(Type arrayType,
+            List<ArrayCreationLevel> levels) {
+        Type current = arrayType;
+        while (current.isArrayType()) {
+            levels.add(new ArrayCreationLevel());
+            current = current.asArrayType().getComponentType();
+        }
+        return current;
     }
 
     private void rewriteAssignment(AssignExpr assign) {
@@ -220,8 +256,9 @@ final class AutoboxingRewriter {
         if (!isSimpleTarget(assign.getTarget())) {
             return;
         }
-        WrapperType wrapper = wrapperOf(typeOf(assign.getTarget()));
-        if (wrapper == null || !isNumericName(wrapper.primitiveName())) {
+        ResolvedType targetType = typeOf(assign.getTarget());
+        String lhsPrimitive = numericPrimitive(targetType);
+        if (lhsPrimitive == null) {
             return;
         }
         BinaryExpr.Operator binaryOperator = binaryOperator(assign.getOperator());
@@ -233,8 +270,12 @@ final class AutoboxingRewriter {
         if (rhsPrimitive == null) {
             return;
         }
+        boolean boxedLhs = targetType.isReferenceType();
+        if (!boxedLhs && (rhsType == null || !rhsType.isReferenceType())) {
+            // Primitive lhs and primitive rhs: the existing widening rules suffice.
+            return;
+        }
 
-        String lhsPrimitive = wrapper.primitiveName();
         String lhsPromoted;
         String rhsPromoted;
         if (isShift(binaryOperator)) {
@@ -246,13 +287,18 @@ final class AutoboxingRewriter {
             rhsPromoted = promoted;
         }
 
-        Expression read = widenPrimitive(
-            new FieldAccessExpr(assign.getTarget().clone(), wrapper.valueFieldName()),
-            lhsPrimitive, lhsPromoted);
+        Expression lhsRead = boxedLhs
+                ? new FieldAccessExpr(assign.getTarget().clone(),
+                    wrapperOf(targetType).valueFieldName())
+                : assign.getTarget().clone();
+        Expression promotedLhs = widenPrimitive(lhsRead, lhsPrimitive, lhsPromoted);
         Expression rhs = widen(assign.getValue().clone(), rhsType, rhsPrimitive, rhsPromoted);
-        Expression operation = new BinaryExpr(read, rhs, binaryOperator);
+        Expression operation = new BinaryExpr(promotedLhs, rhs, binaryOperator);
+        Expression narrowed = cast(lhsPrimitive, operation);
+        Expression value =
+            boxedLhs ? boxPrimitive(wrapperOf(targetType), narrowed) : narrowed;
         assign.setOperator(AssignExpr.Operator.ASSIGN);
-        assign.setValue(boxPrimitive(wrapper, cast(lhsPrimitive, operation)));
+        assign.setValue(value);
     }
 
     private void rewriteIncrement(UnaryExpr unary) {
@@ -440,6 +486,98 @@ final class AutoboxingRewriter {
             return;
         }
         access.setIndex(widen(access.getIndex(), type, primitive, "int"));
+    }
+
+    private void rewriteTopLevelArrayInitializer(ArrayInitializerExpr initializer) {
+        Node parent = initializer.getParentNode().orElse(null);
+        ResolvedType componentType = null;
+        if (parent instanceof ArrayCreationExpr creation) {
+            ResolvedType arrayType = typeOf(creation);
+            if (arrayType != null && arrayType.isArray()) {
+                componentType = arrayType.asArrayType().getComponentType();
+            }
+        } else if (parent instanceof VariableDeclarator declarator) {
+            ResolvedType arrayType = resolveType(declarator.getType());
+            if (arrayType != null && arrayType.isArray()) {
+                componentType = arrayType.asArrayType().getComponentType();
+            }
+        }
+        rewriteArrayInitializer(initializer, componentType);
+    }
+
+    private void rewriteArrayInitializer(ArrayInitializerExpr initializer,
+            @Nullable ResolvedType componentType) {
+        if (componentType == null) {
+            return;
+        }
+        Target target = Target.fromResolved(componentType);
+        ResolvedType nestedComponent =
+            componentType.isArray() ? componentType.asArrayType().getComponentType() : null;
+        for (Expression value : initializer.getValues()) {
+            if (value instanceof ArrayInitializerExpr nested) {
+                rewriteArrayInitializer(nested, nestedComponent);
+                continue;
+            }
+            ResolvedType actualType = typeOf(value);
+            if (actualType == null) {
+                continue;
+            }
+            Expression converted = convertKnown(value, actualType, target);
+            if (converted != value) {
+                value.replace(converted);
+            }
+        }
+    }
+
+    private void rewriteForEach(ForEachStmt forEach) {
+        ResolvedType iterableType = typeOf(forEach.getIterable());
+        if (iterableType == null || !iterableType.isArray()) {
+            return;
+        }
+        if (!isSimpleTarget(forEach.getIterable())) {
+            // Keep side-effecting iterables unchanged rather than evaluating them repeatedly.
+            return;
+        }
+        ResolvedType componentType = iterableType.asArrayType().getComponentType();
+        VariableDeclarationExpr variable = forEach.getVariable();
+        if (variable.getVariables().size() != 1) {
+            return;
+        }
+        VariableDeclarator declarator = variable.getVariable(0);
+        Expression iterable = forEach.getIterable();
+
+        int id = ++freshId;
+        String indexName = "$keYIndex" + id;
+        ArrayAccessExpr element = new ArrayAccessExpr(iterable.clone(), new NameExpr(indexName));
+        declarator.setInitializer(
+            convertKnown(element, componentType, targetOf(declarator.getType())));
+
+        Statement body = forEach.getBody();
+        BlockStmt bodyBlock = body instanceof BlockStmt block ? block
+                : new BlockStmt(NodeList.nodeList(body));
+        bodyBlock.getStatements().add(0, new ExpressionStmt(variable));
+
+        Expression compare = new BinaryExpr(new NameExpr(indexName),
+            new FieldAccessExpr(iterable.clone(), "length"), BinaryExpr.Operator.LESS);
+        Expression update =
+            new UnaryExpr(new NameExpr(indexName), UnaryExpr.Operator.POSTFIX_INCREMENT);
+        VariableDeclarationExpr indexDeclaration = new VariableDeclarationExpr(
+            new VariableDeclarator(new PrimitiveType(PrimitiveType.Primitive.INT), indexName,
+                new IntegerLiteralExpr("0")));
+        ForStmt loop = new ForStmt(NodeList.nodeList(indexDeclaration), compare,
+            NodeList.nodeList(update), bodyBlock);
+
+        copyRange(forEach, loop);
+        forEach.replace(loop);
+        rewriteNode(loop);
+    }
+
+    private static @Nullable ResolvedType resolveType(Type type) {
+        try {
+            return type.resolve();
+        } catch (RuntimeException e) {
+            return null;
+        }
     }
 
     private static Expression unboxBoolean(Expression expression) {
@@ -712,9 +850,13 @@ final class AutoboxingRewriter {
         if (target.kind() == Kind.NONE || expression.isNullLiteralExpr()) {
             return expression;
         }
-
         ResolvedType actualType = typeOf(expression);
-        if (actualType == null) {
+        return actualType == null ? expression : convertKnown(expression, actualType, target);
+    }
+
+    private static Expression convertKnown(Expression expression, ResolvedType actualType,
+            Target target) {
+        if (target.kind() == Kind.NONE || expression.isNullLiteralExpr()) {
             return expression;
         }
 
