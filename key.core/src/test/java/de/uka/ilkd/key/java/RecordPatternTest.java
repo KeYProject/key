@@ -244,4 +244,32 @@ class RecordPatternTest {
         assertTrue(printed.contains("instanceof String"), printed);
         assertTrue(printed.contains("c = true"), printed);
     }
+
+    @Test
+    void recordPatternAssignmentDoesNotCheckUnconditionalComponent() {
+        // JLS 14.30.1: Object is unconditional for an Object component, so no type test is
+        // emitted and the pattern also matches a null component.
+        Goal goal = applyRule("recordPatternDeclaration",
+            "boolean c = new Object() instanceof Box(Object v);");
+        String printed = ProofSaver.printAnything(
+            goal.sequent().succedent().getFirst().formula(), services);
+        assertTrue(printed.contains("boolean c;"), printed);
+        assertFalse(printed.contains("instanceof Object"), printed);
+        assertFalse(printed.contains("instanceof java.lang.Object"), printed);
+        assertTrue(printed.contains("c = true"), printed);
+    }
+
+    @Test
+    void recordPatternAssignmentDoesNotCheckVarComponent() {
+        // JLS 14.30.1: 'var' infers the component's declared type (Object), which is
+        // unconditional, so the pattern also matches a null component.
+        Goal goal = applyRule("recordPatternDeclaration",
+            "boolean c = new Object() instanceof Box(var v);");
+        String printed = ProofSaver.printAnything(
+            goal.sequent().succedent().getFirst().formula(), services);
+        assertTrue(printed.contains("boolean c;"), printed);
+        assertFalse(printed.contains("instanceof Object"), printed);
+        assertFalse(printed.contains("instanceof java.lang.Object"), printed);
+        assertTrue(printed.contains("c = true"), printed);
+    }
 }

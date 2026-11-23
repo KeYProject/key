@@ -923,7 +923,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 TypePatternExpr pattern = findTypePatternInScope(nameExpr);
                 if (pattern != null) {
                     try {
-                        resolvedScope = pattern.getType().resolve();
+                        resolvedScope = patternScopeType(pattern);
                     } catch (RuntimeException ignored) {
                         // fall back to the resolved scope below
                     }
@@ -1281,9 +1281,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Type declaredType = typePattern.getType();
 
         if (declaredType.isVarType()) {
-            return reportError(typePattern,
-                "'var' in a record pattern is not supported by the Java parser front-end yet; "
-                    + "use the component type explicitly");
+            if (component == null) {
+                return reportError(typePattern,
+                    "'var' is not allowed as the top-level pattern of an instanceof expression");
+            }
+            // JLS 14.30.1: 'var' infers the declared type of the component it is matched against
+            // and is unconditional for that type, so the pattern also matches a null component.
+            TypeReference inferred = new TypeRef(getKeYJavaType(component.getType()));
+            VariableSpecification inferredSpecification =
+                specification(pi, c, getPatternVariable(name, inferred), inferred);
+            return new AnyPattern(pi, c, inferred, inferredSpecification);
         }
 
         TypeReference type = requireTypeReference(declaredType);
@@ -1296,6 +1303,67 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return new AnyPattern(pi, c, type, specification);
         }
         return new TypePattern(pi, c, type, specification);
+    }
+
+    /**
+     * Returns the type of the variable declared by a type pattern. A {@code var} pattern infers
+     * the declared type of the record component it lines up with (JLS 14.30.1).
+     *
+     * @param pattern the type pattern
+     * @return the type reference of the pattern's variable
+     */
+    private TypeReference patternVariableType(TypePatternExpr pattern) {
+        if (!pattern.getType().isVarType()) {
+            return requireTypeReference(pattern.getType());
+        }
+        ResolvedType componentType = recordComponentType(pattern);
+        if (componentType == null) {
+            throw new IllegalStateException(
+                "Cannot infer the type of the 'var' pattern " + pattern.getNameAsString());
+        }
+        return new TypeRef(getKeYJavaType(componentType));
+    }
+
+    /**
+     * Returns the declared type of the record component a type pattern lines up with.
+     *
+     * @param pattern the type pattern
+     * @return the component type, or {@code null} if the pattern is not a component of a record
+     *         pattern
+     */
+    private @Nullable ResolvedType recordComponentType(TypePatternExpr pattern) {
+        Node current = pattern;
+        while (current.getParentNode().isPresent()) {
+            Node parent = current.getParentNode().get();
+            if (parent instanceof RecordPatternExpr recordPattern) {
+                NodeList<ComponentPatternExpr> patterns = recordPattern.getPatternList();
+                for (int i = 0; i < patterns.size(); i++) {
+                    if (patterns.get(i) == pattern) {
+                        List<ResolvedFieldDeclaration> components =
+                            recordComponents(recordPattern.getType());
+                        return i < components.size() ? components.get(i).getType() : null;
+                    }
+                }
+                return null;
+            }
+            current = parent;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the type of the value a type pattern variable refers to. For an ordinary type
+     * pattern this is the declared pattern type; for {@code var} it is the type of the record
+     * component the pattern lines up with.
+     *
+     * @param pattern the type pattern
+     * @return the resolved type of the pattern variable's value
+     */
+    private @Nullable ResolvedType patternScopeType(TypePatternExpr pattern) {
+        if (!pattern.getType().isVarType()) {
+            return pattern.getType().resolve();
+        }
+        return recordComponentType(pattern);
     }
 
     private Pattern createRecordPattern(RecordPatternExpr recordPattern) {
@@ -1543,7 +1611,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             TypePatternExpr pattern = findTypePatternInScope(n);
             if (pattern != null) {
                 return (Expression) getPatternVariable(pattern.getName(),
-                    requireTypeReference(pattern.getType()));
+                    patternVariableType(pattern));
             }
             try {
                 ResolvedType type = n.calculateResolvedType();
@@ -1566,7 +1634,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             // converter's visit(TypePatternExpr) returns a declaration where an expression is
             // expected. Return the variable itself.
             return (Expression) getPatternVariable(pattern.getName(),
-                requireTypeReference(pattern.getType()));
+                patternVariableType(pattern));
         }
         VariableDeclarator decl = null;
         if (target instanceof JavaParserFieldDeclaration field) {
