@@ -1,6 +1,6 @@
 package java.lang;
 
-public class Float {
+public class Float extends java.lang.Number {
     public /*@ nullable @*/ final static java.lang.Class TYPE;
 
     private /*@ spec_public @*/ final float value;
@@ -46,4 +46,15 @@ public class Float {
       @     return Float._isNaN(a) ? Float._isNaN(b) : a == b;
       @ }
       @*/
+
+    /*@ public normal_behavior
+      @ ensures \result == (int) value;
+      @ assignable \strictly_nothing;
+      @*/
+    public int intValue();
+    /*@ public normal_behavior
+      @ ensures \result == (long) value;
+      @ assignable \strictly_nothing;
+      @*/
+    public long longValue();
 }

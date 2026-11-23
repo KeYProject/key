@@ -346,6 +346,96 @@ class AutoboxingProofTest {
     }
 
     @Test
+    void castBoxing(@TempDir Path dir) throws Exception {
+        prove("CastBoxing", clazz("CastBoxing", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = (Integer) 42;
+                    int i = a;
+                    //@ assert i == 42;
+                }
+                """), dir);
+    }
+
+    @Test
+    void castUnboxing(@TempDir Path dir) throws Exception {
+        prove("CastUnboxing", clazz("CastUnboxing", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = Integer.valueOf(42);
+                    int i = (int) a;
+                    //@ assert i == 42;
+                }
+                """), dir);
+    }
+
+    @Test
+    void castToObject(@TempDir Path dir) throws Exception {
+        prove("CastToObject", clazz("CastToObject", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Object o = (Object) 42;
+                    //@ assert o != null;
+                }
+                """), dir);
+    }
+
+    @Test
+    void assignmentToNumber(@TempDir Path dir) throws Exception {
+        prove("AssignmentToNumber", clazz("AssignmentToNumber", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Number n = 42;
+                    //@ assert n != null;
+                }
+                """), dir);
+    }
+
+    @Test
+    void numericConditional(@TempDir Path dir) throws Exception {
+        prove("NumericConditional", clazz("NumericConditional", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = Integer.valueOf(42);
+                    boolean f = true;
+                    int i = f ? a : 0;
+                    //@ assert i == 42;
+                }
+                """), dir);
+    }
+
+    @Test
+    void conditionalBoxing(@TempDir Path dir) throws Exception {
+        prove("ConditionalBoxing", clazz("ConditionalBoxing", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    boolean f = false;
+                    Integer a = f ? 1 : Integer.valueOf(42);
+                    int i = a;
+                    //@ assert i == 42;
+                }
+                """), dir);
+    }
+
+    @Test
     void nullUnboxingSplits(@TempDir Path dir) throws Exception {
         Proof proof = proof("NullUnboxing", clazz("NullUnboxing", """
                 /*@ normal_behavior

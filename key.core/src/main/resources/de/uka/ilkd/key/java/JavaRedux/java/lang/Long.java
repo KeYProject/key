@@ -3,7 +3,7 @@
  */
 package java.lang;
 
-public final class Long implements java.lang.Comparable {
+public final class Long extends java.lang.Number implements java.lang.Comparable {
    public final static long MIN_VALUE = 0x8000000000000000L;
    public final static long MAX_VALUE = 0x7fffffffffffffffL;
    public /*@ nullable @*/ final static java.lang.Class TYPE;
@@ -27,4 +27,10 @@ public final class Long implements java.lang.Comparable {
      @ assignable \strictly_nothing;
      @*/
    public long longValue();
+
+    /*@ public normal_behavior
+      @ ensures \result == (int) value;
+      @ assignable \strictly_nothing;
+      @*/
+    public int intValue();
 }

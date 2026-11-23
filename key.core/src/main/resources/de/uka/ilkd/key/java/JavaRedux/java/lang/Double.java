@@ -1,6 +1,6 @@
 package java.lang;
 
-public class Double {
+public class Double extends java.lang.Number {
     public /*@ nullable @*/ final static java.lang.Class TYPE;
 
     private /*@ spec_public @*/ final double value;
@@ -47,4 +47,15 @@ public class Double {
       @     return Double._isNaN(a) ? Double._isNaN(b) : a == b;
       @ }
       @*/
+
+    /*@ public normal_behavior
+      @ ensures \result == (int) value;
+      @ assignable \strictly_nothing;
+      @*/
+    public int intValue();
+    /*@ public normal_behavior
+      @ ensures \result == (long) value;
+      @ assignable \strictly_nothing;
+      @*/
+    public long longValue();
 }

@@ -1,6 +1,6 @@
 package java.lang;
 
-public final class Byte implements java.lang.Comparable {
+public final class Byte extends java.lang.Number implements java.lang.Comparable {
     public final static byte MIN_VALUE = (byte) -128;
     public final static byte MAX_VALUE = (byte) 127;
     public /*@ nullable @*/ final static java.lang.Class TYPE;
@@ -23,4 +23,15 @@ public final class Byte implements java.lang.Comparable {
       @ assignable \strictly_nothing;
       @*/
     public byte byteValue();
+
+    /*@ public normal_behavior
+      @ ensures \result == (int) value;
+      @ assignable \strictly_nothing;
+      @*/
+    public int intValue();
+    /*@ public normal_behavior
+      @ ensures \result == (long) value;
+      @ assignable \strictly_nothing;
+      @*/
+    public long longValue();
 }

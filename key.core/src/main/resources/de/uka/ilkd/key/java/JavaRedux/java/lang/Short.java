@@ -1,6 +1,6 @@
 package java.lang;
 
-public final class Short implements java.lang.Comparable {
+public final class Short extends java.lang.Number implements java.lang.Comparable {
     public final static short MIN_VALUE = (short) -32768;
     public final static short MAX_VALUE = (short) 32767;
     public /*@ nullable @*/ final static java.lang.Class TYPE;
@@ -23,4 +23,15 @@ public final class Short implements java.lang.Comparable {
       @ assignable \strictly_nothing;
       @*/
     public short shortValue();
+
+    /*@ public normal_behavior
+      @ ensures \result == (int) value;
+      @ assignable \strictly_nothing;
+      @*/
+    public int intValue();
+    /*@ public normal_behavior
+      @ ensures \result == (long) value;
+      @ assignable \strictly_nothing;
+      @*/
+    public long longValue();
 }

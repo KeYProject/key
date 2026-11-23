@@ -280,6 +280,62 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void boxesCast() {
+        String out = rewrite("void m() { Integer a = (Integer) 42; }");
+        assertTrue(out.contains("Integer.valueOf(42)"), out);
+        assertFalse(out.contains("(Integer)"), out);
+    }
+
+    @Test
+    void unboxesCast() {
+        String out = rewrite("void m() { Integer a = 42; int i = (int) a; }");
+        assertTrue(out.contains("int i = a.value;"), out);
+    }
+
+    @Test
+    void unboxesAndWidensCast() {
+        String out = rewrite("void m() { Integer a = 42; long v = (long) a; }");
+        assertTrue(out.contains("(long) a.value"), out);
+    }
+
+    @Test
+    void boxesCastToReference() {
+        String out = rewrite("void m() { Object o = (Object) 42; }");
+        assertTrue(out.contains("(Object) Integer.valueOf(42)"), out);
+    }
+
+    @Test
+    void boxesAssignmentToNumber() {
+        String out = rewrite("void m() { Number n = 42; }");
+        assertTrue(out.contains("Number n = Integer.valueOf(42)"), out);
+    }
+
+    @Test
+    void unboxesNumericConditional() {
+        String out = rewrite("void m() { Integer a = 42; boolean f = true; int i = f ? a : 0; }");
+        assertTrue(out.contains("f ? a.value : 0"), out);
+    }
+
+    @Test
+    void boxesNumericConditionalResult() {
+        String out = rewrite("void m() { boolean f = true; Integer a = f ? 1 : 2; }");
+        assertTrue(out.contains("Integer.valueOf(f ? 1 : 2)"), out);
+    }
+
+    @Test
+    void promotesConditionalBranches() {
+        String out = rewrite("void m() { Byte b = 1; boolean f = true; int i = f ? b : 0; }");
+        assertTrue(out.contains("(int) b.value"), out);
+    }
+
+    @Test
+    void unboxesBooleanConditional() {
+        String out = rewrite(
+            "void m() { Boolean z = true; boolean f = true; boolean b = z ? f : false; }");
+        assertTrue(out.contains("z.value ? f : false"), out);
+    }
+
+    @Test
     void explicitCallsAreIdempotent() {
         String out = rewrite(
             "void m() { Integer a = Integer.valueOf(42); int i = a.intValue(); }");

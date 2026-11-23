@@ -3,7 +3,7 @@
  */
 package java.lang;
 
-public final class Integer implements java.lang.Comparable
+public final class Integer extends java.lang.Number implements java.lang.Comparable
 {
    public final static int MIN_VALUE = -2147483648;
    public final static int MAX_VALUE = 2147483647;

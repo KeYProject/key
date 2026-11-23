@@ -19,3 +19,8 @@ postfix-int	PROVABLE	PostfixInt	m
 prefix-int	PROVABLE	PrefixInt	m
 increment-sum	PROVABLE	IncrementSum	m
 postfix-call	PROVABLE	PostfixCall	m
+cast-unbox	PROVABLE	CastUnbox	m
+cast-object	PROVABLE	CastObject	m
+number-int	PROVABLE	NumberInt	m
+conditional-int	PROVABLE	ConditionalInt	m
+conditional-box	PROVABLE	ConditionalBox	m

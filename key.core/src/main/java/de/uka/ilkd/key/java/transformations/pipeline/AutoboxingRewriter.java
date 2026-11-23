@@ -97,6 +97,8 @@ final class AutoboxingRewriter {
             rewriteUnary(unary);
         } else if (node instanceof ArrayAccessExpr access) {
             rewriteArrayIndex(access);
+        } else if (node instanceof CastExpr cast) {
+            rewriteCast(cast);
         } else if (node instanceof IfStmt ifStmt) {
             ifStmt.setCondition(unboxBoolean(ifStmt.getCondition()));
         } else if (node instanceof WhileStmt whileStmt) {
@@ -106,7 +108,7 @@ final class AutoboxingRewriter {
         } else if (node instanceof ForStmt forStmt) {
             forStmt.getCompare().ifPresent(compare -> forStmt.setCompare(unboxBoolean(compare)));
         } else if (node instanceof ConditionalExpr conditional) {
-            conditional.setCondition(unboxBoolean(conditional.getCondition()));
+            rewriteConditional(conditional);
         } else if (node instanceof SwitchStmt switchStmt) {
             switchStmt.setSelector(unboxWrapper(switchStmt.getSelector()));
         } else if (node instanceof SwitchExpr switchExpr) {
@@ -139,6 +141,79 @@ final class AutoboxingRewriter {
             return;
         }
         returnStmt.setExpression(convert(expression, targetOf(method.getType())));
+    }
+
+    private void rewriteCast(CastExpr cast) {
+        Target target = targetOf(cast.getType());
+        if (target.kind() == Kind.NONE) {
+            return;
+        }
+        Expression operand = cast.getExpression();
+        ResolvedType actual = typeOf(operand);
+        if (actual == null) {
+            return;
+        }
+        if (actual.isPrimitive()) {
+            String primitive = actual.asPrimitive().describe();
+            if (target.kind() == Kind.WRAPPER) {
+                Expression boxed = box(operand, primitive, target.wrapper());
+                if (boxed != operand) {
+                    cast.replace(boxed);
+                }
+            } else if (target.kind() == Kind.REFERENCE) {
+                WrapperType natural = WrapperType.forPrimitive(primitive);
+                if (natural != null) {
+                    Expression boxed = box(operand, primitive, natural);
+                    if (boxed != operand) {
+                        cast.setExpression(boxed);
+                    }
+                }
+            }
+        } else if (actual.isReferenceType()) {
+            WrapperType wrapper = wrapperOf(actual);
+            if (wrapper != null && target.kind() == Kind.PRIMITIVE) {
+                cast.replace(unboxForCast(operand, wrapper, target.primitive()));
+            }
+        }
+    }
+
+    private void rewriteConditional(ConditionalExpr conditional) {
+        conditional.setCondition(unboxBoolean(conditional.getCondition()));
+        Expression thenExpr = conditional.getThenExpr();
+        Expression elseExpr = conditional.getElseExpr();
+        ResolvedType thenType = typeOf(thenExpr);
+        ResolvedType elseType = typeOf(elseExpr);
+        String thenPrimitive = numericPrimitive(thenType);
+        String elsePrimitive = numericPrimitive(elseType);
+        if (thenPrimitive != null && elsePrimitive != null) {
+            String promoted = promote(thenPrimitive, elsePrimitive);
+            conditional.setThenExpr(widen(thenExpr, thenType, thenPrimitive, promoted));
+            conditional.setElseExpr(widen(elseExpr, elseType, elsePrimitive, promoted));
+            return;
+        }
+        if (isBooleanLike(thenExpr) && isBooleanLike(elseExpr)) {
+            conditional.setThenExpr(unboxBoolean(thenExpr));
+            conditional.setElseExpr(unboxBoolean(elseExpr));
+        }
+    }
+
+    private static boolean isBooleanLike(Expression expression) {
+        ResolvedType type = typeOf(expression);
+        if (type == null) {
+            return false;
+        }
+        if (type.isPrimitive()) {
+            return "boolean".equals(type.asPrimitive().describe());
+        }
+        return wrapperOf(type) == WrapperType.BOOLEAN;
+    }
+
+    private static Expression unboxForCast(Expression expression, WrapperType wrapper,
+            String targetPrimitive) {
+        Expression field = new FieldAccessExpr(expression.clone(), wrapper.valueFieldName());
+        return targetPrimitive.equals(wrapper.primitiveName())
+                ? field
+                : cast(targetPrimitive, field);
     }
 
     private void rewriteCompoundAssignment(AssignExpr assign) {
@@ -412,6 +487,17 @@ final class AutoboxingRewriter {
                         : operand;
             }
             if (unary.getOperator() == UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
+                return ResolvedPrimitiveType.BOOLEAN;
+            }
+        }
+        if (expression instanceof ConditionalExpr conditional) {
+            String thenPrimitive = numericPrimitive(typeOf(conditional.getThenExpr()));
+            String elsePrimitive = numericPrimitive(typeOf(conditional.getElseExpr()));
+            if (thenPrimitive != null && elsePrimitive != null) {
+                return ResolvedPrimitiveType.byName(promote(thenPrimitive, elsePrimitive));
+            }
+            if (isBooleanLike(conditional.getThenExpr())
+                    && isBooleanLike(conditional.getElseExpr())) {
                 return ResolvedPrimitiveType.BOOLEAN;
             }
         }
