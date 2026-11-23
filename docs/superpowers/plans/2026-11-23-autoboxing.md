@@ -29,7 +29,7 @@
 - Unboxing is desugared to a read of the wrapper's final value field: expression.value. This deliberately reuses the field-access rules, which already produce the requested split: a happy-path subgoal plus a second subgoal requiring the receiver to be non-null (or a NullPointerException branch when runtime exceptions are allowed).
 - Primitive widening is made explicit with a cast before boxing and after unboxing when the primitive types differ.
 - JavaRedux gains a complete model per wrapper (value field, valueOf, primValue, nullable TYPE).
-- The transformer runs after the structural builders and before ConstantStringExpressionEvaluator, and skips JML-specification subtrees.
+- The transformer runs immediately after RecordClassBuilder and before JMLTransformer, and skips JML-specification subtrees.
 - Java-vs-KeY cross-check: a committed corpus is executed by javac/java 21 and by KeY; cases are recorded as PROVABLE or SPLIT.
 
 ## Review Focus
@@ -63,7 +63,7 @@
 - Create: script/autoboxing/check_java_semantics.sh
 - Create: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingSemanticsTest.java
 - Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingWrapperModelTest.java
-- Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java
+- Test: key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java
 - Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java
 - Modify: key.core/src/test/resources/de/uka/ilkd/key/java/coverage/README.md
 
@@ -217,7 +217,7 @@ Expected: both PASS; PROVABLE cases agree, SPLIT cases show the null obligation 
 - Create: key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformer.java
 - Create: key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java
 - Modify: key.core/src/main/java/de/uka/ilkd/key/java/transformations/KeYJavaPipeline.java
-- Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java
+- Test: key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java
 - Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java
 
 **Interfaces:**
@@ -249,7 +249,7 @@ Implement the wrapper/primitive mapping and the primitive widening order (byte <
 
 - [ ] **Step 4: Register the transformation**
 
-In KeYJavaPipeline.createDefault add p.add(new AutoboxingTransformer()); after AnnotationMover and before ConstantStringExpressionEvaluator. In AutoboxingTransformer skip nodes inside com.github.javaparser.ast.jml.* subtrees.
+In KeYJavaPipeline.createDefault add p.add(new AutoboxingTransformer()); immediately after RecordClassBuilder and before JMLTransformer, so later builders that clone field initializers see the converted form. In AutoboxingTransformer skip nodes inside com.github.javaparser.ast.jml.* subtrees.
 
 - [ ] **Step 5: Write the failing proof tests for assignment contexts**
 
@@ -288,7 +288,7 @@ Add the assignment-context cases (uniform-int, null-int, field, return, initiali
 - [ ] **Step 8: Format and commit**
 
     ./gradlew spotlessApply
-    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
+    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
     git commit -m "feat(java): desugar boxing and unboxing in assignment contexts"
 
 ---
@@ -297,7 +297,7 @@ Add the assignment-context cases (uniform-int, null-int, field, return, initiali
 
 **Files:**
 - Modify: key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java
-- Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java
+- Test: key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java
 - Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java
 - Test: key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing/corpus
 
@@ -331,7 +331,7 @@ Add invocation cases (plain argument, varargs fixed and variable arity, construc
 - [ ] **Step 4: Format and commit**
 
     ./gradlew spotlessApply
-    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
+    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
     git commit -m "feat(java): box and unbox method and constructor arguments"
 
 ---
@@ -340,7 +340,7 @@ Add invocation cases (plain argument, varargs fixed and variable arity, construc
 
 **Files:**
 - Modify: key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java
-- Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java
+- Test: key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java
 - Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java
 - Test: key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing/corpus
 
@@ -367,7 +367,7 @@ Add promotion cases (arithmetic, mixed long, shift, array index, switch) with ex
 - [ ] **Step 4: Format and commit**
 
     ./gradlew spotlessApply
-    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
+    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
     git commit -m "feat(java): apply numeric promotion to boxed operands"
 
 ---
@@ -376,7 +376,7 @@ Add promotion cases (arithmetic, mixed long, shift, array index, switch) with ex
 
 **Files:**
 - Modify: key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java
-- Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java
+- Test: key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java
 - Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java
 - Test: key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing/corpus
 
@@ -400,7 +400,7 @@ Add compound-assignment, postfix and prefix cases, including f(a++) and a++ + a+
 - [ ] **Step 4: Format and commit**
 
     ./gradlew spotlessApply
-    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
+    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
     git commit -m "feat(java): handle boxed compound assignment and increment"
 
 ---
@@ -409,7 +409,7 @@ Add compound-assignment, postfix and prefix cases, including f(a++) and a++ + a+
 
 **Files:**
 - Modify: key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java
-- Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java
+- Test: key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java
 - Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java
 - Test: key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing/corpus
 
@@ -432,7 +432,7 @@ Add cast and conditional cases with expected.txt. Run the Java script and the Ke
 - [ ] **Step 4: Format and commit**
 
     ./gradlew spotlessApply
-    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
+    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
     git commit -m "feat(java): box and unbox casts and conditionals"
 
 ---
@@ -441,7 +441,7 @@ Add cast and conditional cases with expected.txt. Run the Java script and the Ke
 
 **Files:**
 - Modify: key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java
-- Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java
+- Test: key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java
 - Test: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java
 - Test: key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing/corpus
 
@@ -465,7 +465,7 @@ Add array-initializer, array-store, array-read and both enhanced-for cases with 
 - [ ] **Step 4: Format and commit**
 
     ./gradlew spotlessApply
-    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
+    git add key.core/src/main/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingRewriter.java key.core/src/test/java/de/uka/ilkd/key/java/transformations/pipeline/AutoboxingTransformerTest.java key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingProofTest.java key.core/src/test/resources/de/uka/ilkd/key/java/autoboxing
     git commit -m "feat(java): box and unbox array elements and enhanced for"
 
 ---

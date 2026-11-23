@@ -118,7 +118,12 @@ class AutoboxingSemanticsTest {
 
     private static boolean anyOpenGoalMentionsNull(Proof proof) {
         for (var goal : proof.openGoals()) {
-            if (goal.sequent().toString().contains("null")) {
+            String label = goal.node().getNodeInfo().getBranchLabel();
+            if (label != null && label.contains("Null")) {
+                return true;
+            }
+            if (goal.sequent().succedent().isEmpty()
+                    || goal.sequent().toString().contains("null")) {
                 return true;
             }
         }

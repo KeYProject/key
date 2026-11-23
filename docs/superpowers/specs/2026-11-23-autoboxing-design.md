@@ -123,9 +123,11 @@ Rules:
   linearised in Java evaluation order so the rewrite stays observationally
   equivalent.
 
-The transformer skips JML-specification subtrees. It runs after the structural
-builders (`RecordClassBuilder`, `LocalClassTransformation`, `AnnotationMover`)
-and before `ConstantStringExpressionEvaluator`.
+The transformer skips JML-specification subtrees. It runs immediately after
+`RecordClassBuilder` and before `JMLTransformer`, so that later builders which
+clone field initializers (for example `ClassInitializeMethodBuilder`) see the
+converted form; JML specifications are still comments at that point and are
+therefore untouched.
 
 ### Wrapper model
 
@@ -182,3 +184,7 @@ A committed semantic corpus backs every conversion context:
 - Float/Double NaN must not be specified with plain `==`.
 - The transformer runs over boot classes too; it must be idempotent and must
   not rewrite JML specifications.
+- Boxed `static final` fields (for example `static final Integer X = 42;`) are
+  rewritten, but reads of them can hit a pre-existing constant-field
+  classification in `ClassInitializeMethodBuilder`; that is independent of the
+  conversion and is not exercised by the proof tests.
