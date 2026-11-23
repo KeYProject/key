@@ -167,11 +167,11 @@ A committed semantic corpus backs every conversion context:
   `javac --release 21`, runs it, and diffs stdout against `expected.txt`,
   including expected exceptions. This records real Java behaviour.
 - `AutoboxingSemanticsTest` runs the same cases through KeY and checks the
-  recorded verdict: `PROVABLE` (the proof closes), `SPLIT` (the null
-  obligation remains), or `UNPROVABLE`.
+  recorded verdict: `PROVABLE` (the proof closes) or `SPLIT` (the null
+  obligation remains).
 - Every feature task extends the corpus and runs both sides before its commit.
-  Value semantics must agree. Reference identity and `valueOf` caching are
-  recorded as known divergences: KeY models value semantics only.
+  Value behaviour must agree. Reference identity and `valueOf` caching are not
+  modelled and are out of scope; the corpus asserts value behaviour only.
 
 ## Risks
 

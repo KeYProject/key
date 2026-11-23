@@ -30,7 +30,7 @@
 - Primitive widening is made explicit with a cast before boxing and after unboxing when the primitive types differ.
 - JavaRedux gains a complete model per wrapper (value field, valueOf, primValue, nullable TYPE).
 - The transformer runs after the structural builders and before ConstantStringExpressionEvaluator, and skips JML-specification subtrees.
-- Java-vs-KeY cross-check: a committed corpus is executed by javac/java 21 and by KeY; cases are recorded as PROVABLE, SPLIT, or DIVERGENCE (identity/caching only).
+- Java-vs-KeY cross-check: a committed corpus is executed by javac/java 21 and by KeY; cases are recorded as PROVABLE or SPLIT.
 
 ## Review Focus
 
@@ -171,16 +171,17 @@ Run the same value assertions through KeY (AutoboxingWrapperModelTest) and confi
 - Create: key.core/src/test/java/de/uka/ilkd/key/java/AutoboxingSemanticsTest.java
 
 **Interfaces:**
-- Produces: a corpus layout and two runners. cases.tsv rows are "<case-id> TAB <kind> TAB <contract-method>", where kind is PROVABLE, SPLIT or DIVERGENCE. The Java runner compiles and executes each case with javac/java 21 and diffs stdout against expected.txt (THROWS <exception> is also supported). AutoboxingSemanticsTest loads the same case and checks the recorded KeY verdict.
+- Produces: a corpus layout and two runners. cases.tsv rows are "<case-id> TAB <kind> TAB <class> TAB <contract-method>", where kind is PROVABLE or SPLIT. The Java runner compiles and executes each case with javac/java 21 and diffs stdout against expected.txt (THROWS <exception> is also supported). AutoboxingSemanticsTest loads the same case and checks the recorded KeY verdict.
 
 - [ ] **Step 1: Define the corpus format and seed cases**
 
-Each case directory contains one .java file that is both valid Java 21 (JML comments are ignored by javac) and loadable by KeY. Give it a main method that prints deterministic key=value lines, and (for the KeY side) a contract on the method named in cases.tsv. expected.txt holds the exact stdout or the line THROWS java.lang.NullPointerException. Seed the wrappers cases from Task 1 plus:
+Each case directory contains one .java file that is both valid Java 21 (JML comments are ignored by javac) and loadable by KeY. Give it a main method that prints deterministic key=value lines, and (for the KeY side) a contract on the method named in cases.tsv. expected.txt holds the exact stdout or the line THROWS java.lang.NullPointerException. Seed the corpus with the explicit wrapper cases from Task 1:
 
-    uniform-int      PROVABLE
-    null-int         SPLIT
-    int-promotion    PROVABLE
-    valueof-identity DIVERGENCE
+    explicit-int    PROVABLE
+    explicit-long   PROVABLE
+    explicit-null   SPLIT
+
+The implicit-conversion cases (uniform-int, null-int, int-promotion) are added in Task 3, once the transformer exists.
 
 - [ ] **Step 2: Write the Java runner**
 
@@ -188,7 +189,7 @@ Create script/autoboxing/check_java_semantics.sh. For every row of cases.tsv it 
 
 - [ ] **Step 3: Write the KeY runner test**
 
-Create AutoboxingSemanticsTest reading the same cases.tsv from the test classpath. For each case, load the .java file with KeYEnvironment, select the contract by the recorded method name, run ProofStarter, and assert: PROVABLE -> proof.closed(); SPLIT -> not closed and one open goal is the null obligation (sequent mentions the null literal); DIVERGENCE -> not closed (KeY does not prove reference identity).
+Create AutoboxingSemanticsTest reading the same cases.tsv from the test classpath. For each case, load the .java file with KeYEnvironment, select the contract by the recorded class and method name, run ProofStarter, and assert: PROVABLE -> proof.closed(); SPLIT -> not closed and one open goal is the null obligation (sequent mentions the null literal).
 
 - [ ] **Step 4: Prove the runner detects wrong expectations**
 
@@ -361,7 +362,7 @@ For numeric binary operators unbox boxed operands and insert a widening cast to 
 
 - [ ] **Step 3: Extend the corpus and cross-check Java vs KeY**
 
-Add promotion cases (arithmetic, mixed long, shift, array index, switch, boxed == boxed as DIVERGENCE) with expected.txt. Run the Java script and the KeY test. Expected: both PASS and the boxed == boxed case is recorded as a documented divergence.
+Add promotion cases (arithmetic, mixed long, shift, array index, switch) with expected.txt, and assert in the AST test that a boxed == boxed comparison stays a reference comparison (no .value inserted). Run the Java script and the KeY test. Expected: both PASS.
 
 - [ ] **Step 4: Format and commit**
 
@@ -489,7 +490,7 @@ Change the README note that autoboxing "loads but is not soundly modelled": it i
     ./script/autoboxing/check_java_semantics.sh
     ./gradlew :key.core:test --tests "de.uka.ilkd.key.java.Autoboxing*" --tests "de.uka.ilkd.key.java.JavaFeatureCoverageTest" --console=plain
 
-Expected: PASS; every corpus case agrees between Java and KeY except the recorded DIVERGENCE cases.
+Expected: PASS; every corpus case agrees between Java and KeY.
 
 - [ ] **Step 4: Format and nullness**
 
