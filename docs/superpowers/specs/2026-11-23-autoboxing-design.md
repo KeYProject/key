@@ -175,6 +175,23 @@ A committed semantic corpus backs every conversion context:
   Value behaviour must agree. Reference identity and `valueOf` caching are not
   modelled and are out of scope; the corpus asserts value behaviour only.
 
+## Known limitations
+
+- Enhanced `for` over an **array** is desugared to an indexed loop; enhanced
+  `for` over an `Iterable` is left to the prover's enhanced-for elimination and
+  does not get the conversion.
+- Side-effecting enhanced-for iterables are not desugared (they would have to
+  be evaluated once).
+- Multi-dimensional array initializers are converted at the AST level, but
+  proofs over them can hit a pre-existing multi-dimensional array limitation in
+  KeY's converter.
+- Float/Double value equality is not provable with KeY's default float
+  reasoning; the wrapper tests assert non-null results for those two types.
+- Compound assignment and `++`/`--` are handled for side-effect-free targets
+  (names, simple field accesses). Array-element or method-call targets are left
+  unchanged.
+- JML specification expressions and string concatenation are not covered.
+
 ## Risks
 
 - Expression linearisation for `++`/`--` is the riskiest part; it must

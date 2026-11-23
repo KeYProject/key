@@ -536,6 +536,68 @@ class AutoboxingProofTest {
                 """), dir, true);
     }
 
+    private record WrapperCase(String name, String primitive, String wrapper, String literal,
+            String assignmentAssertion, String argumentAssertion) {
+    }
+
+    private static final java.util.List<WrapperCase> WRAPPERS = java.util.List.of(
+        new WrapperCase("Boolean", "boolean", "Boolean", "true", "i", "j"),
+        new WrapperCase("Byte", "byte", "Byte", "(byte) 42", "i == 42", "j == 42"),
+        new WrapperCase("Short", "short", "Short", "(short) 42", "i == 42", "j == 42"),
+        new WrapperCase("Character", "char", "Character", "'x'", "i == 'x'", "j == 'x'"),
+        new WrapperCase("Integer", "int", "Integer", "42", "i == 42", "j == 42"),
+        new WrapperCase("Long", "long", "Long", "42L", "i == 42L", "j == 42L"),
+        new WrapperCase("Float", "float", "Float", "1.5f", "a != null", "b != null"),
+        new WrapperCase("Double", "double", "Double", "1.5d", "a != null", "b != null"));
+
+    @Test
+    void allWrapperTypes(@TempDir Path dir) throws Exception {
+        for (WrapperCase c : WRAPPERS) {
+            String source = clazz(c.name() + "Assignment", """
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static void m() {
+                        %s a = %s;
+                        %s i = a;
+                        //@ assert %s;
+                    }
+                    """.formatted(c.wrapper(), c.literal(), c.primitive(),
+                c.assignmentAssertion()));
+            prove(c.name() + "Assignment", source, dir);
+        }
+    }
+
+    @Test
+    void allWrapperArguments(@TempDir Path dir) throws Exception {
+        for (WrapperCase c : WRAPPERS) {
+            String source = clazz(c.name() + "Arguments", """
+                    static %s id(%s x) {
+                        return x;
+                    }
+
+                    static %s wid(%s x) {
+                        return x;
+                    }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static void m() {
+                        %s i = id(%s.valueOf(%s));
+                        %s b = wid(%s);
+                        %s j = b;
+                        //@ assert %s;
+                    }
+                    """.formatted(c.primitive(), c.primitive(), c.wrapper(), c.wrapper(),
+                c.primitive(), c.wrapper(), c.literal(), c.wrapper(), c.literal(), c.primitive(),
+                c.argumentAssertion()));
+            prove(c.name() + "Arguments", source, dir);
+        }
+    }
+
     @Test
     void nullUnboxingSplits(@TempDir Path dir) throws Exception {
         Proof proof = proof("NullUnboxing", clazz("NullUnboxing", """
