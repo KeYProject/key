@@ -14,3 +14,8 @@ promotion-long	PROVABLE	PromotionLong	m
 condition-bool	PROVABLE	ConditionBool	m
 index-int	PROVABLE	IndexInt	m
 switch-int	PROVABLE	SwitchInt	m
+compound-int	PROVABLE	CompoundInt	m
+postfix-int	PROVABLE	PostfixInt	m
+prefix-int	PROVABLE	PrefixInt	m
+increment-sum	PROVABLE	IncrementSum	m
+postfix-call	PROVABLE	PostfixCall	m

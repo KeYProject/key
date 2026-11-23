@@ -13,6 +13,7 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -228,6 +229,54 @@ class AutoboxingTransformerTest {
     void unboxesBooleanNot() {
         String out = rewrite("void m() { Boolean z = true; boolean b = !z; }");
         assertTrue(out.contains("!z.value"), out);
+    }
+
+    @Test
+    void compoundAssignment() {
+        String out = rewrite("void m() { Integer a = 42; a += 1; }");
+        assertTrue(out.contains("Integer.valueOf"), out);
+        assertTrue(out.contains("a.value + 1"), out);
+    }
+
+    @Test
+    void postfixIncrementUsedAsValue() {
+        String out = rewrite("void m() { Integer a = 42; int i = a++; }");
+        assertTrue(out.contains("a.value + 1"), out);
+        assertTrue(out.contains("- 1"), out);
+    }
+
+    @Test
+    void prefixIncrementUsedAsValue() {
+        String out = rewrite("void m() { Integer a = 42; int i = ++a; }");
+        assertTrue(out.contains("Integer.valueOf"), out);
+        assertTrue(out.contains(").value"), out);
+    }
+
+    @Test
+    void incrementInsideCall() {
+        String out = rewrite("""
+                static int id(int x) { return x; }
+                void m() { Integer a = 42; int i = id(a++); }
+                """);
+        assertTrue(out.contains("id("), out);
+        assertTrue(out.contains("a.value + 1"), out);
+        assertTrue(out.contains("- 1"), out);
+    }
+
+    @Test
+    void incrementInBinaryExpression() {
+        String out = rewrite("void m() { Integer a = 42; int i = a++ + a++; }");
+        assertEquals(2, count(out, "a.value + 1"), out);
+    }
+
+    private static int count(String text, String needle) {
+        int result = 0;
+        int index = 0;
+        while ((index = text.indexOf(needle, index)) >= 0) {
+            result++;
+            index += needle.length();
+        }
+        return result;
     }
 
     @Test

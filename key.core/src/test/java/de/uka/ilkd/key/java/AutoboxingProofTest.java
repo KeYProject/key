@@ -260,6 +260,92 @@ class AutoboxingProofTest {
     }
 
     @Test
+    void compoundAssignment(@TempDir Path dir) throws Exception {
+        prove("CompoundAssignment", clazz("CompoundAssignment", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = 42;
+                    a += 1;
+                    int i = a;
+                    //@ assert i == 43;
+                }
+                """), dir);
+    }
+
+    @Test
+    void postIncrement(@TempDir Path dir) throws Exception {
+        prove("PostIncrement", clazz("PostIncrement", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = 42;
+                    int i = a++;
+                    int j = a;
+                    //@ assert i == 42;
+                    //@ assert j == 43;
+                }
+                """), dir);
+    }
+
+    @Test
+    void preIncrement(@TempDir Path dir) throws Exception {
+        prove("PreIncrement", clazz("PreIncrement", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = 42;
+                    int i = ++a;
+                    //@ assert i == 43;
+                }
+                """), dir);
+    }
+
+    @Test
+    void incrementInBinaryExpression(@TempDir Path dir) throws Exception {
+        prove("IncrementBinary", clazz("IncrementBinary", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = 42;
+                    int i = a++ + a++;
+                    int j = a;
+                    //@ assert i == 85;
+                    //@ assert j == 44;
+                }
+                """), dir);
+    }
+
+    @Test
+    void incrementInCall(@TempDir Path dir) throws Exception {
+        prove("IncrementCall", clazz("IncrementCall", """
+                static int id(int x) {
+                    return x;
+                }
+
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = 42;
+                    int i = id(a++);
+                    int j = a;
+                    //@ assert i == 42;
+                    //@ assert j == 43;
+                }
+                """), dir);
+    }
+
+    @Test
     void nullUnboxingSplits(@TempDir Path dir) throws Exception {
         Proof proof = proof("NullUnboxing", clazz("NullUnboxing", """
                 /*@ normal_behavior

@@ -21,6 +21,7 @@ import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.CastExpr;
 import com.github.javaparser.ast.expr.ConditionalExpr;
+import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
@@ -28,6 +29,7 @@ import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
 import com.github.javaparser.ast.expr.SwitchExpr;
+import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
@@ -39,6 +41,7 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
+import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedType;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -72,9 +75,12 @@ final class AutoboxingRewriter {
         }
         if (node instanceof VariableDeclarator declarator) {
             rewriteInitializer(declarator);
-        } else if (node instanceof AssignExpr assign
-                && assign.getOperator() == AssignExpr.Operator.ASSIGN) {
-            rewriteAssignment(assign);
+        } else if (node instanceof AssignExpr assign) {
+            if (assign.getOperator() == AssignExpr.Operator.ASSIGN) {
+                rewriteAssignment(assign);
+            } else {
+                rewriteCompoundAssignment(assign);
+            }
         } else if (node instanceof ReturnStmt returnStmt) {
             rewriteReturn(returnStmt);
         } else if (node instanceof MethodCallExpr call) {
@@ -135,6 +141,148 @@ final class AutoboxingRewriter {
         returnStmt.setExpression(convert(expression, targetOf(method.getType())));
     }
 
+    private void rewriteCompoundAssignment(AssignExpr assign) {
+        if (!isSimpleTarget(assign.getTarget())) {
+            return;
+        }
+        WrapperType wrapper = wrapperOf(typeOf(assign.getTarget()));
+        if (wrapper == null || !isNumericName(wrapper.primitiveName())) {
+            return;
+        }
+        BinaryExpr.Operator binaryOperator = binaryOperator(assign.getOperator());
+        if (binaryOperator == null) {
+            return;
+        }
+        ResolvedType rhsType = typeOf(assign.getValue());
+        String rhsPrimitive = numericPrimitive(rhsType);
+        if (rhsPrimitive == null) {
+            return;
+        }
+
+        String lhsPrimitive = wrapper.primitiveName();
+        String lhsPromoted;
+        String rhsPromoted;
+        if (isShift(binaryOperator)) {
+            lhsPromoted = lhsPrimitive.equals("long") ? "long" : "int";
+            rhsPromoted = rhsPrimitive.equals("long") ? "long" : "int";
+        } else {
+            String promoted = promote(lhsPrimitive, rhsPrimitive);
+            lhsPromoted = promoted;
+            rhsPromoted = promoted;
+        }
+
+        Expression read = widenPrimitive(
+            new FieldAccessExpr(assign.getTarget().clone(), wrapper.valueFieldName()),
+            lhsPrimitive, lhsPromoted);
+        Expression rhs = widen(assign.getValue().clone(), rhsType, rhsPrimitive, rhsPromoted);
+        Expression operation = new BinaryExpr(read, rhs, binaryOperator);
+        assign.setOperator(AssignExpr.Operator.ASSIGN);
+        assign.setValue(boxPrimitive(wrapper, cast(lhsPrimitive, operation)));
+    }
+
+    private void rewriteIncrement(UnaryExpr unary) {
+        UnaryExpr.Operator operator = unary.getOperator();
+        boolean increment = operator == UnaryExpr.Operator.PREFIX_INCREMENT
+                || operator == UnaryExpr.Operator.POSTFIX_INCREMENT;
+        boolean prefix = operator.isPrefix();
+        Expression operand = unary.getExpression();
+        if (!isSimpleTarget(operand)) {
+            return;
+        }
+        WrapperType wrapper = wrapperOf(typeOf(operand));
+        if (wrapper == null || !isNumericName(wrapper.primitiveName())) {
+            return;
+        }
+        String primitive = wrapper.primitiveName();
+        if (!prefix && !isIntegral(primitive)) {
+            // The old-value arithmetic below is only exact for the integral types.
+            return;
+        }
+
+        Expression read = new FieldAccessExpr(operand.clone(), wrapper.valueFieldName());
+        Expression changed = new BinaryExpr(read, new IntegerLiteralExpr("1"),
+            increment ? BinaryExpr.Operator.PLUS : BinaryExpr.Operator.MINUS);
+        AssignExpr assignment = new AssignExpr(operand,
+            boxPrimitive(wrapper, cast(primitive, changed)), AssignExpr.Operator.ASSIGN);
+        Expression value = new FieldAccessExpr(new EnclosedExpr(assignment),
+            wrapper.valueFieldName());
+
+        if (prefix) {
+            unary.replace(value);
+        } else {
+            Expression old = new BinaryExpr(value, new IntegerLiteralExpr("1"),
+                increment ? BinaryExpr.Operator.MINUS : BinaryExpr.Operator.PLUS);
+            unary.replace(cast(primitive, old));
+        }
+    }
+
+    private static boolean isIncrement(UnaryExpr.Operator operator) {
+        return operator == UnaryExpr.Operator.PREFIX_INCREMENT
+                || operator == UnaryExpr.Operator.PREFIX_DECREMENT
+                || operator == UnaryExpr.Operator.POSTFIX_INCREMENT
+                || operator == UnaryExpr.Operator.POSTFIX_DECREMENT;
+    }
+
+    private static BinaryExpr.@Nullable Operator binaryOperator(AssignExpr.Operator operator) {
+        return switch (operator) {
+            case PLUS -> BinaryExpr.Operator.PLUS;
+            case MINUS -> BinaryExpr.Operator.MINUS;
+            case MULTIPLY -> BinaryExpr.Operator.MULTIPLY;
+            case DIVIDE -> BinaryExpr.Operator.DIVIDE;
+            case REMAINDER -> BinaryExpr.Operator.REMAINDER;
+            case BINARY_AND -> BinaryExpr.Operator.BINARY_AND;
+            case BINARY_OR -> BinaryExpr.Operator.BINARY_OR;
+            case XOR -> BinaryExpr.Operator.XOR;
+            case LEFT_SHIFT -> BinaryExpr.Operator.LEFT_SHIFT;
+            case SIGNED_RIGHT_SHIFT -> BinaryExpr.Operator.SIGNED_RIGHT_SHIFT;
+            case UNSIGNED_RIGHT_SHIFT -> BinaryExpr.Operator.UNSIGNED_RIGHT_SHIFT;
+            default -> null;
+        };
+    }
+
+    private static boolean isSimpleTarget(Expression target) {
+        if (target instanceof NameExpr || target instanceof ThisExpr) {
+            return true;
+        }
+        if (target instanceof FieldAccessExpr field) {
+            return isSimpleTarget(field.getScope());
+        }
+        return false;
+    }
+
+    private static @Nullable WrapperType wrapperOf(@Nullable ResolvedType type) {
+        if (type == null || !type.isReferenceType()) {
+            return null;
+        }
+        try {
+            return WrapperType.forWrapper(type.asReferenceType().getQualifiedName());
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    private static boolean isIntegral(String primitive) {
+        return switch (primitive) {
+            case "byte", "short", "char", "int", "long" -> true;
+            default -> false;
+        };
+    }
+
+    private static Expression widenPrimitive(Expression expression, String from, String to) {
+        if (from.equals(to)) {
+            return expression;
+        }
+        if (WrapperType.isWidening(from, to)) {
+            return cast(to, expression);
+        }
+        return expression;
+    }
+
+    private static Expression boxPrimitive(WrapperType wrapper, Expression primitive) {
+        return new MethodCallExpr(new NameExpr(wrapper.simpleWrapperName()), "valueOf",
+            NodeList.nodeList(primitive));
+    }
+
     private void rewriteBinary(BinaryExpr binary) {
         BinaryExpr.Operator operator = binary.getOperator();
         if (operator == BinaryExpr.Operator.EQUALS
@@ -187,6 +335,10 @@ final class AutoboxingRewriter {
     }
 
     private void rewriteUnary(UnaryExpr unary) {
+        if (isIncrement(unary.getOperator())) {
+            rewriteIncrement(unary);
+            return;
+        }
         switch (unary.getOperator()) {
             case PLUS, MINUS, BITWISE_COMPLEMENT -> {
                 ResolvedType type = typeOf(unary.getExpression());
@@ -248,6 +400,46 @@ final class AutoboxingRewriter {
     }
 
     private static @Nullable ResolvedType typeOf(Expression expression) {
+        // JavaParser reports the operand type for ++/-- and !, but the value of these
+        // expressions has the unboxed primitive type. Correcting this here keeps the
+        // conversion pass from wrapping an increment expression in an unboxing itself.
+        if (expression instanceof UnaryExpr unary) {
+            if (isIncrement(unary.getOperator())) {
+                ResolvedType operand = typeOf(unary.getExpression());
+                WrapperType wrapper = wrapperOf(operand);
+                return wrapper != null
+                        ? ResolvedPrimitiveType.byName(wrapper.primitiveName())
+                        : operand;
+            }
+            if (unary.getOperator() == UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
+                return ResolvedPrimitiveType.BOOLEAN;
+            }
+        }
+        if (expression instanceof BinaryExpr binary) {
+            BinaryExpr.Operator operator = binary.getOperator();
+            if (operator == BinaryExpr.Operator.EQUALS
+                    || operator == BinaryExpr.Operator.NOT_EQUALS
+                    || operator == BinaryExpr.Operator.LESS
+                    || operator == BinaryExpr.Operator.GREATER
+                    || operator == BinaryExpr.Operator.LESS_EQUALS
+                    || operator == BinaryExpr.Operator.GREATER_EQUALS
+                    || operator == BinaryExpr.Operator.AND
+                    || operator == BinaryExpr.Operator.OR) {
+                return ResolvedPrimitiveType.BOOLEAN;
+            }
+            if (isShift(operator)) {
+                String left = numericPrimitive(typeOf(binary.getLeft()));
+                if (left != null) {
+                    return ResolvedPrimitiveType.byName(left.equals("long") ? "long" : "int");
+                }
+            } else if (isNumericBinary(operator) && !isStringConcat(binary)) {
+                String left = numericPrimitive(typeOf(binary.getLeft()));
+                String right = numericPrimitive(typeOf(binary.getRight()));
+                if (left != null && right != null) {
+                    return ResolvedPrimitiveType.byName(promote(left, right));
+                }
+            }
+        }
         try {
             return expression.calculateResolvedType();
         } catch (RuntimeException e) {
@@ -435,11 +627,8 @@ final class AutoboxingRewriter {
             return expression;
         }
 
-        ResolvedType actualType;
-        try {
-            actualType = expression.calculateResolvedType();
-        } catch (RuntimeException e) {
-            LOGGER.debug("Cannot resolve type of {} while rewriting autoboxing", expression, e);
+        ResolvedType actualType = typeOf(expression);
+        if (actualType == null) {
             return expression;
         }
 
