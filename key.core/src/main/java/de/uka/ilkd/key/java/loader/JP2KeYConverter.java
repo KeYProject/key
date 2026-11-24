@@ -1413,10 +1413,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
      */
     private boolean hasGeneratedAccessor(ResolvedFieldDeclaration component) {
         var ast = component.toAst().orElse(null);
-        if (ast != null && ast.containsData(PipelineConstants.IMPLICIT_RECORD_ACCESSOR)
-                && Boolean.TRUE.equals(ast.getData(PipelineConstants.IMPLICIT_RECORD_ACCESSOR))) {
-            return true;
-        }
         var enclosing = ast == null ? null
                 : ast.findAncestor(ClassOrInterfaceDeclaration.class).orElse(null);
         return enclosing != null && enclosing.getMethodsByName(component.getName()).stream()
