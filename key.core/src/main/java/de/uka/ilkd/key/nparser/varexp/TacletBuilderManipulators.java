@@ -168,6 +168,9 @@ public class TacletBuilderManipulators {
     public static final TacletBuilderCommand NEW_LOCAL_VARS = new ConstructorBasedBuilder(
         "newLocalVars", NewLocalVarsCondition.class, SV, SV, SV, SV);
 
+    public static final TacletBuilderCommand ABNORMALLY_TERMINATE = new ConstructorBasedBuilder(
+        "alwaysAbnormallyTerminates", AbnormallyTerminatesCond.class, SV);
+
     public static final TacletBuilderCommand BINDING_EXPRESSION_SIMPLE =
         new ConstructorBasedBuilder(
             "isBindingExpr", BindingExpressionCond.class, SV);
@@ -399,7 +402,7 @@ public class TacletBuilderManipulators {
             META_DISJOINT,
             IS_OBSERVER, CONSTANT, HAS_SORT, LABEL, NEW_LABEL, HAS_ELEM_SORT, IS_IN_STRICTFP,
             HAS_ANNOTATION, ADD_ANNOTATION, REMOVE_ANNOTATION,
-            BINDING_EXPRESSION_SIMPLE, RECORD_PATTERN_INSTANCEOF);
+            BINDING_EXPRESSION_SIMPLE, ABNORMALLY_TERMINATE, RECORD_PATTERN_INSTANCEOF);
         register(STORE_TERM_IN, STORE_STMT_IN, HAS_INVARIANT, GET_INVARIANT, GET_FREE_INVARIANT,
             GET_VARIANT, IS_LABELED);
         loadWithServiceLoader();
