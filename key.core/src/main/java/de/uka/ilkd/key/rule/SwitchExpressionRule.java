@@ -153,24 +153,26 @@ public final class SwitchExpressionRule implements BuiltInRule {
                     + "condition).");
         }
 
-        ProgramVariable selectorVariable = null;
+        // The contract's terms use the variable registered in the proof's namespaces; the program
+        // AST may hold an equivalent but distinct instance. Use the registered instance only to
+        // match the antecedent (for the selector fold); the generated program keeps the AST
+        // variable.
+        JTerm knownValue = null;
+        boolean selectorNonNull = false;
         if (switchExpression.getSelector() instanceof ProgramVariable astVariable) {
-            // The contract's terms use the variable registered in the proof's namespaces; the
-            // program AST may hold an equivalent but distinct instance.
             IProgramVariable lookedUp =
                 services.getNamespaces().programVariables().lookup(astVariable.name());
-            selectorVariable =
+            ProgramVariable registered =
                 lookedUp instanceof ProgramVariable pv ? pv : astVariable;
+            JTerm selectorTerm =
+                services.getTypeConverter().convertToLogicElement(registered);
+            if (selectorTerm != null) {
+                knownValue = knownSelectorValue(goal, selectorTerm);
+                selectorNonNull = knownNonNull(goal, selectorTerm);
+            }
         }
-        final JTerm knownValue;
-        if (selectorVariable == null) {
-            knownValue = null;
-        } else {
-            JTerm selectorTerm = services.getTypeConverter()
-                    .convertToLogicElement(selectorVariable);
-            knownValue = selectorTerm == null ? null : knownSelectorValue(goal, selectorTerm);
-        }
-        final Lowered lowered = lower(switchExpression, services, ec, knownValue);
+        final Lowered lowered = lower(switchExpression, services, ec, knownValue,
+            selectorNonNull);
 
         // Replace the switch expression inside the active statement by its temporary.
         JavaBlock rewritten = JavaTools.replaceStatement(javaBlock, services, switchExpression,
@@ -258,7 +260,8 @@ public final class SwitchExpressionRule implements BuiltInRule {
     }
 
     private Lowered lower(SwitchExpression switchExpression, Services services,
-            @Nullable ExecutionContext ec, @Nullable JTerm knownValue) throws RuleAbortException {
+            @Nullable ExecutionContext ec, @Nullable JTerm knownValue, boolean selectorNonNull)
+            throws RuleAbortException {
         final var namer = services.getVariableNamer();
         final List<Statement> prelude = new ArrayList<>();
 
@@ -288,7 +291,8 @@ public final class SwitchExpressionRule implements BuiltInRule {
 
         // Java throws a NullPointerException for a null reference selector unless a case (or a
         // 'case null, default') handles null.
-        if (!(selector.getKeYJavaType(services, ec).getJavaType() instanceof PrimitiveType)
+        if (!selectorNonNull
+                && !(selector.getKeYJavaType(services, ec).getJavaType() instanceof PrimitiveType)
                 && !hasNullArm(switchExpression)) {
             prelude.add(nullCheck(selectorVariable, services));
         }
@@ -340,8 +344,9 @@ public final class SwitchExpressionRule implements BuiltInRule {
                 guard = KeYJavaASTFactory.equalsOperator(selectorVariable,
                     caseBranch.getExpression());
             } else if (branch instanceof PatternCase patternCase) {
-                throw new RuleAbortException(
-                    "Switch patterns are not supported by this rule yet (see the pattern plan).");
+                Expression test = patternGuard(patternCase, selectorVariable);
+                guard = patternCase.getGuard() == null ? test
+                        : KeYJavaASTFactory.logicalAndOperator(test, patternCase.getGuard());
             } else {
                 throw new RuleAbortException("Unknown switch branch: " + branch);
             }
@@ -351,6 +356,16 @@ public final class SwitchExpressionRule implements BuiltInRule {
                     : KeYJavaASTFactory.ifElse(guard, block, current);
         }
         return current;
+    }
+
+
+    private static Expression patternGuard(PatternCase patternCase, ProgramVariable selector)
+            throws RuleAbortException {
+        if (patternCase.getPatterns().size() != 1) {
+            throw new RuleAbortException(
+                "Switch labels with more than one pattern are not supported yet.");
+        }
+        return KeYJavaASTFactory.patternTest(selector, patternCase.getPatterns().get(0));
     }
 
     /**
@@ -437,7 +452,7 @@ public final class SwitchExpressionRule implements BuiltInRule {
         final List<Statement> statements = new ArrayList<>();
         Expression value = yield.getExpression();
         if (value instanceof SwitchExpression inner) {
-            Lowered lowered = lower(inner, services, ec, null);
+            Lowered lowered = lower(inner, services, ec, null, false);
             statements.addAll(lowered.prelude);
             value = lowered.variable;
         } else if (value != null && findSwitchExpression(value) != null) {
@@ -479,6 +494,22 @@ public final class SwitchExpressionRule implements BuiltInRule {
             services.getJavaInfo().getKeYJavaType("java.lang.NullPointerException"));
         return KeYJavaASTFactory.ifThen(KeYJavaASTFactory.equalsNullOperator(selectorVariable),
             KeYJavaASTFactory.throwClause(exception));
+    }
+
+    private static boolean knownNonNull(Goal goal, JTerm selectorTerm) {
+        for (SequentFormula sequentFormula : goal.sequent().antecedent()) {
+            if (!(sequentFormula.formula() instanceof JTerm formula)
+                    || !(formula.op() instanceof Equality)) {
+                continue;
+            }
+            JTerm left = formula.sub(0);
+            if (left.op().name().toString().startsWith("instance<") && left.arity() == 1
+                    && left.sub(0).equals(selectorTerm)
+                    && formula.sub(1).op().name().toString().equals("TRUE")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static @Nullable JTerm knownSelectorValue(Goal goal, JTerm selectorTerm) {

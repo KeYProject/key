@@ -661,6 +661,31 @@ public abstract class KeYJavaASTFactory {
         return new PatternCase(patterns, guard, body);
     }
 
+    /**
+     * Builds the {@code instanceof} test for a switch pattern label.
+     *
+     * @param selector the selector expression
+     * @param pattern the pattern of the label
+     * @return an instanceof pattern expression, or {@code true} for a match-all pattern without a
+     *         type reference
+     * @throws IllegalArgumentException for an unsupported pattern
+     */
+    public static Expression patternTest(final Expression selector, final Pattern pattern) {
+        if (pattern instanceof de.uka.ilkd.key.java.ast.pattern.TypePattern typePattern) {
+            return new InstanceofPattern(selector, typePattern.getTypeReference(), typePattern);
+        }
+        if (pattern instanceof de.uka.ilkd.key.java.ast.pattern.RecordPattern recordPattern) {
+            return new InstanceofPattern(selector, recordPattern.getTypeReference(), recordPattern);
+        }
+        if (pattern instanceof de.uka.ilkd.key.java.ast.pattern.AnyPattern anyPattern) {
+            if (anyPattern.getTypeReference() != null) {
+                return new InstanceofPattern(selector, anyPattern.getTypeReference(), anyPattern);
+            }
+            return new BooleanLiteral(PositionInfo.UNDEFINED, true);
+        }
+        throw new IllegalArgumentException("Unsupported switch pattern: " + pattern);
+    }
+
     public static Continue continueStatement(Label label) {
         return new Continue(label);
     }
