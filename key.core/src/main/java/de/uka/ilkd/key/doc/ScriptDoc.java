@@ -43,20 +43,26 @@ public class ScriptDoc extends AbstractDocGenerator {
             }
 
             var signature = new DocSignature(parameters, "", false);
+            var aliases = command.getAliases().stream()
+                    .filter(alias -> !alias.equals(command.getName()))
+                    .toList();
             items.add(new DocItem(command.getName(),
                 cleanJavadoc(
                     ArgumentsLifter.stripUsageSection(command.getDocumentation())),
                 List.of(signature),
                 command.getCategory(),
-                command.getClass().isAnnotationPresent(Deprecated.class)));
+                command.getClass().isAnnotationPresent(Deprecated.class),
+                aliases));
         }
         return items;
     }
 
-    /// Returns all loaded proof script commands sorted by their name.
+    /// Returns all loaded proof script commands, one entry per command (a command registered
+    /// under several aliases appears once), sorted by their name.
     private List<ProofScriptCommand> sortedCommands() {
-        var commands = new ArrayList<>(ProofScriptEngine.loadCommands().values());
-        commands.sort(Comparator.comparing(ProofScriptCommand::getName));
-        return commands;
+        return ProofScriptEngine.loadCommands().values().stream()
+                .distinct()
+                .sorted(Comparator.comparing(ProofScriptCommand::getName))
+                .toList();
     }
 }

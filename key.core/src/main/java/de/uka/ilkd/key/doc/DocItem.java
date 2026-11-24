@@ -20,10 +20,12 @@ import org.jspecify.annotations.Nullable;
  * @param signatures the signatures (overloads, constructors, or argument lists) of the construct
  * @param category the category of the construct, only set for proof script commands
  * @param deprecated whether the construct is deprecated, only set for proof script commands
+ * @param aliases further names the construct can be invoked with, without its primary name; only
+ *        used for proof script commands
  *
  * @author Alexander Weigl
  * @version 1 (22.10.26)
  */
 public record DocItem(String name, String documentation, List<DocSignature> signatures,
-        @Nullable String category, boolean deprecated) {
+        @Nullable String category, boolean deprecated, List<String> aliases) {
 }

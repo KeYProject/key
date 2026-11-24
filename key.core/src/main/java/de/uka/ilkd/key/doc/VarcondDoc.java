@@ -46,7 +46,7 @@ public class VarcondDoc extends AbstractDocGenerator {
                 signatures.add(collectSignature(cmd));
             }
 
-            items.add(new DocItem(name, documentation, signatures, null, false));
+            items.add(new DocItem(name, documentation, signatures, null, false, List.of()));
         }
         return items;
     }

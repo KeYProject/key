@@ -85,6 +85,12 @@ public abstract class AbstractDocGenerator {
         for (DocItem item : items) {
             sb.append("\n\n### `").append(item.name()).append("`\n\n");
             sb.append(item.documentation()).append('\n');
+            if (!item.aliases().isEmpty()) {
+                sb.append("\n**Aliases:** ");
+                sb.append(item.aliases().stream().map(alias -> "`" + alias + "`")
+                        .collect(Collectors.joining(", ")));
+                sb.append('\n');
+            }
             sb.append("\n**Signatures**\n\n");
             for (DocSignature signature : item.signatures()) {
                 String arguments = signature.parameters().stream()

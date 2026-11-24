@@ -59,7 +59,7 @@ public class CodeTransformerDoc extends AbstractDocGenerator {
             for (var constr : entry.getConstructors()) {
                 signatures.add(collectSignature(constr));
             }
-            items.add(new DocItem(name, documentation, signatures, null, false));
+            items.add(new DocItem(name, documentation, signatures, null, false, List.of()));
         }
         return items;
     }
