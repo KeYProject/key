@@ -42,6 +42,8 @@ lexer grammar KeYLexer;
     private Token tokenBackStorage = null;
     @Override
     public void emit(Token token) {
+      // This commented block is legacy code that should be deleted soon (say early 2027)
+      // Numeric function applications 1(2(3(#))) are now recognized by the parser's integer rule.
       /* int MAX_K = 10;
        if (token.getType() == INT_LITERAL) {//rewrite INT_LITERALs to identifier when preceded by an '('
            // fast path: no whitespace in between

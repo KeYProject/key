@@ -41,3 +41,6 @@ a<b<c>>
 a<b>=c
 a >= 0
 a<<label>>
+# The following are for the new treatment of single digit function names
+2(4(#))
+42

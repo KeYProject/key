@@ -144,6 +144,8 @@ argument_list
    : LPAREN (term (COMMA term)*)? RPAREN
    ;
 
+// A decimal numeral followed by a term denotes a numeric function application,
+// as in Z(2(4(#))) for 42. A bare numeral denotes an integer literal.
 integer
    : (INT_LITERAL ( LPAREN term RPAREN )?
      | HEX_LITERAL | BIN_LITERAL)

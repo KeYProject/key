@@ -1798,14 +1798,17 @@ public class ExpressionBuilder extends DefaultBuilder {
         return getServices().getTermBuilder().rTerm(real.getUnscaledValue(), real.getScale());
     }
 
+    /*
+     * Builds a numeric function application when an argument is present like in "2(4(#))".
+     * or encodes a bare integer literal in Z notation like for "42".
+     */
     @Override
     public Object visitInteger(JavaKeYParser.IntegerContext ctx) {
         JavaKeYParser.TermContext child = ctx.term();
-        if(child != null) {
+        if (child != null) {
             Function fct = functions().lookup(new Name(ctx.INT_LITERAL().getText()));
-            if(fct == null) {
-                // TODO find right exception class
-                throw new RuntimeException("Function symbol '" + ctx.INT_LITERAL().getText() + "' not found.");
+            if (fct == null) {
+                semanticError(ctx, "Function symbol '%s' not found.", ctx.INT_LITERAL().getText());
             }
             JTerm childTerm = accept(child);
             return getTermFactory().createTerm(fct, childTerm);
