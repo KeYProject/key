@@ -519,6 +519,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnYield(Yield x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnSchematicFieldReference(SchematicFieldReference x) {
         doDefaultAction(x);
     }

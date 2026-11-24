@@ -938,6 +938,15 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnYield(Yield x) {
+        layouter.keyWord("yield");
+        if (x.getExpression() != null) {
+            layouter.brk();
+            x.getExpression().visit(this);
+        }
+    }
+
+    @Override
     public void performActionOnThrow(Throw x) {
         layouter.keyWord("throw");
         if (x.getExpression() != null) {
