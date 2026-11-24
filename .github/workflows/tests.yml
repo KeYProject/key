@@ -70,7 +70,17 @@ jobs:
         # matrix.tasks is intentionally interpolated UNQUOTED: it is a whitespace-separated
         # list of Gradle task/option selectors, and quoting would hand Gradle a single
         # argument it cannot resolve.
-        run: ./gradlew --continue ${{ matrix.tasks }}
+        env:
+          JACOCO_FLAG: ${{ matrix.os == 'ubuntu-24.04' && '-DjacocoEnabled=true' || '' }}
+        run: ./gradlew --continue ${{ matrix.tasks }} ${JACOCO_FLAG}
+
+      - name: Upload JaCoCo execution data
+        if: matrix.os == 'ubuntu-24.04'
+        uses: actions/upload-artifact@v7
+        with:
+          name: jacoco-${{ matrix.group }}
+          path: '**/build/jacoco/*.exec'
+          if-no-files-found: error
 
       - name: Upload test results
         uses: actions/upload-artifact@v7
@@ -130,3 +140,41 @@ jobs:
             **/build/test-results/*/*.xml
             key.core/build/reports/runallproofs/*
             **/build/reports/
+
+  coverage:
+    needs: unit-tests
+    if: github.event_name != 'merge_group'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      code-quality: write
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6.3.0
+        with:
+          java-version: 21
+          distribution: 'corretto'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Download JaCoCo execution data
+        uses: actions/download-artifact@v8
+        with:
+          pattern: jacoco-*
+          merge-multiple: true
+
+      - name: Build coverage report
+        run: ./gradlew -DjacocoEnabled=true jacocoRootReport jacocoCobertura
+
+      - name: Upload coverage report
+        uses: actions/upload-code-coverage@v1
+        with:
+          file: build/reports/jacoco/root/cobertura.xml
+          language: Java
+          label: code-coverage/jacoco
+          fail-on-error: false
