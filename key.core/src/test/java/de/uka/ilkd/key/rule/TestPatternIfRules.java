@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
@@ -26,11 +25,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,7 +50,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * handled by {@code ifUnfold}/{@code ifElseUnfold}.
  */
 class TestPatternIfRules {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestPatternIfRules.class);
 
     /**
      * A profile whose standard rules are the LDT declarations plus {@code javaRules.key}, the
@@ -81,31 +76,12 @@ class TestPatternIfRules {
                 "TestPatternIfRules", HelperClassForTests.DUMMY_KEY_FILE, PROFILE);
             initConfig = new ProblemInitializer(PROFILE).prepare(envInput);
         } catch (Exception e) {
-            if (isMetaConstructParserGap(e)) {
-                String reason = "javaRules.key cannot be loaded, because the jmlparser does not"
-                    + " support the #posBinding/#negBinding program meta-constructs yet: "
-                    + e.getMessage();
-                LOGGER.warn("Skipping the pattern-if rule tests. {}", reason);
-                Assumptions.assumeTrue(false, reason);
-            }
             throw e instanceof RuntimeException re ? re : new RuntimeException(e);
         }
         services = initConfig.getServices();
         allRules = initConfig.createTacletIndex();
     }
 
-    private static boolean isMetaConstructParserGap(Throwable error) {
-        for (Throwable t = error; t != null; t = t.getCause()) {
-            if (t instanceof BuildingException) {
-                String message = t.getMessage();
-                if (message != null
-                        && (message.contains("#posBinding") || message.contains("#negBinding"))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     private static JTerm parseTerm(String term) {
         return new KeyIO(services, initConfig.namespaces()).parseExpression(term);

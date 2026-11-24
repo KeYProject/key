@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.nio.file.Files;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.nparser.KeyIO;
@@ -14,8 +16,6 @@ import de.uka.ilkd.key.proof.io.KeYFileForTests;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
-import de.uka.ilkd.key.util.HelperClassForTests;
-import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
@@ -23,11 +23,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -52,10 +49,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * </ul>
  *
  * <p>
- * All six rules are loaded from the production rule file {@code javaRules.key} (there are no
+ * The four {@code instanceof_eval_id*} rules cover the assignment form {@code b = e instanceof
+ * T v;} inside a compound expression: the simple subject is evaluated directly, a non-simple
+ * subject is evaluated once into a temporary, and the pattern variable is bound in the branch
+ * where the test succeeded.
+ *
+ * <p>
+ * All rules are loaded from the production rule file {@code javaRules.key} (there are no
  * test-only copies). Loading this file requires the jmlparser to support the
- * {@code #posBinding}/{@code #negBinding} program meta-constructs; until the parser supports them
- * the rule base cannot be loaded and all tests of this class are skipped (see {@link #setUp()}).
+ * {@code #posBinding}/{@code #negBinding} program meta-constructs; if it does not, the test fails
+ * instead of being skipped so that a parser regression is visible.
  *
  * <p>
  * Each goal is a single active statement (the pattern assignment) so that it sits at the goal's
@@ -65,7 +68,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * expression, which is a non-simple expression.
  */
 class TestPatternAssignmentRules {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestPatternAssignmentRules.class);
 
     /**
      * A profile whose standard rules are the LDT declarations plus {@code javaRules.key}, the
@@ -88,40 +90,23 @@ class TestPatternAssignmentRules {
     @BeforeAll
     static void setUp() {
         try {
+            // the assignment-form rules need an assignment as the first active statement; the
+            // target must therefore be a program variable rather than a statement-local one
+            var keyFile = Files.createTempFile("TestPatternAssignmentRules", ".key");
+            Files.writeString(keyFile, """
+                    \\programVariables { boolean flag; Object o; }
+                    \\problem { true }
+                    """);
             var envInput = new KeYFileForTests(
-                "TestPatternAssignmentRules", HelperClassForTests.DUMMY_KEY_FILE, PROFILE);
+                "TestPatternAssignmentRules", keyFile, PROFILE);
             initConfig = new ProblemInitializer(PROFILE).prepare(envInput);
         } catch (Exception e) {
-            if (isMetaConstructParserGap(e)) {
-                String reason = "javaRules.key cannot be loaded, because the jmlparser does not"
-                    + " support the #posBinding/#negBinding program meta-constructs yet: "
-                    + e.getMessage();
-                LOGGER.warn("Skipping the pattern-assignment rule tests. {}", reason);
-                Assumptions.assumeTrue(false, reason);
-            }
             throw e instanceof RuntimeException re ? re : new RuntimeException(e);
         }
         services = initConfig.getServices();
         allRules = initConfig.createTacletIndex();
     }
 
-    /**
-     * Checks whether the given exception chain contains the parse error caused by the jmlparser
-     * not knowing the {@code #posBinding}/{@code #negBinding} meta-constructs, in which case it
-     * tries to resolve them as schema variables.
-     */
-    private static boolean isMetaConstructParserGap(Throwable error) {
-        for (Throwable t = error; t != null; t = t.getCause()) {
-            if (t instanceof BuildingException) {
-                String message = t.getMessage();
-                if (message != null
-                        && (message.contains("#posBinding") || message.contains("#negBinding"))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     private static JTerm parseTerm(String term) {
         return new KeyIO(services, initConfig.namespaces()).parseExpression(term);
@@ -243,6 +228,43 @@ class TestPatternAssignmentRules {
         assertSuccedent(goal,
             "\\<{boolean b; boolean b_1; { b_1 = (new String(\"x\") instanceof String s); }"
                 + " b = !b_1;}\\> true");
+    }
+
+    @Test
+    void instanceofEvalId() {
+        var goal = applyRule("instanceof_eval_id",
+            "flag = new String(\"x\") instanceof String s;");
+        // the non-simple subject is evaluated once into a temporary; the binding is not needed
+        assertSuccedent(goal,
+            "\\<{java.lang.String v = new String(\"x\"); flag = v instanceof String;}\\> true");
+    }
+
+    @Test
+    void instanceofEvalIdSimple() {
+        var goal = applyRule("instanceof_eval_id_simple", "flag = o instanceof Object s;");
+        assertSuccedent(goal, "\\<{flag = o instanceof Object;}\\> true");
+    }
+
+    @Test
+    void instanceofEvalIdAnd() {
+        var goal = applyRule("instanceof_eval_id_and",
+            "flag = o instanceof Object s && this.hashCode() > 0;");
+        // in the branch where the test succeeded the pattern variable is bound from the subject
+        assertSuccedent(goal,
+            "\\<{flag = o instanceof Object;"
+                + " if (flag) { Object s = (Object) o;"
+                + " flag = this.hashCode() > 0; }}\\> true");
+    }
+
+    @Test
+    void instanceofEvalIdOr() {
+        var goal = applyRule("instanceof_eval_id_or",
+            "flag = !(o instanceof Object s) || this.hashCode() > 0;");
+        // the variable is bound on the branch where the negated test is false
+        assertSuccedent(goal,
+            "\\<{flag = !(o instanceof Object);"
+                + " if (!flag) { Object s = (Object) o;"
+                + " flag = this.hashCode() > 0; }}\\> true");
     }
 
     @Test
