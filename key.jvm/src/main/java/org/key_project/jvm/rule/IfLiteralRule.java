@@ -12,12 +12,12 @@ import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.ast.statement.If;
 import de.uka.ilkd.key.java.ast.statement.Then;
 import de.uka.ilkd.key.logic.JTerm;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
+import org.key_project.logic.LogicServices;
 import org.key_project.logic.Name;
 import org.key_project.logic.op.Modality;
 import org.key_project.prover.rules.RuleAbortException;
@@ -65,7 +65,7 @@ public final class IfLiteralRule implements BuiltInRule {
     }
 
     @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence occurrence, TermServices services) {
+    public IBuiltInRuleApp createApp(PosInOccurrence occurrence, LogicServices services) {
         return new JvmBuiltInRuleApp(this, occurrence);
     }
 
