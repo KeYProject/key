@@ -11,9 +11,8 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Pins exact lexer equivalence properties of the KeY grammar: backslash escapes inside
- * modality-body strings survive lexing, and the {@code emit()} INT_LITERAL retype rules around
- * NBSP.
+ * Checks that modality-body string escapes survive lexing and that integer literals remain
+ * integer tokens when followed by parentheses.
  */
 class LexerEquivalenceTest {
 
@@ -39,9 +38,11 @@ class LexerEquivalenceTest {
     }
 
     @Test
-    void intFollowedByParenIsRetypedToIdent() {
+    void intFollowedByParenStaysInt() {
         Token first = tokenAt("(123(", 1);
-        assertThat(first.getType()).isEqualTo(JavaKeYLexer.IDENT);
+        assertThat(first.getType()).isEqualTo(JavaKeYLexer.INT_LITERAL);
+        Token second = tokenAt("(123(", 2);
+        assertThat(second.getType()).isEqualTo(JavaKeYLexer.LPAREN);
     }
 
     @Test
