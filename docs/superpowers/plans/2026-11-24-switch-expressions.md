@@ -4,9 +4,9 @@
 
 **Goal:** Add proof-level support for Java switch expressions (JEP 361) and pattern matching in `switch` (JEP 440/441) to KeY, for both the statement and the expression form.
 
-**Architecture:** New KeY AST nodes (`SwitchExpression`, `Yield`, `PatternCase`) plus a proof-time rewrite. A `switchExpression` taclet matches the enclosing statement (`#s`) when a new `\containsSwitchExpression(#s)` variable condition holds; the `#lowerSwitchExpression` meta-construct introduces temporaries (via `EvaluateArgs.evaluate`), replaces each switch expression by its temporary, and emits a plain `Switch` statement. That statement is lowered by the existing `#switchToIf` rule, which is extended to emit `instanceof` guards for pattern labels.
+**Architecture:** New KeY AST nodes (`SwitchExpression`, `Yield`, `PatternCase`) plus a proof-time rewrite in a new **built-in rule**. The rule introduces temporaries (via `EvaluateArgs.evaluate`), replaces each switch expression by its temporary, and emits a plain `Switch` statement, which the existing `#switchToIf` rule lowers. Pattern labels are lowered by the same built-in rule into an `if`-cascade with `instanceof` guards.
 
-**Tech Stack:** Java 21, Gradle wrapper, KeY taclets, `ProgramTransformer` meta-constructs, JUnit 5, jmlparser (fork `Contract-LIB/jmlparser`, published as `io.github.jmltoolkit:jmlparser-*`).
+**Tech Stack:** Java 21, Gradle wrapper, KeY built-in rules (with the existing `#switchToIf` meta-construct), JUnit 5, jmlparser (fork `Contract-LIB/jmlparser`, published as `io.github.jmltoolkit:jmlparser-*`).
 
 **Spec:** `docs/superpowers/specs/2026-11-24-switch-expressions-design.md`
 
@@ -19,7 +19,7 @@
 - Javadoc on every new public class and public method; slf4j `LOGGER`, no `System.out`/`System.err`.
 - Tests are JUnit 5. Do not use the tags `owntest`, `interactive`, `performance`. Prover tests assume the single-threaded prover (`key.prover.parallel=false`).
 - Nullness gate: `./gradlew -DENABLE_NULLNESS=true :key.core:compileTestJava`.
-- Adding taclets changes `key.core/src/test/resources/de/uka/ilkd/key/nparser/taclets.old.txt`; refresh it in Task 7.
+- This plan adds no taclets; `TestTacletEquality` must still pass unchanged (run it in Task 7).
 - The pattern stack (`weigl/pattern-hoisting`) provides `Pattern`, `TypePattern`, `RecordPattern`, `AnyPattern`, `InstanceofPattern` and the binding rules; use them, do not duplicate them.
 
 ## Review Focus
@@ -244,82 +244,65 @@ git commit -m "feat(loader): convert switch expressions, yields and pattern labe
 
 ---
 
-### Task 5: `containsSwitchExpression` variable condition
+### Task 5: Built-in rule `SwitchExpressionRule` for switch expressions
 
 **Files:**
-- Create: `key.core/src/main/java/de/uka/ilkd/key/rule/conditions/ContainsSwitchExpressionCond.java`
-- Modify: `key.core/src/main/java/de/uka/ilkd/key/nparser/varexp/TacletBuilderManipulators.java` (register `"containsSwitchExpression"`, mirroring `"alwaysAbnormallyTerminates"`)
-- Test: `key.core/src/test/java/de/uka/ilkd/key/rule/conditions/ContainsSwitchExpressionCondTest.java`
+- Create: `key.core/src/main/java/de/uka/ilkd/key/rule/SwitchExpressionRule.java`
+- Modify: `key.core/src/main/java/de/uka/ilkd/key/proof/init/JavaProfile.java` (`initBuiltInRules()`, next to `SetStatementRule.INSTANCE`)
+- Test: `key.core/src/test/java/de/uka/ilkd/key/java/SwitchExpressionTest.java`
 
 **Interfaces:**
-- Consumes: a statement instantiation (from `SVInstantiations`, as in `BindingExpressionCondTest`).
-- Produces: `\containsSwitchExpression(#s)` succeeds when the instantiation contains a `SwitchExpression` node anywhere in its tree, fails otherwise.
+- Consumes: `BuiltInRule`, `DefaultBuiltInRuleApp`, `Goal`, `PosInOccurrence`, `JavaTools.getActiveStatement(JavaBlock)`, `TermBuilder`, `EvaluateArgs.evaluate(Expression, List<? super LocalVariableDeclaration>, Services, ExecutionContext)`, `KeYJavaASTFactory`.
+- Produces: `public final class SwitchExpressionRule implements BuiltInRule` with `public static final SwitchExpressionRule INSTANCE` and name `"Switch Expression"`; `isApplicable(Goal, PosInOccurrence)` is true iff the occurrence is top-level, not inside a transformer, and the active statement contains a `SwitchExpression`; `createApp(...)` returns `DefaultBuiltInRuleApp`; `apply(...)` returns the goal(s) with the rewritten Java block. Registered via `.prepend(SwitchExpressionRule.INSTANCE)` in `JavaProfile.initBuiltInRules()`.
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Write the failing proof tests**
 
-Reuse the `BindingExpressionCondTest` fixture: parse a statement containing a switch expression (`"int r = switch (x) { default -> 0; };"`) and one without (`"int r = 0;"`); assert the condition matches the first and not the second.
+Using the `InstanceOfPatternFlowScopingTest` harness (`KeYEnvironment.load` + `ProofStarter`), add contracts that must close:
 
-- [ ] **Step 2: Run it and confirm the failure**
+```java
+int f(int x) { return switch (x) { case 1 -> 10; default -> 0; }; }        // requires x==1, ensures \result==10
+int g(int x) { switch (x) { case 1: return 1; default: return 0; } }        // control: statement already works
+int h(int x) { return switch (x) { case 1: yield 10; default: yield 0; }; } // colon + yield
+int t(int x) { return switch (x) { case 1 -> 10; default -> throw new IllegalArgumentException(); }; }
+```
 
-Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.rule.conditions.ContainsSwitchExpressionCondTest"`
-Expected: FAIL to compile: `ContainsSwitchExpressionCond` not found.
+Add a selector-once test with a `static int calls; static int next(){ calls++; return 1; }` and a contract that proves `calls == 1` after `switch (next())`. Add a `case null, default` test on a `String` selector. Add a nested test (`int y = switch (a) { case 1 -> switch (b) { default -> 2; }; default -> 0; };`) and a `yield`-in-loop test (`case 1 -> { for (int i = 0; i < 2; i++) { if (i == 1) { yield 7; } } yield 1; }`) that proves the yielded value and the number of loop iterations. Add a rejection test for a switch expression that is not the first-evaluated operand of its statement (`f(g(), switch (x) { … })`): the proof must report the unsupported position.
 
-- [ ] **Step 3: Implement the condition**
+- [ ] **Step 2: Run them and confirm the failures**
 
-Walk the instantiated `ProgramElement` tree (a small `Visitor` or recursive `getChildAt` loop; stop at nested type/method declarations) and return the match condition if a `SwitchExpression` is found.
+Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.java.SwitchExpressionTest"`
+Expected: proofs stay open / the unsupported-position test fails because no rule applies.
 
-- [ ] **Step 4: Run the test**
+- [ ] **Step 3: Implement the built-in rule**
 
-Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.rule.conditions.ContainsSwitchExpressionCondTest"`
-Expected: PASS.
+`isApplicable` follows `SetStatementRule` (`AbstractAuxiliaryContractRule.occursNotAtTopLevelInSuccedent`, `Transformer.inTransformer`, then a check that the active statement's tree contains a `SwitchExpression`). In `apply`: (1) collect the switch expressions of the active statement in source order; (2) reject a position that is not the first-evaluated operand of the statement with a clear message; (3) create a temporary per switch expression by the `EvaluateArgs.evaluate` mechanism and a `Switch` statement whose branches assign the temporary (`Yield` → assignment + labelled `break`; `Throw` arms unchanged); (4) replace the expression in the statement by the temporary; (5) recurse for nested switch expressions; (6) build the new term with the extended Java block and split the goal as needed. Register the rule in `JavaProfile.initBuiltInRules()`.
+
+- [ ] **Step 4: Run the tests**
+
+Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.java.SwitchExpressionTest"`
+Expected: PASS, including the selector-once, nested, `yield`-in-loop and `case null` tests, and the unsupported-position rejection.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add key.core/src/main/java/de/uka/ilkd/key/rule/conditions/ContainsSwitchExpressionCond.java \
-        key.core/src/main/java/de/uka/ilkd/key/nparser/varexp/TacletBuilderManipulators.java \
-        key.core/src/test/java/de/uka/ilkd/key/rule/conditions/ContainsSwitchExpressionCondTest.java
-git commit -m "feat(rules): add containsSwitchExpression condition"
+git add key.core/src/main/java/de/uka/ilkd/key/rule/SwitchExpressionRule.java \
+        key.core/src/main/java/de/uka/ilkd/key/proof/init/JavaProfile.java \
+        key.core/src/test/java/de/uka/ilkd/key/java/SwitchExpressionTest.java
+git commit -m "feat(rules): lower switch expressions with a built-in rule"
 ```
 
 ---
 
-### Prerequisite (maintainer): `#lowerSwitchExpression` meta-construct and `switchExpression` taclet
-
-The tasks below assume this piece exists; it is implemented separately. Contract:
-
-- `de.uka.ilkd.key.rule.metaconstruct.LowerSwitchExpression`, annotated
-  `@TransformerMeta(name = "#lowerSwitchExpression")` and registered in
-  `ProgramTransformerRegistry`.
-- Taclet `switchExpression` in `javaRules.key`:
-
-  ```
-  switchExpression {
-      \find(\modality{#allmodal}{.. #s ...}\endmodality (post))
-      \varcond(\containsSwitchExpression(#s))
-      \replacewith(\modality{#allmodal}{.. #lowerSwitchExpression(#s) ...}\endmodality (post))
-      \heuristics(simplify_prog)
-  };
-  ```
-- Behaviour: for the matched statement, introduce one temporary per switch expression
-  (via the `EvaluateArgs.evaluate` helper), replace each expression by its temporary, and
-  emit a plain `Switch` statement whose arms assign the temporary (`Yield` becomes an
-  assignment plus a labelled `break`; `Throw` arms stay unchanged). Recurse for nested switch
-  expressions and reject positions that are not the first-evaluated operand of the statement
-  with a clear message. The emitted `Switch` is lowered by the existing `#switchToIf`.
-
----
-
-### Task 6: Pattern labels in `SwitchToIf`
+### Task 6: Pattern labels in the built-in rule
 
 **Files:**
-- Modify: `key.core/src/main/java/de/uka/ilkd/key/rule/metaconstruct/SwitchToIf.java`
+- Modify: `key.core/src/main/java/de/uka/ilkd/key/rule/SwitchExpressionRule.java`
 - Modify: `key.core/src/main/java/de/uka/ilkd/key/java/loader/JP2KeYConverter.java` (only if `PatternCase` construction needs adjustment after Task 4)
 - Test: `key.core/src/test/java/de/uka/ilkd/key/java/SwitchPatternTest.java`
 
 **Interfaces:**
-- Consumes: `PatternCase.getPatterns()`, `PatternCase.getGuard()`, the pattern stack's `InstanceofPattern` and binding rules.
-- Produces: `SwitchToIf` builds, for a `PatternCase`, an `if` whose condition is `exV instanceof <pattern>` (the conversion builds an `InstanceofPattern` expression) and, if a guard exists, `&& guard`; the then-block is the arm body. Constant `Case`s keep the `==` guard. Arm order is preserved.
+- Consumes: `PatternCase.getPatterns()`, `PatternCase.getGuard()`, `InstanceofPattern`, and the pattern stack's binding rules.
+- Produces: the built-in rule also lowers `PatternCase` labels — in `SwitchExpression` and in plain `Switch` statements — to an `if`-cascade: `tmp instanceof <pattern>` (or `exV instanceof <pattern>` for a statement selector) `&& <guard>`, in source order, with the arm body as the then-block. The pattern variable is in scope in the then-block through the existing `instanceof`-pattern rules. Constant `Case`s, `Default` and `case null` keep their current handling.
 
 - [ ] **Step 1: Write the failing proof tests**
 
@@ -335,11 +318,11 @@ Add a guard-order test: a guard with a side effect must not run when the pattern
 - [ ] **Step 2: Run them and confirm the failures**
 
 Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.java.SwitchPatternTest"`
-Expected: FAIL — patterns are not lowered (ClassCastException or open goal).
+Expected: FAIL — patterns are not lowered (open goal or ClassCastException).
 
-- [ ] **Step 3: Extend `SwitchToIf`**
+- [ ] **Step 3: Extend the built-in rule**
 
-In the branch loop, handle `PatternCase` before/across the constant `Case`s in source order: build the pattern test expression (`InstanceofPattern` of `exV` and the pattern), `&&` the guard, and use the arm body. Keep the constant/`default`/null handling as is. Ensure a `case null` arm still wins over the reference null check (add a `case null` pattern test).
+When the active statement contains a `Switch`/`SwitchExpression` with `PatternCase` branches, build the cascade in source order: for each `PatternCase`, an `If` with the `instanceof` pattern test (`&&` the guard) and the arm body; then the constant/default arms as today. For the expression form, assign the arm values to the result temporary as in Task 5. `case null` must be decided before the reference null check.
 
 - [ ] **Step 4: Run the tests**
 
@@ -349,17 +332,16 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add key.core/src/main/java/de/uka/ilkd/key/rule/metaconstruct/SwitchToIf.java \
+git add key.core/src/main/java/de/uka/ilkd/key/rule/SwitchExpressionRule.java \
         key.core/src/test/java/de/uka/ilkd/key/java/SwitchPatternTest.java
-git commit -m "feat(rules): lower pattern labels in switch"
+git commit -m "feat(rules): lower pattern labels in the switch built-in rule"
 ```
 
 ---
 
-### Task 7: Taclet oracle, coverage fixtures, documentation
+### Task 7: Coverage fixtures and documentation
 
 **Files:**
-- Modify: `key.core/src/test/resources/de/uka/ilkd/key/nparser/taclets.old.txt` (regenerate)
 - Move: `key.core/src/test/resources/de/uka/ilkd/key/java/coverage/rejected/switch-expression` → `supported/`
 - Move: `.../rejected/switch-pattern-type` → `supported/`
 - Move: `.../rejected/switch-pattern-record` → `supported/`
@@ -367,31 +349,26 @@ git commit -m "feat(rules): lower pattern labels in switch"
 - Modify (other repository): `key-docs/content/user/features/java-coverage.md`
 
 **Interfaces:**
-- Consumes: the coverage conventions (`problem.key` with `\javaSource "."`, one feature per directory) and the oracle refresh procedure in `TestTacletEquality` (uncomment `createNewOracle()`, run the test, copy `taclets.new.txt` over `taclets.old.txt`, delete the new file, revert the comment).
-- Produces: green `TestTacletEquality` and `JavaFeatureCoverageTest`; updated documentation rows.
+- Consumes: the coverage conventions (`problem.key` with `\javaSource "."`, one feature per directory).
+- Produces: green `JavaFeatureCoverageTest`, unchanged `TestTacletEquality`, updated documentation rows.
 
-- [ ] **Step 1: Refresh the taclet oracle**
-
-Follow the procedure in `TestTacletEquality`; review the diff (new taclet `switchExpression` plus the pattern-related additions); commit the refreshed `taclets.old.txt` without `taclets.new.txt`.
-
-- [ ] **Step 2: Move and add coverage fixtures**
+- [ ] **Step 1: Move and add coverage fixtures**
 
 Move the three directories and update their Java sources if needed so the expected behavior is the new one. Add the four new fixture directories. Run:
 
 `./gradlew :key.core:test --tests "de.uka.ilkd.key.java.JavaFeatureCoverageTest" --tests "de.uka.ilkd.key.nparser.TestTacletEquality"`
 
-Expected: PASS.
+Expected: PASS (the oracle file is unchanged because this plan adds no taclets).
 
-- [ ] **Step 3: Update the documentation**
+- [ ] **Step 2: Update the documentation**
 
 In `key-docs`, update the Java Coverage table: mark switch expressions and pattern matching for `switch` as supported (or partially supported, matching the actual set of accepted constructs), and keep the `switch` statement row's comments consistent.
 
-- [ ] **Step 4: Format and commit**
+- [ ] **Step 3: Format and commit**
 
 ```bash
 ./gradlew spotlessCheck
-git add key.core/src/test/resources/de/uka/ilkd/key/nparser/taclets.old.txt \
-        key.core/src/test/resources/de/uka/ilkd/key/java/coverage/
+git add key.core/src/test/resources/de/uka/ilkd/key/java/coverage/
 git commit -m "test: cover switch expressions and switch patterns"
 ```
 
@@ -406,7 +383,7 @@ git commit -m "test: cover switch expressions and switch patterns"
 - Test: `key.core/src/test/java/de/uka/ilkd/key/java/SwitchExpressionEvaluationOrderTest.java`
 
 **Interfaces:**
-- Consumes: `EvaluateArgs.evaluate` and the lowering meta-construct (see the prerequisite).
+- Consumes: `EvaluateArgs.evaluate` and the built-in rule from Task 5.
 - Produces: switch expressions are accepted in any expression position; preceding side-effecting subexpressions of the same statement are hoisted into temporaries in evaluation order before the switch lowering.
 
 - [ ] **Step 1: Write the failing tests**
@@ -416,11 +393,11 @@ Cases such as `int r = g() + switch (x) { … };`, `f(g(), switch (x) { … });`
 - [ ] **Step 2: Run them and confirm the failures**
 
 Run: `./gradlew :key.core:test --tests "de.uka.ilkd.key.java.SwitchExpressionEvaluationOrderTest"`
-Expected: FAIL with the lowering prerequisite's "unsupported position" message.
+Expected: FAIL with the built-in rule's "unsupported position" rejection.
 
 - [ ] **Step 3: Linearize**
 
-For the matched statement, walk its expression subterms in Java evaluation order up to and including each switch expression; hoist every subexpression that (a) precedes a switch expression in the order and (b) may have side effects, into temporaries via `EvaluateArgs.evaluate` (receiver, arguments, operands, condition parts). Replace them by their temporaries, then proceed as in the lowering meta-construct. Remove the restriction.
+For the matched statement, walk its expression subterms in Java evaluation order up to and including each switch expression; hoist every subexpression that (a) precedes a switch expression in the order and (b) may have side effects, into temporaries via `EvaluateArgs.evaluate` (receiver, arguments, operands, condition parts). Replace them by their temporaries, then proceed as in Task 5. Remove the restriction.
 
 - [ ] **Step 4: Run the tests and the regression suite**
 

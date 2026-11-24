@@ -95,27 +95,25 @@ Approach B from the design discussion: real AST nodes plus a proof-time rewrite 
 - Unsupported forms (e.g. a pattern in a context the base branch does not support) are
   reported through `reportUnsupportedElement`.
 
-### Proof-time lowering
+### Proof-time lowering (built-in rule)
 
-- New taclet (working name `switchExpression`):
-  `\find(\modality#allmodal{ .. #stm ...})` with a new variable condition
-  `\containsSwitchExpression(#stm)` and
-  `\replacewith(\modality#allmodal{ .. #lowerSwitchExpression(#stm) ...})`.
-- `#lowerSwitchExpression` rewrites the enclosing statement:
-  1. introduce a fresh temporary for each switch expression with the `EvaluateArgs.evaluate`
-     helper (declaration before the statement, assignment from the selector);
-  2. replace each switch expression in the statement by its temporary;
-  3. emit a lowered `Switch` statement whose arms assign the temporary
+- New built-in rule `de.uka.ilkd.key.rule.SwitchExpressionRule` (`BuiltInRule`, singleton
+  `INSTANCE`, registered in `JavaProfile.initBuiltInRules()` next to `SetStatementRule`).
+- Applicable when the occurrence is at top level, not inside a transformer, and the active
+  statement contains a `SwitchExpression` or a `Switch` with pattern labels.
+- `apply` rewrites the Java block:
+  1. introduce a fresh temporary per switch expression with the `EvaluateArgs.evaluate` helper;
+  2. replace each switch expression by its temporary;
+  3. emit a plain `Switch` statement whose arms assign the temporary
      (`yield e` → `tmp = e; break;`, arrow arms → assignment + break, `throw` arms keep
      throwing);
   4. recurse for nested switch expressions.
-- The lowered `Switch` is then handled by the existing `#switchToIf` rule, so selector-once,
-  break handling and the null check are shared with statements.
-- **Patterns**: pattern labels are lowered in the same place. `SwitchToIf` is extended to
-  emit pattern guards (an `instanceof` test with the stack's binding machinery,
-  `#declarePatternVars`/`#assumeBinding`) and to `&&` in the `when` guard; a constant label
-  keeps the `==` guard. As a consequence pattern switch **statements** work through the same
-  path.
+- The emitted constant-label `Switch` is lowered by the existing `#switchToIf` rule, so
+  selector-once, break handling and the null check are shared with statements.
+- **Patterns** are lowered by the same built-in rule: a `PatternCase` becomes an `if` with an
+  `instanceof` pattern test (reusing the stack's binding rules) and the `when` guard
+  conjoined; a constant label keeps the `==` guard. Statements and expressions therefore
+  share one lowering path.
 - `yield` outside a lowered switch expression is impossible after conversion (front end
   rejects it).
 
@@ -172,7 +170,7 @@ with the same helper.
 0. jmlparser: enable `yield` under `RAW`, release, bump `jmltk`.
 1. AST nodes and visitor/printer plumbing.
 2. Converter for `SwitchExpr`/`YieldStmt` and pattern labels.
-3. Lowering meta-construct, taclet, variable condition.
+3. Built-in rule for the lowering, registered in `JavaProfile`.
 4. Pattern lowering in `SwitchToIf`.
 5. Tests, coverage fixtures, documentation.
 6. Optional: general evaluation-order linearization.
@@ -185,7 +183,7 @@ the branch is rebased onto the merged result.
 
 - Evaluation order in arbitrary expression positions; mitigated by the restricted first
   increment and a documented rejection.
-- Taclet matching cost for `#stm` + `containsSwitchExpression` over every statement.
+- Cost of the built-in rule's applicability check over the active statement on every goal.
 - Exhaustiveness/definite assignment; handled conservatively (reject when unsure).
 - Cost of the `Visitor` interface change (all implementors), which is why it is a separate,
   mechanical task.
