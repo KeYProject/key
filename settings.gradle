@@ -23,6 +23,8 @@ include "key.core.testgen"
 
 include "key.core.example"
 
+include "key.jvm"
+
 include "key.ui"
 
 include "keyext.ui.testgen"
