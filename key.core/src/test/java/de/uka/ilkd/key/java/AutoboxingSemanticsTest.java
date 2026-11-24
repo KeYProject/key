@@ -673,6 +673,87 @@ class AutoboxingSemanticsTest {
                         System.out.println("foreachunbox=" + m());
                     }
                 }
+                """),
+        new SemanticCase("conditional-byte", "ConditionalByte", PROVABLE, "Byte", """
+                public class ConditionalByte {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static Object m() {
+                        byte b = 7;
+                        boolean f = true;
+                        Object o = f ? b : 2;
+                        //@ assert o != null;
+                        return o;
+                    }
+
+                    public static void main(String[] args) {
+                        Object o = m();
+                        System.out.println(o.getClass().getSimpleName());
+                    }
+                }
+                """),
+        new SemanticCase("conditional-short", "ConditionalShort", PROVABLE, "Short", """
+                public class ConditionalShort {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static Object m() {
+                        Byte x = Byte.valueOf((byte) 1);
+                        Short y = Short.valueOf((short) 2);
+                        boolean f = true;
+                        Object o = f ? x : y;
+                        //@ assert o != null;
+                        return o;
+                    }
+
+                    public static void main(String[] args) {
+                        Object o = m();
+                        System.out.println(o.getClass().getSimpleName());
+                    }
+                }
+                """),
+        new SemanticCase("conditional-character", "ConditionalCharacter", PROVABLE, "Character", """
+                public class ConditionalCharacter {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static Object m() {
+                        boolean f = true;
+                        Object o = f ? ',' : ';';
+                        //@ assert o != null;
+                        return o;
+                    }
+
+                    public static void main(String[] args) {
+                        Object o = m();
+                        System.out.println(o.getClass().getSimpleName());
+                    }
+                }
+                """),
+        new SemanticCase("conditional-long", "ConditionalLong", PROVABLE, "Long", """
+                public class ConditionalLong {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static Object m() {
+                        Integer x = Integer.valueOf(1);
+                        Long y = Long.valueOf(2L);
+                        boolean f = false;
+                        Object o = f ? x : y;
+                        //@ assert o != null;
+                        return o;
+                    }
+
+                    public static void main(String[] args) {
+                        Object o = m();
+                        System.out.println(o.getClass().getSimpleName());
+                    }
+                }
                 """));
 
     @TestFactory

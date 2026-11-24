@@ -268,21 +268,21 @@ final class AutoboxingRewriter {
     }
 
     /**
-     * JLS 15.25: a conditional whose operands are both references is a reference conditional,
-     * even when both references are wrapper types. Only a primitive operand (or a null/reference
-     * paired with one) selects the numeric/boolean/reference-with-primitive shape.
+     * JLS 15.25: a conditional is numeric when both operands are numeric expressions, whether
+     * primitive or boxed. Two operands of the same wrapper type are a reference conditional by
+     * rule 1, while mixed wrapper types are numeric and have to be unboxed.
      */
     private static ConditionalKind classifyConditional(ConditionalExpr conditional) {
         Expression thenExpr = conditional.getThenExpr();
         Expression elseExpr = conditional.getElseExpr();
-        boolean thenPrimitiveNumeric = isPrimitiveNumeric(thenExpr);
-        boolean elsePrimitiveNumeric = isPrimitiveNumeric(elseExpr);
-        if (thenPrimitiveNumeric || elsePrimitiveNumeric) {
-            String thenPrimitive = numericPrimitive(typeOf(thenExpr));
-            String elsePrimitive = numericPrimitive(typeOf(elseExpr));
-            if (thenPrimitive != null && elsePrimitive != null) {
-                return ConditionalKind.NUMERIC;
-            }
+        boolean thenNumeric = numericPrimitive(typeOf(thenExpr)) != null;
+        boolean elseNumeric = numericPrimitive(typeOf(elseExpr)) != null;
+        if (thenNumeric && elseNumeric) {
+            return numericConditionalType(conditional) != null
+                    ? ConditionalKind.NUMERIC
+                    : ConditionalKind.REFERENCE;
+        }
+        if (isPrimitiveNumeric(thenExpr) || isPrimitiveNumeric(elseExpr)) {
             if (isNullPrimitivePair(thenExpr, elseExpr)) {
                 return ConditionalKind.NULL_PRIMITIVE;
             }
@@ -302,12 +302,99 @@ final class AutoboxingRewriter {
         return ConditionalKind.REFERENCE;
     }
 
+    /**
+     * JLS 15.25.2: the primitive type of a numeric conditional, or {@code null} when rule 1
+     * yields a reference type because both operands have the same wrapper type.
+     */
+    private static @Nullable String numericConditionalType(ConditionalExpr conditional) {
+        ResolvedType thenType = typeOf(conditional.getThenExpr());
+        ResolvedType elseType = typeOf(conditional.getElseExpr());
+        String then = numericPrimitive(thenType);
+        String other = numericPrimitive(elseType);
+        if (then == null || other == null) {
+            return null;
+        }
+        boolean thenPrimitive = thenType.isPrimitive();
+        boolean otherPrimitive = elseType.isPrimitive();
+        if (then.equals(other) && thenPrimitive == otherPrimitive) {
+            // Rule 1: int vs int is int, Integer vs Integer is the reference type Integer.
+            return thenPrimitive ? then : null;
+        }
+        if (then.equals(other)) {
+            // Rule 2: T versus boxing(T).
+            return then;
+        }
+        if (isByte(then) && isShort(other) || isShort(then) && isByte(other)) {
+            // Rule 3.
+            return "short";
+        }
+        if (isSmall(then) && thenPrimitive
+                && isSmallConstant(conditional.getElseExpr(), then)) {
+            // Rule 4 with the primitive type as the then branch.
+            return then;
+        }
+        if (isSmall(other) && otherPrimitive
+                && isSmallConstant(conditional.getThenExpr(), other)) {
+            // Rule 4 with the primitive type as the else branch.
+            return other;
+        }
+        if (isSmall(then) && !thenPrimitive
+                && isSmallConstant(conditional.getElseExpr(), then)) {
+            // Rule 5 with the wrapper type as the then branch.
+            return then;
+        }
+        if (isSmall(other) && !otherPrimitive
+                && isSmallConstant(conditional.getThenExpr(), other)) {
+            // Rule 5 with the wrapper type as the else branch.
+            return other;
+        }
+        // Rule 6: binary numeric promotion.
+        return promote(then, other);
+    }
+
+    private static boolean isSmall(String primitive) {
+        return switch (primitive) {
+            case "byte", "short", "char" -> true;
+            default -> false;
+        };
+    }
+
+    private static boolean isByte(String primitive) {
+        return "byte".equals(primitive);
+    }
+
+    private static boolean isShort(String primitive) {
+        return "short".equals(primitive);
+    }
+
+    /**
+     * A compile-time constant of type {@code int}; a {@code short} or {@code long} does not count.
+     */
+    private static boolean isIntConstant(Expression expression) {
+        ResolvedType type = typeOf(expression);
+        return type != null && type.isPrimitive() && "int".equals(type.asPrimitive().describe());
+    }
+
+    /**
+     * JLS 15.25.2 rules 4 and 5: an {@code int} constant that is representable in the small
+     * primitive type {@code small}.
+     */
+    private static boolean isSmallConstant(Expression expression, String small) {
+        WrapperType wrapper = WrapperType.forPrimitive(small);
+        return wrapper != null && isIntConstant(expression)
+                && isConstantInRange(expression, wrapper);
+    }
+
     private static boolean isNullPrimitivePair(Expression thenExpr, Expression elseExpr) {
         return (isPrimitive(thenExpr) && elseExpr.isNullLiteralExpr())
                 || (isPrimitive(elseExpr) && thenExpr.isNullLiteralExpr());
     }
 
     private static void normalizeNumericConditional(ConditionalExpr conditional) {
+        String type = numericConditionalType(conditional);
+        if (type == null) {
+            return;
+        }
         ResolvedType thenType = typeOf(conditional.getThenExpr());
         ResolvedType elseType = typeOf(conditional.getElseExpr());
         String thenPrimitive = numericPrimitive(thenType);
@@ -315,11 +402,8 @@ final class AutoboxingRewriter {
         if (thenPrimitive == null || elsePrimitive == null) {
             return;
         }
-        String promoted = promote(thenPrimitive, elsePrimitive);
-        conditional.setThenExpr(
-            widen(conditional.getThenExpr(), thenType, thenPrimitive, promoted));
-        conditional.setElseExpr(
-            widen(conditional.getElseExpr(), elseType, elsePrimitive, promoted));
+        conditional.setThenExpr(widen(conditional.getThenExpr(), thenType, thenPrimitive, type));
+        conditional.setElseExpr(widen(conditional.getElseExpr(), elseType, elsePrimitive, type));
     }
 
     private static void boxPrimitiveBranch(ConditionalExpr conditional) {
@@ -361,7 +445,7 @@ final class AutoboxingRewriter {
     private static boolean isBooleanLike(Expression expression) {
         ResolvedType type = typeOf(expression);
         if (type == null) {
-            return false;
+            return nullPrimitiveWrapper(expression) == WrapperType.BOOLEAN;
         }
         if (type.isPrimitive()) {
             return "boolean".equals(type.asPrimitive().describe());
@@ -394,12 +478,14 @@ final class AutoboxingRewriter {
             return;
         }
         ResolvedType rhsType = typeOf(assign.getValue());
-        String rhsPrimitive = numericPrimitive(rhsType);
+        String rhsPrimitive = numericOperand(assign.getValue(), rhsType);
         if (rhsPrimitive == null) {
             return;
         }
         boolean boxedLhs = targetType.isReferenceType();
-        if (!boxedLhs && (rhsType == null || !rhsType.isReferenceType())) {
+        boolean unboxesRhs = rhsType != null && rhsType.isReferenceType()
+                || nullPrimitiveWrapper(assign.getValue()) != null;
+        if (!boxedLhs && !unboxesRhs) {
             // Primitive lhs and primitive rhs: the existing widening rules suffice.
             return;
         }
@@ -420,7 +506,8 @@ final class AutoboxingRewriter {
                     wrapperOf(targetType).valueFieldName())
                 : assign.getTarget().clone();
         Expression promotedLhs = widenPrimitive(lhsRead, lhsPrimitive, lhsPromoted);
-        Expression rhs = widen(assign.getValue().clone(), rhsType, rhsPrimitive, rhsPromoted);
+        Expression rhs =
+            widenOperand(assign.getValue().clone(), rhsType, rhsPrimitive, rhsPromoted);
         Expression operation = new BinaryExpr(promotedLhs, rhs, binaryOperator);
         Expression narrowed = cast(lhsPrimitive, operation);
         Expression value =
@@ -447,7 +534,8 @@ final class AutoboxingRewriter {
             return false;
         }
         boolean boxedLhs = targetType.isReferenceType();
-        boolean boxedRhs = rhsType.isReferenceType();
+        boolean boxedRhs = rhsType != null && rhsType.isReferenceType()
+                || nullPrimitiveWrapper(assign.getValue()) == WrapperType.BOOLEAN;
         if (!boxedLhs && !boxedRhs) {
             return false;
         }
@@ -621,28 +709,28 @@ final class AutoboxingRewriter {
     private void promoteBinary(BinaryExpr binary) {
         ResolvedType leftType = typeOf(binary.getLeft());
         ResolvedType rightType = typeOf(binary.getRight());
-        String leftPrimitive = numericPrimitive(leftType);
-        String rightPrimitive = numericPrimitive(rightType);
+        String leftPrimitive = numericOperand(binary.getLeft(), leftType);
+        String rightPrimitive = numericOperand(binary.getRight(), rightType);
         if (leftPrimitive == null || rightPrimitive == null) {
             return;
         }
         String promoted = promote(leftPrimitive, rightPrimitive);
-        binary.setLeft(widen(binary.getLeft(), leftType, leftPrimitive, promoted));
-        binary.setRight(widen(binary.getRight(), rightType, rightPrimitive, promoted));
+        binary.setLeft(widenOperand(binary.getLeft(), leftType, leftPrimitive, promoted));
+        binary.setRight(widenOperand(binary.getRight(), rightType, rightPrimitive, promoted));
     }
 
     private void rewriteShift(BinaryExpr binary) {
         ResolvedType leftType = typeOf(binary.getLeft());
         ResolvedType rightType = typeOf(binary.getRight());
-        String leftPrimitive = numericPrimitive(leftType);
-        String rightPrimitive = numericPrimitive(rightType);
+        String leftPrimitive = numericOperand(binary.getLeft(), leftType);
+        String rightPrimitive = numericOperand(binary.getRight(), rightType);
         if (leftPrimitive == null || rightPrimitive == null) {
             return;
         }
         String leftPromoted = leftPrimitive.equals("long") ? "long" : "int";
         String rightPromoted = rightPrimitive.equals("long") ? "long" : "int";
-        binary.setLeft(widen(binary.getLeft(), leftType, leftPrimitive, leftPromoted));
-        binary.setRight(widen(binary.getRight(), rightType, rightPrimitive, rightPromoted));
+        binary.setLeft(widenOperand(binary.getLeft(), leftType, leftPrimitive, leftPromoted));
+        binary.setRight(widenOperand(binary.getRight(), rightType, rightPrimitive, rightPromoted));
     }
 
     private void rewriteUnary(UnaryExpr unary) {
@@ -653,7 +741,7 @@ final class AutoboxingRewriter {
         switch (unary.getOperator()) {
             case PLUS, MINUS, BITWISE_COMPLEMENT -> {
                 ResolvedType type = typeOf(unary.getExpression());
-                String primitive = numericPrimitive(type);
+                String primitive = numericOperand(unary.getExpression(), type);
                 if (primitive == null) {
                     return;
                 }
@@ -661,7 +749,8 @@ final class AutoboxingRewriter {
                     case "byte", "short", "char" -> "int";
                     default -> primitive;
                 };
-                unary.setExpression(widen(unary.getExpression(), type, primitive, promoted));
+                unary.setExpression(
+                    widenOperand(unary.getExpression(), type, primitive, promoted));
             }
             case LOGICAL_COMPLEMENT -> unary.setExpression(unboxBoolean(unary.getExpression()));
             default -> {
@@ -671,11 +760,11 @@ final class AutoboxingRewriter {
 
     private void rewriteArrayIndex(ArrayAccessExpr access) {
         ResolvedType type = typeOf(access.getIndex());
-        String primitive = numericPrimitive(type);
+        String primitive = numericOperand(access.getIndex(), type);
         if (primitive == null) {
             return;
         }
-        access.setIndex(widen(access.getIndex(), type, primitive, "int"));
+        access.setIndex(widenOperand(access.getIndex(), type, primitive, "int"));
     }
 
     private void rewriteArrayDimensions(ArrayCreationExpr creation) {
@@ -851,6 +940,13 @@ final class AutoboxingRewriter {
                 LOGGER.debug("Cannot resolve boolean operand {}", expression, e);
             }
         }
+        ConditionalExpr conditional = nullPrimitiveConditional(expression);
+        if (conditional != null) {
+            WrapperType wrapper = primitiveBranchWrapper(conditional);
+            if (wrapper == WrapperType.BOOLEAN) {
+                return unboxConditional(conditional, wrapper, wrapper.primitiveName());
+            }
+        }
         return expression;
     }
 
@@ -865,6 +961,13 @@ final class AutoboxingRewriter {
                 }
             } catch (RuntimeException e) {
                 LOGGER.debug("Cannot resolve switch selector {}", expression, e);
+            }
+        }
+        ConditionalExpr conditional = nullPrimitiveConditional(expression);
+        if (conditional != null) {
+            WrapperType wrapper = primitiveBranchWrapper(conditional);
+            if (wrapper != null) {
+                return unboxConditional(conditional, wrapper, null);
             }
         }
         return expression;
@@ -889,10 +992,9 @@ final class AutoboxingRewriter {
         if (expression instanceof ConditionalExpr conditional) {
             ConditionalKind kind = classifyConditional(conditional);
             if (kind == ConditionalKind.NUMERIC) {
-                String thenPrimitive = numericPrimitive(typeOf(conditional.getThenExpr()));
-                String elsePrimitive = numericPrimitive(typeOf(conditional.getElseExpr()));
-                if (thenPrimitive != null && elsePrimitive != null) {
-                    return ResolvedPrimitiveType.byName(promote(thenPrimitive, elsePrimitive));
+                String numeric = numericConditionalType(conditional);
+                if (numeric != null) {
+                    return ResolvedPrimitiveType.byName(numeric);
                 }
             } else if (kind == ConditionalKind.BOOLEAN) {
                 return ResolvedPrimitiveType.BOOLEAN;
@@ -917,13 +1019,13 @@ final class AutoboxingRewriter {
                 return ResolvedPrimitiveType.BOOLEAN;
             }
             if (isShift(operator)) {
-                String left = numericPrimitive(typeOf(binary.getLeft()));
+                String left = numericOperand(binary.getLeft(), typeOf(binary.getLeft()));
                 if (left != null) {
                     return ResolvedPrimitiveType.byName(left.equals("long") ? "long" : "int");
                 }
             } else if (isNumericBinary(operator) && !isStringConcat(binary)) {
-                String left = numericPrimitive(typeOf(binary.getLeft()));
-                String right = numericPrimitive(typeOf(binary.getRight()));
+                String left = numericOperand(binary.getLeft(), typeOf(binary.getLeft()));
+                String right = numericOperand(binary.getRight(), typeOf(binary.getRight()));
                 if (left != null && right != null) {
                     return ResolvedPrimitiveType.byName(promote(left, right));
                 }
@@ -960,7 +1062,11 @@ final class AutoboxingRewriter {
 
     private static boolean isPrimitiveNumeric(Expression expression) {
         ResolvedType type = typeOf(expression);
-        return type != null && type.isPrimitive() && isNumericName(type.asPrimitive().describe());
+        if (type != null && type.isPrimitive()) {
+            return isNumericName(type.asPrimitive().describe());
+        }
+        WrapperType wrapper = nullPrimitiveWrapper(expression);
+        return wrapper != null && isNumericName(wrapper.primitiveName());
     }
 
     private static boolean isNumericName(String name) {
@@ -1172,13 +1278,11 @@ final class AutoboxingRewriter {
     }
 
     private static @Nullable String conditionalPrimitive(ConditionalExpr conditional) {
-        if (classifyConditional(conditional) == ConditionalKind.BOOLEAN) {
-            return "boolean";
-        }
-        String thenPrimitive = numericPrimitive(typeOf(conditional.getThenExpr()));
-        String elsePrimitive = numericPrimitive(typeOf(conditional.getElseExpr()));
-        return thenPrimitive == null || elsePrimitive == null ? null
-                : promote(thenPrimitive, elsePrimitive);
+        return switch (classifyConditional(conditional)) {
+            case BOOLEAN -> "boolean";
+            case NUMERIC -> numericConditionalType(conditional);
+            default -> null;
+        };
     }
 
     private void boxConditionalBranches(ConditionalExpr conditional, String promoted,
@@ -1189,9 +1293,26 @@ final class AutoboxingRewriter {
 
     private Expression boxConditionalBranch(Expression branch, String promoted,
             WrapperType wrapper) {
-        Expression primitive = convert(branch, Target.primitive(promoted));
-        Expression boxed = box(primitive, promoted, wrapper);
-        return boxed == primitive ? branch : boxed;
+        ResolvedType type = typeOf(branch);
+        if (type == null) {
+            return branch;
+        }
+        if (type.isReferenceType()) {
+            Expression primitive = convert(branch, Target.primitive(promoted));
+            Expression boxed = box(primitive, promoted, wrapper);
+            return boxed == primitive ? branch : boxed;
+        }
+        String actual = type.isPrimitive() ? type.asPrimitive().describe()
+                : numericPrimitive(type);
+        if (actual == null) {
+            return branch;
+        }
+        Expression value = widenPrimitive(branch, actual, promoted);
+        // A widening cast already changed the expression's type. Without one, box using the
+        // branch's own type so a constant int is narrowed to Byte, Short or Character.
+        String effective = value != branch ? promoted : actual;
+        Expression boxed = box(value, effective, wrapper);
+        return boxed == value ? branch : boxed;
     }
 
     private static Expression unboxConditional(ConditionalExpr conditional, WrapperType wrapper,
@@ -1232,6 +1353,61 @@ final class AutoboxingRewriter {
             return null;
         }
         return WrapperType.forPrimitive(type.asPrimitive().describe());
+    }
+
+    /**
+     * The wrapper of a {@code null}-versus-primitive conditional, whose value has no type as far
+     * as {@link #typeOf(Expression)} is concerned. Operator positions unbox the conditional as a
+     * whole, which is why the wrapper is resolved here instead of in {@code typeOf}.
+     */
+    private static @Nullable WrapperType nullPrimitiveWrapper(Expression expression) {
+        ConditionalExpr conditional = nullPrimitiveConditional(expression);
+        return conditional == null ? null : primitiveBranchWrapper(conditional);
+    }
+
+    /** The {@code null}-versus-primitive conditional inside any enclosing parentheses. */
+    private static @Nullable ConditionalExpr nullPrimitiveConditional(Expression expression) {
+        Expression current = expression;
+        while (current instanceof EnclosedExpr enclosed) {
+            current = enclosed.getInner();
+        }
+        if (current instanceof ConditionalExpr conditional
+                && classifyConditional(conditional) == ConditionalKind.NULL_PRIMITIVE) {
+            return conditional;
+        }
+        return null;
+    }
+
+    /**
+     * The primitive type an operand is converted to for numeric promotion, taking a
+     * {@code null}-versus-primitive conditional into account.
+     */
+    private static @Nullable String numericOperand(Expression expression,
+            @Nullable ResolvedType type) {
+        String primitive = numericPrimitive(type);
+        if (primitive != null) {
+            return primitive;
+        }
+        WrapperType wrapper = nullPrimitiveWrapper(expression);
+        return wrapper != null && isNumericName(wrapper.primitiveName())
+                ? wrapper.primitiveName()
+                : null;
+    }
+
+    /**
+     * Widens or unboxes an operand for a target primitive type. A {@code null}-versus-primitive
+     * conditional is unboxed as a whole, so the {@code null} branch stays {@code null}.
+     */
+    private static Expression widenOperand(Expression expression, @Nullable ResolvedType type,
+            String actualPrimitive, String target) {
+        ConditionalExpr conditional = nullPrimitiveConditional(expression);
+        if (conditional != null) {
+            WrapperType wrapper = primitiveBranchWrapper(conditional);
+            if (wrapper != null) {
+                return unboxConditional(conditional, wrapper, target);
+            }
+        }
+        return widen(expression, type, actualPrimitive, target);
     }
 
     private static Expression convertKnown(Expression expression, ResolvedType actualType,

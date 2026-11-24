@@ -826,4 +826,126 @@ class AutoboxingProofTest {
         });
         assertTrue(falseGoal, () -> "expected the null/false branch, got: " + proof.openGoals());
     }
+
+    @Test
+    void charConditional(@TempDir Path dir) throws Exception {
+        prove("CharConditional", clazz("CharConditional", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    char x = 'a';
+                    char y = 'b';
+                    boolean f = true;
+                    char c = f ? x : y;
+                    //@ assert c == 'a';
+                }
+                """), dir);
+    }
+
+    @Test
+    void boxedByteAndShortConditional(@TempDir Path dir) throws Exception {
+        prove("ByteShortConditional", clazz("ByteShortConditional", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Byte x = Byte.valueOf((byte) 1);
+                    Short y = Short.valueOf((short) 2);
+                    boolean f = true;
+                    short s = f ? x : y;
+                    //@ assert s == 1;
+                }
+                """), dir);
+    }
+
+    @Test
+    void boxedIntegerAndLongConditional(@TempDir Path dir) throws Exception {
+        prove("IntegerLongConditional", clazz("IntegerLongConditional", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer x = Integer.valueOf(1);
+                    Long y = Long.valueOf(2L);
+                    boolean f = false;
+                    long v = f ? x : y;
+                    //@ assert v == 2L;
+                }
+                """), dir);
+    }
+
+    @Test
+    void constantNarrowingConditional(@TempDir Path dir) throws Exception {
+        prove("ConstantNarrowingConditional", clazz("ConstantNarrowingConditional", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    byte b = 2;
+                    boolean f = true;
+                    byte narrowed = f ? b : 2;
+                    //@ assert narrowed == 2;
+                    char c = f ? 'A' : 65;
+                    //@ assert c == 65;
+                }
+                """), dir);
+    }
+
+    @Test
+    void nullConditionalInOperator(@TempDir Path dir) throws Exception {
+        prove("NullConditionalOperator", clazz("NullConditionalOperator", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    boolean f = false;
+                    int i = (f ? null : 1) + 1;
+                    //@ assert i == 2;
+                }
+                """), dir);
+    }
+
+    @Test
+    void nullBooleanConditionalInOperator(@TempDir Path dir) throws Exception {
+        prove("NullBooleanConditionalOperator", clazz("NullBooleanConditionalOperator", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    boolean f = false;
+                    Boolean b = (f ? null : true) & false;
+                    boolean r = b;
+                    //@ assert !r;
+                }
+                """), dir);
+    }
+
+    @Test
+    void nullConditionalInOperatorSplits(@TempDir Path dir) throws Exception {
+        Proof proof =
+            proof("NullConditionalOperatorSplit", clazz("NullConditionalOperatorSplit", """
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static void m() {
+                        boolean f = true;
+                        int i = (f ? null : 1) + 1;
+                    }
+                    """), "m", dir);
+        assertFalse(proof.closed(), "the null branch of the conditional must split");
+        boolean falseGoal = proof.openGoals().stream().anyMatch(goal -> {
+            String label = goal.node().getNodeInfo().getBranchLabel();
+            boolean nullLabel = label != null && label.contains("Null");
+            return nullLabel || goal.sequent().succedent().isEmpty();
+        });
+        assertTrue(falseGoal, () -> "expected the null/false branch, got: " + proof.openGoals());
+    }
 }

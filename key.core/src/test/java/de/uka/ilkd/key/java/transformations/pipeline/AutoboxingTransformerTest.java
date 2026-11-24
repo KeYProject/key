@@ -596,9 +596,9 @@ class AutoboxingTransformerTest {
     }
 
     @Test
-    void promotesConditionalBranches() {
+    void appliesConstantByteRuleToConditional() {
         String out = rewrite("void m() { Byte b = 1; boolean f = true; int i = f ? b : 0; }");
-        assertTrue(out.contains("(int) b.value"), out);
+        assertTrue(out.contains("int i = f ? b.value : 0;"), out);
     }
 
     @Test
@@ -765,5 +765,174 @@ class AutoboxingTransformerTest {
         assertTrue(out.contains("Integer.valueOf(42)"), out);
         assertTrue(out.contains("a.intValue()"), out);
         assertFalse(out.contains("a.value"), out);
+    }
+
+    @Test
+    void keepsPrimitiveCharConditional() {
+        String out = rewrite("void m(boolean f, char x, char y) { char c = f ? x : y; }");
+        assertTrue(out.contains("char c = f ? x : y;"), out);
+        assertFalse(out.contains("(int)"), out);
+    }
+
+    @Test
+    void keepsPrimitiveByteAndShortConditionals() {
+        String out = rewrite("""
+                void m(boolean f, byte x, byte y, short u, short v) {
+                    byte b = f ? x : y;
+                    short s = f ? u : v;
+                }
+                """);
+        assertTrue(out.contains("byte b = f ? x : y;"), out);
+        assertTrue(out.contains("short s = f ? u : v;"), out);
+    }
+
+    @Test
+    void widensByteBranchToShortConditional() {
+        String out =
+            rewrite("void m(boolean f, byte x, short y) { short s = f ? x : y; }");
+        assertTrue(out.contains("short s = f ? (short) x : y;"), out);
+    }
+
+    @Test
+    void boxesConstantByteConditional() {
+        String out = rewrite("void m(boolean f, byte x) { Object o = f ? x : 2; }");
+        assertTrue(out.contains("f ? Byte.valueOf(x) : Byte.valueOf((byte) 2)"), out);
+    }
+
+    @Test
+    void refusesConstantByteConditionalAboveRange() {
+        String out = rewrite("void m(boolean f, byte x) { Object o = f ? x : 200; }");
+        assertTrue(out.contains("Integer.valueOf((int) x)"), out);
+        assertTrue(out.contains("Integer.valueOf(200)"), out);
+    }
+
+    @Test
+    void promotesBoxedByteAndShortToShort() {
+        String out =
+            rewrite("void m(boolean f, Byte x, Short y) { Object o = f ? x : y; }");
+        assertTrue(out.contains("Short.valueOf((short) x.value)"), out);
+        assertTrue(out.contains("Short.valueOf(y.value)"), out);
+    }
+
+    @Test
+    void promotesByteBranchToShortConditionalForObject() {
+        String out =
+            rewrite("void m(boolean f, byte x) { Object o = f ? x : (short) 2; }");
+        assertTrue(out.contains("Short.valueOf((short) x)"), out);
+        assertTrue(out.contains("Short.valueOf((short) 2)"), out);
+        assertFalse(out.contains("Byte.valueOf"), out);
+    }
+
+    @Test
+    void widensBoxedIntegerAndLongConditional() {
+        String out = rewrite("void m(boolean f, Integer x, Long y) { long v = f ? x : y; }");
+        assertTrue(out.contains("long v = f ? (long) x.value : y.value;"), out);
+    }
+
+    @Test
+    void boxesBoxedIntegerAndLongConditional() {
+        String out = rewrite("void m(boolean f, Integer x, Long y) { Object o = f ? x : y; }");
+        assertTrue(out.contains("Long.valueOf((long) x.value)"), out);
+        assertTrue(out.contains("Long.valueOf(y.value)"), out);
+    }
+
+    @Test
+    void boxesCharConditional() {
+        String out = rewrite("void m(boolean f) { Object o = f ? ',' : ';'; }");
+        assertTrue(out.contains("Character.valueOf(',')"), out);
+        assertTrue(out.contains("Character.valueOf(';')"), out);
+    }
+
+    @Test
+    void promotesBoxedIntegerAndCharacterToInt() {
+        String out =
+            rewrite("void m(boolean f, Integer x, Character y) { Object o = f ? x : y; }");
+        assertTrue(out.contains("Integer.valueOf(x.value)"), out);
+        assertTrue(out.contains("Integer.valueOf((int) y.value)"), out);
+    }
+
+    @Test
+    void appliesConstantCharRule() {
+        String out = rewrite("void m(boolean f, char x) { Object o = f ? x : 65; }");
+        assertTrue(out.contains("Character.valueOf(x)"), out);
+        assertTrue(out.contains("Character.valueOf((char) 65)"), out);
+    }
+
+    @Test
+    void refusesConstantCharRuleAboveRange() {
+        String out = rewrite("void m(boolean f, char x) { Object o = f ? x : 65536; }");
+        assertTrue(out.contains("Integer.valueOf((int) x)"), out);
+        assertTrue(out.contains("Integer.valueOf(65536)"), out);
+    }
+
+    @Test
+    void constantRuleRequiresIntOperand() {
+        String out =
+            rewrite("void m(boolean f, char x) { Object o = f ? x : (short) 2; }");
+        assertTrue(out.contains("Integer.valueOf((int) x)"), out);
+        assertTrue(out.contains("Integer.valueOf((int) (short) 2)"), out);
+        assertFalse(out.contains("Character.valueOf"), out);
+    }
+
+    @Test
+    void keepsBothBoxedIntegerConditionalByReferenceForJlsRuleOne() {
+        String out = rewrite("""
+                void m(boolean f, Integer a, Integer b) {
+                    Integer c = f ? a : b;
+                }
+                """);
+        assertTrue(out.contains("Integer c = f ? a : b;"), out);
+        assertFalse(out.contains("valueOf"), out);
+        assertFalse(out.contains(".value"), out);
+    }
+
+    @Test
+    void unboxesNullConditionalInAddition() {
+        String out = rewrite("void m(boolean f) { int i = (f ? null : 1) + 1; }");
+        assertTrue(out.contains("int i = (f ? null : Integer.valueOf(1)).value + 1;"), out);
+    }
+
+    @Test
+    void unboxesNullConditionalInArrayIndex() {
+        String out = rewrite("void m(boolean f, int[] arr) { int x = arr[f ? null : 1]; }");
+        assertTrue(out.contains("arr[(f ? null : Integer.valueOf(1)).value]"), out);
+    }
+
+    @Test
+    void unboxesNullBooleanConditionalInBinaryOperation() {
+        String out = rewrite("void m(boolean f) { Boolean b = (f ? null : true) & false; }");
+        assertTrue(out
+                .contains("Boolean.valueOf((f ? null : Boolean.valueOf(true)).value & false)"),
+            out);
+    }
+
+    @Test
+    void unboxesNullConditionalInUnary() {
+        String out = rewrite("void m(boolean f) { int i = -(f ? null : 1); }");
+        assertTrue(out.contains("-(f ? null : Integer.valueOf(1)).value"), out);
+    }
+
+    @Test
+    void unboxesNullConditionalInComparison() {
+        String out = rewrite("void m(boolean f) { boolean r = (f ? null : 1) == 2; }");
+        assertTrue(out.contains("(f ? null : Integer.valueOf(1)).value == 2"), out);
+    }
+
+    @Test
+    void unboxesNullConditionalInShift() {
+        String out = rewrite("void m(boolean f) { int i = (f ? null : 1) << 1; }");
+        assertTrue(out.contains("(f ? null : Integer.valueOf(1)).value << 1"), out);
+    }
+
+    @Test
+    void unboxesNullBooleanConditionalInIfCondition() {
+        String out = rewrite("void m(boolean f) { if (f ? null : true) { } }");
+        assertTrue(out.contains("if ((f ? null : Boolean.valueOf(true)).value)"), out);
+    }
+
+    @Test
+    void unboxesNullConditionalInCompoundAssignment() {
+        String out = rewrite("void m(boolean f) { int a = 0; a += (f ? null : 1); }");
+        assertTrue(out.contains("a = (int) (a + (f ? null : Integer.valueOf(1)).value);"), out);
     }
 }
