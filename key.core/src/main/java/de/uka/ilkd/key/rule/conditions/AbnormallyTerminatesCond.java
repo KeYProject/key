@@ -46,7 +46,13 @@ public class AbnormallyTerminatesCond implements VariableCondition {
             @NonNull MatchResultInfo matchCond, @NonNull LogicServices services) {
         var svInst = (de.uka.ilkd.key.rule.inst.SVInstantiations) matchCond.getInstantiations();
         var instantiation = svInst.getInstantiation(svStmts);
-        var analysis = new AlwaysAbnormallyTerminatingAnalysis((Services) services);
+        if (!(services instanceof Services keyServices)) {
+            // the analysis inspects the Java AST and needs the Java model; a matcher that only
+            // provides LogicServices cannot run it, so report the condition as not satisfied
+            // instead of failing with a ClassCastException
+            return null;
+        }
+        var analysis = new AlwaysAbnormallyTerminatingAnalysis(keyServices);
 
         final boolean aborts;
         if (instantiation instanceof ImmutableList<?> stmts) {

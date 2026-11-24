@@ -59,7 +59,9 @@ final class AlwaysAbnormallyTerminatingAnalysis {
             case LabeledStatement labeled -> labeledStatement(labeled);
             case SynchronizedBlock block -> isAlwaysAbnormallyTerminating(block.getBody());
             case LoopScopeBlock block -> isAlwaysAbnormallyTerminating(block.getBody());
-            case Assert assertStmt -> alwaysFalse(assertStmt.getCondition());
+            // JLS 14.22: an assert statement can complete normally if it is reachable, because
+            // assertions may be disabled at runtime; the condition does not matter.
+            case Assert ignored -> false;
             default -> false;
         };
     }
@@ -115,8 +117,15 @@ final class AlwaysAbnormallyTerminatingAnalysis {
 
     /// A {@code do} loop executes its body at least once. It cannot complete normally if that
     /// body always aborts, or if the guard is always true and no {@code break} leaves the loop.
+    /// A reachable {@code continue} that targets the loop transfers control to the condition, so
+    /// the loop can complete normally when the condition is not the constant {@code true}
+    /// (JLS 14.22).
     private boolean doStatement(Do doStmt) {
         if (hasUnlabeledBreak(doStmt.getBody())) {
+            return false;
+        }
+        if (!guardIsAlwaysTrue(doStmt.getGuardExpression())
+                && hasUnlabeledContinue(doStmt.getBody())) {
             return false;
         }
         return isAlwaysAbnormallyTerminating(doStmt.getBody())
@@ -165,6 +174,14 @@ final class AlwaysAbnormallyTerminatingAnalysis {
         var collector = new OuterBreakContinueAndReturnCollector(body, List.of(), services);
         collector.collect();
         return collector.getBreaks().stream().anyMatch(b -> b.getLabel() == null);
+    }
+
+    /// Returns whether a {@code continue} without a label targets the enclosing loop, i.e. it is
+    /// not nested inside another loop within the given body.
+    private boolean hasUnlabeledContinue(Statement body) {
+        var collector = new OuterBreakContinueAndReturnCollector(body, List.of(), services);
+        collector.collect();
+        return !collector.getContinues().isEmpty();
     }
 
     private boolean hasUnlabeledBreak(Branch branch) {

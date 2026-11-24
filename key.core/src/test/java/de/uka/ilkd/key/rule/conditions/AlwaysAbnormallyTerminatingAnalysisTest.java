@@ -68,6 +68,9 @@ class AlwaysAbnormallyTerminatingAnalysisTest {
         "true  ~ do/while with a return                    ~ do { return 1; } while (x);",
         "true  ~ endless do/while                          ~ do { y = z; } while (true);",
         "false ~ do/while(true) with a break               ~ do { if (x) { break; } return 1; } while (true);",
+        "false ~ do/while with a reachable continue        ~ do { continue; } while (false);",
+        "false ~ do/while with a conditional continue      ~ do { if (x) { continue; } else { return 1; } } while (false);",
+        "true  ~ endless do/while with a continue          ~ do { continue; } while (true);",
         "false ~ enhanced for with a return                ~ for (int k : new int[] { 1 }) { return 1; }",
         "false ~ switch without default                    ~ switch (n) { case 1: return 1; }",
         "true  ~ switch with default, all cases return     ~ switch (n) { case 1: return 1; default: throw new RuntimeException(); }",
@@ -79,10 +82,10 @@ class AlwaysAbnormallyTerminatingAnalysisTest {
         "false ~ labeled block with a break                ~ label: { break label; }",
         "true  ~ throw                                     ~ throw new RuntimeException();",
         "false ~ plain statement                           ~ y = z;",
-        "true  ~ assert with a constant-false condition    ~ assert false;",
+        "false ~ assert with a constant-false condition    ~ assert false;",
         "false ~ assert with a constant-true condition     ~ assert true;",
         "false ~ assert with non-constant or-false         ~ assert (x || false);",
-        "true  ~ assert with always-false and              ~ assert (x && false);",
+        "false ~ assert with always-false and              ~ assert (x && false);",
     })
     void statementCannotCompleteNormally(boolean expected, String description, String source) {
         Statement stmt = parseStatement(source);
