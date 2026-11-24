@@ -1,7 +1,7 @@
 # Agent Instructions
 
 KeY — deductive Java program verifier for the Java Modeling Language.
-Using Java 21 and a Gradle multi-module build.
+Using Java 25 and a Gradle multi-module build.
 
 ## Core Commands
 Use the Gradle wrapper.
