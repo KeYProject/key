@@ -41,8 +41,13 @@ its existing behaviour.
 
 ### Converter
 
-Vendor `scripts/tools/cover2cover.py` from `rix0rrr/cover2cover` unchanged and add
-`scripts/tools/cover2cover.LICENSE` (MIT). No new Gradle plugin dependency.
+Add `scripts/tools/jacoco2cobertura.py`, a small converter that emits one
+Cobertura `<class>` per source file with repository-relative filenames and only
+the line data GitHub consumes. The vendored `cover2cover.py` referenced by
+GitHub's documentation was tried first and rejected: it prints Python `bytes`
+(invalid XML) and repeats every source file's lines once per class, turning this
+repository's 21 MB JaCoCo report into 396 MB. Generated sources, which cannot be
+matched to repository files, are skipped.
 
 ### GitHub Actions
 
@@ -71,16 +76,17 @@ baseline that pull requests are compared against.
 
 - A dedicated coverage job running the whole test suite: rejected because it
   duplicates the long KeY test run.
-- A third-party JaCoCo-to-Cobertura Gradle plugin: rejected in favour of the
-  converter referenced by GitHub's documentation.
+- A third-party JaCoCo-to-Cobertura Gradle plugin: rejected in favour of a
+  small in-repository converter.
 - Uploading per-leg reports with separate labels: rejected because the report is
   meant to be one repository-wide aggregate.
 
 ## Risks and mitigations
 
-- GitHub resolves Cobertura `<class filename>` against the `<source>` roots. This
-  is validated locally against a real module report before the workflow relies on
-  it; the fallback is repository-relative filenames in the converted report.
+- GitHub matches Cobertura `<class filename>` to repository files. This is
+  validated locally against a real module report before the workflow relies on
+  it; filenames are emitted repository-relative, so no `<source>` resolution is
+  needed.
 - Pull requests from forks cannot upload coverage; the upload action exits
   gracefully in that case.
 - Only Ubuntu legs contribute coverage, so platform-specific Windows code paths

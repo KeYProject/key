@@ -6,7 +6,7 @@
 
 **Architecture:** The existing opt-in JaCoCo setup gains an aggregated root report and a Cobertura conversion task. GitHub Actions reuses the Ubuntu unit-test legs for execution data, then a small coverage job compiles, aggregates, converts and uploads.
 
-**Tech Stack:** Gradle 9.8.2, JaCoCo 0.8.16, Python 3 (`cover2cover.py`), GitHub Actions (`actions/upload-code-coverage@v1`).
+**Tech Stack:** Gradle 9.8.2, JaCoCo 0.8.16, Python 3 (`jacoco2cobertura.py`), GitHub Actions (`actions/upload-code-coverage@v1`).
 
 **Spec:** `docs/superpowers/specs/2026-11-24-github-code-coverage-design.md`
 
@@ -34,16 +34,20 @@
 
 **Files:**
 - Modify: `scripts/jacocokey.gradle`
-- Create: `scripts/tools/cover2cover.py`
-- Create: `scripts/tools/cover2cover.LICENSE`
+- Create: `scripts/tools/jacoco2cobertura.py`
 
 **Interfaces:**
 - Consumes: nothing.
 - Produces: Gradle tasks `jacocoRootReport` (XML at `build/reports/jacoco/root/jacocoRootReport.xml`) and `jacocoCobertura` (Cobertura at `build/reports/jacoco/root/cobertura.xml`), both available only with `-DjacocoEnabled=true`.
 
-- [ ] **Step 1: Vendor the converter**
+- [ ] **Step 1: Add the converter**
 
-Copy `cover2cover.py` verbatim from `https://raw.githubusercontent.com/rix0rrr/cover2cover/master/cover2cover.py` to `scripts/tools/cover2cover.py`, and the MIT license text from the same repository to `scripts/tools/cover2cover.LICENSE`. Do not modify the script.
+Create `scripts/tools/jacoco2cobertura.py` invoked as
+`jacoco2cobertura.py JACOCO_XML COBERTURA_XML [SOURCE_ROOT ...]`. It emits one
+Cobertura `<class>` per JaCoCo `<sourcefile>` with the repository-relative path
+resolved from the source roots, `hits` = 1 when JaCoCo's `ci` > 0, and skips
+source files no source root contains (generated sources). It prints a one-line
+summary of packages, files, skipped files and covered/total lines to stderr.
 
 - [ ] **Step 2: Bump JaCoCo and add the root tasks**
 
@@ -56,8 +60,8 @@ In `scripts/jacocokey.gradle`:
    - for every subproject with the `java` plugin: `dependsOn` its `classes` task, add `sourceSets.main.java.srcDirs` to `sourceDirectories`, add `sourceSets.main.output.classesDirs` to `classDirectories`;
    - report only XML, output location `build/reports/jacoco/root/jacocoRootReport.xml`.
 4. Register `jacocoCobertura` of type `Exec`, group `verification`, `dependsOn 'jacocoRootReport'`:
-   - `commandLine` is `python3`, the absolute path of `scripts/tools/cover2cover.py`, the absolute path of the aggregated XML, followed by each subproject's `src/main/java` directory relative to the root project (deduplicated);
-   - set `standardOutput` to a stream for `build/reports/jacoco/root/cobertura.xml` in `doFirst`, and declare the XML as input and the Cobertura file as output.
+   - `commandLine` is `python3`, the absolute path of `scripts/tools/jacoco2cobertura.py`, the absolute path of the aggregated XML, the absolute path of the Cobertura file, followed by each subproject's committed `src/main/java` directory relative to the root project (deduplicated);
+   - declare the XML as input and the Cobertura file as output.
 
 - [ ] **Step 3: Generate a real report locally**
 
@@ -84,12 +88,12 @@ print(f'classes={len(classes)} unresolved={len(missing)} line-rate={root.attrib[
 PY
 ```
 
-Expected: prints class count, few or no unresolved filenames (inner-class filenames are allowed to remain unresolved), and a line rate between 0 and 1.
+Expected: prints class count, `unresolved=0` (emitted filenames must all exist), and a line rate between 0 and 1.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add scripts/jacocokey.gradle scripts/tools/cover2cover.py scripts/tools/cover2cover.LICENSE
+git add scripts/jacocokey.gradle scripts/tools/jacoco2cobertura.py
 git commit -m "build: aggregate JaCoCo coverage and convert it to Cobertura"
 ```
 
