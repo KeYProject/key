@@ -1,7 +1,7 @@
 apply plugin: 'jacoco'
 
 jacoco {
-    toolVersion = '0.8.8'
+    toolVersion = '0.8.16'
 }
 
 subprojects {
@@ -26,4 +26,52 @@ subprojects {
             destinationFile = layout.buildDirectory.dir("jacoco/test.exec").get().getAsFile()
         }
     }
+}
+
+// Aggregated report over all modules; used by the GitHub Actions coverage job.
+tasks.register('jacocoRootReport', JacocoReport) {
+    description = 'Creates an aggregated JaCoCo XML report over all subprojects.'
+    group = 'verification'
+
+    executionData.from(fileTree(rootProject.rootDir) {
+        include '*/build/jacoco/*.exec'
+    })
+
+    subprojects.each { subproject ->
+        subproject.plugins.withId('java') {
+            dependsOn subproject.tasks.named('classes')
+            // The execution data are produced by the test tasks; order them without re-running tests.
+            mustRunAfter subproject.tasks.withType(Test)
+            sourceDirectories.from(subproject.files(subproject.sourceSets.main.java.srcDirs))
+            classDirectories.from(subproject.files(subproject.sourceSets.main.output.classesDirs))
+        }
+    }
+
+    reports {
+        xml.required = true
+        xml.outputLocation = layout.buildDirectory.file('reports/jacoco/root/jacocoRootReport.xml')
+        html.required = false
+        csv.required = false
+    }
+}
+
+// Converts the aggregated report to Cobertura XML, as consumed by GitHub code coverage.
+tasks.register('jacocoCobertura', Exec) {
+    description = 'Converts the aggregated JaCoCo XML report to Cobertura XML.'
+    group = 'verification'
+    dependsOn 'jacocoRootReport'
+
+    def converter = rootProject.file('scripts/tools/jacoco2cobertura.py')
+    def aggregatedXml = layout.buildDirectory.file('reports/jacoco/root/jacocoRootReport.xml').get().asFile
+    def cobertura = layout.buildDirectory.file('reports/jacoco/root/cobertura.xml').get().asFile
+    // Only committed sources are reported: generated sources cannot be matched to repository files.
+    def sourceRoots = subprojects.findAll { it.plugins.hasPlugin('java') }.collect { subproject ->
+        rootProject.relativePath(subproject.file('src/main/java'))
+    }.unique()
+
+    inputs.file(aggregatedXml).withPropertyName('jacocoXml')
+    outputs.file(cobertura).withPropertyName('coberturaXml')
+
+    commandLine(['python3', converter.absolutePath, aggregatedXml.absolutePath,
+                 cobertura.absolutePath] + sourceRoots)
 }
