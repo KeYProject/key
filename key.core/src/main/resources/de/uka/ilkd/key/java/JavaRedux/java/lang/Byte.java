@@ -34,4 +34,10 @@ public final class Byte extends java.lang.Number implements java.lang.Comparable
       @ assignable \strictly_nothing;
       @*/
     public long longValue();
+
+    // The result is unconstrained: KeY has no cast axiomatisation to relate it to value.
+    /*@ public normal_behavior
+      @ assignable \strictly_nothing;
+      @*/
+    public short shortValue();
 }

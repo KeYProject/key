@@ -155,4 +155,20 @@ class AutoboxingWrapperModelTest {
                 //@ assert a != null;
                 """), dir);
     }
+
+    @Test
+    void numberIntegralConversionsResolve(@TempDir Path dir) throws Exception {
+        prove("NumberConversions", model("NumberConversions", """
+                Integer i = Integer.valueOf(300);
+                byte ib = i.byteValue();
+                short is = i.shortValue();
+                Byte by = Byte.valueOf((byte) -1);
+                short bs = by.shortValue();
+                Short sh = Short.valueOf((short) 300);
+                byte sb = sh.byteValue();
+                Long l = Long.valueOf(70000L);
+                short ls = l.shortValue();
+                byte lb = l.byteValue();
+                """), dir);
+    }
 }

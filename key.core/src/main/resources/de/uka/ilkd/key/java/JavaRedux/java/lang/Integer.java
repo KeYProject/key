@@ -32,7 +32,14 @@ public final class Integer extends java.lang.Number implements java.lang.Compara
      @*/
    public Integer(int arg0);
    public Integer(java.lang.String arg0) throws java.lang.NumberFormatException;
+   // The result is unconstrained: KeY has no cast axiomatisation to relate it to value.
+   /*@ public normal_behavior
+     @ assignable \strictly_nothing;
+     @*/
    public byte byteValue();
+   /*@ public normal_behavior
+     @ assignable \strictly_nothing;
+     @*/
    public short shortValue();
     /*@ public normal_behavior
       @ ensures \result == value;
@@ -47,6 +54,7 @@ public final class Integer extends java.lang.Number implements java.lang.Compara
    public long longValue();
 //   public float floatValue();
 //   public double doubleValue();
+
    public static java.lang.Integer getInteger(java.lang.String arg0);
    public static java.lang.Integer getInteger(java.lang.String arg0, int arg1);
    public static java.lang.Integer getInteger(java.lang.String arg0, java.lang.Integer arg1);

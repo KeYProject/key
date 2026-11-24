@@ -34,4 +34,10 @@ public final class Short extends java.lang.Number implements java.lang.Comparabl
       @ assignable \strictly_nothing;
       @*/
     public long longValue();
+
+    // The result is unconstrained: KeY has no cast axiomatisation to relate it to value.
+    /*@ public normal_behavior
+      @ assignable \strictly_nothing;
+      @*/
+    public byte byteValue();
 }

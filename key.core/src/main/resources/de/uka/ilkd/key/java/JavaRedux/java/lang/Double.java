@@ -53,6 +53,18 @@ public class Double extends java.lang.Number {
       @ assignable \strictly_nothing;
       @*/
     public int intValue();
+
+    /*@ public normal_behavior
+      @ assignable \strictly_nothing;
+      @*/
+    public short shortValue();
+
+    // The result is unconstrained: KeY has no cast axiomatisation to relate it to value.
+    /*@ public normal_behavior
+      @ assignable \strictly_nothing;
+      @*/
+    public byte byteValue();
+
     /*@ public normal_behavior
       @ ensures \result == (long) value;
       @ assignable \strictly_nothing;
