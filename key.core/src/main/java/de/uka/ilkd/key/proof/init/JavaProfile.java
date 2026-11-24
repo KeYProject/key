@@ -191,6 +191,7 @@ public class JavaProfile extends AbstractProfile {
                 .prepend(QueryExpand.INSTANCE).prepend(MergeRule.INSTANCE)
                 .prepend(LoopApplyHeadRule.INSTANCE).prepend(JmlAssertRule.ASSERT_INSTANCE)
                 .prepend(JmlAssertRule.ASSUME_INSTANCE)
+                .prepend(SwitchExpressionRule.INSTANCE)
                 .prepend(SetStatementRule.INSTANCE)
                 .prepend(ObserverToUpdateRule.INSTANCE);
 
