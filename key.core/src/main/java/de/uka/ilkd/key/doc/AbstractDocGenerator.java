@@ -257,16 +257,18 @@ public abstract class AbstractDocGenerator {
         };
     }
 
-    /// Formats the argument of a `{@link ...}` or `{@linkplain ...}` tag as a markdown link
-    /// `[label](target)`. If no explicit label is given, the simple class or member name is used.
+    /// Formats the argument of a `{@link ...}` or `{@linkplain ...}` tag. The generated
+    /// documentation has no target for a Javadoc reference, so the reference is rendered as its
+    /// label: the explicit label if one is given, otherwise the simple class or member name in
+    /// code markup.
     private static String formatLink(String arg) {
         int end = referenceEnd(arg);
         String target = arg.substring(0, end);
         String label = arg.substring(end).trim();
         if (label.isEmpty()) {
-            label = simpleName(target);
+            return "`" + simpleName(target) + "`";
         }
-        return "[%s](%s)".formatted(label, destination(target));
+        return label;
     }
 
     /// Returns the end index of the referenced part of a `{@link ...}` argument, i.e. of the
@@ -300,18 +302,6 @@ public abstract class AbstractDocGenerator {
         String name = paren < 0 ? tail : tail.substring(0, paren);
         int dot = name.lastIndexOf('.');
         return dot < 0 ? name : name.substring(dot + 1);
-    }
-
-    /// Returns the given javadoc reference as a markdown link destination, wrapped in angle
-    /// brackets when it contains characters that would otherwise break the link syntax.
-    private static String destination(String target) {
-        for (int i = 0; i < target.length(); i++) {
-            char c = target.charAt(i);
-            if (c == ' ' || c == '(' || c == ')' || c == '<' || c == '>') {
-                return "<" + target + ">";
-            }
-        }
-        return target;
     }
 
     /// Formats a `{@snippet ...}` tag. The inline form (`{@snippet lang="..." : ...}`) is

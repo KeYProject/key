@@ -98,7 +98,7 @@ public abstract class AbstractCommand implements ProofScriptCommand {
 
     @Override
     public String getDocumentation() {
-        if (documentation == null && parameterClazz != null) {
+        if (documentation == null) {
             documentation =
                 ArgumentsLifter.extractDocumentation(getName(), getClass(), parameterClazz);
         }

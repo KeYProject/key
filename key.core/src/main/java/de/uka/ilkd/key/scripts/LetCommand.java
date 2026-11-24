@@ -19,35 +19,27 @@ import org.jspecify.annotations.NullMarked;
 /// ```
 /// let @abbrev1=term1 ... @abbrev2=term2;
 /// ```
-/// of
+/// or
 /// ```
 /// letf @abbrev1=term1 ... @abbrev2=term2;
 /// ```
 /// **Arguments:**
 /// - varargs any key-value where *value* is a term and key is prefixed with `@`
 ///
-/// **Aliases**
-/// - `letf` if used, the let bindings are overridden otherwise conflicts results into an exception.
-///
-/// **Changes:**
-/// * Apr,2025 (weigl): remove {@code force} in favor of {@code letf}.
-/// * Jan,2025 (weigl): add new parameter {@code force} to override bindings.
+/// If `letf` is used instead of `let`, existing bindings are overridden; otherwise a conflicting
+/// name results in an exception.
 @NullMarked
 public class LetCommand extends AbstractCommand {
 
+    // Changes:
+    // * Apr,2025 (weigl): remove "force" in favor of "letf".
+    // * Jan,2025 (weigl): add new parameter "force" to override bindings.
+
     @Documentation(category = "Fundamental",
         value = """
-                The let command lets you introduce entries to the abbreviation table.
-
-                    let @abbrev1=term1 ... @abbrev2=term2;
-
-                or
-
-                    letf @abbrev1=term1 ... @abbrev2=term2;
-
-                One or more key-value pairs are supported where key starts is @ followed by an identifier and
-                value is a term.
-                If letf if used instead of let, the let bindings are overridden otherwise conflicts results into an exception.""")
+                Each argument is a key-value pair `@name=term`. With `let`, a name that is already
+                bound results in an exception; `letf` overrides the existing binding.
+                """)
 
 
     public static class Parameters {
@@ -98,11 +90,6 @@ public class LetCommand extends AbstractCommand {
     @Override
     public String getName() {
         return "let";
-    }
-
-    @Override
-    public String getDocumentation() {
-        return "";
     }
 
     @Override

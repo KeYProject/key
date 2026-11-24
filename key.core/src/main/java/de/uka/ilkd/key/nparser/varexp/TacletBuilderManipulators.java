@@ -167,12 +167,15 @@ public class TacletBuilderManipulators {
 
     static class NotFreeInTacletBuilderCommand extends AbstractTacletBuilderCommand {
         public NotFreeInTacletBuilderCommand(ArgumentType... argumentsTypes) {
-            super(createVarcondInfo("notFreeIn", NotFreeIn.class, true, argumentsTypes));
+            super(createVarcondInfo("notFreeIn", NotFreeIn.class, false, argumentsTypes));
         }
 
         @Override
         public void apply(TacletBuilder<?> tacletBuilder, Object[] arguments,
                 List<String> parameters, boolean negated) {
+            if (negated) {
+                throw new IllegalArgumentException("Negation is not supported");
+            }
             SchemaVariable x = (SchemaVariable) arguments[0];
             for (int i = 1; i < arguments.length; i++) {
                 tacletBuilder.addVarsNotFreeIn(x, (SchemaVariable) arguments[i]);
