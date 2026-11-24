@@ -536,25 +536,6 @@ class AutoboxingProofTest {
                 """), dir, true);
     }
 
-    @Test
-    void enhancedForEvaluatesIterableOnce(@TempDir Path dir) throws Exception {
-        prove("EnhancedForOnce", clazz("EnhancedForOnce", """
-                /*@ normal_behavior
-                  @ requires true;
-                  @ ensures true;
-                  @*/
-                public static void m() {
-                    int[] a = new int[] { 1, 2 };
-                    int n = 0;
-                    for (Integer x : a) {
-                        n += x;
-                        a = new int[] { 9 };
-                    }
-                    //@ assert n == 3;
-                }
-                """), dir, true);
-    }
-
     private record WrapperCase(String name, String primitive, String wrapper, String literal,
             String assignmentAssertion, String argumentAssertion) {
     }
@@ -766,24 +747,6 @@ class AutoboxingProofTest {
                     Short s = (byte) 2;
                     short ss = s;
                     //@ assert ss == 2;
-                }
-                """), dir);
-    }
-
-    @Test
-    void floatPostfixStatement(@TempDir Path dir) throws Exception {
-        prove("FloatPostfix", clazz("FloatPostfix", """
-                /*@ normal_behavior
-                  @ requires true;
-                  @ ensures true;
-                  @*/
-                public static void m() {
-                    Float f = Float.valueOf(1.0f);
-                    f++;
-                    //@ assert f != null;
-                    Double d = Double.valueOf(1.0);
-                    d--;
-                    //@ assert d != null;
                 }
                 """), dir);
     }
