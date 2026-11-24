@@ -455,7 +455,9 @@ final class AutoboxingRewriter {
 
     private static Expression unboxForCast(Expression expression, WrapperType wrapper,
             String targetPrimitive) {
-        Expression field = new FieldAccessExpr(expression.clone(), wrapper.valueFieldName());
+        Expression field =
+            new FieldAccessExpr(encloseForFieldAccess(expression.clone()),
+                wrapper.valueFieldName());
         return targetPrimitive.equals(wrapper.primitiveName())
                 ? field
                 : cast(targetPrimitive, field);
@@ -1536,7 +1538,9 @@ final class AutoboxingRewriter {
 
     private static Expression unbox(Expression expression, WrapperType wrapper,
             @Nullable String targetPrimitive) {
-        FieldAccessExpr field = new FieldAccessExpr(expression.clone(), wrapper.valueFieldName());
+        FieldAccessExpr field =
+            new FieldAccessExpr(encloseForFieldAccess(expression.clone()),
+                wrapper.valueFieldName());
         copyRange(expression, field);
         if (targetPrimitive == null || targetPrimitive.equals(wrapper.primitiveName())) {
             return field;
@@ -1545,6 +1549,19 @@ final class AutoboxingRewriter {
             return cast(targetPrimitive, field);
         }
         return expression;
+    }
+
+    /**
+     * A field access needs a primary expression as its scope. Binary, conditional, assignment,
+     * cast and switch expressions would otherwise re-associate when printed ({@code (Boolean) b}
+     * must become {@code ((Boolean) b).value}, not {@code (Boolean) b.value}).
+     */
+    private static Expression encloseForFieldAccess(Expression expression) {
+        return expression instanceof BinaryExpr || expression instanceof ConditionalExpr
+                || expression instanceof AssignExpr || expression instanceof CastExpr
+                || expression instanceof SwitchExpr || expression instanceof LambdaExpr
+                        ? new EnclosedExpr(expression)
+                        : expression;
     }
 
     private static Expression cast(String primitiveName, Expression expression) {

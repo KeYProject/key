@@ -298,6 +298,31 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void parenthesisesConditionalBeforeUnboxing() {
+        String out = rewrite("void m(boolean f, Boolean a, Boolean b) { if (f ? a : b) { } }");
+        assertTrue(out.contains("if ((f ? a : b).value)"), out);
+    }
+
+    @Test
+    void parenthesisesCastBeforeUnboxing() {
+        String out = rewrite("void m(Boolean z) { boolean r = (Boolean) z; }");
+        assertTrue(out.contains("boolean r = ((Boolean) z).value;"), out);
+    }
+
+    @Test
+    void parenthesisesAssignmentBeforeUnboxing() {
+        String out = rewrite("void m(Boolean b, Boolean c) { boolean r = (b = c); }");
+        assertTrue(out.contains("boolean r = (b = c).value;"), out);
+    }
+
+    @Test
+    void parenthesisesConditionalInUnboxingCast() {
+        String out =
+            rewrite("void m(Integer a, Integer b, boolean f) { int i = (int) (f ? a : b); }");
+        assertTrue(out.contains("int i = (f ? a : b).value;"), out);
+    }
+
+    @Test
     void unboxesBooleanOperandOfAnd() {
         String out = rewrite(
             "void m() { Boolean b = true; boolean c = false; boolean r = b & c; }");
