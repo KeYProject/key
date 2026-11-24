@@ -72,6 +72,49 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void narrowsCharConstantBeforeBoxing() {
+        String out = rewrite("void m() { Character c = 65; }");
+        assertTrue(out.contains("Character.valueOf((char) 65)"), out);
+    }
+
+    @Test
+    void narrowsShortConstantToByte() {
+        String out = rewrite("void m() { Byte b = (short) 1; }");
+        assertTrue(out.contains("Byte.valueOf((byte) (short) 1)"), out);
+    }
+
+    @Test
+    void narrowsByteConstantToShort() {
+        String out = rewrite("void m() { Short s = (byte) 1; }");
+        assertTrue(out.contains("Short.valueOf((short) (byte) 1)"), out);
+    }
+
+    @Test
+    void narrowsCharConstantToByte() {
+        String out = rewrite("void m() { Byte b = (char) 65; }");
+        assertTrue(out.contains("Byte.valueOf((byte) (char) 65)"), out);
+    }
+
+    @Test
+    void refusesOutOfRangeConstant() {
+        String out = rewrite("void m() { Byte b = 128; Character c = -1; }");
+        assertFalse(out.contains("Byte.valueOf"), out);
+        assertFalse(out.contains("Character.valueOf"), out);
+    }
+
+    @Test
+    void refusesNarrowingFromLong() {
+        String out = rewrite("void m() { Byte b = 1L; }");
+        assertFalse(out.contains("Byte.valueOf"), out);
+    }
+
+    @Test
+    void doesNotNarrowToInteger() {
+        String out = rewrite("void m() { Integer i = (short) 1; }");
+        assertFalse(out.contains("Integer.valueOf"), out);
+    }
+
+    @Test
     void fieldAssignmentBoxes() {
         String out = rewrite("Integer f; void m() { f = 7; }");
         assertTrue(out.contains("f = Integer.valueOf(7);"), out);
@@ -355,6 +398,32 @@ class AutoboxingTransformerTest {
     void boxesCastToReference() {
         String out = rewrite("void m() { Object o = (Object) 42; }");
         assertTrue(out.contains("(Object) Integer.valueOf(42)"), out);
+    }
+
+    @Test
+    void unboxesCastOperandBeforeBoxing() {
+        String out = rewrite("void m() { Integer a = 1; Integer i = (Integer) (a + 1); }");
+        assertTrue(out.contains("Integer.valueOf((a.value + 1))"), out);
+    }
+
+    @Test
+    void rewritesIncrementInBoxingCast() {
+        String out = rewrite("void m() { Integer a = 1; Integer i = (Integer) a++; }");
+        assertTrue(out.contains("Integer.valueOf"), out);
+        assertTrue(out.contains("a.value + 1"), out);
+    }
+
+    @Test
+    void keepsIdentityCastOnWrapper() {
+        String out = rewrite("void m() { Integer a = 1; Integer i = (Integer) a; }");
+        assertTrue(out.contains("(Integer) a"), out);
+        assertFalse(out.contains("a.value"), out);
+    }
+
+    @Test
+    void unboxesOperandOfReferenceCast() {
+        String out = rewrite("void m() { Integer a = 1; Object o = (Object) (a + 1); }");
+        assertTrue(out.contains("(Object) Integer.valueOf((a.value + 1))"), out);
     }
 
     @Test

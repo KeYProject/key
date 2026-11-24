@@ -23,6 +23,7 @@ import com.github.javaparser.ast.expr.ArrayInitializerExpr;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.CastExpr;
+import com.github.javaparser.ast.expr.CharLiteralExpr;
 import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
@@ -192,9 +193,13 @@ final class AutoboxingRewriter {
         if (actual.isPrimitive()) {
             String primitive = actual.asPrimitive().describe();
             if (target.kind() == Kind.WRAPPER) {
-                Expression boxed = box(operand, primitive, target.wrapper());
-                if (boxed != operand) {
+                WrapperType wrapper = target.wrapper();
+                Expression converted = convert(operand, Target.primitive(wrapper.primitiveName()));
+                Expression boxed = box(converted, wrapper.primitiveName(), wrapper);
+                if (boxed != converted) {
                     cast.replace(boxed);
+                    // The replacement is not among the visited children of the detached cast.
+                    rewriteNode(boxed);
                 }
             } else if (target.kind() == Kind.REFERENCE) {
                 WrapperType natural = WrapperType.forPrimitive(primitive);
@@ -208,7 +213,9 @@ final class AutoboxingRewriter {
         } else if (actual.isReferenceType()) {
             WrapperType wrapper = wrapperOf(actual);
             if (wrapper != null && target.kind() == Kind.PRIMITIVE) {
-                cast.replace(unboxForCast(operand, wrapper, target.primitive()));
+                Expression unboxed = unboxForCast(operand, wrapper, target.primitive());
+                cast.replace(unboxed);
+                rewriteNode(unboxed);
             }
         }
     }
@@ -1191,7 +1198,8 @@ final class AutoboxingRewriter {
         Expression argument;
         if (actualPrimitive.equals(wrapper.primitiveName())) {
             argument = inner;
-        } else if (actualPrimitive.equals("int") && isConstantInRange(expression, wrapper)) {
+        } else if (isIntegralConstant(actualPrimitive)
+                && isConstantInRange(expression, wrapper)) {
             argument = cast(wrapper.primitiveName(), inner);
         } else {
             // Not a legal boxing conversion (for example Long l = 1). Leave the program alone so
@@ -1205,25 +1213,56 @@ final class AutoboxingRewriter {
         return call;
     }
 
+    private static boolean isIntegralConstant(String primitive) {
+        return switch (primitive) {
+            case "byte", "short", "char", "int" -> true;
+            default -> false;
+        };
+    }
+
+    /**
+     * JLS 5.1.7 allows a constant expression of type {@code byte}, {@code short}, {@code char}
+     * or {@code int} to be narrowed and boxed into {@code Byte}, {@code Short} or
+     * {@code Character} when the value is representable in the target type.
+     */
     private static boolean isConstantInRange(Expression expression, WrapperType wrapper) {
-        if (wrapper != WrapperType.BYTE && wrapper != WrapperType.SHORT) {
-            return false;
+        long min;
+        long max;
+        switch (wrapper) {
+            case BYTE -> {
+                min = Byte.MIN_VALUE;
+                max = Byte.MAX_VALUE;
+            }
+            case SHORT -> {
+                min = Short.MIN_VALUE;
+                max = Short.MAX_VALUE;
+            }
+            case CHAR -> {
+                min = Character.MIN_VALUE;
+                max = Character.MAX_VALUE;
+            }
+            default -> {
+                return false;
+            }
         }
         try {
             if (!CONSTANTS.isCompileTimeConstant(expression)) {
                 return false;
             }
+            long number;
             Expression value = CONSTANTS.evaluate(expression);
             if (value instanceof IntegerLiteralExpr literal) {
-                long number = literal.asNumber().longValue();
-                long min = wrapper == WrapperType.BYTE ? Byte.MIN_VALUE : Short.MIN_VALUE;
-                long max = wrapper == WrapperType.BYTE ? Byte.MAX_VALUE : Short.MAX_VALUE;
-                return min <= number && number <= max;
+                number = literal.asNumber().longValue();
+            } else if (value instanceof CharLiteralExpr literal) {
+                number = literal.asChar();
+            } else {
+                return false;
             }
+            return min <= number && number <= max;
         } catch (EvaluationException | RuntimeException e) {
             LOGGER.debug("Cannot evaluate constant {}", expression, e);
+            return false;
         }
-        return false;
     }
 
     private static Expression unbox(Expression expression, WrapperType wrapper,

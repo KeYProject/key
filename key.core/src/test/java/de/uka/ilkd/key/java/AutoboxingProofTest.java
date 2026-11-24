@@ -714,6 +714,27 @@ class AutoboxingProofTest {
     }
 
     @Test
+    void boxesNarrowedConstants(@TempDir Path dir) throws Exception {
+        prove("NarrowedConstants", clazz("NarrowedConstants", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Character c = 65;
+                    char ch = c;
+                    //@ assert ch == 65;
+                    Byte b = (short) 1;
+                    byte bb = b;
+                    //@ assert bb == 1;
+                    Short s = (byte) 2;
+                    short ss = s;
+                    //@ assert ss == 2;
+                }
+                """), dir);
+    }
+
+    @Test
     void nullUnboxingSplits(@TempDir Path dir) throws Exception {
         Proof proof = proof("NullUnboxing", clazz("NullUnboxing", """
                 /*@ normal_behavior
