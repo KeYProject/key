@@ -754,6 +754,29 @@ class AutoboxingSemanticsTest {
                         System.out.println(o.getClass().getSimpleName());
                     }
                 }
+                """),
+        new SemanticCase("foreach-no-block", "ForeachNoBlock", PROVABLE, "foreachblock=6", """
+                public class ForeachNoBlock {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        int[] a = { 1, 2, 3 };
+                        int s = 0;
+                        boolean f = true;
+                        if (f)
+                            for (Integer x : a) {
+                                s += x;
+                            }
+                        //@ assert s == 6;
+                        return s;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("foreachblock=" + m());
+                    }
+                }
                 """));
 
     @TestFactory

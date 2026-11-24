@@ -705,7 +705,7 @@ class AutoboxingTransformerTest {
     }
 
     @Test
-    void leavesEnhancedForWithoutSurroundingBlock() {
+    void wrapsEnhancedForWithoutSurroundingBlock() {
         String out = rewrite("""
                 boolean m(boolean f, int[] a) {
                     if (f)
@@ -713,7 +713,36 @@ class AutoboxingTransformerTest {
                     return f;
                 }
                 """);
-        assertTrue(out.contains("for (Integer x : a)"), out);
+        assertTrue(out.contains("if (f) {"), out);
+        assertTrue(out.contains("var $keYArray1 = a;"), out);
+        assertTrue(out.contains("$keYArray1[$keYIndex1]"), out);
+        assertFalse(out.contains("for (Integer x : a)"), out);
+    }
+
+    @Test
+    void wrapsEnhancedForInLabeledStatement() {
+        String out = rewrite("""
+                void m(int[] a) {
+                    label: for (Integer x : a) {
+                        break label;
+                    }
+                }
+                """);
+        assertTrue(out.contains("label: {"), out);
+        assertTrue(out.contains("var $keYArray1 = a;"), out);
+        assertTrue(out.contains("$keYArray1[$keYIndex1]"), out);
+    }
+
+    @Test
+    void keepsUnconvertedEnhancedForWithoutSurroundingBlock() {
+        String out = rewrite("""
+                boolean m(boolean f, int[] a) {
+                    if (f)
+                        for (int x : a) { }
+                    return f;
+                }
+                """);
+        assertTrue(out.contains("for (int x : a)"), out);
         assertFalse(out.contains("$keYArray"), out);
     }
 

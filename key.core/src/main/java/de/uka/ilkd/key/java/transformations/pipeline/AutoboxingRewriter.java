@@ -834,15 +834,18 @@ final class AutoboxingRewriter {
             return;
         }
         Node parent = forEach.getParentNode().orElse(null);
-        if (!(parent instanceof BlockStmt block)) {
-            // Without a surrounding block there is no place to bind the iterable to a new local.
-            // Leave the loop unchanged rather than evaluating the iterable once per iteration.
-            return;
+        BlockStmt block = parent instanceof BlockStmt b ? b : null;
+        Node scope = block;
+        if (scope == null) {
+            scope = forEach.findAncestor(BlockStmt.class).orElse(null);
+        }
+        if (scope == null) {
+            scope = forEach.findCompilationUnit().map(it -> (Node) it).orElse(forEach);
         }
 
         Expression iterable = forEach.getIterable();
-        String arrayName = freshName(block, "$keYArray" + (freshId + 1));
-        String indexName = freshName(block, "$keYIndex" + (freshId + 1));
+        String arrayName = freshName(scope, "$keYArray" + (freshId + 1));
+        String indexName = freshName(scope, "$keYIndex" + (freshId + 1));
         ++freshId;
 
         // Java evaluates the iterable exactly once, before the first iteration. Binding it to a
@@ -873,19 +876,27 @@ final class AutoboxingRewriter {
             NodeList.nodeList(update), bodyBlock);
 
         copyRange(forEach, loop);
-        block.getStatements().add(block.getStatements().indexOf(forEach), arrayStatement);
-        forEach.replace(loop);
+        if (block != null) {
+            block.getStatements().add(block.getStatements().indexOf(forEach), arrayStatement);
+            forEach.replace(loop);
+        } else {
+            // A block is a valid statement wherever the loop itself is valid, so a loop that is
+            // the body of an if/while/label still gets its iterable evaluated exactly once.
+            BlockStmt wrapper = new BlockStmt(NodeList.nodeList(arrayStatement, loop));
+            copyRange(forEach, wrapper);
+            forEach.replace(wrapper);
+        }
         rewriteNode(arrayStatement);
         rewriteNode(loop);
     }
 
     /**
-     * Returns a name derived from {@code base} that is not used anywhere in {@code block}, so the
+     * Returns a name derived from {@code base} that is not used anywhere in {@code scope}, so the
      * generated temporaries cannot capture or shadow a user identifier.
      */
-    private static String freshName(BlockStmt block, String base) {
+    private static String freshName(Node scope, String base) {
         List<String> names =
-            block.findAll(SimpleName.class).stream().map(SimpleName::getIdentifier).toList();
+            scope.findAll(SimpleName.class).stream().map(SimpleName::getIdentifier).toList();
         String candidate = base;
         int suffix = 0;
         while (names.contains(candidate)) {
