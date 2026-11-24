@@ -65,7 +65,7 @@ public class FullUseInformationFlowContractMacro extends SequentialProofMacro {
             return false;
         }
         final ProofOblInput poForProof =
-            services.getSpecificationRepository().getProofOblInput(proof);
+            services.getProofRegistry().getProofOblInput(proof);
         return (poForProof instanceof AbstractInfFlowPO)
                 && super.canApplyTo(proof, goals, posInOcc);
     }

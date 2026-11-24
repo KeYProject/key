@@ -18,7 +18,9 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.consistency.FileRepo;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.proof.mgt.ProofRegistry;
+import de.uka.ilkd.key.speclang.ClassAxiomComputer;
+import de.uka.ilkd.key.speclang.ContractRegistry;
 import de.uka.ilkd.key.util.KeYResourceManager;
 
 import org.key_project.logic.LogicServices;
@@ -78,9 +80,27 @@ public class Services implements TermServices, LogicServices, ProofServices {
     private final HashMap<String, Counter> counters;
 
     /**
-     * specification repository
+     * the proof↔proof-obligation registry. Owned here (not by the specification repository) since
+     * proof-lifecycle bookkeeping is orthogonal to JML; see {@link ProofRegistry}. Shared by
+     * {@link #copy(boolean)} copies like the specification repository.
      */
-    private SpecificationRepository specRepos;
+    private ProofRegistry proofRegistry;
+
+    /**
+     * the class-axiom/invariant computer (derived-spec synthesis). Owned here (not by the
+     * specification repository) since it synthesizes derived specification elements from inputs
+     * that
+     * live on the services and the AST; see {@link ClassAxiomComputer}. Shared by
+     * {@link #copy(boolean)} copies like the specification repository.
+     */
+    private ClassAxiomComputer classAxiomComputer;
+
+    /**
+     * the per-node derived-spec cache for contracts and initially clauses (the contract registry).
+     * Owned here (not by the specification repository); see {@link ContractRegistry}. Shared by
+     * {@link #copy(boolean)} copies like the specification repository.
+     */
+    private ContractRegistry contractRegistry;
 
     /*
      * the Java model (with all paths)
@@ -137,7 +157,9 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.caches = caches;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
-        this.specRepos = profile.createSpecificationRepository(this);
+        this.classAxiomComputer = profile.createClassAxiomComputer(this);
+        this.contractRegistry = profile.createContractRegistry(this);
+        this.proofRegistry = new ProofRegistry(this);
         this.cee = new ConstantExpressionEvaluator();
         typeconverter = new TypeConverter(this);
         if (javaService == null) {
@@ -157,7 +179,9 @@ public class Services implements TermServices, LogicServices, ProofServices {
         this.typeconverter = s.typeconverter;
         this.javaInfo = s.javaInfo;
         this.counters = s.counters;
-        this.specRepos = s.specRepos;
+        this.proofRegistry = s.proofRegistry;
+        this.classAxiomComputer = s.classAxiomComputer;
+        this.contractRegistry = s.contractRegistry;
         this.javaModel = s.javaModel;
         // Share the (per-thread) recorder with the source: an overlay (see getOverlay) is the
         // services the rule executor works through, and fresh-name proposals set on the base
@@ -238,9 +262,35 @@ public class Services implements TermServices, LogicServices, ProofServices {
         getNameRecorder().addProposal(proposal);
     }
 
+    /**
+     * Returns the proof↔proof-obligation registry of this {@link Services} instance (shared by
+     * copies of this instance).
+     *
+     * @return the proof registry.
+     */
+    public ProofRegistry getProofRegistry() {
+        return proofRegistry;
+    }
 
-    public SpecificationRepository getSpecificationRepository() {
-        return specRepos;
+    /**
+     * Returns the class-axiom/invariant computer of this {@link Services} instance (shared by
+     * copies of this instance, like the specification repository).
+     *
+     * @return the class axiom computer.
+     */
+    public ClassAxiomComputer getClassAxiomComputer() {
+        return classAxiomComputer;
+    }
+
+    /**
+     * Returns the contract registry (per-node derived-spec cache for contracts and initially
+     * clauses) of this {@link Services} instance (shared by copies of this instance, like the
+     * specification repository).
+     *
+     * @return the contract registry.
+     */
+    public ContractRegistry getContractRegistry() {
+        return contractRegistry;
     }
 
 
@@ -278,7 +328,9 @@ public class Services implements TermServices, LogicServices, ProofServices {
     public Services copy(Profile profile, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         Services s = new Services(profile, javaService, copyCounters(), newCaches);
-        s.specRepos = specRepos;
+        s.proofRegistry = proofRegistry;
+        s.classAxiomComputer = classAxiomComputer;
+        s.contractRegistry = contractRegistry;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
         // Detach this instance's recorder from earlier overlays/aliases, keeping the calling

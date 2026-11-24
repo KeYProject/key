@@ -157,6 +157,19 @@ public class KeYJPMapping {
                 formerType);
     }
 
+    /**
+     * Registers only the reverse direction (KeY element to JMLtk node) of the mapping. This is
+     * used for elements whose forward direction is already occupied by a different value, e.g.
+     * the {@link ProgramMethod} of a (constructor) declaration whose KeY {@code MethodDeclaration}
+     * additionally needs to be resolved back to the originating JMLtk node carrying the
+     * specifications.
+     */
+    public void registerReverse(ProgramElement value, Node node) {
+        var formerNode = revMap.putIfAbsent(value, node);
+        if (formerNode != null && formerNode != node)
+            LOGGER.error("Duplicate registration of node: {}, formerNode: {}", node, formerNode);
+    }
+
     public boolean mapped(Node rec) {
         return map.containsKey(rec);
     }

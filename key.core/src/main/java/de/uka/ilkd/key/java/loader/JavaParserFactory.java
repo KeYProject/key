@@ -14,6 +14,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ResolvedLogicalType;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformerRegistry;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
@@ -105,6 +106,17 @@ public class JavaParserFactory {
             config.setKeyMetaConstructNames(ProgramTransformerRegistry.names());
         }
         config.setLanguageLevel(ParserConfiguration.LanguageLevel.RAW);
+        config.setProcessJml(true);
+        // Map KeY's +KEY/-KEY/+OPENJML marker policy onto JMLtk's key sets. JmlProcessor re-runs
+        // once per key set; a single set with all enabled keys reproduces KeY's JmlMarkerDecision
+        // semantics (comment keyed +k is active iff k is enabled).
+        final var enabledKeys = ProofIndependentSettings.DEFAULT_INSTANCE
+                .getGeneralSettings().getJmlEnabledKeys();
+        config.setJmlKeys(List.of(List.copyOf(enabledKeys)));
+        // Transitional (Phase 0/1): keep the raw JmlDoc nodes so the legacy JMLTransformer can
+        // still consume the comment text while the JML AST attaches alongside it. Removed once
+        // JMLTransformer is gone (Phase 3).
+        config.setKeepJmlDocs(true);
         config.getProcessors().add(() -> new Processor() {
             @Override
             public void postProcess(ParseResult<? extends Node> result,

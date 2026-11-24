@@ -41,7 +41,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.OpReplacer;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
@@ -1108,7 +1107,7 @@ public final class LoopContractImpl extends AbstractAuxiliaryContractImpl implem
             for (int i = 1; i < contracts.length; i++) {
                 assert contracts[i].getBlock().equals(head.getBlock());
 
-                baseName.append(SpecificationRepository.CONTRACT_COMBINATION_MARKER)
+                baseName.append(ContractFactory.CONTRACT_COMBINATION_MARKER)
                         .append(contracts[i].getBaseName());
             }
 

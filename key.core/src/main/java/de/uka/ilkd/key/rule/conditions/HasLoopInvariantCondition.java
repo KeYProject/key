@@ -48,15 +48,14 @@ public class HasLoopInvariantCondition implements VariableCondition {
             (SVInstantiations) matchCond.getInstantiations();
 
         final LoopStatement loop = (LoopStatement) svInst.getInstantiation(loopStmtSV);
-        final LoopSpecification loopSpec = //
-            services.getSpecificationRepository().getLoopSpec(loop);
+        final StatementBlock program = (StatementBlock) svInst.getContextInstantiation().program();
+        final LoopSpecification loopSpec = loop.getLoopInvariant(program);
 
         if (loopSpec == null) {
             return null;
         }
 
-        final JavaBlock javaBlock = JavaBlock.createJavaBlock(
-            (StatementBlock) svInst.getContextInstantiation().program());
+        final JavaBlock javaBlock = JavaBlock.createJavaBlock(program);
 
         final MethodFrame mf = //
             JavaTools.getInnermostMethodFrame(javaBlock, services);

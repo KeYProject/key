@@ -7,7 +7,6 @@ package de.uka.ilkd.key.java;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.uka.ilkd.key.java.transformations.pipeline.TransformationPipelineServices;
 import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
 import de.uka.ilkd.key.speclang.njml.JmlParserBaseVisitor;
@@ -16,10 +15,6 @@ import de.uka.ilkd.key.speclang.njml.LabeledParserRuleContext;
 import org.key_project.util.collection.ImmutableList;
 
 import com.github.javaparser.ast.Modifier;
-import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.printer.DefaultPrettyPrinterVisitor;
 import com.github.javaparser.printer.configuration.PrinterConfiguration;
 import com.google.common.base.Strings;
@@ -55,53 +50,6 @@ public class SpecialJavaPrinter extends DefaultPrettyPrinterVisitor {
             printer.print("*/ ");
         } else {
             super.visit(n, arg);
-        }
-    }
-
-    @Override
-    public void visit(MethodDeclaration n, Void arg) {
-        print(TransformationPipelineServices.getSpec(n));
-        super.visit(n, arg);
-    }
-
-    @Override
-    public void visit(ConstructorDeclaration n, Void arg) {
-        print(TransformationPipelineServices.getSpec(n));
-        super.visit(n, arg);
-    }
-
-    @Override
-    protected void printCompactClassMembers(NodeList<BodyDeclaration<?>> members, Void arg) {
-        print(TransformationPipelineServices.getClassSpec(members.getParentNode().get()));
-        super.printCompactClassMembers(members, arg);
-    }
-
-    @Override
-    protected void printMembers(NodeList<BodyDeclaration<?>> members, Void arg) {
-        print(TransformationPipelineServices.getClassSpec(members.getParentNode().get()));
-        super.printMembers(members, arg);
-    }
-
-
-    private void print(List<TextualJMLConstruct> spec) {
-        for (var construct : spec) {
-            switch (construct) {
-                case TextualJMLLoopSpec c -> print(c);
-                case TextualJMLAssertStatement c -> print(c);
-                case TextualJMLClassAxiom c -> print(c.getModifiers(), c.getAxiom().first);
-                case TextualJMLClassInv c -> print(c.getModifiers(), c.getInv());
-                case TextualJMLDepends c -> print(c.getModifiers(), c.getDepends());
-                case TextualJMLFieldDecl c -> {
-                }
-                case TextualJMLInitially c -> print(c.getModifiers(), c.getInv().first);
-                case TextualJMLMergePointDecl c -> print(c.getModifiers(), c.getMergeProc());
-                case TextualJMLMethodDecl c -> print(c.getModifiers(), c.getDecl());
-                case TextualJMLModifierList c -> print(c.getModifiers());
-                case TextualJMLRepresents c -> print(c.getModifiers(), c.getRepresents().first);
-                case TextualJMLSetStatement c -> print(c.getAssignment());
-                case TextualJMLSpecCase c -> print(c.getModifiers(), c);
-                default -> throw new IllegalStateException("Unexpected value: " + construct);
-            }
         }
     }
 

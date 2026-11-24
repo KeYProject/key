@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.java.ast.expression.literal.EmptySeqLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -241,7 +243,8 @@ public class EnhancedForElimination extends ProgramTransformer {
         data.setLoop(KeYJavaASTFactory.forLoop(inits, guard, updates, declArrayElemVar,
             getNextElement, body));
 
-        setInvariant(enhancedFor, data.loop(), data.indexVariable(), Optional.empty(), services);
+        setInvariant(enhancedFor, data.loop(), data.indexVariable(), Optional.empty(),
+            data.execContext(), services);
 
         // arr = exp; for(...) body
         StatementBlock composition = KeYJavaASTFactory.block(arrAssignment, data.loop());
@@ -296,7 +299,11 @@ public class EnhancedForElimination extends ProgramTransformer {
         // block
         final StatementBlock outerBlock = KeYJavaASTFactory.block(itinit, valuesInit, data.loop());
         setInvariant(enhancedFor, data.loop(), data.indexVariable(),
-            Optional.of(data.valuesVariable()), services);
+            Optional.of(data.valuesVariable()), data.execContext(), services);
+        LoopSpecification inv = data.loop().getLoopInvariant();
+        if (inv != null) {
+            data.loop().setLoopInvariant(remapVariables(inv, enhancedFor, services));
+        }
         return outerBlock;
 
     }
@@ -333,6 +340,21 @@ public class EnhancedForElimination extends ProgramTransformer {
     }
 
     /**
+     * Returns the name of the variable iterated by the given enhanced for loop, without the
+     * leading underscore that KeY adds to copies of method parameters.
+     *
+     * @param loop the enhanced for loop.
+     * @return the normalized name, or {@code null} if it cannot be determined.
+     */
+    private static String guardName(EnhancedFor loop) {
+        if (loop.getGuardExpression() instanceof ProgramVariable pv) {
+            String name = pv.name().toString();
+            return name.startsWith("_") ? name.substring(1) : name;
+        }
+        return null;
+    }
+
+    /**
      * Transfer the invariant from <code>original</code> enhanced loop to the
      * <code>transformed</code> while or for loop.
      *
@@ -341,13 +363,96 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param services services.
      */
     private void setInvariant(EnhancedFor original, LoopStatement transformed,
-            ProgramVariable loopIdxVar, Optional<ProgramVariable> valuesVar, Services services) {
-        LoopSpecification li = services.getSpecificationRepository().getLoopSpec(original);
+            ProgramVariable loopIdxVar, Optional<ProgramVariable> valuesVar,
+            ExecutionContext execContext, Services services) {
+        LoopSpecification li = original.getLoopInvariant();
+        if (li == null && execContext != null) {
+            IProgramMethod method = execContext.getMethodContext();
+            if (method != null && method.getBody() != null) {
+                var collector = new JavaASTCollector(method.getBody(), EnhancedFor.class);
+                collector.start();
+                final String wanted = guardName(original);
+                LoopSpecification unique = null;
+                LoopSpecification matching = null;
+                int candidates = 0;
+                for (var node : collector.getNodes()) {
+                    var candidate = (EnhancedFor) node;
+                    var inv = candidate.getLoopInvariant();
+                    if (inv != null) {
+                        candidates++;
+                        unique = inv;
+                        if (wanted != null && wanted.equals(guardName(candidate))) {
+                            matching = inv;
+                        }
+                    }
+                }
+                if (candidates == 1) {
+                    li = unique;
+                } else if (matching != null) {
+                    li = matching;
+                }
+            }
+        }
         if (li != null) {
             li = li.setLoop(transformed);
             li = instantiateIndexValues(li, loopIdxVar, valuesVar, services);
-            services.getSpecificationRepository().addLoopInvariant(li);
+            transformed.setLoopInvariant(li);
         }
+    }
+
+    /**
+     * Rewrites the program variables occurring in the given loop specification to the variables
+     * used by the supplied program fragment.
+     *
+     * @param rawInv the loop specification.
+     * @param current the program fragment whose variables are the target of the rewrite.
+     * @param services the services object.
+     * @return the rewritten loop specification.
+     */
+    private static LoopSpecification remapVariables(LoopSpecification rawInv,
+            ProgramElement current, Services services) {
+        final Map<String, ProgramVariable> target = new LinkedHashMap<>();
+        var collector = new JavaASTCollector(current, ProgramVariable.class);
+        collector.start();
+        for (var node : collector.getNodes()) {
+            var pv = (ProgramVariable) node;
+            target.put(pv.name().toString(), pv);
+        }
+        return remapVariables(rawInv, p -> {
+            ProgramVariable t = target.get(p.name().toString());
+            return t == null ? target.get("_" + p.name()) : t;
+        }, services);
+    }
+
+    /**
+     * Rewrites the program variables in the given loop specification using the supplied resolver.
+     * Variables for which the resolver returns {@code null} are left unchanged.
+     *
+     * @param rawInv the loop specification.
+     * @param resolve maps a source program variable to its target, or {@code null}.
+     * @param services the services object.
+     * @return the rewritten loop specification.
+     */
+    static LoopSpecification remapVariables(LoopSpecification rawInv,
+            Function<ProgramVariable, ProgramVariable> resolve, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        Function<JTerm, JTerm> remap =
+            term -> term == null ? null
+                    : GenericTermReplacer.replace(term,
+                        t -> t.op() instanceof ProgramVariable p && resolve.apply(p) != null
+                                && resolve.apply(p) != p,
+                        t -> tb.var(resolve.apply((ProgramVariable) t.op())), services);
+
+        Map<LocationVariable, JTerm> invs = new LinkedHashMap<>();
+        rawInv.getInternalInvariants().forEach((h, t) -> invs.put(h, remap.apply(t)));
+        Map<LocationVariable, JTerm> freeInvs = new LinkedHashMap<>();
+        rawInv.getInternalFreeInvariants().forEach((h, t) -> freeInvs.put(h, remap.apply(t)));
+        Map<LocationVariable, JTerm> mods = new LinkedHashMap<>();
+        rawInv.getInternalModifiable().forEach((h, t) -> mods.put(h, remap.apply(t)));
+        Map<LocationVariable, JTerm> freeMods = new LinkedHashMap<>();
+        rawInv.getInternalFreeModifiable().forEach((h, t) -> freeMods.put(h, remap.apply(t)));
+        return rawInv.configurate(invs, freeInvs, mods, freeMods,
+            rawInv.getInternalInfFlowSpec(), remap.apply(rawInv.getInternalVariant()));
     }
 
     /**
@@ -363,7 +468,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      *
      * @return The updated {@link LoopSpecification}, or null if the supplied invariant is null.
      */
-    private LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
+    static LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
             ProgramVariable loopIdxVar, Optional<ProgramVariable> maybeValuesVar,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
@@ -404,7 +509,8 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param replaceWith The program variable from which to create the replacement term.
      * @param services The {@link Services} object.
      */
-    private void updateInvs(final Map<LocationVariable, JTerm> invs, final JTerm termToReplace,
+    private static void updateInvs(final Map<LocationVariable, JTerm> invs,
+            final JTerm termToReplace,
             final ProgramVariable replaceWith, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         invs.entrySet().stream().filter(entry -> entry.getValue() != null)

@@ -64,12 +64,9 @@ public class DefaultUserInterfaceControl extends AbstractUserInterfaceControl {
     @Override
     public ProofEnvironment createProofEnvironmentAndRegisterProof(ProofOblInput proofOblInput,
             ProofAggregate proofList, InitConfig initConfig) {
-        // TODO: Find out why the proof has to be registered. This method should just return null
-        // and do nothing.
-        initConfig.getServices().getSpecificationRepository().registerProof(proofOblInput,
-            proofList.getFirstProof());
-
-        // This has to be done to prive the proofList with the environment object.
+        // The environment registers every proof of the list with the (session-wide) proof registry
+        // via ProofEnvironment#registerProof below; no separate registration is needed here.
+        // This has to be done to provide the proofList with the environment object.
         final ProofEnvironment env = new ProofEnvironment(initConfig);
         env.registerProof(proofOblInput, proofList);
         return env;
