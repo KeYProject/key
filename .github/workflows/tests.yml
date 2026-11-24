@@ -172,6 +172,7 @@ jobs:
         run: ./gradlew -DjacocoEnabled=true jacocoRootReport jacocoCobertura
 
       - name: Upload coverage report
+        if: hashFiles('build/reports/jacoco/root/cobertura.xml') != ''
         uses: actions/upload-code-coverage@v1
         with:
           file: build/reports/jacoco/root/cobertura.xml

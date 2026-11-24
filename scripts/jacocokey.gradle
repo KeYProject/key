@@ -69,8 +69,14 @@ tasks.register('jacocoCobertura', Exec) {
         rootProject.relativePath(subproject.file('src/main/java'))
     }.unique()
 
-    inputs.file(aggregatedXml).withPropertyName('jacocoXml')
+    inputs.file(aggregatedXml).withPropertyName('jacocoXml').optional()
+    inputs.file(converter).withPropertyName('converter')
+    inputs.files(sourceRoots).withPropertyName('sourceRoots')
     outputs.file(cobertura).withPropertyName('coberturaXml')
+
+    // Without execution data the JaCoCo report task is skipped and writes no XML; skip the
+    // conversion instead of failing on the missing input.
+    onlyIf { aggregatedXml.exists() }
 
     commandLine(['python3', converter.absolutePath, aggregatedXml.absolutePath,
                  cobertura.absolutePath] + sourceRoots)

@@ -78,8 +78,14 @@ def convert(jacoco_xml, cobertura_xml, source_roots):
             packages.append((package_name, classes))
 
     coverage = ET.Element("coverage")
-    coverage.set("line-rate", str(covered_lines / total_lines if total_lines else 0.0))
+    line_rate = covered_lines / total_lines if total_lines else 0.0
+    coverage.set("line-rate", str(line_rate))
     coverage.set("branch-rate", "0.0")
+    coverage.set("lines-valid", str(total_lines))
+    coverage.set("lines-covered", str(covered_lines))
+    coverage.set("branches-valid", "0")
+    coverage.set("branches-covered", "0")
+    coverage.set("complexity", "0")
     coverage.set("version", "jacoco2cobertura")
     coverage.set("timestamp", str(int(time.time())))
 
@@ -94,6 +100,7 @@ def convert(jacoco_xml, cobertura_xml, source_roots):
         package.set("name", package_name)
         package.set("line-rate", str(package_covered / package_total if package_total else 0.0))
         package.set("branch-rate", "0.0")
+        package.set("complexity", "0")
 
         classes_element = ET.SubElement(package, "classes")
         for qualified_name, path, lines, hits, file_covered in classes:
@@ -102,6 +109,7 @@ def convert(jacoco_xml, cobertura_xml, source_roots):
             cls.set("filename", path)
             cls.set("line-rate", str(file_covered / len(lines)))
             cls.set("branch-rate", "0.0")
+            cls.set("complexity", "0")
             ET.SubElement(cls, "methods")
 
             lines_element = ET.SubElement(cls, "lines")
@@ -109,6 +117,7 @@ def convert(jacoco_xml, cobertura_xml, source_roots):
                 line = ET.SubElement(lines_element, "line")
                 line.set("number", jacoco_line.attrib["nr"])
                 line.set("hits", hit)
+                line.set("branch", "false")
 
     ET.ElementTree(coverage).write(cobertura_xml, encoding="UTF-8", xml_declaration=True)
     return len(packages), sum(len(classes) for _, classes in packages), skipped, covered_lines, total_lines
@@ -124,6 +133,9 @@ def main(argv):
     packages, files, skipped, covered, total = convert(argv[1], argv[2], source_roots)
     print("jacoco2cobertura: %d packages, %d files, %d skipped, %d/%d lines covered"
           % (packages, files, skipped, covered, total), file=sys.stderr)
+    if files == 0:
+        print("jacoco2cobertura: no source file matched the source roots", file=sys.stderr)
+        return 2
     return 0
 
 
