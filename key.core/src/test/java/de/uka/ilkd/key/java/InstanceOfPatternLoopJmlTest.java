@@ -111,4 +111,23 @@ class InstanceOfPatternLoopJmlTest {
                 }
                 """);
     }
+
+    @Test
+    void doWithLoopInvariant(@TempDir Path tempDir) throws Exception {
+        prove(tempDir, "DoInvariant", """
+                public class DoInvariant {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures \\result >= 0;
+                      @*/
+                    public static int m() {
+                        Object o = new String("x");
+                        int n = 0;
+                        /*@ loop_invariant n >= 0; @*/
+                        do { n = n + 1; o = null; } while (o instanceof String s);
+                        return n;
+                    }
+                }
+                """);
+    }
 }

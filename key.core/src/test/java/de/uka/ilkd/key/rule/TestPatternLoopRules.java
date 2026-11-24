@@ -18,7 +18,6 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.util.HelperClassForTests;
-import de.uka.ilkd.key.util.parsing.BuildingException;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.proof.rulefilter.TacletFilter;
@@ -26,11 +25,8 @@ import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,7 +50,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * handled by {@code ifUnfold}/{@code ifElseUnfold}.
  */
 class TestPatternLoopRules {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestPatternLoopRules.class);
 
     /**
      * A profile whose standard rules are the LDT declarations plus {@code javaRules.key}, the
@@ -82,38 +77,20 @@ class TestPatternLoopRules {
                 "TestPatternLoopRules", HelperClassForTests.DUMMY_KEY_FILE, PROFILE);
             initConfig = new ProblemInitializer(PROFILE).prepare(envInput);
         } catch (Exception e) {
-            if (isMetaConstructParserGap(e)) {
-                String reason = "javaRules.key cannot be loaded, because the jmlparser does not"
-                    + " support the #posBinding/#negBinding program meta-constructs yet: "
-                    + e.getMessage();
-                LOGGER.warn("Skipping the pattern-loop rule tests. {}", reason);
-                Assumptions.assumeTrue(false, reason);
-            }
             throw e instanceof RuntimeException re ? re : new RuntimeException(e);
         }
         services = initConfig.getServices();
         allRules = initConfig.createTacletIndex();
     }
 
-    private static boolean isMetaConstructParserGap(Throwable error) {
-        for (Throwable t = error; t != null; t = t.getCause()) {
-            if (t instanceof BuildingException) {
-                String message = t.getMessage();
-                if (message != null
-                        && (message.contains("#posBinding") || message.contains("#negBinding"))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     private static JTerm parseTerm(String term) {
         return new KeyIO(services, initConfig.namespaces()).parseExpression(term);
     }
 
     /**
-     * Creates a goal {@code ==> \<{ program }\> true} whose rule set contains only the given rule,
+     * Creates a goal {@code ==> \\<{ program }\\> true} whose rule set contains only the given
+     * rule,
      * applies the rule at the top level of the succedent and returns the single successor goal.
      */
     private Goal applyRule(String ruleName, String program) {
@@ -170,7 +147,7 @@ class TestPatternLoopRules {
 
     private static void assertSuccedent(Goal goal, String expectedFormula) {
         JTerm actual = (JTerm) goal.sequent().succedent().getFirst().formula();
-        JTerm expected = parseTerm(expectedFormula);
+        final JTerm expected = parseTerm(expectedFormula);
         assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(actual, expected),
             "Expected succedent:\n" + ProofSaver.printAnything(expected, services)
                 + "\nBut was:\n" + ProofSaver.printAnything(actual, services));
@@ -190,14 +167,52 @@ class TestPatternLoopRules {
         assertFalse(rules.contains("patternLoopUnfold"), rules.toString());
     }
 
+    /**
+     * The rewritten loop has a plain boolean guard, so the pattern rule must not fire on it again.
+     */
     @Test
-    void rewritesBodyWithPositionAndGuardRefresh() {
+    void doesNotRefireOnRewrittenLoop() {
+        List<String> rules = applicableRules("boolean b; while (b) { int y = 1; }");
+        assertFalse(rules.contains("patternLoopUnfold"), rules.toString());
+        assertFalse(rules.contains("patternLoopUnfoldNested"), rules.toString());
+    }
+
+    @Test
+    void rewritesWhileWithSingleEvaluation() {
         Goal goal = applyRule("patternLoopUnfold",
             "while (new String(\"x\") instanceof String s) { int y = s.length(); }");
-        assertSuccedent(goal,
-            "\\<{boolean b = new String(\"x\") instanceof String s;"
-                + " while (b) { java.lang.String s = (String) new String(\"x\");"
-                + " int y = s.length(); b = new String(\"x\") instanceof String; }}\\> true");
+        assertSuccedent(goal, """
+                \\<{
+                  java.lang.String subj;
+                  boolean b;
+                  subj = new String("x");
+                  b = subj instanceof String;
+                  while (b) {
+                    java.lang.String s = (String) subj;
+                    loop:
+                    {
+                      int y = s.length();
+                    }
+                    subj = new String("x");
+                    b = subj instanceof String;
+                  }
+                }\\> true
+                """);
+    }
+
+    /**
+     * A tested expression with side effects is evaluated exactly once per guard evaluation: once
+     * before the loop and once at the body-end refresh, and the binding uses the temporary.
+     */
+    @Test
+    void evaluatesTestedMethodCallOncePerGuardEvaluation() {
+        Goal goal = applyRule("patternLoopUnfold",
+            "while (this.toString() instanceof String s) { int y = 1; }");
+        String printed = ProofSaver.printAnything(
+            goal.sequent().succedent().getFirst().formula(), services);
+        assertEquals(2, countOccurrences(printed, "this.toString()"), printed);
+        assertTrue(printed.contains("subj = this.toString();"), printed);
+        assertFalse(printed.contains("(String) this.toString()"), printed);
     }
 
     @Test
@@ -205,73 +220,230 @@ class TestPatternLoopRules {
         Goal goal = applyRule("patternLoopUnfold",
             "while (!(new String(\"x\") instanceof String s)) { int y = 1; }"
                 + " int z = s.length();");
-        assertSuccedent(goal,
-            "\\<{boolean b = !(new String(\"x\") instanceof String s);"
-                + " while (b) { int y = 1; b = !(new String(\"x\") instanceof String); }"
-                + " java.lang.String s = (String) new String(\"x\");"
-                + " int z = s.length();}\\> true");
+        assertSuccedent(goal, """
+                \\<{
+                  java.lang.String subj;
+                  boolean b;
+                  subj = new String("x");
+                  b = !(subj instanceof String);
+                  while (b) {
+                    loop:
+                    {
+                      int y = 1;
+                    }
+                    subj = new String("x");
+                    b = !(subj instanceof String);
+                  }
+                  java.lang.String s = (String) subj;
+                  int z = s.length();
+                }\\> true
+                """);
     }
 
     @Test
     void suppressesAfterLoopBindingOnBreak() {
         Goal goal = applyRule("patternLoopUnfold",
             "while (!(new String(\"x\") instanceof String s)) { break; }");
-        assertSuccedent(goal,
-            "\\<{boolean b = !(new String(\"x\") instanceof String s);"
-                + " while (b) { break; b = !(new String(\"x\") instanceof String); }}\\> true");
+        assertSuccedent(goal, """
+                \\<{
+                  java.lang.String subj;
+                  boolean b;
+                  subj = new String("x");
+                  b = !(subj instanceof String);
+                  while (b) {
+                    loop:
+                    {
+                      break;
+                    }
+                    subj = new String("x");
+                    b = !(subj instanceof String);
+                  }
+                }\\> true
+                """);
     }
 
-
+    /**
+     * A continue leaves the body's labeled block, so the guard refresh runs after any enclosing
+     * finally block instead of inside it.
+     */
     @Test
-    void rewritesForBodyAndUpdate() {
+    void refreshesGuardOutsideFinallyAfterContinue() {
         Goal goal = applyRule("patternLoopUnfold",
-            "for (int i = 0; i < 1 && new String(\"x\") instanceof String s; i++) {"
-                + " int y = s.length(); }");
-        String printed = ProofSaver.printAnything(
-            goal.sequent().succedent().getFirst().formula(), services);
-        assertTrue(printed.contains("while (b)"), printed);
-        assertTrue(printed.contains("s = (String) new String(\"x\")"), printed);
+            "while (this.toString() instanceof String s) {"
+                + " try { continue; } finally { int z = 1; } }");
+        assertSuccedent(goal, """
+                \\<{
+                    java.lang.Object subj;
+                    boolean b;
+                    subj = this.toString();
+                    b = subj instanceof String;
+                    while (b) {
+                      java.lang.String s = (String) subj;
+                      loop:
+                      {
+                        try {
+                          break loop;
+                        } finally {
+                          int z = 1;
+                        }
+                      }
+                      subj = this.toString();
+                      b = subj instanceof String;
+                    }
+                  }\\> true
+                """);
     }
 
     @Test
-    void doesNotLeakForInitVariables() {
+    void rewritesForWithAssignmentInitializerAndAfterBinding() {
         Goal goal = applyRule("patternLoopUnfold",
-            "for (int i = 0; i < 1 && new String(\"x\") instanceof String s; i++) { }");
-        String printed = ProofSaver.printAnything(
-            goal.sequent().succedent().getFirst().formula(), services);
-        assertTrue(printed.contains("int i = 0;"), printed);
+            "int i; for (i = 0; !(this.toString() instanceof String s); i++) { }"
+                + " int z = s.length();");
+        assertSuccedent(goal, """
+                \\<{
+                    int i;
+                    java.lang.Object subj;
+                    boolean b;
+                    {
+                      i = 0;
+                      subj = this.toString();
+                      b = !(subj instanceof String);
+                      while (b) {
+                        loop:
+                        {}
+                        i++;
+                        subj = this.toString();
+                        b = !(subj instanceof String);
+                      }
+                    }
+                    java.lang.String s = (String) subj;
+                    int z = s.length();
+                  }\\> true
+                """);
     }
 
     @Test
-    void rewritesDoBodyButNotFirstBody() {
+    void rewritesForWithContinueAndUpdate() {
         Goal goal = applyRule("patternLoopUnfold",
-            "do { int y = 1; } while (!(new String(\"x\") instanceof String s));");
-        String printed = ProofSaver.printAnything(
-            goal.sequent().succedent().getFirst().formula(), services);
-        assertTrue(printed.indexOf("int y = 1;") < printed.indexOf("java.lang.String s"),
-            printed);
+            "for (int i = 0; i < 3 && this.toString() instanceof String s; i++) {"
+                + " if (i == 1) { continue; } }");
+        assertSuccedent(goal, """
+                \\<{
+                    java.lang.Object subj;
+                    boolean b;
+                    {
+                      int i = 0;
+                      subj = this.toString();
+                      b = i < 3 && subj instanceof String;
+                      while (b) {
+                        java.lang.String s = (String) subj;
+                        loop:
+                        {
+                          if (i == 1) {
+                            break loop;
+                          }
+                        }
+                        i++;
+                        subj = this.toString();
+                        b = i < 3 && subj instanceof String;
+                      }
+                    }
+                  }\\> true
+                """);
     }
 
-
     @Test
-    void rewritesDoWithNestedWhileInBody() {
+    void rewritesDoWithBreak() {
         Goal goal = applyRule("patternLoopUnfold",
-            "do { while (new String(\"x\") != null) { int x = 1; } }"
-                + " while (new String(\"x\") instanceof String s);");
-        String printed = ProofSaver.printAnything(
-            goal.sequent().succedent().getFirst().formula(), services);
-        assertTrue(printed.contains("java.lang.String s = (String) new String(\"x\")"),
-            printed);
+            "do { break; } while (this.toString() instanceof String s);");
+        assertSuccedent(goal, """
+                \\<{
+                    java.lang.Object subj;
+                    boolean b;
+                    outer:
+                    {
+                      {
+                        break outer;
+                      }
+                      {
+                        subj = this.toString();
+                        b = subj instanceof String;
+                        while (b) {
+                          java.lang.String s = (String) subj;
+                          loop:
+                          {
+                            break;
+                          }
+                          subj = this.toString();
+                          b = subj instanceof String;
+                        }
+                      }
+                    }
+                  }\\> true
+                """);
     }
 
     @Test
-    void refreshesGuardBeforeContinue() {
+    void rewritesDoWithContinue() {
         Goal goal = applyRule("patternLoopUnfold",
-            "while (new String(\"x\") instanceof String s) { continue; }");
-        String printed = ProofSaver.printAnything(
-            goal.sequent().succedent().getFirst().formula(), services);
-        assertTrue(printed.matches(
-            "(?s).*b = new String\\(\"x\"\\) instanceof String;\\s+continue;.*"),
-            printed);
+            "do { continue; } while (this.toString() instanceof String s);");
+        assertSuccedent(goal, """
+                \\<{
+                    java.lang.Object subj;
+                    boolean b;
+                    {
+                      inner:
+                      {
+                        break inner;
+                      }
+                      {
+                        subj = this.toString();
+                        b = subj instanceof String;
+                        while (b) {
+                          java.lang.String s = (String) subj;
+                          loop:
+                          {
+                            break loop;
+                          }
+                          subj = this.toString();
+                          b = subj instanceof String;
+                        }
+                      }
+                    }
+                  }\\> true
+                """);
+    }
+
+    @Test
+    void rewritesNestedBlockBindingLoop() {
+        Goal goal = applyRule("patternLoopUnfoldNested",
+            "{ while (new String(\"x\") instanceof String s) { int y = s.length(); } }");
+        assertSuccedent(goal, """
+                \\<{
+                    {
+                      java.lang.String subj;
+                      boolean b;
+                      subj = new String("x");
+                      b = subj instanceof String;
+                      while (b) {
+                        java.lang.String s = (String) subj;
+                        loop:
+                        {
+                          int y = s.length();
+                        }
+                        subj = new String("x");
+                        b = subj instanceof String;
+                      }
+                    }
+                  }\\> true
+                """);
+    }
+
+    private static int countOccurrences(String text, String search) {
+        int count = 0;
+        for (int i = text.indexOf(search); i >= 0; i = text.indexOf(search, i + 1)) {
+            count++;
+        }
+        return count;
     }
 }

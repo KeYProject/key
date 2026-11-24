@@ -142,4 +142,84 @@ class InstanceOfPatternLoopScopingTest {
                 }
                 """, StrategyProperties.LOOP_SCOPE_EXPAND);
     }
+
+    @Test
+    void whileBodyBreak(@TempDir Path tempDir) throws Exception {
+        prove(tempDir, "WhileBreak", """
+                public class WhileBreak {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures \\result >= 0;
+                      @*/
+                    public static int m(Object o) {
+                        int n = 0;
+                        while (o instanceof String s) {
+                            n += s.length();
+                            if (n > 10) { break; }
+                            o = null;
+                        }
+                        return n;
+                    }
+                }
+                """, StrategyProperties.LOOP_SCOPE_EXPAND);
+    }
+
+    @Test
+    void whileBodyContinue(@TempDir Path tempDir) throws Exception {
+        prove(tempDir, "WhileContinue", """
+                public class WhileContinue {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures \\result >= 0;
+                      @*/
+                    public static int m(Object o) {
+                        int n = 0;
+                        while (o instanceof String s) {
+                            if (s.length() == 0) { o = null; continue; }
+                            n += s.length();
+                            o = null;
+                        }
+                        return n;
+                    }
+                }
+                """, StrategyProperties.LOOP_SCOPE_EXPAND);
+    }
+
+    @Test
+    void forUpdateAndContinue(@TempDir Path tempDir) throws Exception {
+        prove(tempDir, "ForContinue", """
+                public class ForContinue {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures \\result >= 0;
+                      @*/
+                    public static int m(Object o) {
+                        int n = 0;
+                        for (int i = 0; i < 3 && o instanceof String s; i++) {
+                            if (i == 1) { continue; }
+                            n += s.length();
+                            o = null;
+                        }
+                        return n;
+                    }
+                }
+                """, StrategyProperties.LOOP_SCOPE_EXPAND);
+    }
+
+    @Test
+    void doWithBreak(@TempDir Path tempDir) throws Exception {
+        prove(tempDir, "DoBreak", """
+                public class DoBreak {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures \\result >= 0;
+                      @*/
+                    public static int m(Object o) {
+                        int n = 0;
+                        do { n += 1; o = null; break; } while (o instanceof String s);
+                        return n;
+                    }
+                }
+                """, StrategyProperties.LOOP_SCOPE_EXPAND);
+    }
 }
