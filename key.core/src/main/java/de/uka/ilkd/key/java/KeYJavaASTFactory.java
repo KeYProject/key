@@ -21,6 +21,7 @@ import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
 import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperatorKind;
+import de.uka.ilkd.key.java.ast.pattern.Pattern;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -645,6 +646,19 @@ public abstract class KeYJavaASTFactory {
     public static Case caseBlock(final Expression expression, final Statement[] statements) {
 
         return new Case(expression, statements);
+    }
+
+    /**
+     * Create a pattern case block ({@code case <patterns> [when <guard>]:}).
+     *
+     * @param patterns the patterns of the label group
+     * @param guard the optional {@code when} guard
+     * @param body the statements of the arm
+     * @return a new {@link PatternCase}
+     */
+    public static PatternCase patternCaseBlock(final ImmutableList<Pattern> patterns,
+            final @Nullable Expression guard, final ImmutableList<Statement> body) {
+        return new PatternCase(patterns, guard, body);
     }
 
     public static Continue continueStatement(Label label) {

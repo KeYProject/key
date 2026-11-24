@@ -1629,6 +1629,25 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnPatternCase(PatternCase x) {
+        layouter.beginRelativeC();
+        layouter.keyWord("case").brk();
+        for (int i = 0; i < x.getPatterns().size(); i++) {
+            if (i > 0) {
+                layouter.print(", ");
+            }
+            x.getPatterns().get(i).visit(this);
+        }
+        if (x.getGuard() != null) {
+            layouter.print(" ");
+            layouter.keyWord("when").brk();
+            x.getGuard().visit(this);
+        }
+        layouter.print(":").end();
+        printCaseBody(x.getBody());
+    }
+
+    @Override
     public void performActionOnCatch(Catch x) {
         layouter.print(" ");
         layouter.keyWord("catch");

@@ -220,6 +220,13 @@ public interface Visitor {
 
     void performActionOnCase(Case x);
 
+    /**
+     * performs an action on the given element
+     *
+     * @param x the element to perform the action on
+     */
+    void performActionOnPatternCase(PatternCase x);
+
     void performActionOnCatch(Catch x);
 
     void performActionOnDefault(Default x);
