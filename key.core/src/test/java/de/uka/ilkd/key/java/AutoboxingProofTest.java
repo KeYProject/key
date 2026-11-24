@@ -635,6 +635,23 @@ class AutoboxingProofTest {
     }
 
     @Test
+    void unboxesBothBoxedConditionalToPrimitive(@TempDir Path dir) throws Exception {
+        prove("BothBoxedToPrimitive", clazz("BothBoxedToPrimitive", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = Integer.valueOf(1);
+                    Integer b = Integer.valueOf(2);
+                    boolean f = true;
+                    int i = f ? a : b;
+                    //@ assert i == 1;
+                }
+                """), dir);
+    }
+
+    @Test
     void bothBoxedConditionalSelectsNull(@TempDir Path dir) throws Exception {
         prove("NullConditionalBranch", clazz("NullConditionalBranch", """
                 /*@ normal_behavior
@@ -767,6 +784,24 @@ class AutoboxingProofTest {
                     Double d = Double.valueOf(1.0);
                     d--;
                     //@ assert d != null;
+                }
+                """), dir);
+    }
+
+    @Test
+    void narrowsCompoundAssignmentAndConstantExpression(@TempDir Path dir) throws Exception {
+        prove("ByteCompound", clazz("ByteCompound", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Byte b = 1 + 2;
+                    byte x = b;
+                    //@ assert x == 3;
+                    b += 1;
+                    byte y = b;
+                    //@ assert y == 4;
                 }
                 """), dir);
     }

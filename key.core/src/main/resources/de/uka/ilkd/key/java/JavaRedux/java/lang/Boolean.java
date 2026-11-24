@@ -1,6 +1,6 @@
 package java.lang;
 
-public final class Boolean implements java.lang.Comparable {
+public final class Boolean implements java.lang.Comparable, java.io.Serializable {
     public /*@ nullable @*/ final static java.lang.Class TYPE;
 
     private /*@ spec_public @*/ final boolean value;

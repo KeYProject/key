@@ -17,6 +17,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.AnnotationExpr;
 import com.github.javaparser.ast.expr.ArrayAccessExpr;
 import com.github.javaparser.ast.expr.ArrayCreationExpr;
 import com.github.javaparser.ast.expr.ArrayInitializerExpr;
@@ -29,6 +30,7 @@ import com.github.javaparser.ast.expr.EnclosedExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
+import com.github.javaparser.ast.expr.LambdaExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
@@ -37,6 +39,7 @@ import com.github.javaparser.ast.expr.SwitchExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.ast.expr.VariableDeclarationExpr;
+import com.github.javaparser.ast.stmt.AssertStmt;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.DoStmt;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
@@ -48,6 +51,7 @@ import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
+import com.github.javaparser.ast.type.ArrayType;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
 import com.github.javaparser.ast.type.VarType;
@@ -70,6 +74,11 @@ import org.slf4j.LoggerFactory;
  * Conversions are driven by the expected type of the enclosing context: variable
  * initializers use the declared type, assignments the target type, and return statements the
  * enclosing method's return type. JML specification subtrees are left untouched.
+ * <p>
+ * Limitations: a compound assignment or increment whose target is an array element or field of a
+ * wrapper type is left unchanged, because the receiver would have to be evaluated once into a
+ * temporary. The same holds for a cast through a non-wrapper reference type such as
+ * {@code (int) (Object) boxed} and for a floating-point postfix increment whose value is used.
  */
 final class AutoboxingRewriter {
     private static final Logger LOGGER = LoggerFactory.getLogger(AutoboxingRewriter.class);
@@ -117,6 +126,10 @@ final class AutoboxingRewriter {
             rewriteArrayIndex(access);
         } else if (node instanceof ArrayInitializerExpr initializer) {
             rewriteTopLevelArrayInitializer(initializer);
+        } else if (node instanceof ArrayCreationExpr creation) {
+            rewriteArrayDimensions(creation);
+        } else if (node instanceof AssertStmt assertStmt) {
+            assertStmt.setCheck(unboxBoolean(assertStmt.getCheck()));
         } else if (node instanceof ForEachStmt forEach) {
             rewriteForEach(forEach);
         } else if (node instanceof CastExpr cast) {
@@ -165,8 +178,13 @@ final class AutoboxingRewriter {
             List<ArrayCreationLevel> levels) {
         Type current = arrayType;
         while (current.isArrayType()) {
-            levels.add(new ArrayCreationLevel());
-            current = current.asArrayType().getComponentType();
+            ArrayType array = current.asArrayType();
+            NodeList<AnnotationExpr> annotations = new NodeList<>();
+            for (AnnotationExpr annotation : array.getAnnotations()) {
+                annotations.add(annotation.clone());
+            }
+            levels.add(new ArrayCreationLevel(null, annotations));
+            current = array.getComponentType();
         }
         return current;
     }
@@ -201,9 +219,13 @@ final class AutoboxingRewriter {
             String primitive = actual.asPrimitive().describe();
             if (target.kind() == Kind.WRAPPER) {
                 WrapperType wrapper = target.wrapper();
-                Expression converted = convert(operand, Target.primitive(wrapper.primitiveName()));
-                Expression boxed = box(converted, wrapper.primitiveName(), wrapper);
-                if (boxed != converted) {
+                if (!primitive.equals(wrapper.primitiveName())) {
+                    // A cast only allows an exact boxing conversion, not the constant narrowing
+                    // that an assignment context allows (JLS 5.5). Leave illegal casts alone.
+                    return;
+                }
+                Expression boxed = box(operand, primitive, wrapper);
+                if (boxed != operand) {
                     cast.replace(boxed);
                     // The replacement is not among the visited children of the detached cast.
                     rewriteNode(boxed);
@@ -656,6 +678,14 @@ final class AutoboxingRewriter {
         access.setIndex(widen(access.getIndex(), type, primitive, "int"));
     }
 
+    private void rewriteArrayDimensions(ArrayCreationExpr creation) {
+        for (ArrayCreationLevel level : creation.getLevels()) {
+            level.getDimension()
+                    .ifPresent(dimension -> level.setDimension(
+                        convert(dimension, Target.primitive("int"))));
+        }
+    }
+
     private void rewriteTopLevelArrayInitializer(ArrayInitializerExpr initializer) {
         Node parent = initializer.getParentNode().orElse(null);
         ResolvedType componentType = null;
@@ -739,7 +769,8 @@ final class AutoboxingRewriter {
         declarator.setInitializer(convertKnown(element, componentType, target));
 
         Statement body = forEach.getBody();
-        BlockStmt bodyBlock = body instanceof BlockStmt b ? b : new BlockStmt(NodeList.nodeList(body));
+        BlockStmt bodyBlock =
+            body instanceof BlockStmt b ? b : new BlockStmt(NodeList.nodeList(body));
         bodyBlock.getStatements().add(0, new ExpressionStmt(variable));
 
         Expression compare = new BinaryExpr(new NameExpr(indexName),
@@ -856,13 +887,14 @@ final class AutoboxingRewriter {
             }
         }
         if (expression instanceof ConditionalExpr conditional) {
-            if (classifyConditional(conditional) == ConditionalKind.NUMERIC) {
+            ConditionalKind kind = classifyConditional(conditional);
+            if (kind == ConditionalKind.NUMERIC) {
                 String thenPrimitive = numericPrimitive(typeOf(conditional.getThenExpr()));
                 String elsePrimitive = numericPrimitive(typeOf(conditional.getElseExpr()));
                 if (thenPrimitive != null && elsePrimitive != null) {
                     return ResolvedPrimitiveType.byName(promote(thenPrimitive, elsePrimitive));
                 }
-            } else if (classifyConditional(conditional) == ConditionalKind.BOOLEAN) {
+            } else if (kind == ConditionalKind.BOOLEAN) {
                 return ResolvedPrimitiveType.BOOLEAN;
             }
         }
@@ -878,11 +910,8 @@ final class AutoboxingRewriter {
                     || operator == BinaryExpr.Operator.OR) {
                 return ResolvedPrimitiveType.BOOLEAN;
             }
-            if (operator == BinaryExpr.Operator.XOR
-                    && isBooleanLike(binary.getLeft()) && isBooleanLike(binary.getRight())) {
-                return ResolvedPrimitiveType.BOOLEAN;
-            }
-            if ((operator == BinaryExpr.Operator.BINARY_AND
+            if ((operator == BinaryExpr.Operator.XOR
+                    || operator == BinaryExpr.Operator.BINARY_AND
                     || operator == BinaryExpr.Operator.BINARY_OR)
                     && isBooleanLike(binary.getLeft()) && isBooleanLike(binary.getRight())) {
                 return ResolvedPrimitiveType.BOOLEAN;
@@ -1167,7 +1196,9 @@ final class AutoboxingRewriter {
 
     private static Expression unboxConditional(ConditionalExpr conditional, WrapperType wrapper,
             @Nullable String targetPrimitive) {
-        Expression field = new FieldAccessExpr(new EnclosedExpr(conditional),
+        // Clone the conditional: the caller replaces the original node, and the clone keeps a
+        // proper parent chain so the walk still rewrites conversions inside its branches.
+        Expression field = new FieldAccessExpr(new EnclosedExpr(conditional.clone()),
             wrapper.valueFieldName());
         if (targetPrimitive == null || targetPrimitive.equals(wrapper.primitiveName())) {
             return field;
@@ -1332,9 +1363,21 @@ final class AutoboxingRewriter {
     private static Expression cast(String primitiveName, Expression expression) {
         PrimitiveType type = new PrimitiveType(
             PrimitiveType.Primitive.valueOf(primitiveName.toUpperCase(Locale.ROOT)));
-        CastExpr cast = new CastExpr(type, expression);
+        Expression operand = needsParenthesesInCast(expression)
+                ? new EnclosedExpr(expression)
+                : expression;
+        CastExpr cast = new CastExpr(type, operand);
         copyRange(expression, cast);
         return cast;
+    }
+
+    /**
+     * A cast binds tighter than binary, conditional and assignment operators, so such an operand
+     * has to be enclosed when it becomes the operand of a generated cast.
+     */
+    private static boolean needsParenthesesInCast(Expression expression) {
+        return expression instanceof BinaryExpr || expression instanceof ConditionalExpr
+                || expression instanceof AssignExpr || expression instanceof LambdaExpr;
     }
 
     private static void copyRange(Node from, Node to) {

@@ -250,6 +250,29 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void unboxesArrayCreationDimension() {
+        String out = rewrite("void m() { Integer n = 2; int[] a = new int[n]; }");
+        assertTrue(out.contains("new int[n.value]"), out);
+    }
+
+    @Test
+    void unboxesAssertCondition() {
+        String out = rewrite("void m() { Boolean b = true; assert b; }");
+        assertTrue(out.contains("assert b.value;"), out);
+    }
+
+    @Test
+    void keepsAnnotatedArrayDimensions() {
+        String out = rewrite("""
+                @interface A { }
+                void m() { Integer @A [] a = { 1 }; }
+                """);
+        assertTrue(out.contains("@A"), out);
+        assertTrue(out.contains("new Integer @A []"), out);
+        assertTrue(out.contains("Integer.valueOf(1)"), out);
+    }
+
+    @Test
     void unboxesSwitchSelector() {
         String out = rewrite(
             "void m() { Integer a = 1; switch (a) { case 1: break; default: break; } }");
@@ -304,7 +327,8 @@ class AutoboxingTransformerTest {
 
     @Test
     void keepsBoxedBooleanEqualityByReference() {
-        String out = rewrite("void m() { Boolean b = true; Boolean c = false; boolean r = b == c; }");
+        String out =
+            rewrite("void m() { Boolean b = true; Boolean c = false; boolean r = b == c; }");
         assertFalse(out.contains("b.value"), out);
         assertFalse(out.contains("c.value"), out);
     }
@@ -402,6 +426,20 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void refusesIllegalBoxingCast() {
+        String out = rewrite("""
+                void m() {
+                    Object o = (Integer) (short) 1;
+                    Byte b = (Byte) 1;
+                    Character c = (Character) 65;
+                }
+                """);
+        assertFalse(out.contains("Integer.valueOf"), out);
+        assertFalse(out.contains("Byte.valueOf"), out);
+        assertFalse(out.contains("Character.valueOf"), out);
+    }
+
+    @Test
     void unboxesCast() {
         String out = rewrite("void m() { Integer a = 42; int i = (int) a; }");
         assertTrue(out.contains("int i = a.value;"), out);
@@ -417,6 +455,24 @@ class AutoboxingTransformerTest {
     void boxesCastToReference() {
         String out = rewrite("void m() { Object o = (Object) 42; }");
         assertTrue(out.contains("(Object) Integer.valueOf(42)"), out);
+    }
+
+    @Test
+    void boxesExactPrimitiveCastToReference() {
+        String out = rewrite("void m() { Object o = (Object) (short) 1; }");
+        assertTrue(out.contains("(Object) Short.valueOf((short) 1)"), out);
+    }
+
+    @Test
+    void parenthesisesNarrowingCastOfBinaryExpression() {
+        String out = rewrite("void m() { Byte b = 1 + 2; }");
+        assertTrue(out.contains("Byte.valueOf((byte) (1 + 2))"), out);
+    }
+
+    @Test
+    void parenthesisesConditionalCastOperand() {
+        String out = rewrite("void m() { boolean f = true; Object o = (Object) (f ? 1 : 2); }");
+        assertTrue(out.contains("(Object) Integer.valueOf((f ? 1 : 2))"), out);
     }
 
     @Test
@@ -501,6 +557,15 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void rewritesNestedConversionsInUnboxedConditional() {
+        String out = rewrite("""
+                Integer id(Integer x) { return x; }
+                void m() { Integer a = 1; boolean f = true; int i = f ? id(2) : a; }
+                """);
+        assertTrue(out.contains("(f ? id(Integer.valueOf(2)) : a).value"), out);
+    }
+
+    @Test
     void boxesNullConditionalBranch() {
         String out = rewrite("void m() { boolean f = true; Integer c = f ? null : 1; }");
         assertTrue(out.contains("f ? null : Integer.valueOf(1)"), out);
@@ -508,7 +573,8 @@ class AutoboxingTransformerTest {
 
     @Test
     void boxesPrimitiveBranchOfReferenceConditional() {
-        String out = rewrite("void m() { Object x = null; boolean f = true; Object c = f ? x : 1; }");
+        String out =
+            rewrite("void m() { Object x = null; boolean f = true; Object c = f ? x : 1; }");
         assertTrue(out.contains("f ? x : Integer.valueOf(1)"), out);
     }
 

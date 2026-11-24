@@ -4,15 +4,19 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -27,22 +31,19 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
- * Runs the autoboxing semantic corpus through KeY and compares the recorded
- * verdict with the expectations shared with
- * {@code script/autoboxing/check_java_semantics.sh} (which runs the same cases
- * under javac/java 21).
- * <p>
- * Cases are recorded in {@code corpus/cases.tsv} as
- * {@code id<TAB>kind<TAB>class<TAB>method}, where {@code kind} is
- * {@link #PROVABLE} or {@link #SPLIT}.
+ * Runs a corpus of boxing and unboxing programs through KeY and through the JDK. Each case is a
+ * complete Java class with a JML contract for {@code m} and a {@code main} that prints the value
+ * observed at run time. KeY must prove or split the contract as recorded, and the JDK run must
+ * print the recorded output, so the transformation can be compared against Java's own semantics
+ * without an external script or data file.
  */
 class AutoboxingSemanticsTest {
-    private static final String CORPUS = "/de/uka/ilkd/key/java/autoboxing/corpus/";
     private static final String PROVABLE = "PROVABLE";
     private static final String SPLIT = "SPLIT";
 
@@ -56,63 +57,666 @@ class AutoboxingSemanticsTest {
         ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setUseJML(true);
     }
 
-    @TestFactory
-    Stream<DynamicTest> corpus() throws IOException {
-        List<String[]> cases = readCases();
-        return cases.stream()
-                .map(row -> DynamicTest.dynamicTest(row[0], () -> runCase(row)));
+    private record SemanticCase(String name, String className, String kind,
+            String expectedOutput, String source) {
     }
 
-    private static List<String[]> readCases() throws IOException {
-        InputStream in = AutoboxingSemanticsTest.class.getResourceAsStream(CORPUS + "cases.tsv");
-        if (in == null) {
-            throw new IOException("corpus cases.tsv not found on the test classpath");
-        }
-        List<String[]> rows = new ArrayList<>();
-        try (in) {
-            String content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-            for (String line : content.split("\\R")) {
-                if (line.isBlank() || line.startsWith("#")) {
-                    continue;
+    private static final List<SemanticCase> CASES = List.of(
+        new SemanticCase("explicit-int", "ExplicitInt", PROVABLE, "int=42", """
+                public class ExplicitInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = Integer.valueOf(42);
+                        int i = a.intValue();
+                        //@ assert i == 42;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("int=" + m());
+                    }
                 }
-                rows.add(line.split("\t"));
-            }
-        }
-        return rows;
+                """),
+        new SemanticCase("explicit-long", "ExplicitLong", PROVABLE, "long=42", """
+                public class ExplicitLong {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static long m() {
+                        Long a = Long.valueOf(42L);
+                        long i = a.longValue();
+                        //@ assert i == 42L;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("long=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("explicit-null", "ExplicitNull", SPLIT, "npe", """
+                public class ExplicitNull {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = null;
+                        int i = a.intValue();
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        try {
+                            m();
+                            System.out.println("no-npe");
+                        } catch (NullPointerException e) {
+                            System.out.println("npe");
+                        }
+                    }
+                }
+                """),
+        new SemanticCase("uniform-int", "UniformInt", PROVABLE, "int=42", """
+                public class UniformInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = 42;
+                        int i = a;
+                        //@ assert i == 42;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("int=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("uniform-long", "UniformLong", PROVABLE, "long=42", """
+                public class UniformLong {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static long m() {
+                        Long a = 42L;
+                        long i = a;
+                        //@ assert i == 42L;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("long=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("null-int", "NullInt", SPLIT, "npe", """
+                public class NullInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = null;
+                        int i = a;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        try {
+                            m();
+                            System.out.println("no-npe");
+                        } catch (NullPointerException e) {
+                            System.out.println("npe");
+                        }
+                    }
+                }
+                """),
+        new SemanticCase("field-int", "FieldInt", PROVABLE, "field=42", """
+                public class FieldInt {
+                    Integer f;
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public int m() {
+                        f = 42;
+                        int i = f;
+                        //@ assert i == 42;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("field=" + new FieldInt().m());
+                    }
+                }
+                """),
+        new SemanticCase("return-int", "ReturnInt", PROVABLE, "return=42", """
+                public class ReturnInt {
+                    static Integer box() {
+                        return 42;
+                    }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        int i = box();
+                        //@ assert i == 42;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("return=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("arg-int", "ArgInt", PROVABLE, "arg=42", """
+                public class ArgInt {
+                    static int id(Integer x) {
+                        return x;
+                    }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        int i = id(42);
+                        //@ assert i == 42;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("arg=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("arg-null", "ArgNull", SPLIT, "npe", """
+                public class ArgNull {
+                    static int id(int x) {
+                        return x;
+                    }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = null;
+                        return id(a);
+                    }
+
+                    public static void main(String[] args) {
+                        try {
+                            m();
+                            System.out.println("no-npe");
+                        } catch (NullPointerException e) {
+                            System.out.println("npe");
+                        }
+                    }
+                }
+                """),
+        new SemanticCase("varargs-int", "VarargsInt", PROVABLE, "varargs=42", """
+                public class VarargsInt {
+                    static int first(Integer... xs) {
+                        return xs[0];
+                    }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        int i = first(42);
+                        //@ assert i == 42;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("varargs=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("promotion-int", "PromotionInt", PROVABLE, "promotion=43", """
+                public class PromotionInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = 42;
+                        int i = a + 1;
+                        //@ assert i == 43;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("promotion=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("promotion-long", "PromotionLong", PROVABLE, "long=43", """
+                public class PromotionLong {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static long m() {
+                        Integer a = 42;
+                        long v = a + 1L;
+                        //@ assert v == 43L;
+                        return v;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("long=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("condition-bool", "ConditionBool", PROVABLE, "condition=1", """
+                public class ConditionBool {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Boolean z = true;
+                        int i = 0;
+                        if (z) {
+                            i = 1;
+                        }
+                        //@ assert i == 1;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("condition=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("index-int", "IndexInt", PROVABLE, "index=6", """
+                public class IndexInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer idx = 1;
+                        int[] values = new int[] { 5, 6, 7 };
+                        int x = values[idx];
+                        //@ assert x == 6;
+                        return x;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("index=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("switch-int", "SwitchInt", PROVABLE, "switch=2", """
+                public class SwitchInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = 2;
+                        int r = 0;
+                        switch (a) {
+                            case 1: r = 1; break;
+                            case 2: r = 2; break;
+                            default: r = 0; break;
+                        }
+                        //@ assert r == 2;
+                        return r;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("switch=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("compound-int", "CompoundInt", PROVABLE, "compound=43", """
+                public class CompoundInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = 42;
+                        a += 1;
+                        int i = a;
+                        //@ assert i == 43;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("compound=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("postfix-int", "PostfixInt", PROVABLE, "postfix=85", """
+                public class PostfixInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = 42;
+                        int i = a++;
+                        int j = a;
+                        //@ assert i == 42;
+                        //@ assert j == 43;
+                        return i + j;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("postfix=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("prefix-int", "PrefixInt", PROVABLE, "prefix=43", """
+                public class PrefixInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = 42;
+                        int i = ++a;
+                        //@ assert i == 43;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("prefix=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("increment-sum", "IncrementSum", PROVABLE, "sum=129", """
+                public class IncrementSum {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = 42;
+                        int i = a++ + a++;
+                        int j = a;
+                        //@ assert i == 85;
+                        //@ assert j == 44;
+                        return i + j;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("sum=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("postfix-call", "PostfixCall", PROVABLE, "call=85", """
+                public class PostfixCall {
+                    static int id(int x) {
+                        return x;
+                    }
+
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = 42;
+                        int i = id(a++);
+                        int j = a;
+                        //@ assert i == 42;
+                        //@ assert j == 43;
+                        return i + j;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("call=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("cast-unbox", "CastUnbox", PROVABLE, "cast=42", """
+                public class CastUnbox {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = 42;
+                        int i = (int) a;
+                        //@ assert i == 42;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("cast=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("cast-object", "CastObject", PROVABLE, "object=nonnull", """
+                public class CastObject {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static void m() {
+                        Object o = (Object) 42;
+                        //@ assert o != null;
+                    }
+
+                    public static void main(String[] args) {
+                        m();
+                        System.out.println("object=nonnull");
+                    }
+                }
+                """),
+        new SemanticCase("number-int", "NumberInt", PROVABLE, "number=nonnull", """
+                public class NumberInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static void m() {
+                        Number n = 42;
+                        //@ assert n != null;
+                    }
+
+                    public static void main(String[] args) {
+                        m();
+                        System.out.println("number=nonnull");
+                    }
+                }
+                """),
+        new SemanticCase("conditional-int", "ConditionalInt", PROVABLE, "cond=42", """
+                public class ConditionalInt {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer a = 42;
+                        boolean f = true;
+                        int i = f ? a : 0;
+                        //@ assert i == 42;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("cond=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("conditional-box", "ConditionalBox", PROVABLE, "box=42", """
+                public class ConditionalBox {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        boolean f = false;
+                        Integer a = f ? 1 : Integer.valueOf(42);
+                        int i = a;
+                        //@ assert i == 42;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("box=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("array-literal", "ArrayLiteral", PROVABLE, "array=2", """
+                public class ArrayLiteral {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer[] xs = { 1, 2 };
+                        int i = xs[1];
+                        //@ assert i == 2;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("array=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("array-store", "ArrayStore", PROVABLE, "store=42", """
+                public class ArrayStore {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer[] xs = new Integer[2];
+                        xs[0] = 42;
+                        int i = xs[0];
+                        //@ assert i == 42;
+                        return i;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("store=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("array-unbox-store", "ArrayUnboxStore", PROVABLE, "unboxstore=42", """
+                public class ArrayUnboxStore {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        int[] a = new int[1];
+                        Integer x = 42;
+                        a[0] = x;
+                        //@ assert a[0] == 42;
+                        return a[0];
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("unboxstore=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("foreach-box", "ForeachBox", PROVABLE, "foreachbox=6", """
+                public class ForeachBox {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        int[] a = { 1, 2, 3 };
+                        int s = 0;
+                        for (Integer x : a) {
+                            s += x;
+                        }
+                        //@ assert s == 6;
+                        return s;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("foreachbox=" + m());
+                    }
+                }
+                """),
+        new SemanticCase("foreach-unbox", "ForeachUnbox", PROVABLE, "foreachunbox=6", """
+                public class ForeachUnbox {
+                    /*@ normal_behavior
+                      @ requires true;
+                      @ ensures true;
+                      @*/
+                    public static int m() {
+                        Integer[] a = { 1, 2, 3 };
+                        int s = 0;
+                        for (int x : a) {
+                            s += x;
+                        }
+                        //@ assert s == 6;
+                        return s;
+                    }
+
+                    public static void main(String[] args) {
+                        System.out.println("foreachunbox=" + m());
+                    }
+                }
+                """));
+
+    @TestFactory
+    Stream<DynamicTest> corpus() {
+        return CASES.stream()
+                .map(c -> DynamicTest.dynamicTest(c.name(), () -> runCase(c)));
     }
 
-    private static void runCase(String[] row) throws Exception {
-        assertTrue(row.length >= 4,
-            "cases.tsv row must have four columns: " + String.join("|", row));
-        String id = row[0];
-        String kind = row[1];
-        String className = row[2];
-        String method = row[3];
+    private static void runCase(SemanticCase c) throws Exception {
+        Path dir = Files.createTempDirectory("autoboxing-" + c.name());
+        try {
+            runInKey(c, dir);
+            runOnJdk(c, dir);
+        } finally {
+            deleteRecursively(dir);
+        }
+    }
 
-        Path source = sourcePath(id, className);
-        KeYEnvironment<?> env = KeYEnvironment.load(source);
+    private static void runInKey(SemanticCase c, Path dir) throws Exception {
+        Path file = dir.resolve(c.className() + ".java");
+        Files.writeString(file, c.source());
+        KeYEnvironment<?> env = KeYEnvironment.load(file);
         try {
             Contract contract = env.getProofContracts().stream()
-                    .filter(c -> c.getTarget() instanceof IProgramMethod pm
-                            && pm.getMethodDeclaration().getName().equals(method))
+                    .filter(candidate -> candidate.getTarget() instanceof IProgramMethod method
+                            && method.getMethodDeclaration().getName().equals("m"))
                     .findFirst()
                     .orElseThrow(() -> new AssertionError(
-                        "no contract for method " + method + " in " + id));
+                        "no contract for method m in " + c.name()));
             Proof proof = env.createProof(contract.createProofObl(env.getInitConfig()));
             ProofStarter starter = new ProofStarter(false);
             starter.init(proof);
             starter.start();
 
-            switch (kind) {
+            switch (c.kind()) {
                 case PROVABLE -> assertTrue(proof.closed(),
-                    () -> id + " must be provable, open goals: " + proof.openGoals());
+                    () -> c.name() + " must be provable, open goals: " + proof.openGoals());
                 case SPLIT -> {
-                    assertFalse(proof.closed(), () -> id + " must split, but closed");
+                    assertFalse(proof.closed(), () -> c.name() + " must split, but closed");
                     assertTrue(anyOpenGoalMentionsNull(proof),
-                        () -> id + " must leave a null obligation, open goals: "
+                        () -> c.name() + " must leave a null obligation, open goals: "
                             + proof.openGoals());
                 }
-                default -> fail("unknown corpus kind: " + kind);
+                default -> throw new AssertionError("unknown corpus kind: " + c.kind());
             }
         } finally {
             env.dispose();
@@ -133,12 +737,54 @@ class AutoboxingSemanticsTest {
         return false;
     }
 
-    private static Path sourcePath(String id, String className) throws URISyntaxException {
-        var url = AutoboxingSemanticsTest.class
-                .getResource(CORPUS + id + "/" + className + ".java");
-        if (url == null) {
-            throw new AssertionError("corpus source not found: " + id + "/" + className);
+    /**
+     * Compiles and runs the case with the JDK in this process, so the expected output is checked
+     * against the real Java semantics instead of being trusted as a literal.
+     */
+    private static void runOnJdk(SemanticCase c, Path dir) throws Exception {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        assertNotNull(compiler, "a JDK is required to run the Java baseline");
+        Path classes = Files.createDirectories(dir.resolve("classes"));
+        Path file = dir.resolve(c.className() + ".java");
+        Files.writeString(file, c.source());
+        int status = compiler.run(null, null, null, "--release", "21", "-proc:none",
+            "-d", classes.toString(), file.toString());
+        assertEquals(0, status, () -> c.name() + " must compile with javac");
+        assertEquals(c.expectedOutput(), runMain(c.className(), classes),
+            () -> c.name() + " must print the recorded output");
+    }
+
+    private static String runMain(String className, Path classes) throws Exception {
+        URL[] classPath = { classes.toUri().toURL() };
+        try (URLClassLoader loader =
+            new URLClassLoader(classPath, ClassLoader.getPlatformClassLoader())) {
+            Class<?> mainClass = loader.loadClass(className);
+            ByteArrayOutputStream captured = new ByteArrayOutputStream();
+            PrintStream original = System.out;
+            try (PrintStream out = new PrintStream(captured, true, StandardCharsets.UTF_8)) {
+                System.setOut(out);
+                try {
+                    mainClass.getMethod("main", String[].class)
+                            .invoke(null, (Object) new String[0]);
+                } catch (InvocationTargetException e) {
+                    throw new AssertionError(className + " threw " + e.getCause(), e.getCause());
+                }
+            } finally {
+                System.setOut(original);
+            }
+            return captured.toString(StandardCharsets.UTF_8).strip();
         }
-        return Paths.get(url.toURI());
+    }
+
+    private static void deleteRecursively(Path dir) throws Exception {
+        try (var paths = Files.walk(dir)) {
+            paths.sorted(Comparator.reverseOrder()).forEach(path -> {
+                try {
+                    Files.deleteIfExists(path);
+                } catch (Exception e) {
+                    // Best effort: the temp directory is outside the repository.
+                }
+            });
+        }
     }
 }
