@@ -227,6 +227,13 @@ public interface Visitor {
      */
     void performActionOnPatternCase(PatternCase x);
 
+    /**
+     * performs an action on the given element
+     *
+     * @param x the element to perform the action on
+     */
+    void performActionOnSwitchExpression(SwitchExpression x);
+
     void performActionOnCatch(Catch x);
 
     void performActionOnDefault(Default x);

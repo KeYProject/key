@@ -1648,6 +1648,22 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnSwitchExpression(SwitchExpression x) {
+        layouter.keyWord("switch");
+        layouter.print(" ");
+        beginMultilineBracket();
+        x.getSelector().visit(this);
+        endMultilineBracket();
+        layouter.print(" ");
+        beginBlock();
+        for (int i = 0; i < x.getBranchCount(); i++) {
+            layouter.nl();
+            x.getBranchAt(i).visit(this);
+        }
+        endBlock();
+    }
+
+    @Override
     public void performActionOnCatch(Catch x) {
         layouter.print(" ");
         layouter.keyWord("catch");
