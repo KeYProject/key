@@ -232,6 +232,59 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void unboxesBooleanOperandOfAnd() {
+        String out = rewrite(
+            "void m() { Boolean b = true; boolean c = false; boolean r = b & c; }");
+        assertTrue(out.contains("b.value & c"), out);
+        assertFalse(out.contains(").value"), out);
+    }
+
+    @Test
+    void unboxesBooleanOperandsOfOr() {
+        String out = rewrite(
+            "void m() { Boolean b = true; Boolean c = false; boolean r = b | c; }");
+        assertTrue(out.contains("b.value | c.value"), out);
+    }
+
+    @Test
+    void boxesBooleanResultOfAnd() {
+        String out = rewrite(
+            "void m() { Boolean b = true; Boolean c = false; Boolean r = b & c; }");
+        assertTrue(out.contains("Boolean.valueOf(b.value & c.value)"), out);
+    }
+
+    @Test
+    void unboxesBoxedEqualityWithPrimitive() {
+        String out = rewrite("void m() { Boolean b = true; boolean r = b == true; }");
+        assertTrue(out.contains("b.value == true"), out);
+    }
+
+    @Test
+    void keepsBoxedBooleanEqualityByReference() {
+        String out = rewrite("void m() { Boolean b = true; Boolean c = false; boolean r = b == c; }");
+        assertFalse(out.contains("b.value"), out);
+        assertFalse(out.contains("c.value"), out);
+    }
+
+    @Test
+    void compoundBooleanAndOnBoxedTarget() {
+        String out = rewrite("void m() { Boolean b = true; b &= true; }");
+        assertTrue(out.contains("b = Boolean.valueOf(b.value & true)"), out);
+    }
+
+    @Test
+    void compoundBooleanAndOnPrimitiveTarget() {
+        String out = rewrite("void m() { boolean b = true; Boolean c = false; b &= c; }");
+        assertTrue(out.contains("b = b & c.value"), out);
+    }
+
+    @Test
+    void leavesPrimitiveBooleanCompoundAssignment() {
+        String out = rewrite("void m() { boolean b = true; b &= false; }");
+        assertTrue(out.contains("b &= false"), out);
+    }
+
+    @Test
     void compoundAssignment() {
         String out = rewrite("void m() { Integer a = 42; a += 1; }");
         assertTrue(out.contains("Integer.valueOf"), out);
@@ -319,7 +372,73 @@ class AutoboxingTransformerTest {
     @Test
     void boxesNumericConditionalResult() {
         String out = rewrite("void m() { boolean f = true; Integer a = f ? 1 : 2; }");
-        assertTrue(out.contains("Integer.valueOf(f ? 1 : 2)"), out);
+        assertTrue(out.contains("f ? Integer.valueOf(1) : Integer.valueOf(2)"), out);
+    }
+
+    @Test
+    void boxesNumericConditionalBranch() {
+        String out = rewrite(
+            "void m() { Integer a = 1; boolean f = true; Integer c = f ? a : 2; }");
+        assertTrue(out.contains("f ? Integer.valueOf(a.value) : Integer.valueOf(2)"), out);
+    }
+
+    @Test
+    void keepsBothBoxedConditionalByReference() {
+        String out = rewrite(
+            "void m() { Integer a = 1; Integer b = 2; boolean f = true; Integer c = f ? a : b; }");
+        assertTrue(out.contains("f ? a : b"), out);
+        assertFalse(out.contains("a.value"), out);
+        assertFalse(out.contains("b.value"), out);
+    }
+
+    @Test
+    void keepsBothBoxedBooleanConditionalByReference() {
+        String out = rewrite("""
+                void m() {
+                    Boolean a = true; Boolean b = false; boolean f = true; Boolean c = f ? a : b;
+                }
+                """);
+        assertTrue(out.contains("f ? a : b"), out);
+        assertFalse(out.contains("a.value"), out);
+        assertFalse(out.contains("b.value"), out);
+    }
+
+    @Test
+    void unboxesBothBoxedConditionalResult() {
+        String out = rewrite(
+            "void m() { Integer a = 1; Integer b = 2; boolean f = true; int i = f ? a : b; }");
+        assertTrue(out.contains("(f ? a : b).value"), out);
+        assertFalse(out.contains("a.value"), out);
+        assertFalse(out.contains("b.value"), out);
+    }
+
+    @Test
+    void boxesNullConditionalBranch() {
+        String out = rewrite("void m() { boolean f = true; Integer c = f ? null : 1; }");
+        assertTrue(out.contains("f ? null : Integer.valueOf(1)"), out);
+    }
+
+    @Test
+    void boxesPrimitiveBranchOfReferenceConditional() {
+        String out = rewrite("void m() { Object x = null; boolean f = true; Object c = f ? x : 1; }");
+        assertTrue(out.contains("f ? x : Integer.valueOf(1)"), out);
+    }
+
+    @Test
+    void boxesBooleanConditionalBranch() {
+        String out = rewrite(
+            "void m() { Boolean a = true; boolean f = true; Boolean c = f ? a : false; }");
+        assertTrue(out.contains("f ? Boolean.valueOf(a.value) : Boolean.valueOf(false)"), out);
+    }
+
+    @Test
+    void boxesBooleanResultWithoutPrimitiveBranch() {
+        String out = rewrite("""
+                void m() {
+                    Boolean a = true; Boolean b = false; boolean f = true; Boolean c = f ? a : b;
+                }
+                """);
+        assertTrue(out.contains("c = f ? a : b"), out);
     }
 
     @Test

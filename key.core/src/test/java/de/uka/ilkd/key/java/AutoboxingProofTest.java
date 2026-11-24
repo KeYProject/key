@@ -599,6 +599,121 @@ class AutoboxingProofTest {
     }
 
     @Test
+    void bothBoxedConditionalKeepsReferenceIdentity(@TempDir Path dir) throws Exception {
+        prove("BothBoxedConditional", clazz("BothBoxedConditional", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = Integer.valueOf(1);
+                    Integer b = Integer.valueOf(42);
+                    boolean f = false;
+                    Integer c = f ? a : b;
+                    //@ assert c == b;
+                }
+                """), dir);
+    }
+
+    @Test
+    void bothBoxedConditionalSelectsNull(@TempDir Path dir) throws Exception {
+        prove("NullConditionalBranch", clazz("NullConditionalBranch", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Integer a = null;
+                    Integer b = Integer.valueOf(42);
+                    boolean f = true;
+                    Integer c = f ? a : b;
+                    //@ assert c == null;
+                }
+                """), dir);
+    }
+
+    @Test
+    void bothBoxedBooleanConditionalKeepsReferenceIdentity(@TempDir Path dir) throws Exception {
+        prove("BoxedBooleanConditional", clazz("BoxedBooleanConditional", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Boolean a = Boolean.valueOf(true);
+                    Boolean b = Boolean.valueOf(false);
+                    boolean f = false;
+                    Boolean c = f ? a : b;
+                    //@ assert c == b;
+                }
+                """), dir);
+    }
+
+    @Test
+    void boxesBooleanConditionalBranch(@TempDir Path dir) throws Exception {
+        prove("BooleanConditionalBranch", clazz("BooleanConditionalBranch", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Boolean a = Boolean.valueOf(true);
+                    boolean f = true;
+                    Boolean c = f ? a : false;
+                    boolean r = c;
+                    //@ assert r;
+                }
+                """), dir);
+    }
+
+    @Test
+    void booleanOperandsOfAnd(@TempDir Path dir) throws Exception {
+        prove("BooleanAnd", clazz("BooleanAnd", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Boolean b = Boolean.valueOf(true);
+                    boolean c = true;
+                    boolean r = b & c;
+                    //@ assert r;
+                }
+                """), dir);
+    }
+
+    @Test
+    void booleanEqualityWithPrimitive(@TempDir Path dir) throws Exception {
+        prove("BooleanEquality", clazz("BooleanEquality", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Boolean b = Boolean.valueOf(true);
+                    boolean r = b == true;
+                    //@ assert r;
+                }
+                """), dir);
+    }
+
+    @Test
+    void booleanCompoundAssignment(@TempDir Path dir) throws Exception {
+        prove("BooleanCompound", clazz("BooleanCompound", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures true;
+                  @*/
+                public static void m() {
+                    Boolean b = Boolean.valueOf(true);
+                    b &= true;
+                    boolean r = b;
+                    //@ assert r;
+                }
+                """), dir);
+    }
+
+    @Test
     void nullUnboxingSplits(@TempDir Path dir) throws Exception {
         Proof proof = proof("NullUnboxing", clazz("NullUnboxing", """
                 /*@ normal_behavior
