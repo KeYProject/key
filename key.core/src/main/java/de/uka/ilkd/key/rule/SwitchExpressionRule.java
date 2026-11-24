@@ -41,6 +41,8 @@ import de.uka.ilkd.key.java.ast.statement.Yield;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -151,7 +153,24 @@ public final class SwitchExpressionRule implements BuiltInRule {
                     + "condition).");
         }
 
-        final Lowered lowered = lower(switchExpression, services, ec);
+        ProgramVariable selectorVariable = null;
+        if (switchExpression.getSelector() instanceof ProgramVariable astVariable) {
+            // The contract's terms use the variable registered in the proof's namespaces; the
+            // program AST may hold an equivalent but distinct instance.
+            IProgramVariable lookedUp =
+                services.getNamespaces().programVariables().lookup(astVariable.name());
+            selectorVariable =
+                lookedUp instanceof ProgramVariable pv ? pv : astVariable;
+        }
+        final JTerm knownValue;
+        if (selectorVariable == null) {
+            knownValue = null;
+        } else {
+            JTerm selectorTerm = services.getTypeConverter()
+                    .convertToLogicElement(selectorVariable);
+            knownValue = selectorTerm == null ? null : knownSelectorValue(goal, selectorTerm);
+        }
+        final Lowered lowered = lower(switchExpression, services, ec, knownValue);
 
         // Replace the switch expression inside the active statement by its temporary.
         JavaBlock rewritten = JavaTools.replaceStatement(javaBlock, services, switchExpression,
@@ -239,7 +258,7 @@ public final class SwitchExpressionRule implements BuiltInRule {
     }
 
     private Lowered lower(SwitchExpression switchExpression, Services services,
-            @Nullable ExecutionContext ec) throws RuleAbortException {
+            @Nullable ExecutionContext ec, @Nullable JTerm knownValue) throws RuleAbortException {
         final var namer = services.getVariableNamer();
         final List<Statement> prelude = new ArrayList<>();
 
@@ -262,7 +281,7 @@ public final class SwitchExpressionRule implements BuiltInRule {
         prelude.add(KeYJavaASTFactory.declare(result, typeRef));
 
         final Statement cascade =
-            buildCascade(switchExpression, selectorVariable, result, services, ec);
+            buildCascade(switchExpression, selectorVariable, result, services, ec, knownValue);
         if (cascade != null) {
             prelude.add(cascade);
         }
@@ -279,8 +298,23 @@ public final class SwitchExpressionRule implements BuiltInRule {
 
     private Statement buildCascade(SwitchExpression switchExpression,
             ProgramVariable selectorVariable, ProgramVariable result, Services services,
-            @Nullable ExecutionContext ec) throws RuleAbortException {
+            @Nullable ExecutionContext ec, @Nullable JTerm knownValue) throws RuleAbortException {
         final int count = switchExpression.getBranchCount();
+
+        if (knownValue != null) {
+            // The antecedent pins the selector to a value: pick the arm directly.
+            for (int i = 0; i < count; i++) {
+                if (switchExpression.getBranchAt(i) instanceof Case caseBranch) {
+                    JTerm caseTerm = services.getTypeConverter()
+                            .convertToLogicElement(caseBranch.getExpression(), ec);
+                    if (caseTerm != null && caseTerm.equals(knownValue)) {
+                        return KeYJavaASTFactory
+                                .block(armBlock(switchExpression, i, result, services, ec,
+                                    "_case" + i));
+                    }
+                }
+            }
+        }
         final List<Statement> statements = new ArrayList<>(count);
 
         int defaultIndex = -1;
@@ -403,7 +437,7 @@ public final class SwitchExpressionRule implements BuiltInRule {
         final List<Statement> statements = new ArrayList<>();
         Expression value = yield.getExpression();
         if (value instanceof SwitchExpression inner) {
-            Lowered lowered = lower(inner, services, ec);
+            Lowered lowered = lower(inner, services, ec, null);
             statements.addAll(lowered.prelude);
             value = lowered.variable;
         } else if (value != null && findSwitchExpression(value) != null) {
@@ -445,6 +479,21 @@ public final class SwitchExpressionRule implements BuiltInRule {
             services.getJavaInfo().getKeYJavaType("java.lang.NullPointerException"));
         return KeYJavaASTFactory.ifThen(KeYJavaASTFactory.equalsNullOperator(selectorVariable),
             KeYJavaASTFactory.throwClause(exception));
+    }
+
+    private static @Nullable JTerm knownSelectorValue(Goal goal, JTerm selectorTerm) {
+        for (SequentFormula sequentFormula : goal.sequent().antecedent()) {
+            if (sequentFormula.formula() instanceof JTerm formula
+                    && formula.op() instanceof Equality) {
+                if (formula.sub(0).equals(selectorTerm)) {
+                    return formula.sub(1);
+                }
+                if (formula.sub(1).equals(selectorTerm)) {
+                    return formula.sub(0);
+                }
+            }
+        }
+        return null;
     }
 
     private static @Nullable StatementBlock findEnclosingBlock(ProgramElement element,
