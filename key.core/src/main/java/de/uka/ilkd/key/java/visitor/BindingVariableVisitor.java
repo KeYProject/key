@@ -27,11 +27,28 @@ import de.uka.ilkd.key.speclang.njml.JmlParser;
 import org.key_project.util.collection.ImmutableList;
 
 /**
+ * Computes the pattern variables that are definitely bound by an {@code instanceof} pattern for
+ * the two possible outcomes of a boolean expression, following the flow-scoping rules of JLS
+ * 6.3.1.1 to 6.3.1.7.
+ * <p>
+ * The result is consumed by the pattern-aware taclets: {@code #posBinding} and
+ * {@code #negBinding} turn the bindings into local-variable declarations (with the tested
+ * expression cast to the pattern type), so that a pattern variable is usable exactly in those
+ * branches in which the corresponding {@code instanceof} check has succeeded.
  *
  * @author Alexander Weigl
  * @version 1 (20.08.26)
  */
 public class BindingVariableVisitor {
+
+    /**
+     * The pattern variables that are guaranteed to be bound for the two outcomes of an
+     * expression, each mapped to the expression the variable is bound to (a cast of the tested
+     * expression).
+     *
+     * @param whenTrue the bindings that hold when the expression evaluates to {@code true}
+     * @param whenFalse the bindings that hold when the expression evaluates to {@code false}
+     */
     public record Bindings(Map<LocationVariable, Expression> whenTrue,
             Map<LocationVariable, Expression> whenFalse) {
         public Bindings(Map<LocationVariable, Expression> whenTrue,
@@ -50,6 +67,14 @@ public class BindingVariableVisitor {
         }
     }
 
+    /**
+     * Returns whether the given expression may bind pattern variables, i.e. whether it contains
+     * an {@code instanceof} pattern below {@code &&}, {@code ||}, {@code !}, the conditional
+     * operator or parentheses.
+     *
+     * @param e the expression to inspect
+     * @return {@code true} if the expression contains an {@code instanceof} pattern
+     */
     public static boolean binds(Expression e) {
         if (e instanceof InstanceofPattern io) {
             // §6.3.1.5 — a instanceof p
@@ -82,6 +107,17 @@ public class BindingVariableVisitor {
     }
 
 
+    /**
+     * Computes the pattern variables that are guaranteed to be bound when the given expression
+     * evaluates to {@code true} or to {@code false}, following JLS 6.3.1.1 to 6.3.1.7.
+     * <p>
+     * Bindings are only reported for the outcome in which they are guaranteed, so the result is
+     * conservative: a binding that cannot be determined statically is omitted rather than
+     * guessed.
+     *
+     * @param e the boolean expression to analyze
+     * @return the bindings for the true and the false outcome of {@code e}
+     */
     public static Bindings analyze(Expression e) {
         if (e instanceof InstanceofPattern io) {
             // §6.3.1.5 — a instanceof p
@@ -179,7 +215,10 @@ public class BindingVariableVisitor {
      *
      * @param bindings a binding according to {@link Bindings#whenTrue()} or
      *        {@link Bindings#whenFalse()}
-     * @return one fresh {@link LocalVariableDeclaration} per bound pattern variable
+     * @param services the services used to convert the bound expression for the identity
+     *        assumption
+     * @return one fresh {@link LocalVariableDeclaration} per bound pattern variable, each
+     *         followed by the assumption {@code expr == var} when it can be built
      */
     public static Statement[] toStatements(Map<LocationVariable, Expression> bindings,
             Services services) {
