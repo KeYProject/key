@@ -365,6 +365,25 @@ class AutoboxingTransformerTest {
         assertEquals(2, count(out, "a.value + 1"), out);
     }
 
+    @Test
+    void rewritesFloatPostfixStatement() {
+        String out = rewrite("void m(Float f) { f++; }");
+        assertTrue(out.contains("f = Float.valueOf(f.value + 1);"), out);
+    }
+
+    @Test
+    void rewritesDoublePostfixDecrementStatement() {
+        String out = rewrite("void m(Double d) { d--; }");
+        assertTrue(out.contains("d = Double.valueOf(d.value - 1);"), out);
+    }
+
+    @Test
+    void leavesFloatPostfixWithUsedValue() {
+        String out = rewrite("void m(Float f) { float x = f++; }");
+        assertFalse(out.contains("Float.valueOf"), out);
+        assertTrue(out.contains("float x = f++;"), out);
+    }
+
     private static int count(String text, String needle) {
         int result = 0;
         int index = 0;
@@ -574,6 +593,76 @@ class AutoboxingTransformerTest {
         String out = rewrite("void m() { Integer[] a = new Integer[1]; for (int x : a) { } }");
         assertTrue(out.contains("$keYIndex"), out);
         assertTrue(out.contains(".value"), out);
+    }
+
+    @Test
+    void evaluatesEnhancedForIterableOnce() {
+        String out = rewrite("""
+                void m() {
+                    int[] a = new int[1];
+                    for (Integer x : a) {
+                        a = new int[] { 9 };
+                    }
+                }
+                """);
+        assertTrue(out.contains("var $keYArray1 = a;"), out);
+        assertTrue(out.contains("$keYArray1[$keYIndex1]"), out);
+        assertTrue(out.contains("$keYArray1.length"), out);
+    }
+
+    @Test
+    void evaluatesParenthesisedIterableOnce() {
+        String out = rewrite("""
+                void m() {
+                    int[] a = new int[1];
+                    for (Integer x : (a)) { }
+                }
+                """);
+        assertTrue(out.contains("$keYArray"), out);
+    }
+
+    @Test
+    void evaluatesCallIterableOnce() {
+        String out = rewrite("""
+                int[] get() { return new int[1]; }
+                void m() { for (Integer x : get()) { } }
+                """);
+        assertTrue(out.contains("var $keYArray1 = get();"), out);
+    }
+
+    @Test
+    void keepsEnhancedForWithoutConversion() {
+        String out = rewrite("void m() { int[] a = new int[1]; for (int x : a) { } }");
+        assertTrue(out.contains("for (int x : a)"), out);
+        assertFalse(out.contains("$keYIndex"), out);
+        assertFalse(out.contains("$keYArray"), out);
+    }
+
+    @Test
+    void leavesEnhancedForWithoutSurroundingBlock() {
+        String out = rewrite("""
+                boolean m(boolean f, int[] a) {
+                    if (f)
+                        for (Integer x : a) { }
+                    return f;
+                }
+                """);
+        assertTrue(out.contains("for (Integer x : a)"), out);
+        assertFalse(out.contains("$keYArray"), out);
+    }
+
+    @Test
+    void doesNotCaptureUserIdentifiers() {
+        String out = rewrite("""
+                void m() {
+                    int[] a = new int[1];
+                    int $keYArray1 = 0;
+                    int $keYIndex1 = 0;
+                    for (Integer x : a) { }
+                }
+                """);
+        assertTrue(out.contains("var $keYArray1$1 = a;"), out);
+        assertTrue(out.contains("$keYArray1$1[$keYIndex1$1]"), out);
     }
 
     @Test

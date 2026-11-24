@@ -32,6 +32,7 @@ import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
+import com.github.javaparser.ast.expr.SimpleName;
 import com.github.javaparser.ast.expr.SwitchExpr;
 import com.github.javaparser.ast.expr.ThisExpr;
 import com.github.javaparser.ast.expr.UnaryExpr;
@@ -49,6 +50,7 @@ import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.type.Type;
+import com.github.javaparser.ast.type.VarType;
 import com.github.javaparser.resolution.declarations.ResolvedMethodLikeDeclaration;
 import com.github.javaparser.resolution.types.ResolvedPrimitiveType;
 import com.github.javaparser.resolution.types.ResolvedType;
@@ -82,6 +84,11 @@ final class AutoboxingRewriter {
 
     private void rewriteNode(Node node) {
         if (isJml(node)) {
+            return;
+        }
+        if (!(node instanceof CompilationUnit) && node.getParentNode().isEmpty()) {
+            // A replaced node stays reachable from the walker that called us, but is no longer
+            // part of the tree. Rewriting it again would visit moved children twice.
             return;
         }
         if (node instanceof VariableDeclarator declarator) {
@@ -448,7 +455,16 @@ final class AutoboxingRewriter {
         }
         String primitive = wrapper.primitiveName();
         if (!prefix && !isIntegral(primitive)) {
-            // The old-value arithmetic below is only exact for the integral types.
+            // The old-value arithmetic below is only exact for the integral types. For a
+            // floating-point postfix increment whose value is discarded, the old value does not
+            // matter, so it can still be rewritten directly.
+            if (isValueDiscarded(unary)) {
+                Expression read = new FieldAccessExpr(operand.clone(), wrapper.valueFieldName());
+                Expression changed = new BinaryExpr(read, new IntegerLiteralExpr("1"),
+                    increment ? BinaryExpr.Operator.PLUS : BinaryExpr.Operator.MINUS);
+                unary.replace(new AssignExpr(operand,
+                    boxPrimitive(wrapper, changed), AssignExpr.Operator.ASSIGN));
+            }
             return;
         }
 
@@ -474,6 +490,12 @@ final class AutoboxingRewriter {
                 || operator == UnaryExpr.Operator.PREFIX_DECREMENT
                 || operator == UnaryExpr.Operator.POSTFIX_INCREMENT
                 || operator == UnaryExpr.Operator.POSTFIX_DECREMENT;
+    }
+
+    /** Tells whether the value of the expression is thrown away, as in {@code f++;}. */
+    private static boolean isValueDiscarded(Expression expression) {
+        return expression.getParentNode().filter(parent -> parent instanceof ExpressionStmt)
+                .isPresent();
     }
 
     private static BinaryExpr.@Nullable Operator binaryOperator(AssignExpr.Operator operator) {
@@ -680,10 +702,6 @@ final class AutoboxingRewriter {
         if (iterableType == null || !iterableType.isArray()) {
             return;
         }
-        if (!isSimpleTarget(forEach.getIterable())) {
-            // Keep side-effecting iterables unchanged rather than evaluating them repeatedly.
-            return;
-        }
         ResolvedType componentType = iterableType.asArrayType().getComponentType();
         VariableDeclarationExpr variable = forEach.getVariable();
         if (variable.getVariables().size() != 1) {
@@ -696,20 +714,36 @@ final class AutoboxingRewriter {
             // loop contracts and \index/\values support) remains intact.
             return;
         }
-        Expression iterable = forEach.getIterable();
+        Node parent = forEach.getParentNode().orElse(null);
+        if (!(parent instanceof BlockStmt block)) {
+            // Without a surrounding block there is no place to bind the iterable to a new local.
+            // Leave the loop unchanged rather than evaluating the iterable once per iteration.
+            return;
+        }
 
-        int id = ++freshId;
-        String indexName = "$keYIndex" + id;
-        ArrayAccessExpr element = new ArrayAccessExpr(iterable.clone(), new NameExpr(indexName));
+        Expression iterable = forEach.getIterable();
+        String arrayName = freshName(block, "$keYArray" + (freshId + 1));
+        String indexName = freshName(block, "$keYIndex" + (freshId + 1));
+        ++freshId;
+
+        // Java evaluates the iterable exactly once, before the first iteration. Binding it to a
+        // local also makes parenthesised, cast and call iterables safe to use in the loop body.
+        VariableDeclarator arrayDeclarator =
+            new VariableDeclarator(new VarType(), arrayName, iterable.clone());
+        ExpressionStmt arrayStatement = new ExpressionStmt(
+            new VariableDeclarationExpr(arrayDeclarator));
+        copyRange(forEach, arrayStatement);
+
+        ArrayAccessExpr element =
+            new ArrayAccessExpr(new NameExpr(arrayName), new NameExpr(indexName));
         declarator.setInitializer(convertKnown(element, componentType, target));
 
         Statement body = forEach.getBody();
-        BlockStmt bodyBlock = body instanceof BlockStmt block ? block
-                : new BlockStmt(NodeList.nodeList(body));
+        BlockStmt bodyBlock = body instanceof BlockStmt b ? b : new BlockStmt(NodeList.nodeList(body));
         bodyBlock.getStatements().add(0, new ExpressionStmt(variable));
 
         Expression compare = new BinaryExpr(new NameExpr(indexName),
-            new FieldAccessExpr(iterable.clone(), "length"), BinaryExpr.Operator.LESS);
+            new FieldAccessExpr(new NameExpr(arrayName), "length"), BinaryExpr.Operator.LESS);
         Expression update =
             new UnaryExpr(new NameExpr(indexName), UnaryExpr.Operator.POSTFIX_INCREMENT);
         VariableDeclarationExpr indexDeclaration = new VariableDeclarationExpr(
@@ -719,8 +753,25 @@ final class AutoboxingRewriter {
             NodeList.nodeList(update), bodyBlock);
 
         copyRange(forEach, loop);
+        block.getStatements().add(block.getStatements().indexOf(forEach), arrayStatement);
         forEach.replace(loop);
+        rewriteNode(arrayStatement);
         rewriteNode(loop);
+    }
+
+    /**
+     * Returns a name derived from {@code base} that is not used anywhere in {@code block}, so the
+     * generated temporaries cannot capture or shadow a user identifier.
+     */
+    private static String freshName(BlockStmt block, String base) {
+        List<String> names =
+            block.findAll(SimpleName.class).stream().map(SimpleName::getIdentifier).toList();
+        String candidate = base;
+        int suffix = 0;
+        while (names.contains(candidate)) {
+            candidate = base + "$" + (++suffix);
+        }
+        return candidate;
     }
 
     private static @Nullable ResolvedType resolveType(Type type) {
