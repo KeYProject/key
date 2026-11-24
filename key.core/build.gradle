@@ -35,7 +35,7 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts,de.uka.ilkd.key.rule.conditions,de.uka.ilkd.key.rule.metaconstruct"
+    options.compilerArgs << "-Ajavadoc.packages=de.uka.ilkd.key.scripts,de.uka.ilkd.key.rule,de.uka.ilkd.key.rule.conditions,de.uka.ilkd.key.rule.metaconstruct"
 }
 
 // The target directory for JavaCC (parser generation)
