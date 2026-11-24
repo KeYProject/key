@@ -185,6 +185,8 @@ public final class SwitchExpressionRule implements BuiltInRule {
         if (update != null) {
             term = tb.apply(update, term);
         }
+        // Keep the labels of the original formula (e.g. the implicit 'assignable' clause).
+        term = tb.addLabel(term, formula.getLabels());
 
         ImmutableList<Goal> result = goal.split(1);
         result.head().changeFormula(new SequentFormula(term), occurrence);
