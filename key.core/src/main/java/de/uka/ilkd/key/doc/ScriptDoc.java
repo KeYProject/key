@@ -10,6 +10,7 @@ import java.util.List;
 
 import de.uka.ilkd.key.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.scripts.ProofScriptEngine;
+import de.uka.ilkd.key.scripts.meta.ArgumentsLifter;
 import de.uka.ilkd.key.scripts.meta.ProofScriptArgument;
 
 /**
@@ -43,7 +44,8 @@ public class ScriptDoc extends AbstractDocGenerator {
 
             var signature = new DocSignature(parameters, "", false);
             items.add(new DocItem(command.getName(),
-                cleanJavadoc(command.getDocumentation()),
+                cleanJavadoc(
+                    ArgumentsLifter.stripUsageSection(command.getDocumentation())),
                 List.of(signature),
                 command.getCategory(),
                 command.getClass().isAnnotationPresent(Deprecated.class)));

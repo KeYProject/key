@@ -29,6 +29,10 @@ public final class ArgumentsLifter {
     private static final String OPEN_BRACKET = "\u27e8";
     private static final String CLOSE_BRACKET = "\u27e9";
 
+    /// Header of the usage section that
+    /// [#extractDocumentation(String, Class, Class)] appends after the prose documentation.
+    private static final String USAGE_HEADER = "#### Usage: ";
+
     private ArgumentsLifter() {
     }
 
@@ -125,7 +129,7 @@ public final class ArgumentsLifter {
         }
 
 
-        sb.append("#### Usage: \n`").append(generateCommandUsage(command, parameterClazz))
+        sb.append(USAGE_HEADER).append("\n`").append(generateCommandUsage(command, parameterClazz))
                 .append("`\n\n");
 
         List<ProofScriptArgument> args = getSortedProofScriptArguments(parameterClazz);
@@ -184,6 +188,18 @@ public final class ArgumentsLifter {
         }
 
         return sb.toString();
+    }
+
+    /// Removes the usage and parameter section that
+    /// [#extractDocumentation(String, Class, Class)] appends to the prose documentation.
+    ///
+    /// @param documentation the documentation text as produced by
+    /// [#extractDocumentation(String, Class, Class)]
+    /// @return the prose documentation, i.e. the deprecation warning and the documentation of
+    /// the command and of its parameters class
+    public static String stripUsageSection(String documentation) {
+        int usage = documentation.indexOf(USAGE_HEADER);
+        return usage < 0 ? documentation : documentation.substring(0, usage).stripTrailing();
     }
 
     private static String ordinalStr(int post) {
