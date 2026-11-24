@@ -1,5 +1,5 @@
-// exceptionClass: ParserException
-// msgContains: no viable alternative at input 'normal_bevhaviour
+// exceptionClass: ProofInputException
+// msgContains: Encountered unexpected token
 // verbose: true
 // broken: false
 
