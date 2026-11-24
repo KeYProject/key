@@ -27,6 +27,8 @@ import de.uka.ilkd.key.rule.metaconstruct.TransformerMeta;
 import com.github.therapi.runtimejavadoc.ClassJavadoc;
 import com.github.therapi.runtimejavadoc.CommentFormatter;
 import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Generates the documentation of all code transformers (program transformers and term
@@ -36,6 +38,7 @@ import com.github.therapi.runtimejavadoc.RuntimeJavadoc;
  * @version 1 (22.10.26)
  */
 public class CodeTransformerDoc extends AbstractDocGenerator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CodeTransformerDoc.class);
 
     public static void main(String[] args) throws Exception {
         new CodeTransformerDoc().run(args[0], args[1]);
@@ -112,9 +115,12 @@ public class CodeTransformerDoc extends AbstractDocGenerator {
 
         return names.stream().map(className -> {
             try {
-                return (Class<?>) Class.forName(className);
+                // not initializing the class: the annotation and the constructors can be read
+                // without running the transformer's static initializer
+                return (Class<?>) Class.forName(className, false,
+                    CodeTransformerDoc.class.getClassLoader());
             } catch (ClassNotFoundException e) {
-                System.err.format("No class found %s possible%n", className);
+                LOGGER.warn("Skipping {}: the class cannot be loaded", className, e);
                 return null;
             }
         }).filter(Objects::nonNull).toList();
