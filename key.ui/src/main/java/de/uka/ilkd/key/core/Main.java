@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.prefs.Preferences;
-import javax.xml.parsers.ParserConfigurationException;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
@@ -25,7 +24,6 @@ import de.uka.ilkd.key.gui.lemmatagenerator.LemmataAutoModeOptions;
 import de.uka.ilkd.key.gui.lemmatagenerator.LemmataHandler;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.SkipMacro;
-import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.io.AutoSaver;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
@@ -46,7 +44,6 @@ import org.key_project.util.reflection.ClassLoaderUtil;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 import picocli.CommandLine;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -59,7 +56,6 @@ import picocli.CommandLine.Parameters;
  */
 public final class Main implements Callable<Integer> {
     private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-    private static Path workingDir;
 
 
     // @Option(names = "--help", description = "display this text")
@@ -310,8 +306,6 @@ public final class Main implements Callable<Integer> {
             setEnabledExperimentalFeatures(false);
         }
 
-        preProcessInput();
-
         printHeader();
 
         if (showProperties) {
@@ -533,45 +527,6 @@ public final class Main implements Callable<Integer> {
         }
         Runtime.getRuntime().addShutdownHook(new Thread(() -> IOUtil.delete(tempDir)));
         return tempDir;
-    }
-
-    /**
-     * Used by {@link de.uka.ilkd.key.gui.KeYFileChooser} (and potentially others)
-     * to determine
-     * working directory. In case there is at least one location (i.e. a file or
-     * directory)
-     * specified as command line argument, working directory is determined based on
-     * first location
-     * that occurred in the list of arguments. Otherwise, value of
-     * System.getProperty("user.home")
-     * is used to determine working directory.
-     *
-     * @return {@link File} object representing working directory.
-     */
-    public static Path getWorkingDir() {
-        return workingDir;
-    }
-
-
-    /**
-     * Perform necessary actions before loading any problem files. Currently only
-     * performs RIFL to JML transformation.
-     */
-    private void preProcessInput()
-            throws ParserException, IOException, ParserConfigurationException, SAXException {
-        if (inputFiles != null && !inputFiles.isEmpty()) {
-            Path f = inputFiles.get(0);
-            if (Files.isDirectory(f)) {
-                workingDir = f;
-            } else {
-                workingDir = f.getParent();
-                if (workingDir == null) {
-                    workingDir = IOUtil.getCurrentDirectory();
-                }
-            }
-        } else {
-            workingDir = IOUtil.getCurrentDirectory();
-        }
     }
 
     private static Path EXAMPLE_DIR = null;

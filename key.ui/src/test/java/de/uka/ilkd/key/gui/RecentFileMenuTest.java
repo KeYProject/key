@@ -64,4 +64,46 @@ class RecentFileMenuTest {
         Assertions.assertThat(menu2.getMostRecent()).isEqualTo(menu.getMostRecent());
         Assertions.assertThat(menu2.getEntries()).containsExactlyElementsOf(menu.getEntries());
     }
+
+    @Test
+    void recentFoldersAreUniqueAndMostRecentFirst(@TempDir Path tmp) throws Exception {
+        Path folderA = Files.createDirectory(tmp.resolve("a"));
+        Path folderB = Files.createDirectory(tmp.resolve("b"));
+        Path fileA1 = Files.createFile(folderA.resolve("A1.key"));
+        Path fileB = Files.createFile(folderB.resolve("B.key"));
+        Path fileA2 = Files.createFile(folderA.resolve("A2.key"));
+
+        RecentFileMenu menu = new RecentFileMenu(null);
+        menu.addRecentFileNoSave(fileA1.toAbsolutePath().toString(), null, false, null);
+        menu.addRecentFileNoSave(fileB.toAbsolutePath().toString(), null, false, null);
+        menu.addRecentFileNoSave(fileA2.toAbsolutePath().toString(), null, false, null);
+
+        Assertions.assertThat(menu.getRecentFolders())
+                .containsExactly(folderA.toFile().getAbsoluteFile(),
+                    folderB.toFile().getAbsoluteFile());
+    }
+
+    @Test
+    void recentFoldersSkipDirectoriesThatNoLongerExist(@TempDir Path tmp) throws Exception {
+        Path folder = Files.createDirectory(tmp.resolve("gone"));
+        Path file = Files.createFile(folder.resolve("G.key"));
+
+        RecentFileMenu menu = new RecentFileMenu(null);
+        menu.addRecentFileNoSave(file.toAbsolutePath().toString(), null, false, null);
+        Files.delete(file);
+        Files.delete(folder);
+
+        Assertions.assertThat(menu.getRecentFolders()).isEmpty();
+    }
+
+    @Test
+    void recentDirectoryIsReturnedAsItself(@TempDir Path tmp) throws Exception {
+        Path folder = Files.createDirectory(tmp.resolve("project"));
+
+        RecentFileMenu menu = new RecentFileMenu(null);
+        menu.addRecentFileNoSave(folder.toAbsolutePath().toString(), null, false, null);
+
+        Assertions.assertThat(menu.getRecentFolders())
+                .containsExactly(folder.toFile().getAbsoluteFile());
+    }
 }

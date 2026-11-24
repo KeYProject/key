@@ -2,7 +2,7 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package org.key_project.util.java;
+package org.key_project.ui.util;
 
 
 import java.awt.*;

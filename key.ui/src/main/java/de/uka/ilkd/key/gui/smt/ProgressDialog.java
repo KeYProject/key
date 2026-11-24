@@ -19,7 +19,7 @@ import de.uka.ilkd.key.gui.smt.ProgressModel.ProcessColumn.ProcessData;
 import de.uka.ilkd.key.gui.smt.ProgressTable.ProgressTableListener;
 import de.uka.ilkd.key.smt.SMTFocusResults;
 
-import org.key_project.util.java.SwingUtil;
+import org.key_project.ui.util.SwingUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
