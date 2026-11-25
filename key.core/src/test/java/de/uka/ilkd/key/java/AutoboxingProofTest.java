@@ -770,6 +770,35 @@ class AutoboxingProofTest {
     }
 
     @Test
+    void arrayElementIncrement(@TempDir Path dir) throws Exception {
+        prove("ArrayElementIncrement", clazz("ArrayElementIncrement", """
+                /*@ normal_behavior
+                  @ requires true;
+                  @ ensures \\result == 6;
+                  @*/
+                public static int m() {
+                    Integer[] arr = new Integer[] { Integer.valueOf(5) };
+                    arr[0]++;
+                    return arr[0];
+                }
+                """), dir);
+    }
+
+    @Test
+    void constantVariableNarrowing(@TempDir Path dir) throws Exception {
+        prove("ConstantVariable", clazz("ConstantVariable", """
+                /*@ normal_behavior
+                  @ ensures \\result.value == 5;
+                  @*/
+                public static Byte m() {
+                    final int K = 5;
+                    Byte r = K;
+                    return r;
+                }
+                """), dir);
+    }
+
+    @Test
     void nullUnboxingSplits(@TempDir Path dir) throws Exception {
         Proof proof = proof("NullUnboxing", clazz("NullUnboxing", """
                 /*@ normal_behavior

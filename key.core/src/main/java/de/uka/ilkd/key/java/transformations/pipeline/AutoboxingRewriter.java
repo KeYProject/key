@@ -31,6 +31,7 @@ import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.FieldAccessExpr;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.LambdaExpr;
+import com.github.javaparser.ast.expr.LiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.ObjectCreationExpr;
@@ -566,25 +567,26 @@ final class AutoboxingRewriter {
             return;
         }
         String primitive = wrapper.primitiveName();
-        if (!prefix && !isIntegral(primitive)) {
-            // The old-value arithmetic below is only exact for the integral types. For a
-            // floating-point postfix increment whose value is discarded, the old value does not
-            // matter, so it can still be rewritten directly.
-            if (isValueDiscarded(unary)) {
-                Expression read = new FieldAccessExpr(operand.clone(), wrapper.valueFieldName());
-                Expression changed = new BinaryExpr(read, new IntegerLiteralExpr("1"),
-                    increment ? BinaryExpr.Operator.PLUS : BinaryExpr.Operator.MINUS);
-                unary.replace(new AssignExpr(operand,
-                    boxPrimitive(wrapper, changed), AssignExpr.Operator.ASSIGN));
-            }
+        boolean discarded = isValueDiscarded(unary);
+        if (!prefix && !isIntegral(primitive) && !discarded) {
+            // The old-value arithmetic below is only exact for the integral types. A
+            // floating-point postfix increment whose value is used is left unchanged.
             return;
         }
 
         Expression read = new FieldAccessExpr(operand.clone(), wrapper.valueFieldName());
         Expression changed = new BinaryExpr(read, new IntegerLiteralExpr("1"),
             increment ? BinaryExpr.Operator.PLUS : BinaryExpr.Operator.MINUS);
+        Expression narrowed = isIntegral(primitive) ? cast(primitive, changed) : changed;
         AssignExpr assignment = new AssignExpr(operand,
-            boxPrimitive(wrapper, cast(primitive, changed)), AssignExpr.Operator.ASSIGN);
+            boxPrimitive(wrapper, narrowed), AssignExpr.Operator.ASSIGN);
+
+        if (discarded) {
+            // Prefix and postfix have the same effect when the value is not used, and only an
+            // assignment is a legal Java expression statement.
+            unary.replace(assignment);
+            return;
+        }
         Expression value = new FieldAccessExpr(new EnclosedExpr(assignment),
             wrapper.valueFieldName());
 
@@ -633,6 +635,42 @@ final class AutoboxingRewriter {
         }
         if (target instanceof FieldAccessExpr field) {
             return isSimpleTarget(field.getScope());
+        }
+        if (target instanceof ArrayAccessExpr access) {
+            // The rewritten target reads the array and index twice; that is only observable
+            // when they have side effects.
+            return isSimpleTarget(access.getName()) && isSideEffectFree(access.getIndex());
+        }
+        return false;
+    }
+
+    /** Tells whether evaluating the expression more than once can be observed. */
+    private static boolean isSideEffectFree(Expression expression) {
+        if (expression instanceof NameExpr || expression instanceof ThisExpr
+                || expression instanceof LiteralExpr) {
+            return true;
+        }
+        if (expression instanceof FieldAccessExpr field) {
+            return isSimpleTarget(field.getScope());
+        }
+        if (expression instanceof EnclosedExpr enclosed) {
+            return isSideEffectFree(enclosed.getInner());
+        }
+        if (expression instanceof ArrayAccessExpr access) {
+            return isSimpleTarget(access.getName()) && isSideEffectFree(access.getIndex());
+        }
+        if (expression instanceof UnaryExpr unary) {
+            return switch (unary.getOperator()) {
+                case PLUS, MINUS, BITWISE_COMPLEMENT, LOGICAL_COMPLEMENT ->
+                    isSideEffectFree(unary.getExpression());
+                default -> false;
+            };
+        }
+        if (expression instanceof BinaryExpr binary && !isStringConcat(binary)) {
+            return isSideEffectFree(binary.getLeft()) && isSideEffectFree(binary.getRight());
+        }
+        if (expression instanceof CastExpr cast && cast.getType().isPrimitiveType()) {
+            return isSideEffectFree(cast.getExpression());
         }
         return false;
     }

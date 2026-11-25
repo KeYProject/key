@@ -4,17 +4,24 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.java.transformations;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 import com.github.javaparser.StaticJavaParser;
+import com.github.javaparser.ast.Modifier;
+import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.key.KeyEscapeExpression;
 import com.github.javaparser.ast.key.KeyPassiveExpression;
 import com.github.javaparser.ast.key.sv.KeyExpressionSV;
 import com.github.javaparser.ast.stmt.ExplicitConstructorInvocationStmt;
 import com.github.javaparser.ast.visitor.GenericVisitorAdapter;
+import org.jspecify.annotations.Nullable;
 
 /**
  * An evaluator for constant expression in Java.
@@ -79,6 +86,10 @@ public class ConstantExpressionEvaluator {
             extends GenericVisitorAdapter<Object, Void> {
 
         private final Queue<FieldDeclaration> path = new LinkedList<>();
+
+        /** Guards against a constant-variable initializer that refers to itself. */
+        private final Set<Node> constantPath =
+            Collections.newSetFromMap(new IdentityHashMap<>());
 
         @Override
         public Object visit(ArrayAccessExpr n, Void arg) {
@@ -289,7 +300,73 @@ public class ConstantExpressionEvaluator {
 
         @Override
         public Object visit(NameExpr n, Void arg) {
+            try {
+                var ast = n.resolve().toAst().orElse(null);
+                VariableDeclarator declarator = declarationOf(ast, n.getNameAsString());
+                if (declarator != null && isConstantVariable(declarator)) {
+                    if (!constantPath.add(declarator)) {
+                        return null;
+                    }
+                    try {
+                        return declarator.getInitializer()
+                                .map(initializer -> initializer.accept(this, arg))
+                                .orElse(null);
+                    } finally {
+                        constantPath.remove(declarator);
+                    }
+                }
+            } catch (RuntimeException e) {
+                // Not resolvable (or not a constant variable): not a compile-time constant.
+            }
             return super.visit(n, arg);
+        }
+
+        /** Resolves the declarator that {@code toAst()} represents for a variable reference. */
+        private static @Nullable VariableDeclarator declarationOf(@Nullable Object ast,
+                String name) {
+            if (ast instanceof VariableDeclarator declarator) {
+                return declarator;
+            }
+            if (ast instanceof VariableDeclarationExpr declaration) {
+                return declaration.getVariables().stream()
+                        .filter(variable -> variable.getNameAsString().equals(name))
+                        .findFirst()
+                        .orElse(null);
+            }
+            if (ast instanceof FieldDeclaration field) {
+                return field.getVariables().stream()
+                        .filter(variable -> variable.getNameAsString().equals(name))
+                        .findFirst()
+                        .orElse(null);
+            }
+            return null;
+        }
+
+        /**
+         * A constant variable is final and of a primitive type or {@code String} (JLS 4.12.4).
+         */
+        private static boolean isConstantVariable(VariableDeclarator declarator) {
+            var parent = declarator.getParentNode().orElse(null);
+            boolean isFinal;
+            if (parent instanceof FieldDeclaration field) {
+                isFinal = field.isFinal();
+            } else if (parent instanceof VariableDeclarationExpr declaration) {
+                isFinal = declaration.getModifiers().stream()
+                        .anyMatch(
+                            modifier -> modifier.getKeyword() == Modifier.DefaultKeyword.FINAL);
+            } else {
+                return false;
+            }
+            if (!isFinal) {
+                return false;
+            }
+            try {
+                var type = declarator.getType().resolve();
+                return type.isPrimitive() || (type.isReferenceType()
+                        && "java.lang.String".equals(type.asReferenceType().getQualifiedName()));
+            } catch (RuntimeException e) {
+                return false;
+            }
         }
 
         @Override

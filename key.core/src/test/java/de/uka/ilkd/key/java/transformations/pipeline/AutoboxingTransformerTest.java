@@ -772,6 +772,45 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void rewritesArrayElementIncrement() {
+        String out = rewrite("void m(Integer[] arr) { arr[0]++; }");
+        assertTrue(out.contains("arr[0] = Integer.valueOf"), out);
+        assertTrue(out.contains("arr[0].value + 1"), out);
+    }
+
+    @Test
+    void rewritesArrayElementCompoundAssignment() {
+        String out = rewrite("void m(Integer[] arr) { arr[0] += 1; }");
+        assertTrue(out.contains("arr[0] = Integer.valueOf"), out);
+        assertTrue(out.contains("arr[0].value + 1"), out);
+    }
+
+    @Test
+    void keepsArrayElementIncrementWithSideEffectingIndex() {
+        String out = rewrite("void m(Integer[] arr, int i) { arr[i++]++; }");
+        assertTrue(out.contains("arr[i++]++"), out);
+        assertFalse(out.contains("Integer.valueOf"), out);
+    }
+
+    @Test
+    void narrowsConstantVariable() {
+        String out = rewrite("Byte m() { final int K = 5; Byte r = K; return r; }");
+        assertTrue(out.contains("Byte r = Byte.valueOf((byte) K);"), out);
+    }
+
+    @Test
+    void doesNotNarrowNonFinalVariable() {
+        String out = rewrite("Byte m() { int K = 5; Byte r = K; return r; }");
+        assertFalse(out.contains("Byte.valueOf"), out);
+    }
+
+    @Test
+    void doesNotNarrowOutOfRangeConstantVariable() {
+        String out = rewrite("Byte m() { final int K = 200; Byte r = K; return r; }");
+        assertFalse(out.contains("Byte.valueOf"), out);
+    }
+
+    @Test
     void doesNotCaptureUserIdentifiers() {
         String out = rewrite("""
                 void m() {
