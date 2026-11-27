@@ -608,8 +608,17 @@ final class AutoboxingRewriter {
 
     /** Tells whether the value of the expression is thrown away, as in {@code f++;}. */
     private static boolean isValueDiscarded(Expression expression) {
-        return expression.getParentNode().filter(parent -> parent instanceof ExpressionStmt)
-                .isPresent();
+        Node current = expression;
+        Node parent;
+        while ((parent = current.getParentNode().orElse(null)) instanceof EnclosedExpr) {
+            current = parent;
+        }
+        if (parent instanceof ExpressionStmt) {
+            return true;
+        }
+        Node target = current;
+        return parent instanceof ForStmt forStmt
+                && forStmt.getUpdate().stream().anyMatch(update -> update == target);
     }
 
     private static BinaryExpr.@Nullable Operator binaryOperator(AssignExpr.Operator operator) {

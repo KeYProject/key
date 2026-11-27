@@ -799,6 +799,22 @@ class AutoboxingProofTest {
     }
 
     @Test
+    void forUpdateIncrement(@TempDir Path dir) throws Exception {
+        prove("ForUpdate", clazz("ForUpdate", """
+                /*@ normal_behavior
+                  @ ensures \\result == 3;
+                  @*/
+                public static int m() {
+                    int s = 0;
+                    for (Integer i = 0; i < 3; i++) {
+                        s++;
+                    }
+                    return s;
+                }
+                """), dir, true);
+    }
+
+    @Test
     void nullUnboxingSplits(@TempDir Path dir) throws Exception {
         Proof proof = proof("NullUnboxing", clazz("NullUnboxing", """
                 /*@ normal_behavior

@@ -465,6 +465,22 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void rewritesForUpdateIncrement() {
+        String out = rewrite(
+            "int m() { int s = 0; for (Integer i = 0; i < 3; i++) { s++; } return s; }");
+        assertTrue(out.contains("i = Integer.valueOf((int) (i.value + 1))"), out);
+        assertFalse(out.contains(".value - 1"), out);
+    }
+
+    @Test
+    void rewritesForUpdatePrefixIncrement() {
+        String out = rewrite(
+            "int m() { int s = 0; for (Integer i = 0; i < 3; ++i) { s++; } return s; }");
+        assertTrue(out.contains("i = Integer.valueOf((int) (i.value + 1))"), out);
+        assertFalse(out.contains(").value"), out);
+    }
+
+    @Test
     void unboxesCast() {
         String out = rewrite("void m() { Integer a = 42; int i = (int) a; }");
         assertTrue(out.contains("int i = a.value;"), out);
