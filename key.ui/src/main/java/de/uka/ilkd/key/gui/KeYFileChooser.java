@@ -6,24 +6,26 @@ package de.uka.ilkd.key.gui;
 
 import java.awt.Component;
 import java.io.File;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import de.uka.ilkd.key.core.Main;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import org.key_project.util.java.IOUtil;
 
+
 /**
- * Extends the usual Swing file chooser by a bookmark panel and predefined filters. This class is a
- * singleton, the only instance is created lazily and can be obtained via
- * {@link #getFileChooser(String)}. This has the benefit of remembering the last visited directory
- * across different load/save actions of the user. To keep it simple, the choosable file filters
- * contain all file extensions that are relevant in KeY. The predefined constants can be used to set
- * the corresponding filter via {@link #setFileFilter(FileFilter)}. Usually it is a good idea to do
- * this right after calling {@link #getFileChooser(String)}.
+ * Extends the usual Swing file chooser by a bookmark panel and predefined filters. Obtain an
+ * instance via {@link #getFileChooser(String)}; every call creates a fresh chooser. To remember the
+ * last visited directory across different load/save actions of the user, the selected path is
+ * stored in the proof-independent settings. The choosable file filters contain all file extensions
+ * that are relevant in KeY. The predefined constants can be used to set the corresponding filter
+ * via {@link #setFileFilter(FileFilter)}. Usually it is a good idea to do this right after calling
+ * {@link #getFileChooser(String)}.
  *
  * @author Wolfram Pfeifer: refactoring: extend JFileChooser instead of wrapping it (avoids the need
  *         for delegating many methods)
@@ -94,8 +96,6 @@ public final class KeYFileChooser extends JFileChooser {
     /** The Constant for the home directory. */
     private final static File HOME_DIR = IOUtil.getHomeDirectory();
 
-    private static KeYFileChooser INSTANCE;
-
     /** indicates whether the dialog is used for saving or loading */
     private boolean saveDialog;
 
@@ -131,6 +131,18 @@ public final class KeYFileChooser extends JFileChooser {
         return p;
     }
 
+    /**
+     * Adds a bookmark panel that also displays the folders of the given recent files.
+     *
+     * @param recentFiles the recent files to derive folder shortcuts from
+     * @return the added bookmark panel
+     */
+    public KeYFileChooserBookmarkPanel addBookmarkPanel(List<File> recentFiles) {
+        var p = new KeYFileChooserBookmarkPanel(this, recentFiles);
+        getAccessory().add(p);
+        return p;
+    }
+
     public boolean useCompression() {
         return getSelectedFile().getName().endsWith(".proof.gz");
     }
@@ -138,9 +150,13 @@ public final class KeYFileChooser extends JFileChooser {
     @Override
     public void approveSelection() {
         File file = getSelectedFile();
+        if (file == null) {
+            return;
+        }
         if (saveDialog && file.exists() && showOverwriteDialog(file) != JOptionPane.YES_OPTION) {
             return;
         }
+        ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings().setLastUsedPath(file);
         super.approveSelection();
     }
 
@@ -299,27 +315,60 @@ public final class KeYFileChooser extends JFileChooser {
     }
 
     /**
-     * Gets <b>the</b> file chooser for the prover.
-     *
-     * The chooser is created lazily when first requested. It points to the directory of the command
-     * line argument (if present), otherwise to the user's home directory.
+     * Gets a fresh file chooser for the prover. It points to the directory given by
+     * {@code initDir} and shows the bookmark panel without recent-file folders.
      *
      * @param title the title of the key file chooser
-     *
+     * @param initDir the folder to start the selection process
      * @return the key file chooser
      */
+    public static KeYFileChooser getFileChooser(String title, File initDir) {
+        return getFileChooser(title, initDir, List.of());
+    }
+
+    /**
+     * Gets a fresh file chooser for the prover. It points to the directory given by
+     * {@code initDir} and shows the bookmark panel with the folders of the given recent files.
+     *
+     * @param title the title of the key file chooser
+     * @param initDir the folder to start the selection process
+     * @param recentFiles the recent files to derive folder shortcuts from
+     * @return the key file chooser
+     */
+    public static KeYFileChooser getFileChooser(String title, File initDir,
+            List<File> recentFiles) {
+        var fc = new KeYFileChooser(initDir);
+        fc.setDialogTitle(title);
+        fc.prepare();
+        fc.addBookmarkPanel(recentFiles);
+        return fc;
+    }
+
+    /**
+     * Convenience overload of {@link #getFileChooser(String, File)} that starts from the last used
+     * path remembered in the settings instead of an explicit start folder.
+     *
+     * @param title the title of the key file chooser
+     * @return the key file chooser, as described in {@link #getFileChooser(String, File)}
+     * @see #getFileChooser(String, File)
+     */
     public static KeYFileChooser getFileChooser(String title) {
-        if (INSTANCE == null) {
-            File initDir = Main.getWorkingDir().toFile();
-            INSTANCE = new KeYFileChooser(initDir);
+        return getFileChooser(title, List.of());
+    }
 
-            // not the best design probably: this constructor has the side effect of connecting
-            // the new bookmark panel to the file chooser.
-            INSTANCE.addBookmarkPanel();
-        }
-
-        INSTANCE.setDialogTitle(title);
-        INSTANCE.prepare();
-        return INSTANCE;
+    /**
+     * Convenience overload of {@link #getFileChooser(String, File, List)} that starts from the last
+     * used path remembered in the settings instead of an explicit start folder.
+     *
+     * @param title the title of the key file chooser
+     * @param recentFiles the recent files to derive folder shortcuts from
+     * @return the key file chooser, as described in {@link #getFileChooser(String, File, List)}
+     * @see #getFileChooser(String, File, List)
+     */
+    public static KeYFileChooser getFileChooser(String title, List<File> recentFiles) {
+        return getFileChooser(title,
+            ProofIndependentSettings.DEFAULT_INSTANCE.getGeneralSettings()
+                    .getLastUsedPathEnsureFolder(),
+            recentFiles);
     }
 }

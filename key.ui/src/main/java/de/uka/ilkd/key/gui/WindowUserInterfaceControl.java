@@ -48,9 +48,9 @@ import org.key_project.prover.engine.ProverCore;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
+import org.key_project.ui.util.SwingUtil;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Pair;
-import org.key_project.util.java.SwingUtil;
 
 import org.antlr.v4.runtime.misc.ParseCancellationException;
 import org.jspecify.annotations.Nullable;
@@ -411,7 +411,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @SuppressWarnings("deprecation")
     public Path saveProof(Proof proof, String fileExtension) {
         final MainWindow mainWindow = MainWindow.getInstance();
-        final KeYFileChooser fc = KeYFileChooser.getFileChooser("Choose filename to save proof");
+        final KeYFileChooser fc = KeYFileChooser.getFileChooser(
+            "Choose filename to save proof", mainWindow.getRecentFiles().getRecentFolders());
         fc.setFileFilter(KeYFileChooser.DEFAULT_FILTER);
 
         Pair<Path, String> f = fileName(proof, fileExtension);
@@ -455,8 +456,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @SuppressWarnings("deprecation")
     public void saveProofBundle(Proof proof) {
         final MainWindow mainWindow = MainWindow.getInstance();
-        final KeYFileChooser fileChooser =
-            KeYFileChooser.getFileChooser("Choose filename to save proof");
+        final KeYFileChooser fileChooser = KeYFileChooser.getFileChooser(
+            "Choose filename to save proof", mainWindow.getRecentFiles().getRecentFolders());
         fileChooser.setFileFilter(KeYFileChooser.PROOF_BUNDLE_FILTER);
 
         Pair<Path, String> f = fileName(proof, ".zproof");

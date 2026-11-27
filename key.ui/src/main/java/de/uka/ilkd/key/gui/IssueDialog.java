@@ -37,10 +37,10 @@ import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ExceptionTools;
 import de.uka.ilkd.key.util.parsing.BuildingExceptions;
 
+import org.key_project.ui.util.SwingUtil;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.java.StringUtil;
-import org.key_project.util.java.SwingUtil;
 import org.key_project.util.parsing.Location;
 import org.key_project.util.parsing.Position;
 

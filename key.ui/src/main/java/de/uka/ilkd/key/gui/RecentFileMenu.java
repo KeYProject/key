@@ -287,6 +287,25 @@ public class RecentFileMenu {
         return this.recentFiles;
     }
 
+    /**
+     * Returns the directories containing the recent files, most recent first. Directory entries
+     * are returned as-is; for file entries their parent directory is used. Duplicate and
+     * nonexistent directories are omitted.
+     *
+     * @return the existing, unique directories of the recent files
+     */
+    public List<File> getRecentFolders() {
+        return recentFiles.stream()
+                .map(entry -> {
+                    File file = new File(entry.getAbsolutePath());
+                    return file.isDirectory() ? file : file.getParentFile();
+                })
+                .filter(Objects::nonNull)
+                .filter(File::isDirectory)
+                .distinct()
+                .toList();
+    }
+
     public class RecentFileEntry {
         public static final String KEY_PATH = "path";
         public static final String KEY_PROFILE = "profile";
