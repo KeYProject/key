@@ -1,0 +1,284 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+package de.uka.ilkd.key.rule;
+
+import java.nio.file.Files;
+
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.nparser.KeyIO;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.calculus.JavaDLSequentKit;
+import de.uka.ilkd.key.proof.init.*;
+import de.uka.ilkd.key.proof.io.KeYFileForTests;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.io.RuleSource;
+import de.uka.ilkd.key.proof.io.RuleSourceFactory;
+
+import org.key_project.logic.PosInTerm;
+import org.key_project.prover.proof.rulefilter.TacletFilter;
+import org.key_project.prover.sequent.PosInOccurrence;
+import org.key_project.prover.sequent.SequentFormula;
+import org.key_project.util.collection.ImmutableList;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import static de.uka.ilkd.key.logic.equality.RenamingTermProperty.RENAMING_TERM_PROPERTY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Tests the pattern-assignment taclets of the production rule file {@code javaRules.key}, which
+ * decompose assignments whose initializer binds pattern variables:
+ *
+ * <ul>
+ * <li>{@code instanceofPatternAssignmentSE/NSE}: {@code b = e instanceof T v;} is rewritten to
+ * {@code b = e instanceof T;} (the binding is not relevant for a plain assignment)</li>
+ * <li>{@code andPatternAssignment}/{@code orPatternAssignment}: the guard expression is evaluated
+ * once into a fresh boolean variable; in the branch where the guard is known to have matched the
+ * pattern variables are declared by {@code #posBinding}</li>
+ * <li>{@code notPatternAssignment}: the guard is evaluated into a fresh boolean variable and
+ * negated</li>
+ * <li>{@code conditionalPatternAssignment}: the condition of a ternary is evaluated into a fresh
+ * boolean variable; the branches declare the pattern variables bound by {@code #posBinding} (resp.
+ * {@code #negBinding})</li>
+ * </ul>
+ *
+ * <p>
+ * The four {@code instanceof_eval_id*} rules cover the assignment form {@code b = e instanceof
+ * T v;} inside a compound expression: the simple subject is evaluated directly, a non-simple
+ * subject is evaluated once into a temporary, and the pattern variable is bound in the branch
+ * where the test succeeded.
+ *
+ * <p>
+ * All rules are loaded from the production rule file {@code javaRules.key} (there are no
+ * test-only copies). Loading this file requires the jmlparser to support the
+ * {@code #posBinding}/{@code #negBinding} program meta-constructs; if it does not, the test fails
+ * instead of being skipped so that a parser regression is visible.
+ *
+ * <p>
+ * Each goal is a single active statement (the pattern assignment) so that it sits at the goal's
+ * only reachable active-statement position; the right-hand side is therefore self-contained (no
+ * local declaration precedes it). The {@code #se} rule is exercised with {@code this}, a simple
+ * expression that needs no surrounding scope; the {@code #nse} rules with a {@code new}
+ * expression, which is a non-simple expression.
+ */
+class TestPatternAssignmentRules {
+
+    /**
+     * A profile whose standard rules are the LDT declarations plus {@code javaRules.key}, the
+     * file containing the pattern assignment rules under test.
+     */
+    private static final Profile PROFILE = new JavaProfile() {
+        @Override
+        public RuleCollection getStandardRules() {
+            return new RuleCollection(
+                ImmutableList.of(RuleSourceFactory.fromDefaultLocation(RuleSource.ldtFile),
+                    RuleSourceFactory.fromDefaultLocation("javaRules.key")),
+                ImmutableList.nil());
+        }
+    };
+
+    private static InitConfig initConfig;
+    private static Services services;
+    private static TacletIndex allRules;
+
+    @BeforeAll
+    static void setUp() {
+        try {
+            // the assignment-form rules need an assignment as the first active statement; the
+            // target must therefore be a program variable rather than a statement-local one
+            var keyFile = Files.createTempFile("TestPatternAssignmentRules", ".key");
+            Files.writeString(keyFile, """
+                    \\programVariables { boolean flag; Object o; }
+                    \\problem { true }
+                    """);
+            var envInput = new KeYFileForTests(
+                "TestPatternAssignmentRules", keyFile, PROFILE);
+            initConfig = new ProblemInitializer(PROFILE).prepare(envInput);
+        } catch (Exception e) {
+            throw e instanceof RuntimeException re ? re : new RuntimeException(e);
+        }
+        services = initConfig.getServices();
+        allRules = initConfig.createTacletIndex();
+    }
+
+
+    private static JTerm parseTerm(String term) {
+        return new KeyIO(services, initConfig.namespaces()).parseExpression(term);
+    }
+
+    /**
+     * Creates a goal {@code ==> \<{ program }\> true} whose rule set contains only the given rule
+     * and applies the rule at the top level of the succedent. Asserts that there is exactly one
+     * complete application and that it produces exactly one successor goal, which is returned.
+     */
+    private Goal applyRule(String ruleName, String program) {
+        var succ =
+            ImmutableList.singleton(new SequentFormula(parseTerm("\\<{" + program + "}\\> true")));
+        var sequent = JavaDLSequentKit.createSequent(ImmutableList.nil(), succ);
+        var proof = new Proof("TestPatternAssignmentRules", initConfig.deepCopy());
+        proof.setRoot(new Node(proof, sequent));
+
+        var taclet = allRules.lookup(ruleName);
+        assertNotNull(taclet, "rule " + ruleName + " not found in javaRules.key");
+        var tacletIndex = TacletIndexKit.getKit().createTacletIndex();
+        tacletIndex.add(taclet);
+        var goal = new Goal(proof.root(), tacletIndex,
+            new BuiltInRuleAppIndex(new BuiltInRuleIndex()), proof.getServices());
+
+        var pos =
+            new PosInOccurrence(goal.sequent().succedent().getFirst(), PosInTerm.getTopLevel(),
+                false);
+        var apps = goal.ruleAppIndex().getTacletAppAt(TacletFilter.TRUE, pos, services);
+        assertEquals(1, apps.size(),
+            "Expected exactly one application of " + ruleName + " at " + pos + ", but found:\n"
+                + apps);
+        var app = apps.head();
+        // Rules that introduce a fresh variable through a \new condition are only complete once
+        // that fresh variable has been generated; tryToInstantiate performs this step, as the
+        // normal application pipeline (RuleCommand) does.
+        app = app.tryToInstantiate(services);
+        assertNotNull(app, "Rule application of " + ruleName + " could not be completed");
+        assertTrue(app.complete(), "Rule application of " + ruleName + " should be complete");
+
+        ImmutableList<Goal> goals = app.taclet().getExecutor().apply(goal, app);
+        assertEquals(1, goals.size(), "Applying " + ruleName + " should create a single goal");
+        return goals.head();
+    }
+
+    /**
+     * Asserts that the succedent of the goal consists of a single formula that is equal to the
+     * parsed expected formula modulo bound renaming, i.e. the programs are the same up to the
+     * names of the (locally declared) program variables.
+     */
+    private static void assertSuccedent(Goal goal, String expectedFormula) {
+        JTerm actual = (JTerm) goal.sequent().succedent().getFirst().formula();
+        JTerm expected = parseTerm(expectedFormula);
+        assertTrue(RENAMING_TERM_PROPERTY.equalsModThisProperty(actual, expected),
+            "Expected succedent:\n" + ProofSaver.printAnything(expected, services)
+                + "\nBut was:\n" + ProofSaver.printAnything(actual, services));
+    }
+
+    @Test
+    void instanceofPatternAssignmentSE() {
+        var goal =
+            applyRule("instanceofPatternAssignmentSE", "boolean b = this instanceof Object s;");
+        // the pattern variable s is dropped, the right hand side becomes a plain instanceof
+        assertSuccedent(goal, "\\<{boolean b = this instanceof Object;}\\> true");
+    }
+
+    @Test
+    void instanceofPatternAssignmentNSE() {
+        var goal = applyRule("instanceofPatternAssignmentNSE",
+            "boolean b = new String(\"x\") instanceof String s;");
+        assertSuccedent(goal, "\\<{boolean b = new String(\"x\") instanceof String;}\\> true");
+    }
+
+    @Test
+    void andPatternAssignment() {
+        var goal = applyRule("andPatternAssignment",
+            "boolean b = new String(\"x\") instanceof String s && new String(\"y\") == null;");
+        // The guard is evaluated once into a fresh boolean variable; the second operand is
+        // evaluated only in the branch where the guard is known to have matched, where the
+        // pattern variable s is additionally declared by #posBinding.
+        assertSuccedent(goal,
+            "\\<{boolean b; boolean b_1; { b_1 = new String(\"x\") instanceof String s; }"
+                + " if (b_1) { java.lang.String s = (String) new String(\"x\");"
+                + " b = new String(\"y\") == null; }"
+                + " else { b = false; }}\\> true");
+    }
+
+    @Test
+    void orPatternAssignment() {
+        var goal = applyRule("orPatternAssignment",
+            "boolean b = new String(\"x\") instanceof String s || new String(\"y\") == null;");
+        // The guard is evaluated once into a fresh boolean variable; the second operand is
+        // evaluated only if the guard is false, in which case b is the value of the second
+        // operand.
+        assertSuccedent(goal,
+            "\\<{boolean b; boolean b_1; { b_1 = new String(\"x\") instanceof String s; }"
+                + " if (b_1) { b = true; } else { b = new String(\"y\") == null; }}\\> true");
+    }
+
+    @Test
+    void orPatternAssignmentWithBoundVariable() {
+        // A negated instanceof in the left operand of || binds the pattern variable when it is
+        // false, i.e. in the else-branch, where the right operand is evaluated: the declaration
+        // must be introduced by #negBinding, otherwise s is undeclared in that branch.
+        var goal = applyRule("orPatternAssignment",
+            "boolean b = !(new String(\"x\") instanceof String s) || s.isEmpty();");
+        assertSuccedent(goal,
+            "\\<{boolean b; boolean b_1; { b_1 = !(new String(\"x\") instanceof String s); }"
+                + " if (b_1) { b = true; }"
+                + " else { java.lang.String s = (String) new String(\"x\"); b = s.isEmpty(); }}"
+                + "\\> true");
+    }
+
+    @Test
+    void notPatternAssignment() {
+        var goal = applyRule("notPatternAssignment",
+            "boolean b = !(new String(\"x\") instanceof String s);");
+        // The guard is evaluated into a fresh boolean variable and negated; no branch is
+        // introduced, hence no pattern variable is declared.
+        assertSuccedent(goal,
+            "\\<{boolean b; boolean b_1; { b_1 = (new String(\"x\") instanceof String s); }"
+                + " b = !b_1;}\\> true");
+    }
+
+    @Test
+    void instanceofEvalId() {
+        var goal = applyRule("instanceof_eval_id",
+            "flag = new String(\"x\") instanceof String s;");
+        // the non-simple subject is evaluated once into a temporary; the binding is not needed
+        assertSuccedent(goal,
+            "\\<{java.lang.String v = new String(\"x\"); flag = v instanceof String;}\\> true");
+    }
+
+    @Test
+    void instanceofEvalIdSimple() {
+        var goal = applyRule("instanceof_eval_id_simple", "flag = o instanceof Object s;");
+        assertSuccedent(goal, "\\<{flag = o instanceof Object;}\\> true");
+    }
+
+    @Test
+    void instanceofEvalIdAnd() {
+        var goal = applyRule("instanceof_eval_id_and",
+            "flag = o instanceof Object s && this.hashCode() > 0;");
+        // in the branch where the test succeeded the pattern variable is bound from the subject
+        assertSuccedent(goal,
+            "\\<{flag = o instanceof Object;"
+                + " if (flag) { Object s = (Object) o;"
+                + " flag = this.hashCode() > 0; }}\\> true");
+    }
+
+    @Test
+    void instanceofEvalIdOr() {
+        var goal = applyRule("instanceof_eval_id_or",
+            "flag = !(o instanceof Object s) || this.hashCode() > 0;");
+        // the variable is bound on the branch where the negated test is false
+        assertSuccedent(goal,
+            "\\<{flag = !(o instanceof Object);"
+                + " if (!flag) { Object s = (Object) o;"
+                + " flag = this.hashCode() > 0; }}\\> true");
+    }
+
+    @Test
+    void conditionalPatternAssignment() {
+        var goal = applyRule("conditionalPatternAssignment",
+            "boolean r = !(new String(\"x\") instanceof String s) ? new String(\"y\") != null"
+                + " : new String(\"z\") == null;");
+        // The negated guard binds s only when it evaluates to false, hence s is declared in the
+        // else-branch by #negBinding; in the then-branch no pattern variable is bound.
+        assertSuccedent(goal,
+            "\\<{boolean r; boolean b; { b = !(new String(\"x\") instanceof String s); }"
+                + " if (b) { r = new String(\"y\") != null; }"
+                + " else { java.lang.String s = (String) new String(\"x\");"
+                + " r = new String(\"z\") == null; }}"
+                + "\\> true");
+    }
+}
