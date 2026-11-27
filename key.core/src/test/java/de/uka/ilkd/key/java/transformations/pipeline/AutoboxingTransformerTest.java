@@ -286,6 +286,19 @@ class AutoboxingTransformerTest {
     }
 
     @Test
+    void unboxesBitwiseComplementOperand() {
+        String out = rewrite("int m(Integer a) { int r = ~a; return r; }");
+        assertTrue(out.contains("int r = ~a.value;"), out);
+        assertFalse(out.contains("~a.value.value"), out);
+    }
+
+    @Test
+    void promotesBitwiseComplementOperand() {
+        String out = rewrite("int m(Byte b) { return ~b; }");
+        assertTrue(out.contains("~(int) b.value"), out);
+    }
+
+    @Test
     void unboxesBooleanCondition() {
         String out = rewrite("void m() { Boolean z = true; if (z) { } }");
         assertTrue(out.contains("if (z.value)"), out);

@@ -1048,6 +1048,18 @@ final class AutoboxingRewriter {
             if (unary.getOperator() == UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
                 return ResolvedPrimitiveType.BOOLEAN;
             }
+            if (unary.getOperator() == UnaryExpr.Operator.PLUS
+                    || unary.getOperator() == UnaryExpr.Operator.MINUS
+                    || unary.getOperator() == UnaryExpr.Operator.BITWISE_COMPLEMENT) {
+                String operand =
+                    numericOperand(unary.getExpression(), typeOf(unary.getExpression()));
+                if (operand != null) {
+                    return ResolvedPrimitiveType.byName(switch (operand) {
+                        case "byte", "short", "char" -> "int";
+                        default -> operand;
+                    });
+                }
+            }
         }
         if (expression instanceof ConditionalExpr conditional) {
             ConditionalKind kind = classifyConditional(conditional);
@@ -1606,7 +1618,8 @@ final class AutoboxingRewriter {
     private static Expression encloseForFieldAccess(Expression expression) {
         return expression instanceof BinaryExpr || expression instanceof ConditionalExpr
                 || expression instanceof AssignExpr || expression instanceof CastExpr
-                || expression instanceof SwitchExpr || expression instanceof LambdaExpr
+                || expression instanceof UnaryExpr || expression instanceof SwitchExpr
+                || expression instanceof LambdaExpr
                         ? new EnclosedExpr(expression)
                         : expression;
     }

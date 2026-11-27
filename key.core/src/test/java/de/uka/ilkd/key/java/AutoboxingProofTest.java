@@ -799,6 +799,19 @@ class AutoboxingProofTest {
     }
 
     @Test
+    void bitwiseComplement(@TempDir Path dir) throws Exception {
+        prove("BitwiseComplement", clazz("BitwiseComplement", """
+                /*@ normal_behavior
+                  @ requires a.value == 0;
+                  @ ensures \\result == -1;
+                  @*/
+                public static int m(Integer a) {
+                    return ~a;
+                }
+                """), dir);
+    }
+
+    @Test
     void forUpdateIncrement(@TempDir Path dir) throws Exception {
         prove("ForUpdate", clazz("ForUpdate", """
                 /*@ normal_behavior
