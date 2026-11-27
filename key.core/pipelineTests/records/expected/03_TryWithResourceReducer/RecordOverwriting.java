@@ -1,5 +1,4 @@
-//@ /*@ nullable */
-
+/*@ nullable */
 
 record MyRecord(String test) {
 

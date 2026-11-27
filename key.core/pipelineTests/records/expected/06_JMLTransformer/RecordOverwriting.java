@@ -1,5 +1,4 @@
-//@ /*@ nullable */
-
+/*@ nullable */
 
 @javax.annotation.processing.Generated("RecordClassBuilder")
 final /*@ nullable */ class MyRecord extends Record {
