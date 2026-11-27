@@ -29,7 +29,7 @@ import org.key_project.util.collection.ImmutableList;
  * {@code SuperTermGenerated(ancestor, index)}.
  */
 @WeakStableCost
-public abstract class SuperTermWithIndexGenerator extends SuperTermGenerator {
+public class SuperTermWithIndexGenerator extends SuperTermGenerator {
     private final Services services;
     private final Operator binFunc;
 
@@ -41,15 +41,13 @@ public abstract class SuperTermWithIndexGenerator extends SuperTermGenerator {
     }
 
     public static TermGenerator upwardsWithIndex(TermFeature cond, Services services) {
-        return new SuperTermWithIndexGenerator(cond, services) {
-        };
+        return new SuperTermWithIndexGenerator(cond, services);
     }
 
     @Override
     protected Term generateOneTerm(Term superterm, int child) {
         final var index = services.getTermBuilder().zTerm(String.valueOf(child));
-        return services.getTermBuilder().tf().createTerm(binFunc,
-            (JTerm) superterm, index);
+        return services.getTermBuilder().tf().createTerm(binFunc, (JTerm) superterm, index);
     }
 
     private static class SuperTermGeneratedOp
