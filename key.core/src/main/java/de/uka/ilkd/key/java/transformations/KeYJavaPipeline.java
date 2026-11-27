@@ -44,6 +44,7 @@ public class KeYJavaPipeline {
         p.add(new TryWithResourceReducer());
         p.add(new EnumClassBuilder(pipelineServices));
         p.add(new RecordClassBuilder(pipelineServices));
+        p.add(new AutoboxingTransformer());
         p.add(new JMLTransformer(pipelineServices));
         p.add(new JmlDocRemoval(pipelineServices));
         p.add(new ImplicitFieldAdder(pipelineServices));

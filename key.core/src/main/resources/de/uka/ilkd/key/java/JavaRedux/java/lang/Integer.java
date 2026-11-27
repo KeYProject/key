@@ -3,11 +3,11 @@
  */
 package java.lang;
 
-public final class Integer implements java.lang.Comparable
+public final class Integer extends java.lang.Number implements java.lang.Comparable
 {
    public final static int MIN_VALUE = -2147483648;
    public final static int MAX_VALUE = 2147483647;
-   public final static java.lang.Class TYPE;
+   public /*@ nullable @*/ final static java.lang.Class TYPE;
    public final static int SIZE = 32;
 
    private /*@ spec_public @*/ final int value;
@@ -32,7 +32,14 @@ public final class Integer implements java.lang.Comparable
      @*/
    public Integer(int arg0);
    public Integer(java.lang.String arg0) throws java.lang.NumberFormatException;
+   // The result is unconstrained: KeY has no cast axiomatisation to relate it to value.
+   /*@ public normal_behavior
+     @ assignable \strictly_nothing;
+     @*/
    public byte byteValue();
+   /*@ public normal_behavior
+     @ assignable \strictly_nothing;
+     @*/
    public short shortValue();
     /*@ public normal_behavior
       @ ensures \result == value;
@@ -47,6 +54,7 @@ public final class Integer implements java.lang.Comparable
    public long longValue();
 //   public float floatValue();
 //   public double doubleValue();
+
    public static java.lang.Integer getInteger(java.lang.String arg0);
    public static java.lang.Integer getInteger(java.lang.String arg0, int arg1);
    public static java.lang.Integer getInteger(java.lang.String arg0, java.lang.Integer arg1);

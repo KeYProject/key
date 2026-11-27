@@ -57,6 +57,9 @@ its surroundings.
 - `var-primitive` / `var-in-for` load, but `var-reference-type` does not.
 - Generics come in five variants (`plain`, `bounded`, `wildcard`, `method`,
   `diamond`), all rejected.
-- "Parses" is not "soundly reasoned about": `autoboxing`, `annotation-declaration` and
+- "Parses" is not "soundly reasoned about": `annotation-declaration` and
   `try-with-resources` sit in `supported/` because they load, but KeY does not
-  model them soundly (see the documentation's *Comments* column).
+  model them soundly (see the documentation's *Comments* column). Autoboxing is
+  now supported for assignment, invocation, casting, numeric and boolean
+  promotion, conditional, array and enhanced-for contexts; JML specification
+  expressions and string concatenation are not covered.
