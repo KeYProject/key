@@ -28,7 +28,7 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
 public class SuperTermGenerator implements TermGenerator {
 
     private final TermFeature cond;
-    private final LogicServices services;
+    protected final LogicServices services;
 
     protected SuperTermGenerator(TermFeature cond, LogicServices services) {
         this.cond = cond;
