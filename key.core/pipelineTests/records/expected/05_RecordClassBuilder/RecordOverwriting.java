@@ -15,7 +15,7 @@ final class MyRecord extends Record {
       @*/
     @javax.annotation.processing.Generated("RecordClassBuilder")
     public MyRecord(String test) {
-        //Created by RecordClassBuilder.java:137
+        //Created by RecordClassBuilder.java:135
         this.test = test;
     }
 
