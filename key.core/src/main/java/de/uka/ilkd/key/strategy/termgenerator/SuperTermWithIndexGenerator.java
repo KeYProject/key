@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.JavaDLTheory;
 import de.uka.ilkd.key.logic.JTerm;
+import de.uka.ilkd.key.logic.TermBuilder;
 
 import org.key_project.logic.Name;
 import org.key_project.logic.Term;
@@ -23,33 +24,32 @@ import org.key_project.prover.strategy.costbased.termgenerator.SuperTermGenerato
 import org.key_project.prover.strategy.costbased.termgenerator.TermGenerator;
 import org.key_project.util.collection.ImmutableList;
 
+import org.jspecify.annotations.NonNull;
+
 /**
  * Generates the terms upward a given position, like {@link SuperTermGenerator#upwards}, but
  * returns each ancestor packed with the index of the child on the path as
  * {@code SuperTermGenerated(ancestor, index)}.
  */
 @WeakStableCost
-public abstract class SuperTermWithIndexGenerator extends SuperTermGenerator {
-    private final Services services;
+public class SuperTermWithIndexGenerator extends SuperTermGenerator {
     private final Operator binFunc;
 
     protected SuperTermWithIndexGenerator(TermFeature cond, Services services) {
         super(cond, services);
-        this.services = services;
         final IntegerLDT numbers = services.getTypeConverter().getIntegerLDT();
         this.binFunc = new SuperTermGeneratedOp(numbers);
     }
 
     public static TermGenerator upwardsWithIndex(TermFeature cond, Services services) {
-        return new SuperTermWithIndexGenerator(cond, services) {
-        };
+        return new SuperTermWithIndexGenerator(cond, services);
     }
 
     @Override
-    protected Term generateOneTerm(Term superterm, int child) {
-        final var index = services.getTermBuilder().zTerm(String.valueOf(child));
-        return services.getTermBuilder().tf().createTerm(binFunc,
-            (JTerm) superterm, index);
+    protected @NonNull Term generateOneTerm(@NonNull Term superterm, int child) {
+        final TermBuilder tb = ((Services) services).getTermBuilder();
+        final var index = tb.zTerm(String.valueOf(child));
+        return tb.tf().createTerm(binFunc, (JTerm) superterm, index);
     }
 
     private static class SuperTermGeneratedOp

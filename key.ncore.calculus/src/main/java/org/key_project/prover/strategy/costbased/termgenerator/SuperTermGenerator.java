@@ -25,10 +25,10 @@ import org.key_project.prover.strategy.costbased.termfeature.TermFeature;
  * As it only looks upwards, the computed cost is weak stable
  */
 @WeakStableCost
-public abstract class SuperTermGenerator implements TermGenerator {
+public class SuperTermGenerator implements TermGenerator {
 
     private final TermFeature cond;
-    private final LogicServices services;
+    protected final LogicServices services;
 
     protected SuperTermGenerator(TermFeature cond, LogicServices services) {
         this.cond = cond;
@@ -36,8 +36,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
     }
 
     public static TermGenerator upwards(TermFeature cond, LogicServices services) {
-        return new SuperTermGenerator(cond, services) {
-        };
+        return new SuperTermGenerator(cond, services);
     }
 
     @Override
