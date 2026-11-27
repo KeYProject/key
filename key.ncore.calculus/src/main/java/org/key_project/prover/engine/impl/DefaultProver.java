@@ -15,6 +15,7 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.rules.RuleApp;
 
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
     public static final AtomicLong PERF_GOAL_APPLY = new AtomicLong();
 
     /// The proof currently being constructed or manipulated by this prover.
-    protected ProofObject<Goal> proof;
+    protected @MonotonicNonNull ProofObject<Goal> proof;
 
     /// The maximum number of rule applications allowed during the proof process.
     protected int maxApplications;
@@ -91,7 +92,7 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
     /// @param goalChooser the [GoalChooser] that determines the next goal to process
     /// @param stopCondition the [StopCondition] that dictates when the prover should stop
     /// @return an [ApplyStrategyInfo] instance containing details about the proof process
-    protected final synchronized ApplyStrategyInfo<@Nullable Goal> doWork(
+    protected final synchronized ApplyStrategyInfo<Goal> doWork(
             final GoalChooser<Goal> goalChooser,
             final StopCondition<Goal> stopCondition) {
         assert proof != null : "@AssumeAssertion(nullness): proof cannot be null";
