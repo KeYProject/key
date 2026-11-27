@@ -38,6 +38,9 @@ final class SymExCost {
      */
     static final long LOOP_INVARIANT = -20_000;
 
+    /** Cost of the pattern-loop rewrite; it must run before any loop treatment. */
+    static final long PATTERN_LOOP_BINDING = -30_000;
+
     /**
      * A cheap concrete program step: {@code simplify_expression}, {@code execute*Assignment} and
      * the ordinary {@code simplify_prog} case — "advance the program by one small step".
