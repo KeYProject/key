@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
  * and does not consult the {@link GoalChooser} it is constructed with (the constructor keeps the
  * parameter for API symmetry with {@code ApplyStrategy}).
  */
-public final class ParallelProver extends DefaultProver<Proof, Goal> {
+public final class ParallelProver extends DefaultProver<Goal> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParallelProver.class);
 
@@ -186,7 +186,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
      * @param goalChooser kept for API symmetry with {@link ApplyStrategy}; the parallel engine uses
      *        a {@link GoalScheduler} for goal selection rather than this chooser
      */
-    public ParallelProver(GoalChooser<Proof, Goal> goalChooser) {
+    public ParallelProver(GoalChooser<Goal> goalChooser) {
         this.goalChooser = goalChooser;
         this.workerCount = resolveWorkerCount();
     }
@@ -232,7 +232,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         }
         // thread counts provided via setting are capped at number of CPU cores
         int configured = generalSettings().getParallelProverThreadCount();
-        return Math.max(1, Math.min(configured, Runtime.getRuntime().availableProcessors()));
+        return Math.clamp(configured, 1, Runtime.getRuntime().availableProcessors());
     }
 
     private static GeneralSettings generalSettings() {
@@ -256,18 +256,18 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     }
 
     @Override
-    public ApplyStrategyInfo<Proof, Goal> start(Proof proof, Goal goal) {
+    public ApplyStrategyInfo<Goal> start(ProofObject<Goal> proof, Goal goal) {
         return start(proof, ImmutableList.<Goal>nil().prepend(goal));
     }
 
     @Override
-    public ApplyStrategyInfo<Proof, Goal> start(Proof proof, ImmutableList<Goal> goals) {
+    public ApplyStrategyInfo<Goal> start(ProofObject<Goal> p_proof, ImmutableList<Goal> goals) {
+        final Proof proof = (Proof) p_proof;
         ProofSettings settings = proof.getSettings();
         return start(proof, goals, settings.getStrategySettings());
     }
 
-    @Override
-    public ApplyStrategyInfo<Proof, Goal> start(Proof proof, ImmutableList<Goal> goals,
+    private ApplyStrategyInfo<Goal> start(Proof proof, ImmutableList<Goal> goals,
             Object strategySettings) {
         final StrategySettings stratSet = (StrategySettings) strategySettings;
         int maxSteps = stratSet.getMaxSteps();
@@ -286,30 +286,33 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     // is
     // no longer fired per step, see processStep), so holding it for the run cannot deadlock them.
     @Override
-    public synchronized ApplyStrategyInfo<Proof, Goal> start(Proof proof, ImmutableList<Goal> goals,
+    public synchronized ApplyStrategyInfo<Goal> start(ProofObject<Goal> proof,
+            ImmutableList<Goal> goals,
             int maxSteps,
             long timeout, boolean stopAtFirstNonCloseableGoal) {
-        return run(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal, 0);
+        return run((Proof) proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal, 0);
     }
 
     /**
      * Runs the workers over {@code goals} and reports the outcome
      *
-     * @param proof the Proof the goals belong too
+     * @param p_proof the proof the goals belong too
      * @param goals the goals to
      * @param maxSteps the run-wide limit on rule applications
      * @param perTaskSteps the budget each goal is assigned, or {@code 0} when the
      *        step budget applies to all as a whole
      */
-    private ApplyStrategyInfo<Proof, Goal> run(Proof proof, ImmutableList<Goal> goals, int maxSteps,
+    private ApplyStrategyInfo<Goal> run(ProofObject<Goal> p_proof, ImmutableList<Goal> goals,
+            int maxSteps,
             long timeout, boolean stopAtFirstNonCloseableGoal, int perTaskSteps) {
+        final Proof proof = (Proof) p_proof;
         assert proof != null;
         initializeProverRun(proof, maxSteps, timeout, stopAtFirstNonCloseableGoal);
 
         fireTaskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy,
             PROCESSING_STRATEGY, -1));
 
-        final ApplyStrategyInfo<Proof, Goal> result;
+        final ApplyStrategyInfo<Goal> result;
         try (var ignored =
             proof.setRuleAppIndexMode(proof.getActiveStrategy().getRuleAppIndexMode())) {
             result = runParallel(goals, perTaskSteps);
@@ -324,12 +327,12 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         return result;
     }
 
-    private void initializeProverRun(Proof proof, int maxSteps, long timeout,
+    private void initializeProverRun(ProofObject<Goal> proof, int maxSteps, long timeout,
             boolean stopAtFirstNonCloseableGoal) {
         this.proof = proof;
         this.stopAtFirstNonClosableGoal = stopAtFirstNonCloseableGoal;
         this.stopCondition =
-            proof.getSettings().getStrategySettings().getApplyStrategyStopCondition();
+            ((Proof) proof).getSettings().getStrategySettings().getApplyStrategyStopCondition();
         this.maxApplications = stopCondition.getMaximalWork(maxSteps, timeout);
         this.timeout = timeout;
         this.countApplied = 0;
@@ -347,14 +350,14 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     /// step count, timeout is global for all tasks
     ///
     /// @param proof The [ProofObject] representing the proof instance.
-    /// @param goals An [ImmutableList] of [ProofGoal] objects to prove.
+    /// @param goals An [ImmutableList] of [Goal] objects to prove.
     /// @param maxSteps The maximum number of rule applications to perform per goal task.
     /// @param timeout The maximum duration (in milliseconds) to perform the proof search (global
     /// over all tasks).
-    /// @return An [ProofSearchInformation] object containing information about the performed
+    /// @return An [ApplyStrategy] object containing information about the performed
     /// work, such as the number of rules applied.
     @Override
-    public synchronized ApplyStrategyInfo<Proof, Goal> startEach(Proof proof,
+    public synchronized ApplyStrategyInfo<Goal> startEach(ProofObject<Goal> proof,
             ImmutableList<Goal> goals, int maxSteps, long timeout) {
         // Tasks never stop the run: a task that runs out of budget or of rules leaves its goals
         return run(proof, goals, Integer.MAX_VALUE, timeout, false, maxSteps);
@@ -370,7 +373,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
      */
     @SuppressWarnings("try") // the binding is deliberately unused: suspending the listeners is the
     // whole point and close() restores them, so the resource is a pure scoping handle
-    private ApplyStrategyInfo<Proof, Goal> runParallel(ImmutableList<Goal> goals,
+    private ApplyStrategyInfo<Goal> runParallel(ImmutableList<Goal> goals,
             int perTaskSteps) {
         final long startTime = System.currentTimeMillis();
         final GoalScheduler<Goal> scheduler = new GoalScheduler<>();
@@ -395,7 +398,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
                 t.setDaemon(true);
                 return t;
             });
-            try (var ignored = proof.suspendNonEssentialListeners()) {
+            try (var ignored = ((Proof) proof).suspendNonEssentialListeners()) {
                 List<Future<?>> futures = new ArrayList<>(workerCount);
                 try {
                     for (int w = 0; w < workerCount; w++) {
@@ -472,7 +475,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         }
         final RunScope marker = enterMultiThreadedRun(proof);
         try {
-            final JavaInfo javaInfo = proof.getServices().getJavaInfo();
+            final JavaInfo javaInfo = ((Proof) proof).getServices().getJavaInfo();
             // Materialise the default execution context on this proof's (fresh) JavaInfo before
             // sealing, so the matcher reads it instead of registering it during the run.
             javaInfo.getDefaultExecutionContext();

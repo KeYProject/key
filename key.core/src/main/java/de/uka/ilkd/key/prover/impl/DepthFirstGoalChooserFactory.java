@@ -16,7 +16,7 @@ public class DepthFirstGoalChooserFactory implements GoalChooserFactory<Proof, G
 
     public DepthFirstGoalChooserFactory() {}
 
-    public GoalChooser<Proof, Goal> create() {
+    public GoalChooser<Goal> create() {
         return new DepthFirstGoalChooser();
     }
 

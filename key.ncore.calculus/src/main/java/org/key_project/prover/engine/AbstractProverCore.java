@@ -8,14 +8,13 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.key_project.prover.proof.ProofGoal;
-import org.key_project.prover.proof.ProofObject;
 
 
 /// Common class for provers which takes care of listener registration and task event propagation.
 ///
 /// @author Richard Bubel
-public abstract class AbstractProverCore<P extends ProofObject<G>, G extends ProofGoal<G>>
-        implements ProverCore<P, G> {
+public abstract class AbstractProverCore<G extends ProofGoal<G>>
+        implements ProverCore<G> {
 
     /// number of rules automatically applied
     protected int countApplied = 0;

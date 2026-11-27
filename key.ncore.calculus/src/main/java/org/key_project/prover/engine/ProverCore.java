@@ -16,7 +16,7 @@ import org.key_project.util.collection.ImmutableList;
 ///
 /// @param <P> type of proof object, which extends [ProofObject].
 /// @param <G> The type of proof goal, which extends [ProofGoal].
-public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
+public interface ProverCore<G extends ProofGoal<G>> {
 
     /// A constant used by some listeners to identify that a proof macro is running.
     String PROCESSING_STRATEGY = "Processing Strategy";
@@ -29,7 +29,7 @@ public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
     /// @return An [ProofSearchInformation] object containing information about the performed
     /// work,
     /// such as the number of rules applied.
-    ProofSearchInformation<P, G> start(P proof, G goal);
+    ProofSearchInformation<G> start(ProofObject<G> proof, G goal);
 
     /// Starts a proof search for a list of goals using the specified proof instance and
     /// strategy settings provided by the proof instance.
@@ -39,18 +39,7 @@ public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
     /// @return An [ProofSearchInformation] object containing information about the performed
     /// work,
     /// such as the number of rules applied.
-    ProofSearchInformation<P, G> start(P proof, ImmutableList<G> goals);
-
-    /// Starts a proof search for a list of goals using the specified proof instance and
-    /// the provided strategy settings.
-    ///
-    /// @param proof The [ProofObject] representing the proof instance.
-    /// @param goals An [ImmutableList] of [ProofGoal] objects to prove.
-    /// @param stratSet The strategy settings to use during the proof search.
-    /// @return An [ProofSearchInformation] object containing information about the performed
-    /// work,
-    /// such as the number of rules applied.
-    ProofSearchInformation<P, G> start(P proof, ImmutableList<G> goals, Object stratSet);
+    ProofSearchInformation<G> start(ProofObject<G> proof, ImmutableList<G> goals);
 
     /// Starts a proof search for a list of goals using the specified proof instance,
     /// with configurable options for maximum steps, timeout, and early termination.
@@ -64,7 +53,8 @@ public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
     /// @return An [ProofSearchInformation] object containing information about the performed
     /// work,
     /// such as the number of rules applied.
-    ProofSearchInformation<P, G> start(P proof, ImmutableList<G> goals, int maxSteps, long timeout,
+    ProofSearchInformation<G> start(ProofObject<G> proof, ImmutableList<G> goals, int maxSteps,
+            long timeout,
             boolean stopAtFirstNonCloseableGoal);
 
     /// Starts a proof search for a list of goals, each goal is treated as its own task with its own
@@ -78,14 +68,15 @@ public interface ProverCore<P extends ProofObject<G>, G extends ProofGoal<G>> {
     /// over all tasks).
     /// @return An [ProofSearchInformation] object containing information about the performed
     /// work, such as the number of rules applied.
-    default ProofSearchInformation<P, G> startEach(P proof, ImmutableList<G> goals, int maxSteps,
+    default ProofSearchInformation<G> startEach(ProofObject<G> proof, ImmutableList<G> goals,
+            int maxSteps,
             long timeout) {
 
-        ProofSearchInformation<P, G> aggregatedResult = null;
+        ProofSearchInformation<G> aggregatedResult = null;
         long deadline = timeout >= 0 ? System.currentTimeMillis() + timeout : -1;
 
         for (G goal : goals) {
-            final ProofSearchInformation<P, G> result;
+            final ProofSearchInformation<G> result;
             long remainingTime = deadline;
             if (deadline >= 0 &&
                     (remainingTime -= System.currentTimeMillis()) <= 0) {

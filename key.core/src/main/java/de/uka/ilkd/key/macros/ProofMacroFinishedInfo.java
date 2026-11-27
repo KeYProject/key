@@ -17,8 +17,6 @@ import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 import org.key_project.prover.engine.ProofSearchInformation;
 import org.key_project.util.collection.ImmutableList;
 
-import org.jspecify.annotations.NonNull;
-
 /**
  * An information object with additional information about the finished proof macro. The source is
  * always a proof macro and the result is always a list of goals. This information is created and
@@ -94,7 +92,7 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     }
 
     ProofMacroFinishedInfo(ProofMacroFinishedInfo info,
-            ProofSearchInformation<@NonNull Proof, Goal> stratInfo) {
+            ProofSearchInformation<Goal> stratInfo) {
         this(info.getMacro(), info.getGoals(), info.getProof(),
             info.getTime() + stratInfo.getTime(),
             info.getAppliedRules() + stratInfo.getNumberOfAppliedRuleApps(),

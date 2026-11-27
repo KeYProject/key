@@ -51,7 +51,7 @@ class DataRecordingTestFile extends TestFile {
         // we skip reloading for these test cases
     }
 
-    private static ApplyStrategyInfo<@NonNull Proof, Goal> applyStrategy(Proof proof,
+    private static ApplyStrategyInfo<Goal> applyStrategy(Proof proof,
             Strategy<@NonNull Goal> strategy) {
         proof.setActiveStrategy(strategy);
         return new ApplyStrategy(

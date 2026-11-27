@@ -13,7 +13,7 @@ import org.jspecify.annotations.NonNull;
 public interface GoalChooserFactory<P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> {
 
     /// returns a new goal chooser
-    GoalChooser<P, G> create();
+    GoalChooser<G> create();
 
     /// returns a clone of this goal chooser
     GoalChooserFactory<P, G> copy();

@@ -19,7 +19,7 @@ public class DefaultGoalChooserFactory implements GoalChooserFactory<Proof, Goal
 
     public DefaultGoalChooserFactory() {}
 
-    public GoalChooser<Proof, Goal> create() {
+    public GoalChooser<Goal> create() {
         return new DefaultGoalChooser();
     }
 

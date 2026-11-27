@@ -30,11 +30,9 @@ import org.jspecify.annotations.Nullable;
 /// - Recording the number of applied rule applications and closed goals.
 /// - Providing details of unresolved goals and any errors encountered.
 ///
-///
-///
 /// @see ProofSearchInformation
-public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends ProofGoal<Goal>>
-        implements ProofSearchInformation<Proof, Goal> {
+public class ApplyStrategyInfo<Goal extends ProofGoal<Goal>>
+        implements ProofSearchInformation<Goal> {
 
     /// The reason why the strategy stopped, for example, proof finished, maximal number of rule
     /// applications reached etc.
@@ -57,7 +55,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends Pro
     private final int nrClosedGoals;
 
     /// The proof object associated with this strategy application.
-    private final Proof proof;
+    private final ProofObject<Goal> proof;
 
     /// Constructs an `ApplyStrategyInfo` object with all necessary details
     /// of the strategy execution.
@@ -69,7 +67,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends Pro
     /// @param timeInMillis the total execution time in milliseconds
     /// @param appliedRuleAppsCount the number of applied rule applications
     /// @param nrClosedGoals the number of successfully closed goals
-    public ApplyStrategyInfo(String message, Proof proof, @Nullable Throwable error,
+    public ApplyStrategyInfo(String message, ProofObject<Goal> proof, @Nullable Throwable error,
             @Nullable Goal nonCloseableGoal,
             long timeInMillis, int appliedRuleAppsCount, int nrClosedGoals) {
         this.message = message;
@@ -125,7 +123,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends Pro
     }
 
     @Override
-    public ApplyStrategyInfo<Proof, Goal> join(ProofSearchInformation<Proof, Goal> other) {
+    public ApplyStrategyInfo<Goal> join(ProofSearchInformation<Goal> other) {
         if (other.getProof() != proof) {
             throw new IllegalArgumentException("Tried to combine ProofSearchInformations from" +
                 "different proof objects");
@@ -142,7 +140,7 @@ public class ApplyStrategyInfo<Proof extends ProofObject<Goal>, Goal extends Pro
 
     /// {@inheritDoc}
     @Override
-    public Proof getProof() {
+    public ProofObject<Goal> getProof() {
         return proof;
     }
 

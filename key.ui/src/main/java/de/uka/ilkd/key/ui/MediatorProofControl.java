@@ -182,12 +182,12 @@ public class MediatorProofControl extends AbstractProofControl {
      * mediator().stopInterface(true); }. The thread itself
      * unfreezes the UI when it is finished. </p>
      */
-    private class AutoModeWorker extends SwingWorker<ProofSearchInformation<Proof, Goal>, Object> {
+    private class AutoModeWorker extends SwingWorker<ProofSearchInformation<Goal>, Object> {
         private final Proof proof;
         private final List<Node> initialGoals;
         private final ImmutableList<Goal> goals;
-        private final ProverCore<Proof, Goal> applyStrategy;
-        private ProofSearchInformation<Proof, Goal> info;
+        private final ProverCore<Goal> applyStrategy;
+        private ProofSearchInformation<Goal> info;
         private volatile boolean backgroundStarted = false;
 
         public AutoModeWorker(final Proof proof, final ImmutableList<Goal> goals,
@@ -252,7 +252,7 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         protected void emitInteractiveAutoMode(List<Node> initialGoals, Proof proof,
-                ProofSearchInformation<Proof, Goal> info) {
+                ProofSearchInformation<Goal> info) {
             interactionListeners.forEach((l) -> l.runAutoMode(initialGoals, proof, info));
         }
 
@@ -262,7 +262,7 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         @Override
-        protected ProofSearchInformation<Proof, Goal> doInBackground() {
+        protected ProofSearchInformation<Goal> doInBackground() {
             backgroundStarted = true;
             try {
                 boolean stopMode =

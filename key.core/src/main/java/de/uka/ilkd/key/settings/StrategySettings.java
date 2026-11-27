@@ -8,7 +8,6 @@ import java.util.Objects;
 import java.util.Properties;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -58,7 +57,7 @@ public class StrategySettings extends AbstractSettings {
      * to select the next {@link Goal} to apply a rule on. If no one is defined the default one of
      * the {@link ApplyStrategy}, which is defined by the user interface, is used.
      */
-    private GoalChooser<Proof, Goal> customApplyStrategyGoalChooser;
+    private GoalChooser<Goal> customApplyStrategyGoalChooser;
 
     /**
      * returns the maximal amount of heuristics steps before a user interaction is required
@@ -329,7 +328,7 @@ public class StrategySettings extends AbstractSettings {
      * @return The customized {@link GoalChooser} to use or {@code null} to use the default one of
      *         the {@link ApplyStrategy}.
      */
-    public GoalChooser<Proof, Goal> getCustomApplyStrategyGoalChooser() {
+    public GoalChooser<Goal> getCustomApplyStrategyGoalChooser() {
         return customApplyStrategyGoalChooser;
     }
 
@@ -341,7 +340,7 @@ public class StrategySettings extends AbstractSettings {
      * @param customGoalChooser The customized {@link GoalChooser} to use or {@code null} to use the
      *        default one of the {@link ApplyStrategy}.
      */
-    public void setCustomApplyStrategyGoalChooser(GoalChooser<Proof, Goal> customGoalChooser) {
+    public void setCustomApplyStrategyGoalChooser(GoalChooser<Goal> customGoalChooser) {
         this.customApplyStrategyGoalChooser = customGoalChooser;
     }
 }

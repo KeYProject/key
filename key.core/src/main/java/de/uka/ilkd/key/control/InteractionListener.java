@@ -36,7 +36,7 @@ public interface InteractionListener {
             boolean forced);
 
     void runAutoMode(List<Node> initialGoals, Proof proof,
-            ProofSearchInformation<Proof, Goal> info);
+            ProofSearchInformation<Goal> info);
 
     void runRule(Node goal, RuleApp app);
 

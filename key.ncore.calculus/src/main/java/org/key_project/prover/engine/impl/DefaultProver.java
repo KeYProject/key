@@ -15,7 +15,6 @@ import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.rules.RuleApp;
 
-import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +27,9 @@ import org.slf4j.LoggerFactory;
 /// and behaviors for proof construction.
 ///
 ///
-/// @param <Proof> the type of [ProofObject] that the prover constructs
 /// @param <Goal> the type of [ProofGoal] instances manipulated by this prover
-public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extends ProofGoal<Goal>>
-        extends AbstractProverCore<Proof, Goal> {
+public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
+        extends AbstractProverCore<Goal> {
 
     /// Logger for tracing and debugging the prover's execution.
     private final static Logger LOGGER = LoggerFactory.getLogger(DefaultProver.class);
@@ -40,7 +38,7 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
     public static final AtomicLong PERF_GOAL_APPLY = new AtomicLong();
 
     /// The proof currently being constructed or manipulated by this prover.
-    protected @MonotonicNonNull Proof proof;
+    protected ProofObject<Goal> proof;
 
     /// The maximum number of rule applications allowed during the proof process.
     protected int maxApplications;
@@ -71,7 +69,7 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
     protected @Nullable StopCondition<Goal> stopCondition;
 
     /// A strategy component that selects the next goal to be processed.
-    protected @Nullable GoalChooser<Proof, Goal> goalChooser;
+    protected @Nullable GoalChooser<Goal> goalChooser;
 
     /// This is currently a hook method for the JavaDL prover as according to a
     /// comment the built-in-rule index is not updated when rules are applied.
@@ -93,8 +91,8 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
     /// @param goalChooser the [GoalChooser] that determines the next goal to process
     /// @param stopCondition the [StopCondition] that dictates when the prover should stop
     /// @return an [ApplyStrategyInfo] instance containing details about the proof process
-    protected final synchronized ApplyStrategyInfo<Proof, Goal> doWork(
-            final GoalChooser<Proof, Goal> goalChooser,
+    protected final synchronized ApplyStrategyInfo<@Nullable Goal> doWork(
+            final GoalChooser<Goal> goalChooser,
             final StopCondition<Goal> stopCondition) {
         assert proof != null : "@AssumeAssertion(nullness): proof cannot be null";
         long time = System.currentTimeMillis();
@@ -143,7 +141,7 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
                 closedGoals);
         } catch (InterruptedException e) {
             cancelled = true;
-            return new ApplyStrategyInfo<Proof, Goal>("Interrupted.", proof, null,
+            return new ApplyStrategyInfo<Goal>("Interrupted.", proof, null,
                 goalChooser.getNextGoal(),
                 System.currentTimeMillis() - time, countApplied, closedGoals);
         } catch (Throwable t) { // treated later in finished()
@@ -166,7 +164,7 @@ public abstract class DefaultProver<Proof extends ProofObject<Goal>, Goal extend
     /// @return a [SingleRuleApplicationInfo] instance containing the result of the rule
     /// application
     protected final synchronized SingleRuleApplicationInfo applyAutomaticRule(
-            final GoalChooser<Proof, Goal> goalChooser,
+            final GoalChooser<Goal> goalChooser,
             final StopCondition<Goal> stopCondition,
             long startTime, boolean stopAtFirstNonClosableGoal) {
         // Look for the strategy ...
