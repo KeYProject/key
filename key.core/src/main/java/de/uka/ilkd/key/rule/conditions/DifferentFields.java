@@ -22,6 +22,13 @@ public final class DifferentFields extends VariableConditionAdapter {
 
     private final SchemaVariable var1, var2;
 
+    /**
+     * Instantiates a new different-fields condition.
+     *
+     * @param var1 the first schema variable; both instantiations must differ in their top-level
+     *        unique function symbol
+     * @param var2 the second schema variable
+     */
     public DifferentFields(SchemaVariable var1, SchemaVariable var2) {
         this.var1 = var1;
         this.var2 = var2;

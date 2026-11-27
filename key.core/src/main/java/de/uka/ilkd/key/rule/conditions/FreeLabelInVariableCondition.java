@@ -15,6 +15,12 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 
+/**
+ * A variable condition for the taclet construct {@code \freeLabelIn}, checking whether a program
+ * label occurs freely in a Java program (block).
+ *
+ * @author Michael Kirsten
+ */
 public final class FreeLabelInVariableCondition extends VariableConditionAdapter {
 
     private final SchemaVariable label;
@@ -22,6 +28,14 @@ public final class FreeLabelInVariableCondition extends VariableConditionAdapter
     private final boolean negated;
     private final FreeLabelFinder freeLabelFinder = new FreeLabelFinder();
 
+    /**
+     * Instantiates a new free-label-in condition.
+     *
+     * @param label the schema variable which must be instantiated with a program label
+     * @param statement the schema variable which must be instantiated with a program element
+     *        (statement)
+     * @param negated whether the condition is negated ({@code \not freeLabelIn})
+     */
     public FreeLabelInVariableCondition(SchemaVariable label, SchemaVariable statement,
             boolean negated) {
         this.label = label;

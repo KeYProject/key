@@ -10,7 +10,10 @@ import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import org.key_project.logic.op.sv.SchemaVariable;
 
 /**
- * variable condition used if a new variable is introduced
+ * Variable condition that introduces a new variable into a taclet. The sort of the new variable
+ * is defined by the second argument: either an explicit Java type ({@code \new(sv, T)}), a sort
+ * ({@code \new(sv, S)}), or the type of another schema variable
+ * ({@code \new(sv, \typeof(otherSV))}); the latter form is also used for {@code \newTypeOf}.
  */
 public class NewVarcond implements org.key_project.prover.rules.conditions.NewVarcond {
 
@@ -18,10 +21,12 @@ public class NewVarcond implements org.key_project.prover.rules.conditions.NewVa
     private final SchemaVariable peerSV;
     private final KeYJavaType type;
 
-    /*
-     * @param sv the SchemaVariable representing a new variable.
+    /**
+     * Creates a condition that introduces {@code sv} with the type of the schema variable
+     * {@code peerSV}.
      *
-     * @param peerSV a SchemaVariable defining the type of the new variable.
+     * @param sv the schema variable representing the new variable
+     * @param peerSV the schema variable that defines the type of the new variable
      */
     public NewVarcond(SchemaVariable sv, SchemaVariable peerSV) {
         assert sv != null;
@@ -31,6 +36,12 @@ public class NewVarcond implements org.key_project.prover.rules.conditions.NewVa
         this.type = null;
     }
 
+    /**
+     * Creates a condition that introduces {@code sv} with the given Java type.
+     *
+     * @param sv the schema variable representing the new variable
+     * @param type the Java type of the new variable
+     */
     public NewVarcond(SchemaVariable sv, KeYJavaType type) {
         assert sv != null;
         assert type != null;

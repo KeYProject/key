@@ -8,6 +8,14 @@ dependencies {
     api project(':key.util')
     api project(':key.ncore')
     implementation(libs.jspecify)
+
+    annotationProcessor(libs.therapi.processor)
+}
+
+tasks.withType(JavaCompile).configureEach {
+    // The Javadocs of the conditions implemented in this module are read by the varcond
+    // documentation generator in key.core (see de.uka.ilkd.key.doc.VarcondDoc).
+    options.compilerArgs << "-Ajavadoc.packages=org.key_project.prover.rules.conditions"
 }
 
 checkerFramework {
