@@ -8,7 +8,6 @@ package de.uka.ilkd.key.proof.init;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.RuleSourceFactory;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
@@ -43,14 +42,14 @@ public abstract class AbstractProfile implements Profile {
     private final ImmutableSet<StrategyFactory> strategies;
 
     private final ImmutableSet<String> supportedGC;
-    private final ImmutableSet<GoalChooserFactory<Proof, Goal>> supportedGCB;
+    private final ImmutableSet<GoalChooserFactory<Goal>> supportedGCB;
 
-    private GoalChooserFactory<Proof, Goal> prototype;
+    private GoalChooserFactory<Goal> prototype;
 
     private TermLabelManager termLabelManager;
 
     private static ImmutableSet<String> extractNames(
-            ImmutableSet<GoalChooserFactory<Proof, Goal>> supportedGCB) {
+            ImmutableSet<GoalChooserFactory<Goal>> supportedGCB) {
 
         ImmutableSet<String> result = DefaultImmutableSet.nil();
 
@@ -74,8 +73,8 @@ public abstract class AbstractProfile implements Profile {
         initTermLabelManager();
     }
 
-    protected ImmutableSet<GoalChooserFactory<Proof, Goal>> computeSupportedGoalChooserBuilder() {
-        return DefaultImmutableSet.<GoalChooserFactory<Proof, Goal>>nil()
+    protected ImmutableSet<GoalChooserFactory<Goal>> computeSupportedGoalChooserBuilder() {
+        return DefaultImmutableSet.<GoalChooserFactory<Goal>>nil()
                 .add(new DefaultGoalChooserFactory())
                 .add(new DepthFirstGoalChooserFactory());
     }
@@ -142,7 +141,7 @@ public abstract class AbstractProfile implements Profile {
      * @return this implementation returns a new instance of {@link DefaultGoalChooserFactory}
      */
     @Override
-    public GoalChooserFactory<Proof, @NonNull Goal> getDefaultGoalChooserBuilder() {
+    public GoalChooserFactory<@NonNull Goal> getDefaultGoalChooserBuilder() {
         return new DefaultGoalChooserFactory();
     }
 
@@ -170,7 +169,7 @@ public abstract class AbstractProfile implements Profile {
      * @return a new instance of the builder or <code>null</code> if the demanded chooser is not
      *         supported
      */
-    public GoalChooserFactory<Proof, Goal> lookupGC(String name) {
+    public GoalChooserFactory<Goal> lookupGC(String name) {
         for (var supprotedGCB : supportedGCB) {
             if (supprotedGCB.name().equals(name)) {
                 return supprotedGCB.copy();
@@ -183,7 +182,7 @@ public abstract class AbstractProfile implements Profile {
      * returns a copy of the selected goal chooser builder
      */
     @Override
-    public GoalChooserFactory<Proof, @NonNull Goal> getSelectedGoalChooserBuilder() {
+    public GoalChooserFactory<@NonNull Goal> getSelectedGoalChooserBuilder() {
         return prototype.copy();
     }
 

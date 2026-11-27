@@ -57,7 +57,8 @@ public interface ProofSearchInformation<G extends ProofGoal<G>> {
     /// conclusion of the strategy execution.
     ///
     ///
-    /// @return the proof object of type `P`
+    /// @return the proof object
+    /// @return the proof object
     ProofObject<G> getProof();
 
     /// Retrieves one of non-closeable proof goals, if one exists.
@@ -120,7 +121,7 @@ public interface ProofSearchInformation<G extends ProofGoal<G>> {
     /// needed for batch runs (messages becomes a generic message)
     /// counters are summed and in case of error and non-closeable goal
     /// the first current one is kept
-    /// @param other the ProofSearchInformation<P,G> to combine with
-    /// @return the aggregated ProofSearchInformation<P,G>
+    /// @param other the [ProofSearchInformation<G>] to combine with
+    /// @return the aggregated [ProofSearchInformation<G>]
     ProofSearchInformation<G> join(ProofSearchInformation<G> other);
 }

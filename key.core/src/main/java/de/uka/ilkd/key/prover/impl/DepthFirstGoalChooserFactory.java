@@ -5,12 +5,11 @@
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.GoalChooserFactory;
 
-public class DepthFirstGoalChooserFactory implements GoalChooserFactory<Proof, Goal> {
+public class DepthFirstGoalChooserFactory implements GoalChooserFactory<Goal> {
 
     public static final String NAME = "Depth First Goal Chooser";
 
@@ -20,7 +19,7 @@ public class DepthFirstGoalChooserFactory implements GoalChooserFactory<Proof, G
         return new DepthFirstGoalChooser();
     }
 
-    public GoalChooserFactory<Proof, Goal> copy() {
+    public GoalChooserFactory<Goal> copy() {
         return new DepthFirstGoalChooserFactory();
     }
 

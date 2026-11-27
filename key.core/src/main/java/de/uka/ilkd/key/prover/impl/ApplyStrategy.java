@@ -104,12 +104,10 @@ public class ApplyStrategy extends DefaultProver<Goal> {
      *
      */
     private synchronized ApplyStrategyInfo<Goal> start(ProofObject<Goal> p_proof,
-            ImmutableList<Goal> goals,
-            Object strategySettings) {
+            ImmutableList<Goal> goals, StrategySettings strategySettings) {
         final Proof proof = (Proof) p_proof;
-        final StrategySettings stratSet = (StrategySettings) strategySettings;
-        int maxSteps = stratSet.getMaxSteps();
-        long timeout = stratSet.getTimeout();
+        int maxSteps = strategySettings.getMaxSteps();
+        long timeout = strategySettings.getTimeout();
 
         boolean stopAtFirstNonCloseableGoal = proof.getSettings().getStrategySettings()
                 .getActiveStrategyProperties().getProperty(StrategyProperties.STOPMODE_OPTIONS_KEY)

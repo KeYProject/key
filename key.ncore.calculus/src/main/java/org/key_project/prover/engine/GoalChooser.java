@@ -19,7 +19,7 @@ public interface GoalChooser<G extends ProofGoal<G>> {
     ///
     /// @param p_proof the proof object
     /// @param p_goals the initial list of goals
-    void init(ProofObject<G> p_proof, @Nullable ImmutableList<G> p_goals);
+    void init(@Nullable ProofObject<G> p_proof, @Nullable ImmutableList<G> p_goals);
 
     /// @return the next goal a taclet should be applied to
     @Nullable

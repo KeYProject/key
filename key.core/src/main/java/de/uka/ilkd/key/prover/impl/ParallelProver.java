@@ -354,7 +354,7 @@ public final class ParallelProver extends DefaultProver<Goal> {
     /// @param maxSteps The maximum number of rule applications to perform per goal task.
     /// @param timeout The maximum duration (in milliseconds) to perform the proof search (global
     /// over all tasks).
-    /// @return An [ApplyStrategy] object containing information about the performed
+    /// @return An [ApplyStrategyInfo] object containing information about the performed
     /// work, such as the number of rules applied.
     @Override
     public synchronized ApplyStrategyInfo<Goal> startEach(ProofObject<Goal> proof,
@@ -390,15 +390,14 @@ public final class ParallelProver extends DefaultProver<Goal> {
         // Enter the multi-worker run scope (MT-active marker + sealed Java types) with guaranteed
         // teardown: the pool is created *inside* this scope so that a failure while entering it
         // (e.g. sealing) can never leak the marker or an unshut pool.
-        final RunScope mtScope = enterMultiWorkerRunScope();
-        try {
+        try (RunScope mtScope = enterMultiWorkerRunScope()) {
             final int poolId = POOL_COUNTER.incrementAndGet();
             final ExecutorService pool = Executors.newFixedThreadPool(workerCount, r -> {
                 Thread t = new Thread(r, "key-prover-" + poolId + "-worker");
                 t.setDaemon(true);
                 return t;
             });
-            try (var ignored = ((Proof) proof).suspendNonEssentialListeners()) {
+            try (var ignored = proof().suspendNonEssentialListeners()) {
                 List<Future<?>> futures = new ArrayList<>(workerCount);
                 try {
                     for (int w = 0; w < workerCount; w++) {
@@ -433,8 +432,6 @@ public final class ParallelProver extends DefaultProver<Goal> {
                     awaitWorkerTermination(pool);
                 }
             }
-        } finally {
-            mtScope.close();
         }
 
         // Publish the lock-free counters into the inherited fields for the result.
@@ -475,7 +472,7 @@ public final class ParallelProver extends DefaultProver<Goal> {
         }
         final RunScope marker = enterMultiThreadedRun(proof);
         try {
-            final JavaInfo javaInfo = ((Proof) proof).getServices().getJavaInfo();
+            final JavaInfo javaInfo = proof().getServices().getJavaInfo();
             // Materialise the default execution context on this proof's (fresh) JavaInfo before
             // sealing, so the matcher reads it instead of registering it during the run.
             javaInfo.getDefaultExecutionContext();
@@ -730,5 +727,9 @@ public final class ParallelProver extends DefaultProver<Goal> {
     @Override
     public boolean hasBeenInterrupted() {
         return cancelled;
+    }
+
+    private Proof proof() {
+        return (Proof) proof;
     }
 }

@@ -140,7 +140,7 @@ public interface Profile {
     /**
      * returns the default builder for a goal chooser
      */
-    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<P, G> getDefaultGoalChooserBuilder();
+    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<G> getDefaultGoalChooserBuilder();
 
     /**
      * sets the user selected goal chooser builder to be used as prototype
@@ -153,7 +153,7 @@ public interface Profile {
     /**
      * returns a new builder instance for the selected goal choooser
      */
-    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<P, G> getSelectedGoalChooserBuilder();
+    <P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> GoalChooserFactory<G> getSelectedGoalChooserBuilder();
 
     /**
      * returns the (default) justification for the given rule

@@ -5,18 +5,17 @@
 package org.key_project.prover.engine;
 
 import org.key_project.prover.proof.ProofGoal;
-import org.key_project.prover.proof.ProofObject;
 
 import org.jspecify.annotations.NonNull;
 
 /// Interface to be implemented by builders returning a goal chooser.
-public interface GoalChooserFactory<P extends ProofObject<G>, G extends ProofGoal<@NonNull G>> {
+public interface GoalChooserFactory<G extends ProofGoal<@NonNull G>> {
 
     /// returns a new goal chooser
     GoalChooser<G> create();
 
     /// returns a clone of this goal chooser
-    GoalChooserFactory<P, G> copy();
+    GoalChooserFactory<G> copy();
 
     /// returns the name of the goal chooser
     String name();
