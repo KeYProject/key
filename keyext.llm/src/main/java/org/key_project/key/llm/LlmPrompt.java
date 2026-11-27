@@ -1,0 +1,1066 @@
+/* This file is part of KeY - https://key-project.org
+ * KeY is licensed under the GNU General Public License Version 2, 
+ * or (at your option) any later version.
+ * SPDX-License-Identifier: GPL-2.0-or-later */
+package org.key_project.key.llm;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.dnd.DragSource;
+import java.awt.dnd.DragSourceAdapter;
+import java.awt.dnd.DragSourceDragEvent;
+import java.awt.dnd.DragSourceDropEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Supplier;
+import javax.swing.*;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
+import de.uka.ilkd.key.gui.docking.DynamicCMenu;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.help.HelpFacade;
+import de.uka.ilkd.key.gui.nodeviews.PosInSequentTransferable;
+import de.uka.ilkd.key.gui.nodeviews.PosInSequentTransferable.PrintMode;
+import de.uka.ilkd.key.gui.settings.SettingsManager;
+import de.uka.ilkd.key.gui.settings.SettingsProvider;
+import de.uka.ilkd.key.gui.utilities.LexerHighlighter;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CMenu;
+import bibliothek.gui.dock.common.action.CRadioButton;
+import bibliothek.gui.dock.common.action.CRadioGroup;
+import net.miginfocom.layout.CC;
+import net.miginfocom.layout.LC;
+import net.miginfocom.swing.MigLayout;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
+
+/**
+ * The KeY-Agent chat panel. It is deliberately thin: prompt assembly lives in
+ * {@link ExtendedPrompt}, the agent turn is driven by {@link AgentLoop} and the markup in the
+ * input box is resolved by {@link PromptResolver}. This panel only collects input, renders the
+ * conversation, asks for tool approvals and relays answers to the agent's questions.
+ * <p>
+ * A turn is started on a background thread; whenever the loop pauses (question or approval) the
+ * corresponding box is added and the turn is resumed with the user's decision.
+ *
+ * @author Alexander Weigl
+ */
+public class LlmPrompt extends JPanel implements TabPanel, TurnScheduler.TurnListener {
+    private static final org.slf4j.Logger LOGGER =
+        org.slf4j.LoggerFactory.getLogger(LlmPrompt.class);
+
+    public static final ColorSettings.ColorProperty COLOR_BG_INPUT = ColorSettings.define(
+        "llm.output.bg.input", "Background color in chat of LLM answers", new Color(130, 180, 220));
+    public static final ColorSettings.ColorProperty COLOR_BG_ERROR = ColorSettings.define(
+        "llm.output.bg.error", "Background color in chat of LLM answers", new Color(255, 180, 180));
+    public static final ColorSettings.ColorProperty COLOR_BG_ANSWER = ColorSettings.define(
+        "llm.output.bg.answer", "Background color in chat of LLM answers",
+        new Color(230, 230, 230));
+    public static final ColorSettings.ColorProperty COLOR_BG_ACTION = ColorSettings.define(
+        "llm.output.bg.action", "Background color of question/approval boxes",
+        new Color(255, 244, 200));
+
+    private final JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+    private final AutocompleteInput txtInput = new AutocompleteInput();
+    private final JPanel pOutput = new ConversationPanel();
+    private final JScrollPane scrpOutput = new JScrollPane(pOutput);
+
+    private final KeyAction actionSwitchOrientation = new SwitchOrientationAction();
+    private final JButton btnStop = new JButton("Stop");
+    private final JLabel lblQueued = new JLabel("");
+    private final JCheckBox chkProofContext = new JCheckBox("attach proof context");
+
+    /** The live row of the tool call currently running in the foreground (with Background). */
+    private @Nullable JPanel runningToolRow;
+    private @Nullable String runningToolId;
+    /** The rows of the currently running background jobs. */
+    private final List<JPanel> jobRows = new ArrayList<>();
+
+    private final MainWindow mainWindow;
+    private final KeYMediator mediator;
+
+    /** Hint shown while no drag is active: the send shortcut and the completion triggers. */
+    private static final String HINT_SEND =
+        "<html><b>Ctrl+Enter</b> to send &nbsp;·&nbsp; completions: <b>$</b> context, "
+            + "<b>@</b> files, <b>/</b> commands &nbsp;·&nbsp; <b>Ctrl+Space</b> expands</html>";
+    private static final String HINT_DRAG_PRETTY = "<html><b>Drop:</b> pretty-printed as in the "
+        + "sequent view &nbsp;·&nbsp; <b>Shift</b> safe ASCII, <b>Ctrl</b> term structure</html>";
+    private static final String HINT_DRAG_SAFE = "<html><b>Drop:</b> safe ASCII (no unicode, all "
+        + "term labels) &nbsp;·&nbsp; release <b>Shift</b> for pretty, <b>Ctrl</b> structure</html>";
+    private static final String HINT_DRAG_STRUCTURE =
+        "<html><b>Drop:</b> term structure &nbsp;·&nbsp; <b>Shift</b> safe ASCII, release "
+            + "<b>Ctrl</b> for pretty</html>";
+
+    /** The hint below the prompt; shows the drag print mode while a term/sequent is dragged. */
+    private final JLabel hint = new JLabel();
+    /** The print mode last shown in the hint (to avoid redundant label updates). */
+    private @Nullable PrintMode lastHintMode;
+    /** Restores the default hint after a transient message (see {@link #flashHint}). */
+    private @Nullable Timer hintTimer;
+
+    public LlmPrompt(MainWindow mainWindow, @NonNull KeYMediator mediator) {
+        this.mainWindow = mainWindow;
+        this.mediator = mediator;
+
+        // hear about results, queue and background jobs of the current session's scheduler
+        LlmUtils.getSession(mediator.getSelectedProof()).getTurnScheduler().setListener(this);
+        lblQueued.setForeground(Color.GRAY);
+
+        setLayout(new BorderLayout());
+        add(buildToolbar(), BorderLayout.NORTH);
+
+        scrpOutput.getVerticalScrollBar().setUnitIncrement(16);
+        splitPane.add(scrpOutput);
+
+        txtInput.addProvider(AutocompleteProviders.contextTokens());
+        txtInput.addProvider(AutocompleteProviders.files());
+        txtInput.addProvider(AutocompleteProviders.commands(this::openPromptSettings,
+            this::openSkillSettings));
+
+        var inputPane = new JPanel(new BorderLayout());
+        inputPane.add(new JScrollPane(txtInput), BorderLayout.CENTER);
+        hint.setText(HINT_SEND);
+        hint.setForeground(Color.GRAY);
+        hint.setBorder(BorderFactory.createEmptyBorder(0, 4, 2, 4));
+        inputPane.add(hint, BorderLayout.SOUTH);
+
+        splitPane.add(inputPane);
+        add(splitPane, BorderLayout.CENTER);
+
+        // conversation output gets 2/3 of the panel height, input 1/3 - and the split keeps
+        // that ratio when the dock is resized (the default resize weight would give all extra
+        // space to the bottom input area)
+        splitPane.setResizeWeight(2.0 / 3.0);
+        splitPane.setDividerLocation(2.0 / 3.0);
+
+        // Ctrl+Enter sends the prompt. It is bound to the input (the usual case) and to the
+        // panel itself, so that it also works when the keyboard focus is on another part of
+        // the KeY-Agent panel (toolbar button, output area, ...). A panel-level
+        // WHEN_ANCESTOR_OF_FOCUSED_COMPONENT binding only matches while the focus is inside
+        // this panel, so it cannot hijack the shortcut in the rest of the main window.
+        var sendAction = new SendPromptAction();
+        var sendStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK);
+        txtInput.getInputMap().put(sendStroke, "sendPrompt");
+        txtInput.getActionMap().put("sendPrompt", sendAction);
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(sendStroke, "sendPrompt");
+        getActionMap().put("sendPrompt", sendAction);
+        // Ctrl+Space expands the $token / @file / /directive at the caret in place. The input's
+        // key listener handles the shortcut while the input itself has the focus (it consumes the
+        // event before any key binding processing); the panel-level binding covers the rest of the
+        // panel (toolbar, output area), where the shortcut would otherwise fall through to the
+        // root pane's AutoMode binding and start the automatic prover instead.
+        var expandAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                expandAtCaret();
+            }
+        };
+        var expandStroke = KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK);
+        txtInput.getInputMap().put(expandStroke, "expandAtCaret");
+        txtInput.getActionMap().put("expandAtCaret", expandAction);
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(expandStroke,
+            "expandAtCaret");
+        getActionMap().put("expandAtCaret", expandAction);
+        txtInput.setExpandHook(this::expandAtCaret);
+
+        // simple KeY syntax highlighting for ```key fenced blocks typed into the prompt
+        txtInput.setHighlighter(new LexerHighlighter.KeYLexerHighlighter());
+
+        // While a term/sequent is dragged from the sequent view, the keyboard modifiers choose
+        // the print mode applied on drop. The sequent view drags via the default drag source,
+        // so global listeners here can observe the drag and reflect the mode in the hint.
+        var dragSource = DragSource.getDefaultDragSource();
+        dragSource.addDragSourceMotionListener(this::dragMoved);
+        dragSource.addDragSourceListener(new DragSourceAdapter() {
+            @Override
+            public void dropActionChanged(DragSourceDragEvent e) {
+                // fired when the gesture modifiers change without mouse movement
+                dragMoved(e);
+            }
+
+            @Override
+            public void dragDropEnd(DragSourceDropEvent e) {
+                endDragHint();
+            }
+        });
+    }
+
+    /**
+     * A drag of a term/sequent is in motion: apply the modifier-dependent print mode and show it
+     * in the hint label. Drag source events may arrive off the EDT.
+     */
+    private void dragMoved(DragSourceDragEvent e) {
+        if (!(e.getDragSourceContext().getTransferable() instanceof PosInSequentTransferable t)) {
+            return;
+        }
+        var mode = PrintMode.of(e.getGestureModifiersEx());
+        if (mode == t.getPrintMode() && mode == lastHintMode) {
+            return;
+        }
+        t.setPrintMode(mode);
+        runOnEdt(() -> showDragHint(mode));
+    }
+
+    private void showDragHint(PrintMode mode) {
+        lastHintMode = mode;
+        hint.setText(switch (mode) {
+            case PRETTY -> HINT_DRAG_PRETTY;
+            case SAFE -> HINT_DRAG_SAFE;
+            case STRUCTURE -> HINT_DRAG_STRUCTURE;
+        });
+    }
+
+    /** The drag ended: restore the default hint. */
+    private void endDragHint() {
+        lastHintMode = null;
+        runOnEdt(() -> hint.setText(HINT_SEND));
+    }
+
+    private static void runOnEdt(Runnable r) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            r.run();
+        } else {
+            SwingUtilities.invokeLater(r);
+        }
+    }
+
+    private JComponent buildToolbar() {
+        var toolbar = new JToolBar();
+        toolbar.setFloatable(false);
+        btnStop.setEnabled(false);
+        btnStop.addActionListener(e -> schedulerOfCurrentSession().requestStop());
+        chkProofContext.addActionListener(e -> {
+            var session = LlmUtils.getSession(mediator.getSelectedProof());
+            session.setAttachProofContext(chkProofContext.isSelected());
+        });
+        toolbar.add(chkProofContext);
+        toolbar.add(lblQueued);
+        toolbar.add(new JButton(new PromptsMenuAction()));
+        toolbar.add(Box.createHorizontalGlue());
+        toolbar.add(new JButton(new ClearHistoryAction()));
+        toolbar.add(btnStop);
+        return toolbar;
+    }
+
+    private @Nullable String activeSkillOfCurrentSession() {
+        return LlmUtils.getSession(mediator.getSelectedProof()).getActiveSkill();
+    }
+
+    /**
+     * Opens the settings dialog at the given settings-tree node (a child of "LLM Settings").
+     */
+    private void openLibrarySettings(SettingsProvider provider) {
+        SettingsManager.getInstance().showSettingsDialog(mainWindow, provider);
+    }
+
+    /** Opens the settings dialog at the prompt library editor ("LLM Settings → Prompts"). */
+    private void openPromptSettings() {
+        openLibrarySettings(LlmExtension.LlmSettingsProvider.PROMPT_LIBRARY);
+    }
+
+    /** Opens the settings dialog at the skill library editor ("LLM Settings → Skills"). */
+    private void openSkillSettings() {
+        openLibrarySettings(LlmExtension.LlmSettingsProvider.SKILL_LIBRARY);
+    }
+
+    /**
+     * Replaces the {@code $token}/{@code @file}/{@code /directive} before the caret with its
+     * currently resolved content (Ctrl+Space). Unknown {@code $tokens} and bare activation
+     * directives stay untouched; the failure is reported in the hint line below the input.
+     */
+    private void expandAtCaret() {
+        var session = LlmUtils.getSession(mediator.getSelectedProof());
+        var context = new PromptResolver.Context() {
+            @Override
+            public @Nullable Proof proof() {
+                return mediator.getSelectedProof();
+            }
+
+            @Override
+            public @Nullable Node node() {
+                return mediator.getSelectedNode();
+            }
+        };
+        boolean expanded = txtInput.expandAtCaret(fragment -> {
+            String value = fragment.startsWith("$")
+                    ? PromptResolver.token(fragment.substring(1), session, context)
+                    : resolveDirective(fragment, session, context);
+            if (value == null || value.isBlank()) {
+                flashHint("cannot expand <b>" + fragment + "</b>");
+            }
+            return value;
+        });
+        if (!expanded) {
+            flashHint("place the caret right after a <b>$token</b>, <b>@file</b> or "
+                + "<b>/directive</b>");
+        }
+    }
+
+    /**
+     * Shows a transient message in the hint line below the input (e.g. why a Ctrl+Space expansion
+     * failed); the default hint returns automatically after a few seconds. A running term/sequent
+     * drag keeps its own print-mode hint.
+     */
+    private void flashHint(String html) {
+        if (lastHintMode != null) {
+            return; // a drag owns the hint line
+        }
+        hint.setText("<html>" + html + "</html>");
+        if (hintTimer == null) {
+            hintTimer = new Timer(4000, e -> {
+                if (lastHintMode == null) {
+                    hint.setText(HINT_SEND);
+                }
+            });
+            hintTimer.setRepeats(false);
+        }
+        hintTimer.restart();
+    }
+
+    private static @Nullable String resolveDirective(String fragment, LlmSession session,
+            PromptResolver.Context context) {
+        var resolved = PromptResolver.resolve(fragment, session, context);
+        return resolved.text().isBlank() ? null : resolved.text();
+    }
+
+    // ------------------------------------------------------------------ rendering helpers
+
+    /**
+     * Adds the box of a user prompt (package-private so the UI tests can render a conversation).
+     */
+    OutputBox<String> addInput(String text) {
+        var o = addBox(new LlmPromptModel<>(LlmPromptModel.Kind.INPUT, text, text),
+            new RepromptAction(text));
+        o.setBackground(COLOR_BG_INPUT.get());
+        return o;
+    }
+
+    /**
+     * Adds the box of an agent answer (package-private so the UI tests can render a
+     * conversation).
+     */
+    void addOutput(String text) {
+        var o = addBox(new LlmPromptModel<>(LlmPromptModel.Kind.OUTPUT, text,
+            new LlmContext.LlmMessage("assistant", text)));
+        o.setBackground(COLOR_BG_ANSWER.get());
+    }
+
+    /**
+     * Renders the tool-activity rows of a finished agent turn (package-private so the UI tests
+     * can render a conversation).
+     */
+    void addToolActivities(@NonNull List<AgentResult.ToolActivity> activities) {
+        addToolActivity(activities);
+    }
+
+    private void addError(String text) {
+        var o = addBox(new LlmPromptModel<>(LlmPromptModel.Kind.ERROR, text, null));
+        o.setBackground(COLOR_BG_ERROR.get());
+    }
+
+    private <T> OutputBox<T> addBox(LlmPromptModel<T> data, Action... actions) {
+        var box = new OutputBox<>(data);
+        for (Action it : actions) {
+            box.menu.add(it);
+        }
+        pOutput.add(box, new CC().growX());
+        box.setBackground(data.kind().background().get());
+        return box;
+    }
+
+    private void addToolActivity(List<AgentResult.ToolActivity> activities) {
+        if (!LlmSettings.INSTANCE.getShowToolActivity() || activities.isEmpty()) {
+            return;
+        }
+        for (var activity : activities) {
+            addActivityBox(activity, 0);
+        }
+        scrollToEnd();
+    }
+
+    /** Renders one tool-activity row; sub-activity (e.g. sub-agent tasks) is indented deeper. */
+    private void addActivityBox(AgentResult.ToolActivity activity, int depth) {
+        var box = new JPanel(new MigLayout(new LC().insets("3 " + (10 + depth * 12) + " 3 10")));
+        box.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        var label = new JLabel("<html><i>" + escapeHtml(activity.name() + "("
+            + clip(activity.arguments(), 160) + ")") + "</i></html>");
+        label.setToolTipText(clip(activity.result(), 2000));
+        box.add(label);
+        pOutput.add(box, new CC().growX());
+        for (var child : activity.children()) {
+            addActivityBox(child, depth + 1);
+        }
+    }
+
+    private static String clip(String s, int max) {
+        if (s == null || s.length() <= max) {
+            return s;
+        }
+        return s.substring(0, max) + "…";
+    }
+
+    private static String escapeHtml(String s) {
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+    }
+
+    /** Dispatches the outcome of a turn step (must run on the EDT). */
+    private void renderAgentResult(AgentResult result) {
+        switch (result) {
+            case AgentResult.Done done -> {
+                addToolActivity(done.activities());
+                addOutput(done.content());
+            }
+            case AgentResult.NeedsInput needsInput -> addQuestionBox(needsInput.questions());
+            case AgentResult.NeedsApproval needsApproval ->
+                addApprovalBox(needsApproval.toolCall());
+            case AgentResult.PausedForBackground paused ->
+                addBackgroundBox(paused);
+            case AgentResult.Failed failed -> {
+                LOGGER.error("Agent turn failed", failed.error());
+                addError(failed.error() == null ? "Unknown error"
+                        : String.valueOf(failed.error().getMessage()));
+            }
+        }
+        scrollToEnd();
+    }
+
+    private void addQuestionBox(List<AgentResult.Question> questions) {
+        pOutput.add(new AskUserBox(questions, this), new CC().growX());
+        scrollToEnd();
+    }
+
+    private void addApprovalBox(AgentResult.ToolCallInfo toolCall) {
+        pOutput.add(new ApprovalBox(toolCall, this), new CC().growX());
+        scrollToEnd();
+    }
+
+    /** Renders a note that a running tool call was moved into the background. */
+    private void addBackgroundBox(AgentResult.PausedForBackground paused) {
+        var box = new JPanel(new MigLayout(new LC().insets("6 10 6 10")));
+        box.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY),
+            BorderFactory.createEmptyBorder(6, 8, 6, 8)));
+        box.setBackground(COLOR_BG_ACTION.get());
+        var label = new JLabel("<html><b>In the background:</b> <code>"
+            + escapeHtml(paused.toolName()) + "</code> · job <code>" + paused.jobId()
+            + "</code><br/>You can keep chatting; the result will be delivered when it"
+            + " finishes.</html>");
+        box.add(label);
+        pOutput.add(box, new CC().growX());
+        scrollToEnd();
+    }
+
+    private void scrollToEnd() {
+        if (LlmSettings.INSTANCE.getAutoScrollOutput()) {
+            SwingUtilities.invokeLater(() -> scrpOutput.getVerticalScrollBar()
+                    .setValue(scrpOutput.getVerticalScrollBar().getMaximum()));
+        }
+    }
+
+    // ----------------------------------------------------------------- turn management
+
+    /**
+     * Submits the raw input to the current session's {@link TurnScheduler}. Input is always
+     * accepted: while another turn runs or is parked, the prompt is queued and processed in order.
+     */
+    private void beginTurn(String text) {
+        if (text.isBlank()) {
+            return;
+        }
+        var proof = mediator.getSelectedProof();
+        var node = mediator.getSelectedNode();
+        var session = LlmUtils.getSession(proof);
+
+        // Pure /skills and /prompts messages are answered locally: the listing is rendered in the
+        // chat without involving the LLM, so the command also works without a configured model.
+        if (PromptResolver.isPureLibraryDirective(text)) {
+            addInput(text);
+            txtInput.setText("");
+            var resolver = new PromptResolver.Context() {
+                @Override
+                public @Nullable Proof proof() {
+                    return proof;
+                }
+
+                @Override
+                public @Nullable Node node() {
+                    return node;
+                }
+            };
+            addOutput(PromptResolver.resolve(text, session, resolver).text());
+            return;
+        }
+
+        var skillName = activeSkillOfCurrentSession();
+        var skill = skillName == null ? null : SkillLibrary.INSTANCE.get(skillName);
+
+        addInput(text);
+        txtInput.setText("");
+        var scheduler = session.getTurnScheduler();
+        scheduler.setListener(this);
+        scheduler.submitPrompt(text, proof, node, skill);
+    }
+
+    void answerQuestion(String answer) {
+        schedulerOfCurrentSession().answer(answer);
+    }
+
+    void decideApproval(boolean allow, boolean always) {
+        schedulerOfCurrentSession().decide(allow, always);
+    }
+
+    void skipTurn() {
+        schedulerOfCurrentSession().requestStop();
+    }
+
+    private TurnScheduler schedulerOfCurrentSession() {
+        var session = LlmUtils.getSession(mediator.getSelectedProof());
+        var scheduler = session.getTurnScheduler();
+        scheduler.setListener(this);
+        return scheduler;
+    }
+
+    // --------------------------------------------------------------- TurnScheduler.TurnListener
+
+    @Override
+    public void onResult(AgentResult result) {
+        onEdt(() -> {
+            removeRunningToolRow();
+            setRunning(false);
+            renderAgentResult(result);
+        });
+    }
+
+    @Override
+    public void onPaused(AgentResult result) {
+        onEdt(() -> {
+            if (result instanceof AgentResult.PausedForBackground) {
+                removeRunningToolRow();
+            }
+            setRunning(true);
+            renderAgentResult(result);
+        });
+    }
+
+    @Override
+    public void onQueueChanged(int queued) {
+        onEdt(() -> lblQueued.setText(queued > 0 ? queued + " queued" : ""));
+    }
+
+    @Override
+    public void onJobsChanged(List<BackgroundJob> jobs) {
+        onEdt(() -> rebuildJobRows(jobs));
+    }
+
+    @Override
+    public void onToolStarted(AgentResult.ToolCallInfo info) {
+        onEdt(() -> showRunningTool(info));
+    }
+
+    @Override
+    public void onToolFinished(String toolCallId, String outcome) {
+        onEdt(() -> {
+            if (java.util.Objects.equals(toolCallId, runningToolId)) {
+                removeRunningToolRow();
+            }
+        });
+    }
+
+    /** Runs {@code action} on the EDT (directly when already there, queued otherwise). */
+    private void onEdt(Runnable action) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            action.run();
+        } else {
+            SwingUtilities.invokeLater(action);
+        }
+    }
+
+    /**
+     * Renders the live row of the tool call currently running in the foreground, with the
+     * "Background" button (enabled when the tool may run in the background and a slot is free).
+     */
+    private void showRunningTool(AgentResult.ToolCallInfo info) {
+        removeRunningToolRow();
+        runningToolId = info.id();
+        var session = LlmUtils.getSession(mediator.getSelectedProof());
+        var row = new JPanel(new MigLayout(new LC().insets("3 10 3 10")));
+        row.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        row.setBackground(COLOR_BG_INPUT.get());
+        var label = new JLabel("<html><i>Running: " + escapeHtml(info.name() + "("
+            + clip(info.arguments(), 80) + ")…") + "</i></html>");
+        row.add(label);
+        if (session.isBackgroundAllowed(info.name()) && session.getBackgroundJobs()
+                .canStartMore(LlmSettings.INSTANCE.getMaxBackgroundJobs())) {
+            var background = new JButton("Background");
+            background.setToolTipText("Move the running call into the background; you can keep"
+                + " chatting and its result is delivered when it finishes.");
+            background.addActionListener(e -> schedulerOfCurrentSession().requestBackground());
+            row.add(background);
+        }
+        var cancel = new JButton("Cancel");
+        cancel.setToolTipText("Stop the agent turn (the call itself keeps running).");
+        cancel.addActionListener(e -> schedulerOfCurrentSession().requestStop());
+        row.add(cancel);
+        pOutput.add(row, new CC().growX());
+        runningToolRow = row;
+        scrollToEnd();
+    }
+
+    private void removeRunningToolRow() {
+        if (runningToolRow != null) {
+            pOutput.remove(runningToolRow);
+            runningToolRow = null;
+        }
+        runningToolId = null;
+        pOutput.revalidate();
+        pOutput.repaint();
+    }
+
+    /** Rebuilds the rows of the running background jobs (each with a Cancel job action). */
+    private void rebuildJobRows(List<BackgroundJob> jobs) {
+        for (var row : jobRows) {
+            pOutput.remove(row);
+        }
+        jobRows.clear();
+        for (var job : jobs) {
+            var row = new JPanel(new MigLayout(new LC().insets("3 10 3 10")));
+            row.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+            row.setBackground(COLOR_BG_ACTION.get());
+            var label = new JLabel("<html><i>Background: " + escapeHtml(job.toolName() + "("
+                + clip(job.arguments(), 80) + ")…") + (job.isCancelled() ? " (cancelling)" : "")
+                + "</i></html>");
+            label.setToolTipText("Running in the background since it was moved out of the"
+                + " foreground turn; the result is delivered when it finishes.\nJob "
+                + job.jobId());
+            row.add(label);
+            var cancel = new JButton("Cancel job");
+            cancel.addActionListener(e -> schedulerOfCurrentSession().cancelJob(job.jobId()));
+            row.add(cancel);
+            pOutput.add(row, new CC().growX());
+            jobRows.add(row);
+        }
+        if (!jobs.isEmpty()) {
+            scrollToEnd();
+        }
+        pOutput.revalidate();
+        pOutput.repaint();
+    }
+
+    private void setRunning(boolean value) {
+        btnStop.setEnabled(value);
+        btnStop.setToolTipText(value ? "Stop the running agent turn" : null);
+    }
+
+    // ------------------------------------------------------------------ TabPanel / actions
+
+    @Override
+    public @NonNull String getTitle() {
+        return "KeY-Agent";
+    }
+
+    @Override
+    public @NonNull JComponent getComponent() {
+        return this;
+    }
+
+    @Override
+    public @NonNull Collection<CAction> getTitleCActions() {
+        Supplier<CMenu> supplier = () -> {
+            CMenu menu = new CMenu();
+            menu.add(actionSwitchOrientation.toCAction());
+
+            CMenu menuModels = new CMenu("Models", null);
+            menu.add(menuModels);
+            var groupModels = new CRadioGroup();
+            var llmSession = LlmUtils.getSession(mediator.getSelectedProof());
+
+            for (var m : LlmSettings.INSTANCE.getAvailableModels()) {
+                var selected = m.equals(llmSession.getModel());
+                final var action = new CRadioButton(m, null) {
+                    @Override
+                    protected void changed() {
+                        llmSession.setModel(m);
+                    }
+                };
+                action.setSelected(selected);
+                groupModels.add(action);
+                menuModels.add(action);
+            }
+            return menu;
+        };
+
+        var a = new DynamicCMenu("Settings", IconFactory.properties(MainWindow.TOOLBAR_ICON_SIZE),
+            supplier);
+        var help = HelpFacade.createHelpButton("user/LLM/");
+        return List.of(help, a);
+    }
+
+    class SwitchOrientationAction extends KeyAction {
+        public SwitchOrientationAction() {
+            setName("Switch Orientation");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (splitPane.getOrientation() == JSplitPane.HORIZONTAL_SPLIT) {
+                splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
+            } else {
+                splitPane.setOrientation(JSplitPane.HORIZONTAL_SPLIT);
+            }
+        }
+    }
+
+    class SendPromptAction extends KeyAction {
+        public SendPromptAction() {
+            setName("Send");
+            putValue(SHORT_DESCRIPTION, "Send the prompt (Ctrl+Enter)");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            beginTurn(txtInput.getText());
+        }
+    }
+
+    class ClearHistoryAction extends KeyAction {
+        public ClearHistoryAction() {
+            setName("Clear history");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            var session = LlmUtils.getSession(mediator.getSelectedProof());
+            session.getContext().clear();
+            session.getSubagentLog().clear();
+            pOutput.removeAll();
+            pOutput.invalidate();
+            pOutput.repaint();
+        }
+    }
+
+    class PromptsMenuAction extends KeyAction {
+        public PromptsMenuAction() {
+            setName("Prompts");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            var menu = new JPopupMenu();
+            for (var prompt : PromptLibrary.INSTANCE.all()) {
+                var item = new JMenuItem(prompt.name());
+                item.setToolTipText(prompt.description());
+                item.addActionListener(ev -> txtInput.replaceSelection(
+                    (txtInput.getCaretPosition() > 0
+                            && !txtInput.getText().substring(0, txtInput.getCaretPosition())
+                                    .endsWith(" ") ? " " : "")
+                            + prompt.template()));
+                menu.add(item);
+            }
+            menu.addSeparator();
+            var newItem = new JMenuItem("+ new prompt\u2026");
+            newItem.addActionListener(ev -> openPromptSettings());
+            menu.add(newItem);
+            menu.show(LlmPrompt.this, 0, 30);
+        }
+    }
+
+    private class RepromptAction extends KeyAction {
+        private final String prompt;
+
+        public RepromptAction(String prompt) {
+            this.prompt = prompt;
+            setName("into input");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            txtInput.setText(prompt);
+        }
+    }
+}
+
+
+/**
+ * The conversation content: stacks the message boxes top to bottom and always fills the viewport
+ * width, so the messages wrap to the width of the panel and the conversation only ever scrolls
+ * vertically (like a line-wrapped text area).
+ */
+class ConversationPanel extends JPanel implements Scrollable {
+    ConversationPanel() {
+        super(new MigLayout(new LC().fillX().topToBottom().wrapAfter(1)));
+    }
+
+    @Override
+    public Dimension getPreferredScrollableViewportSize() {
+        return getPreferredSize();
+    }
+
+    @Override
+    public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return 16;
+    }
+
+    @Override
+    public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+        return orientation == SwingConstants.VERTICAL ? visibleRect.height : visibleRect.width;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportWidth() {
+        return true;
+    }
+
+    @Override
+    public boolean getScrollableTracksViewportHeight() {
+        // the conversation scrolls vertically
+        return false;
+    }
+}
+
+
+/**
+ * A rendered message box in the conversation (input, answer or error). Agent answers are rendered
+ * as Markdown ({@link MarkdownView}), user prompts and errors stay plain text. Right-click offers
+ * the registered context actions (e.g. "into input").
+ */
+class OutputBox<T> extends JPanel {
+    protected final LlmPromptModel<T> model;
+    /** The message content: a Markdown view for answers, a plain text area otherwise. */
+    protected final JComponent output;
+    protected final JPopupMenu menu = new JPopupMenu();
+
+    public OutputBox(LlmPromptModel<T> userData) {
+        this.model = userData;
+        setLayout(new BorderLayout());
+        setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        if (userData.kind() == LlmPromptModel.Kind.OUTPUT) {
+            output = new MarkdownView();
+            ((MarkdownView) output).setMarkdown(userData.text());
+        } else {
+            var text = new JTextArea();
+            text.setEditable(false);
+            text.setText(userData.text());
+            text.setLineWrap(true);
+            text.setWrapStyleWord(true);
+            output = text;
+        }
+        output.setComponentPopupMenu(menu);
+        add(output, BorderLayout.CENTER);
+    }
+
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+        if (output != null) {
+            output.setBackground(bg);
+        }
+    }
+}
+
+
+/**
+ * Renders the questions asked by the agent via {@code question} (OpenCode schema: an optional
+ * header, options with an optional explanation, and optional multiple selections). One box per
+ * turn; the answers of all questions are combined into one text and relayed to the running
+ * agent loop, which continues the turn.
+ */
+class AskUserBox extends JPanel {
+
+    private final List<AgentResult.Question> questions;
+    private final LlmPrompt panel;
+    /** One list of option widgets per question (buttons for single choice, toggles otherwise). */
+    private final List<List<JToggleButton>> optionWidgets = new java.util.ArrayList<>();
+    /** One free-text field per question. */
+    private final List<JTextField> fields = new java.util.ArrayList<>();
+
+    public AskUserBox(List<AgentResult.Question> questions, LlmPrompt panel) {
+        this.questions = questions == null ? List.of() : questions;
+        this.panel = panel;
+        setLayout(new BorderLayout(8, 8));
+        setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY),
+            BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+        setBackground(LlmPrompt.COLOR_BG_ACTION.get());
+        add(sections(), BorderLayout.CENTER);
+    }
+
+    /** The stacked question sections; each carries its own answer widgets. */
+    private JComponent sections() {
+        var sections = new JPanel();
+        sections.setOpaque(false);
+        sections.setLayout(new javax.swing.BoxLayout(sections, javax.swing.BoxLayout.Y_AXIS));
+        for (var question : this.questions) {
+            sections.add(section(question));
+        }
+        return sections;
+    }
+
+    /** One question section: title, optional option widgets and the free-text field. */
+    private JComponent section(AgentResult.Question question) {
+        var section = new JPanel();
+        section.setOpaque(false);
+        section.setLayout(new BorderLayout(4, 4));
+
+        var title = "<html><b>"
+            + text(question.header() == null ? "Question" : question.header())
+            + ":</b> " + text(question.text()) + "</html>";
+        var label = new JLabel(title);
+        label.setBorder(BorderFactory.createEmptyBorder(0, 0, 4, 0));
+        section.add(label, BorderLayout.NORTH);
+
+        var options = question.options() == null ? List.<AgentResult.Question.Option>of()
+                : question.options();
+        var widgets = new ArrayList<JToggleButton>();
+        var center = new JPanel();
+        center.setOpaque(false);
+
+        if (options.isEmpty()) {
+            center.setLayout(new BorderLayout(4, 0));
+        } else if (question.multiple()) {
+            center.setLayout(new javax.swing.BoxLayout(center, javax.swing.BoxLayout.Y_AXIS));
+            var toggles = new JPanel(new java.awt.GridLayout(0, 1, 4, 2));
+            toggles.setOpaque(false);
+            for (var option : options) {
+                var box = new JCheckBox(option.label());
+                box.setToolTipText(option.description() == null ? null
+                        : text(option.description()));
+                widgets.add(box);
+                toggles.add(box);
+            }
+            center.add(toggles, BorderLayout.NORTH);
+        } else {
+            var buttons = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 6, 0));
+            buttons.setOpaque(false);
+            for (var option : options) {
+                if (this.questions.size() == 1) {
+                    // single question: clicking an option answers immediately (OpenCode behavior)
+                    var b = new JButton(option.label());
+                    b.setToolTipText(option.description() == null ? null
+                            : text(option.description()));
+                    b.addActionListener(e -> panel.answerQuestion(option.label()));
+                    buttons.add(b);
+                } else {
+                    var box = new JToggleButton(option.label());
+                    box.setToolTipText(option.description() == null ? null
+                            : text(option.description()));
+                    widgets.add(box);
+                    buttons.add(box);
+                }
+            }
+            center.add(buttons, BorderLayout.NORTH);
+        }
+
+        // a free-text answer is always available
+        var field = new JTextField(40);
+        var send = new JButton("Send");
+        send.addActionListener(e -> panel.answerQuestion(answer()));
+        var skip = new JButton("Skip");
+        skip.addActionListener(e -> panel.skipTurn());
+        var row = new JPanel(new BorderLayout(4, 0));
+        row.setOpaque(false);
+        row.add(field, BorderLayout.CENTER);
+        var buttons = new JPanel();
+        buttons.setOpaque(false);
+        buttons.add(send);
+        buttons.add(skip);
+        row.add(buttons, BorderLayout.EAST);
+        field.addActionListener(e -> send.doClick());
+        if (options.isEmpty()) {
+            center.add(row, BorderLayout.CENTER);
+        } else {
+            center.add(row, BorderLayout.SOUTH);
+        }
+
+        fields.add(field);
+        optionWidgets.add(widgets);
+        section.add(center, BorderLayout.CENTER);
+        return section;
+    }
+
+    /** The combined answer of all questions of this box. */
+    private String answer() {
+        var parts = new ArrayList<String>();
+        for (int i = 0; i < questions.size(); i++) {
+            var question = questions.get(i);
+            var field = i < fields.size() ? fields.get(i) : null;
+            var free = field == null ? "" : field.getText().strip();
+            var selected = new ArrayList<String>();
+            if (i < optionWidgets.size()) {
+                for (var widget : optionWidgets.get(i)) {
+                    if (widget.isSelected()) {
+                        selected.add(label(widget));
+                    }
+                }
+            }
+            var chosen = String.join(", ", selected);
+            if (!free.isEmpty()) {
+                chosen = chosen.isEmpty() ? free : chosen + "; " + free;
+            }
+            if (chosen.isEmpty()) {
+                continue;
+            }
+            var name = question.header() == null ? question.text() : question.header();
+            parts.add(questions.size() == 1 ? chosen : name + ": " + chosen);
+        }
+        if (parts.isEmpty()) {
+            return "(no answer given)";
+        }
+        return String.join("\n", parts);
+    }
+
+    /** The label of an option widget (the button text). */
+    private static String label(JToggleButton widget) {
+        return widget instanceof AbstractButton button ? button.getText() : "";
+    }
+
+    private static String text(String s) {
+        return s == null ? "" : s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+    }
+}
+
+
+/**
+ * Renders a tool call that awaits user approval. The user may allow it once, allow it always
+ * (remembered in the settings) or deny it.
+ */
+class ApprovalBox extends JPanel {
+    public ApprovalBox(AgentResult.ToolCallInfo toolCall, LlmPrompt panel) {
+        setLayout(new BorderLayout(8, 8));
+        setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.GRAY),
+            BorderFactory.createEmptyBorder(8, 10, 8, 10)));
+        setBackground(LlmPrompt.COLOR_BG_ACTION.get());
+        var label = new JLabel("<html><b>Approval required:</b> " + "tool <code>"
+            + text(toolCall.name()) + "</code><br/><code>" + text(toolCall.arguments())
+            + "</code></html>");
+        label.setBorder(BorderFactory.createEmptyBorder(0, 0, 6, 0));
+        add(label, BorderLayout.NORTH);
+
+        var buttons = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 6, 0));
+        var allowOnce = new JButton("Allow once");
+        allowOnce.addActionListener(e -> panel.decideApproval(true, false));
+        buttons.add(allowOnce);
+        var always = new JButton("Always allow");
+        always.setToolTipText("Remember the decision for this tool (persisted in the settings)");
+        always.addActionListener(e -> panel.decideApproval(true, true));
+        buttons.add(always);
+        var deny = new JButton("Deny");
+        deny.addActionListener(e -> panel.decideApproval(false, false));
+        buttons.add(deny);
+        add(buttons, BorderLayout.SOUTH);
+    }
+
+    private static String text(String s) {
+        return s == null ? "" : s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+    }
+}
