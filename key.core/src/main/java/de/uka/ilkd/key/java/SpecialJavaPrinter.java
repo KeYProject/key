@@ -20,6 +20,7 @@ import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.jml.doc.JmlDoc;
 import com.github.javaparser.printer.DefaultPrettyPrinterVisitor;
 import com.github.javaparser.printer.configuration.PrinterConfiguration;
 import com.google.common.base.Strings;
@@ -38,6 +39,14 @@ import org.jspecify.annotations.Nullable;
 public class SpecialJavaPrinter extends DefaultPrettyPrinterVisitor {
     public SpecialJavaPrinter(PrinterConfiguration configuration) {
         super(configuration);
+    }
+
+    @Override
+    public void visit(JmlDoc n, Void arg) {
+        // The content of a JmlDoc is the complete JML comment including its `/*@ ... */` or
+        // `//@ ...` delimiters. The default visitor wraps it in another JML comment, which
+        // produces doubled markers such as `//@ /*@ ... */` or `//@ //@ ...`.
+        printer.print(n.getContent());
     }
 
     @Override
