@@ -519,6 +519,14 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getOpenGoalCount() {
+        return openGoals.size();
+    }
+
+    /**
      * Returns the list of closed goals, needed to make pruning in closed branches possible. If the
      * list needs too much memory, pruning can be disabled via the command line option
      * "--no-pruning-closed". In this case the list will not be filled.

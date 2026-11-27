@@ -11,7 +11,6 @@ import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.settings.DefaultSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.smt.*;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.testgen.macros.SemanticsBlastingMacro;
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskFinishedInfo;
 import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
+import org.key_project.prover.engine.impl.DefaultTaskStartedInfo;
 import org.key_project.prover.sequent.Sequent;
 
 import org.slf4j.Logger;

@@ -57,4 +57,12 @@ public interface ProofObject<G extends ProofGoal<G>> {
     ///
     /// @return services managing the logic infrastructure
     LogicServices getServices();
+
+    /// @return true iff the proof is disposed and must not be used anymore
+    default boolean isDisposed() {
+        return false;
+    }
+
+    /// @return the number of open goals
+    int getOpenGoalCount();
 }

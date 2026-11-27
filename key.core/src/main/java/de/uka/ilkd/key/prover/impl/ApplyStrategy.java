@@ -16,6 +16,8 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import org.key_project.prover.engine.*;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.engine.impl.DefaultProver;
+import org.key_project.prover.engine.impl.DefaultTaskFinishedInfo;
+import org.key_project.prover.engine.impl.DefaultTaskStartedInfo;
 import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;

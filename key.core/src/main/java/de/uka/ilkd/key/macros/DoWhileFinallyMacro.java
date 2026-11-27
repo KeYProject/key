@@ -7,10 +7,10 @@ package de.uka.ilkd.key.macros;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskStartedInfo.TaskKind;
+import org.key_project.prover.engine.impl.DefaultTaskStartedInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.util.collection.ImmutableList;
 
@@ -76,7 +76,7 @@ public abstract class DoWhileFinallyMacro extends AbstractProofMacro {
             steps -= info.getAppliedRules();
             info = new ProofMacroFinishedInfo(this, info);
             goals = info.getGoals();
-            proof = info.getProof();
+            proof = (Proof) info.getProof();
             posInOcc = null;
         }
         final ProofMacro altMacro = getAltProofMacro();

@@ -2,11 +2,10 @@
  * KeY is licensed under the GNU General Public License Version 2, 
  * or (at your option) any later version.
  * SPDX-License-Identifier: GPL-2.0-or-later */
-package de.uka.ilkd.key.prover.impl;
-
-import de.uka.ilkd.key.proof.Proof;
+package org.key_project.prover.engine.impl;
 
 import org.key_project.prover.engine.TaskFinishedInfo;
+import org.key_project.prover.proof.ProofObject;
 
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -29,17 +28,8 @@ import org.jspecify.annotations.Nullable;
 public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
 
     /**
-     * The task that has finished. This can be one of several possible sources:
-     * <ul>
-     * <li>{@link de.uka.ilkd.key.macros.ProofMacro}</li>
-     * <li>{@link ApplyStrategy}</li>
-     * <li>{@code de.uka.ilkd.key.core.KeYMediator} (when pruning)</li>
-     * <li>{@code de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem}
-     * (when applying a merge rule)</li>
-     * <li>{@link de.uka.ilkd.key.proof.io.AbstractProblemLoader} (when loading a proof)</li>
-     * </ul>
-     *
-     * @return the source
+     * The task that has finished. This can be one of several possible sources, for example,
+     * proof macros, the provers, loaders, etc.
      */
     private final Object source;
 
@@ -47,7 +37,7 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
     private final @Nullable Object result;
 
     // The proof the task worked on.
-    private final @Nullable Proof proof;
+    private final @Nullable ProofObject<?> proof;
 
     // Time taken to complete the task, in milliseconds.
     private final long timeInMillis;
@@ -69,8 +59,8 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      * @param appliedRules The number of rules applied during the task.
      * @param closedGoals The number of goals closed during the task.
      */
-    public DefaultTaskFinishedInfo(Object source, @Nullable Object result, @Nullable Proof proof,
-            long time, int appliedRules, int closedGoals) {
+    public DefaultTaskFinishedInfo(Object source, @Nullable Object result,
+            @Nullable ProofObject<?> proof, long time, int appliedRules, int closedGoals) {
         this.source = source;
         this.result = result;
         this.proof = proof;
@@ -123,7 +113,7 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
      * {@inheritDoc}
      */
     @Override
-    public @Nullable Proof getProof() {
+    public @Nullable ProofObject<?> getProof() {
         return proof;
     }
 
@@ -162,7 +152,7 @@ public class DefaultTaskFinishedInfo implements TaskFinishedInfo {
             if (closedGoals != 1) {
                 message.append("s");
             }
-            message.append(", ").append(proof.openGoals().size());
+            message.append(", ").append(proof.getOpenGoalCount());
             message.append(" remaining");
             return message.toString();
         } else {
