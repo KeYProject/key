@@ -156,7 +156,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
          * only one model method with same name is allowed (no overloading)
          */
         assert axiomList.size() == 1;
-        ClassAxiom axiom = axiomList.get(0);
+        ClassAxiom axiom = axiomList.getFirst();
 
         // found axiom always is a contract axiom, target always a program (model) method!
         assert axiom instanceof ContractAxiom;
@@ -173,7 +173,7 @@ public class ContractAppCollector extends NodeIntermediateWalker {
         // TODO: this is not the case if multiple contracts are combined with also keyword,
         // however, in this case the contract axioms are completely broken anyway
         assert contractList.size() == 1;
-        Contract contract = contractList.get(0);
+        Contract contract = contractList.getFirst();
 
         // model method contract application is always termination sensitive!
         result.putIfAbsent(contract.getName(), TERMINATION_SENSITIVE);
