@@ -5,7 +5,9 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.ProgramElement;
@@ -143,11 +145,11 @@ public class ForToWhile extends ProgramTransformer {
         if (match == null) {
             return null;
         }
-        if (match.getLoopInvariant() != null) {
-            return match.getLoopInvariant();
-        }
         if (match.getExpandedLoopInvariant() != null) {
             return match.getExpandedLoopInvariant();
+        }
+        if (match.getLoopInvariant() != null) {
+            return match.getLoopInvariant();
         }
 
         // The source loop still uses the source parameter names; the loop in the proof has
@@ -231,10 +233,21 @@ public class ForToWhile extends ProgramTransformer {
                 && ef.getGuardExpression() instanceof ProgramVariable pv) {
             arraySource = pv;
         }
+        Set<String> parameterNames = new LinkedHashSet<>();
+        var context = svInst.getContextInstantiation();
+        if (context != null && context.activeStatementContext() != null) {
+            var method = context.activeStatementContext().getMethodContext();
+            if (method != null) {
+                for (var parameter : method.getParameters()) {
+                    parameterNames.add(parameter.getVariableSpecification().getProgramVariable()
+                            .name().toString());
+                }
+            }
+        }
         WhileLoopTransformation w = new ForToWhileTransformation(pe,
             (ProgramElementName) svInst.getInstantiation(outerLabel),
             (ProgramElementName) svInst.getInstantiation(innerLabel), services, sourceInvariant,
-            targetVariables, arraySource);
+            targetVariables, arraySource, parameterNames);
 
         w.start();
         return new ProgramElement[] { w.result() };

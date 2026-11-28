@@ -5,6 +5,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
@@ -21,11 +22,13 @@ import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This transformation is used to transform a for-loop into a while-loop.
@@ -46,14 +49,21 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
     private final LoopSpecification sourceInvariant;
     private final Map<String, ProgramVariable> targetVariables;
     private final ProgramVariable arraySource;
+    private final Set<String> parameterNames;
 
     public ForToWhileTransformation(ProgramElement root, ProgramElementName outerLabel,
             ProgramElementName innerLabel, Services services, LoopSpecification sourceInvariant,
-            Map<String, ProgramVariable> targetVariables, ProgramVariable arraySource) {
+            Map<String, ProgramVariable> targetVariables, ProgramVariable arraySource,
+            Set<String> parameterNames) {
         super(root, outerLabel, innerLabel, services);
         this.sourceInvariant = sourceInvariant;
         this.targetVariables = targetVariables;
         this.arraySource = arraySource;
+        this.parameterNames = parameterNames;
+    }
+
+    private boolean isNotParameter(LocationVariable variable) {
+        return !parameterNames.contains(variable.name().toString().replaceFirst("^_", ""));
     }
 
     /**
@@ -177,12 +187,15 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                     p -> resolve(p, arrVar), services);
                 While newLoop = (While) outerBlockStatements[initSize];
                 TermBuilder tb = services.getTermBuilder();
+                var localIns = MiscTools.getLocalIns(newLoop, services).stream()
+                        .filter(this::isNotParameter).collect(ImmutableList.collector());
+                var localOuts = MiscTools.getLocalOuts(newLoop, services).stream()
+                        .filter(this::isNotParameter).collect(ImmutableList.collector());
                 li = li.create(newLoop, li.getInternalInvariants(),
                     li.getInternalFreeInvariants(), li.getInternalModifiable(),
                     li.getInternalFreeModifiable(), li.getInternalInfFlowSpec(),
                     li.getInternalVariant(), li.getInternalSelfTerm(),
-                    tb.var(MiscTools.getLocalIns(newLoop, services)),
-                    tb.var(MiscTools.getLocalOuts(newLoop, services)), li.getInternalAtPres());
+                    tb.var(localIns), tb.var(localOuts), li.getInternalAtPres());
                 newLoop.setLoopInvariant(li);
             }
 
