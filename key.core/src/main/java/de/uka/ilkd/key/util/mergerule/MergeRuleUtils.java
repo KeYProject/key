@@ -1510,7 +1510,7 @@ public class MergeRuleUtils {
      * @param timeout A timeout for the proof in milliseconds.
      * @return The proof result.
      */
-    private static ProofSearchInformation<@NonNull Proof, Goal> tryToProve(JTerm toProve,
+    private static ProofSearchInformation<Goal> tryToProve(JTerm toProve,
             Services services,
             boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
@@ -1530,7 +1530,7 @@ public class MergeRuleUtils {
      * @param timeout A timeout for the proof in milliseconds. Set to -1 for no timeout.
      * @return The proof result.
      */
-    private static ProofSearchInformation<@NonNull Proof, Goal> tryToProve(Sequent toProve,
+    private static ProofSearchInformation<Goal> tryToProve(Sequent toProve,
             Services services,
             boolean doSplit,
             String sideProofName, int timeout) throws ProofInputException {
@@ -1583,7 +1583,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(JTerm toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ProofSearchInformation<@NonNull Proof, Goal> proofResult =
+            final ProofSearchInformation<Goal> proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
@@ -1605,7 +1605,7 @@ public class MergeRuleUtils {
     private static boolean isProvable(Sequent toProve, Services services, boolean doSplit,
             int timeout) {
         try {
-            final ProofSearchInformation<@NonNull Proof, Goal> proofResult =
+            final ProofSearchInformation<Goal> proofResult =
                 tryToProve(toProve, services, doSplit, "Provability check", timeout);
             return proofResult.getProof().closed();
         } catch (ProofInputException pie) {
@@ -1633,11 +1633,11 @@ public class MergeRuleUtils {
 
         final Services services = parentProof.getServices();
 
-        final ProofSearchInformation<Proof, Goal> info =
+        final ProofSearchInformation<Goal> info =
             tryToProve(term, services, true, "Term simplification", timeout);
 
         // The simplified formula is the conjunction of all open goals
-        ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
+        ImmutableList<Goal> openGoals = ((Proof) info.getProof()).openEnabledGoals();
         final TermBuilder tb = services.getTermBuilder();
         if (openGoals.isEmpty()) {
             return tb.tt();

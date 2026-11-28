@@ -96,8 +96,10 @@ public class MediatorProofControl extends AbstractProofControl {
             // The proof was marked erroneous by a failing essential proof listener; it may be
             // inconsistent, so refuse a new run. Saving the proof for a later reload is still fine.
             ui.notify(new GeneralInformationEvent(
-                "This proof is marked erroneous (an essential proof listener failed) and cannot be "
-                    + "continued. You can still save it and try to reload it later."));
+                "This proof is marked erroneous due to an internal error (for example, an essential "
+                    +
+                    "proof listener failed) and cannot be continued. " +
+                    "You can still save it and try to reload it later."));
             return;
         }
         if (goals.isEmpty()) {
@@ -182,12 +184,12 @@ public class MediatorProofControl extends AbstractProofControl {
      * mediator().stopInterface(true); }. The thread itself
      * unfreezes the UI when it is finished. </p>
      */
-    private class AutoModeWorker extends SwingWorker<ProofSearchInformation<Proof, Goal>, Object> {
+    private class AutoModeWorker extends SwingWorker<ProofSearchInformation<Goal>, Object> {
         private final Proof proof;
         private final List<Node> initialGoals;
         private final ImmutableList<Goal> goals;
-        private final ProverCore<Proof, Goal> applyStrategy;
-        private ProofSearchInformation<Proof, Goal> info;
+        private final ProverCore<Goal> applyStrategy;
+        private ProofSearchInformation<Goal> info;
         private volatile boolean backgroundStarted = false;
 
         public AutoModeWorker(final Proof proof, final ImmutableList<Goal> goals,
@@ -252,7 +254,7 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         protected void emitInteractiveAutoMode(List<Node> initialGoals, Proof proof,
-                ProofSearchInformation<Proof, Goal> info) {
+                ProofSearchInformation<Goal> info) {
             interactionListeners.forEach((l) -> l.runAutoMode(initialGoals, proof, info));
         }
 
@@ -262,7 +264,7 @@ public class MediatorProofControl extends AbstractProofControl {
         }
 
         @Override
-        protected ProofSearchInformation<Proof, Goal> doInBackground() {
+        protected ProofSearchInformation<Goal> doInBackground() {
             backgroundStarted = true;
             try {
                 boolean stopMode =

@@ -57,7 +57,7 @@ public class AutoCommand extends AbstractCommand {
 
         // Create the rule application engine via AutoProvers: the script `auto` command is plain
         // automode, so it honours the selected prover mode (single- or multi-core).
-        final ProverCore<Proof, Goal> applyStrategy =
+        final ProverCore<Goal> applyStrategy =
             AutoProvers.create(profile.<Proof, Goal>getSelectedGoalChooserBuilder().create(),
                 profile);
 
@@ -117,7 +117,7 @@ public class AutoCommand extends AbstractCommand {
         // start actual autoprove
         try {
             final Proof proof = state().getProof();
-            final ProofSearchInformation<Proof, Goal> result;
+            final ProofSearchInformation<Goal> result;
             if (arguments.onAllOpenGoals) {
                 final StrategySettings strategySettings = proof.getSettings().getStrategySettings();
                 result = applyStrategy.startEach(proof, goals, strategySettings.getMaxSteps(),
@@ -176,7 +176,7 @@ public class AutoCommand extends AbstractCommand {
      * @throws ScriptException
      */
     private void setupFocussedBreakpointStrategy(final String maybeMatchesRegEx,
-            final String breakpointArg, final Goal goal, final ProverCore<Proof, Goal> proverCore,
+            final String breakpointArg, final Goal goal, final ProverCore<Goal> proverCore,
             final Services services) throws ScriptException {
         final var focus =
             MacroCommand.extractMatchingPio(goal.node().sequent(), maybeMatchesRegEx, services);

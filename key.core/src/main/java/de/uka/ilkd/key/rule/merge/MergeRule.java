@@ -36,7 +36,6 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
@@ -130,22 +129,15 @@ public class MergeRule implements BuiltInRule {
     }
 
     @Override
-    public final @NonNull ImmutableList<Goal> apply(Goal goal,
-            RuleApp ruleApp)
-            throws RuleAbortException {
+    public final @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
         final MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) ruleApp;
-
-        if (!mergeRuleApp.complete()) {
-            throw new RuleAbortException("Merge rule not complete");
-        }
 
         // The number of goals needed for side conditions related to
         // manually chosen lattice elements.
         final int numSideConditionsToProve =
-            mergeRuleApp.getConcreteRule() instanceof MergeWithLatticeAbstraction
-                    ? ((MergeWithLatticeAbstraction) mergeRuleApp.getConcreteRule())
-                            .getUserChoices().size() * (mergeRuleApp.getMergePartners().size() + 1)
+            mergeRuleApp.getConcreteRule() instanceof MergeWithLatticeAbstraction mla
+                    ? mla.getUserChoices().size() * (mergeRuleApp.getMergePartners().size() + 1)
                     : 0;
 
         // New goals are reversed to make sure that they are displayed in the

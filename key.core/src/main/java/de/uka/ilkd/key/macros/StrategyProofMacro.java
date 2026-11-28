@@ -100,13 +100,13 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         }
         List<Node> nodes = goals.stream().map(Goal::node).collect(Collectors.toList());
 
-        final GoalChooser<Proof, Goal> goalChooser = proof.getInitConfig().getProfile()
+        final GoalChooser<Goal> goalChooser = proof.getInitConfig().getProfile()
                 .<Proof, Goal>getSelectedGoalChooserBuilder().create();
         // Route through the central prover selection so the macro runs on the multi-core prover
         // when it is
         // enabled, the proof's profile supports it, and the macro's strategy tolerates concurrent
         // use (see allowParallel()); otherwise the single-threaded ApplyStrategy.
-        final ProverCore<Proof, Goal> applyStrategy =
+        final ProverCore<Goal> applyStrategy =
             AutoProvers.create(goalChooser, proof.getInitConfig().getProfile(), allowParallel());
         final ImmutableList<Goal> ignoredOpenGoals = setDifference(proof.openGoals(), goals);
 
@@ -135,7 +135,7 @@ public abstract class StrategyProofMacro extends AbstractProofMacro {
         try {
             // find the relevant goals
             // and start
-            final ProofSearchInformation<Proof, Goal> result = applyStrategy.start(proof, goals);
+            final ProofSearchInformation<Goal> result = applyStrategy.start(proof, goals);
             if (result.isError()) {
                 throw new RuntimeException("Proof search failed: " + result.getException(),
                     result.getException());

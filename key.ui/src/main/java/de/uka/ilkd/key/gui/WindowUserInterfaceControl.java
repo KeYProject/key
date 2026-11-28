@@ -183,8 +183,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
             }
-            ApplyStrategyInfo<Proof, Goal> result =
-                (ApplyStrategyInfo<Proof, Goal>) info.getResult();
+            ApplyStrategyInfo<Goal> result =
+                (ApplyStrategyInfo<Goal>) info.getResult();
 
             final Proof proof = (Proof) info.getProof();
             if (proof != null && !proof.isDisposed() && !proof.closed()

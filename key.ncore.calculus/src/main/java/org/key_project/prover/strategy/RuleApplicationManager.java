@@ -7,6 +7,8 @@ package org.key_project.prover.strategy;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.rules.RuleApp;
 
+import org.jspecify.annotations.Nullable;
+
 
 
 /// This interface provides the next rule application to be applied to the
@@ -25,6 +27,7 @@ public interface RuleApplicationManager<G extends ProofGoal<G>> extends NewRuleL
     RuleApp peekNext();
 
     /// @return the next rule that is supposed to be applied
+    @Nullable
     RuleApp next();
 
     /// Set the goal <code>this</code> is the rule app manager for

@@ -33,12 +33,11 @@ import org.jspecify.annotations.Nullable;
 /// resolving unresolved goals or handling errors.
 ///
 ///
-/// @param <P> the type of the proof object, extending [ProofObject]
 /// @param <G> the type of the proof goal, extending [ProofGoal]
 ///
 /// @see ProofObject
 /// @see ProofGoal
-public interface ProofSearchInformation<P extends ProofObject<G>, G extends ProofGoal<G>> {
+public interface ProofSearchInformation<G extends ProofGoal<G>> {
 
     /// Retrieves the explanation or reason wjy the proof search (strategy execution) finished.
     ///
@@ -58,8 +57,9 @@ public interface ProofSearchInformation<P extends ProofObject<G>, G extends Proo
     /// conclusion of the strategy execution.
     ///
     ///
-    /// @return the proof object of type `P`
-    P getProof();
+    /// @return the proof object
+    /// @return the proof object
+    ProofObject<G> getProof();
 
     /// Retrieves one of non-closeable proof goals, if one exists.
     ///
@@ -121,7 +121,7 @@ public interface ProofSearchInformation<P extends ProofObject<G>, G extends Proo
     /// needed for batch runs (messages becomes a generic message)
     /// counters are summed and in case of error and non-closeable goal
     /// the first current one is kept
-    /// @param other the ProofSearchInformation<P,G> to combine with
-    /// @return the aggregated ProofSearchInformation<P,G>
-    ProofSearchInformation<P, G> join(ProofSearchInformation<P, G> other);
+    /// @param other the [ProofSearchInformation<G>] to combine with
+    /// @return the aggregated [ProofSearchInformation<G>]
+    ProofSearchInformation<G> join(ProofSearchInformation<G> other);
 }

@@ -310,7 +310,7 @@ public class GoalSchedulerTest {
 
     /**
      * {@link GoalScheduler#reoffer} returns an in-flight goal to the queue so it is immediately
-     * claimable again &mdash; without waiting for progress (unlike {@link GoalScheduler#stall}).
+     * claimable again without waiting for progress (unlike {@link GoalScheduler#stall}).
      */
     @Test
     void reofferMakesGoalImmediatelyClaimable() {
@@ -321,7 +321,7 @@ public class GoalSchedulerTest {
         assertEquals(0, scheduler.availableCount());
         assertEquals(1, scheduler.inFlightCount());
 
-        scheduler.reoffer(g); // aborted rule app: retry immediately, no progress gate
+        scheduler.reoffer(g); // retry immediately, no progress gate
         assertEquals(1, scheduler.availableCount(), "reoffered goal is available at once");
         assertEquals(0, scheduler.inFlightCount());
         assertFalse(scheduler.isQuiescent());

@@ -12,12 +12,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.Statistics;
-import de.uka.ilkd.key.prover.impl.DefaultTaskFinishedInfo;
 
 import org.key_project.prover.engine.ProofSearchInformation;
+import org.key_project.prover.engine.impl.DefaultTaskFinishedInfo;
 import org.key_project.util.collection.ImmutableList;
-
-import org.jspecify.annotations.NonNull;
 
 /**
  * An information object with additional information about the finished proof macro. The source is
@@ -84,18 +82,18 @@ public class ProofMacroFinishedInfo extends DefaultTaskFinishedInfo {
     }
 
     public ProofMacroFinishedInfo(ProofMacro macro, ProofMacroFinishedInfo info) {
-        this(macro, info.getGoals(), info.getProof());
+        this(macro, info.getGoals(), (Proof) info.getProof());
     }
 
     ProofMacroFinishedInfo(ProofMacro macro, ProofMacroFinishedInfo info,
             ImmutableList<Goal> goals) {
-        this(macro, goals, info.getProof(), info.getTime(), info.getAppliedRules(),
+        this(macro, goals, (Proof) info.getProof(), info.getTime(), info.getAppliedRules(),
             info.getClosedGoals());
     }
 
     ProofMacroFinishedInfo(ProofMacroFinishedInfo info,
-            ProofSearchInformation<@NonNull Proof, Goal> stratInfo) {
-        this(info.getMacro(), info.getGoals(), info.getProof(),
+            ProofSearchInformation<Goal> stratInfo) {
+        this(info.getMacro(), info.getGoals(), (Proof) info.getProof(),
             info.getTime() + stratInfo.getTime(),
             info.getAppliedRules() + stratInfo.getNumberOfAppliedRuleApps(),
             info.getClosedGoals() + stratInfo.getNumberOfClosedGoals());

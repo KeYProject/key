@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 
 import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.GoalChooserFactory;
@@ -13,13 +12,13 @@ import org.key_project.prover.engine.GoalChooserFactory;
 /**
  * creates the default goal chooser used in KeY
  */
-public class DefaultGoalChooserFactory implements GoalChooserFactory<Proof, Goal> {
+public class DefaultGoalChooserFactory implements GoalChooserFactory<Goal> {
 
     public static final String NAME = "Simple Goal Chooser";
 
     public DefaultGoalChooserFactory() {}
 
-    public GoalChooser<Proof, Goal> create() {
+    public GoalChooser<Goal> create() {
         return new DefaultGoalChooser();
     }
 
@@ -27,7 +26,7 @@ public class DefaultGoalChooserFactory implements GoalChooserFactory<Proof, Goal
         return NAME;
     }
 
-    public GoalChooserFactory<Proof, Goal> copy() {
+    public GoalChooserFactory<Goal> copy() {
         return new DefaultGoalChooserFactory();
     }
 

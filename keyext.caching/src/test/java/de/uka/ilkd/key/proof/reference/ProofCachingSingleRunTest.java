@@ -45,7 +45,7 @@ class ProofCachingSingleRunTest {
     private static final Path BIN = testCaseDirectory.resolve(
         "../../../../../key.ui/examples/heap/WeideEtAl_02_BinarySearch/BinarySearch_search.key");
 
-    private static ApplyStrategyInfo<Proof, Goal> auto(Proof p, ImmutableList<Goal> goals) {
+    private static ApplyStrategyInfo<Goal> auto(Proof p, ImmutableList<Goal> goals) {
         int maxSteps = p.getSettings().getStrategySettings().getMaxSteps();
         long timeout = p.getSettings().getStrategySettings().getTimeout();
         ApplyStrategy s = new ApplyStrategy(

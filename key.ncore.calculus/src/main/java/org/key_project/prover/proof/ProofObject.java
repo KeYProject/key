@@ -27,6 +27,10 @@ public interface ProofObject<G extends ProofGoal<G>> {
     /// @param goals the list of [ProofGoal]s to be added
     void add(Iterable<G> goals);
 
+    /// returns the number of closed goals of the proof object
+    /// @return number of closed goals
+    int getClosedGoalCount();
+
     /// replace a given goal by a list of new goals
     ///
     /// @param oldGoal the [ProofGoal] to be replaced
@@ -57,4 +61,12 @@ public interface ProofObject<G extends ProofGoal<G>> {
     ///
     /// @return services managing the logic infrastructure
     LogicServices getServices();
+
+    /// @return true iff the proof is disposed and must not be used anymore
+    default boolean isDisposed() {
+        return false;
+    }
+
+    /// @return the number of open goals
+    int getOpenGoalCount();
 }

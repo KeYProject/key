@@ -29,6 +29,8 @@ import org.key_project.prover.engine.GoalChooser;
 import org.key_project.prover.engine.TaskStartedInfo;
 import org.key_project.prover.engine.impl.ApplyStrategyInfo;
 import org.key_project.prover.engine.impl.DefaultProver;
+import org.key_project.prover.engine.impl.DefaultTaskFinishedInfo;
+import org.key_project.prover.engine.impl.DefaultTaskStartedInfo;
 import org.key_project.prover.proof.ProofObject;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
@@ -76,7 +78,7 @@ import org.slf4j.LoggerFactory;
  * and does not consult the {@link GoalChooser} it is constructed with (the constructor keeps the
  * parameter for API symmetry with {@code ApplyStrategy}).
  */
-public final class ParallelProver extends DefaultProver<Proof, Goal> {
+public final class ParallelProver extends DefaultProver<Goal> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParallelProver.class);
 
@@ -176,8 +178,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
 
     /**
      * Applied-rule and closed-goal counters maintained lock-free during the run, so the per-step
-     * bookkeeping does not need the commit lock. They are mirrored into the inherited
-     * {@code countApplied}/{@code closedGoals} fields when the run finishes (for the result).
+     * bookkeeping does not need the commit lock.
      */
     private final AtomicInteger appliedSteps = new AtomicInteger();
     private final AtomicInteger closedCount = new AtomicInteger();
@@ -186,7 +187,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
      * @param goalChooser kept for API symmetry with {@link ApplyStrategy}; the parallel engine uses
      *        a {@link GoalScheduler} for goal selection rather than this chooser
      */
-    public ParallelProver(GoalChooser<Proof, Goal> goalChooser) {
+    public ParallelProver(GoalChooser<Goal> goalChooser) {
         this.goalChooser = goalChooser;
         this.workerCount = resolveWorkerCount();
     }
@@ -232,7 +233,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         }
         // thread counts provided via setting are capped at number of CPU cores
         int configured = generalSettings().getParallelProverThreadCount();
-        return Math.max(1, Math.min(configured, Runtime.getRuntime().availableProcessors()));
+        return Math.clamp(configured, 1, Runtime.getRuntime().availableProcessors());
     }
 
     private static GeneralSettings generalSettings() {
@@ -244,10 +245,14 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         return workerCount;
     }
 
+    /// retrieves the next rule app to be applied on this goal
+    ///
+    /// @param goal the [Goal] currently being processed
+    /// @return the next [RuleApp] to apply, or `null` if no rule is applicable
     @Override
-    protected final @Nullable RuleApp updateBuiltInRuleIndex(Goal goal, @Nullable RuleApp app) {
-        // Hack mirrored from ApplyStrategy: built-in rules may become applicable without the
-        // BuiltInRuleAppIndex noticing.
+    protected final @Nullable RuleApp nextRuleApp(Goal goal) {
+        // Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
+        RuleApp app = super.nextRuleApp(goal);
         if (app == null) {
             goal.ruleAppIndex().scanBuiltInRules(goal);
             app = goal.getRuleAppManager().next();
@@ -255,19 +260,27 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         return app;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public ApplyStrategyInfo<Proof, Goal> start(Proof proof, Goal goal) {
+    protected int getClosedGoalCount() {
+        return proof.getClosedGoalCount();
+    }
+
+    @Override
+    public ApplyStrategyInfo<Goal> start(ProofObject<Goal> proof, Goal goal) {
         return start(proof, ImmutableList.<Goal>nil().prepend(goal));
     }
 
     @Override
-    public ApplyStrategyInfo<Proof, Goal> start(Proof proof, ImmutableList<Goal> goals) {
+    public ApplyStrategyInfo<Goal> start(ProofObject<Goal> p_proof, ImmutableList<Goal> goals) {
+        final Proof proof = (Proof) p_proof;
         ProofSettings settings = proof.getSettings();
         return start(proof, goals, settings.getStrategySettings());
     }
 
-    @Override
-    public ApplyStrategyInfo<Proof, Goal> start(Proof proof, ImmutableList<Goal> goals,
+    private ApplyStrategyInfo<Goal> start(Proof proof, ImmutableList<Goal> goals,
             Object strategySettings) {
         final StrategySettings stratSet = (StrategySettings) strategySettings;
         int maxSteps = stratSet.getMaxSteps();
@@ -286,7 +299,8 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     // is
     // no longer fired per step, see processStep), so holding it for the run cannot deadlock them.
     @Override
-    public synchronized ApplyStrategyInfo<Proof, Goal> start(Proof proof, ImmutableList<Goal> goals,
+    public synchronized ApplyStrategyInfo<Goal> start(ProofObject<Goal> proof,
+            ImmutableList<Goal> goals,
             int maxSteps,
             long timeout, boolean stopAtFirstNonCloseableGoal) {
         return run(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal, 0);
@@ -295,21 +309,23 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     /**
      * Runs the workers over {@code goals} and reports the outcome
      *
-     * @param proof the Proof the goals belong too
+     * @param p_proof the proof the goals belong too
      * @param goals the goals to
      * @param maxSteps the run-wide limit on rule applications
      * @param perTaskSteps the budget each goal is assigned, or {@code 0} when the
      *        step budget applies to all as a whole
      */
-    private ApplyStrategyInfo<Proof, Goal> run(Proof proof, ImmutableList<Goal> goals, int maxSteps,
+    private ApplyStrategyInfo<Goal> run(ProofObject<Goal> p_proof, ImmutableList<Goal> goals,
+            int maxSteps,
             long timeout, boolean stopAtFirstNonCloseableGoal, int perTaskSteps) {
+        final Proof proof = (Proof) p_proof;
         assert proof != null;
         initializeProverRun(proof, maxSteps, timeout, stopAtFirstNonCloseableGoal);
 
         fireTaskStarted(new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy,
             PROCESSING_STRATEGY, -1));
 
-        final ApplyStrategyInfo<Proof, Goal> result;
+        final ApplyStrategyInfo<Goal> result;
         try (var ignored =
             proof.setRuleAppIndexMode(proof.getActiveStrategy().getRuleAppIndexMode())) {
             result = runParallel(goals, perTaskSteps);
@@ -324,16 +340,15 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         return result;
     }
 
-    private void initializeProverRun(Proof proof, int maxSteps, long timeout,
+    private void initializeProverRun(ProofObject<Goal> proof, int maxSteps, long timeout,
             boolean stopAtFirstNonCloseableGoal) {
         this.proof = proof;
         this.stopAtFirstNonClosableGoal = stopAtFirstNonCloseableGoal;
         this.stopCondition =
-            proof.getSettings().getStrategySettings().getApplyStrategyStopCondition();
+            ((Proof) proof).getSettings().getStrategySettings().getApplyStrategyStopCondition();
         this.maxApplications = stopCondition.getMaximalWork(maxSteps, timeout);
         this.timeout = timeout;
         this.countApplied = 0;
-        this.closedGoals = 0;
         this.appliedSteps.set(0);
         this.closedCount.set(0);
         this.cancelled = false;
@@ -347,14 +362,14 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     /// step count, timeout is global for all tasks
     ///
     /// @param proof The [ProofObject] representing the proof instance.
-    /// @param goals An [ImmutableList] of [ProofGoal] objects to prove.
+    /// @param goals An [ImmutableList] of [Goal] objects to prove.
     /// @param maxSteps The maximum number of rule applications to perform per goal task.
     /// @param timeout The maximum duration (in milliseconds) to perform the proof search (global
     /// over all tasks).
-    /// @return An [ProofSearchInformation] object containing information about the performed
+    /// @return An [ApplyStrategyInfo] object containing information about the performed
     /// work, such as the number of rules applied.
     @Override
-    public synchronized ApplyStrategyInfo<Proof, Goal> startEach(Proof proof,
+    public synchronized ApplyStrategyInfo<Goal> startEach(ProofObject<Goal> proof,
             ImmutableList<Goal> goals, int maxSteps, long timeout) {
         // Tasks never stop the run: a task that runs out of budget or of rules leaves its goals
         return run(proof, goals, Integer.MAX_VALUE, timeout, false, maxSteps);
@@ -370,7 +385,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
      */
     @SuppressWarnings("try") // the binding is deliberately unused: suspending the listeners is the
     // whole point and close() restores them, so the resource is a pure scoping handle
-    private ApplyStrategyInfo<Proof, Goal> runParallel(ImmutableList<Goal> goals,
+    private ApplyStrategyInfo<Goal> runParallel(ImmutableList<Goal> goals,
             int perTaskSteps) {
         final long startTime = System.currentTimeMillis();
         final GoalScheduler<Goal> scheduler = new GoalScheduler<>();
@@ -387,15 +402,14 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         // Enter the multi-worker run scope (MT-active marker + sealed Java types) with guaranteed
         // teardown: the pool is created *inside* this scope so that a failure while entering it
         // (e.g. sealing) can never leak the marker or an unshut pool.
-        final RunScope mtScope = enterMultiWorkerRunScope();
-        try {
+        try (RunScope mtScope = enterMultiWorkerRunScope()) {
             final int poolId = POOL_COUNTER.incrementAndGet();
             final ExecutorService pool = Executors.newFixedThreadPool(workerCount, r -> {
                 Thread t = new Thread(r, "key-prover-" + poolId + "-worker");
                 t.setDaemon(true);
                 return t;
             });
-            try (var ignored = proof.suspendNonEssentialListeners()) {
+            try (var ignored = proof().suspendNonEssentialListeners()) {
                 List<Future<?>> futures = new ArrayList<>(workerCount);
                 try {
                     for (int w = 0; w < workerCount; w++) {
@@ -430,13 +444,10 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
                     awaitWorkerTermination(pool);
                 }
             }
-        } finally {
-            mtScope.close();
         }
 
         // Publish the lock-free counters into the inherited fields for the result.
         countApplied = appliedSteps.get();
-        closedGoals = closedCount.get();
 
         final Throwable error = firstError.get();
         long time = System.currentTimeMillis() - startTime;
@@ -451,7 +462,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             message = "No more rules automatically applicable to any goal.";
         }
         return new ApplyStrategyInfo<>(message, proof, error, nonCloseableGoal, time, countApplied,
-            closedGoals);
+            closedCount.get());
     }
 
     /**
@@ -472,7 +483,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
         }
         final RunScope marker = enterMultiThreadedRun(proof);
         try {
-            final JavaInfo javaInfo = proof.getServices().getJavaInfo();
+            final JavaInfo javaInfo = proof().getServices().getJavaInfo();
             // Materialise the default execution context on this proof's (fresh) JavaInfo before
             // sealing, so the matcher reads it instead of registering it during the run.
             javaInfo.getDefaultExecutionContext();
@@ -544,12 +555,17 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             Goal goal;
             while (!stopRequested.get() && (goal = scheduler.claimOrAwait()) != null) {
                 if (proof.isErroneous()) {
-                    // An essential proof listener failed on some worker: wind all workers down
-                    // through the regular stop path (the claimed goal is returned below by the
-                    // loop exit; parked workers wake through the scheduler as with any stop).
-                    // Checking a volatile flag once per rule application is free next to the
-                    // step itself; no push notification into the workers is needed.
-                    requestStop("Proof search stopped: an essential proof listener failed.", null);
+                    // An internal error occured (e.g., an essential proof listener failed) on some
+                    // worker:
+                    // wind all workers down through the regular stop path (the claimed goal is
+                    // returned below by the loop exit; parked workers wake through the scheduler
+                    // as with any stop). Checking a volatile flag once per rule application is
+                    // free next to the step itself; no push notification into the workers is
+                    // needed.
+                    requestStop(
+                        "Proof search stopped due to an internal error, but " +
+                            "can still be saved for later recoverability.",
+                        null);
                     scheduler.reoffer(goal);
                     break;
                 }
@@ -611,8 +627,7 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
                 return;
             }
 
-            RuleApp app = goal.getRuleAppManager().next();
-            app = updateBuiltInRuleIndex(goal, app);
+            final RuleApp app = nextRuleApp(goal);
 
             if (app == null) {
                 // The strategy currently offers no rule for this goal. With STOPMODE_NONCLOSE that
@@ -634,20 +649,9 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
             // --- apply: the executor runs concurrently; only the tree commit is serialized ---
             // computeRuleApp (rule execution / term construction) is safe to run in parallel: the
             // shared structures it reaches through the Services were made thread-safe by the
-            // shared-state audit. Only commitRuleApp -- the proof-tree mutation -- needs the commit
+            // shared-state audit. Only commitRuleApp, the proof-tree mutation, needs the commit
             // lock; the scheduler hand-off, the atomic counters and the stop check stay outside it.
-            Goal.PendingRuleApp pending = goal.computeRuleApp(app);
-            if (pending == null) {
-                // The rule application aborted. The candidate rule was already removed from the
-                // goal's queue by next() above, so re-offer the goal to retry with its next
-                // candidate instead of dropping it -- dropping loses the goal and can leave the
-                // proof open. This mirrors the single-threaded prover, which retries the goal after
-                // an aborted application rather than discarding it.
-                scheduler.reoffer(goal);
-                handled = true;
-                return;
-            }
-
+            final Goal.PendingRuleApp pending = goal.computeRuleApp(app);
             final ImmutableList<Goal> goalList;
             synchronized (commitLock) {
                 goalList = goal.commitRuleApp(pending);
@@ -727,5 +731,9 @@ public final class ParallelProver extends DefaultProver<Proof, Goal> {
     @Override
     public boolean hasBeenInterrupted() {
         return cancelled;
+    }
+
+    private Proof proof() {
+        return (Proof) proof;
     }
 }

@@ -242,7 +242,7 @@ public class ProofStarter {
      *
      * @throws NullPointerException if the proof object is not yet created
      */
-    public ProofSearchInformation<Proof, Goal> start() {
+    public ProofSearchInformation<Goal> start() {
         return start(proof.openGoals());
     }
 
@@ -252,7 +252,7 @@ public class ProofStarter {
      * @return the proof after the attempt terminated
      * @throws NullPointerException if the proof object is not yet created
      */
-    public ProofSearchInformation<Proof, Goal> start(ImmutableList<Goal> goals) {
+    public ProofSearchInformation<Goal> start(ImmutableList<Goal> goals) {
         final Profile profile = proof.getInitConfig().getProfile();
 
         if (strategy == null) {
@@ -269,7 +269,7 @@ public class ProofStarter {
         OneStepSimplifier.refreshOSS(proof);
 
         var goalChooser = profile.<Proof, Goal>getSelectedGoalChooserBuilder().create();
-        ProverCore<Proof, Goal> prover =
+        ProverCore<Goal> prover =
             AutoProvers.create(goalChooser, profile, allowParallel);
         if (ptl != null) {
             prover.addProverTaskObserver(ptl);
@@ -279,7 +279,7 @@ public class ProofStarter {
             prover.addProverTaskObserver(autoSaver);
         }
 
-        ProofSearchInformation<Proof, Goal> result;
+        ProofSearchInformation<Goal> result;
 
         result = prover.start(proof, goals, maxSteps, timeout,
             strategy.isStopAtFirstNonCloseableGoal());

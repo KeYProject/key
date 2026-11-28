@@ -69,7 +69,7 @@ public class StateChangeListener implements InteractionListener {
 
     @Override
     public void runAutoMode(List<Node> initialGoals, Proof proof,
-            ProofSearchInformation<Proof, Goal> info) {
+            ProofSearchInformation<Goal> info) {
 
     }
 

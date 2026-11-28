@@ -70,7 +70,7 @@ public class TestProofStarter {
             ProofStarter ps = new ProofStarter(false);
             ps.init(proof);
             HelperClassForTests.setOneStepSimplificationEnabled(proof, oneStepSimplification);
-            ProofSearchInformation<Proof, Goal> info = ps.start();
+            ProofSearchInformation<Goal> info = ps.start();
             assertNotNull(info);
             assertTrue(proof.closed());
         } finally {

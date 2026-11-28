@@ -13,6 +13,7 @@ import de.uka.ilkd.key.proof.ProofTreeAdapter;
 import de.uka.ilkd.key.proof.ProofTreeEvent;
 
 import org.key_project.prover.engine.GoalChooser;
+import org.key_project.prover.proof.ProofObject;
 import org.key_project.util.collection.ImmutableList;
 
 import org.jspecify.annotations.NonNull;
@@ -23,7 +24,7 @@ import org.jspecify.annotations.Nullable;
  * Helper class for managing a list of goals on which rules are applied. The class provides methods
  * for removing a goal, and for updating the internal data structures after a rule has been applied.
  */
-public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullable Goal> {
+public class DefaultGoalChooser implements GoalChooser<@Nullable Goal> {
 
     /** the proof that is worked with */
     protected @Nullable Proof proof;
@@ -52,21 +53,23 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
     /**
      * {@inheritDoc}
      */
-    public void init(@Nullable Proof p_proof, @Nullable ImmutableList<Goal> p_goals) {
-        if (p_proof == null && !(p_goals == null || p_goals.isEmpty())) {
+    @Override
+    public void init(@Nullable ProofObject<Goal> p_proof, @Nullable ImmutableList<Goal> p_goals) {
+        final Proof newProof = (Proof) p_proof;
+        if (newProof == null && !(p_goals == null || p_goals.isEmpty())) {
             throw new RuntimeException("A not existing proof has goals. This makes no sense.");
         }
         allGoalsSatisfiable = p_goals == null || p_goals.isEmpty();
         currentSubtreeRoot = null;
-        if (p_proof != proof) {
+        if (newProof != proof) {
             if (proof != null) {
                 proof.removeProofTreeListener(proofTreeListener);
             }
-            if (p_proof != null) {
-                p_proof.addProofTreeListener(proofTreeListener);
+            if (newProof != null) {
+                newProof.addProofTreeListener(proofTreeListener);
             }
         }
-        proof = p_proof;
+        proof = newProof;
         setupGoals(p_goals);
     }
 
@@ -149,7 +152,7 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      *
      * @see de.uka.ilkd.key.proof.IGoalChooser#removeGoal(de.uka.ilkd.key.proof.Goal)
      */
-    public void removeGoal(Goal goal) {
+    public void removeGoal(@NonNull Goal goal) {
         selectedList = selectedList.removeAll(goal);
         nextGoals = ImmutableList.nil();
 
@@ -165,12 +168,12 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
      * @see de.uka.ilkd.key.proof.IGoalChooser#updateGoalList(de.uka.ilkd.key.proof.Node,
      * de.uka.ilkd.key.proof.IList<Goal>)
      */
-    public void updateGoalList(@Nullable Object node, @NonNull ImmutableList<Goal> newGoals) {
-        if (newGoals.isEmpty() || (newGoals.tail().isEmpty() && newGoals.head().node() == node)) {
+    public void updateGoalList(@Nullable Goal goal, @NonNull ImmutableList<Goal> newGoals) {
+        if (newGoals.isEmpty()) {
             // Goals (may) have been closed, remove them from the goal lists
             removeClosedGoals();
         } else {
-            updateGoalListHelp(node, newGoals);
+            updateGoalListHelp(goal, newGoals);
         }
 
         if (proof.openGoals().isEmpty())
@@ -185,18 +188,18 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Proof, @Nullabl
         }
     }
 
-    protected void updateGoalListHelp(Object node, ImmutableList<Goal> newGoals) {
+    protected void updateGoalListHelp(Goal appliedGoal, ImmutableList<Goal> newGoals) {
         ImmutableList<Goal> prevGoalList = ImmutableList.nil();
         boolean newGoalsInserted = false;
 
         nextGoals = ImmutableList.nil();
 
-        // Remove "node" and goals contained within "newGoals"
+        // Remove applied goal and goals contained within "newGoals"
         while (!selectedList.isEmpty()) {
             final Goal goal = selectedList.head();
             selectedList = selectedList.tail();
 
-            if (node == goal.node() || newGoals.contains(goal)) {
+            if (appliedGoal == goal || newGoals.contains(goal)) {
                 // continue taclet apps at the next goal in list
                 nextGoals = selectedList;
 

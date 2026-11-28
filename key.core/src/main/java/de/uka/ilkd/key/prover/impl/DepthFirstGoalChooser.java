@@ -68,7 +68,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
     }
 
     @Override
-    protected void updateGoalListHelp(Object node, ImmutableList<Goal> newGoals) {
+    protected void updateGoalListHelp(Goal appliedGoal, ImmutableList<Goal> newGoals) {
         ImmutableList<Goal> prevGoalList = ImmutableList.nil();
         boolean newGoalsInserted = false;
 
@@ -93,7 +93,7 @@ public class DepthFirstGoalChooser extends DefaultGoalChooser {
             final @NonNull Goal goal = selectedList.head();
             selectedList = selectedList.tail();
 
-            if (node == goal.node() || newGoals.contains(goal)) {
+            if (appliedGoal == goal || newGoals.contains(goal)) {
                 // continue taclet apps at the next goal in list
                 nextGoals = selectedList;
 

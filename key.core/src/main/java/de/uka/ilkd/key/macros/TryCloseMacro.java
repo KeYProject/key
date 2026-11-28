@@ -157,7 +157,7 @@ public class TryCloseMacro extends AbstractProofMacro {
 
         // create the rule application engine
         final Profile profile = proof.getServices().getProfile();
-        final ProverCore<Proof, Goal> applyStrategy = AutoProvers.create(
+        final ProverCore<Goal> applyStrategy = AutoProvers.create(
             profile.<Proof, Goal>getSelectedGoalChooserBuilder().create(), profile);
         // assert: all goals have the same proof
 
@@ -183,7 +183,7 @@ public class TryCloseMacro extends AbstractProofMacro {
                 final ImmutableList<Goal> current = batch.take(size);
                 batch = batch.skip(size);
                 final List<Node> initialGoalNodes = current.map(g -> g.node()).toList();
-                final ProofSearchInformation<Proof, Goal> result =
+                final ProofSearchInformation<Goal> result =
                     applyStrategy.startEach(proof, current, maxSteps, -1);
                 if (result.isError()) {
                     throw new RuntimeException("Proof search failed: " + result.getException(),

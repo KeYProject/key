@@ -67,14 +67,6 @@ public abstract class AbstractBuiltInRuleApp<T extends BuiltInRule> implements I
         return pio;
     }
 
-    /**
-     * applies the specified rule at the specified position if all schema variables have been
-     * instantiated
-     */
-    @Override
-    public void checkApplicability() {
-    }
-
     @Override
     public void registerSkolemConstants(Namespace<@NonNull Function> fns) {
     }

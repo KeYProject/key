@@ -79,6 +79,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * name of the proof
      */
     private final Name name;
+    private final AtomicInteger closedGoalCount = new AtomicInteger(0);
 
     /**
      * the root of the proof
@@ -519,6 +520,22 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getOpenGoalCount() {
+        return openGoals.size();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getClosedGoalCount() {
+        return closedGoalCount.get();
+    }
+
+    /**
      * Returns the list of closed goals, needed to make pruning in closed branches possible. If the
      * list needs too much memory, pruning can be disabled via the command line option
      * "--no-pruning-closed". In this case the list will not be filled.
@@ -588,7 +605,6 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
-
     /**
      * Close the given goals and all goals in the subtree below it.
      *
@@ -596,7 +612,6 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     @Override
     public void closeGoal(Goal goalToClose) {
-
         Node closedSubtree = goalToClose.node().close();
 
         boolean b = false;
@@ -612,6 +627,7 @@ public class Proof implements ProofObject<Goal>, Named {
                     closedGoals = closedGoals.prepend(goal);
                 }
                 remove(goal);
+                closedGoalCount.incrementAndGet();
             }
         }
 
@@ -1260,7 +1276,7 @@ public class Proof implements ProofObject<Goal>, Named {
 
     /**
      * Flags this proof as {@linkplain #isErroneous() erroneous} after an essential-listener
-     * failure. Idempotent; only the first failure is logged.
+     * failure. Only the first failure is logged.
      *
      * @param listenerName the failing listener's class name (for the log)
      * @param cause the throwable it raised
@@ -1271,6 +1287,19 @@ public class Proof implements ProofObject<Goal>, Named {
             LOGGER.error("essential proof listener {} failed; the proof search is stopped and the "
                 + "proof is marked erroneous (no further search possible). The proof can still be "
                 + "saved for a later reload attempt.", listenerName, cause);
+        }
+    }
+
+    /**
+     * Flags this proof as {@linkplain #isErroneous() erroneous} after a failure.
+     *
+     * @param cause the throwable it raised
+     */
+    public void markErroneous(Throwable cause) {
+        if (!erroneous) {
+            erroneous = true;
+            LOGGER.error("Failure that might have left proof in an inconsistent state happened.",
+                cause);
         }
     }
 

@@ -14,7 +14,6 @@ import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.scripts.meta.Argument;
 import de.uka.ilkd.key.scripts.meta.Documentation;
 import de.uka.ilkd.key.scripts.meta.Option;
@@ -22,6 +21,7 @@ import de.uka.ilkd.key.scripts.meta.OptionalVarargs;
 
 import org.key_project.logic.PosInTerm;
 import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.engine.impl.DefaultTaskStartedInfo;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
 

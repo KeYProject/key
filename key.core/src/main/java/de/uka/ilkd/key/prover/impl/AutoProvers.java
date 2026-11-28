@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.prover.impl;
 
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.Profile;
 
 import org.key_project.prover.engine.GoalChooser;
@@ -36,7 +35,7 @@ public final class AutoProvers {
      *        it {@link Profile#supportsParallelAutomode() supports parallel automode}
      * @return a {@link ParallelProver} if enabled and supported, otherwise an {@link ApplyStrategy}
      */
-    public static ProverCore<Proof, Goal> create(GoalChooser<Proof, Goal> goalChooser,
+    public static ProverCore<Goal> create(GoalChooser<Goal> goalChooser,
             Profile profile) {
         return create(goalChooser, profile, true);
     }
@@ -51,7 +50,7 @@ public final class AutoProvers {
      * @return a {@link ParallelProver} if allowed, enabled and supported, otherwise an
      *         {@link ApplyStrategy}
      */
-    public static ProverCore<Proof, Goal> create(GoalChooser<Proof, Goal> goalChooser,
+    public static ProverCore<Goal> create(GoalChooser<Goal> goalChooser,
             Profile profile, boolean allowParallel) {
         boolean parallel =
             allowParallel && ParallelProver.isEnabled() && profile.supportsParallelAutomode();

@@ -30,13 +30,13 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentEvent;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironmentListener;
-import de.uka.ilkd.key.prover.impl.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
 
 import org.key_project.prover.engine.ProverTaskListener;
 import org.key_project.prover.engine.TaskStartedInfo;
+import org.key_project.prover.engine.impl.DefaultTaskStartedInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,7 +159,7 @@ public abstract class AbstractMediatorUserInterfaceControl extends AbstractUserI
         if (info.getMacro() instanceof StartSideProofMacro) {
             final Proof initiatingProof = (Proof) info
                     .getValueFor(StartSideProofMacro.PROOF_MACRO_FINISHED_INFO_KEY_ORIGINAL_PROOF);
-            info.getProof().addProofDisposedListener(new ProofDisposedListener() {
+            ((Proof) info.getProof()).addProofDisposedListener(new ProofDisposedListener() {
                 @Override
                 public void proofDisposing(final ProofDisposedEvent e) {
                     e.getSource().removeProofDisposedListener(this);
