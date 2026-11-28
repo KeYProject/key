@@ -300,6 +300,29 @@ class SwitchExpressionTest {
         assertThat(proof.closed()).isFalse();
     }
 
+    /// A `case null` label in a switch statement matches a null selector; the null check must not
+    /// preempt it. The selector is a local: `requires s == null` on a parameter is contradictory
+    /// because KeY adds the implicit non-null requirement, which would make the proof vacuous.
+    @Test
+    void caseNullStatement(@TempDir Path dir) throws Exception {
+        assertCloses(dir, "C", """
+                public class C {
+                    /*@ normal_behavior
+                      @ ensures \\result == -1;
+                      @*/
+                    static int f() {
+                        Object o = null;
+                        int r;
+                        switch (o) {
+                            case null: r = -1; break;
+                            default: r = 0;
+                        }
+                        return r;
+                    }
+                }
+                """);
+    }
+
     @Disabled("blocked on the jmlparser RAW-yield prerequisite (external repository)")
     @Test
     void colonArmWithYield(@TempDir Path dir) throws Exception {

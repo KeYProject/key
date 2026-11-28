@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.StatementContainer;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.expression.BinaryAssignment;
@@ -234,6 +235,7 @@ public final class SwitchExpressionRule implements BuiltInRule {
             }
         }
         if (statement instanceof BinaryAssignment assignment
+                && assignment.getKind() == BinaryAssignment.BinaryAssignmentKind.COPY
                 && assignment.getChildAt(1) instanceof SwitchExpression sw
                 && assignment.getChildAt(0) instanceof ProgramVariable) {
             return sw;
@@ -265,17 +267,28 @@ public final class SwitchExpressionRule implements BuiltInRule {
         final var namer = services.getVariableNamer();
         final List<Statement> prelude = new ArrayList<>();
 
-        Expression selector = switchExpression.getSelector();
+        final Expression selector = switchExpression.getSelector();
+        final KeYJavaType selectorType = selector.getKeYJavaType(services, ec);
+        // Java throws a NullPointerException for a null reference selector unless a case (or a
+        // 'case null, default') handles null. The check runs before any arm (JLS 15.28.1) and
+        // inspects the value that was selected, so even a variable selector is copied when the
+        // check is needed: an arm may reassign the variable.
+        final boolean nullCheckNeeded = !selectorNonNull
+                && !(selectorType.getJavaType() instanceof PrimitiveType)
+                && !hasNullArm(switchExpression);
         final ProgramVariable selectorVariable;
-        if (selector instanceof ProgramVariable variable) {
+        if (selector instanceof ProgramVariable variable && !nullCheckNeeded) {
             selectorVariable = variable;
         } else {
-            TypeRef selectorType = new TypeRef(selector.getKeYJavaType(services, ec));
+            final TypeRef selectorRef = new TypeRef(selectorType);
             selectorVariable =
                 KeYJavaASTFactory.localVariable(namer.getTemporaryNameProposal("_sel"),
-                    selectorType);
-            prelude.add(KeYJavaASTFactory.declare(selectorVariable, selectorType));
+                    selectorRef);
+            prelude.add(KeYJavaASTFactory.declare(selectorVariable, selectorRef));
             prelude.add(KeYJavaASTFactory.assign(selectorVariable, selector));
+        }
+        if (nullCheckNeeded) {
+            prelude.add(nullCheck(selectorVariable, services));
         }
 
         final TypeRef typeRef = new TypeRef(switchExpression.getKeYJavaType(services, ec));
@@ -289,14 +302,6 @@ public final class SwitchExpressionRule implements BuiltInRule {
             prelude.add(cascade);
         }
 
-        // Java throws a NullPointerException for a null reference selector unless a case (or a
-        // 'case null, default') handles null.
-        if (!selectorNonNull
-                && !(selector.getKeYJavaType(services, ec).getJavaType() instanceof PrimitiveType)
-                && !hasNullArm(switchExpression)) {
-            prelude.add(nullCheck(selectorVariable, services));
-        }
-
         return new Lowered(result, prelude);
     }
 
@@ -306,12 +311,22 @@ public final class SwitchExpressionRule implements BuiltInRule {
         final int count = switchExpression.getBranchCount();
 
         if (knownValue != null) {
-            // The antecedent pins the selector to a value: pick the arm directly.
+            // The antecedent pins the selector to a value: pick the arm directly. Stop at the
+            // first pattern arm: its guard may match the pinned value as well, and a guarded
+            // pattern does not dominate a later constant label, so a matching constant label
+            // after it must not be selected without evaluating the guard.
             for (int i = 0; i < count; i++) {
-                if (switchExpression.getBranchAt(i) instanceof Case caseBranch) {
+                final Branch branch = switchExpression.getBranchAt(i);
+                if (branch instanceof PatternCase) {
+                    break;
+                }
+                if (branch instanceof Case caseBranch) {
                     JTerm caseTerm = services.getTypeConverter()
                             .convertToLogicElement(caseBranch.getExpression(), ec);
-                    if (caseTerm != null && caseTerm.equals(knownValue)) {
+                    if (caseTerm == null) {
+                        break;
+                    }
+                    if (caseTerm.equals(knownValue)) {
                         return KeYJavaASTFactory
                                 .block(armBlock(switchExpression, i, result, services, ec,
                                     "_case" + i));

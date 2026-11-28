@@ -16,6 +16,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -100,9 +101,10 @@ public class SwitchToIf extends ProgramTransformer {
                 currentBlock = KeYJavaASTFactory.ifThen(guard, caseBlock);
             }
         }
-        // mulbrich: Added additional null check for enum constants
+        // mulbrich: Added additional null check for enum constants. A 'case null' label matches a
+        // null selector, so the check must not preempt it.
         if (!(sw.getExpression().getKeYJavaType(services, ec)
-                .getJavaType() instanceof PrimitiveType)) {
+                .getJavaType() instanceof PrimitiveType) && !hasNullLabel(sw)) {
             currentBlock = mkIfNullCheck(services, exV, currentBlock);
         }
 
@@ -143,6 +145,20 @@ public class SwitchToIf extends ProgramTransformer {
         } else {
             return KeYJavaASTFactory.ifThen(cnd, t);
         }
+    }
+
+    /**
+     * Returns whether the switch has a {@code case null} label, which matches a null selector
+     * before any null check could.
+     */
+    private static boolean hasNullLabel(Switch sw) {
+        for (int i = 0; i < sw.getBranchCount(); i++) {
+            if (sw.getBranchAt(i) instanceof Case caseBranch
+                    && caseBranch.getExpression() instanceof NullLiteral) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
