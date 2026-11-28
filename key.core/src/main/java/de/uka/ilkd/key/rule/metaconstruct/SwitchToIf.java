@@ -16,7 +16,7 @@ import de.uka.ilkd.key.java.ast.Statement;
 import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.ast.expression.Expression;
-import de.uka.ilkd.key.java.ast.expression.operator.BinaryOperator;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.ast.expression.operator.New;
 import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
@@ -73,26 +73,38 @@ public class SwitchToIf extends ProgramTransformer {
         sw = (Switch) changeBreakResult.result;
         Statement currentBlock = null;
         for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
-            if (sw.getBranchAt(i) instanceof Default) {
+            final Branch branch = sw.getBranchAt(i);
+            final Expression guard;
+            if (branch instanceof Default) {
                 currentBlock = collectStatements(sw, i);
-            }
-        }
-        for (int i = sw.getBranchCount() - 1; 0 <= i; i--) {
-            if (sw.getBranchAt(i) instanceof Case) {
-                BinaryOperator guard = KeYJavaASTFactory.equalsOperator(exV,
-                    ((Case) sw.getBranchAt(i)).getExpression());
-                StatementBlock caseBlock = collectStatements(sw, i);
-                // Avoid creating a Else(null) block
-                if (currentBlock != null) {
-                    currentBlock = KeYJavaASTFactory.ifElse(guard, caseBlock, currentBlock);
-                } else {
-                    currentBlock = KeYJavaASTFactory.ifThen(guard, caseBlock);
+                continue;
+            } else if (branch instanceof Case) {
+                guard = KeYJavaASTFactory.equalsOperator(exV,
+                    ((Case) branch).getExpression());
+            } else if (branch instanceof PatternCase patternCase) {
+                if (patternCase.getPatterns().size() != 1) {
+                    throw new IllegalStateException(
+                        "Switch labels with more than one pattern are not supported yet.");
                 }
+                Expression test =
+                    KeYJavaASTFactory.patternTest(exV, patternCase.getPatterns().get(0));
+                guard = patternCase.getGuard() == null ? test
+                        : KeYJavaASTFactory.logicalAndOperator(test, patternCase.getGuard());
+            } else {
+                continue;
+            }
+            StatementBlock caseBlock = collectStatements(sw, i);
+            // Avoid creating a Else(null) block
+            if (currentBlock != null) {
+                currentBlock = KeYJavaASTFactory.ifElse(guard, caseBlock, currentBlock);
+            } else {
+                currentBlock = KeYJavaASTFactory.ifThen(guard, caseBlock);
             }
         }
-        // mulbrich: Added additional null check for enum constants
+        // mulbrich: Added additional null check for enum constants. A 'case null' label matches a
+        // null selector, so the check must not preempt it.
         if (!(sw.getExpression().getKeYJavaType(services, ec)
-                .getJavaType() instanceof PrimitiveType)) {
+                .getJavaType() instanceof PrimitiveType) && !hasNullLabel(sw)) {
             currentBlock = mkIfNullCheck(services, exV, currentBlock);
         }
 
@@ -136,6 +148,20 @@ public class SwitchToIf extends ProgramTransformer {
     }
 
     /**
+     * Returns whether the switch has a {@code case null} label, which matches a null selector
+     * before any null check could.
+     */
+    private static boolean hasNullLabel(Switch sw) {
+        for (int i = 0; i < sw.getBranchCount(); i++) {
+            if (sw.getBranchAt(i) instanceof Case caseBranch
+                    && caseBranch.getExpression() instanceof NullLiteral) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Replaces all breaks in <code>sw</code>, whose target is sw, with <code>b</code>
      */
     private ChangeBreakResult changeBreaks(Switch sw, Break b, boolean noNewBreak) {
@@ -168,6 +194,12 @@ public class SwitchToIf extends ProgramTransformer {
             if (p instanceof Case) {
                 return new ChangeBreakResult(
                     KeYJavaASTFactory.caseBlock(((Case) p).getExpression(), s),
+                    noNewBreak);
+            }
+            if (p instanceof PatternCase patternCase) {
+                return new ChangeBreakResult(
+                    KeYJavaASTFactory.patternCaseBlock(patternCase.getPatterns(),
+                        patternCase.getGuard(), ImmutableList.fromList(java.util.Arrays.asList(s))),
                     noNewBreak);
             }
             if (p instanceof Default) {

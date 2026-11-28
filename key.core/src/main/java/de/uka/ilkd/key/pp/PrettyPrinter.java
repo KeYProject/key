@@ -938,6 +938,15 @@ public class PrettyPrinter implements Visitor {
     }
 
     @Override
+    public void performActionOnYield(Yield x) {
+        layouter.keyWord("yield");
+        if (x.getExpression() != null) {
+            layouter.brk();
+            x.getExpression().visit(this);
+        }
+    }
+
+    @Override
     public void performActionOnThrow(Throw x) {
         layouter.keyWord("throw");
         if (x.getExpression() != null) {
@@ -1617,6 +1626,41 @@ public class PrettyPrinter implements Visitor {
         }
         layouter.print(":").end();
         printCaseBody(x.getBody());
+    }
+
+    @Override
+    public void performActionOnPatternCase(PatternCase x) {
+        layouter.beginRelativeC();
+        layouter.keyWord("case").brk();
+        for (int i = 0; i < x.getPatterns().size(); i++) {
+            if (i > 0) {
+                layouter.print(", ");
+            }
+            x.getPatterns().get(i).visit(this);
+        }
+        if (x.getGuard() != null) {
+            layouter.print(" ");
+            layouter.keyWord("when").brk();
+            x.getGuard().visit(this);
+        }
+        layouter.print(":").end();
+        printCaseBody(x.getBody());
+    }
+
+    @Override
+    public void performActionOnSwitchExpression(SwitchExpression x) {
+        layouter.keyWord("switch");
+        layouter.print(" ");
+        beginMultilineBracket();
+        x.getSelector().visit(this);
+        endMultilineBracket();
+        layouter.print(" ");
+        beginBlock();
+        for (int i = 0; i < x.getBranchCount(); i++) {
+            layouter.nl();
+            x.getBranchAt(i).visit(this);
+        }
+        endBlock();
     }
 
     @Override

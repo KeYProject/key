@@ -160,6 +160,16 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnPatternCase(PatternCase x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnSwitchExpression(SwitchExpression x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnCatch(Catch x) {
         doDefaultAction(x);
     }
@@ -515,6 +525,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnReturn(Return x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnYield(Yield x) {
         doDefaultAction(x);
     }
 

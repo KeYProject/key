@@ -1870,21 +1870,60 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(SwitchEntry n, Void arg) {
+        return convertSwitchEntry(n, false);
+    }
+
+    /**
+     * Converts one entry of a switch statement or switch expression.
+     *
+     * @param n the parsed entry
+     * @param expressionForm whether the entry belongs to a switch expression; then an arrow arm
+     *        value becomes a {@code yield} statement
+     * @return the branches of the entry
+     */
+    private List<Branch> convertSwitchEntry(SwitchEntry n, boolean expressionForm) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        ImmutableList<Statement> body = map(n.getStatements());
-        if (n.getLabels().isEmpty()) {
-            // Default branch
-            return List.of(new Default(body, pi, c));
+        ImmutableList<Statement> body;
+        if (expressionForm && n.getType() == SwitchEntry.Type.EXPRESSION) {
+            body = ImmutableList.of(new Yield(n.getStatements().isEmpty() ? null
+                    : (Expression) accept(n.getStatements().get(0)),
+                pi, c));
+        } else {
+            body = map(n.getStatements());
+        }
+
+        List<Pattern> patterns = new ArrayList<>();
+        List<Expression> constants = new ArrayList<>();
+        for (com.github.javaparser.ast.expr.Expression label : n.getLabels()) {
+            if (label instanceof PatternExpr pattern) {
+                patterns.add(createPattern(pattern));
+            } else {
+                constants.add(accept(label));
+            }
+        }
+        if (!patterns.isEmpty() && !constants.isEmpty()) {
+            return reportError(n, "Switch labels mixing patterns and constants are not supported");
+        }
+
+        List<Branch> result = new ArrayList<>();
+        if (!patterns.isEmpty()) {
+            Expression guard = n.getGuard().map(g -> (Expression) accept(g)).orElse(null);
+            result.add(new PatternCase(pi, c, ImmutableList.fromList(patterns), guard, body));
         } else {
             // TODO javaparser we currently multiply the branches
-            ArrayList<Case> result = new ArrayList<Case>(n.getLabels().size());
-            for (com.github.javaparser.ast.expr.Expression label : n.getLabels()) {
-                Expression expr = accept(label);
+            for (Expression expr : constants) {
                 result.add(new Case(expr, body, pi, c));
             }
-            return result;
         }
+        if (n.isDefault()) {
+            // also covers the 'case null, default' form: the null label is one of the constants
+            result.add(new Default(body, pi, c));
+        }
+        if (result.isEmpty()) {
+            result.add(new Default(body, pi, c));
+        }
+        return result;
     }
 
     @Override
@@ -2749,12 +2788,32 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(SwitchExpr n, Void arg) {
-        return reportUnsupportedElement(n);
+        PositionInfo pi = createPositionInfo(n);
+        List<Comment> c = createComments(n);
+        Expression selector = accept(n.getSelector());
+        if (!hasDefaultArm(n)) {
+            return reportError(n, "Switch expressions require a 'default' arm; "
+                + "exhaustiveness is not analysed yet");
+        }
+        List<Branch> branches = new ArrayList<>();
+        for (SwitchEntry entry : n.getEntries()) {
+            branches.addAll(convertSwitchEntry(entry, true));
+        }
+        return new SwitchExpression(pi, c, selector, ImmutableList.fromList(branches));
+    }
+
+    private static boolean hasDefaultArm(SwitchExpr n) {
+        for (SwitchEntry entry : n.getEntries()) {
+            if (entry.isDefault() || entry.getLabels().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
     public Object visit(YieldStmt n, Void arg) {
-        return reportUnsupportedElement(n);
+        return new Yield(accept(n.getExpression()), createPositionInfo(n), createComments(n));
     }
 
     @Override

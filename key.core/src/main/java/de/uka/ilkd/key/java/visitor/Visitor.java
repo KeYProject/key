@@ -117,6 +117,13 @@ public interface Visitor {
 
     void performActionOnReturn(Return x);
 
+    /**
+     * performs an action on the given element
+     *
+     * @param x the element to perform the action on
+     */
+    void performActionOnYield(Yield x);
+
     void performActionOnThrow(Throw x);
 
     void performActionOnDo(Do x);
@@ -212,6 +219,20 @@ public interface Visitor {
     void performActionOnElse(Else x);
 
     void performActionOnCase(Case x);
+
+    /**
+     * performs an action on the given element
+     *
+     * @param x the element to perform the action on
+     */
+    void performActionOnPatternCase(PatternCase x);
+
+    /**
+     * performs an action on the given element
+     *
+     * @param x the element to perform the action on
+     */
+    void performActionOnSwitchExpression(SwitchExpression x);
 
     void performActionOnCatch(Catch x);
 
