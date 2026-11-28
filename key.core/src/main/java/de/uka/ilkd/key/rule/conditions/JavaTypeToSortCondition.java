@@ -94,7 +94,9 @@ public final class JavaTypeToSortCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return "\\hasSort(" + (elemSort ? "\\elemSort(" + exprOrTypeSV + ")" : exprOrTypeSV) + ", "
-            + sort + ")";
+        if (elemSort) {
+            return "\\hasElementarySort(" + exprOrTypeSV + ", " + sort + ")";
+        }
+        return "\\hasSort(" + exprOrTypeSV + ", " + sort + ")";
     }
 }

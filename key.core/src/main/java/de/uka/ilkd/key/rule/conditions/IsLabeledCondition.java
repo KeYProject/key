@@ -61,6 +61,6 @@ public class IsLabeledCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return String.format("\\varcond (%s\\isLabeled(%s)", negated ? "\\not" : "", stmtSV);
+        return String.format("%s\\isLabeled(%s)", negated ? "\\not" : "", stmtSV);
     }
 }

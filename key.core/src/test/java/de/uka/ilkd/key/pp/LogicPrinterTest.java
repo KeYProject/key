@@ -22,6 +22,20 @@ import static org.junit.jupiter.api.Assertions.*;
 class LogicPrinterTest {
 
     /**
+     * Tests that the pretty printer keeps the notation settings chosen by the caller. The
+     * constructor used to refresh with the defaults, silently turning pretty syntax back on.
+     */
+    @Test
+    void nonPrettyPrinterKeepsNotationSettings() {
+        Services services = TacletForTests.services();
+        NotationInfo notation = new NotationInfo();
+        notation.refresh(services, false, false, false);
+        LogicPrinter lp = LogicPrinter.purePrinter(notation, services);
+        assertFalse(lp.getNotationInfo().isPrettySyntax(),
+            "pretty syntax must stay disabled");
+    }
+
+    /**
      * Tests that no stackoverflow exception is thrown when pretty printing a taclet
      * containing a modality.
      */

@@ -51,8 +51,15 @@ public class StoreTermInCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return String.format( //
-            "\\varcond (\\storeTermIn(%s, %s))", storeInSV, term);
+        return String.format("\\storeTermIn(%s, %s)", storeInSV, term);
+    }
+
+    public SchemaVariable getStoreInSV() {
+        return storeInSV;
+    }
+
+    public JTerm getTerm() {
+        return term;
     }
 
 }

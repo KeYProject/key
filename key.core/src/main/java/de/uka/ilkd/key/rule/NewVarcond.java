@@ -66,7 +66,11 @@ public class NewVarcond implements org.key_project.prover.rules.conditions.NewVa
 
     @Override
     public String toString() {
-        return "\\new(" + sv + ", "
-            + (type != null ? String.valueOf(type) : "\\typeof(" + peerSV + ")") + ")";
+        if (type != null) {
+            return "\\new(" + sv + ", " + type + ")";
+        }
+        // \new(sv, \typeof(peer)) is not accepted by the parser; the corresponding
+        // surface syntax is \newTypeOf(sv, peer).
+        return "\\newTypeOf(" + sv + ", " + peerSV + ")";
     }
 }

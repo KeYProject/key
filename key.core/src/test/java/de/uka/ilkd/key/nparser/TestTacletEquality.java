@@ -9,19 +9,29 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.*;
 import java.util.stream.Stream;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.logic.sort.GenericSort;
+import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
+import de.uka.ilkd.key.pp.LogicPrinter;
+import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderControl;
 import de.uka.ilkd.key.proof.io.SingleThreadProblemLoader;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.UninstantiatedGenericSortCollector;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.HelperClassForTests;
+
+import org.key_project.logic.ChoiceExpr;
+import org.key_project.logic.op.sv.SchemaVariable;
+import org.key_project.logic.sort.Sort;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NewVarcond;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 
 import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
@@ -35,16 +45,17 @@ import org.junit.jupiter.params.provider.MethodSource;
  * This class provides regression tests for KeY Taclets.
  *
  * <p>
- * This class uses a default project to boostrap a {@link de.uka.ilkd.key.control.KeYEnvironment}
- * and print all registered taclets. For the string representation of taclets, the
- * {@link Taclet#toString()} method is used. So do not expect anything fancy. Later, the actual
- * printout of each taclet is compared to the latest version defined in {@code taclets.old.txt}.
+ * This class uses a default project to bootstrap a
+ * {@link de.uka.ilkd.key.control.KeYEnvironment} and prints all registered taclets with the
+ * {@link LogicPrinter} in parseable (non-pretty) mode. The printout of each taclet is compared to
+ * the latest version defined in {@code taclets.old.txt}. In addition, every entry is parsed again
+ * and re-printed; the re-print must be structurally identical to the original taclet.
  * </p>
  *
  * <h2>How to update {@code taclet.old.txt} efficiently.</h2>
  * <p>
  * You can generate a new oracle easily by invoking the disabled test-method
- * {@link #createNewOracle()}. This method generates the {@code taclets.new.txt} file. Then, you
+ * {@link #createOracle()}. This method generates the {@code taclets.new.txt} file. Then, you
  * should use a diff-tool to compare the changes or directly overwrite {@code taclets.old.txt} with
  * the new representations.
  *
@@ -90,6 +101,7 @@ public class TestTacletEquality {
     }
 
     private static InitConfig initConfig;
+    private static InitConfig parseConfig;
 
     @BeforeAll
     static void setUp() throws Exception {
@@ -101,9 +113,151 @@ public class TestTacletEquality {
                     JavaProfile.getDefaultInstance(), true, control, false, null);
             loader.load();
             initConfig = loader.getInitConfig();
+            parseConfig = initConfig.copy();
+            registerGenericSorts(parseConfig);
             // uncomment the line, if you want to generate a new oracle file
             // createNewOracle();
         }
+    }
+
+    /**
+     * Makes the generic sorts used by the base taclets available for re-parsing. The generic sorts
+     * are deliberately removed from the base namespace after loading the standard rules, so the
+     * printed taclets can only be parsed if their generic sorts are registered again.
+     */
+    private static void registerGenericSorts(InitConfig config) {
+        for (Taclet taclet : initConfig.activatedTaclets()) {
+            for (GenericSort sort : genericSorts(taclet)) {
+                if (config.namespaces().sorts().lookup(sort.name()) == null) {
+                    config.namespaces().sorts().add(sort);
+                }
+            }
+        }
+    }
+
+    private static Set<GenericSort> genericSorts(Taclet taclet) {
+        Set<GenericSort> result = new LinkedHashSet<>();
+        var collector = new UninstantiatedGenericSortCollector(
+            SVInstantiations.EMPTY_SVINSTANTIATIONS);
+        collector.visit(taclet, true);
+        result.addAll(collector.getSortList());
+
+        for (SchemaVariable sv : taclet.collectSchemaVars()) {
+            if (!(sv instanceof de.uka.ilkd.key.logic.op.ModalOperatorSV)) {
+                collectGenericSorts(sv.sort(), result);
+            }
+        }
+        for (NewVarcond nvc : taclet.varsNew()) {
+            collectGenericSorts(nvc.getSchemaVariable().sort(), result);
+            if (nvc instanceof de.uka.ilkd.key.rule.NewVarcond keyVarcond
+                    && keyVarcond.getType() != null) {
+                collectGenericSorts(keyVarcond.getType().getSort(), result);
+            }
+        }
+        for (NotFreeIn pair : taclet.varsNotFreeIn()) {
+            collectGenericSorts(pair.first().sort(), result);
+            collectGenericSorts(pair.second().sort(), result);
+        }
+        for (NewDependingOn pair : taclet.varsNewDependingOn()) {
+            collectGenericSorts(pair.first().sort(), result);
+            collectGenericSorts(pair.second().sort(), result);
+        }
+        for (var condition : taclet.getVariableConditions()) {
+            collectGenericSortsFromObject(condition, result);
+        }
+        if (taclet.hasTrigger()) {
+            collectGenericSortsFromObject(taclet.getTrigger(), result);
+        }
+        return result;
+    }
+
+    private static void collectGenericSorts(Sort sort, Set<GenericSort> result) {
+        if (sort instanceof GenericSort genericSort) {
+            result.add(genericSort);
+        } else if (sort instanceof ParametricSortInstance parametricSort) {
+            for (var argument : parametricSort.getArgs()) {
+                collectGenericSorts(argument.sort(), result);
+            }
+        }
+    }
+
+    private static void collectGenericSortsFromObject(Object object, Set<GenericSort> result) {
+        collectGenericSortsFromObject(object, result,
+            Collections.newSetFromMap(new IdentityHashMap<>()));
+    }
+
+    private static void collectGenericSortsFromObject(Object object, Set<GenericSort> result,
+            Set<Object> visited) {
+        if (object == null || visited.contains(object)) {
+            return;
+        }
+        if (object instanceof Sort sort) {
+            collectGenericSorts(sort, result);
+            return;
+        }
+        if (object instanceof String || object instanceof Number || object instanceof Boolean
+                || object instanceof Enum<?>) {
+            return;
+        }
+        if (object instanceof Map<?, ?> map) {
+            for (Object value : map.values()) {
+                collectGenericSortsFromObject(value, result, visited);
+            }
+            return;
+        }
+        if (object instanceof Iterable<?> iterable) {
+            for (Object element : iterable) {
+                collectGenericSortsFromObject(element, result, visited);
+            }
+            return;
+        }
+        Class<?> clazz = object.getClass();
+        if (clazz.isArray()) {
+            for (int i = 0; i < java.lang.reflect.Array.getLength(object); i++) {
+                collectGenericSortsFromObject(java.lang.reflect.Array.get(object, i), result,
+                    visited);
+            }
+            return;
+        }
+        if (!clazz.getName().startsWith("de.uka.ilkd.key.rule")) {
+            return;
+        }
+        visited.add(object);
+        for (var field : clazz.getDeclaredFields()) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())
+                    || field.getType().isPrimitive()) {
+                continue;
+            }
+            try {
+                field.setAccessible(true);
+                collectGenericSortsFromObject(field.get(object), result, visited);
+            } catch (ReflectiveOperationException | RuntimeException e) {
+                // best effort: inaccessible fields cannot contribute sorts
+            }
+        }
+    }
+
+    /**
+     * Prints a taclet in parseable KeY rule syntax, including its choice restrictions.
+     */
+    private static String printTaclet(Taclet taclet) {
+        var notation = new NotationInfo();
+        notation.refresh(initConfig.getServices(), false, false, false);
+        var printer = LogicPrinter.purePrinter(notation, initConfig.getServices());
+        printer.printTaclet(taclet);
+        String text = printer.result().strip();
+        ChoiceExpr choices = taclet.getChoices();
+        if (choices != null && !choices.equals(ChoiceExpr.TRUE)) {
+            int brace = text.indexOf('{');
+            text = text.substring(0, brace) + "(" + choices + ") " + text.substring(brace);
+        }
+        return text;
+    }
+
+    private static Taclet parseTaclet(String text) throws IOException {
+        var io = new KeyIO(parseConfig.getServices(), parseConfig.namespaces());
+        List<Taclet> taclets = io.load("\n\\rules { " + text + "; }").loadComplete();
+        return taclets.get(0);
     }
 
     @SuppressWarnings("unused")
@@ -113,14 +267,18 @@ public class TestTacletEquality {
         // sort by name
         taclets.sort(Comparator.comparing(it -> it.name().toString()));
 
-        try (var out = new PrintWriter(Files.newBufferedWriter(path))) {
+        try (var out =
+            new PrintWriter(Files.newBufferedWriter(path, StandardCharsets.UTF_8))) {
             out.write(
                 "# This files contains representation of taclets, which are accepted and revised.\n");
+            out.write("# Each taclet is printed in parseable KeY rule syntax.\n");
             out.format("# Date: %s\n\n", new Date());
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================\n", taclet.name(),
                     taclet.displayName());
-                out.println(taclet);
+                for (String line : printTaclet(taclet).split("\n", -1)) {
+                    out.println(line.stripTrailing());
+                }
                 out.format("-----------------------------------------------------\n");
             }
         } catch (IOException e) {
@@ -136,18 +294,28 @@ public class TestTacletEquality {
     @ParameterizedTest
     @MethodSource("createCases")
     public void testEquality(String name, String expected) {
-        Taclet t = findTaclet(name);
-        Assumptions.assumeTrue(t != null);
-        assertEquals(expected, t.toString());
+        Taclet taclet = findTaclet(name);
+        Assumptions.assumeTrue(taclet != null);
+
+        String printed = printTaclet(taclet);
+        assertEquals(expected, printed);
+
+        Taclet reparsed;
+        try {
+            reparsed = parseTaclet(expected);
+        } catch (IOException e) {
+            throw new AssertionError("Oracle entry for " + name + " is not parseable", e);
+        }
+        assertEquals(printed, printTaclet(reparsed));
     }
 
 
     private void assertEquals(String expected, String actual) {
-        Assertions.assertEquals(normalise(expected).trim(), normalise(actual).trim());
+        Assertions.assertEquals(normalise(expected), normalise(actual));
     }
 
-    private @NonNull String normalise(String expected) {
-        return expected.replaceAll("\\s+", "\n").replaceAll("Choices:\\s*\\{.*?\\}", "");
+    private @NonNull String normalise(String text) {
+        return text.replaceAll("\\s+", " ").trim();
     }
 
     final HashMap<String, Taclet> cache = new HashMap<>();

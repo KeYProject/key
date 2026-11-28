@@ -154,7 +154,7 @@ public class TestTacletBuild {
             assertTrue(e.toString().contains("schemaVarInAddruleRespectPrefix.key:9:3"),
                 "Position of error message is wrong.");
             assertTrue(e.getCause().getMessage().contains(
-                "Schema variable b (formula)occurs at different places in taclet all_left_hide with different prefixes."),
+                "Schema variable b occurs at different places in taclet all_left_hide with different prefixes."),
                 "Cause should be prefix error");
             return;
         } catch (ProofInputException e) {

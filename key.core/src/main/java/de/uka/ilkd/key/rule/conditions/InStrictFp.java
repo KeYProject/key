@@ -63,6 +63,6 @@ public final class InStrictFp extends VariableConditionAdapter {
     @Override
     public String toString() {
         String prefix = negated ? "\\not" : "";
-        return prefix + "\\isStrictFp";
+        return prefix + "\\isInStrictFp";
     }
 }

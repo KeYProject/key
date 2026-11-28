@@ -224,7 +224,7 @@ public class TacletPrefixBuilder {
         InvalidPrefixException(String tacletName, SchemaVariable sv,
                 org.key_project.prover.rules.TacletPrefix prefix,
                 ImmutableSet<SchemaVariable> sndPrefixVar) {
-            super("Schema variable " + sv + "occurs at different places " + "in taclet "
+            super("Schema variable " + sv + " occurs at different places " + "in taclet "
                 + tacletName + " with different prefixes.\n" + "Prefix P1:"
                 + ((prefix == null) ? DefaultImmutableSet.<SchemaVariable>nil() : prefix)
                 + "\n" + "Prefix P2:" + sndPrefixVar);

@@ -7,6 +7,7 @@ package de.uka.ilkd.key.rule;
 import java.util.HashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.op.ParametricFunctionInstance;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.ParametricSortInstance;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -31,6 +32,11 @@ public class UninstantiatedGenericSortCollector extends TacletSchemaVariableColl
     @Override
     public void visit(@NonNull Term p_visited) {
         visit(p_visited.sort());
+        if (p_visited.op() instanceof ParametricFunctionInstance pfi) {
+            for (var arg : pfi.getArgs()) {
+                visit(arg.sort());
+            }
+        }
         for (var t : p_visited.subs()) {
             visit(t);
         }

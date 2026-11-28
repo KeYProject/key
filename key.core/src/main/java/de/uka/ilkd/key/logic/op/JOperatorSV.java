@@ -40,8 +40,13 @@ public abstract class JOperatorSV extends JAbstractSortedOperator
     }
 
 
+    /**
+     * Returns the name of this schema variable. Sort annotations are deliberately not included:
+     * string representations are also used to print variable conditions back to KeY rule syntax,
+     * where {@code name (sort)} is not valid.
+     */
     protected final String toString(String sortSpec) {
-        return name() + " (" + sortSpec + ")";
+        return name().toString();
     }
 
 

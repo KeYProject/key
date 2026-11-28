@@ -26,6 +26,12 @@ public abstract class ChoiceExpr {
     }
 
     public static ChoiceExpr and(ChoiceExpr left, ChoiceExpr right) {
+        if (left == TRUE) {
+            return right;
+        }
+        if (right == TRUE) {
+            return left;
+        }
         return new And(left, right);
     }
 

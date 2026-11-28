@@ -547,7 +547,8 @@ public abstract class Notation {
                     }
                     case FormulaSV fsv -> {
                         svType = "\\formula";
-                        specificSort = fsv.sort().name().toString();
+                        // formula sorts are implicit in the rule grammar
+                        specificSort = "";
                     }
                     case VariableSV varSV -> {
                         svType = "\\variables";
@@ -570,7 +571,9 @@ public abstract class Notation {
             } else if (v instanceof ModalOperatorSV modalOperatorSV) {
                 sp.layouter().beginC(0).beginC().print("\\schemaVar \\modalOperator {").brk(0);
                 boolean first = true;
-                for (JModality.JavaModalityKind modality : modalOperatorSV.getModalities()) {
+                for (JModality.JavaModalityKind modality : modalOperatorSV.getModalities().stream()
+                        .sorted(java.util.Comparator.comparing(it -> it.name().toString()))
+                        .toList()) {
                     if (!first) {
                         sp.layouter().print(",").brk();
                     } else {

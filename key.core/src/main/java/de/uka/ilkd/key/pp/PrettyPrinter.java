@@ -299,7 +299,12 @@ public class PrettyPrinter implements Visitor {
     public void performActionOnContextStatementBlock(ContextStatementBlock x) {
         if (x.getStatementCount() > 0) {
             layouter.beginRelativeC();
-            layouter.print("{ ..");
+            layouter.print("{ ");
+            if (x.getExecutionContext() != null) {
+                layouter.print(".");
+                printExecutionContextPrefix(x.getExecutionContext());
+            }
+            layouter.print("..");
             for (Statement statement : x.getBody()) {
                 layouter.nl();
                 performActionOnStatement(statement);
@@ -307,7 +312,31 @@ public class PrettyPrinter implements Visitor {
             layouter.end().nl();
             layouter.print("... }");
         } else {
-            layouter.print("{ ..  ... }");
+            layouter.print("{ ");
+            if (x.getExecutionContext() != null) {
+                layouter.print(".");
+                printExecutionContextPrefix(x.getExecutionContext());
+            }
+            layouter.print("..  ... }");
+        }
+    }
+
+    /**
+     * Prints the execution context of a context statement block in prefix position, e.g.
+     * {@code #method@#type()}.
+     */
+    private void printExecutionContextPrefix(IExecutionContext executionContext) {
+        if (executionContext instanceof ExecutionContext context) {
+            if (context.getMethodContext() != null) {
+                context.getMethodContext().visit(this);
+            }
+            layouter.print("@");
+            if (context.getTypeReference() != null) {
+                context.getTypeReference().visit(this);
+            }
+            layouter.print("()");
+        } else if (executionContext instanceof ProgramElement element) {
+            element.visit(this);
         }
     }
 
@@ -375,9 +404,15 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnMergePointStatement(MergePointStatement x) {
-        layouter.beginC().print("//@ merge_point (").brk(0);
-        x.getExpression().visit(this);
-        layouter.brk(0).print(");");
+        if (usePrettyPrinting) {
+            layouter.beginC().print("//@ merge_point (").brk(0);
+            x.getExpression().visit(this);
+            layouter.brk(0).print(");");
+        } else {
+            layouter.beginC().print("merge_point (").brk(0);
+            x.getExpression().visit(this);
+            layouter.brk(0).print(")");
+        }
     }
 
     @Override
@@ -532,7 +567,17 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnLogicFunctionalOperator(LogicFunctionalOperator op) {
-        op.getFunction().format.call(this, op);
+        if (!usePrettyPrinting) {
+            // In parseable output mode use the explicit KeY function syntax instead of the
+            // display-oriented array/field access sugar.
+            switch (op.getFunction()) {
+                case SeqGet -> AsFunction("\\seq_get").call(this, op);
+                case SeqLength -> AsFunction("\\seq_length").call(this, op);
+                default -> op.getFunction().format.call(this, op);
+            }
+        } else {
+            op.getFunction().format.call(this, op);
+        }
     }
 
     @Override
@@ -1601,7 +1646,12 @@ public class PrettyPrinter implements Visitor {
 
     @Override
     public void performActionOnModifier(Modifier x) {
-        layouter.keyWord(x.getText());
+        if (!usePrettyPrinting && x.getKind().name().startsWith("JML_")) {
+            // In parseable output mode print the plain modifier keyword instead of a JML comment.
+            layouter.keyWord(x.getKind().name().substring("JML_".length()).toLowerCase());
+        } else {
+            layouter.keyWord(x.getText());
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -1614,6 +1664,10 @@ public class PrettyPrinter implements Visitor {
 
         Object o = instantiations.getInstantiation(x);
         if (o == null) {
+            if (!usePrettyPrinting
+                    && ((ProgramSV) x).sort() == de.uka.ilkd.key.logic.sort.ProgramSVSort.CATCH) {
+                layouter.keyWord("catch").print(" ");
+            }
             layouter.print(x.name().toString());
         } else {
             if (o instanceof ProgramElement) {

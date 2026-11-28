@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.pp;
 
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -20,6 +21,8 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Notation.HeapConstructorNotation;
 import de.uka.ilkd.key.pp.Notation.ObserverNotation;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.conditions.StoreStmtInCondition;
+import de.uka.ilkd.key.rule.conditions.StoreTermInCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
@@ -83,6 +86,9 @@ public class LogicPrinter {
 
     private SVInstantiations instantiations = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
+    /// whether the current taclet is nested inside an {@code \addrules} block
+    private boolean inAddRules = false;
+
     private final SelectPrinter selectPrinter;
     private final FinalPrinter finalPrinter;
     private final StorePrinter storePrinter;
@@ -109,7 +115,11 @@ public class LogicPrinter {
         this.notationInfo = notationInfo;
         this.services = services;
         if (services != null) {
-            notationInfo.refresh(services);
+            // Keep the notation configuration chosen by the caller. Refreshing with the
+            // defaults here used to silently re-enable pretty syntax, which made
+            // "pretty syntax off" printers emit non-parseable output again.
+            notationInfo.refresh(services, notationInfo.isPrettySyntax(),
+                notationInfo.isUnicodeEnabled(), notationInfo.isHidePackagePrefix());
         }
         storePrinter = new StorePrinter(this.services);
         finalPrinter = new FinalPrinter(this.services);
@@ -303,7 +313,10 @@ public class LogicPrinter {
             boolean showWholeTaclet,
             boolean declareSchemaVars) {
         instantiations = sv;
-        quantifiableVariablePrintMode = QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
+        quantifiableVariablePrintMode =
+            declareSchemaVars || !notationInfo.isPrettySyntax()
+                    ? QuantifiableVariablePrintMode.NORMAL
+                    : QuantifiableVariablePrintMode.WITH_OUT_DECLARATION;
 
         layouter.beginC();
         if (showWholeTaclet) {
@@ -312,7 +325,8 @@ public class LogicPrinter {
         if (declareSchemaVars) {
             Set<SchemaVariable> schemaVars =
                 ((de.uka.ilkd.key.rule.Taclet) taclet).collectSchemaVars();
-            for (SchemaVariable schemaVar : schemaVars) {
+            for (SchemaVariable schemaVar : schemaVars.stream()
+                    .sorted(Comparator.comparing(it -> it.name().toString())).toList()) {
                 layouter.nl();
                 final Notation notation;
                 if (schemaVar instanceof Operator opSV) {
@@ -383,7 +397,30 @@ public class LogicPrinter {
 
     protected void printRewriteAttributes(RewriteTaclet taclet) {
         final var applicationRestriction = taclet.applicationRestriction();
-        layouter.nl().print(applicationRestriction.toString());
+        String restriction = applicationRestriction.toString(needsSameUpdateLevel(taclet));
+        // The parser enables \sameUpdateLevel by default for taclets inside \addrules. Without
+        // an explicit \ignoreUpdateLevel a nested taclet without that restriction would change.
+        if (inAddRules && !applicationRestriction.matches(ApplicationRestriction.SAME_UPDATE_LEVEL)
+                && !restriction.contains("\\ignoreUpdateLevel")) {
+            restriction = "\\ignoreUpdateLevel" + restriction;
+        }
+        layouter.nl().print(restriction);
+    }
+
+    /**
+     * Whether the taclet semantics imply {@code \sameUpdateLevel}, in which case the parser also
+     * sets it implicitly and the printed rule must not add {@code \ignoreUpdateLevel}.
+     */
+    private boolean needsSameUpdateLevel(Taclet taclet) {
+        if (!taclet.assumesSequent().isEmpty()) {
+            return true;
+        }
+        for (var tgt : taclet.goalTemplates()) {
+            if (!tgt.sequent().isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected void printVarCond(Taclet taclet) {
@@ -401,7 +438,7 @@ public class LogicPrinter {
             layouter.nl().beginC().print("\\varcond(").brk(0);
             boolean first = true;
 
-            for (NewDependingOn ndo : varsNewDependingOn) {
+            for (NewDependingOn ndo : stableOrder(varsNewDependingOn)) {
                 if (first) {
                     first = false;
                 } else {
@@ -410,7 +447,7 @@ public class LogicPrinter {
                 printNewVarDepOnCond(ndo);
             }
 
-            for (final var nvc : varsNew) {
+            for (final var nvc : stableOrder(varsNew)) {
                 if (first) {
                     first = false;
                 } else {
@@ -419,7 +456,7 @@ public class LogicPrinter {
                 printNewVarcond(nvc);
             }
 
-            for (final NotFreeIn pair : varsNotFreeIn) {
+            for (final NotFreeIn pair : stableOrder(varsNotFreeIn)) {
                 if (first) {
                     first = false;
                 } else {
@@ -428,7 +465,7 @@ public class LogicPrinter {
                 printNotFreeIn(pair);
             }
 
-            for (final VariableCondition vc : variableConditions) {
+            for (final VariableCondition vc : stableOrder(variableConditions)) {
                 if (first) {
                     first = false;
                 } else {
@@ -440,35 +477,49 @@ public class LogicPrinter {
         }
     }
 
+    /**
+     * Variable conditions form a conjunction and have no defined order. The parser may reorder
+     * them, so a parseable (non-pretty) rendering sorts them to stay diff-stable.
+     */
+    private <T> Iterable<T> stableOrder(Iterable<T> elements) {
+        if (notationInfo.isPrettySyntax()) {
+            return elements;
+        }
+        var list = new java.util.ArrayList<T>();
+        elements.forEach(list::add);
+        list.sort(java.util.Comparator.comparing(Object::toString));
+        return list;
+    }
+
     private void printNewVarDepOnCond(NewDependingOn on) {
         layouter.beginC(0);
-        layouter.print("\\new(");
+        layouter.print("\\newDependingOn(");
         printSchemaVariable(on.first());
         layouter.print(",").brk();
-        layouter.print("\\dependingOn(");
         printSchemaVariable(on.second());
-        layouter.brk(0, -2).print(")").brk();
         layouter.brk(0, -2).print(")").end();
     }
 
     protected void printNewVarcond(NewVarcond p_sv) {
         de.uka.ilkd.key.rule.NewVarcond sv = (de.uka.ilkd.key.rule.NewVarcond) p_sv;
         layouter.beginC();
-        layouter.print("\\new(");
-        printSchemaVariable(sv.getSchemaVariable());
-        layouter.print(",").brk();
         if (sv.isDefinedByType()) {
+            layouter.print("\\new(");
+            printSchemaVariable(sv.getSchemaVariable());
+            layouter.print(",").brk();
             if (sv.getType().getJavaType() instanceof ArrayType at) {
                 layouter.print(at.getAlternativeNameRepresentation());
             } else {
                 layouter.print(sv.getType().getFullName());
             }
+            layouter.brk(0, -2).print(")").end();
         } else {
-            layouter.print("\\typeof(").brk(0);
+            layouter.print("\\newTypeOf(");
+            printSchemaVariable(sv.getSchemaVariable());
+            layouter.print(",").brk();
             printSchemaVariable(sv.getPeerSchemaVariable());
-            layouter.brk(0, -2).print(")").brk(0);
+            layouter.brk(0, -2).print(")").end();
         }
-        layouter.brk(0, -2).print(")").end();
     }
 
     protected void printNotFreeIn(NotFreeIn sv) {
@@ -480,7 +531,21 @@ public class LogicPrinter {
     }
 
     protected void printVariableCondition(VariableCondition sv) {
-        layouter.print(sv.toString());
+        if (sv instanceof StoreStmtInCondition store) {
+            layouter.print("\\storeStmtIn(");
+            printSchemaVariable(store.getStoreInSV());
+            layouter.print(",").brk();
+            printTerm(store.getTerm());
+            layouter.print(")");
+        } else if (sv instanceof StoreTermInCondition store) {
+            layouter.print("\\storeTermIn(");
+            printSchemaVariable(store.getStoreInSV());
+            layouter.print(",").brk();
+            printTerm(store.getTerm());
+            layouter.print(")");
+        } else {
+            layouter.print(sv.toString());
+        }
     }
 
     protected void printHeuristics(Taclet taclet) {
@@ -488,7 +553,9 @@ public class LogicPrinter {
             return;
         }
         layouter.nl().beginRelativeC().print("\\heuristics(").brk(0);
-        for (Iterator<RuleSet> it = taclet.getRuleSets().iterator(); it.hasNext();) {
+        for (Iterator<RuleSet> it = taclet.getRuleSets().stream()
+                .sorted(Comparator.comparing(ruleSet -> ruleSet.name().toString())).iterator(); it
+                        .hasNext();) {
             RuleSet tgt = it.next();
             printHeuristic(tgt);
             if (it.hasNext()) {
@@ -608,10 +675,16 @@ public class LogicPrinter {
     protected void printRules(ImmutableList<? extends org.key_project.prover.rules.Taclet> rules) {
         layouter.nl().beginC().print("\\addrules(");
         SVInstantiations svi = instantiations;
-        for (org.key_project.prover.rules.Taclet rule : rules) {
-            layouter.nl();
-            printTaclet(rule, instantiations, true, false);
-            instantiations = svi;
+        boolean oldInAddRules = inAddRules;
+        inAddRules = true;
+        try {
+            for (org.key_project.prover.rules.Taclet rule : rules) {
+                layouter.nl();
+                printTaclet(rule, instantiations, true, false);
+                instantiations = svi;
+            }
+        } finally {
+            inAddRules = oldInAddRules;
         }
         layouter.brk(0, -2).print(")").end();
     }
@@ -1550,7 +1623,15 @@ public class LogicPrinter {
         layouter.markEndUpdate();
         layouter.brk(0);
 
-        maybeParens(t.sub(1), ass3);
+        if (!notationInfo.isPrettySyntax() && t.sub(1).op() instanceof ElementaryUpdate) {
+            // The parser needs explicit brackets around an elementary update used as the body of
+            // an update application, e.g. {u}(#x := t).
+            layouter.print("(").beginC(0);
+            printTerm(t.sub(1));
+            layouter.end().print(")");
+        } else {
+            maybeParens(t.sub(1), ass3);
+        }
 
         layouter.end();
     }
