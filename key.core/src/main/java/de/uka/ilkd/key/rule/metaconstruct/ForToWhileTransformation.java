@@ -20,8 +20,10 @@ import de.uka.ilkd.key.java.ast.statement.ILoopInit;
 import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.ExtList;
 
@@ -173,8 +175,15 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                 ProgramVariable arrVar = findArrayVariable(x);
                 li = EnhancedForElimination.remapVariables(li,
                     p -> resolve(p, arrVar), services);
-                li = li.setLoop((While) outerBlockStatements[initSize]);
-                ((While) outerBlockStatements[initSize]).setLoopInvariant(li);
+                While newLoop = (While) outerBlockStatements[initSize];
+                TermBuilder tb = services.getTermBuilder();
+                li = li.create(newLoop, li.getInternalInvariants(),
+                    li.getInternalFreeInvariants(), li.getInternalModifiable(),
+                    li.getInternalFreeModifiable(), li.getInternalInfFlowSpec(),
+                    li.getInternalVariant(), li.getInternalSelfTerm(),
+                    tb.var(MiscTools.getLocalIns(newLoop, services)),
+                    tb.var(MiscTools.getLocalOuts(newLoop, services)), li.getInternalAtPres());
+                newLoop.setLoopInvariant(li);
             }
 
             addChild(outerBlock);
