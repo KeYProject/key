@@ -246,10 +246,14 @@ public final class ParallelProver extends DefaultProver<Goal> {
         return workerCount;
     }
 
-    @Override
-    protected final @Nullable RuleApp updateBuiltInRuleIndex(Goal goal, @Nullable RuleApp app) {
-        // Hack mirrored from ApplyStrategy: built-in rules may become applicable without the
-        // BuiltInRuleAppIndex noticing.
+    /// retrieves the next rule app to be applied on this goal
+    ///
+    /// @param goal the [Goal] currently being processed
+    /// index is updated and queried whether a built-in rule is applicable)
+    /// @return the next [RuleApp] to apply, or `null` if no rule is applicable
+    protected final @Nullable RuleApp nextRuleApp(Goal goal) {
+        // Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
+        RuleApp app = super.nextRuleApp(goal);
         if (app == null) {
             goal.ruleAppIndex().scanBuiltInRules(goal);
             app = goal.getRuleAppManager().next();
@@ -292,7 +296,7 @@ public final class ParallelProver extends DefaultProver<Goal> {
             ImmutableList<Goal> goals,
             int maxSteps,
             long timeout, boolean stopAtFirstNonCloseableGoal) {
-        return run((Proof) proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal, 0);
+        return run(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal, 0);
     }
 
     /**
@@ -613,8 +617,7 @@ public final class ParallelProver extends DefaultProver<Goal> {
                 return;
             }
 
-            RuleApp app = goal.getRuleAppManager().next();
-            app = updateBuiltInRuleIndex(goal, app);
+            final RuleApp app = nextRuleApp(goal);
 
             if (app == null) {
                 // The strategy currently offers no rule for this goal. With STOPMODE_NONCLOSE that

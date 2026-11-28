@@ -207,14 +207,18 @@ public class ApplyStrategy extends DefaultProver<Goal> {
         return chooser != null ? chooser : defaultGoalChooser;
     }
 
-    @Override
-    protected final @Nullable RuleApp updateBuiltInRuleIndex(Goal goal, @Nullable RuleApp app) {
+    /// retrieves the next rule app to be applied on this goal
+    ///
+    /// @param goal the [Goal] currently being processed
+    /// index is updated and queried whether a built-in rule is applicable)
+    /// @return the next [RuleApp] to apply, or `null` if no rule is applicable
+    protected final @Nullable RuleApp nextRuleApp(Goal goal) {
         // Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
+        final RuleApp app = super.nextRuleApp(goal);
         if (app == null) {
             goal.ruleAppIndex().scanBuiltInRules(goal);
-            app = goal.getRuleAppManager().next();
+            return goal.getRuleAppManager().next();
         }
-        // <-------
         return app;
     }
 

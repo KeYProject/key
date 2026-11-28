@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.engine.impl;
 
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.key_project.prover.engine.AbstractProverCore;
@@ -72,19 +71,9 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
     /// A strategy component that selects the next goal to be processed.
     protected @Nullable GoalChooser<Goal> goalChooser;
 
-    /// This is currently a hook method for the JavaDL prover as according to a
-    /// comment the built-in-rule index is not updated when rules are applied.
-    ///
-    /// Ultimately, this has to be fixed in the listener structure of JavaDL.
-    /// But for the moment we move it up. Other implementations should implement
-    /// this method as an empty method.
-    ///
-    ///
-    /// @param goal the [Goal] currently being processed
-    /// @param app the [RuleApp] to be applied next (if null, the built-in-rule
-    /// index is updated and queried whether a built-in rule is applicable)
-    /// @return the next [RuleApp] to apply, or `null` if no rule is applicable
-    protected abstract @Nullable RuleApp updateBuiltInRuleIndex(Goal goal, @Nullable RuleApp app);
+    protected @Nullable RuleApp nextRuleApp(Goal goal) {
+        return goal.getRuleAppManager().next();
+    }
 
     /// Executes the proof strategy by applying rules to goals until no further rules
     /// can be applied, a stop condition is met, or the thread is interrupted.
@@ -180,9 +169,7 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
                 return new SingleRuleApplicationInfo(message, g, null);
             }
 
-            app = Objects.requireNonNull(g.getRuleAppManager()).next();
-
-            app = updateBuiltInRuleIndex(g, app);
+            app = nextRuleApp(g);
 
             if (app == null) {
                 if (stopAtFirstNonClosableGoal) {
