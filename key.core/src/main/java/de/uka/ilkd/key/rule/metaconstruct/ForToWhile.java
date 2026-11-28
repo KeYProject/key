@@ -234,10 +234,12 @@ public class ForToWhile extends ProgramTransformer {
             arraySource = pv;
         }
         Set<String> parameterNames = new LinkedHashSet<>();
+        String methodName = null;
         var context = svInst.getContextInstantiation();
         if (context != null && context.activeStatementContext() != null) {
             var method = context.activeStatementContext().getMethodContext();
             if (method != null) {
+                methodName = method.getName();
                 for (var parameter : method.getParameters()) {
                     parameterNames.add(parameter.getVariableSpecification().getProgramVariable()
                             .name().toString());
@@ -247,7 +249,7 @@ public class ForToWhile extends ProgramTransformer {
         WhileLoopTransformation w = new ForToWhileTransformation(pe,
             (ProgramElementName) svInst.getInstantiation(outerLabel),
             (ProgramElementName) svInst.getInstantiation(innerLabel), services, sourceInvariant,
-            targetVariables, arraySource, parameterNames);
+            targetVariables, arraySource, parameterNames, methodName);
 
         w.start();
         return new ProgramElement[] { w.result() };

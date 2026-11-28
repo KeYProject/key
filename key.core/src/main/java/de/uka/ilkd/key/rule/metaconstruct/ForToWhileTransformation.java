@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.ast.statement.IForUpdates;
 import de.uka.ilkd.key.java.ast.statement.ILoopInit;
 import de.uka.ilkd.key.java.ast.statement.While;
 import de.uka.ilkd.key.java.visitor.JavaASTCollector;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -50,16 +51,18 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
     private final Map<String, ProgramVariable> targetVariables;
     private final ProgramVariable arraySource;
     private final Set<String> parameterNames;
+    private final String methodName;
 
     public ForToWhileTransformation(ProgramElement root, ProgramElementName outerLabel,
             ProgramElementName innerLabel, Services services, LoopSpecification sourceInvariant,
             Map<String, ProgramVariable> targetVariables, ProgramVariable arraySource,
-            Set<String> parameterNames) {
+            Set<String> parameterNames, String methodName) {
         super(root, outerLabel, innerLabel, services);
         this.sourceInvariant = sourceInvariant;
         this.targetVariables = targetVariables;
         this.arraySource = arraySource;
         this.parameterNames = parameterNames;
+        this.methodName = methodName;
     }
 
     private boolean isNotParameter(LocationVariable variable) {
@@ -191,11 +194,24 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                         .filter(this::isNotParameter).collect(ImmutableList.collector());
                 var localOuts = MiscTools.getLocalOuts(newLoop, services).stream()
                         .filter(this::isNotParameter).collect(ImmutableList.collector());
+                Map<LocationVariable, JTerm> atPres =
+                    new java.util.LinkedHashMap<>(li.getInternalAtPres());
+                if (methodName != null) {
+                    for (var key : atPres.keySet()) {
+                        String name = key.name().toString();
+                        var variable = services.getNamespaces().programVariables()
+                                .lookup(new org.key_project.logic.Name(
+                                    name + "Before_" + methodName));
+                        if (variable instanceof LocationVariable location) {
+                            atPres.put(key, tb.var(location));
+                        }
+                    }
+                }
                 li = li.create(newLoop, li.getInternalInvariants(),
                     li.getInternalFreeInvariants(), li.getInternalModifiable(),
                     li.getInternalFreeModifiable(), li.getInternalInfFlowSpec(),
                     li.getInternalVariant(), li.getInternalSelfTerm(),
-                    tb.var(localIns), tb.var(localOuts), li.getInternalAtPres());
+                    tb.var(localIns), tb.var(localOuts), atPres);
                 newLoop.setLoopInvariant(li);
             }
 
