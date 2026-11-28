@@ -3,7 +3,7 @@ import java.lang.Object;
 public class OuterClass {
 
     @javax.annotation.processing.Generated("RecordClassBuilder")
-    final class MyRecord extends Record {
+    final static class MyRecord extends Record {
 
         @javax.annotation.processing.Generated("RecordClassBuilder")
         private final String test;
@@ -64,8 +64,6 @@ public class OuterClass {
 
         @javax.annotation.processing.Generated()
         static private boolean $classPrepared;
-
-        private OuterClass $enclosingThis;
 
         @javax.annotation.processing.Generated()
         static public /*@ model */ boolean $staticInv;

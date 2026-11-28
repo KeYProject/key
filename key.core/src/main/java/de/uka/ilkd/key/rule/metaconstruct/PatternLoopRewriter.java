@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.ast.expression.operator.Instanceof;
 import de.uka.ilkd.key.java.ast.expression.operator.InstanceofPattern;
+import de.uka.ilkd.key.java.ast.pattern.RecordPattern;
 import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.ast.statement.Break;
@@ -515,7 +516,7 @@ public final class PatternLoopRewriter extends ProgramTransformer {
             declarations.add(declare(temporary));
             testedValues.add(new TestedValue(temporary, subject));
             addChild(new InstanceofPattern(x.getPositionInfo(), List.of(x.getComments()), temporary,
-                x.getTypeReference(), x.getPatternVariable()));
+                x.getTypeReference(), x.getPattern()));
             changed();
         }
     }
@@ -546,8 +547,12 @@ public final class PatternLoopRewriter extends ProgramTransformer {
 
         @Override
         public void performActionOnInstanceofPattern(InstanceofPattern x) {
-            addChild(new Instanceof(x.getPositionInfo(),
-                List.of(x.getComments()), x.getExpressionAt(0), x.getTypeReference()));
+            if (x.getPattern() instanceof RecordPattern) {
+                addChild(BindingVariableVisitor.toTest(x));
+            } else {
+                addChild(new Instanceof(x.getPositionInfo(),
+                    List.of(x.getComments()), x.getExpressionAt(0), x.getTypeReference()));
+            }
             changed();
         }
     }

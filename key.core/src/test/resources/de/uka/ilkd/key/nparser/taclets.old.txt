@@ -1,5 +1,5 @@
 # This files contains representation of taclets, which are accepted and revised.
-# Date: Sun Nov 15 00:37:08 CET 2026
+# Date: Sun Nov 22 19:32:58 CET 2026
 
 == abortJavaCardTransactionAPI (abortJavaCardTransactionAPI) =========================================
 abortJavaCardTransactionAPI {
@@ -731,7 +731,7 @@ andPatternAssignment {
   boolean #b;
   boolean #boolv;
   {
-    #boolv = #nse;
+    #boolv = #patternTest(#nse);
   }
   if (#boolv) {
     #posBinding(#nse)
@@ -5133,7 +5133,7 @@ conditionalPatternAssignment {
   #t #v;
   boolean #boolv;
   {
-    #boolv = #nse;
+    #boolv = #patternTest(#nse);
   }
   if (#boolv) {
     #posBinding(#nse)
@@ -10898,7 +10898,7 @@ ifElseUnfoldPattern {
 \replacewith(#allmodal ((modal operator))|{{ ..
   boolean #boolv;
   {
-    #boolv = #nse;
+    #boolv = #patternTest(#nse);
   }
   if (#boolv) {
     #posBinding(#nse)
@@ -11205,7 +11205,7 @@ ifUnfoldPattern {
 \replacewith(#allmodal ((modal operator))|{{ ..
   boolean #boolv;
   {
-    #boolv = #nse;
+    #boolv = #patternTest(#nse);
   }
   if (#boolv) {
     #posBinding(#nse)
@@ -11224,7 +11224,7 @@ ifUnfoldPatternUnreachable {
 \replacewith(#allmodal ((modal operator))|{{ ..
   boolean #boolv;
   {
-    #boolv = #nse;
+    #boolv = #patternTest(#nse);
   }
   if (#boolv) {
     #posBinding(#nse)
@@ -15380,7 +15380,7 @@ notPatternAssignment {
   boolean #b;
   boolean #boolv;
   {
-    #boolv = #nse;
+    #boolv = #patternTest(#nse);
   }
   #b = !#boolv;
 ... }}| (post)) 
@@ -15593,7 +15593,7 @@ orPatternAssignment {
   boolean #b;
   boolean #boolv;
   {
-    #boolv = #nse;
+    #boolv = #patternTest(#nse);
   }
   if (#boolv) {
     #b = true;
@@ -17278,7 +17278,7 @@ reachDependenciesAnon {
 \find(reach(anon(h,s2,h2),s,o,o2,n))
 \varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(nv (variable), h2 (Heap term)), \notFreeIn(nv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(nv (variable), h (Heap term)), \notFreeIn(fv (variable), n (int term)), \notFreeIn(fv (variable), o2 (java.lang.Object term)), \notFreeIn(fv (variable), o (java.lang.Object term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), h2 (Heap term)), \notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), h (Heap term)), \notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h2 (Heap term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h (Heap term)))
 \add [all{ov (variable)}(all{fv (variable)}(not(and(and(or(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),freshLocs(h))),exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,ov,nv)))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)))))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
-\add []==>[all{ov (variable)}(all{fv (variable)}(not(and(and(or(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),freshLocs(h))),exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,ov,nv)))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)))))]
+\add []==>[all{ov (variable)}(all{fv (variable)}(not(and(and(or(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),freshLocs(h))),exists{nv (variable)}(and(lt(nv,n),reach(h,s,o,ov,nv)))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)))))] 
 
 Choices: reach:on}
 -----------------------------------------------------
@@ -17287,7 +17287,7 @@ reachDependenciesAnonCoarse {
 \find(reach(anon(h,s2,h2),s,o,o2,n))
 \varcond(\notFreeIn(nv (variable), n (int term)), \notFreeIn(nv (variable), o2 (java.lang.Object term)), \notFreeIn(nv (variable), o (java.lang.Object term)), \notFreeIn(nv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(nv (variable), h2 (Heap term)), \notFreeIn(nv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(nv (variable), h (Heap term)), \notFreeIn(fv (variable), n (int term)), \notFreeIn(fv (variable), o2 (java.lang.Object term)), \notFreeIn(fv (variable), o (java.lang.Object term)), \notFreeIn(fv (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), h2 (Heap term)), \notFreeIn(fv (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(fv (variable), h (Heap term)), \notFreeIn(ov (variable), n (int term)), \notFreeIn(ov (variable), o2 (java.lang.Object term)), \notFreeIn(ov (variable), o (java.lang.Object term)), \notFreeIn(ov (variable), s (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h2 (Heap term)), \notFreeIn(ov (variable), s2 (Set<Pair<java.lang.Object,Field>> term)), \notFreeIn(ov (variable), h (Heap term)))
 \add [all{ov (variable)}(all{fv (variable)}(not(and(and(or(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),freshLocs(h))),exists{nv (variable)}(reach(h,s,o,ov,nv))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)))))]==>[] \replacewith(reach(h,s,o,o2,n)) ;
-\add []==>[all{ov (variable)}(all{fv (variable)}(not(and(and(or(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),freshLocs(h))),exists{nv (variable)}(reach(h,s,o,ov,nv))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)))))]
+\add []==>[all{ov (variable)}(all{fv (variable)}(not(and(and(or(elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s2),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),freshLocs(h))),exists{nv (variable)}(reach(h,s,o,ov,nv))),elementOf<Pair<java.lang.Object,Field>>(pair<java.lang.Object,Field>(ov,fv),s)))))] 
 
 Choices: reach:on}
 -----------------------------------------------------
@@ -17420,6 +17420,30 @@ readPermissionObject {
 \replacewith(true) 
 \heuristics(concrete)
 Choices: permissions:off}
+-----------------------------------------------------
+== recordPatternAssignment (instanceofRecordPatternAssignment) =========================================
+recordPatternAssignment {
+\find(#allmodal ((modal operator))|{{ ..
+  boolean #b = #nse;
+... }}| (post))
+\varcond(\isRecordPatternInstanceof(#nse))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  boolean #b = #patternTest(#nse);
+... }}| (post)) 
+
+Choices: programRules:Java}
+-----------------------------------------------------
+== recordPatternAssignmentExpr (instanceofRecordPatternAssignment) =========================================
+recordPatternAssignmentExpr {
+\find(#allmodal ((modal operator))|{{ ..
+  #v = #nse;
+... }}| (post))
+\varcond(\isRecordPatternInstanceof(#nse))
+\replacewith(#allmodal ((modal operator))|{{ ..
+  #v = #patternTest(#nse);
+... }}| (post)) 
+
+Choices: programRules:Java}
 -----------------------------------------------------
 == reference_type_cast (reference_type_cast) =========================================
 reference_type_cast {

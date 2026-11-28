@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.ast.declaration.*;
 import de.uka.ilkd.key.java.ast.expression.*;
 import de.uka.ilkd.key.java.ast.expression.literal.*;
 import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.pattern.*;
 import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -165,6 +166,14 @@ public interface Visitor {
     void performActionOnExactInstanceof(ExactInstanceof x);
 
     void performActionOnInstanceofPattern(InstanceofPattern x);
+
+    void performActionOnTypePattern(TypePattern x);
+
+    void performActionOnAnyPattern(AnyPattern x);
+
+    void performActionOnRecordPattern(RecordPattern x);
+
+    void performActionOnRecordPatternComponent(RecordPatternComponent x);
 
     void performActionOnNew(New x);
 
