@@ -1,0 +1,14 @@
+{
+  "intRules": "intRules:javaSemantics",
+  "integerSimplificationRules": "integerSimplificationRules:full",
+  "javaLoopTreatment": "javaLoopTreatment:efficient",
+  "assertions": "assertions:safe",
+  "runtimeExceptions": "runtimeExceptions:ban",
+  "bigint": "bigint:on",
+  "programRules": "programRules:Java",
+  "methodExpansion": "methodExpansion:modularOnly",
+  "Strings": "Strings:on",
+  "sequences": "sequences:on",
+  "reach": "reach:on",
+  "permissions": "permissions:off"
+}

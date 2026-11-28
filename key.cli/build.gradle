@@ -1,0 +1,59 @@
+plugins {
+    id 'application'
+
+    // Used to create a single executable jar file with all dependencies,
+    // see task "shadowJar" below: https://github.com/GradleUp/shadow
+    alias(libs.plugins.shadow)
+}
+
+description = "Headless command-line interface for the deductive verification of Java programs"
+
+dependencies {
+    implementation project(":key.core")
+
+    implementation(libs.picocli)
+
+    // logging implementation used by slf4j
+    implementation(libs.logback.classic)
+
+    // SMT solver settings shared with the key.core SMT tests (SMTTestSettings)
+    testImplementation(testFixtures(project(":key.core")))
+}
+
+application {
+    mainClass.set("org.key_project.key.cli.Main")
+}
+
+shadowJar {
+    archiveBaseName.set("key-cli")
+    // Produce exactly "key-cli.jar" without group/version suffix
+    archiveClassifier.set("")
+    archiveVersion.set("")
+    mergeServiceFiles()
+    filesMatching("META-INF/services/**") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE // needed for mergeServices
+    }
+    manifest {
+        attributes 'Main-Class': 'org.key_project.key.cli.Main'
+    }
+}
+
+checkerFramework {
+    if (System.getProperty("ENABLE_NULLNESS")) {
+        checkers = [
+                "org.checkerframework.checker.nullness.NullnessChecker",
+        ]
+        extraJavacArgs = [
+                // The Checker Framework is the only processor in this build; picocli's
+                // annotations are intentionally unclaimed, which javac reports as a
+                // 'processing' lint warning that -Werror would turn into a build failure.
+                "-Xlint:-processing",
+                "-AonlyDefs=^org\\.key_project\\.key\\.cli",
+                "-Xmaxerrs", "10000",
+                "-Astubs=$rootDir/key.util/src/main/checkerframework:permit-nullness-assertion-exception.astub:checker.jar/junit-assertions.astub",
+                "-AstubNoWarnIfNotFound",
+                "-Werror",
+                "-Aversion",
+        ]
+    }
+}

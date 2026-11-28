@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.nparser.KeyIO;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.io.ConstructNotSupportedException;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -46,6 +47,7 @@ import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.Pair;
+import org.key_project.util.parsing.SourceNames;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -1156,7 +1158,48 @@ class Translator extends JmlParserBaseVisitor<Object> {
         SLExpression curReceiver = receiver;
         SLExpression rangeFrom = accept(ctx.from);
         SLExpression rangeTo = accept(ctx.to);
+        if (curReceiver != null && curReceiver.getType() == null) {
+            // e.g. bucketData[*][*]: a star reference (x[*]) translates to the *locset*
+            // allFields(x) (see JmlTermFactory.translateArrayReference) and therefore carries no
+            // Java type; a locset cannot be indexed again, so nested star references have no
+            // translation. Reported as a structured diagnostic instead of the former NPE (§8).
+            ParserRuleContext postfix = enclosingPostfix(ctx);
+            Token start = postfix.getStart();
+            throw new ConstructNotSupportedException(
+                sourceFileOf(ctx),
+                start != null ? start.getLine() : 0,
+                start != null ? start.getCharPositionInLine() + 1 : 0,
+                postfix.getText(),
+                "star array reference cannot be indexed further");
+        }
         return termFactory.arrayRef(curReceiver, fullyQualifiedName, rangeFrom, rangeTo);
+    }
+
+    /**
+     * Returns the smallest enclosing {@code postfixexpr} context of the given context (the full
+     * receiver-with-suffixes expression, e.g. {@code bucketData[*][*]}), or the context itself
+     * when no enclosing {@code postfixexpr} exists.
+     */
+    private static ParserRuleContext enclosingPostfix(ParserRuleContext ctx) {
+        ParserRuleContext cur = ctx;
+        while (cur != null && !(cur instanceof JmlParser.PostfixexprContext)) {
+            cur = cur.getParent();
+        }
+        return cur != null ? cur : ctx;
+    }
+
+    /**
+     * Returns the source file of the parse tree of the given context (the URI recovered from the
+     * token source, as a path when it is a {@code file:} URI), or
+     * {@link ConstructNotSupportedException#UNKNOWN_FILE} when unknown.
+     */
+    private static String sourceFileOf(ParserRuleContext ctx) {
+        Token start = ctx.getStart();
+        if (start != null && start.getTokenSource() != null) {
+            return ConstructNotSupportedException.displayFile(
+                SourceNames.getURIFromTokenSource(start.getTokenSource()));
+        }
+        return ConstructNotSupportedException.UNKNOWN_FILE;
     }
     // endregion
 
