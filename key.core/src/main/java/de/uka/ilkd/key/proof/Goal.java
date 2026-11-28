@@ -730,11 +730,13 @@ public final class Goal implements ProofGoal<Goal> {
             // aborted application would otherwise leak the listener (inherited by subgoals on
             // split)
             removeGoalListener(journal);
+            proof.markErroneous(rae);
             throw rae;
         } catch (IndexOutOfBoundsException e) {
             removeLastAppliedRuleApp();
             node().setAppliedRuleApp(null);
             removeGoalListener(journal);
+            proof.markErroneous(e);
             throw e;
         } finally {
             PerfScope.stop(PERF_APP_EXECUTE, time);

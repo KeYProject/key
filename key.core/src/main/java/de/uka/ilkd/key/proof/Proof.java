@@ -1268,7 +1268,7 @@ public class Proof implements ProofObject<Goal>, Named {
 
     /**
      * Flags this proof as {@linkplain #isErroneous() erroneous} after an essential-listener
-     * failure. Idempotent; only the first failure is logged.
+     * failure. Only the first failure is logged.
      *
      * @param listenerName the failing listener's class name (for the log)
      * @param cause the throwable it raised
@@ -1279,6 +1279,19 @@ public class Proof implements ProofObject<Goal>, Named {
             LOGGER.error("essential proof listener {} failed; the proof search is stopped and the "
                 + "proof is marked erroneous (no further search possible). The proof can still be "
                 + "saved for a later reload attempt.", listenerName, cause);
+        }
+    }
+
+    /**
+     * Flags this proof as {@linkplain #isErroneous() erroneous} after a failure.
+     *
+     * @param cause the throwable it raised
+     */
+    public void markErroneous(Throwable cause) {
+        if (!erroneous) {
+            erroneous = true;
+            LOGGER.error("Failure that might have left proof in an inconsistent state happened.",
+                cause);
         }
     }
 

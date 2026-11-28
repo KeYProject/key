@@ -12,7 +12,6 @@ import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
-import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
@@ -209,12 +208,6 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
                 synchronized (goalChooser) {
                     goalChooser.updateGoalList(g, premisses.reverse());
                 }
-            } catch (RuleAbortException e) {
-                LOGGER.error("Rule application failed unexpectedly.", e);
-                return new SingleRuleApplicationInfo(
-                    "Application of rule " + app.rule().name() + " failed, despite " +
-                        "being applicable.",
-                    g, app);
             } finally {
                 PERF_GOAL_APPLY.getAndAdd(System.nanoTime() - time);
             }

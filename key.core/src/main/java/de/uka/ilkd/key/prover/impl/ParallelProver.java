@@ -32,7 +32,6 @@ import org.key_project.prover.engine.impl.DefaultProver;
 import org.key_project.prover.engine.impl.DefaultTaskFinishedInfo;
 import org.key_project.prover.engine.impl.DefaultTaskStartedInfo;
 import org.key_project.prover.proof.ProofObject;
-import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
@@ -639,16 +638,7 @@ public final class ParallelProver extends DefaultProver<Goal> {
             // shared structures it reaches through the Services were made thread-safe by the
             // shared-state audit. Only commitRuleApp -- the proof-tree mutation -- needs the commit
             // lock; the scheduler hand-off, the atomic counters and the stop check stay outside it.
-            final Goal.PendingRuleApp pending;
-            try {
-                pending = goal.computeRuleApp(app);
-            } catch (RuleAbortException e) {
-                LOGGER.error("Rule application failed unexpectedly.", e);
-                requestStop("Application of rule " + app.rule().name()
-                    + " failed, despite being applicable.", goal);
-                return;
-            }
-
+            final Goal.PendingRuleApp pending = goal.computeRuleApp(app);
             final ImmutableList<Goal> goalList;
             synchronized (commitLock) {
                 goalList = goal.commitRuleApp(pending);
