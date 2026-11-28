@@ -6,3 +6,4 @@ simplify_autoname
 executeIntegerAssignment
 simplify_expression
 loop_scope_inv_taclet
+for_to_while
