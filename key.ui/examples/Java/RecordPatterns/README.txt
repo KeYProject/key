@@ -14,7 +14,8 @@ single expression:
     }
 
 The example shows plain record patterns (sum), nested record patterns (nested),
-a conditional component pattern (conditional), and a record pattern inside a
-compound assignment (compound).
+a conditional component pattern (conditional), a record pattern inside a
+compound assignment (compound), and the null-matching rule for unconditional
+component patterns (nullMatching).
 
 Open project.key in the GUI to choose one of the contracts.

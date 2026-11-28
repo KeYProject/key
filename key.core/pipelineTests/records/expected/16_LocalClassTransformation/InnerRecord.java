@@ -21,7 +21,7 @@ public class OuterClass {
           @*/
         @javax.annotation.processing.Generated("RecordClassBuilder")
         public MyRecord(String test) {
-            //Created by RecordClassBuilder.java:132
+            //Created by RecordClassBuilder.java:135
             this.test = test;
         }
 
@@ -75,7 +75,7 @@ public class OuterClass {
 
         public void $init(String test) {
             super.$init();
-            //Created by RecordClassBuilder.java:132
+            //Created by RecordClassBuilder.java:135
             this.test = test;
         }
 

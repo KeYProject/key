@@ -75,6 +75,9 @@ public class RecordClassBuilder extends JavaTransformerAbstract {
                 getter.getBody().get()
                         .addStatement(new ReturnStmt(parameter.getNameAsExpression()));
                 addGenerated(getter);
+                // only generated accessors are guaranteed not to throw; record patterns over a
+                // record with an explicit accessor need MatchException handling and are rejected.
+                // The @Generated annotation on the accessor records that it was generated here.
             }
         }
 

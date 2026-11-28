@@ -15,6 +15,11 @@ public class RecordPatternExample {
     record Line(Point start, int length) { }
     record Box(Object value) { }
 
+    static class Animal { }
+    static class Dog extends Animal { }
+
+    record DogBox(Dog value) { }
+
     /*@ normal_behavior
       @ requires true;
       @ ensures \result >= 0;
@@ -60,5 +65,34 @@ public class RecordPatternExample {
         boolean positive;
         positive = o instanceof Point(int x, int y) && x > 0 && y > 0;
         return positive ? 1 : 0;
+    }
+
+    /*@ normal_behavior
+      @ requires true;
+      @ ensures \result == true;
+      @*/
+    public static boolean nullMatchingComponent() {
+        // JLS 14.30.1: Object is unconditional for an Object component, so the pattern also
+        // matches a null component.
+        return (new Box(null)) instanceof Box(Object value);
+    }
+
+    /*@ normal_behavior
+      @ requires true;
+      @ ensures \result == true;
+      @*/
+    public static boolean nullMatchingVar() {
+        // 'var' infers the component's declared type (Object), which is unconditional for it.
+        return (new Box(null)) instanceof Box(var value);
+    }
+
+    /*@ normal_behavior
+      @ requires true;
+      @ ensures \result == true;
+      @*/
+    public static boolean nullMatchingSupertype() {
+        // Animal is a supertype of the Dog component: every non-null Dog matches it,
+        // and null does as well.
+        return (new DogBox(null)) instanceof DogBox(Animal value);
     }
 }

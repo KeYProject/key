@@ -888,6 +888,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 return new FieldReference(pi, c, variable, translatePackageReference(n.getScope()));
             }
         } catch (UnsolvedSymbolException e) {
+            // jmlparser cannot resolve a field access whose scope is a pattern variable; the
+            // scope expression itself is resolved by the fallback in visit(NameExpr).
+            Object fallback = resolveFieldAccessFallback(n, pi, c);
+            if (fallback != null) {
+                return fallback;
+            }
             try {
                 ResolvedType type = n.calculateResolvedType();
                 KeYJavaType keyType = getKeYJavaType(type);
@@ -898,6 +904,153 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                     JavaSourceLocations.locationFromNode(n));
             }
         }
+    }
+
+    /**
+     * Resolves {@code scope.name} from the KeY type of the already resolved scope when jmlparser
+     * cannot resolve the field access (for example {@code a.g} on a pattern variable).
+     */
+    private @Nullable Object resolveFieldAccessFallback(FieldAccessExpr n, PositionInfo pi,
+            List<Comment> c) {
+        try {
+            Object scope = n.getScope().accept(this, null);
+            if (!(scope instanceof Expression expression)
+                    || !(expression instanceof ReferencePrefix prefix)) {
+                return null;
+            }
+            ResolvedType resolvedScope = null;
+            if (n.getScope() instanceof NameExpr nameExpr) {
+                TypePatternExpr pattern = findTypePatternInScope(nameExpr);
+                if (pattern != null) {
+                    try {
+                        resolvedScope = patternScopeType(pattern);
+                    } catch (RuntimeException ignored) {
+                        // fall back to the resolved scope below
+                    }
+                }
+            }
+            if (resolvedScope == null) {
+                resolvedScope = n.getScope().calculateResolvedType();
+            }
+            if (!resolvedScope.isReferenceType()) {
+                return null;
+            }
+            var declaration = resolvedScope.asReferenceType().getTypeDeclaration().orElse(null);
+            if (declaration == null) {
+                return null;
+            }
+            ResolvedFieldDeclaration fieldDecl = declaration.getAllFields().stream()
+                    .filter(field -> field.getName().equals(n.getNameAsString()))
+                    .findFirst().orElse(null);
+            if (fieldDecl == null || fieldDecl.toAst().isEmpty()) {
+                return null;
+            }
+            Node fieldNode = fieldDecl.toAst().get();
+            if (!(fieldNode instanceof FieldDeclaration fldDecl)) {
+                return null;
+            }
+            List<VariableDeclarator> variableCandidates = fldDecl.getVariables().stream()
+                    .filter(v -> v.getName().asString().equals(n.getNameAsString()))
+                    .toList();
+            if (variableCandidates.size() != 1) {
+                return null;
+            }
+            VariableDeclarator varDecl = variableCandidates.getFirst();
+            boolean isModel = fldDecl.hasModifier(JML_MODEL);
+            boolean isGhost = fldDecl.hasModifier(JML_GHOST);
+            FullVariableDeclarator decl = new FullVariableDeclarator(varDecl,
+                varDecl.findAncestor(ClassOrInterfaceDeclaration.class).orElse(null),
+                fldDecl.isFinal(), fldDecl.isStatic(), isModel, isGhost);
+            ProgramVariable field = getProgramVariableForFieldSpecification(decl);
+            return new FieldReference(pi, c, field, prefix);
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    /**
+     * Finds the type pattern that declares a variable with the name of {@code name} and whose
+     * scope contains the name expression. This is the KeY-side fallback for the jmlparser symbol
+     * solver, which does not yet resolve pattern variables in the branches of {@code ?:} or as
+     * the scope of a field access.
+     */
+    private static @Nullable TypePatternExpr findTypePatternInScope(NameExpr name) {
+        String identifier = name.getNameAsString();
+        Node current = name;
+        while (current.getParentNode().isPresent()) {
+            Node parent = current.getParentNode().get();
+            if (parent instanceof ConditionalExpr conditional) {
+                if (contains(conditional.getThenExpr(), current)
+                        || contains(conditional.getElseExpr(), current)) {
+                    TypePatternExpr pattern =
+                        findPattern(conditional.getCondition(), identifier);
+                    if (pattern != null) {
+                        return pattern;
+                    }
+                }
+            } else if (parent instanceof IfStmt ifStmt) {
+                if (contains(ifStmt.getThenStmt(), current)
+                        || contains(ifStmt.getElseStmt().orElse(null), current)) {
+                    TypePatternExpr pattern = findPattern(ifStmt.getCondition(), identifier);
+                    if (pattern != null) {
+                        return pattern;
+                    }
+                }
+            } else if (parent instanceof BinaryExpr binary
+                    && (binary.getOperator() == BinaryExpr.Operator.AND
+                            || binary.getOperator() == BinaryExpr.Operator.OR)) {
+                if (contains(binary.getRight(), current)) {
+                    TypePatternExpr pattern = findPattern(binary.getLeft(), identifier);
+                    if (pattern != null) {
+                        return pattern;
+                    }
+                }
+            } else if (parent instanceof UnaryExpr unary
+                    && unary.getOperator() == UnaryExpr.Operator.LOGICAL_COMPLEMENT) {
+                TypePatternExpr pattern = findPattern(unary.getExpression(), identifier);
+                if (pattern != null) {
+                    return pattern;
+                }
+            } else if (parent instanceof WhileStmt whileStmt) {
+                TypePatternExpr pattern = findPattern(whileStmt.getCondition(), identifier);
+                if (pattern != null) {
+                    return pattern;
+                }
+            } else if (parent instanceof DoStmt doStmt) {
+                TypePatternExpr pattern = findPattern(doStmt.getCondition(), identifier);
+                if (pattern != null) {
+                    return pattern;
+                }
+            } else if (parent instanceof ForStmt forStmt && forStmt.getCompare().isPresent()) {
+                TypePatternExpr pattern =
+                    findPattern(forStmt.getCompare().get(), identifier);
+                if (pattern != null) {
+                    return pattern;
+                }
+            } else if (parent instanceof MethodDeclaration
+                    || parent instanceof ClassOrInterfaceDeclaration) {
+                // do not leak a pattern from an enclosing declaration into a nested method/class;
+                // a lambda, in contrast, may capture an effectively final pattern variable
+                return null;
+            }
+            current = parent;
+        }
+        return null;
+    }
+
+    private static @Nullable TypePatternExpr findPattern(Node expression, String identifier) {
+        return expression.findAll(TypePatternExpr.class).stream()
+                .filter(pattern -> pattern.getName().asString().equals(identifier))
+                .findFirst().orElse(null);
+    }
+
+    private static boolean contains(Node ancestor, Node node) {
+        for (Node current = node; current != null; current = current.getParentNode().orElse(null)) {
+            if (current == ancestor) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -1128,9 +1281,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Type declaredType = typePattern.getType();
 
         if (declaredType.isVarType()) {
-            return reportError(typePattern,
-                "'var' in a record pattern is not supported by the Java parser front-end yet; "
-                    + "use the component type explicitly");
+            if (component == null) {
+                return reportError(typePattern,
+                    "'var' is not allowed as the top-level pattern of an instanceof expression");
+            }
+            // JLS 14.30.1: 'var' infers the declared type of the component it is matched against
+            // and is unconditional for that type, so the pattern also matches a null component.
+            TypeReference inferred = new TypeRef(getKeYJavaType(component.getType()));
+            VariableSpecification inferredSpecification =
+                specification(pi, c, getPatternVariable(name, inferred), inferred);
+            return new AnyPattern(pi, c, inferred, inferredSpecification);
         }
 
         TypeReference type = requireTypeReference(declaredType);
@@ -1143,6 +1303,67 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
             return new AnyPattern(pi, c, type, specification);
         }
         return new TypePattern(pi, c, type, specification);
+    }
+
+    /**
+     * Returns the type of the variable declared by a type pattern. A {@code var} pattern infers
+     * the declared type of the record component it lines up with (JLS 14.30.1).
+     *
+     * @param pattern the type pattern
+     * @return the type reference of the pattern's variable
+     */
+    private TypeReference patternVariableType(TypePatternExpr pattern) {
+        if (!pattern.getType().isVarType()) {
+            return requireTypeReference(pattern.getType());
+        }
+        ResolvedType componentType = recordComponentType(pattern);
+        if (componentType == null) {
+            throw new IllegalStateException(
+                "Cannot infer the type of the 'var' pattern " + pattern.getNameAsString());
+        }
+        return new TypeRef(getKeYJavaType(componentType));
+    }
+
+    /**
+     * Returns the declared type of the record component a type pattern lines up with.
+     *
+     * @param pattern the type pattern
+     * @return the component type, or {@code null} if the pattern is not a component of a record
+     *         pattern
+     */
+    private @Nullable ResolvedType recordComponentType(TypePatternExpr pattern) {
+        Node current = pattern;
+        while (current.getParentNode().isPresent()) {
+            Node parent = current.getParentNode().get();
+            if (parent instanceof RecordPatternExpr recordPattern) {
+                NodeList<ComponentPatternExpr> patterns = recordPattern.getPatternList();
+                for (int i = 0; i < patterns.size(); i++) {
+                    if (patterns.get(i) == pattern) {
+                        List<ResolvedFieldDeclaration> components =
+                            recordComponents(recordPattern.getType());
+                        return i < components.size() ? components.get(i).getType() : null;
+                    }
+                }
+                return null;
+            }
+            current = parent;
+        }
+        return null;
+    }
+
+    /**
+     * Returns the type of the value a type pattern variable refers to. For an ordinary type
+     * pattern this is the declared pattern type; for {@code var} it is the type of the record
+     * component the pattern lines up with.
+     *
+     * @param pattern the type pattern
+     * @return the resolved type of the pattern variable's value
+     */
+    private @Nullable ResolvedType patternScopeType(TypePatternExpr pattern) {
+        if (!pattern.getType().isVarType()) {
+            return pattern.getType().resolve();
+        }
+        return recordComponentType(pattern);
     }
 
     private Pattern createRecordPattern(RecordPatternExpr recordPattern) {
@@ -1177,9 +1398,27 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 return reportUnsupportedElement(componentPattern);
             }
             converted.add(new RecordPatternComponent(componentPi, componentComments,
-                new ProgramElementName(component.getName()), pattern));
+                new ProgramElementName(component.getName()),
+                new TypeRef(getKeYJavaType(component.getType())), pattern,
+                hasGeneratedAccessor(component)));
         }
         return new RecordPattern(pi, c, type, ImmutableList.fromList(converted));
+    }
+
+    /**
+     * Returns whether the accessor for the given record component was generated by the
+     * transformation pipeline and therefore cannot throw. A record may declare its own accessor;
+     * such an accessor can complete abruptly, and JLS 14.30.2 then requires a MatchException.
+     * Until that is modelled, record patterns over such records are rejected.
+     */
+    private boolean hasGeneratedAccessor(ResolvedFieldDeclaration component) {
+        var ast = component.toAst().orElse(null);
+        var enclosing = ast == null ? null
+                : ast.findAncestor(ClassOrInterfaceDeclaration.class).orElse(null);
+        return enclosing != null && enclosing.getMethodsByName(component.getName()).stream()
+                .anyMatch(method -> method.getAnnotations().stream()
+                        .anyMatch(
+                            annotation -> annotation.getNameAsString().endsWith("Generated")));
     }
 
     /**
@@ -1360,6 +1599,16 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         try {
             target = n.resolve();
         } catch (UnsolvedSymbolException e) {
+            // jmlparser's symbol solver does not put a pattern variable declared by an
+            // instanceof precondition into the scope of the then/else branch or the branches of
+            // ?: (JLS 6.3.1.1-6.3.1.4). Check this before falling back to a type reference: the
+            // symbol solver can resolve the type of such a name even when it cannot resolve the
+            // value declaration.
+            TypePatternExpr pattern = findTypePatternInScope(n);
+            if (pattern != null) {
+                return (Expression) getPatternVariable(pattern.getName(),
+                    patternVariableType(pattern));
+            }
             try {
                 ResolvedType type = n.calculateResolvedType();
                 KeYJavaType keyType = getKeYJavaType(type);
@@ -1376,6 +1625,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         }
 
         Node ast = target.toAst().get();
+        if (ast instanceof TypePatternExpr pattern) {
+            // jmlparser resolves the name to the pattern variable's TypePatternExpr, but the
+            // converter's visit(TypePatternExpr) returns a declaration where an expression is
+            // expected. Return the variable itself.
+            return (Expression) getPatternVariable(pattern.getName(),
+                patternVariableType(pattern));
+        }
         VariableDeclarator decl = null;
         if (target instanceof JavaParserFieldDeclaration field) {
             decl = field.getVariableDeclarator();
