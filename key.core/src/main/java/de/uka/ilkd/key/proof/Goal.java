@@ -710,15 +710,13 @@ public final class Goal implements ProofGoal<Goal> {
                 ? tacletApp.createSkolemConstants(this)
                 : p_ruleApp;
         final Proof proof = proof();
-
-        final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
-        addGoalListener(journal);
-
         final Node n = node;
+        final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
 
         final ImmutableList<Goal> goalList;
         final long time = PerfScope.start();
         ruleApp.checkApplicability();
+        addGoalListener(journal);
         ruleApp.registerSkolemConstants(localNamespaces.functions());
         addAppliedRuleApp(ruleApp);
         try {

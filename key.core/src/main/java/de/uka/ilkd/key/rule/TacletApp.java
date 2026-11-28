@@ -327,15 +327,10 @@ public abstract class TacletApp implements ITacletApp {
 
     /**
      * asserts that the rule application is complete and executable
-     *
      */
     @Override
     public void checkApplicability() {
-        if (!complete()) {
-            throw new IllegalStateException(
-                "Tried to apply rule \n" + taclet + "\nthat is not complete." + this);
-        }
-
+        ITacletApp.super.checkApplicability();
         if (!isExecutable()) {
             throw new RuntimeException(
                 "taclet application with unsatisfied 'checkPrefix': " + this);

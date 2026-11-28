@@ -24,7 +24,12 @@ public interface RuleApp {
     ///
     ///
     /// @throws RuntimeException if rule is scheduled for application but not yet ready
-    void checkApplicability();
+    default void checkApplicability() {
+        if (!complete()) {
+            throw new IllegalStateException(
+                "Tried to apply rule \n" + rule().name() + "\nthat is not complete." + this);
+        }
+    }
 
     /// registers new Skolem functions to the provided namespace
     /// This method should be moved to the rule application logic, but remains for

@@ -83,9 +83,17 @@ public class RuleCommand extends AbstractCommand {
                 }
             }
 
-            RuleApp completeApp =
+            TacletApp completeApp =
                 tacletApp.tryToInstantiate(g.proof().getServices());
             theApp = completeApp == null ? theApp : completeApp;
+
+            if (!((TacletApp) theApp).completeExceptSkolemConstants()) {
+                throw new ScriptException(
+                    "Not all schema elements (variables, generic sorts) are instantiated:"
+                        + tacletApp.taclet().name() + " instantiations "
+                        + tacletApp.matchConditions().getInstantiations());
+            }
+
         }
         assert theApp != null;
 
@@ -130,10 +138,13 @@ public class RuleCommand extends AbstractCommand {
 
             return instantiateTacletApp(p, state, proof, theApp);
         } else {
-            IBuiltInRuleApp builtInRuleApp = //
-                builtInRuleApp(p, state, maybeBuiltInRule.get());
+            IBuiltInRuleApp builtInRuleApp = builtInRuleApp(p, state, maybeBuiltInRule.get());
             if (builtInRuleApp.isSufficientlyComplete()) {
                 builtInRuleApp = builtInRuleApp.forceInstantiate(state.getFirstOpenAutomaticGoal());
+            }
+            if (!builtInRuleApp.complete()) {
+                throw new ScriptException("Could not complete " + builtInRuleApp.rule().name()
+                    + " with " + builtInRuleApp);
             }
             return builtInRuleApp;
         }
@@ -149,7 +160,7 @@ public class RuleCommand extends AbstractCommand {
 
         assumesCandidates = ImmutableList.fromList(filterList(services, p, assumesCandidates));
 
-        if (assumesCandidates.size() == 0) {
+        if (assumesCandidates.isEmpty()) {
             throw new ScriptException("No \\assumes instantiation");
         } else if (assumesCandidates.size() != 1) {
             throw new ScriptException("Not a unique \\assumes instantiation");
