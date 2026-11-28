@@ -31,11 +31,11 @@ public interface GoalChooser<G extends ProofGoal<G>> {
     /// The given node has become an internal node of the proof tree, and the children of the node
     /// are the given goals
     ///
-    /// @param previousGoalContent the content of the goal which has been replaced by the new goals;
-    /// it is used to identify outdated goals managed by this chooser (a typical argument is
-    /// the node of proof tree which is now an inner node)
+    /// @param goal the goal which has been replaced by the new goals; it is used to identify
+    /// outdated goals managed
+    /// by this chooser
     ///
     /// @param newGoals the goals associated with node's children
-    void updateGoalList(@Nullable Object previousGoalContent, @NonNull ImmutableList<G> newGoals);
+    void updateGoalList(@Nullable G goal, @NonNull ImmutableList<G> newGoals);
 
 }

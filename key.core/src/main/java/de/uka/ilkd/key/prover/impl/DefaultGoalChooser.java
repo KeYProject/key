@@ -168,12 +168,12 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Goal> {
      * @see de.uka.ilkd.key.proof.IGoalChooser#updateGoalList(de.uka.ilkd.key.proof.Node,
      * de.uka.ilkd.key.proof.IList<Goal>)
      */
-    public void updateGoalList(@Nullable Object node, @NonNull ImmutableList<Goal> newGoals) {
-        if (newGoals.isEmpty() || (newGoals.tail().isEmpty() && newGoals.head().node() == node)) {
+    public void updateGoalList(@Nullable Goal goal, @NonNull ImmutableList<Goal> newGoals) {
+        if (newGoals.isEmpty()) {
             // Goals (may) have been closed, remove them from the goal lists
             removeClosedGoals();
         } else {
-            updateGoalListHelp(node, newGoals);
+            updateGoalListHelp(goal, newGoals);
         }
 
         if (proof.openGoals().isEmpty())
@@ -188,18 +188,18 @@ public class DefaultGoalChooser implements GoalChooser<@Nullable Goal> {
         }
     }
 
-    protected void updateGoalListHelp(Object node, ImmutableList<Goal> newGoals) {
+    protected void updateGoalListHelp(Goal appliedGoal, ImmutableList<Goal> newGoals) {
         ImmutableList<Goal> prevGoalList = ImmutableList.nil();
         boolean newGoalsInserted = false;
 
         nextGoals = ImmutableList.nil();
 
-        // Remove "node" and goals contained within "newGoals"
+        // Remove applied goal and goals contained within "newGoals"
         while (!selectedList.isEmpty()) {
             final Goal goal = selectedList.head();
             selectedList = selectedList.tail();
 
-            if (node == goal.node() || newGoals.contains(goal)) {
+            if (appliedGoal == goal || newGoals.contains(goal)) {
                 // continue taclet apps at the next goal in list
                 nextGoals = selectedList;
 

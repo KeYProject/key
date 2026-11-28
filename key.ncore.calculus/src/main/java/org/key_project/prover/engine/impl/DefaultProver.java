@@ -12,7 +12,9 @@ import org.key_project.prover.engine.SingleRuleApplicationInfo;
 import org.key_project.prover.engine.StopCondition;
 import org.key_project.prover.proof.ProofGoal;
 import org.key_project.prover.proof.ProofObject;
+import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
+import org.key_project.util.collection.ImmutableList;
 
 import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 import org.jspecify.annotations.Nullable;
@@ -53,8 +55,8 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
     /// Indicates whether the prover should stop as soon as a non-closable goal is detected.
     protected boolean stopAtFirstNonClosableGoal;
 
-    /// The number of goals closed during the current proof process.
-    protected int closedGoals;
+    /// Number of fresh created successors (excludes the goal that introduces them)
+    private int successors;
 
     /// Indicates whether the prover has been interrupted and should stop.
     ///
@@ -71,6 +73,9 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
     /// A strategy component that selects the next goal to be processed.
     protected @Nullable GoalChooser<Goal> goalChooser;
 
+    /// offers the next applicable rule app for this goal or `null` if there is none
+    /// @return the applicable rule app or `null`
+    @SuppressWarnings("nullness")
     protected @Nullable RuleApp nextRuleApp(Goal goal) {
         return goal.getRuleAppManager().next();
     }
@@ -88,6 +93,8 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
         long time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
 
+        final int openGoalCountAtStart = proof.getOpenGoalCount();
+        successors = 0;
         long applyAutomatic = 0;
         try {
             LOGGER.trace("Strategy started.");
@@ -102,7 +109,8 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
                         "Proof search stopped: the proof is marked erroneous "
                             + "(an essential proof listener failed).",
                         proof, null, srInfo == null ? null : srInfo.getGoal(),
-                        System.currentTimeMillis() - time, countApplied, closedGoals);
+                        System.currentTimeMillis() - time, countApplied,
+                        getClosedGoalCount(openGoalCountAtStart));
                 }
                 var applyAutomaticTime = System.nanoTime();
                 try {
@@ -114,7 +122,8 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
                 if (!srInfo.isSuccess()) {
                     return new ApplyStrategyInfo<>(srInfo.message(), proof,
                         null, srInfo.getGoal(),
-                        System.currentTimeMillis() - time, countApplied, closedGoals);
+                        System.currentTimeMillis() - time, countApplied,
+                        getClosedGoalCount(openGoalCountAtStart));
                 }
                 countApplied++;
                 fireTaskProgress();
@@ -128,21 +137,28 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
                 stopCondition.getStopMessage(maxApplications, timeout, time,
                     countApplied, srInfo),
                 proof, null, null, System.currentTimeMillis() - time, countApplied,
-                closedGoals);
+                getClosedGoalCount(openGoalCountAtStart));
         } catch (InterruptedException e) {
             cancelled = true;
-            return new ApplyStrategyInfo<Goal>("Interrupted.", proof, null,
+            return new ApplyStrategyInfo<>("Interrupted.", proof, null,
                 goalChooser.getNextGoal(),
-                System.currentTimeMillis() - time, countApplied, closedGoals);
+                System.currentTimeMillis() - time, countApplied,
+                getClosedGoalCount(openGoalCountAtStart));
         } catch (Throwable t) { // treated later in finished()
             LOGGER.warn("doWork exception", t);
             return new ApplyStrategyInfo<>("Error.", proof, t, null,
-                System.currentTimeMillis() - time, countApplied, closedGoals);
+                System.currentTimeMillis() - time, countApplied,
+                getClosedGoalCount(openGoalCountAtStart));
         } finally {
             time = (System.currentTimeMillis() - time);
             LOGGER.trace("Strategy stopped, applied {} steps in {}ms", countApplied, time);
             LOGGER.trace("applyAutomaticRule: {} ", applyAutomatic);
         }
+    }
+
+    private int getClosedGoalCount(int openGoalCountAtStart) {
+        assert proof != null : "@AssumeAssertion(nullness)";
+        return openGoalCountAtStart + successors - proof.getOpenGoalCount();
     }
 
     /// Applies rules to goals using the active strategy until a stopping condition is met.
@@ -185,8 +201,20 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
                 "No more rules automatically applicable to any goal.", null, app);
         } else {
             try {
-                @SuppressWarnings({ "nullness", "unused" })
-                final var result = g.apply(app);
+                @SuppressWarnings("nullness") // g is not null here as app != null
+                final ImmutableList<Goal> premisses = g.apply(app);
+                final int size = premisses.size();
+                successors += size > 0 ? size - 1 : 0;
+
+                synchronized (goalChooser) {
+                    goalChooser.updateGoalList(g, premisses.reverse());
+                }
+            } catch (RuleAbortException e) {
+                LOGGER.error("Rule application failed unexpectedly.", e);
+                return new SingleRuleApplicationInfo(
+                    "Application of rule " + app.rule().name() + " failed, despite " +
+                        "being applicable.",
+                    g, app);
             } finally {
                 PERF_GOAL_APPLY.getAndAdd(System.nanoTime() - time);
             }

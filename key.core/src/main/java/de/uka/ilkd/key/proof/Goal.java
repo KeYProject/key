@@ -660,13 +660,12 @@ public final class Goal implements ProofGoal<Goal> {
      *
      * @param ruleApp the rule app
      * @return new goal(s)
+     * @throws RuleAbortException in case of an application failure
+     * @throws IndexOutOfBoundsException in case of an application failure
      */
     @Override
     public ImmutableList<Goal> apply(final RuleApp ruleApp) {
         final PendingRuleApp pending = computeRuleApp(ruleApp);
-        if (pending == null) {
-            return null;
-        }
         return commitRuleApp(pending);
     }
 
@@ -702,9 +701,11 @@ public final class Goal implements ProofGoal<Goal> {
      * single-threaded behaviour is unchanged.
      *
      * @param p_ruleApp the rule application to perform
-     * @return the pending application to be committed, or {@code null} if the rule aborted
+     * @return the pending application to be committed
+     * @throws RuleAbortException in case of an application failure
+     * @throws IndexOutOfBoundsException in case of an application failure
      */
-    public @Nullable PendingRuleApp computeRuleApp(final RuleApp p_ruleApp) {
+    public PendingRuleApp computeRuleApp(final RuleApp p_ruleApp) {
         final RuleApp ruleApp = p_ruleApp instanceof TacletApp tacletApp
                 ? tacletApp.createSkolemConstants(this)
                 : p_ruleApp;
@@ -729,12 +730,12 @@ public final class Goal implements ProofGoal<Goal> {
             // aborted application would otherwise leak the listener (inherited by subgoals on
             // split)
             removeGoalListener(journal);
-            return null;
+            throw rae;
         } catch (IndexOutOfBoundsException e) {
             removeLastAppliedRuleApp();
             node().setAppliedRuleApp(null);
             removeGoalListener(journal);
-            return null;
+            throw e;
         } finally {
             PerfScope.stop(PERF_APP_EXECUTE, time);
         }

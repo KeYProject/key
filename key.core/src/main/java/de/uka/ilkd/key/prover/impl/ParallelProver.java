@@ -32,6 +32,7 @@ import org.key_project.prover.engine.impl.DefaultProver;
 import org.key_project.prover.engine.impl.DefaultTaskFinishedInfo;
 import org.key_project.prover.engine.impl.DefaultTaskStartedInfo;
 import org.key_project.prover.proof.ProofObject;
+import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.util.collection.ImmutableList;
 
@@ -178,8 +179,7 @@ public final class ParallelProver extends DefaultProver<Goal> {
 
     /**
      * Applied-rule and closed-goal counters maintained lock-free during the run, so the per-step
-     * bookkeeping does not need the commit lock. They are mirrored into the inherited
-     * {@code countApplied}/{@code closedGoals} fields when the run finishes (for the result).
+     * bookkeeping does not need the commit lock.
      */
     private final AtomicInteger appliedSteps = new AtomicInteger();
     private final AtomicInteger closedCount = new AtomicInteger();
@@ -249,8 +249,8 @@ public final class ParallelProver extends DefaultProver<Goal> {
     /// retrieves the next rule app to be applied on this goal
     ///
     /// @param goal the [Goal] currently being processed
-    /// index is updated and queried whether a built-in rule is applicable)
     /// @return the next [RuleApp] to apply, or `null` if no rule is applicable
+    @Override
     protected final @Nullable RuleApp nextRuleApp(Goal goal) {
         // Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
         RuleApp app = super.nextRuleApp(goal);
@@ -342,7 +342,6 @@ public final class ParallelProver extends DefaultProver<Goal> {
         this.maxApplications = stopCondition.getMaximalWork(maxSteps, timeout);
         this.timeout = timeout;
         this.countApplied = 0;
-        this.closedGoals = 0;
         this.appliedSteps.set(0);
         this.closedCount.set(0);
         this.cancelled = false;
@@ -442,7 +441,6 @@ public final class ParallelProver extends DefaultProver<Goal> {
 
         // Publish the lock-free counters into the inherited fields for the result.
         countApplied = appliedSteps.get();
-        closedGoals = closedCount.get();
 
         final Throwable error = firstError.get();
         long time = System.currentTimeMillis() - startTime;
@@ -457,7 +455,7 @@ public final class ParallelProver extends DefaultProver<Goal> {
             message = "No more rules automatically applicable to any goal.";
         }
         return new ApplyStrategyInfo<>(message, proof, error, nonCloseableGoal, time, countApplied,
-            closedGoals);
+            closedCount.get());
     }
 
     /**
@@ -641,15 +639,13 @@ public final class ParallelProver extends DefaultProver<Goal> {
             // shared structures it reaches through the Services were made thread-safe by the
             // shared-state audit. Only commitRuleApp -- the proof-tree mutation -- needs the commit
             // lock; the scheduler hand-off, the atomic counters and the stop check stay outside it.
-            Goal.PendingRuleApp pending = goal.computeRuleApp(app);
-            if (pending == null) {
-                // The rule application aborted. The candidate rule was already removed from the
-                // goal's queue by next() above, so re-offer the goal to retry with its next
-                // candidate instead of dropping it -- dropping loses the goal and can leave the
-                // proof open. This mirrors the single-threaded prover, which retries the goal after
-                // an aborted application rather than discarding it.
-                scheduler.reoffer(goal);
-                handled = true;
+            final Goal.PendingRuleApp pending;
+            try {
+                pending = goal.computeRuleApp(app);
+            } catch (RuleAbortException e) {
+                LOGGER.error("Rule application failed unexpectedly.", e);
+                requestStop("Application of rule " + app.rule().name()
+                    + " failed, despite being applicable.", goal);
                 return;
             }
 

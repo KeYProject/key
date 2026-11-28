@@ -31,7 +31,8 @@ public interface ProofGoal<G extends ProofGoal<G>> {
     ///
     /// @param ruleApp the [RuleApp] to be applied
     /// @return new goal(s)
-    @Nullable
+    /// @throws org.key_project.prover.rules.RuleAbortException in case of an unexpected application
+    /// failure
     ImmutableList<G> apply(final RuleApp ruleApp);
 
     /// returns the prover component responsible for providing the next

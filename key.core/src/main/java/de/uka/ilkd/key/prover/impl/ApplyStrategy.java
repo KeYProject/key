@@ -8,7 +8,6 @@ package de.uka.ilkd.key.prover.impl;
 import java.util.concurrent.atomic.AtomicLong;
 
 import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -46,9 +45,6 @@ public class ApplyStrategy extends DefaultProver<Goal> {
      */
     private final GoalChooser<Goal> defaultGoalChooser;
 
-    /** interrupted by the user? */
-    private boolean autoModeActive = false;
-
     // Please create this object beforehand and re-use it.
     // Otherwise, the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
@@ -61,7 +57,6 @@ public class ApplyStrategy extends DefaultProver<Goal> {
         maxApplications = maxSteps;
         this.timeout = timeout;
         countApplied = 0;
-        closedGoals = 0;
         cancelled = false;
         stopCondition =
             newProof.getSettings().getStrategySettings().getApplyStrategyStopCondition();
@@ -69,7 +64,6 @@ public class ApplyStrategy extends DefaultProver<Goal> {
         goalChooser = getGoalChooserForProof(newProof);
         assert goalChooser != null;
         goalChooser.init(newProof, goals);
-        setAutoModeActive(true);
         fireTaskStarted(
             new DefaultTaskStartedInfo(TaskStartedInfo.TaskKind.Strategy, PROCESSING_STRATEGY,
                 stopCondition.getMaximalWork(maxSteps, timeout)));
@@ -136,11 +130,11 @@ public class ApplyStrategy extends DefaultProver<Goal> {
 
         this.stopAtFirstNonClosableGoal = stopAtFirstNonCloseableGoal;
 
-        ProofTreeListener treeListener = prepareStrategy(proof, goals, maxSteps, timeout);
+        init(proof, goals, maxSteps, timeout);
         ApplyStrategyInfo<Goal> result;
         try (var ignored =
             proof.setRuleAppIndexMode(proof.getActiveStrategy().getRuleAppIndexMode())) {
-            result = executeStrategy(treeListener);
+            result = executeStrategy();
         } catch (Exception e) { // should never be reached
             throw new RuntimeException(e);
         }
@@ -149,39 +143,8 @@ public class ApplyStrategy extends DefaultProver<Goal> {
     }
 
 
-    private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals, int maxSteps,
-            long timeout) {
-        ProofTreeListener treeListener = new ProofTreeAdapter() {
-            @Override
-            public void proofGoalsAdded(ProofTreeEvent e) {
-                Iterable<Goal> newGoals = e.getGoals();
-                // Check for a closed goal ...
-                if (!newGoals.iterator().hasNext()) {
-                    // No new goals have been generated ...
-                    closedGoals++;
-                }
-            }
-        };
-        proof.addProofTreeListener(treeListener);
-        init(proof, goals, maxSteps, timeout);
-
-        return treeListener;
-    }
-
-    private ApplyStrategyInfo<Goal> executeStrategy(ProofTreeListener treeListener) {
-        assert proof() != null;
-
-        ProofListener pl = new ProofListener();
-        proof().addRuleAppListener(pl);
-        ApplyStrategyInfo<Goal> result;
-        try {
-            result = doWork(goalChooser, stopCondition);
-        } finally {
-            proof().removeProofTreeListener(treeListener);
-            proof().removeRuleAppListener(pl);
-            setAutoModeActive(false);
-        }
-        return result;
+    private ApplyStrategyInfo<Goal> executeStrategy() {
+        return doWork(goalChooser, stopCondition);
     }
 
     private void finishStrategy(ApplyStrategyInfo<Goal> result) {
@@ -210,8 +173,8 @@ public class ApplyStrategy extends DefaultProver<Goal> {
     /// retrieves the next rule app to be applied on this goal
     ///
     /// @param goal the [Goal] currently being processed
-    /// index is updated and queried whether a built-in rule is applicable)
     /// @return the next [RuleApp] to apply, or `null` if no rule is applicable
+    @Override
     protected final @Nullable RuleApp nextRuleApp(Goal goal) {
         // Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
         final RuleApp app = super.nextRuleApp(goal);
@@ -220,36 +183,6 @@ public class ApplyStrategy extends DefaultProver<Goal> {
             return goal.getRuleAppManager().next();
         }
         return app;
-    }
-
-    private class ProofListener implements RuleAppListener {
-
-        /** invoked when a rule has been applied */
-        @Override
-        public void ruleApplied(ProofEvent e) {
-            if (!isAutoModeActive()) {
-                return;
-            }
-            RuleAppInfo rai = e.getRuleAppInfo();
-            if (rai == null) {
-                return;
-            }
-
-            final GoalChooser<Goal> goalChooser =
-                getGoalChooserForProof(rai.getOriginalNode().proof());
-            synchronized (goalChooser) {
-                // reverse just to keep old order
-                goalChooser.updateGoalList(rai.getOriginalNode(), e.getNewGoals().reverse());
-            }
-        }
-    }
-
-    private boolean isAutoModeActive() {
-        return autoModeActive;
-    }
-
-    private void setAutoModeActive(boolean autoModeActive) {
-        this.autoModeActive = autoModeActive;
     }
 
     /*
