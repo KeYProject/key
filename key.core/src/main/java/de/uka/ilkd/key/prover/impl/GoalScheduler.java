@@ -273,13 +273,8 @@ public final class GoalScheduler<T extends ProofGoal<T>> {
     }
 
     /**
-     * Returns an in-flight goal to the available queue for immediate re-processing. Used when a
-     * rule application aborted but the goal still has further candidate rules to try: dropping it
-     * (via
-     * {@link #complete}) would lose the goal and leave the proof open, while {@link #stall}ing
-     * would defer it to a progress-gated retry. Re-offering makes it available again right away,
-     * mirroring the single-threaded prover, which simply retries the goal after an aborted
-     * application.
+     * Returns an in-flight goal to the available queue for immediate re-processing.
+     * Re-offering makes it available again right away.
      *
      * @param goal the in-flight goal whose rule application aborted
      */

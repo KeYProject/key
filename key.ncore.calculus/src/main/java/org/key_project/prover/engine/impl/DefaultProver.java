@@ -101,12 +101,12 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
                 countApplied, srInfo);
             while (!shouldStop) {
                 if (proof.isErroneous()) {
-                    // The proof is flagged as erroneous (an essential proof listener failed --
-                    // possibly during the previous step of this very run): stop before applying
+                    // The proof is flagged as erroneous: stop before applying
                     // anything further. The proof refuses new searches but stays saveable.
                     return new ApplyStrategyInfo<>(
-                        "Proof search stopped: the proof is marked erroneous "
-                            + "(an essential proof listener failed).",
+                        "Proof search stopped with an internal error: the proof is marked erroneous "
+                            +
+                            "but can still be saved for later recovery.",
                         proof, null, srInfo == null ? null : srInfo.getGoal(),
                         System.currentTimeMillis() - time, countApplied,
                         getClosedGoalCount(openGoalCountAtStart));

@@ -547,12 +547,17 @@ public final class ParallelProver extends DefaultProver<Goal> {
             Goal goal;
             while (!stopRequested.get() && (goal = scheduler.claimOrAwait()) != null) {
                 if (proof.isErroneous()) {
-                    // An essential proof listener failed on some worker: wind all workers down
-                    // through the regular stop path (the claimed goal is returned below by the
-                    // loop exit; parked workers wake through the scheduler as with any stop).
-                    // Checking a volatile flag once per rule application is free next to the
-                    // step itself; no push notification into the workers is needed.
-                    requestStop("Proof search stopped: an essential proof listener failed.", null);
+                    // An internal error occured (e.g., an essential proof listener failed) on some
+                    // worker:
+                    // wind all workers down through the regular stop path (the claimed goal is
+                    // returned below by the loop exit; parked workers wake through the scheduler
+                    // as with any stop). Checking a volatile flag once per rule application is
+                    // free next to the step itself; no push notification into the workers is
+                    // needed.
+                    requestStop(
+                        "Proof search stopped due to an internal error, but " +
+                            "can still be saved for later recoverability.",
+                        null);
                     scheduler.reoffer(goal);
                     break;
                 }
@@ -636,7 +641,7 @@ public final class ParallelProver extends DefaultProver<Goal> {
             // --- apply: the executor runs concurrently; only the tree commit is serialized ---
             // computeRuleApp (rule execution / term construction) is safe to run in parallel: the
             // shared structures it reaches through the Services were made thread-safe by the
-            // shared-state audit. Only commitRuleApp -- the proof-tree mutation -- needs the commit
+            // shared-state audit. Only commitRuleApp, the proof-tree mutation, needs the commit
             // lock; the scheduler hand-off, the atomic counters and the stop check stay outside it.
             final Goal.PendingRuleApp pending = goal.computeRuleApp(app);
             final ImmutableList<Goal> goalList;
