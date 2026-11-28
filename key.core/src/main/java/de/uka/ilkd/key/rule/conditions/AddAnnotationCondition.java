@@ -36,7 +36,7 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Daniel Grévent
  */
-public final class AddAnnotation implements VariableCondition {
+public final class AddAnnotationCondition implements VariableCondition {
     private static final Sort[] ALLOWED = {
         ProgramSVSort.SIMPLE_NEW,
         ProgramSVSort.LOCALVARIABLE, ProgramSVSort.VARIABLE
@@ -57,7 +57,7 @@ public final class AddAnnotation implements VariableCondition {
      *         <code>store</code> is not compatible with that of <code>read</code>, so
      *         they do not correspond to the same kind of AST type.
      */
-    public AddAnnotation(SchemaVariable store, SchemaVariable read, String annot) {
+    public AddAnnotationCondition(SchemaVariable store, SchemaVariable read, String annot) {
         if (!equivalent(store.sort(), read.sort())) {
             throw new IllegalArgumentException(
                 "Expected left and right to have an equivalent sort!");

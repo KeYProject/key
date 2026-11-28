@@ -316,7 +316,8 @@ public class ProofCollections {
         // Symbolic-execution performance: straight-line code and (unrolled) bounded loops execute
         // a long program with many parallel updates, which stresses the update-simplification
         // machinery (\dropEffectlessElementaries). These close quickly with the targeted update
-        // simplification but degrade quadratically without it; straightline_10000 in particular is
+        // simplification but degrade quadratically without it; straightline_10000 in particular
+        // is
         // a regression canary -- fast as is, but it explodes if the quadratic behaviour returns.
         var updateSimplificationPerformance = c.group("updateSimplificationPerformance");
         updateSimplificationPerformance
@@ -1236,6 +1237,20 @@ public class ProofCollections {
         g.provable("case-studies/stipula/behavior_run_donation.key");
         g.provable("case-studies/stipula/behavior_run_license.key");
         g.provable("case-studies/stipula/behavior_run_loanForUse.key");
+
+        g = c.group("Universe");
+        g.provable("universe/domField.key");
+        g.provable("universe/peerArg.key");
+        g.provable("universe/domArg.key");
+        g.provable("universe/repArg.key");
+        g.provable("universe/peerCreate.key");
+        g.provable("universe/domCreate.key");
+        g.provable("universe/repCreate.key");
+        g.provable("universe/peerReturn.key");
+        g.provable("universe/domReturn.key");
+        g.provable("universe/repReturn.key");
+        g.provable("universe/peerField.key");
+        g.provable("universe/repField.key");
 
         g = c.group("regression"); // proof files that fixed regressions
         // must not be provable
