@@ -17,7 +17,9 @@ import de.uka.ilkd.key.java.ast.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.ast.expression.Expression;
 import de.uka.ilkd.key.java.ast.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.statement.LoopStatement;
 import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.visitor.JavaASTCollector;
 import de.uka.ilkd.key.java.visitor.ProgVarReplaceVisitor;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -78,6 +80,23 @@ public class ExpandMethodBody extends ProgramTransformer {
         ProgVarReplaceVisitor paramRepl = new ProgVarReplaceVisitor(result, map, services);
         paramRepl.start();
         result = (StatementBlock) paramRepl.result();
+
+        // Keep the parameter-renamed loop specifications reachable from the source loops. A
+        // later taclet application may rebuild a loop from its textual pattern, which does not
+        // carry the node-attached specification.
+        var sourceLoops = new JavaASTCollector(methDecl.getBody(), LoopStatement.class);
+        sourceLoops.start();
+        var expandedLoops = new JavaASTCollector(result, LoopStatement.class);
+        expandedLoops.start();
+        var sourceNodes = sourceLoops.getNodes();
+        var expandedNodes = expandedLoops.getNodes();
+        for (int i = 0; i < Math.min(sourceNodes.size(), expandedNodes.size()); i++) {
+            var expanded = (LoopStatement) expandedNodes.get(i);
+            if (expanded.getLoopInvariant() != null) {
+                ((LoopStatement) sourceNodes.get(i)).setExpandedLoopInvariant(
+                    expanded.getLoopInvariant());
+            }
+        }
 
         return new ProgramElement[] { KeYJavaASTFactory.methodFrame(mbs.getResultVariable(),
             KeYJavaASTFactory.executionContext(mbs.getBodySource(), pm, newCalled), result,

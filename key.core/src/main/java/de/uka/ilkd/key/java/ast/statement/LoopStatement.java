@@ -62,6 +62,13 @@ public abstract class LoopStatement extends JavaStatement
     private @Nullable LoopSpecification loopInvariant;
 
     /**
+     * The loop specification after method-frame parameter renaming. It is produced when this
+     * loop's method body is expanded into a proof and is used to recover the specification when
+     * the expanded loop is later rebuilt from a taclet pattern.
+     */
+    private @Nullable LoopSpecification expandedLoopInvariant;
+
+    /**
      * The loop contracts applying directly to this loop (as opposed to the {@code StatementBlock}
      * containing it), attached to the node; former {@code loopContractsOnLoops} map.
      */
@@ -518,6 +525,21 @@ public abstract class LoopStatement extends JavaStatement
      */
     public synchronized void setLoopInvariant(@Nullable LoopSpecification inv) {
         this.loopInvariant = inv;
+    }
+
+    /**
+     * Returns the loop specification produced by the last method-body expansion of this loop, or
+     * {@code null} if the loop has not been expanded yet.
+     */
+    public synchronized @Nullable LoopSpecification getExpandedLoopInvariant() {
+        return expandedLoopInvariant;
+    }
+
+    /**
+     * Remembers the loop specification produced by a method-body expansion of this loop.
+     */
+    public synchronized void setExpandedLoopInvariant(@Nullable LoopSpecification inv) {
+        this.expandedLoopInvariant = inv;
     }
 
     /**
