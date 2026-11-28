@@ -37,6 +37,7 @@ import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -238,25 +239,41 @@ public class TestTacletEquality {
     }
 
     /**
-     * Prints a taclet in parseable KeY rule syntax, including its choice restrictions.
+     * Prints a taclet in parseable KeY rule syntax. Choice restrictions are not part of the
+     * taclet declaration; {@link #printOracleEntry(Taclet)} adds them in a {@code \rules} block.
      */
     private static String printTaclet(Taclet taclet) {
         var notation = new NotationInfo();
         notation.refresh(initConfig.getServices(), false, false, false);
         var printer = LogicPrinter.purePrinter(notation, initConfig.getServices());
         printer.printTaclet(taclet);
-        String text = printer.result().strip();
+        return printer.result().strip();
+    }
+
+    /**
+     * Prints an oracle entry: the taclet, wrapped in a {@code \rules} block when it is restricted
+     * to specific choices.
+     */
+    private static String printOracleEntry(Taclet taclet) {
+        String printed = printTaclet(taclet);
         ChoiceExpr choices = taclet.getChoices();
-        if (choices != null && !choices.equals(ChoiceExpr.TRUE)) {
-            int brace = text.indexOf('{');
-            text = text.substring(0, brace) + "(" + choices + ") " + text.substring(brace);
+        if (choices == null || choices.equals(ChoiceExpr.TRUE)) {
+            return printed;
         }
-        return text;
+        String expression = choices.toString();
+        if (!expression.startsWith("(") || !expression.endsWith(")")) {
+            expression = "(" + expression + ")";
+        }
+        return "\\rules " + expression + " {\n  " + printed.replace("\n", "\n  ") + ";\n}";
     }
 
     private static Taclet parseTaclet(String text) throws IOException {
+        String source = text.strip();
+        if (!source.startsWith("\\rules")) {
+            source = "\\rules { " + source + "; }";
+        }
         var io = new KeyIO(parseConfig.getServices(), parseConfig.namespaces());
-        List<Taclet> taclets = io.load("\n\\rules { " + text + "; }").loadComplete();
+        List<Taclet> taclets = io.load(source).loadComplete();
         return taclets.get(0);
     }
 
@@ -276,7 +293,7 @@ public class TestTacletEquality {
             for (Taclet taclet : taclets) {
                 out.format("== %s (%s) =========================================\n", taclet.name(),
                     taclet.displayName());
-                for (String line : printTaclet(taclet).split("\n", -1)) {
+                for (String line : printOracleEntry(taclet).split("\n", -1)) {
                     out.println(line.stripTrailing());
                 }
                 out.format("-----------------------------------------------------\n");
@@ -291,13 +308,32 @@ public class TestTacletEquality {
         createNewOracle();
     }
 
+    @Test
+    public void testWholeOracleIsOneParseableFile() throws IOException {
+        var cases = createCases().toList();
+        var source = new StringBuilder();
+        for (Arguments arguments : cases) {
+            String text = (String) arguments.get()[1];
+            if (text.strip().startsWith("\\rules")) {
+                source.append(text).append('\n');
+            } else {
+                source.append("\\rules {\n").append(text).append(";\n}\n");
+            }
+        }
+
+        var io = new KeyIO(parseConfig.getServices(), parseConfig.namespaces());
+        List<Taclet> parsed = io.load(source.toString()).loadComplete();
+        Assertions.assertEquals(cases.size(), parsed.size(),
+            "Every oracle entry must parse from one KeY document");
+    }
+
     @ParameterizedTest
     @MethodSource("createCases")
     public void testEquality(String name, String expected) {
         Taclet taclet = findTaclet(name);
         Assumptions.assumeTrue(taclet != null);
 
-        String printed = printTaclet(taclet);
+        String printed = printOracleEntry(taclet);
         assertEquals(expected, printed);
 
         Taclet reparsed;
@@ -306,7 +342,7 @@ public class TestTacletEquality {
         } catch (IOException e) {
             throw new AssertionError("Oracle entry for " + name + " is not parseable", e);
         }
-        assertEquals(printed, printTaclet(reparsed));
+        assertEquals(printed, printOracleEntry(reparsed));
     }
 
 
