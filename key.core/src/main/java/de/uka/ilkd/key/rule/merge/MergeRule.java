@@ -36,7 +36,6 @@ import org.key_project.logic.PosInTerm;
 import org.key_project.logic.Term;
 import org.key_project.logic.op.Function;
 import org.key_project.logic.sort.Sort;
-import org.key_project.prover.rules.RuleAbortException;
 import org.key_project.prover.rules.RuleApp;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Semisequent;
@@ -130,8 +129,7 @@ public class MergeRule implements BuiltInRule {
     }
 
     @Override
-    public final @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp)
-            throws RuleAbortException {
+    public final @NonNull ImmutableList<Goal> apply(Goal goal, RuleApp ruleApp) {
 
         final MergeRuleBuiltInRuleApp mergeRuleApp = (MergeRuleBuiltInRuleApp) ruleApp;
 

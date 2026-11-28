@@ -27,6 +27,10 @@ public interface ProofObject<G extends ProofGoal<G>> {
     /// @param goals the list of [ProofGoal]s to be added
     void add(Iterable<G> goals);
 
+    /// returns the number of closed goals of the proof object
+    /// @return number of closed goals
+    int getClosedGoalCount();
+
     /// replace a given goal by a list of new goals
     ///
     /// @param oldGoal the [ProofGoal] to be replaced

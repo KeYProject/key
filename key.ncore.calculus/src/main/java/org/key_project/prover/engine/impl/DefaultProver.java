@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package org.key_project.prover.engine.impl;
 
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.key_project.prover.engine.AbstractProverCore;
 import org.key_project.prover.engine.GoalChooser;
@@ -35,17 +34,11 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
     /// Logger for tracing and debugging the prover's execution.
     private final static Logger LOGGER = LoggerFactory.getLogger(DefaultProver.class);
 
-    /// Counter for tracking performance metrics related to goal application.
-    public static final AtomicLong PERF_GOAL_APPLY = new AtomicLong();
-
     /// The proof currently being constructed or manipulated by this prover.
     protected @MonotonicNonNull ProofObject<Goal> proof;
 
     /// The maximum number of rule applications allowed during the proof process.
     protected int maxApplications;
-
-    /// The start time of the most recent prover invocation, measured in milliseconds.
-    protected long time;
 
     /// The timeout duration, in milliseconds, after which rule application will be aborted.
     /// A value of `-1` disables the timeout.
@@ -53,9 +46,6 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
 
     /// Indicates whether the prover should stop as soon as a non-closable goal is detected.
     protected boolean stopAtFirstNonClosableGoal;
-
-    /// Number of fresh created successors (excludes the goal that introduces them)
-    private int successors;
 
     /// Indicates whether the prover has been interrupted and should stop.
     ///
@@ -90,10 +80,10 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
             final StopCondition<Goal> stopCondition) {
         assert proof != null : "@AssumeAssertion(nullness): proof cannot be null";
         long time = System.currentTimeMillis();
+        long closedGoalsAtStart = getClosedGoalCount();
         SingleRuleApplicationInfo srInfo = null;
 
         final int openGoalCountAtStart = proof.getOpenGoalCount();
-        successors = 0;
         long applyAutomatic = 0;
         try {
             LOGGER.trace("Strategy started.");
@@ -109,7 +99,7 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
                             "but can still be saved for later recovery.",
                         proof, null, srInfo == null ? null : srInfo.getGoal(),
                         System.currentTimeMillis() - time, countApplied,
-                        getClosedGoalCount(openGoalCountAtStart));
+                        getClosedGoalCount() - openGoalCountAtStart);
                 }
                 var applyAutomaticTime = System.nanoTime();
                 try {
@@ -122,7 +112,7 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
                     return new ApplyStrategyInfo<>(srInfo.message(), proof,
                         null, srInfo.getGoal(),
                         System.currentTimeMillis() - time, countApplied,
-                        getClosedGoalCount(openGoalCountAtStart));
+                        getClosedGoalCount() - openGoalCountAtStart);
                 }
                 countApplied++;
                 fireTaskProgress();
@@ -136,18 +126,18 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
                 stopCondition.getStopMessage(maxApplications, timeout, time,
                     countApplied, srInfo),
                 proof, null, null, System.currentTimeMillis() - time, countApplied,
-                getClosedGoalCount(openGoalCountAtStart));
+                getClosedGoalCount() - openGoalCountAtStart);
         } catch (InterruptedException e) {
             cancelled = true;
             return new ApplyStrategyInfo<>("Interrupted.", proof, null,
                 goalChooser.getNextGoal(),
                 System.currentTimeMillis() - time, countApplied,
-                getClosedGoalCount(openGoalCountAtStart));
+                getClosedGoalCount() - openGoalCountAtStart);
         } catch (Throwable t) { // treated later in finished()
             LOGGER.warn("doWork exception", t);
             return new ApplyStrategyInfo<>("Error.", proof, t, null,
                 System.currentTimeMillis() - time, countApplied,
-                getClosedGoalCount(openGoalCountAtStart));
+                getClosedGoalCount() - openGoalCountAtStart);
         } finally {
             time = (System.currentTimeMillis() - time);
             LOGGER.trace("Strategy stopped, applied {} steps in {}ms", countApplied, time);
@@ -155,10 +145,8 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
         }
     }
 
-    private int getClosedGoalCount(int openGoalCountAtStart) {
-        assert proof != null : "@AssumeAssertion(nullness)";
-        return openGoalCountAtStart + successors - proof.getOpenGoalCount();
-    }
+    /// return the number of closed goals of the current proof
+    protected abstract int getClosedGoalCount();
 
     /// Applies rules to goals using the active strategy until a stopping condition is met.
     ///
@@ -199,17 +187,10 @@ public abstract class DefaultProver<Goal extends ProofGoal<Goal>>
             return new SingleRuleApplicationInfo(
                 "No more rules automatically applicable to any goal.", null, app);
         } else {
-            try {
-                @SuppressWarnings("nullness") // g is not null here as app != null
-                final ImmutableList<Goal> premisses = g.apply(app);
-                final int size = premisses.size();
-                successors += size > 0 ? size - 1 : 0;
-
-                synchronized (goalChooser) {
-                    goalChooser.updateGoalList(g, premisses.reverse());
-                }
-            } finally {
-                PERF_GOAL_APPLY.getAndAdd(System.nanoTime() - time);
+            @SuppressWarnings("nullness") // g is not null here as app != null
+            final ImmutableList<Goal> premisses = g.apply(app);
+            synchronized (goalChooser) {
+                goalChooser.updateGoalList(g, premisses.reverse());
             }
             return new SingleRuleApplicationInfo(g, app);
         }

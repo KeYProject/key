@@ -79,6 +79,7 @@ public class Proof implements ProofObject<Goal>, Named {
      * name of the proof
      */
     private final Name name;
+    private final AtomicInteger closedGoalCount = new AtomicInteger(0);
 
     /**
      * the root of the proof
@@ -527,6 +528,14 @@ public class Proof implements ProofObject<Goal>, Named {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getClosedGoalCount() {
+        return closedGoalCount.get();
+    }
+
+    /**
      * Returns the list of closed goals, needed to make pruning in closed branches possible. If the
      * list needs too much memory, pruning can be disabled via the command line option
      * "--no-pruning-closed". In this case the list will not be filled.
@@ -596,7 +605,6 @@ public class Proof implements ProofObject<Goal>, Named {
         }
     }
 
-
     /**
      * Close the given goals and all goals in the subtree below it.
      *
@@ -604,7 +612,6 @@ public class Proof implements ProofObject<Goal>, Named {
      */
     @Override
     public void closeGoal(Goal goalToClose) {
-
         Node closedSubtree = goalToClose.node().close();
 
         boolean b = false;
@@ -620,6 +627,7 @@ public class Proof implements ProofObject<Goal>, Named {
                     closedGoals = closedGoals.prepend(goal);
                 }
                 remove(goal);
+                closedGoalCount.incrementAndGet();
             }
         }
 

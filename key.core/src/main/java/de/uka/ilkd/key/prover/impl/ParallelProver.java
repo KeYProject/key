@@ -260,6 +260,14 @@ public final class ParallelProver extends DefaultProver<Goal> {
         return app;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getClosedGoalCount() {
+        return proof.getClosedGoalCount();
+    }
+
     @Override
     public ApplyStrategyInfo<Goal> start(ProofObject<Goal> proof, Goal goal) {
         return start(proof, ImmutableList.<Goal>nil().prepend(goal));

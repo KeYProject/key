@@ -185,6 +185,14 @@ public class ApplyStrategy extends DefaultProver<Goal> {
         return app;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getClosedGoalCount() {
+        return proof.getClosedGoalCount();
+    }
+
     /*
      * (non-Javadoc)
      *

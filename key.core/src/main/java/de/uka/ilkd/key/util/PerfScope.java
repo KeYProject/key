@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.SemisequentTacletAppIndex;
 import de.uka.ilkd.key.proof.TacletAppIndex;
-import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.executor.javadl.FindTacletExecutor;
@@ -27,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 public class PerfScope {
     private static final Logger LOGGER = LoggerFactory.getLogger(PerfScope.class);
-    @SuppressWarnings({ "unchecked", "rawtypes" }) // generic array creation requires the raw Pair
+    @SuppressWarnings({ "unchecked" }) // generic array creation requires the raw Pair
     // array type; the element type Pair<String, AtomicLong> is fixed by the initializer
     private static final Pair<String, AtomicLong>[] PERF_COUNTERS = new Pair[] {
         new Pair<>("JavaCardDLStrategy approve", JavaCardDLStrategy.PERF_APPROVE),
@@ -38,7 +37,6 @@ public class PerfScope {
             QueueRuleApplicationManager.PERF_QUEUE_OPS),
         new Pair<>("QueueRuleApplicationManager create container",
             QueueRuleApplicationManager.PERF_CREATE_CONTAINER),
-        new Pair<>("Goal apply", ApplyStrategy.PERF_GOAL_APPLY),
         new Pair<>("RuleApp execute", Goal.PERF_APP_EXECUTE),
         new Pair<>("Goal setSequent", Goal.PERF_SET_SEQUENT),
         new Pair<>("Goal update tag manager", Goal.PERF_UPDATE_TAG_MANAGER),
