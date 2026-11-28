@@ -102,7 +102,7 @@ public abstract class VariableDeclaration extends JavaDeclaration
 
     public VariableDeclaration(PositionInfo pi, List<Comment> c, ImmutableList<Modifier> modArray,
             TypeReference type, boolean parentIsInferface) {
-        super(pi, c, modArray, ImmutableList.nil());
+        super(pi, c, modArray);
         this.typeReference = type;
         this.parentIsInterfaceDeclaration = parentIsInferface;
     }

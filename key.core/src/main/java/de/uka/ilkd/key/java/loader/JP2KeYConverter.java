@@ -40,9 +40,10 @@ import de.uka.ilkd.key.nparser.KeyAst;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
+import de.uka.ilkd.key.speclang.jml.translation.JmlSideEffectChecker;
+import de.uka.ilkd.key.speclang.njml.JmlFacade;
+import de.uka.ilkd.key.speclang.njml.JmlLexer;
+import de.uka.ilkd.key.speclang.njml.JmlParser;
 
 import org.key_project.logic.MetaSpace;
 import org.key_project.logic.Namespace;
@@ -61,8 +62,18 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.comments.TraditionalJavadocComment;
 import com.github.javaparser.ast.expr.*;
+import com.github.javaparser.ast.jml.body.JmlClassLevelDeclaration;
+import com.github.javaparser.ast.jml.body.JmlFieldDeclaration;
+import com.github.javaparser.ast.jml.body.JmlMethodDeclaration;
+import com.github.javaparser.ast.jml.doc.JmlDocStmt;
+import com.github.javaparser.ast.jml.proof.JmlProofArg;
+import com.github.javaparser.ast.jml.proof.JmlProofCaseStmt;
+import com.github.javaparser.ast.jml.proof.JmlProofCmdStmt;
+import com.github.javaparser.ast.jml.proof.JmlProofObtainStmt;
+import com.github.javaparser.ast.jml.proof.JmlProofStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt;
 import com.github.javaparser.ast.jml.stmt.JmlExpressionStmt.JmlStmtKind;
+import com.github.javaparser.ast.jml.stmt.JmlMergePointStmt;
 import com.github.javaparser.ast.key.*;
 import com.github.javaparser.ast.key.sv.*;
 import com.github.javaparser.ast.modules.*;
@@ -292,7 +303,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ImmutableList<Statement> body = map(n.getStatements());
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        return new StatementBlock(pi, c, body, getSpec(n));
+        return addToMapping(n, new StatementBlock(pi, c, body));
     }
 
     @Override
@@ -353,7 +364,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         boolean isLibrary = mapping.isParsingLibraries();
         ImmutableList<de.uka.ilkd.key.java.ast.declaration.Modifier> modArray =
             map(n.getModifiers());
-        ImmutableList<MemberDeclaration> members = map(n.getMembers());
+        // Pure class-level JML specification constructs (invariants, initially clauses, axioms,
+        // represents, accessible) have no KeY AST counterpart as members; they stay on the
+        // JMLtk type and are consumed by JMLSpecExtractor via KeYJPMapping.nodeFromKeY.
+        // Declarations containing real Java declarations (model/ghost methods and fields)
+        // are converted to regular KeY members.
+        ImmutableList<MemberDeclaration> members = jmlJavaMembers(n.getMembers());
         boolean parentIsInterface = false;
 
         ImmutableList<TypeReference> e = map(n.getExtendedTypes());
@@ -365,11 +381,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         if (n.isInterface()) {
             td = new InterfaceDeclaration(
                 pi, c, modArray, name, fullName, members,
-                parentIsInterface, isLibrary, extending, getClassSpec(n));
+                parentIsInterface, isLibrary, extending);
         } else {
             td = new ClassDeclaration(pi, c, modArray, name, fullName, members, parentIsInterface,
                 isLibrary, extending, implementing, n.isInnerClass(), n.isLocalClassDeclaration(),
-                false, ImmutableList.fromList(getClassSpec(n)));
+                false);
         }
         kjt.setJavaType(td);
         mapping.registerType(ref, kjt);
@@ -400,6 +416,11 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     private boolean parentIsInterface(@NonNull Node n) {
         if (n.getParentNode().isPresent()) {
             Node parent = n.getParentNode().get();
+            // The JMLtk JmlMethodDeclaration/JmlFieldDeclaration wrappers sit between the
+            // contained declaration and its containing type.
+            if (parent instanceof JmlClassLevelDeclaration) {
+                parent = parent.getParentNode().orElse(null);
+            }
             if (parent instanceof ClassOrInterfaceDeclaration) {
                 return ((ClassOrInterfaceDeclaration) parent).isInterface();
             }
@@ -445,16 +466,46 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     }
 
     private static List<Comment> createComments(Node n) {
-        ArrayList<Comment> comments = new ArrayList<Comment>();
-        // if (n.containsData(JMLCommentTransformer.BEFORE_COMMENTS)) {
-        // comments.addAll(n.getData(JMLCommentTransformer.BEFORE_COMMENTS).stream()
-        // .map(c -> new Comment(c.asString(), createPositionInfo(c))).toList());
-        // }
-        comments.addAll(n.getAssociatedSpecificationComments()
-                .map(l -> l.stream().map(c -> new Comment(c.asString(), createPositionInfo(c)))
-                        .toList())
-                .orElse(Collections.emptyList()));
-        return comments;
+        // JMLtk 1.1.0 removed Node#getAssociatedSpecificationComments(): the parsed JML
+        // specification is now part of the JMLtk AST itself (typed nodes such as JmlContract
+        // and JmlClassLevelDeclaration), from which KeY reads it via KeYJPMapping. There are
+        // no raw specification comments to carry over into the KeY AST, hence no comments.
+        return Collections.emptyList();
+    }
+
+    /**
+     * Converts a type's member list to KeY members, skipping pure class-level JML specification
+     * constructs (invariants, initially clauses, axioms, represents, accessible). Such
+     * constructs have no KeY AST counterpart: they stay on the JMLtk type and are consumed by
+     * the {@code JMLSpecExtractor} via {@code KeYJPMapping.nodeFromKeY}. Members containing real
+     * Java declarations (model/ghost methods and fields, i.e. {@link JmlMethodDeclaration} and
+     * {@link JmlFieldDeclaration} wrappers) are converted as usual.
+     */
+    private ImmutableList<MemberDeclaration> jmlJavaMembers(
+            NodeList<? extends Visitable> members) {
+        List<MemberDeclaration> result = new ArrayList<>(members.size());
+        for (Node member : members) {
+            if (member instanceof JmlClassLevelDeclaration
+                    && !(member instanceof JmlMethodDeclaration)
+                    && !(member instanceof JmlFieldDeclaration)) {
+                continue;
+            }
+            result.add((MemberDeclaration) Objects.requireNonNull(member.accept(this, null)));
+        }
+        return ImmutableList.fromList(result);
+    }
+
+    /**
+     * Returns the {@link JmlMethodDeclaration}/{@link JmlFieldDeclaration} wrapper that the
+     * pipeline unwrapped from the given declaration, if any. The pipeline remembers the wrapper
+     * on the contained declaration so that the specification (contract, method definition) can
+     * still be resolved back from the KeY declaration via the mapping.
+     */
+    @Nullable
+    private static Node jmlWrapperOf(Node n) {
+        return n.containsData(JMLTransformer.KEY_JML_WRAPPER)
+                ? n.getData(JMLTransformer.KEY_JML_WRAPPER)
+                : null;
     }
 
     /**
@@ -634,8 +685,10 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 createProgramElementName(n.getName()),
                 map(n.getParameters()),
                 thr,
-                body != null ? accept(body) : new StatementBlock(), isInInterface,
-                getSpec(n));
+                body != null ? accept(body) : new StatementBlock(), isInInterface);
+        // Resolve the KeY declaration back to the JMLtk node that carries the contracts
+        // (CallableDeclaration is a NodeWithContracts).
+        mapping.registerReverse(cd, n);
 
         ClassOrInterfaceDeclaration clazz = getContainingClass(n);
         try {
@@ -697,11 +750,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         Object guard = accept(n.getCondition());
         Object body = accept(n.getBody());
-        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
-        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
-        loopSpecs.addAll(getSpec(n)); // loop contracts
-        return new Do(pi, c, new Guard((Expression) guard),
-            (Statement) body, loopSpecs);
+        return addToMapping(n,
+            new Do(pi, c, new Guard((Expression) guard), (Statement) body));
     }
 
     @Override
@@ -715,21 +765,6 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(EmptyStmt n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-        /*
-         * if (n.containsData(JMLTransformer.KEY_CONSTRUCT)) {
-         * var construct = n.getData(JMLTransformer.KEY_CONSTRUCT);
-         * if (construct instanceof TextualJMLAssertStatement a) {
-         * return new JmlAssert(a.getKind(), a.getContext(), pi);
-         * }
-         * if (construct instanceof TextualJMLMergePointDecl a) {
-         * var loc =
-         * new LocationVariable(services.getVariableNamer().getTemporaryNameProposal("x"),
-         * services.getNamespaces().sorts().lookup("boolean"));
-         * return new MergePointStatement(pi, c, a, loc);
-         * }
-         * LOGGER.warn(n.getRange() + " Ignoring statement " + construct.getClass());
-         * }
-         */
         return new EmptyStatement(pi, c);
     }
 
@@ -753,8 +788,21 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
     @Override
     public Object visit(ExpressionStmt n, Void arg) {
-
-        return accept(n.getExpression());
+        var expression = n.getExpression();
+        // JMLtk 1.2.1 no longer produces a dedicated statement node for the ProofJava form
+        // `merge_point (<expr>);` (it became a contextual keyword), so it parses as an ordinary
+        // method call. Restore KeY's merge point statement semantics for that spelling; the
+        // taclet snippets in javaRules.key rely on the statement type for indexing.
+        if (expression instanceof MethodCallExpr call
+                && call.getScope().isEmpty()
+                && "merge_point".equals(call.getNameAsString())
+                && call.getArguments().size() == 1) {
+            PositionInfo pi = createPositionInfo(n);
+            List<Comment> c = createComments(n);
+            IProgramVariable loc = (IProgramVariable) accept(call.getArgument(0));
+            return new MergePointStatement(pi, c, loc);
+        }
+        return accept(expression);
     }
 
     private static FieldSpecification findArrayLength(ArrayDeclaration type) {
@@ -896,20 +944,179 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
     public Object visit(JmlExpressionStmt n, Void arg) {
         PositionInfo pi = createPositionInfo(n);
         return switch (n.getKind()) {
-            case JmlStmtKind.ASSERT -> {
-                TextualJMLAssertStatement construct = n.getData(MarkerStatementHelper.KEY_ASSERT);
-                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSERT, construct, pi);
-            }
-            case JmlStmtKind.ASSUME -> {
-                TextualJMLAssertStatement construct = n.getData(MarkerStatementHelper.KEY_ASSERT);
-                yield new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, construct, pi);
+            case JmlStmtKind.ASSERT, JmlStmtKind.ASSUME -> {
+                // Assertion conditions must be side-effect free; reject assignments,
+                // increments/decrements and object/array creation structurally instead of
+                // relying on the re-parse (which would fail late or, worse, silently).
+                JmlSideEffectChecker.check(n.getExpression());
+                // Re-parse the JML expression text against KeY's own JML grammar so that the
+                // JML term translation (JMLSpecFactory) can process it.
+                JmlLexer lexer = JmlFacade
+                        .createLexer(JmlFacade.positionedString(n, n.getExpression().toString()));
+                lexer._mode = JmlLexer.expr;
+                JmlParser parser = JmlFacade.createParser(lexer);
+                var exprCtx = parser.expressionEOF();
+                parser.getErrorReporter().throwException();
+                KeyAst.Expression condition = new KeyAst.Expression(exprCtx.expression());
+                TextualJMLAssertStatement.Kind kind = n.getKind() == JmlStmtKind.ASSERT
+                        ? TextualJMLAssertStatement.Kind.ASSERT
+                        : TextualJMLAssertStatement.Kind.ASSUME;
+                yield new JmlAssert(kind, null, condition, toProofScript(n), pi);
             }
             case JmlStmtKind.SET -> {
-                KeyAst.SetStatementContext context = n.getData(MarkerStatementHelper.KEY_ASSIGN);
-                yield new SetStatement(context, pi);
+                JmlParser parser = JmlFacade.createParser(JmlFacade.createLexer(
+                    JmlFacade.positionedString(n, "set " + n.getExpression() + ";")));
+                var ctx = parser.set_statement();
+                parser.getErrorReporter().throwException();
+                yield new SetStatement(new KeyAst.SetStatementContext(ctx), pi);
             }
             default -> throw new IllegalStateException("Unexpected value: " + n.getKind());
         };
+    }
+
+    /**
+     * Re-parses the proof script of a JML assertion (`assert e \by { ... }`) from the JMLtk AST
+     * against KeY's own JML grammar, or returns {@code null} if the statement carries no script.
+     * <p>
+     * JMLtk stores the script as a {@link NodeList} of {@link JmlProofStmt}s; the text is
+     * reconstructed from the AST by {@link #appendProofStatement} so that the downstream
+     * proof-script machinery ({@link de.uka.ilkd.key.macros.ApplyScriptsMacro}) can process it. A
+     * script JMLtk was able to parse but KeY cannot is rejected loudly instead of being silently
+     * dropped.
+     */
+    private static KeyAst.@Nullable JMLProofScript toProofScript(JmlExpressionStmt stmt) {
+        var script = stmt.getScript();
+        if (script.isEmpty() || script.get().isEmpty()) {
+            return null;
+        }
+        StringBuilder text = new StringBuilder("\\by { ");
+        for (JmlProofStmt proofStmt : script.get()) {
+            appendProofStatement(text, proofStmt);
+            text.append(' ');
+        }
+        text.append('}');
+        JmlLexer lexer = JmlFacade.createLexer(JmlFacade.positionedString(stmt, text.toString()));
+        lexer._mode = JmlLexer.expr;
+        JmlParser parser = JmlFacade.createParser(lexer);
+        var ctx = parser.assertionProof();
+        parser.getErrorReporter().throwException();
+        return KeyAst.JMLProofScript.fromContext(ctx);
+    }
+
+    /**
+     * Serializes one JMLtk proof-script statement into KeY's proof-script syntax. We do not use
+     * {@code Node.toString()} here: JMLtk's pretty printer wraps the commands of a
+     * {@code case}/{@code default} branch in braces when there is more than one, which KeY's
+     * grammar does not accept (the original {@code Quicksort.java} has no such braces either).
+     */
+    private static void appendProofStatement(StringBuilder text, JmlProofStmt stmt) {
+        if (stmt instanceof JmlProofCmdStmt cmd) {
+            text.append(cmd.getName());
+            for (JmlProofArg arg : cmd.getArgs()) {
+                text.append(' ');
+                arg.getLabel().ifPresent(label -> text.append(label).append(": "));
+                text.append(arg.getExpr());
+            }
+            appendProofSuffix(text, cmd.getSuffix());
+        } else if (stmt instanceof JmlProofObtainStmt obtain) {
+            text.append("obtain ").append(obtain.getType()).append(' ').append(obtain.getVar());
+            if (obtain.getKind() != null) {
+                text.append(' ').append(obtain.getKind().jmlSymbol());
+                obtain.getValue().ifPresent(value -> text.append(' ').append(value));
+            }
+            appendProofSuffix(text, obtain.getSuffix());
+        } else if (stmt instanceof JmlProofCaseStmt caseStmt) {
+            caseStmt.getLabel().ifPresentOrElse(
+                label -> text.append("case ").append(label).append(": "),
+                () -> text.append("case: "));
+            for (JmlProofStmt command : caseStmt.getCommands()) {
+                appendProofStatement(text, command);
+                text.append(' ');
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported JML proof statement: " + stmt);
+        }
+    }
+
+    /**
+     * Serializes the {@code ;}/{@code \by …} suffix of a proof command. A single case branch is
+     * always wrapped in braces, because {@code \by case …} is not valid proof-script syntax.
+     */
+    private static void appendProofSuffix(StringBuilder text, List<JmlProofStmt> suffix) {
+        boolean hasCase = suffix.stream().anyMatch(JmlProofCaseStmt.class::isInstance);
+        if (suffix.isEmpty()) {
+            text.append(';');
+        } else if (suffix.size() == 1 && !hasCase) {
+            text.append("\\by ");
+            appendProofStatement(text, suffix.getFirst());
+        } else {
+            text.append("\\by { ");
+            for (JmlProofStmt proofStmt : suffix) {
+                appendProofStatement(text, proofStmt);
+                text.append(' ');
+            }
+            text.append('}');
+        }
+    }
+
+    /**
+     * Translates a leftover raw JML comment block that the {@code JMLTransformer} re-parsed
+     * against KeY's own JML grammar ({@link MarkerStatementHelper#KEY_JML_FALLBACK}): merge
+     * point statements, {@code set} statements and {@code assert}/{@code assume} statements with
+     * KeY proof scripts or obtain clauses, which JMLtk cannot parse.
+     */
+    @Override
+    public Object visit(JmlDocStmt n, Void arg) {
+        var element = n.getData(MarkerStatementHelper.KEY_JML_FALLBACK);
+        if (element == null) {
+            // Unmarked leftovers are removed by the JmlDocRemoval pipeline step; reaching this
+            // point indicates a pipeline ordering problem.
+            throw new IllegalArgumentException("JmlDocStmt without a re-parsed method level "
+                + "element reached the converter: " + n);
+        }
+        PositionInfo pi = createPositionInfo(n);
+        List<Comment> c = createComments(n);
+        if (element instanceof JmlParser.Merge_point_statementContext) {
+            // The concrete merge procedure and parameters are re-derived by the
+            // JMLSpecExtractor from the parse tree.
+            var loc = new LocationVariable(
+                services.getVariableNamer().getTemporaryNameProposal("x"),
+                services.getNamespaces().sorts().lookup("boolean"));
+            return addToMapping(n, new MergePointStatement(pi, c, loc));
+        } else if (element instanceof JmlParser.Set_statementContext set) {
+            return addToMapping(n, new SetStatement(new KeyAst.SetStatementContext(set), pi));
+        } else if (element instanceof JmlParser.Assert_statementContext asrt) {
+            KeyAst.Expression condition;
+            if (asrt.UNREACHABLE() != null) {
+                condition = new KeyAst.Expression(
+                    (JmlParser.ExpressionContext) JmlFacade.parseExpr("false"));
+            } else {
+                condition = new KeyAst.Expression(asrt.expression());
+            }
+            String label = asrt.label != null ? asrt.label.getText() : null;
+            return addToMapping(n, new JmlAssert(TextualJMLAssertStatement.Kind.ASSERT, label,
+                condition, KeyAst.JMLProofScript.fromContext(asrt.assertionProof()), pi));
+        } else if (element instanceof JmlParser.Assume_statementContext assume) {
+            return addToMapping(n, new JmlAssert(TextualJMLAssertStatement.Kind.ASSUME, null,
+                new KeyAst.Expression(assume.expression()), null, pi));
+        }
+        throw new IllegalStateException(
+            "Unsupported re-parsed method level element: " + element.getClass());
+    }
+
+    @Override
+    public Object visit(JmlMethodDeclaration n, Void arg) {
+        // A model method appears in the JMLtk class members as a JmlMethodDeclaration wrapping
+        // the real MethodDeclaration. Convert the inner declaration as a regular member; the
+        // reverse mapping registered in visit(MethodDeclaration) lets the JMLSpecExtractor find
+        // the wrapper again (with its contract and definition).
+        return accept(n.getMethodDeclaration());
+    }
+
+    @Override
+    public Object visit(JmlFieldDeclaration n, Void arg) {
+        // Ghost/model field: convert the contained FieldDeclaration as a regular member.
+        return accept(n.getDecl());
     }
 
     @Override
@@ -956,10 +1163,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         LocalVariableDeclaration decl = accept(n.getVariable());
         ILoopInit init = new LoopInit(new LoopInitializer[] { decl });
         Guard guard = new Guard(null, null, accept(n.getIterable()));
-        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
-        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
-        loopSpecs.addAll(getSpec(n)); // loop contracts
-        return new EnhancedFor(pi, c, init, guard, accept(n.getBody()), loopSpecs);
+        return addToMapping(n,
+            new EnhancedFor(pi, c, init, guard, accept(n.getBody())));
     }
 
     @Override
@@ -990,34 +1195,8 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         } else if (!n.getUpdate().isEmpty()) {
             forUpdates = new ForUpdates(updates);
         }
-        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
-        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
-        loopSpecs.addAll(getSpec(n)); // loop contracts
-        return new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody()), loopSpecs);
-    }
-
-    public static List<TextualJMLConstruct> getSpec(Node n) {
-        try {
-            return n.getData(JMLTransformer.KEY_SPEC_CASE);
-        } catch (IllegalStateException e) {
-            return List.of();
-        }
-    }
-
-    public static List<TextualJMLLoopSpec> getLoopSpec(Node n) {
-        try {
-            return n.getData(JMLTransformer.KEY_LOOP_SPEC);
-        } catch (IllegalStateException e) {
-            return List.of();
-        }
-    }
-
-    public static List<TextualJMLConstruct> getClassSpec(Node n) {
-        try {
-            return n.getData(JMLTransformer.KEY_CLASS_SPEC);
-        } catch (IllegalStateException e) {
-            return List.of();
-        }
+        return addToMapping(n,
+            new For(pi, c, forInit, forUpdates, forGuard, accept(n.getBody())));
     }
 
     @Override
@@ -1120,6 +1299,12 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         Throws thr = t.isEmpty() ? null : new Throws(null, null, t);
         boolean isInInterface = parentIsInterface(n);
         TypeReference returnType = requireTypeReference(n.getType());
+        final Node jmlWrapper = jmlWrapperOf(n);
+        // A model/ghost method unwrapped from a JmlMethodDeclaration: its body is a JML
+        // definition (specification text, e.g. containing \old), not executable Java. The
+        // pre-JMLtk front-end produced signature-only KeY methods for it; the definition
+        // itself is translated via the JML grammar (JmlToTextual.toMethodDecl, AXIOMS).
+        final Optional<BlockStmt> body = jmlWrapper == null ? n.getBody() : Optional.empty();
 
         de.uka.ilkd.key.java.ast.declaration.MethodDeclaration md =
             new de.uka.ilkd.key.java.ast.declaration.MethodDeclaration(
@@ -1129,8 +1314,19 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
                 createProgramElementName(n.getName()),
                 map(n.getParameters()),
                 thr,
-                accepto(n.getBody()),
-                isInInterface, ImmutableList.fromList(getSpec(n)));
+                accepto(body),
+                isInInterface);
+        // Model method contracts and the method definition live on the JmlMethodDeclaration
+        // wrapper; for regular methods the MethodDeclaration node itself carries the contracts
+        // (CallableDeclaration is a NodeWithContracts). The pipeline (JMLTransformer) unwraps
+        // the wrapper into a regular member and remembers it on the inner declaration, so the
+        // wrapper is looked up from there first.
+        Node contractCarrier = jmlWrapper;
+        if (contractCarrier == null) {
+            Node parent = n.getParentNode().orElse(null);
+            contractCarrier = parent instanceof JmlMethodDeclaration ? parent : n;
+        }
+        mapping.registerReverse(md, contractCarrier);
 
         ResolvedReferenceTypeDeclaration containing = getContainingClass(n).resolve();
         final HeapLDT heapLDT = typeConverter.getTypeConverter().getHeapLDT();
@@ -1243,10 +1439,13 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         ClassDeclaration decl = null;
         if (n.getAnonymousClassBody().isPresent()) {
             // TODO: Add pipeline step for anonymous classes
-            ImmutableList<MemberDeclaration> bodies = map(n.getAnonymousClassBody().get());
+            // JML class-level constructs inside an anonymous class body stay on the JMLtk AST
+            // (they are not supported by KeY's anonymous-class translation).
+            ImmutableList<MemberDeclaration> bodies =
+                jmlJavaMembers(n.getAnonymousClassBody().get());
             decl = new ClassDeclaration(pi, c, ImmutableList.of(), null, null,
                 bodies, true, false, null, null,
-                true, false, true, ImmutableList.of());
+                true, false, true);
         }
         return new New(pi, c, args, type, decl);
     }
@@ -1704,10 +1903,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         List<Comment> c = createComments(n);
         Guard guard = new Guard((Expression) accept(n.getCondition()));
         Statement body = accept(n.getBody());
-        List<TextualJMLConstruct> loopSpecs = new ArrayList<>();
-        loopSpecs.addAll(getLoopSpec(n)); // loop invariants
-        loopSpecs.addAll(getSpec(n)); // loop contracts
-        return new While(pi, c, guard, body, loopSpecs);
+        return addToMapping(n, new While(pi, c, guard, body));
     }
 
     @Override
@@ -1897,6 +2093,18 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
 
         ImmutableList<Expression> args = map(arguments);
 
+        if (name.equals("\\seq")) {
+            // \seq() is the empty sequence, \seq(e1, ..., en) the sequence literal
+            // [e1, ..., en]. Mirror TermBuilder.seq: left-fold concatenation of singleton
+            // sequences, starting from the empty sequence.
+            Expression result = EmptySeqLiteral.INSTANCE;
+            for (Expression elem : args) {
+                result = new LogicFunctionalOperator(pi, c, SeqConcat, result,
+                    new LogicFunctionalOperator(pi, c, SeqSingleton, elem));
+            }
+            return result;
+        }
+
         var fn = switch (name) {
             case "\\all_objects" -> AllObjects;
             case "\\all_fields" -> AllFields;
@@ -1972,22 +2180,23 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         return new LoopScopeBlock(pi, c, indexPV, body, null, 0);
     }
 
+    /**
+     * Translates the JMLtk typed merge point statement, which the front-end produces for the
+     * comment form ({@code //@ merge_point ...}). It carries no executable expression (only
+     * optional merge procedure / lattice / predicate metadata plus JML key tags), so it is
+     * translated exactly like the re-parsed fallback form: a {@link MergePointStatement} holding
+     * a temporary boolean location variable. The concrete merge procedure and parameters are
+     * re-derived by the {@code JMLSpecExtractor} from the node (see
+     * {@code JMLSpecFactory#createJMLMergeContracts}).
+     */
     @Override
-    public Object visit(KeyMergePointStmt n, Void arg) {
+    public Object visit(JmlMergePointStmt n, Void arg) {
         var pi = createPositionInfo(n);
         List<Comment> c = createComments(n);
-
-        if (n.containsData(MarkerStatementHelper.KEY_MERGE_POINT)) {
-            // IProgramVariable expr = accept(n.getExpr());
-            var loc = new LocationVariable(
-                services.getVariableNamer().getTemporaryNameProposal("x"),
-                services.getNamespaces().sorts().lookup("boolean"));
-            TextualJMLMergePointDecl a = n.getData(MarkerStatementHelper.KEY_MERGE_POINT);
-            return new MergePointStatement(pi, c, a, loc);
-        } else {
-            IProgramVariable expr = accept(n.getExpr());
-            return new MergePointStatement(pi, c, null, expr);
-        }
+        var loc = new LocationVariable(
+            services.getVariableNamer().getTemporaryNameProposal("x"),
+            services.getNamespaces().sorts().lookup("boolean"));
+        return addToMapping(n, new MergePointStatement(pi, c, loc));
     }
 
     @Override
@@ -2159,8 +2368,7 @@ class JP2KeYVisitor extends GenericVisitorAdapter<Object, Void> {
         boolean parentIsInterface = false;
 
         TypeDeclaration td = new AnnotationInterfaceDeclaration(
-            pi, c, modArray, name, fullName, members,
-            parentIsInterface, isLibrary, getClassSpec(n));
+            pi, c, modArray, name, fullName, members, parentIsInterface, isLibrary);
 
         kjt.setJavaType(td);
         mapping.registerType(ref, kjt);

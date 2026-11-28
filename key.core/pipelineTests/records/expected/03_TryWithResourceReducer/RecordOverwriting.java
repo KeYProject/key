@@ -1,7 +1,4 @@
-//@ /*@ nullable */
-
-
-record MyRecord(String test) {
+/*@ nullable */ record MyRecord(String test) {
 
     public int hashCode() {
         return 0;

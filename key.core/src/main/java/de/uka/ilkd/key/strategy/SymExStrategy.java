@@ -160,7 +160,9 @@ public class SymExStrategy extends JavaAbstractFeatureStrategy implements Compon
                     .equals(StrategyProperties.LOOP_SCOPE_EXPAND);
 
         bindRuleSet(d, "loop_expand", useLoopExpand ? longConst(0) : inftyConst());
-        bindRuleSet(d, "loop_scope_inv_taclet", useLoopInvTaclets ? longConst(0) : inftyConst());
+        bindRuleSet(d, "for_to_while", longConst(PROGRAM_STEP - 1));
+        bindRuleSet(d, "loop_scope_inv_taclet",
+            useLoopInvTaclets ? longConst(PROGRAM_STEP - 1) : inftyConst());
         bindRuleSet(d, "loop_scope_expand",
             useLoopScopeExpand ? longConst(LOOP_SCOPE_EXPAND) : inftyConst());
 

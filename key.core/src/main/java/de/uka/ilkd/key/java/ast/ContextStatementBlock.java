@@ -54,7 +54,7 @@ public class ContextStatementBlock extends StatementBlock {
             PositionInfo pi, List<Comment> c,
             ImmutableList<? extends Statement> body,
             IExecutionContext execContext) {
-        super(pi, c, body, ImmutableList.nil());
+        super(pi, c, body);
         this.executionContext = execContext;
     }
 

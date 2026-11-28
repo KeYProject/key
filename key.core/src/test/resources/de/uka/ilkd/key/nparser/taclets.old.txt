@@ -6665,7 +6665,7 @@ elim_double_block_3 {
   }
 ... }}| (post))
 \replacewith(#allmodal ((modal operator))|{{ ..
-  while (#e) #s
+  #reattachLoopInvariant(while (#e) #s)
 ... }}| (post)) 
 \heuristics(simplify_prog)
 Choices: programRules:Java}
@@ -10004,7 +10004,7 @@ for_to_while {
 \replacewith(#allmodal ((modal operator))|{{ ..
   #forToWhile(#innerLabel, #outerLabel, #forloop)
 ... }}| (post)) 
-\heuristics(simplify_prog)
+\heuristics(for_to_while)
 Choices: programRules:Java}
 -----------------------------------------------------
 == geq_add (geq_add) =========================================

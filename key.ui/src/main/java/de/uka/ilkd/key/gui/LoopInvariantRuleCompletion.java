@@ -72,7 +72,7 @@ public class LoopInvariantRuleCompletion implements InteractiveRuleApplicationCo
 
         if (inv != null && forced) {
             // overwrite old loop invariant in spec repo
-            services.getSpecificationRepository().addLoopInvariant(inv);
+            inv.getLoop().setLoopInvariant(inv);
         }
 
         return inv == null ? null : loopApp.setLoopInvariant(inv);

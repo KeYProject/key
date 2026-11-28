@@ -23,7 +23,7 @@ public class InfFlowLoopContractInternalRule extends LoopContractInternalRule {
         if (!super.contractApplied(contract, goal)) {
             Services services = goal.proof().getServices();
             Proof proof = goal.proof();
-            ProofOblInput po = services.getSpecificationRepository().getProofOblInput(proof);
+            ProofOblInput po = services.getProofRegistry().getProofOblInput(proof);
             if (po instanceof SymbolicExecutionPO) {
                 Goal initiatingGoal = ((SymbolicExecutionPO) po).getInitiatingGoal();
                 return contractApplied(contract, initiatingGoal);

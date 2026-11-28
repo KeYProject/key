@@ -11,6 +11,7 @@ import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.nparser.KeyAst;
+import de.uka.ilkd.key.speclang.JmlStatementSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLAssertStatement;
 import de.uka.ilkd.key.speclang.njml.JmlIO;
 import de.uka.ilkd.key.speclang.njml.JmlParser;
@@ -26,16 +27,21 @@ import org.jspecify.annotations.Nullable;
  *
  * @author Benjamin Takacs
  */
-public class JmlAssert extends JavaStatement {
+public class JmlAssert extends JavaStatement implements JmlSpecCarrier {
     /**
-     * Index in the list of terms of
-     * {@link de.uka.ilkd.key.proof.mgt.SpecificationRepository.JmlStatementSpec}
+     * Index in the list of terms of {@link JmlStatementSpec}
      */
     public static final int INDEX_CONDITION = 0;
     /**
      * the kind of the statement, assert or assume
      */
     private final TextualJMLAssertStatement.Kind kind;
+
+    /**
+     * the translated specification of this statement (terms etc.), or {@code null} until
+     * {@code JMLSpecFactory.translateJmlAssertCondition} has run
+     */
+    private @Nullable JmlStatementSpec spec;
 
     /*
      * Temporary solution until full jml labels are there ...
@@ -85,6 +91,7 @@ public class JmlAssert extends JavaStatement {
     public JmlAssert(JmlAssert other) {
         this(other.kind, other.optLabel, other.condition, other.assertionProof,
             other.getPositionInfo());
+        this.spec = other.spec;
     }
 
     public JmlAssert(TextualJMLAssertStatement.Kind kind, TextualJMLAssertStatement construct,
@@ -99,6 +106,14 @@ public class JmlAssert extends JavaStatement {
 
     public TextualJMLAssertStatement.Kind getKind() {
         return kind;
+    }
+
+    public @Nullable JmlStatementSpec getSpec() {
+        return spec;
+    }
+
+    public void setSpec(@Nullable JmlStatementSpec spec) {
+        this.spec = spec;
     }
 
     /*

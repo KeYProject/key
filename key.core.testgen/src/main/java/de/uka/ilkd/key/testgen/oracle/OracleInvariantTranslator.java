@@ -16,7 +16,6 @@ import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 
@@ -27,7 +26,6 @@ public record OracleInvariantTranslator(Services services) {
     public JTerm getInvariantTerm(Sort s) {
         JavaInfo info = services.getJavaInfo();
         TermBuilder tb = new TermBuilder(services.getTermFactory(), services);
-        SpecificationRepository spec = services.getSpecificationRepository();
 
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
 
@@ -45,7 +43,7 @@ public record OracleInvariantTranslator(Services services) {
 
         JTerm result = tb.tt();
 
-        for (ClassAxiom c : spec.getClassAxioms(kjt)) {
+        for (ClassAxiom c : services.getClassAxiomComputer().getClassAxioms(kjt)) {
 
             if (c instanceof RepresentsAxiom ra && c.getKJT().equals(kjt)) {
 

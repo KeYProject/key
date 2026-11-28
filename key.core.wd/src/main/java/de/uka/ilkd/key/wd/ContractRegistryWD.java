@@ -7,15 +7,12 @@ package de.uka.ilkd.key.wd;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.UnaryOperator;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.ast.declaration.ModifierKind;
 import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.*;
 
 import org.key_project.util.collection.*;
@@ -25,19 +22,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A special variant of
- *
- * @author Alexander Weigl
- * @version 1 (1/1/26)
+ * The well-definedness variant of the {@link ContractRegistry}: registers the
+ * {@link WellDefinednessCheck}s that belong to newly registered contracts (mirroring the checks
+ * the former {@code SpecificationRepositoryWD} created on top of the base repository) and keeps
+ * them in a separate {@code wdChecks} map. When well-definedness checks are deactivated
+ * ({@link WellDefinednessCheck#isOn(Services)}), {@link #getAllContracts()} and
+ * {@link #getContracts(KeYJavaType, IObserverFunction)} filter them out (mirroring the former
+ * WD repository). It also carries the WD {@link #processJavaType} hook (representa clauses →
+ * WD checks), which the former {@code SpecificationRepositoryWD} provided.
  */
 @NullMarked
-public class SpecificationRepositoryWD extends SpecificationRepository {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpecificationRepositoryWD.class);
+public class ContractRegistryWD extends ContractRegistry {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContractRegistryWD.class);
 
     private final Map<Pair<KeYJavaType, IObserverFunction>, ImmutableSet<WellDefinednessCheck>> wdChecks =
         new LinkedHashMap<>();
 
-    public SpecificationRepositoryWD(Services services) {
+    public ContractRegistryWD(Services services) {
         super(services);
     }
 
@@ -98,12 +99,6 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
         } else if (contract instanceof WellDefinednessCheck) {
             registerWdCheck((WellDefinednessCheck) contract);
         }
-        /*
-         * contractsByName.put(contract.getName(), contract);
-         * final ImmutableSet<IObserverFunction> oldTargets = getContractTargets(targetKJT);
-         * final ImmutableSet<IObserverFunction> newTargets = oldTargets.add(targetMethod);
-         * contractTargets.put(targetKJT, newTargets);
-         */
         return contract;
     }
 
@@ -193,7 +188,7 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
     /**
      * Returns all registered (atomic) well-definedness method checks for the passed kjt.
      */
-    private ImmutableSet<MethodWellDefinedness> getWdMethodChecks(KeYJavaType kjt) {
+    ImmutableSet<MethodWellDefinedness> getWdMethodChecks(KeYJavaType kjt) {
         assert kjt != null;
         ImmutableSet<MethodWellDefinedness> result = DefaultImmutableSet.nil();
         for (MethodWellDefinedness ch : getAllWdMethodChecks()) {
@@ -207,7 +202,7 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
     /**
      * Returns all registered (atomic) well-definedness method checks for the passed target and kjt.
      */
-    private ImmutableSet<MethodWellDefinedness> getWdMethodChecks(KeYJavaType kjt,
+    ImmutableSet<MethodWellDefinedness> getWdMethodChecks(KeYJavaType kjt,
             IObserverFunction target) {
         assert kjt != null;
         assert target != null;
@@ -223,7 +218,7 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
     /**
      * Returns all registered (atomic) well-definedness class checks for the passed kjt.
      */
-    private ImmutableSet<ClassWellDefinedness> getWdClassChecks(KeYJavaType kjt) {
+    ImmutableSet<ClassWellDefinedness> getWdClassChecks(KeYJavaType kjt) {
         ImmutableSet<WellDefinednessCheck> checks = getWdChecks(kjt);
         ImmutableSet<ClassWellDefinedness> invs = DefaultImmutableSet.nil();
         for (WellDefinednessCheck check : checks) {
@@ -256,10 +251,31 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
     }
 
     /**
-     * Removes the contract from the repository, but keeps its target.
+     * Registers a contract (package-private bridge for {@link ClassAxiomComputerWD}, which is not
+     * a {@link ContractRegistry} subclass and thus cannot see the protected
+     * {@link #registerContract(Contract)}; the call chains into the overridden 2-arg
+     * {@link #registerContract(Contract, Pair)} so the well-definedness logic still runs).
+     *
+     * @param contract the contract to register
+     */
+    void registerContractForClassAxioms(Contract contract) {
+        registerContract(contract);
+    }
+
+    /**
+     * Unregisters a contract (package-private bridge for {@link ClassAxiomComputerWD}).
+     *
+     * @param contract the contract to unregister
+     */
+    void unregisterContractForClassAxioms(Contract contract) {
+        unregisterContract(contract);
+    }
+
+    /**
+     * Removes the contract from the registry, but keeps its target.
      */
     @Override
-    protected void unregisterContract(Contract contract) {
+    public void unregisterContract(Contract contract) {
         super.unregisterContract(contract);
 
         final KeYJavaType kjt = contract.getKJT();
@@ -284,13 +300,6 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
     }
 
     @Override
-    public void map(UnaryOperator<JTerm> op, Services services) {
-        super.map(op, services);
-        mapValueSets(wdChecks, op, services);
-    }
-
-
-    @Override
     public ImmutableSet<Contract> getAllContracts() {
         var result = super.getAllContracts();
         return WellDefinednessCheck.isOn(services) ? result : removeWdChecks(result);
@@ -305,16 +314,17 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
             return removeWdChecks(result);
     }
 
-
     /**
      * Represent terms belong to model fields, so the well-definedness check considers both of them
-     * together.
+     * together. Formerly {@code SpecificationRepositoryWD.processJavaType} (the WD variant of the
+     * {@link de.uka.ilkd.key.speclang.ContractRegistry#processJavaType} hook).
      *
      * @param kjt The relevant KeYJavaType
      */
     @Override
     public void processJavaType(KeYJavaType kjt) {
-        ImmutableSet<ClassAxiom> axs = axioms.get(kjt);
+        ImmutableSet<ClassAxiom> axs =
+            services.getClassAxiomComputer().getClassAxiomsForType(kjt);
         if (axs == null) {
             return;
         }
@@ -330,60 +340,16 @@ public class SpecificationRepositoryWD extends SpecificationRepository {
             for (MethodWellDefinedness ch : getWdMethodChecks(kjt)) {
                 if (ch.modelField() && ch.getTarget().equals(rep.getTarget())) {
                     dep = true;
-                    unregisterContract(ch);
+                    unregisterContractForClassAxioms(ch);
                     JTerm represents = rep.getAxiom(heap, ch.getOrigVars().self, services);
                     WellDefinednessCheck newCh = ch.addRepresents(represents);
-                    registerContract(newCh);
+                    registerContractForClassAxioms(newCh);
                 }
             }
             if (!dep) {
                 MethodWellDefinedness mwd = new MethodWellDefinedness(rep, services);
-                registerContract(mwd);
+                registerContractForClassAxioms(mwd);
             }
         }
     }
-
-    @Override
-    public void addClassInvariant(ClassInvariant inv) {
-        super.addClassInvariant(inv);
-
-        final KeYJavaType kjt = inv.getKJT();
-        final IObserverFunction target = inv.isStatic() ? services.getJavaInfo().getStaticInv(kjt)
-                : services.getJavaInfo().getInv();
-
-        final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(kjt);
-        if (cwds.isEmpty()) {
-            registerContract(new ClassWellDefinedness(inv, target, null, null, services));
-        } else {
-            assert cwds.size() == 1;
-            ClassWellDefinedness cwd = cwds.iterator().next();
-            unregisterContract(cwd);
-            cwd = cwd.combine(new ClassWellDefinedness(inv, cwd.getTarget(), null, null, services),
-                services);
-            registerContract(cwd);
-        }
-
-        // inherit non-private, non-static invariants
-        if (!inv.isStatic() && ModifierKind.allowsInheritance(inv.getVisibility())) {
-            final ImmutableList<KeYJavaType> subs = services.getJavaInfo().getAllSubtypes(kjt);
-            for (KeYJavaType sub : subs) {
-                ClassInvariant subInv = inv.setKJT(sub);
-                final IObserverFunction subTarget =
-                    subInv.isStatic() ? services.getJavaInfo().getStaticInv(sub)
-                            : services.getJavaInfo().getInv();
-                final ImmutableSet<ClassWellDefinedness> subCwds = getWdClassChecks(sub);
-                if (subCwds.isEmpty()) {
-                    registerContract(
-                        new ClassWellDefinedness(subInv, subTarget, null, null, services));
-                } else {
-                    for (ClassWellDefinedness cwd : subCwds) {
-                        unregisterContract(cwd);
-                        cwd.addInv(subInv.getInv(cwd.getOrigVars().self, services));
-                        registerContract(cwd);
-                    }
-                }
-            }
-        }
-    }
-
 }

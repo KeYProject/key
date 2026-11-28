@@ -13,7 +13,6 @@ import de.uka.ilkd.key.java.ast.abstraction.Constructor;
 import de.uka.ilkd.key.java.ast.reference.TypeReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableList;
@@ -62,10 +61,8 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
     public ConstructorDeclaration(PositionInfo pi, List<Comment> c, ImmutableList<Modifier> map,
             TypeReference o, Comment[] comments, ProgramElementName name,
             ImmutableList<ParameterDeclaration> map1,
-            Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration,
-            List<TextualJMLConstruct> specs) {
-        super(pi, c, map, o, comments, name, map1, exceptions, body, parentIsInterfaceDeclaration,
-            ImmutableList.fromList(specs));
+            Throws exceptions, StatementBlock body, boolean parentIsInterfaceDeclaration) {
+        super(pi, c, map, o, comments, name, map1, exceptions, body, parentIsInterfaceDeclaration);
     }
 
     /**

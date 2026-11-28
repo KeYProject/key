@@ -45,7 +45,7 @@ public class FunctionalLoopContractPOLoader implements ProofObligationLoader {
         } else {
             baseContractName = contractName.substring(0, ind);
         }
-        final Contract contract = initConfig.getServices().getSpecificationRepository()
+        final Contract contract = initConfig.getServices().getContractRegistry()
                 .getContractByName(baseContractName);
         if (contract == null) {
             throw new RuntimeException("Contract not found: " + baseContractName);

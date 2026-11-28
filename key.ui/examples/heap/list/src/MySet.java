@@ -6,7 +6,7 @@ public class MySet {
 
     private List list;
 
-    //@ private represents footprint = this.*, list.footprint;
+    //@ private represents footprint = \locset(this.*, list.footprint);
 
     
     /*@ private invariant list.\inv;

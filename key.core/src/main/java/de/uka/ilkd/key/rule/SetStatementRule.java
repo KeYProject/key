@@ -103,11 +103,10 @@ public final class SetStatementRule implements BuiltInRule {
         final MethodFrame frame = JavaTools.getInnermostMethodFrame(target.javaBlock(), services);
         final JTerm self = MiscTools.getSelfTerm(frame, services);
 
-        var spec = services.getSpecificationRepository().getStatementSpec(setStatement);
+        var spec = setStatement.getSpec();
 
         if (spec == null) {
-            throw new RuleAbortException(
-                "No specification for the set statement found in the specification repository.");
+            throw new RuleAbortException("No specification for the set statement found.");
         }
 
         var targetTerm = spec.getTerm(services, self, SetStatement.INDEX_TARGET);

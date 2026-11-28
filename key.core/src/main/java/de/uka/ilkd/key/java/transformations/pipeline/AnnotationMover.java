@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Jmlish;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
 import com.github.javaparser.ast.body.AnnotationDeclaration;
@@ -69,6 +70,13 @@ public class AnnotationMover extends JavaTransformerAbstract {
                     break;
                 case VariableDeclarationExpr v:
                     annots = v.getAnnotations();
+                    break;
+                // JML bound variables (e.g. the <code>j</code> of
+                // <code>\forall int j; ...</code>) are parsed as a
+                // VariableDeclarator whose parent is a JML node such as
+                // JmlQuantifiedExpr; they carry no Java type annotations to
+                // move, so skip them quietly instead of reporting an error.
+                case Jmlish ignored:
                     break;
                 default:
                     LOGGER.error("unexpected class: {}", parent.getClass());

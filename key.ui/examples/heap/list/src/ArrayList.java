@@ -3,7 +3,7 @@ public class ArrayList implements List {
     private /*@nullable@*/ Object[] array = new Object[10];
     private int size = 0;
 
-    //@ private represents footprint = array, array[*], size;
+    //@ private represents footprint = \locset(array, array[*], size);
     
     /*@ private invariant array != null;
       @ private invariant 0 <= size && size <= array.length;

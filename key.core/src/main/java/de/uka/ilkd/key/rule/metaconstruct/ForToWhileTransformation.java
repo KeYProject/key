@@ -4,21 +4,32 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.Map;
+import java.util.Set;
+
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.ast.PositionInfo;
 import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.ast.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.ast.statement.For;
 import de.uka.ilkd.key.java.ast.statement.Guard;
 import de.uka.ilkd.key.java.ast.statement.IForUpdates;
 import de.uka.ilkd.key.java.ast.statement.ILoopInit;
 import de.uka.ilkd.key.java.ast.statement.While;
+import de.uka.ilkd.key.java.visitor.JavaASTCollector;
+import de.uka.ilkd.key.logic.JTerm;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.util.MiscTools;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This transformation is used to transform a for-loop into a while-loop.
@@ -36,14 +47,58 @@ import org.key_project.util.ExtList;
 
 public class ForToWhileTransformation extends WhileLoopTransformation {
 
+    private final LoopSpecification sourceInvariant;
+    private final Map<String, ProgramVariable> targetVariables;
+    private final ProgramVariable arraySource;
+    private final Set<String> parameterNames;
+    private final String methodName;
+
     public ForToWhileTransformation(ProgramElement root, ProgramElementName outerLabel,
-            ProgramElementName innerLabel, Services services) {
+            ProgramElementName innerLabel, Services services, LoopSpecification sourceInvariant,
+            Map<String, ProgramVariable> targetVariables, ProgramVariable arraySource,
+            Set<String> parameterNames, String methodName) {
         super(root, outerLabel, innerLabel, services);
+        this.sourceInvariant = sourceInvariant;
+        this.targetVariables = targetVariables;
+        this.arraySource = arraySource;
+        this.parameterNames = parameterNames;
+        this.methodName = methodName;
+    }
+
+    private boolean isNotParameter(LocationVariable variable) {
+        return !parameterNames.contains(variable.name().toString().replaceFirst("^_", ""));
     }
 
     /**
      * change the for-loop to a while loop with inits and updates.
      */
+    private static ProgramVariable findArrayVariable(For x) {
+        if (x.getGuardExpression() != null) {
+            var collector = new JavaASTCollector(x.getGuardExpression(), ProgramVariable.class);
+            collector.start();
+            for (var node : collector.getNodes()) {
+                var pv = (ProgramVariable) node;
+                if (pv.name().toString().startsWith("arr")) {
+                    return pv;
+                }
+            }
+        }
+        return null;
+    }
+
+    private ProgramVariable resolve(ProgramVariable source, ProgramVariable arrayVar) {
+        if (source == arraySource
+                || (arraySource != null && source.name().toString()
+                        .equals("_" + arraySource.name()))) {
+            return arrayVar;
+        }
+        ProgramVariable target = targetVariables.get(source.name().toString());
+        if (target == null) {
+            target = targetVariables.get("_" + source.name());
+        }
+        return target;
+    }
+
     public void performActionOnFor(For x) {
         ExtList changeList = stack.peek();
 
@@ -114,10 +169,50 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             }
 
             // copy loop invariant to the created while loop
-            LoopSpecification li = services.getSpecificationRepository().getLoopSpec(x);
+            LoopSpecification li = x.getLoopInvariant();
+            if (li == null) {
+                li = sourceInvariant;
+            }
             if (li != null) {
-                li = li.setLoop((While) outerBlockStatements[initSize]);
-                services.getSpecificationRepository().addLoopInvariant(li);
+                ProgramVariable indexVar = null;
+                var initializers = x.getInitializers();
+                if (initializers != null && !initializers.isEmpty()
+                        && initializers.get(0) instanceof LocalVariableDeclaration lvd
+                        && !lvd.getVariables().isEmpty()) {
+                    indexVar = (ProgramVariable) lvd.getVariables().get(0).getProgramVariable();
+                }
+                if (indexVar != null) {
+                    li = EnhancedForElimination.instantiateIndexValues(li, indexVar,
+                        java.util.Optional.empty(), services);
+                }
+                ProgramVariable arrVar = findArrayVariable(x);
+                li = EnhancedForElimination.remapVariables(li,
+                    p -> resolve(p, arrVar), services);
+                While newLoop = (While) outerBlockStatements[initSize];
+                TermBuilder tb = services.getTermBuilder();
+                var localIns = MiscTools.getLocalIns(newLoop, services).stream()
+                        .filter(this::isNotParameter).collect(ImmutableList.collector());
+                var localOuts = MiscTools.getLocalOuts(newLoop, services).stream()
+                        .filter(this::isNotParameter).collect(ImmutableList.collector());
+                Map<LocationVariable, JTerm> atPres =
+                    new java.util.LinkedHashMap<>(li.getInternalAtPres());
+                if (methodName != null) {
+                    for (var key : atPres.keySet()) {
+                        String name = key.name().toString();
+                        var variable = services.getNamespaces().programVariables()
+                                .lookup(new org.key_project.logic.Name(
+                                    name + "Before_" + methodName));
+                        if (variable instanceof LocationVariable location) {
+                            atPres.put(key, tb.var(location));
+                        }
+                    }
+                }
+                li = li.create(newLoop, li.getInternalInvariants(),
+                    li.getInternalFreeInvariants(), li.getInternalModifiable(),
+                    li.getInternalFreeModifiable(), li.getInternalInfFlowSpec(),
+                    li.getInternalVariant(), li.getInternalSelfTerm(),
+                    tb.var(localIns), tb.var(localOuts), atPres);
+                newLoop.setLoopInvariant(li);
             }
 
             addChild(outerBlock);
