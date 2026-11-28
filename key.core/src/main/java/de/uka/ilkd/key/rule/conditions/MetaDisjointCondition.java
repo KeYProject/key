@@ -84,6 +84,6 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 
     @Override
     public String toString() {
-        return ("\\metaDisjoint " + var1 + ", " + var2);
+        return ("\\metaDisjoint(" + var1 + ", " + var2 + ")");
     }
 }

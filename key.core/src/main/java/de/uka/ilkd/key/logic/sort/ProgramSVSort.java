@@ -44,6 +44,27 @@ public abstract class ProgramSVSort extends SortImpl {
     // schema variable declarations)
     private static final Map<Name, ProgramSVSort> NAME2SORT = new LinkedHashMap<>(60);
 
+    /**
+     * Formats the sort name for a schema-variable declaration. Sorts with a fixed parameter carry
+     * it in their internal name as {@code Base[name=value]}; the declaration syntax expects
+     * {@code Base [name = value]}.
+     */
+    @Override
+    public String declarationString() {
+        String name = name().toString();
+        int open = name.indexOf('[');
+        if (open < 0 || !name.endsWith("]")) {
+            return name;
+        }
+        String parameter = name.substring(open + 1, name.length() - 1);
+        int equals = parameter.indexOf('=');
+        if (equals < 0) {
+            return name;
+        }
+        return name.substring(0, open) + " [" + parameter.substring(0, equals) + " = "
+            + parameter.substring(equals + 1) + "]";
+    }
+
 
     // ----------- Types of Expression Program SVs ----------------------------
 
@@ -966,11 +987,6 @@ public abstract class ProgramSVSort extends SortImpl {
         @Override
         public ProgramSVSort createInstance(String parameter) {
             return new MethodNameSort(new ProgramElementName(parameter));
-        }
-
-        @Override
-        public String declarationString() {
-            return name().toString();
         }
 
     }

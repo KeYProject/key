@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later */
 package de.uka.ilkd.key.rule;
 
+import java.lang.reflect.Field;
 import java.util.*;
 
 import de.uka.ilkd.key.java.Services;
@@ -13,8 +14,6 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.LemmaJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.rule.match.TacletMatcherKit;
-import de.uka.ilkd.key.rule.tacletbuilder.AntecSuccTacletGoalTemplate;
-import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 
 import org.key_project.logic.ChoiceExpr;
 import org.key_project.logic.Name;
@@ -22,6 +21,8 @@ import org.key_project.logic.SyntaxElement;
 import org.key_project.logic.op.QuantifiableVariable;
 import org.key_project.logic.op.sv.SchemaVariable;
 import org.key_project.prover.rules.*;
+import org.key_project.prover.rules.conditions.NewDependingOn;
+import org.key_project.prover.rules.conditions.NotFreeIn;
 import org.key_project.prover.rules.tacletbuilder.TacletGoalTemplate;
 import org.key_project.prover.sequent.PosInOccurrence;
 import org.key_project.prover.sequent.Sequent;
@@ -286,35 +287,104 @@ public abstract class Taclet extends org.key_project.prover.rules.Taclet impleme
     public Set<SchemaVariable> collectSchemaVars() {
 
         Set<SchemaVariable> result = new LinkedHashSet<>();
-        OpCollector oc = new OpCollector();
 
-        // find, assumes
-        for (var sv : this.getAssumesAndFindVariables()) {
+        // Find, assumes and goal templates, including schema variables that occur only
+        // inside Java program blocks (e.g. variables introduced by a varcond and used in a
+        // modality's program).
+        TacletSchemaVariableCollector collector = new TacletSchemaVariableCollector();
+        collector.visit(this, true);
+        for (SchemaVariable sv : collector.vars()) {
             result.add(sv);
         }
 
-        // add, replacewith
-        for (var tgt : this.goalTemplates()) {
-            collectSchemaVarsHelper(tgt.sequent(), oc);
-            if (tgt instanceof AntecSuccTacletGoalTemplate antecSuccTemplate) {
-                collectSchemaVarsHelper(antecSuccTemplate.replaceWith(), oc);
-            } else if (tgt instanceof RewriteTacletGoalTemplate rwTemplate) {
-                rwTemplate.replaceWith().execPostOrder(oc);
+        // Variables that are introduced by the variable conditions themselves.
+        for (var nvc : varsNew) {
+            result.add(nvc.getSchemaVariable());
+        }
+        for (NotFreeIn pair : varsNotFreeIn) {
+            result.add(pair.first());
+            result.add(pair.second());
+        }
+        for (NewDependingOn pair : varsNewDependingOn) {
+            result.add(pair.first());
+            result.add(pair.second());
+        }
+
+        if (trigger != null) {
+            result.add(trigger.triggerVar());
+            ((JTerm) trigger.trigger()).execPostOrder(collector);
+            for (var cond : trigger.avoidConditions()) {
+                ((JTerm) cond).execPostOrder(collector);
+            }
+            for (SchemaVariable sv : collector.vars()) {
+                result.add(sv);
             }
         }
 
-        for (final var op : oc.ops()) {
-            if (op instanceof SchemaVariable sv) {
-                result.add(sv);
-            }
+        // Variable conditions refer to schema variables directly (not through terms), e.g.
+        // \simplifyIfThenElseUpdate(phi, u1, u2, t, result). They have no common accessor for
+        // their schema variables, so inspect their object graphs.
+        for (VariableCondition condition : variableConditions) {
+            collectSchemaVarsFromCondition(condition, result);
         }
 
         return result;
     }
 
-    private void collectSchemaVarsHelper(Sequent s, OpCollector oc) {
-        for (SequentFormula cf : s) {
-            cf.formula().execPostOrder(oc);
+    private static void collectSchemaVarsFromCondition(Object object,
+            Set<SchemaVariable> result) {
+        collectSchemaVarsFromCondition(object, result, Collections.newSetFromMap(
+            new IdentityHashMap<>()));
+    }
+
+    private static void collectSchemaVarsFromCondition(Object object, Set<SchemaVariable> result,
+            Set<Object> visited) {
+        if (object == null || visited.contains(object)) {
+            return;
+        }
+        if (object instanceof SchemaVariable sv) {
+            result.add(sv);
+            return;
+        }
+        if (object instanceof String || object instanceof Number || object instanceof Boolean
+                || object instanceof Enum<?> || object instanceof org.key_project.logic.sort.Sort) {
+            return;
+        }
+        if (object instanceof Map<?, ?> map) {
+            for (Object value : map.values()) {
+                collectSchemaVarsFromCondition(value, result, visited);
+            }
+            return;
+        }
+        if (object instanceof Iterable<?> iterable) {
+            for (Object element : iterable) {
+                collectSchemaVarsFromCondition(element, result, visited);
+            }
+            return;
+        }
+        Class<?> clazz = object.getClass();
+        if (clazz.isArray()) {
+            for (int i = 0; i < java.lang.reflect.Array.getLength(object); i++) {
+                collectSchemaVarsFromCondition(java.lang.reflect.Array.get(object, i), result,
+                    visited);
+            }
+            return;
+        }
+        if (!clazz.getName().startsWith("de.uka.ilkd.key.rule")) {
+            return;
+        }
+        visited.add(object);
+        for (Field field : clazz.getDeclaredFields()) {
+            if (java.lang.reflect.Modifier.isStatic(field.getModifiers())
+                    || field.getType().isPrimitive()) {
+                continue;
+            }
+            try {
+                field.setAccessible(true);
+                collectSchemaVarsFromCondition(field.get(object), result, visited);
+            } catch (ReflectiveOperationException | RuntimeException e) {
+                // best effort: an inaccessible field cannot contribute to the declarations
+            }
         }
     }
 

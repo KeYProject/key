@@ -193,7 +193,10 @@ public final class MayExpandMethodCondition extends VariableConditionAdapter {
 
     @Override
     public String toString() {
-        return (negation ? "\\not " : "") + NAME + "(" + receiver + ", " + methname + ", " + args
-            + ")";
+        String prefix = negation ? "\\not " : "";
+        if (receiver == null) {
+            return prefix + NAME + "(" + methname + ", " + args + ")";
+        }
+        return prefix + NAME + "(" + receiver + ", " + methname + ", " + args + ")";
     }
 }

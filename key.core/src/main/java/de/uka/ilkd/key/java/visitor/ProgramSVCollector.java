@@ -73,6 +73,13 @@ public class ProgramSVCollector extends JavaASTWalker {
         } else if (node instanceof ProgramTransformer) {
             result =
                 result.prepend(((ProgramTransformer) node).neededInstantiations(instantiations));
+            // Some meta constructs keep schema variables as arguments that are not part of the
+            // program child tree (e.g. #methodCall's result variable).
+            for (ProgramElement argument : ((ProgramTransformer) node).getArguments()) {
+                if (argument instanceof SchemaVariable sv) {
+                    result = result.prepend(sv);
+                }
+            }
         }
     }
 }

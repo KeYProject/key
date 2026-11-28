@@ -49,8 +49,7 @@ public final class ModalOperatorSV extends JModality.JavaModalityKind
 
     @Override
     public @NonNull String toString() {
-        // TODO: HACKS, remove new-line and re-generate taclets.old.txt
-        return name() + " ((modal operator))";
+        return name().toString();
     }
 
     @Override
